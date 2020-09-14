@@ -1,0 +1,106 @@
+/* ==UserStyle==
+@name           Tabun comments collapse
+@namespace      USO Archive
+@author         Hedgeg
+@description    `Стиль полностью сворачивает содержимое свернутых постов вместе с веткой и скрывает заминусованые (от -5)*последние можно просмотреть при наведении мыши на небольшую область над аватаркой участника.Также переопределяет максимальный размер изображений в комментах (опционально - постах и спойлерах) с возможностью просмотра на максимальную ширину при наведении мыши.и многое другое..`
+@version        2015121.3.53
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+@-moz-document domain("tabun.everypony.ru") {
+
+/** сворачиваем заминусованые комментарии **/
+.comment-bad > .comment-content {height:10px;width:10px;
+/*(опция) смещение заминусованного коммента вправо*/
+ margin-left:calc(99% - 26px) }
+.comment-bad > .comment-content > .text {visibility:hidden}
+.comment-bad > .comment-content:hover {height:auto;width:auto;margin-left:0}
+.comment-bad > .comment-content:hover > .text {visibility:visible}
+
+/** минимизируем свернутые комменты **/
+.folded + .comment-content {min-height:20.8px}
+.folded + .comment-content .text {display:none}
+/*отображаем содержимое при наведении*/
+/*.folded + .comment-content:hover {height:auto}*/
+/*.folded + .comment-content:hover .text {display:block}*/
+
+/***Альтернативные правила сворачивания от zluka***/
+/*сворачиваем заминусованые посты*/
+/*.comment-bad>.comment-content {height:3px !important; width:10px; overflow:hidden; padding:0px 10px}*/
+/*.comment-bad>.comment-content:hover {height:auto !important; width:auto; padding:5px 10px}*/
+
+/*скрываем свернутые посты*/
+/*.folded + .comment-content {display:none}*/
+/*.comment {min-height:24px}*/
+/*--(end zluka)--*/
+
+/** "Спойлеризация изображений" **/
+/*для топиков*/
+/*.topic-content img {max-width:30%;max-height:250px}*/
+/*.topic-content .spoiler img, .topic-content img:hover {max-width:100%;max-height:100%}*/
+/*для комментов*/
+.comment-content img {max-width:30%;max-height:250px}
+.comment-content .spoiler img,  /*исключение для картинок в спойлерах*/
+.comment-content img:hover {max-width:100%;max-height:100%}
+/*(опция) анимация перехода*/
+.comment-content > .text img {transition: all 1s linear 0s}
+
+
+ /** "Ширма" - вспомогательный элемент на ширину секции с привязкой к нику пользователя **/
+/*при необходимости поставить несколько ширм на пользователей следует полностью копировать первую строку*/
+/*и продублировать её с другим ником через запятую (ник должен содержаться в //)*/
+/*пробелы в нике менять на нижнее подчеркивание:"_" - особенность css*/
+.comment-author > [href$="/вписать ник/"]:last-child:before,
+.comment-author > [href$="/вписать ник/"]:last-child:before
+{position:absolute; content:" "; z-index:10;
+ height:100%; width:calc(100% - 10px);
+ background-color:grey; border-radius: 5px
+}
+ /*=правки для работы ширмы*/
+/**Изменение порядка блоков**/
+.comment {display:flex; flex-direction:column-reverse}
+ /*!фикс ссылки с id*/
+.comment > [name] {order:11}
+ /*переопределяем стиль инфо к комментам для работы ширмы*/
+.comment-info {width:calc(100% - 55px); height:calc(100% - 4px); position:absolute; padding:0 65px 0 0}
+ /*переопределяем отступ комментам (чтобы не наезжали, буквально)*/
+.comment-content {margin:19px 0 0 0; z-index:1}
+ /*реверс порядка ссылок к комментарию*/
+.comment-info {display:flex; flex-direction:row-reverse; justify-content:flex-end}
+.comment-author{order:10} /*без этого наша ширма будет накладываться не из крайнего верхнего угла и не все закрывать*/
+ /*перемещаем аватарку за ник (для работы ширмы)*/
+.comment-info .comment-avatar {position:relative; float:right; top: -5px; padding-right:3px}
+ /*корректируем отступ никнейма*/
+.comment-info .comment-author {padding-left:0px!important}
+ /*позиционируем плюсы/минусы*/
+.comment-info .vote {top:0px!important;right:5px!important}
+
+ /*=правки для обеспечения вида*/
+ /*добавляем видимость рейтинга коммента за ширмой*/
+.comment-info .vote {z-index:15}
+ /*корректировка положения стрелочек, чтобы не обрезались*/
+.comment .vote-down {background-position: 0px -1px!important} /*получился обратный эффект: стрелка вверх как бы вырастает снизу, а вниз "обрушивается" сверху*/
+ /*уменьшим отступ между элементами*/
+.comment-info li {margin-right:5px}
+
+ /*убираем смещение плюсика*/
+.comment .folding {top:1px}
+ /*модифицируем высоту ul при сворачивании поста*/
+.comment .folded .comment-info {height:auto}
+.comment {min-height:16px}
+
+/*=выравнивание элементов инфостроки коммента*/
+.comment-info > li {padding:4px 1px 1px}
+/*выравнивание числа добавлений в избранное*/
+.comment-info li .favourite-count {top:-1px}
+
+
+ /*=функциональные стили*/
+ /*выделение ника автора поста в комментах*/
+.comment-topic-author a {text-shadow: 2px 1px 1px #aff} /*если вас конечно не смущает что пользоатели несколько голубеют*/
+ /*пришивание минимальной ширины комментов*/
+.comment {min-width: 400px}
+
+}

@@ -1,0 +1,155 @@
+/* ==UserStyle==
+@name           beta: Baltimore Sun: autohide the menu & sidebar
+@namespace      USO Archive
+@author         hideheader
+@description    `Auto-hide the page header and footer as icons in the upper-left and lower right corners, and autohide the sidebar at the left edge of the screen. Optionally, remove the ads, comments, and/or social media buttons.`
+@version        201326.16.22
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+@-moz-document domain("www.baltimoresun.com") {
+/* latimes.com is (almost) identical */
+  @keyframes breathe {
+    0% {opacity: 1}
+    60%,100% {opacity: .3}
+  }
+  @-webkit-keyframes breathe {
+    0% {opacity: 1}
+    60%,100% {opacity: .3}
+  }
+
+/* - - - - - autohide header - - - - - */
+  #branding {
+    position: fixed; left: 0; top: 0;
+    z-index: 1002; /*else #story-body > .thumbnail is on top*/
+    clip: rect(0, 1600px, 1600px, 0);
+    min-width: 100%;
+    background: white;
+    -webkit-transition: clip .5s linear, background .5s step-start;
+    transition: clip .5s linear, background .5s step-start;
+  }
+  #branding:not(:hover) {
+    clip: rect(0, 16px, 16px, 0);
+    background: left top no-repeat url("http://www.baltimoresun.com/favicon.ico");
+    -webkit-transition-delay: 1s;
+    -webkit-transition-timing-function: linear, step-end;
+    transition-delay: 1s;
+    transition-timing-function: linear, step-end;
+    -webkit-animation: breathe 3s 6s linear alternate infinite;
+    animation: breathe 3s 6s linear alternate infinite;
+  }
+  #branding:not(:hover) > * {
+    visibility: hidden;
+    -webkit-transition: visibility .5s 1s step-end;
+    transition: visibility .5s 1s step-end;
+  }
+
+
+/* - - - - - autohide footer - - - - - */
+  #container {position: static !important}
+  BODY {position: relative}
+  #footer {
+    position: absolute; left: 0; bottom: 0;
+    z-index: 1001;
+    clip: rect(0, 1600px, 1600px, 0);
+    background: /*white*/beige !important;
+    -webkit-transition: clip .5s linear, background .5s step-start;
+    transition: clip .5s linear, background .5s step-start;
+  }
+  #footer:hover {border-top: thin solid black}
+  #footer:not(:hover) {
+    clip: rect(263px, 16px, 279px, 0);
+    clip: rect(-webkit-calc(318px - 16px), 16px, 318px, 0);
+    background: left bottom no-repeat url("http://www.baltimoresun.com/favicon.ico") !important;
+    -webkit-transition-delay: 1s;
+    -webkit-transition-timing-function: linear, step-end;
+    transition-delay: 1s;
+    transition-timing-function: linear, step-end;
+    -webkit-animation: breathe 3s 6s linear alternate infinite;
+    animation: breathe 3s 6s linear alternate infinite;
+  }
+  #footer:not(:hover) > * {
+    visibility: hidden;
+    -webkit-transition: visibility .5s 1s step-end;
+    transition: visibility .5s 1s step-end;
+  }
+
+
+/* - - - - - autohide sidebar - - - - - */
+  #rail {
+    position: fixed !important; left: 0; top: 0;
+    height: 100%; overflow-y: scroll; resize: horizontal;
+    width: -moz-calc(336px + 17px) !important;
+    width: -webkit-calc(336px + 17px) !important;
+    margin: 0 !important;
+    z-index: 1001;
+    border-right: 0 dotted lightblue;
+    -webkit-transition: left .5s linear, background .5s step-start, border-right-width .5s step-start;
+    transition: left .5s linear, background .5s step-start, border-right-width .5s step-start;
+  }
+  #rail:hover {background: white;}
+  #rail:not(:hover) {
+    left: -moz-calc(-336px - 17px) !important;
+    left: -webkit-calc(-336px - 17px) !important;
+    border-right-width: 3mm;
+    -webkit-transition-delay: 1s;
+    -webkit-transition-timing-function: linear, step-end, step-end;
+    transition-delay: 1s;
+    transition-timing-function: linear, step-end, step-end;
+  }
+
+
+/* - - - - - no ads - - - - - */
+  .skyScraper, .leaderboard,
+  .konafilter,
+  [id*="outbrain"], [class*="outbrain"], [id^="odb"],
+  [class^="ad_"],
+  /*.slidingbillboard,*/
+  [id*="AdCode"], [class*="AdCode"],
+  [id^="adx"],
+  .ad,
+  /*[id*="promo"], [class*="promo"],*/
+  [id$="Ad"], [class$="Ad"] {display: none !important}
+
+/* - - - - - no comment - - - - - */
+  [id*="comment"], [class*="comment"],
+  #gallery-subcontent,
+  #message-guidelines {display: none !important}
+
+/* - - - - - no social - - - - - */
+  [class*="share"],
+  /*.shareTop, /* leave .shareBottom with email, print */
+  [id*="share"], [id*="social"],
+  A[href*="plus.google"],
+  [id*="twitter"], [class*="twitter"], [src*="twitter"],
+  [id^="fb-"], [id*="facebook"], [class*="facebook"],
+  IFRAME[src*="facebook"] {display: none !important}
+
+/* - - - - - no nonsense - - - - - */
+  /*#sigshell {padding: 0 !important}*/
+  #sigheadshot /*author pic*/ {display: none !important}
+
+  /* remove background from breadcrumb */
+  #breadcrumb {
+    padding-top: 0 !important;
+    width: auto !important;
+  }
+  #container, /* header bg behind "Ravens Insider" banner */
+  /*#content /* "Ravens Insider" banner, et al. */
+  #container #content-rail-wrapper #content.article.article /* Chrome hack */ {
+    background: none !important;
+  }
+}
+
+@-moz-document url("http://www.baltimoresun.com/") {
+/* don't hide the front page header */
+  #branding {position: static}
+  #branding:not(:hover) {
+    background: transparent;
+    -webkit-animation: none;
+    animation: none;
+  }
+  #branding:not(:hover) > * {visibility: visible}
+}

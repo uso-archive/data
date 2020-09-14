@@ -1,0 +1,207 @@
+/* ==UserStyle==
+@name           Heavenly Tabun
+@namespace      USO Archive
+@author         Hedgeg
+@description    `*скрытие поняш, некоторых ссылок и блоков, "на пони"а также аватарок, скруглений комментариев*сворачивание комментов и боковых блоков*скрытие пустых строк после спойлеров*12 шрифт и меньший межстрочный интервал`
+@version        20161113.16.17
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown youtubeWideMod "Расширять видео в полноэкранном режиме?" {
+		youtubeWideMod+ "Пожалуй*" <<<EOT /*пошире видео в полноэкранном*\/
+.widemode .topic iframe[src*="//www.youtube.com/"]
+{width:100%; height:720px} EOT;
+	youtubeWideMod- "Нет" <<<EOT  EOT;
+
+}
+
+==/UserStyle== */
+
+@-moz-document domain("tabun.everypony.ru") {
+
+
+/*=== Общий вид ===*/
+  
+.text {font-size:12px; /*12 шрифт как основа*/
+       line-height:1.4em} /*слегка меньшие отступы между строками*/
+
+.topic {margin-bottom:22px} /*меньший отступ между постами в ленте*/
+.pagination {margin:-10px 0 10px} /*смещение 12345 прокрутки от (порезанного стилем же) края страницы*/
+
+ /*выравнивание блока с видео ютюба по центру*/
+iframe[src*="youtube.com"] {margin: 0px auto;display:block}
+ /*удаление переносов строк после видео, цитат и спойлеров*/
+iframe + br, blockquote + br, .spoiler + br {display:none!important}
+  
+  
+  /***Стилизация боковых блоков***/
+ /*раскраска ненужных блогов в "прямом эфире"*/
+.stream-blog[href="https://tabun.everypony.ru/blog/fanart/"] {color:black!important}
+ /*ограничение по высоте и анимирование блоков "Прямой эфир" и "Блоги"*/
+.block-type-stream, .block-type-blogs {height:auto; max-height:/*40px*/300px; overflow:hidden; transition: max-height 3s linear 0.5s}
+#sidebar > .block:hover {max-height:1500px; transition: max-height 2s linear 0.2s}
+ /*фикс косячного ограничения высоты блока скриптом
+.js-block-stream-content {height:auto!important}*/
+  
+  
+  
+  /*= Скрытие ненужного и строгость элементов =*/
+ /*выпиливание отступа от заголовка блока*/ .block .block-header {padding-bottom:0px}
+ /*убираем фоновые картинки*/ #sidebar > .block {background-image:none;
+ /*и закругления, рамки блоков*/ border-radius:0px;border:none}
+  
+ /*убираем лишние блоки*/ .block-type-pseudomenu, /*<-малоиспользуемо*/
+.block-type-search, /*поиск не работал*/ .block-type-tags, /*пожертвования, разум табуна*/ .block-type-donations /*список пожертвовавших*/,
+.donate /*на пони*/, .twitter, .rss /*кнопки в правом верхнем*/ {display:none}
+  /*убираем ссылку на удаление блога (для слабаков ☺)*/
+.delete {display:none}
+  
+ /*сглаживание углов и отступы*/ 
+#container, #footer, .topic:only-of-type {border-radius:0px;margin-bottom:0px}
+ .comments, #wrapper {margin-bottom:0px;padding-bottom:0px}
+/*правим отступы и сглаживание рамки комментов*/
+.comment-content {padding:3px 8px;border-radius:0px}
+/*бордеры (рамки) не нужны*/.comment-content {border:none}
+ /*кроме своих комментов*/ .comment-self .comment-content {border: 1px solid #e7ebed}
+ /*аватарки у комментов*/ .comment-avatar {display:none}
+ /*гифки (бегущие пони)*/ #running_ponies {display:none}
+  
+
+  /*= Область комментов =*/
+/** сворачиваем заминусованые комментарии **/
+.comment-bad > .comment-content {height:10px;width:10px;
+/*(опция) смещение заминусованного коммента вправо*/
+ margin-left:97%;margin-left:calc(99% - 22px)}
+.comment-bad .text {visibility:hidden}
+.comment-bad > .comment-content:hover {height:auto;width:auto;margin-left:0}
+.comment-bad > .comment-content:hover > .text {visibility:visible}
+/*скрываем свернутые*/
+.folded + .comment-content {display:none}
+
+/*-правки редактора комментов-*/
+ /*замена шрифта в редакторе комментов для совпадения с конечным*/
+textarea.markItUpEditor {font-family: Arial,sans-serif}
+ /*смещение предпросмотра пишушегося комментария ближе к как-он-будет-на-странице */
+.comments .comment-preview {margin-left:20px}
+ /*фикс окна редактирования*/
+.comment-wrapper .reply {margin-left: 20px}
+
+
+/** "Спойлеризация изображений" **/
+.comment-content img[width] {width:auto} /*new*/
+.comment-content img[height] {height:auto}
+/*анимация перехода*/
+.comment-content > .text img {transition: all 1s linear 0s}
+/*для комментов*/
+.comment-content img {max-width:30%;max-height:250px} /*может давать искажения*/
+.comment-content .spoiler img,  /*исключение для картинок в спойлерах*/
+.comment-content img:hover {max-width:100%;max-height:100%}
+ /*для топиков*/
+/*.topic-content img {max-width:30%;max-height:250px}*/
+/*.topic-content .spoiler img, .topic-content img:hover {max-width:100%;max-height:100%}*/
+
+
+ /** "Ширма" - вспомогательный элемент на ширину секции с привязкой к нику пользователя **/
+/*при необходимости поставить несколько ширм на пользователей следует полностью копировать первую строку*/
+/*и продублировать её с другим ником через запятую (ник должен содержаться в //)*/
+/*пробелы в нике менять на нижнее подчеркивание:"_" - особенность css*/
+.comment-author > [href$="/вписать ник/"]:last-child:before,
+.comment-author > [href$="/вписать ник/"]:last-child:before
+{position:absolute; content:" "; z-index:10;
+ height:100%; width:calc(100% - 10px);
+ background-color:grey; border-radius: 5px
+}
+ /*=правки для работы ширмы*/
+/**Изменение порядка блоков**/
+.comment {display:flex; flex-direction:column-reverse}
+ /*!фикс ссылки с id*/
+.comment > [name] {order:11}
+ /*переопределяем стиль инфо к комментам для работы ширмы*/
+.comment-info {width:calc(100% - 55px); height:calc(100% - 4px); position:absolute; padding:0 65px 0 0}
+ /*переопределяем отступ комментам (чтобы не наезжали, буквально)*/
+.comment-content {margin:19px 0 0 0; z-index:1}
+ /*реверс порядка ссылок к комментарию*/
+.comment-info {display:flex; flex-direction:row-reverse; justify-content:flex-end}
+.comment-author{order:10} /*без этого наша ширма будет накладываться не из крайнего верхнего угла и не все закрывать*/
+ /*перемещаем аватарку за ник (для работы ширмы)*/
+.comment-info .comment-avatar {position:relative; float:right; top: -5px; padding-right:3px}
+ /*корректируем отступ никнейма*/
+.comment-info .comment-author {padding-left:0px!important}
+ /*позиционируем плюсы/минусы*/
+.comment-info .vote {top:0px!important;right:5px!important}
+
+ /*=правки для вида*/
+ /*добавляем видимость рейтинга коммента за ширмой*/
+.comment-info .vote {z-index:15}
+ /*корректировка положения стрелочек, чтобы не обрезались*/
+.comment .vote-down {background-position: 0px -1px!important} /*получился обратный эффект: стрелка вверх как бы вырастает снизу, а вниз "обрушивается" сверху*/
+ /*уменьшим отступ между элементами*/
+.comment-info li {margin-right:3px}
+ /*убираем смещение плюсика*/
+.comment .folding {top:1px}
+ /*корректируем отображение плюсика*/
+.comment .folding.folded {background-position: -12.5px -94px}
+ /*модифицируем высоту ul при сворачивании поста*/
+.comment .folded .comment-info {height:auto}
+.comment {min-height:16px}
+
+/*=выравнивание элементов инфостроки коммента*/
+.comment-info > li {padding:4px 1px 1px}
+/*выравнивание числа добавлений в избранное*/
+.comment-info li .favourite-count {top:-1px}
+
+
+ /*=функциональные правки*/
+ /*выделение ника автора поста в комментах*/
+/*https://bitbucket.org/Orhideous/tabun/issues/94/*/
+.comment-topic-author a {text-shadow: 2px 1px 1px #aff} /*если вас конечно не смущает что пользователи несколько голубеют*/
+ /*пришивание минимальной ширины комментов*/
+.comment {min-width: 400px}
+
+  
+/*3е обновление*/
+/*=заплата для личных страниц*/
+ /* вариант1=убрать всё возможное: свой ник, ?? */
+.comment-list .comment-author {display:none}
+
+/*что-то подправить зрительно*/
+.comment-list .comment-info .vote {
+position:relative!important; top:-2px!important; left:-1px; padding:0 3px 0 0}
+.comment-list .comment, .comment-content {margin-bottom:0px!important}
+.comment-list .comment {padding:0px}
+.comment-list .comment-favourite {height:22px}
+ 
+  
+ /*=избранное=звездочка*/
+.comment-favourite .favourite {font-size:0px;  /*убираем надпись*/
+ /*заменяем на звездочку-картинку*/
+background-image: url("https://cdn.everypony.ru/static/e5710bab1500ffe32df7/img/7423.png"); background-position: 0px -37px;
+width:11px; height:11px}
+ /*другую звездочку при добавлении*/
+.favourite.active {background-position: 0px -66px;
+ /*+опция с превращением всех надписей "В избранном" в звездочку*/
+ font-size:0px; padding:0!important;
+background-image: url("https://cdn.everypony.ru/static/e5710bab1500ffe32df7/img/7423.png");
+width:11px; height:11px}
+ /*выравнивание числа добавлений в избранное и цвет*/
+.comment-info li .favourite-count {top:-1px}
+.favourite-count {color:#09f!important}
+ /*фикс положения звезды в списках статей*/
+.topic .favourite.active,
+/*включая смещение даты на тот же уровень*/ .topic-info-date  {margin:1px 0 0}
+.topic .favourite.active>[id^="fav_topic"]{display:none}
+.topic .favourite.active>.favourite-count{font-size:12px;position:relative;left:9px}
+ /*фикс положения числа плюсов в списке избранного*/
+.comments.comment-list ul.comment-info li.vote {margin: 3px 3px 0px}
+
+
+
+/*прочее*/
+/*скрытие цитирования*/
+#quote {display:none!important}
+/*предупреждение о комментариях*/
+.comments-not-allowed {border:none;background:none}
+/*лайт-спойлер картинки (скрытие прямоугольником)*/
+.spoiler-gray:not(:hover) img {background:grey;/*transition:background 0s*/}
+
+/*[[youtubeWideMod]]*/
+}

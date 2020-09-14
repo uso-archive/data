@@ -1,0 +1,140 @@
+/* ==UserStyle==
+@name           Firefox Addons Manager Trim List Items
+@namespace      USO Archive
+@author         bernstein
+@description    `<ul><li>Trim list item paddings everywhere. (addon title may overlap with update-available-msg/update-now-button. when title longer than ~70% window width)</li><li>Moves list item notification. Hides description when there is a notification.</li></ul><p>Tested on Firefox 13 & 15 on OSX. FF12 on Win7/XP.</p><p><em>Updated for Firefox beta on OSX!</em></p><p>Other styles from user 142430.</p>`
+@version        2012530.3.18
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+@-moz-document url(chrome://mozapps/content/extensions/extensions.xul), url(about:addons)
+{
+    /* trim list items padding */
+    .addon:not([pending="uninstall"]) {
+    	padding: 0px 5px !important;
+    }
+    .icon-container {
+        margin: 2px 7px !important;
+    }
+    .icon-container .icon {
+        max-height: 40px !important;
+    }
+    .name-container > *, .date-updated {
+        margin: 7px 6px -2px !important;
+    }
+    .description-container {
+        margin-top: 6px !important;
+        margin-bottom: 6px !important
+    }
+    .details.button-link {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+    }
+    
+    .update-available, .install-status {
+        margin-top: -25px;
+    }
+    .status-container .addon-control {
+        margin-top: 4px !important;
+        margin-bottom: 1px !important;
+    }
+    .control-container .addon-control {
+        margin-top: 4px !important;
+        margin-bottom: 4px !important;
+    }
+    /* fix update progress */
+    #list-view .install-status {
+        margin-top: -54px !important;
+    }
+    /* fix notification & pending */
+    .addon:not([pending="uninstall"]) :-moz-any(.warning,.error,.pending) {
+        padding-top: 5px;
+        margin-bottom: -5px;
+    }
+    /* fix style in available/recent updates & search */
+    .relnotes-toggle {
+        margin-top: -1px !important;
+        margin-bottom: 4px !important;
+    }
+    #updates-list .include-update {
+        margin-bottom: 1px !important;
+    }
+    #search-list .status-container .addon-control,
+    #updates-list .addon-control.update {
+        margin-bottom: 4px !important;
+    }
+    #updates-list .install-status {
+        margin-top: 2px !important;
+        margin-right: -2px !important;
+    }
+    
+    /* perfect control & update button style */
+    #addon-list .addon.addon-view .button-text {
+        margin-right: 3px !important;
+    }
+    #addon-list .addon.addon-view :-moz-any(.addon-control.preferences,.addon-control.update) .button-text {
+        margin-right: 4px !important;
+    }
+    
+    /* perfect installing style */
+    .addon[status="installing"][notification="warning"] .name-outer-container,
+    .addon[status="installing"][notification="warning"] .install-status-container {
+        max-height: 30px !important;
+    }
+    .addon[status="installing"] .name-outer-container,
+    .addon[status="installing"] .install-status-container {
+        max-height: 36px !important;
+        margin: 12px 0px 16px !important;
+    }
+    
+	/* trim notifications & pending VERSION A */
+	/* REQUIRES : hide category names @ ≤860px, ultrasmall @ ≤710px     */
+	/* and even then will look bad when pending on a long named addon   */
+	/* (>19 chars)at an increasing number of window widths (and <666px) */
+	.addon[notification] .description,
+	.addon[pending]:not([pending="uninstall"]) .description {
+	   display: none !important;
+	}
+	.addon[notification] .details.button-link,
+	.addon[pending]:not([pending="uninstall"]) .details.button-link {
+		margin-left: -8px !important;
+	}
+	.addon[notification] .warning > *,
+	.addon[pending]:not([pending="uninstall"]) .pending > * {
+	   position: absolute;
+	   white-space: nowrap;
+	}
+	.addon[notification] .warning > * {
+	   margin-top: 26px !important;
+	   margin-bottom: -41px !important;
+	}
+	.addon[pending]:not([pending="uninstall"]) .pending > * {
+	   margin-top: 25px !important;
+	   margin-bottom: -43px !important;
+	}
+	.addon[notification] .warning > *:first-child,
+	.addon[pending]:not([pending="uninstall"]) .pending > *:first-child {
+	   margin-left: 60px !important;
+	}
+	.addon:-moz-any([pending="enable"],[pending="disable"],[pending="install"]) .control-container {
+	   visibility: hidden !important;
+	}
+	/* fixes for recent Updates */
+	#categories[last-selected="category-recentUpdates"] + #view-port-container .update-available {
+	   margin-top: -2px !important;
+	}
+	#categories[last-selected="category-recentUpdates"] + #view-port-container .addon:-moz-any([pending="enable"],[pending="disable"],[pending="install"]) .update-available {
+	    margin-top: 23px !important;
+        margin-bottom: -25px !important;
+	}
+	
+	/* hide category labels earlier to mitigate nowrap problem */
+	@media all and (max-width: 860px) { .category-name { display: none !important; } }
+	/* fix when combined with poweruser */
+	@media all and (max-width:  860px) and (min-width: 800px) { #list-view:-moz-any([type="extension"],[type="theme"]) #addon-list::after { left: 63px; } #list-view[type="userstyle"] #addon-list::after { left: 16em; }}
+
+}

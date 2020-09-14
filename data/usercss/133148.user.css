@@ -1,0 +1,692 @@
+/* ==UserStyle==
+@name           Firefox macOS Sierra
+@namespace      USO Archive
+@author         nikk gitanes
+@description    `Safari-like style for Firefox 46+ on Mac OS X<b>Important</b>The theme doesn't display properly with Stylish. Try it using the userChrome.css file instead.`
+@version        2017422.10.29
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+/*
+Firefox macOS Sierra by tsynik
+Based on Firefox OS X El Capitan theme by devegadev from userstyles.org
+
+Set browser.tabs.animate value to false in about:config (avoid blank spaces after closing tabs)
+
+Version 1.8
+-----------
+Adopted layout for Firefox 53+
+Added tabs loading spinner
+Fixed pinned tab close overflow
+Added url / search bar text left alignment on focus
+Added url / search bar macOS-like focus
+Inline base64 encoded images
+Dirty fix for private browsing button (hided for now)
+Disabled info images background and border in url bar
+Base64 images size optimization
+Disabled url-bar on popup windows
+
+*/
+
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+/* Global UI font */
+* {
+	font-family: -apple-system !important;
+}
+
+/* allow small main window sizes */
+#main-window:not([chromehidden~="toolbar"]) {
+	min-width: 200px !important;
+}
+
+/* hide url-bar on popup windows: it overflow with titlebar (Mac OS X native one) */
+#main-window[chromehidden~="toolbar"] #nav-bar {
+	display: none !important;
+}
+
+#titlebar {
+/*	margin-bottom: 0px !important; /* -23px by default */
+}
+
+#titlebar-buttonbox-container {
+	margin-left: 5px !important;
+}
+
+#nav-bar {
+	background: -moz-linear-gradient(rgb(230, 230, 230), rgb(220, 220, 220)) !important;
+	border: 0 !important;
+	border-bottom: 1px solid rgba(0, 0, 0, .2) !important;
+	height: 38px !important; /* total navbar height */
+	margin-top: -16px !important;
+}
+
+#nav-bar:-moz-window-inactive {
+	background: rgb(246, 246, 246) !important;
+	border-bottom: 1px solid rgba(0, 0, 0, .1) !important;
+}
+
+#nav-bar[inFullscreen] {
+	margin-left: -72px !important;
+	margin-top: 0 !important;
+}
+
+#nav-bar-customization-target {
+	margin-left: 72px !important;
+}
+
+#nav-bar-customization-target[inFullscreen] {
+	margin-left: 0 !important;
+}
+
+#back-button {
+	background: -moz-linear-gradient(rgb(255, 255, 255), rgb(242, 242, 242)) !important;
+	border: 0 !important;
+	border-radius: 4px !important;
+	border-right: 1px solid rgba(0, 0, 0, .1) !important;
+	box-shadow: 0 0 1px rgba(0, 0, 0, .33) !important;
+	height: 22px !important;
+	min-height: 22px !important;
+	line-height: 14px !important;
+	max-width: 27px !important;
+	min-width: 27px !important;
+}
+
+#back-button .toolbarbutton-icon {
+	list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAMCAAAAACL/vjMAAAAAnRSTlMAAHaTzTgAAAA3SURBVHgBYwCDBVvB1NzGSxDqIphqOA+hzoKohfXnwGoWNZyA6JlffxyNsaD+KJAEq4WqWbYBABHDFc8qBTSpAAAAAElFTkSuQmCC) !important;
+	-moz-image-region: rect(0px 7px 12px 0px) !important;
+	opacity: 1 !important;
+	width: 7px !important;
+	height: 12px !important;
+}
+
+#forward-button {
+	background: -moz-linear-gradient(rgb(255, 255, 255), rgb(242, 242, 242)) !important;
+	border: 0 !important;
+	border-left: 1px solid rgba(0, 0, 0, .1) !important;
+	border-radius: 4px !important;
+	box-shadow: 0 0 1px rgba(0, 0, 0, .33) !important;
+	height: 22px !important;
+	min-height: 22px !important;
+	margin-left: 5px !important;
+	max-width: 27px !important;
+	min-width: 27px !important;
+}
+
+#forward-button .toolbarbutton-icon {
+	list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAMCAAAAACL/vjMAAAAAnRSTlMAAHaTzTgAAAA2SURBVHgBY9i6gAEMLjXOhTAuwhjnG6CMszDGufqFYPpEwyIQdbx+PhJ1tH4BWA6qZsMyMAUAIrUVz9rCM/EAAAAASUVORK5CYII=) !important;
+	-moz-image-region: rect(0px 7px 12px 0px) !important;
+	margin-left: -2px !important;
+	opacity: 1 !important;
+	width: 7px !important;
+	height: 12px !important;
+}
+
+#back-button:-moz-window-inactive,
+#forward-button:-moz-window-inactive,
+#urlbar:-moz-window-inactive,
+.searchbar-textbox:-moz-window-inactive,
+.toolbarbutton-1[cui-areatype="toolbar"]:not(#new-tab-button):-moz-window-inactive,
+.toolbarbutton-1[cui-areatype="toolbar"]:not(#new-tab-button):hover:-moz-window-inactive,
+#PanelUI-menu-button:-moz-window-inactive,
+#PanelUI-menu-button:hover:-moz-window-inactive {
+	background: rgb(246, 246, 246) !important;
+	border: 1px solid rgba(0, 0, 0, .11) !important;
+	box-shadow: none !important;
+}
+
+#back-button[disabled] .toolbarbutton-icon,
+#forward-button[disabled] .toolbarbutton-icon {
+	opacity: .3 !important;
+}
+
+#back-button:-moz-window-inactive .toolbarbutton-icon,
+#forward-button:-moz-window-inactive .toolbarbutton-icon,
+.toolbarbutton-1[cui-areatype="toolbar"]:not(#new-tab-button):-moz-window-inactive .toolbarbutton-icon,
+.toolbarbutton-1[cui-areatype="toolbar"]:not(#new-tab-button):hover:-moz-window-inactive .toolbarbutton-icon,
+#bookmarks-menu-button:-moz-window-inactive .toolbarbutton-menubutton-dropmarker .dropmarker-icon,
+#bookmarks-menu-button:hover:-moz-window-inactive .toolbarbutton-menubutton-dropmarker .dropmarker-icon,
+#PanelUI-menu-button:-moz-window-inactive .toolbarbutton-icon,
+#PanelUI-menu-button:hover:-moz-window-inactive .toolbarbutton-icon {
+	opacity: .5 !important;
+}
+
+#urlbar {
+	background: -moz-linear-gradient(rgb(255, 255, 255), rgb(242, 242, 242)) !important;
+	border: 0 !important;
+	border-radius: 4px !important;
+	box-shadow: 0 0 1px rgba(0, 0, 0, .33) !important;
+	height: 22px !important;
+	margin: 0 13px 0 17px !important;
+	text-align: center !important;
+}
+
+#urlbar[focused="true"] {
+/*	-moz-outline-radius: 7px !important;
+	outline: rgba(0, 122, 255, .33) solid 4px !important; */
+	box-shadow: 0 0 1px 3px rgba(0, 122, 255, .05) inset,
+	0 0 0 4px rgba(0, 122, 255, .33) !important;
+	background: #fff !important;
+	text-align: left !important;
+}
+
+#urlbar-reload-button:-moz-window-inactive .toolbarbutton-icon,
+#urlbar-stop-button:-moz-window-inactive .toolbarbutton-icon {
+	-moz-image-region: rect(1px 12px 13px 0px) !important;
+	opacity: .5 !important;
+}
+
+#page-proxy-favicon:-moz-window-inactive,
+.searchbar-search-button-container:-moz-window-inactive .searchbar-search-button {
+	opacity: .6 !important;
+}
+
+.searchbar-textbox {
+/*	box-shadow: 0 2px 0 -1px rgba(0, 0, 0, .1) !important; */
+	background: -moz-linear-gradient(rgb(255, 255, 255), rgb(242, 242, 242)) !important;
+	box-shadow: 0 0 1px rgba(0, 0, 0, .33) !important;
+	border: 0 !important;
+	border-radius: 4px !important;
+	height: 22px !important;
+	text-align: center !important;
+}
+
+.searchbar-textbox[focused="true"] {
+/*	-moz-outline-radius: 7px !important;
+	outline: rgba(0, 122, 255, .33) solid 4px !important; */
+	background: #fff !important;
+	box-shadow: 0 0 1px 3px rgba(0, 122, 255, .05) inset,
+	0 0 0 4px rgba(0, 122, 255, .33) !important;
+	text-align: left !important;
+}
+
+.toolbarbutton-1[cui-areatype="toolbar"]:not(#new-tab-button) {
+	background: -moz-linear-gradient(rgb(255, 255, 255), rgb(242, 242, 242)) !important;
+	border: none !important;
+	border-color: rgba(0, 0, 0, .11) !important;
+	margin-left: 4px !important;
+	margin-right: 4px !important;
+	border-radius: 4px !important;
+	box-shadow: 0 0 1px rgba(0, 0, 0, .33) !important;
+	max-height: 22px !important;
+	min-height: 22px !important;
+}
+
+#PanelUI-button,
+.toolbarbutton-1[cui-areatype="toolbar"]:not(#new-tab-button):hover {
+	border: none !important;
+}
+
+#bookmarks-menu-button,
+#bookmarks-menu-button .box-inherit {
+	border: none !important;
+	border-right: 1px solid rgb(226, 225, 226) !important;
+	box-shadow: none !important;
+}
+
+#bookmarks-menu-button .toolbarbutton-menubutton-dropmarker {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	transition: color 0s !important;
+}
+
+#bookmarks-menu-button .toolbarbutton-menubutton-dropmarker:before {
+	background: transparent !important;
+}
+
+#PanelUI-menu-button {
+	background: -moz-linear-gradient(rgb(255, 255, 255), rgb(242, 242, 242)) !important;
+	border: none !important;
+	border-color: rgba(0, 0, 0, .11) !important;
+	border-radius: 4px !important;
+	box-shadow: 0 0 1px rgba(0, 0, 0, .33) !important;
+	margin: 8px 14px 8px -2px !important;
+	max-height: 22px !important;
+	min-height: 22px !important;
+}
+
+#PanelUI-menu-button:hover {
+	border: none !important;
+}
+
+.toolbarbutton-1[cui-areatype="toolbar"]:not(#new-tab-button) .toolbarbutton-icon,
+#bookmarks-menu-button .toolbarbutton-menubutton-dropmarker .dropmarker-icon,
+#PanelUI-menu-button .toolbarbutton-icon,
+#urlbar-reload-button .toolbarbutton-icon,
+#urlbar-stop-button .toolbarbutton-icon {
+	opacity: .8 !important;
+}
+
+#nav-bar .toolbarbutton-menubutton-button-dropmarker,
+#nav-bar .toolbarbutton-1 {
+	transition: background 0s !important;
+}
+
+#nav-bar .toolbarbutton-menubutton-button-dropmarker[open],
+#nav-bar .toolbarbutton-1[open] {
+	background: rgb(108, 107, 108) !important;
+	box-shadow: none !important;
+}
+
+.toolbarbutton-menubutton-button[open] .toolbarbutton-icon,
+.toolbarbutton-1[open] .toolbarbutton-icon,
+.toolbarbutton-1[open] .dropmarker-icon {
+	filter: invert(100%) brightness(200%) grayscale(100%) !important;
+	opacity: 1 !important;
+}
+
+#PersonalToolbar {
+	background: -moz-linear-gradient(rgb(219, 219, 219), rgb(213, 213, 213)) !important;
+	border-bottom: 1px solid rgba(0, 0, 0, .15) !important;
+	-moz-box-ordinal-group: 3 !important;
+	height: 24px !important;
+	margin-top: -1px !important;
+	margin-bottom: 0 !important;
+}
+
+#PersonalToolbar:-moz-window-inactive {
+	background: rgb(246, 246, 246) !important;
+	border-bottom: 1px solid rgba(0, 0, 0, .1) !important;
+}
+
+#PersonalToolbar #personal-bookmarks {
+	margin-top: 3px !important;
+}
+
+#PersonalToolbar #personal-bookmarks .toolbarbutton-icon {
+	display: none !important;
+}
+
+#PersonalToolbar #personal-bookmarks .toolbarbutton-text {
+	color: rgba(0, 0, 0, .7) !important;
+}
+
+#PersonalToolbar #personal-bookmarks .bookmark-item:hover {
+	background: rgb(166, 166, 166) !important;
+	border-radius: 4px !important;
+}
+
+#PersonalToolbar #personal-bookmarks .bookmark-item:hover .toolbarbutton-text {
+	color: rgb(255, 255, 255) !important;
+	text-shadow: none !important;
+}
+
+#PersonalToolbar #personal-bookmarks:-moz-window-inactive .bookmark-item:hover {
+	background: rgb(209, 209, 209) !important;
+}
+
+#PersonalToolbar #personal-bookmarks:-moz-window-inactive .toolbarbutton-text {
+	color: rgb(168, 168, 168) !important;
+}
+
+#PersonalToolbar #personal-bookmarks:-moz-window-inactive .bookmark-item:hover .toolbarbutton-text {
+	color: rgb(84, 84, 84) !important;
+}
+
+#PersonalToolbar #PlacesToolbarItems {
+	-moz-box-pack: center !important;
+}
+
+/* TABS */
+#TabsToolbar {
+	background: -moz-linear-gradient(rgb(203, 202, 203), rgb(196, 195, 196)) !important;
+	box-shadow: none !important;
+	-moz-box-ordinal-group: 4 !important;
+	height: 23px !important; /* total tabs-bar height */
+	margin-left: -69px !important;
+	margin-right: -15px !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	overflow: hidden !important;
+}
+
+#TabsToolbar[inFullscreen] {
+	height: 24px !important; /* total tabsbar height in fullscreen */
+	margin-bottom: -1px !important;
+	margin-left: -1px !important;
+	margin-right: -1px !important;
+	margin-top: 0 !important;
+}
+
+#TabsToolbar:-moz-window-inactive {
+	background: rgb(246, 246, 246) !important;
+}
+
+#TabsToolbar .tabbrowser-tabs {
+	background: -moz-linear-gradient(rgb(219, 219, 219), rgb(213, 213, 213)) !important;
+	margin-top: -1px !important;
+	max-height: 22px !important; /* all elements height */
+	min-height: 22px !important;
+}
+
+#TabsToolbar[inFullscreen] .tabbrowser-tabs {
+	margin-top: -11px !important;
+	padding-top: 1px !important;
+	max-height: 23px !important; /* all elements height in fullscreen */
+	min-height: 23px !important;
+}
+
+#TabsToolbar .tabbrowser-tab {
+	border: none !important;
+	border-left: 1px solid rgba(0, 0, 0, .15) !important;
+	border-right: 1px solid rgba(0, 0, 0, .15) !important;
+	padding: 0 !important;
+}
+
+#TabsToolbar[inFullscreen] .tabbrowser-tab {
+    margin-top: 0 !important; /* vertical tabs alignment */
+}
+
+#TabsToolbar .tabbrowser-tab:not([pinned]) {
+	margin-left: -1px !important;
+	max-width: 100% !important;
+	padding-right: 1px !important;
+}
+
+#TabsToolbar .tabbrowser-tabs[positionpinnedtabs] {
+	border-top: 1px solid rgba(0, 0, 0, .25) !important;
+	margin-left: 1px !important;
+}
+
+#TabsToolbar .tabbrowser-tab[pinned] {
+	border: none !important;
+	border-right: 1px solid rgba(0, 0, 0, .15) !important;
+	padding-left: 5px !important;
+	padding-top: 3px !important;
+	padding-bottom: 3px !important;
+	min-height: 22px !important;
+	width: 36px !important;
+}
+
+#TabsToolbar .tabbrowser-tab[pinned][selected] {
+	border-right: 1px solid rgba(0, 0, 0, .25) !important;
+}
+
+#TabsToolbar .tabbrowser-tab[pinned] .tab-label {
+	display: none !important;
+}
+
+#TabsToolbar .tabbrowser-tab:-moz-window-inactive, #TabsToolbar .tabbrowser-tab[pinned]:-moz-window-inactive {
+	background: rgb(236, 236, 236) !important;
+	border-right: 1px solid rgba(0, 0, 0, .1) !important;
+}
+
+#TabsToolbar .tabbrowser-tab[selected] {
+	background: -moz-linear-gradient(rgb(219, 219, 219), rgb(213, 213, 213)) !important;
+}
+
+#TabsToolbar .tabbrowser-tab[selected]:-moz-window-inactive {
+	background: rgb(246, 246, 246) !important;
+}
+
+#TabsToolbar .tabbrowser-tab:not([selected]) {
+	background: -moz-linear-gradient(rgb(184, 184, 184), rgb(179, 179, 179)) !important;
+}
+
+#TabsToolbar .tabbrowser-tab:not([selected]):-moz-window-inactive {
+	background: rgb(236, 236, 236) !important;
+}
+
+#TabsToolbar .tabs-newtab-button:hover,
+#TabsToolbar .tabbrowser-tab:hover:not([selected]) {
+	background: -moz-linear-gradient(rgb(175, 175, 175), rgb(170, 170, 170)) !important;
+}
+
+#TabsToolbar .tabbrowser-tab:hover:not([selected]):-moz-window-inactive {
+	background: rgb(227, 227, 227) !important;
+}
+
+#TabsToolbar .tabbrowser-tab .tab-label {
+	color: rgba(0, 0, 0, .75) !important;
+}
+
+#TabsToolbar .tabbrowser-tab:-moz-window-inactive .tab-label {
+	color: rgba(0, 0, 0, .5) !important;
+}
+
+#TabsToolbar .tabbrowser-tab[selected] .tab-label {
+	color: rgba(0, 0, 0, .8) !important;
+}
+
+#TabsToolbar .tabbrowser-tab[selected]:-moz-window-inactive .tab-label {
+	color: rgba(0, 0, 0, .6) !important;
+}
+
+#TabsToolbar .tabbrowser-tab:after,
+#TabsToolbar .tabbrowser-tab:before,
+#TabsToolbar .tabbrowser-tab[pinned]:after,
+#TabsToolbar .tabbrowser-tab[pinned]:before {
+	display: none !important;
+}
+
+#TabsToolbar .tab-background {
+	margin: 0 !important;
+	background: transparent !important;
+}
+
+#TabsToolbar .tab-background-start,
+#TabsToolbar .tab-background-end {
+    display: none !important;
+}
+
+#TabsToolbar .tab-background-middle {
+	background: transparent !important;
+	margin: -4px -2px !important;
+}
+
+#TabsToolbar .tabs-newtab-button {
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAAAAACMxyj6AAAAAnRSTlMAAHaTzTgAAAAgSURBVHgBYwCDTAYEyMDBTsdkpyEAVABJTQoSOxkvGwArughdhoSpwQAAAABJRU5ErkJggg==) center no-repeat, -moz-linear-gradient(rgb(184, 184, 184), rgb(179, 179, 179)) !important;
+	border-left: 1px solid rgba(0, 0, 0, .1) !important;
+	margin: 0 !important;
+	margin-left: -1px !important;
+	width: 24px !important;
+}
+
+#TabsToolbar #new-tab-button {
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAAAAACMxyj6AAAAAnRSTlMAAHaTzTgAAAAgSURBVHgBYwCDTAYEyMDBTsdkpyEAVABJTQoSOxkvGwArughdhoSpwQAAAABJRU5ErkJggg==) center no-repeat, -moz-linear-gradient(rgb(184, 184, 184), rgb(179, 179, 179)) !important;
+	border-left: 1px solid rgba(0, 0, 0, .1) !important;
+	border-right: 1px solid rgba(0, 0, 0, .1) !important;
+	margin-left: -1px !important;
+	width: 24px !important;
+	margin-bottom: -1px !important; /* align + with arrows */
+}
+
+#TabsToolbar[inFullscreen] #new-tab-button {
+    margin-top: -8px !important;
+}
+
+#TabsToolbar .tabs-newtab-button .toolbarbutton-icon,
+#TabsToolbar #new-tab-button .toolbarbutton-icon {
+	list-style-image: none !important;
+	width: 24px !important;
+}
+
+#TabsToolbar .tabs-newtab-button:hover,
+#TabsToolbar #new-tab-button:hover {
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAAAAACMxyj6AAAAAnRSTlMAAHaTzTgAAAAgSURBVHgBYwCDTAYEyMDBTsdkpyEAVABJTQoSOxkvGwArughdhoSpwQAAAABJRU5ErkJggg==) center center no-repeat, -moz-linear-gradient(rgb(175, 175, 175), rgb(170, 170, 170)) !important;
+}
+
+#TabsToolbar:-moz-window-inactive .tabs-newtab-button,
+#TabsToolbar:-moz-window-inactive #new-tab-button {
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAAAAACMxyj6AAAAAnRSTlMAAHaTzTgAAAAgSURBVHgBYwCDTAYEyMDBTsdkpyEAVABJTQoSOxkvGwArughdhoSpwQAAAABJRU5ErkJggg==) center center no-repeat, rgb(240, 240, 240) !important;
+	opacity: .7;
+}
+
+#TabsToolbar:-moz-window-inactive .tabs-newtab-button:hover,
+#TabsToolbar:-moz-window-inactive #new-tab-button:hover {
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAAAAACMxyj6AAAAAnRSTlMAAHaTzTgAAAAgSURBVHgBYwCDTAYEyMDBTsdkpyEAVABJTQoSOxkvGwArughdhoSpwQAAAABJRU5ErkJggg==) center center no-repeat, rgb(231, 231, 231) !important;
+	opacity: .7;
+}
+
+#TabsToolbar .tabbrowser-arrowscrollbox {
+	border-right: 1px solid rgba(0, 0, 0, .1) !important;
+	margin-left: 1px !important;
+	margin-bottom: -1px !important;
+}
+
+#TabsToolbar[inFullscreen] .tabbrowser-arrowscrollbox {
+	border-right: 1px solid rgba(0, 0, 0, .1) !important;
+	margin-left: 1px !important;
+	margin-bottom: -1px !important;
+}
+
+#TabsToolbar .arrowscrollbox-scrollbox {
+	padding: 0 !important;
+}
+
+#TabsToolbar .scrollbutton-up {
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAMCAAAAACL/vjMAAAAAnRSTlMAAHaTzTgAAAA3SURBVHgBYwCDBVvB1NzGSxDqIphqOA+hzoKohfXnwGoWNZyA6JlffxyNsaD+KJAEq4WqWbYBABHDFc8qBTSpAAAAAElFTkSuQmCC) 8px center no-repeat !important;
+	border-right: 1px solid rgba(0, 0, 0, .2) !important;
+	margin-top: 0 !important;
+	transition: none !important;
+	width: 16px !important;
+}
+
+#TabsToolbar .scrollbutton-down {
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAMCAAAAACL/vjMAAAAAnRSTlMAAHaTzTgAAAA2SURBVHgBY9i6gAEMLjXOhTAuwhjnG6CMszDGufqFYPpEwyIQdbx+PhJ1tH4BWA6qZsMyMAUAIrUVz9rCM/EAAAAASUVORK5CYII=) 8px center no-repeat !important;
+	margin-top: 0 !important;
+	transition: none !important;
+	width: 16px !important;
+}
+
+#TabsToolbar .scrollbutton-up .toolbarbutton-icon,
+#TabsToolbar .scrollbutton-down .toolbarbutton-icon {
+	list-style-image: none !important;
+	width: 16px !important;
+}
+
+#TabsToolbar .scrollbutton-up[disabled],
+#TabsToolbar .scrollbutton-down[disabled] {
+	opacity: .5 !important;
+}
+
+#TabsToolbar .scrollbutton-up:-moz-window-inactive {
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAMCAAAAACL/vjMAAAAAnRSTlMAAHaTzTgAAAA3SURBVHgBYwCDBVvB1NzGSxDqIphqOA+hzoKohfXnwGoWNZyA6JlffxyNsaD+KJAEq4WqWbYBABHDFc8qBTSpAAAAAElFTkSuQmCC) 8px center no-repeat, rgb(255, 255, 255) !important;
+	opacity: .5 !important;
+}
+
+#TabsToolbar .scrollbutton-down:-moz-window-inactive {
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAMCAAAAACL/vjMAAAAAnRSTlMAAHaTzTgAAAA2SURBVHgBY9i6gAEMLjXOhTAuwhjnG6CMszDGufqFYPpEwyIQdbx+PhJ1tH4BWA6qZsMyMAUAIrUVz9rCM/EAAAAASUVORK5CYII=) 8px center no-repeat, rgb(255, 255, 255) !important;
+	opacity: .5 !important;
+}
+
+#TabsToolbar #alltabs-button {
+	background: -moz-linear-gradient(rgb(184, 184, 184), rgb(179, 179, 179)) !important;
+	border: none !important;
+	border-right: 1px solid rgba(0, 0, 0, .1) !important;
+	margin-bottom: -1px !important;
+}
+
+#TabsToolbar[inFullscreen] #alltabs-button {
+	background: -moz-linear-gradient(rgb(184, 184, 184), rgb(179, 179, 179)) !important;
+	border: none !important;
+	border-right: 1px solid rgba(0, 0, 0, .1) !important;
+	margin-bottom: 0px !important;
+	margin-top: -9px !important;
+}
+
+#TabsToolbar #alltabs-button:hover {
+	background: -moz-linear-gradient(rgb(175, 175, 175), rgb(170, 170, 170)) !important;
+}
+
+#TabsToolbar #alltabs-button:-moz-window-inactive {
+	background: rgb(237, 237, 237) !important;
+}
+
+#TabsToolbar #alltabs-button:-moz-window-inactive .toolbarbutton-icon,
+#TabsToolbar #alltabs-button:hover:-moz-window-inactive .toolbarbutton-icon {
+	opacity: .5 !important;
+}
+
+#TabsToolbar .tabbrowser-tab .tab-icon-image,
+#TabsToolbar .tabbrowser-tab .tab-throbber {
+	-moz-box-ordinal-group: 1 !important;
+	margin-left: -4px !important;
+	margin-right: 2px !important;
+}
+
+#TabsToolbar .tabbrowser-tab .tab-icon-sound {
+	-moz-box-ordinal-group: 2 !important;
+	margin-left: 0 !important;
+}
+
+#TabsToolbar:not([inFullscreen]) .tabbrowser-tab .tab-icon-image,
+#TabsToolbar:not([inFullscreen]) .tabbrowser-tab .tab-throbber {
+	margin-top: 0 !important;
+}
+
+#TabsToolbar .tabbrowser-tab .tab-label {
+	-moz-box-ordinal-group: 3 !important;
+}
+
+#TabsToolbar .tabbrowser-tab:hover .tab-label {
+	margin-left: 0 !important;
+}
+/* FF 53+ left alignment fix */
+#TabsToolbar .tabbrowser-tab .tab-label-container {
+	-moz-box-ordinal-group: 3 !important;
+}
+
+#TabsToolbar .tabbrowser-tab .tab-close-button,
+#TabsToolbar .tabbrowser-tab:hover .tab-icon-image,
+#TabsToolbar .tabbrowser-tab:hover .tab-throbber,
+#TabsToolbar .tabbrowser-tab[pinned]:hover .tab-close-button,
+#TabsToolbar .tabbrowser-tab[pinned] .tab-icon-overlay {
+	display: none !important;
+}
+
+#TabsToolbar[inFullscreen] .tabbrowser-tab[pinned] .tab-stack {
+	margin-top: -1px !important;
+}
+
+#TabsToolbar .tabbrowser-tab:hover .tab-close-button {
+	display: block !important;
+	margin-left: -4px !important;
+	margin-right: 2px !important;
+	margin-top: 0 !important;
+}
+
+#TabsToolbar .tabbrowser-tab:hover .tab-close-button .toolbarbutton-icon {
+	list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAYklEQVR4AWMYfoAZiEVBNGlyCCCan5f/H0hrIyuEsrWhcqKEXKAdGREFNwSHGAOxhuiBMAmaEYbANMIMgmmmtQEIL0SER8K9AGST5n9kDehiBKMxNycPZzRC5UQpT0jDCwAAihwmq8hmF7sAAAAASUVORK5CYII=) !important;
+	-moz-image-region: rect(0px 16px 16px 0px) !important;
+}
+
+#TabsToolbar .tabbrowser-tab:hover .tab-close-button:hover .toolbarbutton-icon {
+	background: rgba(90, 90, 90, .2) !important;
+	border-radius: 2px !important;
+}
+
+#TabsToolbar:-moz-window-inactive .tabbrowser-tab:hover .tab-close-button {
+	opacity: .45 !important;
+}
+
+#TabsToolbar .tabbrowser-tab[pinned]:hover .tab-icon-image {
+	display: block !important;
+}
+
+/* tab loading image */
+.tab-throbber[progress], .tab-throbber[busy]
+{
+	list-style-image: url(data:image/png;base64,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) !important;
+}
+
+/* dirty private browsing indicator button hack (just hide it) */
+#TabsToolbar[inFullscreen] #titlebar-placeholder-on-TabsToolbar-for-fullscreen-button {
+	max-width: 0 !important;
+	margin-right: 1px !important;
+}
+#TabsToolbar #titlebar-placeholder-on-TabsToolbar-for-fullscreen-button {
+	max-width: 8px !important;
+}
+#TabsToolbar .private-browsing-indicator {
+/*	display: none !important; */
+}
+
+/* disable urlbar info icons background */
+#identity-box, #identity-box:-moz-window-inactive, #identity-box:hover, #identity-box:active {
+	background: transparent !important;
+	border: none !important;
+}

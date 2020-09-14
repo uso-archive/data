@@ -1,0 +1,231 @@
+/* ==UserStyle==
+@name           Flexible Mastodon
+@namespace      USO Archive
+@author         mtzk
+@description    `<a href="https://mstdn.kemono-friends.info/">ますとどんちほー</a>のために作ったテーマです．<br>mstdn.jpなどでも使えるはずです．<br><b>基本機能</b><ul><li>ウィンドウサイズに合わせてカラムの大きさが変わるようにします．</li><li>画像を常に広く表示します．</li></ul><b>追加機能</b><ul><li>CW投稿を常に開きます．</li><li>スクロールバーを隠します(Win10のFirefox, GoogleChromeで確認)．</li><li>非収載・非公開投稿を見やすくします．</li><li>ログアウトボタンを隠します．</li><li>トゥートウィンドウを自動的に隠します．</li><li>トゥートウィンドウを右側へ移動します．</li><li>ウィンドウサイズが960px以下の場合コンパクトなデザインになります．</li><li>リアクションを自動的に隠して表示領域を広げます．</li></ul>`
+@version        2019104.21.14
+@license        CC0-1.0
+@preprocessor   uso
+@advanced dropdown CW-style "CWのスタイル" {
+		default "デフォルト*" <<<EOT  EOT;
+	CW "常に表示" <<<EOT /* CWを常に表示 *\/
+.status__content--with-spoiler > .status__content__text {
+	display: block !important;
+	padding: .5rem;
+	background-color: rgba(192, 192, 192, .25);
+	border-left: 5px solid rgba(255, 255, 255, .75);
+	max-height: 50vh;
+	overflow: auto;
+}
+.detailed-status .status__content__text {
+	max-height: none;
+}
+
+/* レイアウト調整 *\/
+.status__content--with-spoiler > p:first-of-type {
+	margin-bottom: 1rem !important;
+}
+.status__content--with-spoiler > div {
+	display: none;
+} EOT;
+
+}
+@advanced dropdown scroll "スクロールバー" {
+		default "デフォルト*" <<<EOT  EOT;
+	scroll-FX "隠す(Firefox)" <<<EOT /* スクロールバーを見えなくする *\/
+/* 十分に隠れない場合は "+ xx px" の所を適宜修正してください *\/
+.scrollable {
+	width: calc(100% + 23px);
+} EOT;
+	scroll-GC "隠す(Webkit・Blink)" <<<EOT /* スクロールバーを見えなくする *\/
+.scrollable::-webkit-scrollbar {
+	display: none;
+} EOT;
+
+}
+@advanced dropdown unlisted "未収載・非公開投稿" {
+		default "デフォルト*" <<<EOT  EOT;
+	unlisted "強調する" <<<EOT /* 未収載・非公開投稿を見やすく (アイデア元： ブルーレヰ (@BlueRayi@mstdn.kemono-friends.info) さん） *\/
+.status-unlisted,
+.status-private {
+	background: linear-gradient( 0deg, rgba(255, 255, 255, .25) 0%, rgba(0, 0, 0, .75) .5rem, rgba(0, 0, 0, 0) 100%);
+} EOT;
+
+}
+@advanced dropdown logout "ログアウトボタン" {
+		default "デフォルト*" <<<EOT  EOT;
+	logout "隠す" <<<EOT /* ログアウトボタンを隠す(誤爆対策) *\/
+.drawer__tab[aria-label="ログアウト"],
+[href="/auth/sign_out"] {
+	display: none;
+} EOT;
+
+}
+@advanced dropdown hide-reaction "リアクションを自動的に隠す" {
+		default "デフォルト*" <<<EOT  EOT;
+	hide "隠す" <<<EOT .status__action-bar {
+	position: absolute;
+	bottom: 0;
+	right: 0px;
+	padding: 5px;
+	opacity: 0;
+	background-color: rgba(0, 0, 0, .5);
+	box-shadow: 0px 0px 10px 0px rgba(255, 255, 255, .5);
+	transition: all .25s ease .25s;
+}
+.status:hover .status__action-bar {
+	opacity: 1;
+} EOT;
+
+}
+@advanced dropdown drawer "トゥートウィンドウをマウスオーバー時に表示" {
+		default "デフォルト*" <<<EOT  EOT;
+	drawer "マウスオーバー時に表示" <<<EOT 	.drawer {
+		flex-grow: 0;
+		opacity: 0;
+		transition: opacity .15s linear .1s;
+	}
+	.columns-area:hover > .drawer{
+		flex-grow: 1;
+		opacity: 1;
+	} EOT;
+
+}
+@advanced dropdown drawer-right "トゥートウィンドウを右側に配置" {
+		default "デフォルト(左側)*" <<<EOT  EOT;
+	drawer-right "右側表示" <<<EOT 	.drawer:first-of-type {
+		order: 999;
+	} EOT;
+
+}
+@advanced dropdown compact "コンパクト表示(ウィンドウサイズ960px以下の時)" {
+		default "OFF*" <<<EOT  EOT;
+	compact "ON" <<<EOT @media (min-width: 631px) and (max-width: 960px) {
+	.status__content, .status__relative-time, .display-name__html, .display-name__account, .column-link {
+		font-size: small;
+	}
+	.status__avatar,
+	.account__avatar {
+		width: 32px !important;
+		height: 32px !important;
+		background-size: 32px 32px !important;
+	}
+	.account__avatar-overlay {
+		display: none;
+	}
+	.notification__message {
+		position: relative;
+		left: -16px;
+	}
+	.muted > .status__content {
+		position: relative;
+		left: -16px;
+		width: calc(100% + 16px)
+	}
+	/* レイアウト調整 *\/
+	.status {
+		padding-left: 48px;
+	}
+	.notification__message {
+		margin-left: 48px;
+	}
+} EOT;
+
+}
+
+==/UserStyle== */
+
+@-moz-document url-prefix("https://mstdn.kemono-friends.info/") {
+
+/*[[CW-style]]*/
+
+/*[[scroll]]*/
+
+/*[[unlisted]]*/
+
+/*[[logout]]*/
+
+/*[[hide-reaction]]*/
+
+/* 画像を幅一杯表示 */
+.media-gallery {
+	height: auto !important;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-wrap: wrap;
+}
+@media (min-width: 961px) {
+	:not(.detailed-status) > .media-gallery {
+		width: calc(100% + 64px);
+		margin-top: 16px;
+		position: relative;
+		left: -64px;
+	}
+}
+.media-gallery__item {
+	flex-grow: 1;
+	position: static;
+	border: 1px solid rgba(128, 128, 128, .5);
+}
+.media-gallery__item-thumbnail img {
+	max-height: calc(100vh / 3);
+	object-fit: contain;
+}
+.media-gallery__item-gifv-thumbnail {
+	object-fit: contain;
+}
+.media-gallery__gifv {
+	height: 110px;
+}
+.detailed-status .media-gallery__gifv {
+	height: auto;
+}
+
+/* 通知欄の表示を簡略化 */
+.notification .display-name,
+.notification .status__action-bar,
+.notification .status__relative-time {
+	display: none;
+}
+.notification__favourite-icon-wrapper + span {
+	font-size: small;
+}
+.notification .status__content p {
+	color: rgba(255, 255, 255, .75);
+}
+
+/* userIDを常に表示する */
+.display-name__html {
+	display: block;
+	float: left;
+	margin-right: .5rem;
+}
+.display-name__account {
+	display: block;
+	float: left;
+}
+/* clearfix */
+.display-name:after {
+	content: "";
+	clear: both;
+	display: block;
+}
+
+/* カラム幅を変更 */
+@media (min-width: 631px) {
+	.column {
+		flex-grow: 1;
+		width: 0;
+	}
+	.drawer,
+	.column:last-of-type {
+		flex-grow: 1;
+		width: 0;
+		max-width: 300px;
+	}
+/*[[drawer]]*/
+/*[[drawer-right]]*/
+}
+/*[[compact]]*/
+}

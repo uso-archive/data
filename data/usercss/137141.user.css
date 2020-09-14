@@ -1,0 +1,258 @@
+/* ==UserStyle==
+@name           the-darkening
+@namespace      USO Archive
+@author         Trevor Joynson (trevorj)
+@description    `Global black style that doesn't suck. All syntax highlighting is kept while being dead simple.To make iframes nicely dark as well, this style is meant to be used with Stylus, and you must go into it's options and enable "Expose iframes via HTML[stylus-iframe]".`
+@version        2019712.20.11
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+/* *{?:?} */
+@namespace url(http://www.w3.org/1999/xhtml);
+
+/*
+ * The Darkening
+ * Global black style that doesn't suck. All syntax highlighting is kept while being dead simple.
+ *
+ * To make iframes nicely dark as well, this style is meant to be used with Stylus, and you must
+ *   go into it's options and enable "Expose iframes via HTML[stylus-iframe]".
+ *
+ * @github: https://github.com/akatrevorjay/the-darkening
+ *
+ * --
+ *
+ * Note: Stylish developers have denied PRs to add per-user exclusion support.
+ *
+ * Yes, seriously.
+ *
+ * Until a better fork exists or they stop smoking crack, here's an example exclusion regexp if you wish to do so:
+ *   (ht|f)tps?://(?!([^/]*?\.)?(plus.google|mail.google.com|maps.google|google.com/maps|google.hu/maps|inbox.google)).*
+ *
+ * Here's mine:
+ *
+ *   (ht|f)tps?://(?!([^/]*?\.)?(localhost|duckduckgo\.com|facebook\.com|messenger\.com|mozilla\.org|ebay\.com|(grafana)\.(services|local)\.disqus\.net|wikipedia\.org|astralapp\.com|spotify\.com|tidal\.com|github\.com|reddit\.com|youtube\.com|(mail|inbox|drive)\.google\.com|google\.com/maps|massdrop\.com)).*
+ *
+ */
+
+/* Sylish actually requires this: */
+/* i really want this to be global */
+
+html {
+    /* ugh */
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Stylus (fork of Shylus) has an option to set the `stylus-iframe` attribute on iframes.
+ * This is used to *not* re-filter them. */
+html:not([stylus-iframe]) body
+{
+    filter:
+        hue-rotate(180deg)
+        invert(1)
+        /*
+        opacity(0.9)
+        brightness(80%)
+        contrast(90%)
+        */
+        !important;
+
+    /* Some sites actually do set this!? fuck it, this is what we have come to. */
+    background: black !important;
+    background-color: black !important;
+}
+
+
+/*
+ * Background adaptation
+ */
+
+/* Re-reverse background images */
+/* eBay for instance has a background image on body that is not happy about this. Avoid body bgs. */
+body [style*="background-image"]
+{
+    backdrop-filter:
+        invert(1)
+        hue-rotate(180deg)
+        !important;
+}
+
+/* Chrome new tab for instance sets body seperately, fyi */
+body
+/* W3Schools has a weird bright div on top */
+, div.top
+/* Sphinx docs nav bar is too bright */
+, nav.wy-nav-side
+{
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #000 !important;
+}
+
+
+/*
+ * Exclusions (via another inverse lol)
+ */
+
+/* Youtube player background */
+#theater-background,
+
+/* cVim giant black overlay */
+iframe#cVim-command-frame,
+
+/* CodeMirror dark themes (don't want to make them light!)
+ * Also it really bugs me that this exists. It shouldn't have to. */
+div.CodeMirror.cm-s-3024-night,
+div.CodeMirror.cm-s-ambiance,
+div.CodeMirror.cm-s-base16-dark,
+div.CodeMirror.cm-s-blackboard,
+div.CodeMirror.cm-s-cobalt,
+div.CodeMirror.cm-s-colorforth,
+div.CodeMirror.cm-s-erlang-dark,
+div.CodeMirror.cm-s-lesser-dark,
+div.CodeMirror.cm-s-liquibyte,
+div.CodeMirror.cm-s-mbo,
+div.CodeMirror.cm-s-midnight,
+div.CodeMirror.cm-s-monokai,
+div.CodeMirror.cm-s-night,
+div.CodeMirror.cm-s-paraiso-dark,
+div.CodeMirror.cm-s-pastel-on-dark,
+div.CodeMirror.cm-s-rubyblue,
+div.CodeMirror.cm-s-the-matrix,
+div.CodeMirror.cm-s-tomorrow-night-bright,
+div.CodeMirror.cm-s-tomorrow-night-eighties,
+div.CodeMirror.cm-s-twilight,
+div.CodeMirror.cm-s-vibrant-ink,
+div.CodeMirror.cm-s-xq-dark,
+div.CodeMirror.cm-s-zenburn,
+
+/* Facebook photos */
+.uiMediaThumbImg,
+
+/* Google avatar */
+/*a [title^="Google Account: "],*/
+.gbii, .gbip
+
+{
+    filter:
+        invert(1)
+        hue-rotate(180deg)
+        !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* We cannot set a bg here at all.. */
+/* userstyles.org preview is actually a div for reasons I guess. */
+div#preview_image_div
+/* Slack (non-expanded) images. They wrap an `img` inside of a `figure` with a `background-image`,
+ * Which is certainly something that I'd love to hear the story on. */
+, figure[style*="background-image"]
+/* Slack profile icons */
+, a[style*="background-image"]
+/* Amazon image gallery view uses divs with background images */
+/* BREAKs confluence */
+/* , div[style*="background-image"] */
+{
+    filter:
+        invert(1)
+        hue-rotate(180deg)
+        !important;
+}
+
+/* Youtube fullscreen shouldn't be reversed. It lives in it's own, very special space.
+ */
+div[aria-label="YouTube Video Player in Fullscreen"] video,
+div.vjs-fullscreen video
+{
+    filter: none !important;
+}
+
+/* Images and interactive things that we also want to darken slightly except on hover.
+ */
+
+/* Image */
+img,
+svg,
+canvas,
+
+/* Video */
+video,
+
+/* Flash */
+embed[flashvars],
+embed,
+*[type*="application/x-shockwave-flash"],
+*[type*="application/x-silverlight"]
+
+{
+    filter:
+        invert(1)
+        hue-rotate(180deg)
+        /* This is what's different for images. We darken them by lightening them thanks to invert. */
+        brightness(120%)
+        !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Hovers for the above. Brightness goes back to normal here.
+ */
+
+/* Image */
+img:hover,
+svg:hover,
+canvas,
+
+/* Video */
+video:hover,
+
+/* Flash */
+embed[flashvars]:hover,
+embed,
+*[type*="application/x-shockwave-flash"]:hover,
+*[type*="application/x-silverlight"]
+
+{
+    filter:
+        invert(1)
+        hue-rotate(180deg)
+        brightness(100%)
+        !important;
+}
+
+/* Enforce a decent code font
+ */
+div.CodeMirror,
+pre,
+code,
+tt,
+kbd:not(.badmono),
+pre,
+samp,
+.blob-code,
+.file-data pre,
+.line-data,
+#gist-form .file .input textarea,
+.blob-code-inner
+{
+    font-family:
+        "Fura Code Nerd Font",
+        "PragmataPro Nerd Font",
+        "Input Mono",
+        "Monoid",
+        "Monoid Halftight",
+        "Monoisome",
+        "Fura Code",
+        "Fira Code",
+        Consolas,
+        "Liberation Mono",
+        Menlo,
+        Courier,
+        monospace
+        !important;
+}

@@ -1,0 +1,684 @@
+/* ==UserStyle==
+@name           FV Battling
+@namespace      USO Archive
+@author         msjanny
+@description    `Provides a few quality-of-life improvements for the battling system on <a href="http://www.furvilla.com/">FurVilla</a>:<br><ul><li>Condenses the page (less scrolling).  <li>Opens the opponent's stats automatically.  <li>Moves up the candycorn button; allows you to continue battling without exiting the modal.  <li>Use your consumables at the end of the battle even when the modal is open.  <li>Numbers the first page of the tourney leaderboard.  <li>Moves the "Begin scrapping" button on blacksmith pages; allows you to continue scrapping without exiting the modal.</ul>Under Customize Settings, you can number all pages of the leaderboard, disable the sliding animation, and move the end-of-battle stats up (ideal for shorter screens).<br>Please direct any comments, questions, concerns, issues, feedback, etc. <a href="http://www.furvilla.com/forums/thread/62734">here.</a>`
+@version        2020719.20.36
+@license        CC0-1.0
+@preprocessor   uso
+@advanced dropdown counter "Number the leaderboard" {
+		first "First page only*" <<<EOT @-moz-document url("http://www.furvilla.com/tourney"), url("http://www.furvilla.com/tourney?page=1") {
+/*sets up the counter*\/
+.registration-well + .widget tbody,
+.fur-idol-big + .widget tbody {
+    counter-reset: row-num;
+}
+
+/*increments the counter each row*\/
+.registration-well + .widget tbody tr,
+.fur-idol-big + .widget tbody tr {
+    counter-increment: row-num;
+}
+
+/*displays the counter*\/
+.registration-well + .widget tbody td:first-child::before,
+.fur-idol-big + .widget tbody td:first-child::before {
+    content: counter(row-num) ".";
+    width: 30px;
+    display: inline-block;
+}
+
+/*alignment*\/
+.registration-well + .widget tbody td:first-child,
+.fur-idol-big + .widget tbody td:first-child{
+    margin-left: -109px;
+}
+
+/*alignment*\/
+.registration-well + .widget th:first-child,
+.fur-idol-big + .widget th:first-child{
+    padding-left: 38px;
+}
+} EOT;
+	all "All pages" <<<EOT @-moz-document url-prefix("http://www.furvilla.com/tourney") {
+/*sets up the counter*\/
+.registration-well + .widget tbody,
+.fur-idol-big + .widget tbody {
+    counter-reset: row-num;
+}
+
+/*increments the counter each row*\/
+.registration-well + .widget tbody tr,
+.fur-idol-big + .widget tbody tr {
+    counter-increment: row-num;
+}
+
+/*displays the counter*\/
+.registration-well + .widget tbody td:first-child::before,
+.fur-idol-big + .widget tbody td:first-child::before {
+    content: counter(row-num) ".";
+    width: 30px;
+    display: inline-block;
+}
+
+/*alignment*\/
+.registration-well + .widget tbody td:first-child,
+.fur-idol-big + .widget tbody td:first-child{
+    margin-left: -109px;
+}
+
+/*alignment*\/
+.registration-well + .widget th:first-child,
+.fur-idol-big + .widget th:first-child{
+    padding-left: 38px;
+}
+} EOT;
+
+}
+@advanced dropdown switch "Continue/cancel button placement (scrapping)" {
+		keep "Default positions*" <<<EOT  EOT;
+	move "Switch positions" <<<EOT .inventory-block-confirm-button {
+    float: right;
+}
+
+.inventory-block-selected-cancel {
+    float: left !important;
+} EOT;
+
+}
+@advanced dropdown fleepass "Flee/pass button size" {
+		default "Default*" <<<EOT  EOT;
+	large "Larger" <<<EOT .pass-span, .flee-span {
+    padding: 0 50px;
+    line-height: 50px;
+    height: 50px;
+    display: inline-block;
+} EOT;
+
+}
+
+==/UserStyle== */
+
+@-moz-document url-prefix("http://www.furvilla.com/career/warrior/battle") {
+/* ==========================================================================
+   Header
+   ========================================================================== */
+/* shrinks the header */
+header {
+    height: 78px;
+}
+
+/* shrinks the header (moving top part of navigation to proper position) */
+header nav {
+    top: 0;
+    border-radius: 0;
+}
+
+/* moves the search bar to where the logo used to be */
+header .search-form {
+    top: 6px;
+    left: 6px;
+}
+/* hiding unnecessary content - alerts, logo, header, ads, shopkeeper*/
+/* (logo and breadcrumbs removed because both link to Town Hall - which already has a link) */
+.margin-10px, #logo, .modal-content .logo, .stat-panel .text-center:first-child, .battle-complete > br, .equipment-wrap > br, .left-column > br, .right-column .widget-header, .battle-end-stats .registration-well > .row:nth-child(5), .battle-end-stats .registration-well > .row:nth-child(7) {
+    display: none;
+}
+
+/* ==========================================================================
+   Notifications
+   ========================================================================== */
+/*shrinks notifications widget*/
+.notifications-widget {
+    height: 32px;
+    width: 116px;
+    overflow: hidden;
+    position: absolute;
+    left: -74px;
+    top: 54px;
+    -ms-transform: rotate(270deg);
+    -webkit-transform: rotate(270deg);
+    transform: rotate(270deg);
+    z-index: 10;
+}
+
+/*expands notifications widget on mouseover*/
+.notifications-widget:hover {
+    height: auto;
+    width: auto;
+    left: -32px;
+    top: 0;
+    z-index: 95;
+    -ms-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+    padding: 10px 10px 0 42px;
+    overflow: visible;
+}
+
+/*keeps notifications header still on mouseover*/
+.notifications-widget:hover .widget-header {
+    -ms-transform: rotate(270deg);
+    -webkit-transform: rotate(270deg);
+    transform: rotate(270deg);
+    position: absolute;
+    z-index: 10;
+    left: -42px;
+    top: 54px;
+    border: 0;
+}
+
+/*keeps notifications header visible on smaller screens*/
+@media screen and (max-width: 1054px) {
+    .notifications-widget {
+        transform: none;
+        top: -32px;
+        left: 400px;
+    }
+
+    .notifications-widget:hover .widget-header {
+        transform: none;
+        left: 432px;
+        top: -32px;
+    }
+}
+
+/* ==========================================================================
+   Right column
+   ========================================================================== */
+/* full width */
+.content .right-column {
+    width: 950px;
+    margin-top: 50px;
+}
+
+/* horizontal adjustments */
+.right-column .widget, .widget .text-center {
+    float: left;
+    margin: 0;
+}
+
+/* horizontal adjustments */
+.widget:first-child .text-center {
+    float: none;
+}
+
+/* horizontal adjustments */
+.widget .text-center div:last-child {
+    display: block !important;
+    width: 50px;
+    height: 50px;
+    margin: 0 7px 7px;
+}
+
+/* hides excess text from first widget */
+.widget h4, .widget:first-child p {
+    font-size: 0;
+}
+.widget h4 a, .widget:first-child p a, .widget:first-child p strong, .widget:first-child p b {
+    font-size: 14px;
+}
+
+/* shrink user avatar */
+.widget img {
+    height: 64px;
+    max-height: 100%;
+    margin-bottom: 5px;
+}
+
+/* shrink villager and career images */
+.widget .villager-avatar {
+    width: 50px;
+    height: 50px;
+    margin: 7px;
+}
+
+/* currency images */
+.widget:first-child p:nth-child(3) img {
+    display: block;
+    margin: -24px 0 0;
+    height: auto;
+}
+/* spacing */
+.right-column .widget:first-child {
+    margin: 0 45px;
+}
+/* horizontal adjustments */
+.widget .forum-posts li {
+    float: left;
+    width: 190px;
+    padding: 20px;
+    background: none !important;
+    font-size: 12px !important;
+    border-bottom: none;
+    text-align: right;
+}
+
+/* fairy buffs */
+.widget .forum-posts {
+    position: absolute;
+    left: -412px;
+    background: #fff;
+}
+
+/* fairy buffs */
+.recent-posts .forum-posts {
+    position: relative;
+    left: 0;
+}
+
+/* fairy buffs */
+.recent-posts .forum-posts li {
+    text-align: center;
+}
+
+/* horizontal adjustments  for unemployed villagers */
+.widget .text-center .villager-avatar:only-child {
+    margin-top: 7px;
+}
+
+/* aesthetic adjustments */
+.right-column .widget-content {
+    background: none;
+}
+
+/* ==========================================================================
+   Battling adjustments
+   ========================================================================== */
+/*moves the monster's stats to the right + minor aesthetic changes*/
+.enemy-panel .stat-panel {
+    display: block !important;
+    border: none;
+    width: 215px;
+    position: absolute;
+    top: 0;
+    right: -234px;
+    margin: 0;
+    cursor: pointer !important;
+    z-index: 89;
+    overflow: auto;
+    height: 465px;
+}
+
+/*shrinks the monster's description*/
+.stat-panel .text-center {
+    font-size: 12px;
+    line-height: 1.5em;
+    height: 72px;
+    overflow: auto;
+}
+
+/*shrinks margins*/
+.stat-panel hr {
+    margin: 6px 0;
+}
+
+/*turns the stats into a single column*/
+.stat-panel > .row > .col-sm-6 {
+    width: 100%;
+}
+
+/* moves progress bars under monster's stats */
+.battle-end-stats .registration-well > .row:nth-child(2),
+.battle-end-stats .registration-well > .row:nth-child(3),
+.battle-end-stats .registration-well > .row:nth-child(4) {
+    margin: 0 !important;
+    position: absolute;
+    top: 505px;
+    right: 20px;
+    width: 215px;
+}
+
+/* moves progress bars under monster's stats */
+.battle-end-stats .registration-well > .row:nth-child(3) {
+    top: 529px;
+}
+
+/* moves progress bars under monster's stats */
+.battle-end-stats .registration-well > .row:nth-child(4) {
+    top: 553px;
+}
+
+/*condenses things down to five abilities per row*/
+.equipment-slot {
+    margin: 0 11px 20px 0;
+    border: 0;
+    width: 130px;
+    height: 180px;
+    vertical-align: top;
+    padding: 6px;
+    position: relative;
+}
+
+
+
+/*spacing equipment slots*/
+.equipment-wrap {
+    overflow: hidden;
+}
+
+
+/*spacing equipment slots*/
+.equipment-wrap .row {
+    padding: 0;
+    margin: 0;
+}
+
+/*spacing equipment slots*/
+.equipment-slot:last-child {
+    margin-right: 0;
+}
+
+/*move charge counter + readability */
+.equipment-slot .label-info {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    color: #3b4e51;
+    font-size: 16px;
+    height: 24px;
+    line-height: 20px;
+    border: 1px solid #37317e;
+    padding: 0 6px;
+}
+
+/*condenses loot*/
+.battle-loots {
+    margin: 15px 0 0;
+    padding: 0;
+}
+
+/*condenses loot*/
+.battle-loot {
+    height: auto;
+}
+
+/*consumables*/
+.battle-end-stats .row.text-center {
+    position: absolute;
+    top: 649px;
+    right: 20px;
+    width: 215px;
+    margin: 0;
+    font-size: 0;
+}
+
+/*consumables*/
+.battle-end-stats .row.text-center img {
+    max-width: 70px;
+}
+
+/* back to warrior button */
+.battle-complete > p .btn {
+    position: absolute;
+    right: 20px;
+    width: 215px;
+    top: 597px;
+}
+
+/* continue battling - sizing */
+.battle-complete > p > .btn[href*="generate"] {
+    position: absolute;
+    top: 377px;
+    width: 716px;
+    left: 20px;
+    height: 86px;
+    line-height: 86px;
+}
+
+/* continue battling from open modal */
+.modal-open .battle-complete > p > .btn[href*="generate"] {
+    position: fixed;
+    z-index: 1051;
+    width: 200px;
+    top: 0;
+    right: calc(50% - 500px);
+    height: 100%;
+    line-height: 100vh;
+    margin: 0;
+    left: initial;
+}
+
+/* readability adjustments */
+.whitetext h4, .effects {
+    text-shadow: 2px -2px #000, 2px -1px #000, 2px 0 #000, 2px 1px #000, 2px 2px #000, 1px -2px #000, 1px -1px #000, 1px 0 #000, 1px 1px #000, 1px 2px #000, 0 -2px #000, 0 -1px #000, 0 0 #000, 0 1px #000, 0 2px #000, -1px -2px #000, -1px -1px #000, -1px 0 #000, -1px 1px #000, -1px 2px #000, -2px -2px #000, -2px -1px #000, -2px 0 #000, -2px 1px #000, -2px 2px #000;
+}
+
+/*aesthetic changes*/
+.enemy-panel .stat-panel,
+.equipment-slot,
+.pass-span,
+.flee-span,
+.equipment-slot:hover,
+.pass-span:hover,
+.flee-span:hover,
+.battle-log {
+    background: rgba(255,255,255, .5);
+}
+
+/*aesthetic changes*/
+.top-panel-wrap, .top-panel-wrap-pvp {
+    height: 335px;
+    background-position: bottom;
+    margin-bottom: 20px;
+}
+
+/* aesthetic changes */
+.battleground-wrap {
+    bottom: initial;
+}
+
+/* pvp village crest */
+.stat-panel-toggle > .text-center > div:first-child {
+    top: 165px;
+    font-size: 0;
+}
+.stat-panel-toggle p {
+    position: relative;
+    z-index: 1;
+}
+
+/*fv does weird things when screens get small*/
+/*they pretend it makes things "responsive"*/
+/*it doesn't*/
+.col-sm-6 {
+    width: 50%;
+    float: left;
+}
+
+/*button spacing*/
+.battle-complete > p {
+    height: 96px;
+}
+
+
+/* ==========================================================================
+   Modal consumables
+   ========================================================================== */
+/* modal spacing */
+.modal {
+    padding: 0 !important;
+}
+
+/* consumables */
+.modal-open .battle-end-stats .row.text-center a {
+    position: fixed;
+    z-index: 2050;
+    top: 100px;
+    height: 50px;
+    width: 50px;
+    background: none;
+    left: calc(50% - 300px);
+}
+
+/* image resizing */
+.modal-open .battle-end-stats .row.text-center a img {
+    display: block;
+    width: 100%;
+}
+
+/* candycorn */
+.modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/1894"] {
+    left: calc(50% - 197px);
+}
+
+/* elixir */
+.modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/2183"] {
+    left: calc(50% - 146px);
+}
+
+/* mini hp potion */
+.modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/575"] {
+    left: calc(50% - 249px);
+}
+
+/* wax lips */
+.modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/3843"] {
+    left: calc(50% - 95px);
+}
+
+/* dew */
+.modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/4275"] {
+    left: calc(50% - 44px);
+}
+
+/*positions buttons on smaller screens*/
+@media screen and (max-width: 900px) {
+    .modal-open .battle-complete > p > .btn[href*="generate"] {
+        top: 30px;
+        height: 170px;
+        line-height: 170px;
+        right: 0;
+        left: 0;
+        width: 253px;
+        margin: 0 auto;
+    }
+
+    /* candycorn */
+    .modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/1894"] {
+        left: calc(50% - 198px);
+    }
+
+    /* elixir */
+    .modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/2183"] {
+        left: calc(50% + 134px);
+    }
+
+    /* wax lips */
+    .modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/3843"] {
+        left: calc(50% + 185px);
+    }
+
+    /* dew */
+    .modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/4275"] {
+        left: calc(50% + 237px);
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .modal-header .modal-title {
+        max-width: 253px;
+        margin: 0 auto;
+    }
+
+    /* hp potion */
+    .modal-open .battle-end-stats .row.text-center a {
+        left: calc(50% - 213px);
+        top: 200px;
+    }
+
+    /* mini hp potion */
+    .modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/575"] {
+        position: fixed;
+        left: calc(50% - 213px);
+        top: 149px;
+    }
+
+    /* candycorn */
+    .modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/1894"] {
+        left: calc(50% - 213px);
+        top: 98px;
+    }
+
+    /* elixir */
+    .modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/2183"] {
+        left: calc(50% + 164px);
+        top: 100px;
+    }
+
+    /* wax lips */
+    .modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/3843"] {
+        left: calc(50% + 164px);
+        top: 150px;
+    }
+
+    /* dew */
+    .modal-open .battle-end-stats .row.text-center a[data-url^="/use/warrior-hp-charge/4275"] {
+        left: calc(50% + 164px);
+    }
+}
+
+/*spacing fix for button placement*/
+.enemy-panel, .warrior-panel {
+    margin-bottom: 20px;
+}
+
+/*disable sliding animation*/
+.equipment-loader {
+    margin-left: 1000px !important;
+}
+.equipment-slots {
+    margin-left: 0 !important;
+}
+
+/*[[collapse]]*/
+/*[[fleepass]]*/
+}
+
+/*[[counter]]*/
+
+/*just delete everything below this if you don't like what I've done to scrapping*/
+@-moz-document url-prefix("http://www.furvilla.com/career/blacksmith/") {
+/* reduce flickering when scrapping quickly */
+.modal-content {
+    min-height: 540px;
+}
+
+/*let's you continue scrapping without closing the modal*/
+.modal-open .btn[data-url*="scrap/"] {
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    right: calc(50% - 443px);
+    height: 100%;
+    line-height: 100vh;
+}
+
+/*let's you continue scrapping without closing the modal*/
+.widget-content {
+    z-index: initial;
+}
+
+/*[[switch]]*/
+
+/*positions button on smaller screens*/
+@media screen and (max-width: 900px) {
+    .modal-open .btn[data-url*="scrap/"] {
+        top: 30px;
+        height: 170px;
+        line-height: 170px;
+        right: 0;
+        left: 0;
+        width: 500px;
+        margin: 0 auto;
+    }
+}
+
+/*positions button on even smaller screens*/
+@media screen and (max-width: 500px) {
+    .modal-open .btn[data-url*="scrap/"] {
+        width: 100%;
+    }
+}
+}

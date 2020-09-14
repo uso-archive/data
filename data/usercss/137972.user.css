@@ -1,0 +1,317 @@
+/* ==UserStyle==
+@name           ITProTV - karaoke view
+@namespace      USO Archive
+@author         codestaila
+@description    `Shows episodes on ITProTV with a larger video area, and the rolling transcript just beneath it. Also removes distracting elements while watching.This is very helpful when you want to watch, read along, plus have a termial or other tool open all at the same time on a single screen.This is in BETA, use with caution.`
+@version        2017124.20.38
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+@-moz-document domain(itpro.tv) {
+/*----------------------------------------------
+ITProTV karaoke view, a user style by marcel@codeministry.ch
+------------------------------------------------
+Description:
+Shows episodes on ITProTV with a larger video area, and the rolling transcript just beneath it. Also removes distracting elements while watching.
+
+This is very helpful when you want to watch, read along, plus have a termial or other tool open all at the same time on a single screen.
+
+This is in BETA, use with caution.
+------------------------------------------------
+Details:
+This is a simple, hacked together modification of the default CSS of ITProTV's course library watching page. 
+It optimizes the viewing experience when reading along the transcript, by moving the transscript very close to the video and removing distracting parts in other areas of the page. The Episode-menu is hidden in a fly-out menu.
+
+Notes: The modification are grouped among visual elements to keep them somewhat easier recognisable and modifiyable. 
+
+Feel free to change anyting as you like.
+--------------------------------------------/*
+
+
+/*----------------------------------------------
+  Header modifications
+  --------------------------------------------/*
+/* Dont use the sticky nav bar while watching episodes. 
+   Frees up the space instead. */
+
+#navTop {
+    position: relative;
+    /* Show at medium z-index */
+    
+    z-index: 100;
+}
+/* Remove the distracting banner */
+
+#content > banner {
+    display: none;
+}
+/* Show the content as large as possible */
+
+#content {
+    margin-top: -32px;
+    /* take over the area from the hidden footer. */
+    
+    margin-bottom: 10px;
+}
+/* Make room for the Sidebar menu handle */
+
+@media (min-width: 0px) {
+    #navTop > div.container > div.navbar-header > a.navbar-brand {
+        margin-left: 60px;
+    }
+}
+@media (min-width: 768px) {
+    #navTop > div.container > div.navbar-header > a.navbar-brand {
+        margin-left: 40px;
+    }
+}
+/*----------------------------------------------
+  Episode topics (#courseSideContainer) space 
+  usage improvements
+  --------------------------------------------/*    
+  
+/* improve space usage in episode topics */
+
+div#courseSideContainer {
+    background-color: hsla(0, 0%, 98%, 1);
+    border: 1px solid #bbb;
+    /* Use max windown height */
+    
+    max-height: 95%;
+    /*verflow-y: scroll;*/
+}
+/* Introduce a vertical scrollbar, because the
+    menu can grow larger than the window height */
+
+#top-id {
+    max-height: calc(100% - 90px);
+    /* On small widths just use a scroll bar on the top-ids */
+    
+    overflow-y: auto;
+}
+@media (min-width: 768px) {
+    /* For larger width, override !important original stuff. */
+    
+    #top-id {
+        overflow-y: auto!important;
+        max-height: calc(100% - 50px);
+    }
+}
+/* Shrink menu entries */
+/* improve space usage in the course menu */
+/* Does not work, most likely because of javascript running  
+div#courseSideContainer#top-id.navbar-collapse {
+
+    padding-left: 0px;
+    padding-right: 0px;
+}*/
+
+li.courseEpisode.list-unstyled {
+    margin-bottom: 0px;
+}
+/* Never collapse the course menu */
+/* Does not work, most likely because of javascript running 
+    div#courseSideContainer#top-id.collapse.navbar-collapse.course-menu-collapse {
+        display: block !important;
+        height: auto !important;
+        padding-bottom: 0;
+        overflow: visible !important;       
+        
+    }*/
+/*----------------------------------------------
+  Episode topics (#courseSideContainer) flyout 
+  modifications
+  --------------------------------------------/*        
+    
+        /* Add an area with a drag handle icon that 
+    allows to pull the fly-out menu. */
+/* //TODO To improve responsiveness, this could 
+    be adapted for @media widths dynamicaly */
+
+div#courseSideContainer::after {
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 8 8">  <path  fill="darkgrey" stroke="grey" stroke-width="0.1" stroke-linejoin="round" d="M2.5 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z" id="chevron-right"></path></svg>');
+    position: absolute;
+    top: 0;
+    right: -70px;
+    height: 58px;
+    background-color: hsla(0, 0%, 98%, 1);
+    border: 1px solid darkgrey;
+    border-left: 2px solid hsla(0, 0%, 98%, 1);
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    padding-left: 15px;
+    padding-right: 5px;
+    padding-top: 5px;
+    /* Use some shadow to distinguish the element from the page */
+    
+    -webkit-box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.29);
+    -moz-box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.29);
+    box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.29);
+    /* Above the page */
+    
+    z-index: 101;
+}
+/* Modify the Episode topics to glue them to the top left windows edge */
+
+div#courseSideContainer {
+    /* glue it to the left part of the whole windows 
+        all the time for easy access */
+    
+    position: fixed;
+    top: 0;
+    overflow: visible;
+    height: 100%;
+    /* Keep the menu over the video */
+    
+    z-index: 101;
+    /* Always have the Episode Topics nav float left, even at small sizes */
+    
+    float: left;
+    /* Use some shadow to distinguish the element from the page */
+    
+    -webkit-box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.29);
+    -moz-box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.29);
+    box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.29);
+}
+/* Defining the Episode topics nav menu and fly out widths, 
+    adapted to media width */
+
+
+    div#courseSideContainer {
+        /* Move additional pixels left to move the shadow                                 out of the screen area too */
+        
+        left: calc(-50% - 10px);
+        width: 50%;
+        transition: 0.075s ease-in-out;
+    }
+
+@media (min-width: 768px) {
+    div#courseSideContainer {
+        /* Move additional pixels left to move the shadow                                out of the screen area too */
+        
+        left: calc(-33.33333333% - 10px);
+        width: 33.33333333%;
+        transition: 0.075s ease-in-out;
+    }
+}
+@media (min-width: 1200px) {
+    div#courseSideContainer {
+        /* Move additional pixels left to move the shadow                                 out of the screen area too */
+        
+        left: calc(-25% - 10px);
+        width: 25%;
+        transition: 0.075s ease-in-out;
+    }
+}
+/* fly in on hover (icluding hover on the handle icon) */
+
+div#courseSideContainer:hover {
+    left: 0;
+    transition: 0.075s ease-in-out;
+}
+
+/*----------------------------------------------
+  content, coursePage & Episode area modifications
+  --------------------------------------------/*   
+
+/* Take non-sticky header & footer into consideration */
+
+#content {
+    margin-top: -15px;
+    margin-bottom: 10px;
+}
+/* Shrink Course & Episode separator space */
+
+#coursePage > hr {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+/* Shrink vertical space on titles */
+
+#episode-main h2#selected-episode,
+#coursePage h1 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+/* Show the episode at full size */
+
+#episode-div {
+    width: 100%;
+    /* Show at medium z-index of sorts */
+    
+    z-index: 100;
+}
+/* Remove well around video */
+
+#episode-main div.well.white-well {
+    padding: 0;
+}
+/* Expand course to (almost) full width */
+
+#coursePage {
+    padding-left: 5px;
+    padding-right: 15px;
+    /* right is a bit larger because of scrollbar */
+}
+#episode-div {
+    padding-right: 5px;
+}
+/*----------------------------------------------
+    "Below video" area modifications
+  --------------------------------------------/*   
+
+/* Hide the episode navigation inside the episode div. You can use the Topics Navigation if you need to navigate between episodes. */
+
+#episode-div #episode-main > div.row.episodes-nav {
+    display: none;
+}
+/* Hide the existing ratings, you probably don't 
+want to rate while watching anyway. */
+/* Speaker rating */
+
+#episode-main span.rating {
+    display: none;
+}
+/* Course and Episode rating */
+
+div.rating {
+    display: none;
+}
+/* Hide the transcript nav tabs, you will see the transcript anyway. */
+/* As anonUser */
+
+#episode-main > div > div > h3 {
+    display: none;
+}
+/* When not logged in */
+
+#episode-main div ul.nav.nav-tabs {
+    display: none;
+}
+/* Optimize the transcript text area */
+
+#episode-main div.transcript div.text {
+    /*make it wide*/
+    
+    padding: 0px 0px;
+}
+/* Optimize the height of the transcript */
+
+#episode-main div.transcript div.text p {
+    /* limit it's size to half the screen height. More text is just overwhelming, plus you want to watch the video too, don't you? */
+    
+    max-height: 50%;
+    height: 300px;
+}
+/*----------------------------------------------
+  Footer area modifications
+  --------------------------------------------/*    
+
+/* Dont use any footer, who wants to watch the footer all the time? */
+
+body > footer {
+    display: none;
+}
+}

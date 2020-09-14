@@ -1,0 +1,1423 @@
+/* ==UserStyle==
+@name           Userstyles.org - Simple dark [by Splark]
+@namespace      USO Archive
+@author         Splark
+@description    `Dark. Customizable background. Now with more bokeh. Some buttons easier to click. Transparency pops up on hover. [beta]`
+@version        20131218.9.50
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown bg-option "background?" {
+	bokeh snow "bokeh snow*" <<<EOT http://i.imgur.com/mqQ74Sr.jpg EOT;
+	fireflies "fireflies" <<<EOT http://i.imgur.com/PFJQtHd.jpg EOT;
+	[texture] dark paper "[texture] dark paper" <<<EOT http://i.imgur.com/S48Fs.jpg EOT;
+	blank, dark "blank, dark" <<<EOT http://i.imgur.com/roj7crR.png EOT;
+
+	bg-option-custom-dropdown "Custom" <<<EOT /*[[bg-option-custom]]*\/ EOT;
+}
+@advanced text bg-option-custom "background? (Custom)" "https://example.com/image.png"
+@advanced dropdown bgfit-option "background fit?" {
+		cover (for images) "cover (for images)*" <<<EOT     /* Option 1: Cover *\/
+      html {
+        background-size: cover!important;
+        background-repeat: no-repeat!important;
+      } EOT;
+	tile (for textures/b "tile (for textures/blank)" <<<EOT     /* Option 2: Tile *\/
+      html {
+        background-repeat: repeat!important;
+      } EOT;
+
+}
+@advanced dropdown ads-option "ads?" {
+		remove ads "remove ads*" <<<EOT     /* Option 4: remove ads *\/
+      [id$="-ad"],
+      .ad
+        {display: none!important;} EOT;
+	unchanged "unchanged" <<<EOT     /* Option 1: unchanged ads *\/
+      /* no code *\/ EOT;
+	hover-activate ads "hover-activate ads" <<<EOT     /* Option 2: activatable ads *\/
+      #post-install-ad > * {
+        visibility: hidden!important;
+      }
+      #post-install-ad:hover > * {
+        visibility: visible!important;
+      }
+      #post-install-ad:before {
+        visibility: visible!important;
+        content: "Hover for Advertisement:"!important;
+        color: black!important;
+      }
+
+      #post-install-ad,
+      #left-sidebar .ad,
+      #main-article #below-install-ad {
+        transition: 0.4s 0.35s!important;
+      }
+      #post-install-ad:hover > * {
+        transition: 0.4s 0.1s!important;
+      }
+    
+      #left-sidebar .ad,
+      #main-article #below-install-ad {
+        opacity: 0.07!important;
+      }
+    
+      #post-install-ad > *,
+      #main-article #below-install-ad {
+        max-height: 25px!important;
+      }  
+      #post-install-ad:hover > *,
+      #left-sidebar .ad:hover,
+      #main-article #below-install-ad:hover {
+        opacity: 1.0!important;
+        max-height: 1000px!important; /* max-height: none  works, but won't transition *\/
+      } EOT;
+
+}
+@advanced dropdown forum-grphics-option "disable forum graphics (emoticons, avatars)?" {
+		yes "yes*" <<<EOT     /**\/
+    .ProfilePhotoMedium,
+    .EmotifyDropdown
+      {display: none!important;}
+    .Comment .Meta {
+      right: 696px!important; /* 8px bump *\/
+    }
+    a.EditDiscussion {
+      right: -687px!important; /* 8px bump *\/
+    }
+    /**\/
+
+    .Emoticon {
+      background-image: none!important;
+      opacity: 1.0!important;
+      width: auto!important; /* override of native, 18px *\/
+    }
+    .Emoticon span {
+      display: inherit!important;
+    }
+    img[src*="emoticon"][src*=".gif"] /* for external links to emoticons from other sites *\/
+      {display:none!important;}
+      
+    /* old, generalized version * /
+    .Comment .Message img[src$=".gif"] {
+      opacity: 0.15!important;
+      visibility: hidden!important;
+    }
+    .Comment .Message img[src$=".gif"]:after {
+      visibility: visible!important;
+      opacity: 1.0!important;
+      content: "[emotion]"!important; /* not working * /
+    }
+    /**\/ EOT;
+	no "no" <<<EOT     /* no: forum-grphics-option *\/ EOT;
+
+}
+
+==/UserStyle== */
+
+/* AGENT_SHEET */
+/* Splark — 2013 http://userstyles.org/styles/88888 */
+@namespace url(http://www.w3.org/1999/xhtml);
+@-moz-document domain("userstyles.org"), domain("forum.userstyles.org"), domain("doubleclick.net") {
+
+/* Blanket override
+**************************************/
+
+  body *
+  {
+    color: rgba(72%,72%,72%,1.0)!important;
+    background-color: transparent!important;
+    border-color: rgba(100%,100%,100%,0.07)!important;
+  }
+
+/* Cleanup
+**************************************/
+
+  a[href*="/styles/delete/"],
+  .Comment .Meta span:last-of-type .FlagContent, /* flag comment */
+  #social,
+  #discussions-area > h3,
+  a[href*="vanillaforums.org"],
+  .Profile .User h1 /* redundant profile name */
+    {display:none!important;}
+    
+  /* removing "Author:" text */
+  .ShowDiscussionAuthor {
+    visibility: hidden!important;
+    /*position: relative!important;*/
+    font-size: 0px!important;
+  }
+  .ShowDiscussionAuthor a {
+    visibility: visible!important;
+    /*position: absolute!important;
+    left: 0px!important;*/
+    font-size: 11px!important;
+  }
+
+/* Background
+**************************************/
+
+  /* Transparency */
+  body,
+  /*#main-header,*/
+  #Head .Menu,
+  /*#left-sidebar,*/
+  #left-sidebar nav,
+  #left-sidebar #related,
+  #Frame,
+  #content-wrapper,
+  #main-article,
+  #Foot,
+  #Foot *,
+  footer,
+  #Content .Comment .CommentForm
+    {background-color: transparent!important;}
+  input#search-terms,
+  select,
+  .ToggleFlyout,
+  .OptionsMenu,
+  .MenuTitle
+    {background-image: none!important;}
+
+  /* Level 0: html */
+  html,
+  #overlay, /* from lightbox */
+  #main-header,
+  #left-sidebar,
+  #Content /* forums */
+  {
+    background-color: rgba(6%,6%,6%,1.0)!important;
+  }
+
+  /* Level 0.5: main */
+  #main-article {
+    background-color: rgba(13%,13%,13%,1.0)!important;
+    /* edge blurring * /
+      box-shadow: 0px 0px 2px 2px rgba(13%,13%,13%,1.0)!important;
+    /**/
+  }
+
+  /* Level 1 */
+  iframe#add-review,
+  #Frame #Head, /* things inside iframe only associate up to the html inside there, and not the iframe node itself(?) */
+  .Tabs.HeadingTabs,
+  .GuestBox,
+  .BoxCategories,
+  .Box,
+  #Bookmarks,
+  #MessageForm,
+  .Conversation [id*="Message"].Mine,
+  .Tabs.DiscussionsTabs,
+  #Frame #Form_Discussion,
+  #outerImageContainer, /* from lightbox */
+  #imageDataContainer, /* from lightbox */
+  zerp
+  {
+    background-color: rgba(16%,16%,16%,1.0)!important;
+  }
+
+  /* Level 1.2 */
+  .Item.Comment.Alt, /* every other comment */
+  #Popup .Body
+  {
+    background-color: rgba(19%,19%,19%,1.0)!important;  
+  }
+
+  /* Level 2 */
+  input#search-terms,
+  select,
+  .Item.Comment,
+  .MessageForm.CommentForm,
+  .BoxCategories > ul.PanelInfo.PanelCategories,
+  .BoxCategories > ul.PanelInfo.PanelCategories > li,
+  blockquote,
+  #show-code #view-code,
+  .Conversation [id*="Message"]:not(.Mine),
+  .FileHover,
+  #Frame #Form_Discussion input#Form_Name.InputBox.BigInput,
+  #Frame #Form_Discussion input#Form_Name.InputBox.BigInput *,
+  #Frame #Form_Discussion textarea#Form_Body.TextBox,
+  #Frame #Form_Discussion textarea#Form_Body.TextBox *,
+  .Flyout.MenuItems,
+  .ToggleFlyout,
+  .OptionsMenu,
+  .MenuTitle,
+  zerp
+  {
+    background-color: rgba(24%,24%,24%,1.0)!important; /* old: 26% */
+  }
+
+  /* Level 3 */
+  textarea,
+  textarea *,
+  .TextBoxWrapper,
+  .TextBoxWrapper *,
+  input[type="text"],
+  input[type="text"] *,
+  a.TabLink,
+  #Head input#Form_Search *
+  {
+    background-color: rgba(30%,30%,30%,1.0)!important; /* old: 36% */
+  }
+
+  .Comment code,
+  .Comment pre,
+  .Message code,
+  .Message pre {
+    background-color: rgba(255,255,255,0.03)!important;
+  }
+
+  /* ghetto input background color */
+  input#search-terms,
+  select {
+    opacity: 0.7!important;
+  }
+
+  .Item.New .Discussion strong {
+    /*background-color: rgba(100%,100%,100%,0.07)!important;*/
+  }
+
+  /* Gradients
+  **************************************/
+
+    /*#Head {
+      background-image: -moz-linear-gradient(top, rgb(14%,14%,14%) 0%, rgb(20%,20%,20%) 100%)!important;
+      background-image: linear-gradient(top, rgb(14%,14%,14%) 0%, rgb(20%,20%,20%) 100%)!important;
+      background-image: -webkit-linear-gradient(top, rgb(14%,14%,14%) 0%, rgb(20%,20%,20%) 100%)!important;
+      background-image: -o-linear-gradient(top, rgb(14%,14%,14%) 0%, rgb(20%,20%,20%) 100%)!important;
+    }*/
+
+    .Discussions > .Item,
+    .Profile > .Activities > .ConversationMessage {
+      background-image: -moz-linear-gradient(top, rgb(10%,10%,10%) 0%, rgb(6%,6%,6%) 100%)!important;
+      background-image: linear-gradient(top, rgb(10%,10%,10%) 0%, rgb(6%,6%,6%) 100%)!important;
+      background-image: -webkit-linear-gradient(top, rgb(10%,10%,10%) 0%, rgb(6%,6%,6%) 100%)!important;
+      background-image: -o-linear-gradient(top, rgb(10%,10%,10%) 0%, rgb(6%,6%,6%) 100%)!important;
+    }
+    .Discussions > .Item:hover,
+    .Profile > .Activities > .ConversationMessage:hover {
+      background-image: -moz-linear-gradient(top, rgb(20%,20%,20%) 0%, rgb(6%,6%,6%) 100%)!important;
+      background-image: linear-gradient(top, rgb(20%,20%,20%) 0%, rgb(6%,6%,6%) 100%)!important;
+      background-image: -webkit-linear-gradient(top, rgb(20%,20%,20%) 0%, rgb(6%,6%,6%) 100%)!important;
+      background-image: -o-linear-gradient(top, rgb(20%,20%,20%) 0%, rgb(6%,6%,6%) 100%)!important;
+    }
+    .Profile > .Activities > .BookmarkComment {
+      background-image: -moz-linear-gradient(top, rgb(7%,7%,16%) 0%, rgb(6%,6%,6%) 100%)!important;
+      background-image: linear-gradient(top, rgb(7%,7%,16%) 0%, rgb(6%,6%,6%) 100%)!important;
+      background-image: -webkit-linear-gradient(top, rgb(7%,7%,16%) 0%, rgb(6%,6%,6%) 100%)!important;
+      background-image: -o-linear-gradient(top, rgb(7%,7%,16%) 0%, rgb(6%,6%,6%) 100%)!important;
+    }
+    .Profile > .Activities > .BookmarkComment:hover {
+      background-image: -moz-linear-gradient(top, rgb(14%,14%,32%) 0%, rgb(6%,6%,6%) 100%)!important;
+      background-image: linear-gradient(top, rgb(14%,14%,32%) 0%, rgb(6%,6%,6%) 100%)!important;
+      background-image: -webkit-linear-gradient(top, rgb(14%,14%,32%) 0%, rgb(6%,6%,6%) 100%)!important;
+      background-image: -o-linear-gradient(top, rgb(14%,14%,32%) 0%, rgb(6%,6%,6%) 100%)!important;
+    }
+
+  /* Box-shadows
+  **************************************/
+
+    #Content,
+    #main-article {
+      box-shadow: 0px 0px 42px 0px rgba(100%,100%,100%,0.42)!important; /* alt: rgba(6%,6%,6%,1.0) */
+      -webkit-box-shadow: 0px 0px 63px 0px rgba(100%,100%,100%,0.42)!important; /* alt: rgba(6%,6%,6%,1.0) */
+    }
+
+    .Item.Comment {
+      /* vignetting */
+      box-shadow: inset 0px 0px 20px 20px rgba(6%,6%,6%,0.2)!important;
+      -webkit-box-shadow: inset 0px 0px 30px 30px rgba(6%,6%,6%,0.2)!important;
+    }
+
+/* Border
+**************************************/
+
+  #screenshots,
+  #left-sidebar .more,
+  iframe#add-review,
+  a.TabLink,
+  .MessageForm.CommentForm,
+  .TextBoxWrapper *,
+  .BoxCategories > ul.PanelInfo.PanelCategories,
+  .BoxCategories > ul.PanelInfo.PanelCategories > li,
+  .Conversation [id*="Message"].Mine,
+  .Conversation [id*="Message"]:not(.Mine),
+  .Tabs.DiscussionsTabs,
+  .FileHover,
+  #Form_Discussion,
+  .Discussions > .Item,
+  .Category,
+  #Popup .Body,
+  #Popup .Border
+  {
+    border-color: rgba(100%,100%,100%,0.07)!important;
+  }
+  
+  .Tabs.HeadingTabs,
+  .Item.Comment,
+  .Message code, /* border is used to create padding effect */
+  textarea,
+  textarea *,
+  input[type="text"],
+  input[type="text"] *,
+  #Frame #Form_Discussion input#Form_Name.InputBox.BigInput,
+  #Frame #Form_Discussion textarea#Form_Body.TextBox,
+  .PanelCategories,
+  .PanelCategories *,
+  .Foot, /* "Add a Comment" container at bottom of forum thread */
+  zerp
+  {
+    border-color: transparent!important;
+    border-width: 0px!important;
+    border-image: none!important;
+  }
+
+  #main-header,
+  #left-sidebar,
+  .Comment code,
+  .Comment pre,
+  .Message code,
+  .Message pre,
+  #Popup .Border,
+  #Popup .Body,
+  .style-warning {
+    border: 1px dashed rgba(100%,100%,100%,0.11)!important;
+  }
+
+  #Bookmarks #Bookmark_List li:last-of-type {
+    border-bottom: none!important;
+  }
+  
+  .QuoteText /* quote's left indent-line-thing */
+  {
+    border-color: rgba(133,191,37,1.0)!important; /* imgur green */
+  }
+  
+  .Comment .Meta {
+    /*border-bottom: 1px dashed rgba(50%,50%,50%,0.14)!important;*/
+  }
+  
+  .Discussions > .Item {
+    border-bottom-width: 0px!important;
+    border-top-style: solid!important;
+    border-top-width: 1px!important;
+  }
+  
+  /* Border Radii
+  ***********************/
+    
+    #main-header,
+    #left-sidebar {
+      border-radius: 5px!important;
+    }
+    
+    #main-article,
+    #Content,
+    #Popup .Border,
+    #Popup .Body {
+      border-radius: 9px!important;
+    }
+    #Content .Tabs:first-of-type {
+      border-radius: 9px 9px 0px 0px!important;
+    }
+    .MessageForm,
+    .CommentForm {
+      border-radius: 0px 0px 9px 9px!important;
+    }
+  
+    #Head input#Form_Search *,
+    .Category {
+      border-radius: 3px!important;
+    }
+  
+    .Category {
+      border-style: solid!important;
+      border-width: 1px!important;
+    }
+
+/* Font color
+**************************************/
+
+  /* Links
+  ***********************/
+    a,
+    a > *,
+    span[onclick], /* ad pseudo-links */
+    a[href*="/users/"] {
+      color: rgba(58,115,201,1.0)!important; /* old, light: 34,67,117 */
+    }
+    a:hover,
+    a:hover > *,
+    a[href*="/users/"]:hover {
+      color: rgba(108,167,231,1.0)!important; /* guesswork */ /* old, light: 82,115,165 */
+    }
+    a:focus {
+      color: rgba(6%,6%,6%,1.0)!important;
+      background-color: rgba(58,115,201,1.0)!important;
+      /* border: 2px solid rgba(58,115,201,1.0)!important; /* pseudo padding */
+      border-radius: 3px!important;
+      /*padding: 2px!important;*/
+      /*margin: -2px!important;*/
+      /*font-weight: bold!important;*/
+    }
+    
+    a:visited,
+    a:visited > * {
+      color: rgba(145,81,194,1.0)!important; /* old, light: 144,67,204 */
+    }
+    a:visited:hover,
+    a:visited:hover > * {
+      color: rgba(160,113,226,1.0)!important; /* guesswork */ /* old, light: 160,99,236 */
+    }
+    a:visited:focus {
+      color: rgba(6%,6%,6%,1.0)!important;
+      background-color: rgba(145,81,194,1.0)!important;
+      /* border: 2px solid rgba(145,81,194,1.0)!important; /* pseudo padding */
+      border-radius: 3px!important;
+      /*padding: 2px!important;*/
+      /*margin: -2px!important;*/
+      /*font-weight: bold!important;*/
+    }
+    
+    a.EditComment:hover,
+    a.EditDiscussion:hover {
+      color: rgba(83%,83%,83%,1.0)!important;
+    }
+    a.EditComment:focus,
+    a.EditDiscussion:focus {
+      text-shadow: -1px -1px 1px black!important;    
+    }
+    
+    /* Except these */
+      a[class*="Button"],
+      #Head .Menu a,
+      .QuoteAuthor a,
+      .Author a,
+      a.Back,
+      a.BigButton:focus {
+        color: rgba(72%,72%,72%,1.0)!important;
+      }
+      a[class*="Button"]:hover,
+      a.TabLink[class*="Button"]:hover, /* specificity override */
+      .BoxCategories a,
+      a.TabLink {
+        color: rgba(78%,78%,78%,1.0)!important;
+      }
+      #Head .Menu a:hover,
+      .BoxCategories a:hover,
+      .QuoteAuthor a:hover,
+      a.TabLink:hover {
+        color: rgba(82,115,165,1.0)!important;
+        text-shadow: black 1px 1px 2px!important; 
+        /* text-shadow: rgba(0,0,0,0.2) -1px 0px,
+                     rgba(0,0,0,0.2) 0px -1px,
+                     rgba(0,0,0,0.2) -1px -1px,
+                     rgba(100%,100%,100%,0.05) 1px 0px,
+                     rgba(100%,100%,100%,0.05) 0px 1px,
+                     rgba(100%,100%,100%,0.05) 1px 1px; */
+      }
+      a#nextLink:focus,
+      a#nextLink:visited:focus,
+      a#prevLink:focus,
+      a#prevLink:visited:focus,
+      a.EditComment:focus,
+      a.EditDiscussion:focus {
+        background-color: transparent!important;
+      }
+
+    a.Category,
+    #discussions a[href*="/users/"],
+    .ShowDiscussionAuthor a {
+      color: inherit!important;
+    }
+    a.Category:hover,
+    #discussions a[href*="/users/"]:hover,
+    .ShowDiscussionAuthor a:hover {
+      color: rgba(108,167,231,1.0)!important;
+    }
+
+    a,
+    #show-advanced-search {
+      text-decoration: none!important;
+    }
+  
+  /* Level 0 */
+  html, body,
+  iframe#add-review,
+  .TextBoxWrapper *,
+  .Count,
+  .Meta *
+  {
+    color: rgba(72%,72%,72%,1.0)!important;
+  }
+    /* Restoration */
+      zerp {
+        color: rgba(30,121,167,1.0)!important; /* normal userstyles.org link color */
+      }
+
+  /* Level 1 */
+  .Tabs.HeadingTabs,
+  .Tabs.HeadingTabs .SubTab,
+  a.TabLink,
+  .Comment code,
+  .Comment pre,
+  .Message code,
+  .Message pre,
+  #Head input#Form_Search *
+  {
+    color: rgba(78%,78%,78%,1.0)!important;
+  }
+
+  /* Level -1 */
+  .Comment .Meta span:not(.Author) a {
+    color: rgba(41%,41%,41%,1.0)!important;
+  }
+
+  .Item.New .Discussion strong {
+    color: rgba(220,205,80,0.8)!important;
+  }
+  .Item.New .Discussion strong:before {
+    content: "( "!important;
+    color: rgba(72%,72%,72%,0.3)!important;
+  }
+  .Item.New .Discussion strong:after {
+    content: " )"!important;
+    color: rgba(72%,72%,72%,0.3)!important;
+  }
+  .Item.New .CommentCount {
+    margin-right: 0px!important;
+  }
+  
+  .install-status,
+  .install-status * {
+    color: black!important;
+  }
+  .install-status a {
+    color: rgba(255,200,0,1.0)!important; /* imgur green: 133,191,37 */
+  }
+  .Comment .ImageResized {
+    color: rgba(133,191,37,1.0)!important; /* taken from blockquote border color */
+  }
+
+/* Layout
+**************************************/
+
+  html {
+    min-height: 100%!important;
+  }
+
+  #main-article {
+    padding: 1em!important;
+  }
+
+  #main-style-info {
+    padding-left: 25px!important;
+  }
+
+  #additional-info-text {
+    max-width: 50em!important;
+  }
+
+  body > footer /* must be tagged like this, since #left-navigation has a 'footer' too */
+  {
+    padding-top: 100px!important;
+  }
+
+  .Discussion {
+    margin-bottom: 0px!important; /* is natively 1px for some reason */
+  }
+
+  .edit-link,
+  a[href$="/edit"]:not([href*="/users/"]) {
+    font-size: 2.3em!important;
+    padding: 0.4em!important;
+  }
+  .edit-link {
+    /*position: absolute!important;*/ /* required for padding on top to take effect for some reason - update: not any more? */
+  }
+  a.EditComment,
+  a.EditDiscussion {
+    font-size: 2.3em!important;
+    position: absolute!important;
+    right: -695px!important;
+    top: 0px!important;
+  }
+  /* Exceptions & Compensations */
+    .author-styles a[href$="/edit"] {
+      padding: 0.2em!important;
+    }
+    .author-styles a[href*="/stats/"] {
+      font-size: 1.4em!important;
+      padding: 0.2em!important;
+    }
+    .EditAccountLink a[href$="/edit"] {
+      font-size: 1em!important;
+      padding: 0px!important;
+    }
+
+  #miscellaneous-info {
+    float: none!important;
+  }
+
+  #additional-info-text {
+    max-height: none!important;
+    overflow-y: visible!important; /* redundant */
+  }
+
+  .style-warning-icon,
+  .style-warning {
+    padding: 5px 10px!important;
+  }
+
+  /* Making panel categories easier to click on */
+    .PanelCategories > li {
+      position: relative!important;
+      min-height: 1em!important;
+    }
+    .PanelCategories > li a {
+      position: absolute!important;
+      width: 97%!important; /* Compensating for padding */
+      height: 100%!important;
+      left: 0px!important;
+      padding-left: 0.5em!important;
+      top: 1px!important;
+      z-index: 5!important;
+    }
+
+  /* Lists of forum discussion threads
+  **************************************/
+    /* making forum posts easier to click on */
+    .Discussions > .Item {
+      padding: 0px 0px 0px 0px!important;
+      overflow: hidden!important;
+    }
+    .Discussions > .Item > .ItemContent.Discussion {
+    }
+    .Discussions > .Item .Title {
+      /* troubleshooting * /
+        background-color: rgba(155,70,70,0.2)!important;
+      /**/
+      /* old, slightly-broken version */
+        /*position: absolute!important;
+        top: 2px!important;
+        left: 0px!important;
+        padding-left: 9px!important;*/
+
+      line-height: 1.3em!important;
+      padding: 4px 0px 27px 0px!important;
+      display: block!important; /* needed to allow parent elements to expand to .Title's increased size, and for width:95% to work, for some reason */
+      margin: 0px!important;
+      min-height: 19px!important;
+      height: 100%!important; /* not working */
+
+      width: 95%!important; /* some room for bookmark star to work */
+      max-width: none!important; /* reset site setting */
+
+      position: relative!important;
+      z-index: 3!important; /* to pop over .Meta's plain text */
+    }
+    .Discussions > .Item a:not(.Title) {
+      position: relative!important;
+      z-index: 5!important;
+    }
+    .Discussions > .Item .OptionsMenu,
+    .Discussions > .Item .OptionsMenu .Flyout.MenuItems {
+      position: relative!important;
+      z-index: 6!important;
+    }
+
+    .Discussions > .Item .Meta {
+      margin-top: 3px!important;
+      margin-bottom: -3px!important;
+      position: absolute!important;
+      bottom: 3px!important;
+      left: 9px!important;
+    }
+
+  /* Inside a discussion thread
+  **************************************/
+
+    /* Thread's title/header */
+    .HeadingTabs.DiscussionTabs > .SubTab {
+      line-height: 1.3em!important;
+      padding-right: 7px!important;
+    }
+
+    #Content h1 {
+      padding-left: 1em!important;
+      padding-top: 0.4em!important;
+    }
+
+    #vanilla_discussion_index #Body {
+      /*width: 1200px!important;
+      margin-left: 120px!important;
+      margin-right: 120px!important;*/
+
+      /*position: absolute!important;
+      left: 50%!important;
+      margin-left: -450px!important;*/
+      
+      /*position: relative!important;
+      left: -120px!important;
+      width: 1080px!important;*/
+      
+      padding-left: 240px!important;
+      position: relative!important;
+      left:-90px!important;
+    }
+    
+    /*#vanilla_discussion_index #Content {
+      padding-left: 120px!important;
+    }*/
+
+    /*#vanilla_discussion_index #Content {
+      float: left!important;
+    }
+    #vanilla_discussion_index #Body>#Panel {
+      float: none!important;
+      position: absolute!important;
+      left: 840px!important;
+    }*/
+
+    /*#vanilla_discussion_index #Body:before {
+      content: ".";
+      float: left!important;
+      width: 120px!important;
+      margin-left: -120px!important;
+    }*/
+
+  /* Comments
+  **************************************/
+
+    .Item.Comment .Comment {
+      margin: 1em 1.5em!important;
+    }
+  
+    /* Meta
+    **************************************/
+
+      .Item.Comment {
+        position: relative!important; /* to set up for .Meta's position: absolute */
+      }
+      .Comment .Meta {
+        position: absolute!important;
+        top: 10px!important;
+        right: 704px!important; /* #Content natively set to 680px */ /* gets reset to 696 when forum graphics hidden */
+        margin: 0px!important;
+        min-width: 82px!important; /* should be just enough for the longest dates (e.g. December 22) */
+        /*
+        width: 70%!important;
+        margin: auto!important;
+        */
+        padding: 5px 5px 0px 5px!important;
+        border-radius: 5px!important;
+        /* alternative solution to colliding .Meta blocks - dark-to-transparent gradient background */
+          /*background-image: url('')!important;
+          background-repeat: repeat-x!important;*/
+      }
+
+      .Comment .Meta > * {
+        display: block!important;
+        text-align: right!important;
+      }
+      .Comment .Meta .CommentQuote,
+      .Comment .Meta span:last-of-type {
+        display: inline!important;
+        float: right!important;
+      }
+
+      .Comment .Meta > * {
+        line-height: 1.3em!important;
+      }
+      .Comment .Meta > .Author {
+        margin-bottom: 0.5em!important;
+      }
+      .Comment .Meta > .Author a {
+        white-space: nowrap!important;
+      }
+      .Comment .Meta * {
+        max-height: 3em!important;
+      }
+
+      .Comment .Meta .DateCreated {
+        padding-left: 0px!important;
+      }
+    
+      .Comment .Meta .ProfileLink {
+        position: absolute!important;
+        right: -54px!important;
+      }
+      .Comment .Meta a.ProfileLink img.ProfilePhotoMedium {
+        box-shadow: 0px 0px 2px black!important;       
+      }
+    
+      .Comment .Meta .Author a[href*="1/"] {
+        color: rgb(207,144,19)!important;}
+      .Comment .Meta .Author a[href*="2/"] {
+        color: rgb(209,96,65)!important;}
+      .Comment .Meta .Author a[href*="3/"] {
+        color: rgb(49,164,196)!important;}
+      .Comment .Meta .Author a[href*="4/"] {
+        color: rgb(92,124,229)!important;}
+      .Comment .Meta .Author a[href*="5/"] {
+        color: rgb(207,185,76)!important;}
+      .Comment .Meta .Author a[href*="6/"] {
+        color: rgb(158,111,232)!important;}
+      .Comment .Meta .Author a[href*="7/"] {
+        color: rgb(217,89,170)!important;}
+      .Comment .Meta .Author a[href*="8/"] {
+        color: rgb(31,156,135)!important;}
+      .Comment .Meta .Author a[href*="9/"] {
+        color: rgb(166,107,25)!important;}
+      .Comment .Meta .Author a[href*="0/"] {
+        color: rgb(120,158,55)!important;}
+
+/* Packs of stuff
+**************************************/
+
+  /* Blockquotes
+  **************************************/
+  
+    .UserQuote .QuoteAuthor {
+      visibility: hidden!important;
+    }
+    .UserQuote .QuoteAuthor a {
+      visibility: visible!important;
+    }
+    .UserQuote .QuoteAuthor a:after {
+      content: ":"!important;
+    }
+
+    .UserQuote .QuoteAuthor {
+      position: absolute!important;
+      top: -0.8em!important;
+      left: 2.7em!important;
+    }
+    .UserQuote {
+      position: relative!important; /* just to make .QuoteAuthor absolute align off of this */
+      margin: 2em 3em 0em 3em!important;
+      border-radius: 3px!important;
+      padding: 0px 0px 1em 0px!important;
+      background-color: transparent!important;
+      font-size: 0.9em!important;
+    }
+    .Comment .UserQuote .QuoteAuthor a {
+      background-image: -moz-linear-gradient(top, rgb(22%,22%,22%) 0%, rgb(30%,30%,30%) 85%)!important;
+      background-image: linear-gradient(top, rgb(22%,22%,22%) 0%, rgb(30%,30%,30%) 85%)!important;
+      background-image: -webkit-linear-gradient(top, rgb(22%,22%,22%) 0%, rgb(30%,30%,30%) 85%)!important;
+      background-image: -o-linear-gradient(top, rgb(22%,22%,22%) 0%, rgb(30%,30%,30%) 85%)!important;
+      padding: 5px 5px 2px 5px!important;
+      border-radius: 9px!important; /* 3px */
+      /*border-top: 1px dashed rgba(133,191,37,1.0)!important;
+      border-left: 1px dashed rgba(133,191,37,1.0)!important;
+      border-right: 1px dashed rgba(133,191,37,1.0)!important;*/
+    }
+    .Comment.Alt .UserQuote .QuoteAuthor a {
+      background-image: -moz-linear-gradient(top, rgb(18%,18%,18%) 0%, rgb(25%,25%,25%) 85%)!important;
+      background-image: linear-gradient(top, rgb(18%,18%,18%) 0%, rgb(25%,25%,25%) 85%)!important;
+      background-image: -webkit-linear-gradient(top, rgb(18%,18%,18%) 0%, rgb(25%,25%,25%) 85%)!important;
+      background-image: -o-linear-gradient(top, rgb(18%,18%,18%) 0%, rgb(25%,25%,25%) 85%)!important;
+    }
+
+    .UserQuote .QuoteText {
+      color: rgba(55%,55%,55%,1.0)!important;
+      background-color: rgba(100%,100%,100%,0.07)!important;
+      font-style: normal!important;
+      border: 1px dashed rgba(133,191,37,1.0)!important;
+      padding-left: 11px!important;
+      padding-right: 11px!important;
+    }
+
+  /* Pagination
+  **************************************/
+
+    #main-article .pagination {
+      margin: 28px 10px 10px 10px!important;
+    }
+    #Content .P {
+      margin: 30px 12px 17px 10px!important;
+    }
+
+    .Pager .Next:before {
+      content: "Next"!important;
+    }
+    .Pager .Previous:after {
+      content: "Previous"!important;
+    }
+
+    .pagination .next_page,
+    .pagination .prev_page,
+    .Pager .Next,
+    .Pager .Previous {
+      font-size: 2em!important;
+      background-color: rgba(100%,100%,100%,0.07)!important;
+      padding: 3px 6px!important;
+      border-radius: 6px!important;
+      transition: 0.2s 0s!important;
+    }
+    .pagination .next_page:hover,
+    .pagination .prev_page:hover,
+    .Pager .Next:hover,
+    .Pager .Previous:hover {
+      border-radius: 9px!important;
+    }
+    .pagination .next_page:focus,
+    .pagination .prev_page:focus,
+    .Pager .Next:focus,
+    .Pager .Previous:focus {
+      background-color: rgba(100%,100%,100%,0.14)!important;
+      outline: none!important;
+      /* restoration from inversion effect; not applicable due to background-image */
+        color: rgba(72%,72%,72%,1.0)!important;
+    }
+
+  /* Buttons
+  **************************************/
+
+    .Button,
+    .BigButton,
+    .WriteButton,
+    .PreviewButton,
+    .DraftButton,
+    a[class$="Button"], /* not working */
+    a.next_page,
+    a.prev_page,
+    a.Next,
+    a.Previous,
+    .Buttons .AttachFileLink a,
+    .Buttons a.Cancel,
+    .author-styles img.style-warning-icon
+    {
+      background-image: -moz-linear-gradient(top, rgb(26%,26%,26%) 0%, rgb(13%,13%,13%) 100%)!important;
+      background-image: linear-gradient(top, rgb(26%,26%,26%) 0%, rgb(13%,13%,13%) 100%)!important;
+      background-image: -webkit-linear-gradient(top, rgb(26%,26%,26%) 0%, rgb(13%,13%,13%) 100%)!important;
+      background-image: -o-linear-gradient(top, rgb(26%,26%,26%) 0%, rgb(13%,13%,13%) 100%)!important;
+      border-color: transparent!important;
+      border-width: 0px!important;
+      text-shadow: rgba(6%,6%,6%,1.0) 0px 1px 0px!important;
+      box-shadow: rgba(6%,6%,6%,1.0) 0px 0px 1px 0px!important;
+      -webkit-box-shadow: rgba(6%,6%,6%,1.0) 0px 0px 1.5px 0px!important;
+      color: rgba(72%,72%,72%,1.0)!important;
+    }
+    .Button:hover,
+    .BigButton:hover,
+    .WriteButton:hover,
+    .PreviewButton:hover,
+    .DraftButton:hover,
+    a[class$="Button"]:hover, /* not working */
+    a.next_page:hover,
+    a.prev_page:hover,
+    a.Next:hover,
+    a.Previous:hover,
+    .Buttons .AttachFileLink a:hover,
+    .Buttons a.Cancel:hover,
+    .author-styles img.style-warning-icon:hover
+    {
+      background-image: -moz-linear-gradient(top, rgb(17%,17%,17%) 0%, rgb(9%,9%,9%) 100%)!important;
+        /* old: linear-gradient(top, rgb(26%,26%,26%) 20%, rgb(13%,13%,13%) 100%) */
+      background-image: linear-gradient(top, rgb(17%,17%,17%) 0%, rgb(9%,9%,9%) 100%)!important;
+      background-image: -webkit-linear-gradient(top, rgb(17%,17%,17%) 0%, rgb(9%,9%,9%) 100%)!important;
+      background-image: -o-linear-gradient(top, rgb(17%,17%,17%) 0%, rgb(9%,9%,9%) 100%)!important;
+      /*box-shadow: rgba(100%,100%,100%,0.35) 1px 1px 2px 0px!important;*/
+      /*-webkit-box-shadow: rgba(100%,100%,100%,0.35) 1px 1px 3px 0px!important;*/
+    }
+    .Button:focus,
+    .BigButton:focus,
+    .WriteButton:focus,
+    .PreviewButton:focus,
+    .DraftButton:focus,
+    a[class$="Button"]:focus, /* not working */
+    a.next_page:focus,
+    a.prev_page:focus,
+    a.Next:focus,
+    a.Previous:focus,
+    .Buttons .AttachFileLink a:focus,
+    /*.Buttons a.Cancel:focus,*/ /* problems with positioning */
+    .author-styles img.style-warning-icon:focus
+    {
+      box-shadow: inset rgba(6%,6%,6%,1.0) 3px 2px 3px 0px!important;
+      -webkit-box-shadow: inset rgba(6%,6%,6%,1.0) 3px 2px 4.5px 0px!important;
+      outline: none!important;
+      position:relative!important;
+      top: 2px!important;
+      left: 2px!important;
+    }
+    
+    .Buttons .AttachFileLink a,
+    .Buttons a.Cancel {
+      padding: 5px!important;
+      border-radius: 5px!important;
+      line-height: 1em!important;
+    }
+      /* Compensation */
+      .CurrentUploader {
+        margin-top: 5px!important;
+      }
+    .Buttons a.Cancel {
+      position: absolute!important;
+      bottom: 0px!important;
+      left: 0px!important;
+    }
+
+    .Tabs.HeadingTabs ul:not([class]) /* parent of a.Tablink */ {
+      margin: -5px 0px -5px 0px!important; /* compensating for padding of own element and/or parent element */
+    }
+
+/* Opacity
+**************************************/
+
+  /*img.ProfilePhotoMedium*/ /* avatars */
+  img
+  {
+    opacity: 0.7!important;
+  }
+    /* Restoration */
+    #lightbox img {
+      opacity: 1.0!important;
+    }
+
+  #main-header,
+  #left-sidebar,
+  body > footer a {
+    opacity: 0.4!important;
+  }
+  #main-header {
+    transition: 0.4s 0.35s!important;    
+  }
+  #left-sidebar,
+  body > footer a {
+    transition: 0.4s 0.25s!important;  
+  }
+  #main-header:hover,
+  #left-sidebar:hover,
+  body > footer a:hover {
+    opacity: 1.0!important;
+  }
+
+  #Head,
+  .GuestBox,
+  .BoxCategories,
+  #Bookmarks,
+  .Comment .Meta > *:not(.Author),
+  .Comment .Meta > .Author > *:not(.ProfileLink),
+  zerp {
+    opacity: 0.25!important;
+    opacity: 0.45!important;
+    transition: 0.4s 0.25s!important;
+  }
+  #Head:hover,
+  .GuestBox:hover,
+  .BoxCategories:hover,
+  #Bookmarks:hover,
+  .Comment .Meta:hover > *:not(.Author),
+  .Comment .Meta:hover > .Author > *:not(.ProfileLink),
+  .Comment .Meta img,
+  zerp {
+    opacity: 1.0!important;
+  }
+
+  a.Bookmark:hover /* bookmark star icon */
+  {
+    opacity: 0.7!important;
+  }
+
+  .Emoticon {
+    opacity: 0.45!important;
+  }
+
+/* Images & Image replacements
+**************************************/
+
+  .Comment .Message img,
+  .Comment img.ImageThumbnail /* specificity override */
+  {
+    box-shadow: 0px 0px 2px black!important;       
+  }
+
+  a.Bookmark {
+    background-image: url('http://i.imgur.com/R66x1CS.png')!important;
+  }
+
+  /* fix for image replacement */
+    .style-brief-stats span:last-of-type {
+      width: 120px!important;
+      overflow-x: hidden!important;
+      line-height: 2.3em!important;
+    }
+    #main-article {
+      overflow-x: hidden!important;
+      position: relative!important;
+      z-index: 3!important;
+    }
+
+  img.good-average-rating,
+  img.good-rating {
+    /* troubleshooting  background-color: rgba(100%,100%,100%,0.07)!important; */
+    padding-left: 9999px!important;
+    background-image: url('http://i.imgur.com/pI3MrL6.png')!important;
+    background-repeat: no-repeat!important;
+    background-position: 0% 100%!important;
+    margin-right: -9999px!important;
+    pointer-events: none!important;
+    /* alternate method for removing pointer interaction with box all the way to the right */
+      /*position: relative!important;
+      z-index: -3!important;*/
+  }
+  img.bad-average-rating,
+  img.bad-rating {
+    /* troubleshooting  background-color: rgba(100%,100%,100%,0.07)!important; */
+    padding-left: 9999px!important;
+    background-image: url('http://i.imgur.com/KELeq5F.png')!important;
+    background-repeat: no-repeat!important;
+    background-position: 0% 100%!important;
+    margin-right: -9999px!important;
+    pointer-events: none!important;
+    /* alternate method for removing pointer interaction with box all the way to the right */
+      /*position: relative!important;
+      z-index: -3!important;*/
+  }
+
+  #discussions .good-rating {
+    list-style-image: url("http://i.imgur.com/pI3MrL6.png")!important;
+  }
+  #discussions .bad-rating {
+    list-style-image: url("http://i.imgur.com/KELeq5F.png")!important;
+  }
+  
+  /* other method(s) * /
+  img.bad-rating {
+    visibility: hidden!important;
+  }
+  .bad-rating:before
+  {
+    content: "##"!important;
+    color: transparent!important;
+    width: 11px!important;
+    height: 11px!important;
+    background-image: url('http://i.imgur.com/KELeq5F.png')!important;
+    background-repeat: no-repeat!important;
+    list-style-image: url("http://i.imgur.com/KELeq5F.png")!important;
+  }
+  /**/
+  
+  /* Start a new discussion */
+    input#Form_Rating1 + img,
+    input#Form_Rating3 + img {
+      visibility: hidden!important;
+    }
+    .RadioLabel:nth-of-type(2) {
+      background-image: url("http://i.imgur.com/KELeq5F.png")!important;
+      background-repeat: no-repeat!important;
+      background-position: 25px 4px!important;
+    }
+    .RadioLabel:nth-of-type(4) {
+      background-image: url("http://i.imgur.com/pI3MrL6.png")!important;
+      background-repeat: no-repeat!important;
+      background-position: 25px 4px!important;
+      /* list-style: circle outside url("http://i.imgur.com/pI3MrL6.png")!important; */
+    }
+  
+  a#bottomNavClose img {
+    visibility: hidden!important;
+  }
+  a#bottomNavClose {
+    background-image: url('http://i.imgur.com/VWuJvEI.png')!important;
+    background-repeat: no-repeat!important;
+    background-position: center center!important;
+  }
+  
+/* Other
+**************************************/
+
+  img {
+    border-radius: 5px!important;
+  }
+
+  /* troubleshooting * /
+  #prevLink,
+  #nextLink {
+    border: 1px dashed pink!important;
+  }
+  /**/
+
+  #prevLink:after {
+    content: "← Previous"!important;
+    position: absolute!important;
+    bottom: -2px!important;
+    font-size: 14px!important;
+    left: 24%!important;
+  }
+  #nextLink:after {
+    content: "Next →"!important;
+    position: absolute!important;
+    bottom: -2px!important;
+    font-size: 14px!important;
+    left: 70%!important;
+  }
+  
+  /* Custom user flair
+  **************************************/
+  
+    /* If you're cool enough to be reading this and you have a userstyles.org account, PM me for custom user flair */
+
+    a[href$="users/155761"]:before,
+    a[href*="profile/113692/"]:not(.ProfileLink):before {
+      content: "♥"!important;
+      font-size: 0.7em!important;
+      /*color: red!important;*/
+      margin-right: 0.5em!important;
+      position: relative!important;
+      bottom: 0.15em!important;
+    }
+    a[href$="users/155761"]:after,
+    a[href*="profile/113692/"]:not(.ProfileLink):after {
+      content: "♥"!important;
+      font-size: 0.7em!important;  
+      /*color: red!important;*/
+      margin-left: 0.5em!important;
+      position: relative!important;
+      bottom: 0.15em!important;
+    }
+
+    .Meta .Author a[href*="profile/1/"]:not(.ProfileLink):after {
+      content: "The Overlord";
+      width: 15em!important;
+      /* -- */
+      display: block!important;
+      float: right!important;
+      text-align: right!important;
+      padding-right: 0.3em!important;
+      /* -- */
+      /*position: absolute!important;
+      text-align: center!important;
+      left: 2px!important;
+      top: 17px!important;*/
+      /* -- */
+      font-size: 0.6em!important;
+      font-style: italic!important;
+      /*letter-spacing: 1px!important;*/
+      /*font-variant: small-caps!important;*/
+      color: rgba(90%,90%,90%,1.0)!important;
+    }
+    .Meta:hover .Author a[href*="profile/1/"]:not(.ProfileLink):after {
+      animation-name: pulse;
+      /* cross-browser support */ -moz-animation-name: pulse; -webkit-animation-name: pulse; -o-animation-name: pulse; -ms-animation-name: pulse;
+      animation-duration: 2.2s;
+      /* cross-browser support */ -moz-animation-duration: 2.2s; -webkit-animation-duration: 2.2s; -o-animation-duration: 2.2s; -ms-animation-duration: 2.2s;
+      animation-fill-mode: both;
+      /* cross-browser support */ -moz-animation-fill-mode: both; -webkit-animation-fill-mode: both; -o-animation-fill-mode: both; -ms-animation-fill-mode: both;
+    }
+      @keyframes pulse {
+        0%, 25% {
+          text-shadow: 0px 0px 5px rgb(180,0,0),
+                       0px 0px 5px rgb(180,0,0),
+                       0px 0px 5px rgb(180,0,0),
+                       0px 0px 5px rgb(180,0,0) !important;
+        }
+        100% {
+          text-shadow: 0px 0px 0px rgb(180,0,0)!important;
+        }
+      }
+      /* cross-browser support */
+        @-moz-keyframes pulse {  0%, 25% {  text-shadow: 0px 0px 5px rgb(180,0,0), 0px 0px 5px rgb(180,0,0), 0px 0px 5px rgb(180,0,0), 0px 0px 5px rgb(180,0,0)!important;  }  100%  {  text-shadow: 0px 0px 0px rgb(180,0,0)!important;  }  }
+        @-webkit-keyframes pulse {  0%, 25% {  text-shadow: 0px 0px 5px rgb(180,0,0), 0px 0px 5px rgb(180,0,0), 0px 0px 5px rgb(180,0,0), 0px 0px 5px rgb(180,0,0)!important;  }  100%  {  text-shadow: 0px 0px 0px rgb(180,0,0)!important;  }  }
+        @-o-keyframes pulse {  0%, 25% {  text-shadow: 0px 0px 5px rgb(180,0,0), 0px 0px 5px rgb(180,0,0), 0px 0px 5px rgb(180,0,0), 0px 0px 5px rgb(180,0,0)!important;  }  100%  {  text-shadow: 0px 0px 0px rgb(180,0,0)!important;  }  }
+        @-ms-keyframes pulse {  0%, 25% {  text-shadow: 0px 0px 5px rgb(180,0,0), 0px 0px 5px rgb(180,0,0), 0px 0px 5px rgb(180,0,0), 0px 0px 5px rgb(180,0,0)!important;  }  100%  {  text-shadow: 0px 0px 0px rgb(180,0,0)!important;  }  }
+
+/* Options
+**************************************/
+
+  /* Background, option
+  *************************************/
+
+    html /* can't be 'body' or 'background-size: cover' will stretch to the full height of the body */
+    {
+      background-image: url('/*[[bg-option]]*/')!important;
+      background-attachment: fixed!important;
+      background-position: center center!important;
+    }
+
+  /* Background fit, option
+  *************************************/
+
+    /*[[bgfit-option]]*/
+
+  /* Ads, option
+  *************************************/
+
+    /*[[ads-option]]*/
+
+    /* Option 3: text-only ads * / /* not working, can't predict iframe domain and can't affect content * /
+      [id$="-ad"] img,
+      [id$="-ad"] iframe,
+      .ad img,
+      .ad iframe
+        {display: none!important;}
+    /**/
+
+  /* Disable forum graphics, option
+  *************************************/
+
+    /*[[forum-grphics-option]]*/
+
+
+
+}
+
+
+
+/*******************************************************
+********************* Edit page ************************
+*******************************************************/
+
+@-moz-document regexp('https?://userstyles.org/.+/edit') {
+
+  #left-sidebar,
+  article#main-article > ul:first-of-type
+    {display:none!important;}
+  
+  #content-wrapper {}
+
+  article#main-article {
+    margin: 0px!important;
+    overflow-x: visible!important;
+  }
+  
+  th {
+    background-color: rgba(13%,13%,13%,1.0)!important;
+  }
+  
+  .form-controls a img,
+  td img {
+    width: 120px!important;
+    margin-top: 10px!important;
+    border: 1px dashed grey!important;
+  }
+
+  textarea,
+  input[id][type="text"] /* id to avoid selecting buttons in chrome */
+  {
+    background-color: rgba(20%,20%,20%,1.0)!important;
+    color: rgba(72%,72%,72%,1.0)!important;
+    border: 1px dashed rgba(100%,100%,100%,0.07)!important; /* for chrome, which doesn't have forced input borders */
+  }
+  
+  textarea *, /* working substitute for input/textarea selector */
+  input[id][type="text"] * /* id to avoid selecting buttons in chrome */
+  {
+    background-color: rgba(20%,20%,20%,1.0)!important;
+    color: rgba(72%,72%,72%,1.0)!important;
+    border: 0px solid transparent!important; /* not working */
+    padding: 7px 8px!important;
+  }
+
+  footer {
+    padding-top: 80px!important;
+  }
+
+
+
+}
+
+
+
+

@@ -1,0 +1,63 @@
+/* ==UserStyle==
+@name           Firefox rotating favicons
+@namespace      USO Archive
+@author         klntsky
+@description    `Replaces page loading indicators with rotating favicon images in older (XUL) versions of Firefox.`
+@version        201764.15.23
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+@-moz-document url(chrome://browser/content/browser.xul) {
+
+  /* Replaces firefox tab throbbers (page loading indicators)
+   * with rotating favicon images.
+   *
+   * repo: https://github.com/8084/firefox-rotating-favicons
+   * (c) klntsky <klntsky@openmailbox.org>
+   * License - MIT.
+   */
+
+  .tabbrowser-tabs .tab-icon-image {
+    /* border-radius transition is used for smooth image cropping,
+     * transform - to make animation finishing smooth */
+    transition-property: border-radius transform;
+    transition-duration: 1s !important;
+  }
+
+  /* hide empty (default) favicons (only when page is fully loaded) */
+  .tabbrowser-tabs *|tab:not([image]):not([busy]) .tab-icon-image {
+    display: none !important;
+  }
+
+  /* hide default throbber */
+  .tabbrowser-tabs *|tab[busy] .tab-throbber {
+    display: none !important;
+  }
+
+  @keyframes favicon-rotation {
+    from {
+      transform: rotate(-360deg);
+    }
+    to {
+      transform: rotate(0deg);
+    }
+  }
+
+  /* set rotation animation to favicon (when page is actively loading) */
+  .tabbrowser-tabs *|tab[busy] .tab-icon-image
+  {
+    display: -moz-box !important;
+    animation-name: favicon-rotation;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    border-radius: 20px !important;
+  }
+
+  /* add semitransparency to favicon (when waiting for server response) */
+  .tabbrowser-tabs *|tab[busy]:not([progress]) .tab-icon-image {
+    opacity: 0.6 !important;
+  }
+}

@@ -1,0 +1,51 @@
+/* ==UserStyle==
+@name           Firefox Tab Hover QuickTip Fixed Position
+@namespace      USO Archive
+@author         bernstein
+@description    `<p>When hovering over a tab, show the tab title in the space where the urlbar is.</p><p><b>If urlbar is not the first item in your navbar, don't use style 82221, the positioning may be a bit off.</b></p><p>Inspired by other quicktip styles which don't work once tabs overflow (at least on OSX).</p><p>Tested on Firefox 29+ on OSX & Win7.</b></p><p>Other styles from user 142430</p>`
+@version        2014430.12.15
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+@-moz-document url(chrome://browser/content/browser.xul) 
+{
+    /*** overlay tab title on hover over navbar ***/
+    /* #1 : title gets truncated on far right tabs */
+    /* #2 : doesn't work on tab-overflow's far right tabs */
+    /* fix possible by fixed location, but counterintuitive */
+    #tabbrowser-tab-tooltip {
+	   display: none !important;
+    }
+    .tabbrowser-tab::after {
+    	content: attr(label);
+    	margin-top: 8px;
+    	margin-left: -6px;
+    	white-space: nowrap;
+    	/* generic hover style */
+    	position: fixed;
+    	padding: 4px 6px;
+    	color: white;
+    	background: rgba(0,0,0,0.9);
+    	border-radius: 4px;
+    	box-shadow: 0px 0px 2px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 10000;
+    }
+    .tabbrowser-tab:hover::after {
+        display: -moz-box;
+        left:72px; /* fix #1 & #2 */
+    }
+    /* win7 */
+    #main-window[stylish-platform="Win32"] .tabbrowser-tab:hover::after {
+        left: 37px !important;
+        margin-top: 33px; /* default: 39px */
+        padding-bottom: 3px !important;
+    }
+    #main-window[stylish-platform="Win32"] .tabbrowser-tab[pinned]:hover::after {
+        margin-top: 2px; /* default: 8px */
+    }
+}

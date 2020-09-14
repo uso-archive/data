@@ -1,0 +1,370 @@
+/* ==UserStyle==
+@name           RocketChat 0.59+ Compact+
+@namespace      USO Archive
+@author         myf
+@description    `Ultra compact sidebar and status to text colour.`
+@version        201815.11.18
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+@-moz-document domain("demo.rocket.chat"), regexp("https?://rocketchat\\.[^:/@]+(:\\d+)?/.*") {
+	:root {
+		--sidebar-default-padding: 0px;
+		--sidebar-item-height: 21px; /* font-size is 16px; this is minimal reasonable line-height */
+		--sidebar-header-small-padding: 0;
+		--sidebar-width: 16rem;
+		--avatar-radius: 0;
+		--header-min-height: 2.5em;
+		--sidebar-item-radius: 0;
+		--flex-tab-width: 25vw;
+	
+		--sidebar-item-thumb-size: calc( var(--sidebar-item-height) - 1px );
+		
+		--u-avatar-width: calc( var(--sidebar-item-thumb-size) * 2.5 );
+		--u-avatar-height: calc( var(--sidebar-item-thumb-size) * 1 );
+		--u-avatar-space: calc( var(--u-avatar-width) + 5px );
+		--u-sc: calc( var(--u-avatar-width) * 1.3 ); /* 1 means the same as cover below */
+		--u-avatar-scale: var(--u-sc) var(--u-sc); 
+		--u-avatar-scale: var(--u-sc);
+	}
+	/*
+	§	"legibler" (X|) font (?)
+	*/
+	.global-font-family {
+		font-family: "Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol", "Verdana",
+		/* orig: */
+		-apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif,
+		"Apple Color Emoji", "Meiryo UI";
+	}
+	/*
+	§	status colour to text
+	*/
+	.away ~ .room-title,
+	.user-card-room.status-away p,
+	.sidebar-item__user-status--away ~ * .sidebar-item__name {
+		color: var(--status-away);
+	}
+	.online ~ .room-title,
+	.user-card-room.status-online p,
+	.sidebar-item__user-status--online ~ * .sidebar-item__name {
+		color: var(--status-online);
+	}
+	.busy ~ .room-title,
+	.user-card-room.status-busy p,
+	.sidebar-item__user-status--busy ~ * .sidebar-item__name {
+		color: var(--status-busy);
+	}
+	.offline ~ .room-title,
+	.user-card-room.status-offline p,
+	.sidebar-item__user-status--offline ~ * .sidebar-item__name {
+		color: var(--sidebar-item-text-color);
+	}
+	/*
+	§	unread emphasis
+	*/
+	.sidebar-item--unread .sidebar-item__name {
+		font-weight: bold;
+	}
+	.sidebar-item--unread .sidebar-item__name::before {
+		content: '(•) ';
+		font-weight: normal;
+	}
+	/*
+	§	currently active emphasis
+	*/
+	.sidebar-item {
+		transition: none;
+	}
+	.sidebar-item--active .sidebar-item__name {
+		text-decoration: underline;
+	}
+	/*
+	§	rooms
+	*/
+	/* v 60 introduced "avatars" for rooms */
+	.rooms-list__list.type-channels .sidebar-item__picture {
+		display: none;
+	}
+	.rooms-list__list.type-channels .sidebar-item__room-type {
+		position: static;
+		width: var(--u-avatar-width);
+		flex-direction: column;
+		align-items: center;
+	}
+	.rooms-list__list.type-channels .sidebar-item__icon {
+		height: var(--u-avatar-height);
+	}
+	.rooms-list__list.type-channels .sidebar-item__name {
+		color: var(--status-online);
+	}
+	
+	
+	.sidebar-item__user-status {
+	/* *
+		Leaving this invisible because under the avatar image.
+		Since status information is expressed by the text colour,
+		this "point" is completely pointless (what a pun!).
+	/
+		top: 0; left: 0;
+		transform: none;
+		z-index: 1;
+		opacity: 0.8;
+	/**/
+	}
+	.sidebar-item {
+		height: auto;
+		min-height: var(--sidebar-item-height);
+		line-height: var(--sidebar-item-height);
+	}
+	.sidebar-item__name {
+		line-height: var(--sidebar-item-height);
+	}
+	.sidebar-item__link ,
+	.sidebar-item__picture {
+		margin: 0;
+	}
+	.rooms-list__type {
+		display: none; 
+	}
+	.rooms-list__list:not(:last-child) {
+		margin-bottom: 0;
+	}
+	/*
+	§	sidebar "logo" footer: hide
+	*/
+	.sidebar__footer {
+		display: none
+	}
+	.rooms-list__list.rooms-list__toolbar-search {
+		bottom: 0;
+	}
+	/*
+	§	avatars: bigger but more compact
+	*/
+	.messages-box.compact .message .thumb .avatar ,
+	.messages-box.compact .message .thumb  ,
+	.sidebar-item__user-thumb {
+		width: var(--u-avatar-width);
+		height: var(--u-avatar-height);
+	}
+	.messages-box.compact .avatar .avatar-image {
+		background-size: var(--u-avatar-scale);
+	}
+	.sidebar-item__user-thumb .avatar .avatar-image {
+		background-size: var(--u-avatar-scale);
+	}
+	.user-view .avatar .avatar-image {
+		background-size: contain;
+	}
+	.messages-box.compact .message button.user {
+		text-indent: var(--u-avatar-space);
+	}
+	.messages-box.compact .message .thumb {
+		left: 0;
+	}
+	.messages-box.compact .message {
+		padding-left: 0;
+	}
+	.messages-box.compact > .wrapper > ul {
+		padding-left: 0.5rem;
+	}
+	/*
+	§	no gaps
+	*/
+	.rc-old .compact .message {
+		padding-top: 0;
+	}
+	.rc-old .compact .message.new-day {
+		margin-top: 30px; /* hardcoded */
+	}
+	/*
+	§	"message actions": move to the left
+	*/
+	.messages-box.compact .first-unread .message-actions ,
+	.messages-box.compact .message-actions {
+		top: 0;
+		right: auto;
+		bottom: auto;
+		left: var(--u-avatar-space);
+		background-color: #F2F2F2;
+		z-index: 2;
+	}
+	.messages-box.compact .message.sequential .message-actions {
+		left: 0;
+	}
+	/*
+	§	sequential redundances: hide
+	*/
+	.messages-box.compact .message .message-alias {
+		display: none;
+	}
+	.messages-box.compact .message.sequential .user-card-message {
+		display: none !important;
+	}
+	/*
+	§	"textarea": compact
+	*/
+	.messages-box.compact + * .rc-message-box {
+		padding: 0;
+	}
+	.messages-box.compact + * .rc-message-box__container {
+		padding: 0;
+	}
+	/*
+	§	emoticons small big emo, no picture (rely on local font), textual represantation
+	*/
+	.messages-box.compact .emojione[title],
+	.messages-box.compact .emojione.big[title] {
+		width: auto !important;
+		height: auto !important;
+		line-height: 1;
+	}
+	.messages-box.compact .emojione[title] {
+		background-image: none;
+		text-indent: 0;
+	}
+	.messages-box.compact .emojione[title]::after {
+		content: attr(title);
+	}
+	/*
+	§	Current theme contains `.rc-old .message .body > * + * { padding-top: 10px; }`.
+		That screws our screwed emojis.
+		I wonder what that was good for anyway.
+	*/
+	.rc-old .message .body > * + * {
+		padding-top: 0;
+	}
+	/*
+	§	visible reactioners
+	*/
+	.messages-box.compact .message .reactions .people {
+		display: inline;
+	}
+	.messages-box.compact .message .reactions .people span span {
+		display: none;
+	}
+	/*
+	§	typing notification fix
+	*/
+	.rc-message-box__typing {
+		top: auto;
+		bottom: 100%;
+		margin-left: 0;
+		background-color: var(--rc-color-primary-lightest);
+	}
+	/*
+	§	reaction emojis number sort fix (vertical (block) variant)
+	*/
+	.reactions {
+		display: flex;
+		flex-direction: column;
+	}
+	/*
+	(horizontal (float) variant)
+	*/
+	/*
+	.reactions {
+		display: flex;
+		flex-direction: column;
+	}
+	.reactions > * {
+		display: block !important;
+		height: auto !important;
+		float: left;
+		overflow: hidden;
+	}
+	*/
+	.reactions > [data-emoji] {
+		order: 100;
+	}
+	.reactions > [data-emoji=":zero:"] {
+		order: 0;
+	}
+	.reactions > [data-emoji=":one:"] {
+		order: 1;
+	}
+	.reactions > [data-emoji=":two:"] {
+		order: 2;
+	}
+	.reactions > [data-emoji=":three:"] {
+		order: 3;
+	}
+	.reactions > [data-emoji=":four:"] {
+		order: 4;
+	}
+	.reactions > [data-emoji=":five:"] {
+		order: 5;
+	}
+	.reactions > [data-emoji=":six:"] {
+		order: 6;
+	}
+	.reactions > [data-emoji=":seven:"] {
+		order: 7;
+	}
+	.reactions > [data-emoji=":eight:"] {
+		order: 8;
+	}
+	.reactions > [data-emoji=":nine:"] {
+		order: 9;
+	}
+	.reactions > .add-reaction {
+		order: 200;
+	}
+	/*
+	there is originial nonsence:
+	.messages-box ul {
+		padding: 21px 0 10px;
+	}
+	*/
+	.reactions ul {
+		padding: 0;
+	}
+	/*
+	§ tooltip bubble ~> status bar
+	*/
+	.tooltip {
+		position: fixed !important;
+		top: auto !important;
+		right: auto !important;
+		bottom: 0 !important;
+		left: 0 !important;
+		border-radius: 0 1em 0 0 !important;
+		max-width: none;
+		opacity: 1 !important;
+	}
+	.tooltip .content {
+		padding: 0.1em 0.8em 0.1em 0.5em;
+		opacity: 1;
+	}
+	.tooltip-arrow {
+		display: none;
+	}
+	/*
+	§ hide scrollbar when not needed
+	*/
+	.rooms-list {
+		overflow-y: auto;
+	}
+	
+	/*
+	§ "three dots" appearance faster and less demanding
+	(swapping `display` on hover? SRSLY?)
+	*/
+	.sidebar-item__menu {
+		display: block;
+		opacity: 0;
+	}
+	.sidebar-item:hover .sidebar-item__menu {
+		opacity: 1;
+	}
+	
+	/*
+	§ edited avatars: hide (pen icon is sufficient)
+	  todo: hide only self-edits
+	*/
+	.user-card-message + .info .edited .icon-edit + .user-card-message {
+		display: none;
+	}
+}

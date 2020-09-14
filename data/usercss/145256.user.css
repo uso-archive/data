@@ -1,0 +1,118 @@
+/* ==UserStyle==
+@name           Firefox Tabs on Bottom
+@namespace      USO Archive
+@author         Alexander Pap.
+@description    `Moves tabs on bottom, allowing the navigation bar to be on the title bar.Works with any theme.`
+@version        20171230.16.5
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+/* Move tabs on bottom */
+#TabsToolbar {
+    -moz-box-ordinal-group:10!important;
+    
+    /* Needed for normal sizemode (else there is a big gap when not maximized) */
+    margin-top: 0px !important;
+    
+    /* Remove 1 pixel below the selected tab */
+    margin-bottom: 0px !important;
+}
+
+/* Remove the gap on the left of the first tab */
+/* Only needed for firefox < 57, first-child selector is for that */
+#tabbrowser-tabs:first-child:not([overflow]),
+#tabbrowser-tabs[positionpinnedtabs]:first-child {
+    margin-left: -12px !important;
+}
+
+/* Remove background */
+#nav-bar,
+#PersonalToolbar { 
+    border: none !important;
+    background: transparent !important;
+}
+
+/* Move Personal Toolbar below navigation bar, this is required since firefox 36 */
+#PersonalToolbar { 
+    -moz-box-ordinal-group:9!important;
+}
+
+/* Remove the gap on the right of the tab group that is caused by the window controls */
+#titlebar-placeholder-on-TabsToolbar-for-captions-buttons { /* Versions < 57 */
+    position: fixed !important;
+}
+.titlebar-placeholder {
+    display: none !important;
+}
+
+/* Space for the window controls */
+@media not all and (-moz-os-version: windows-win10) { /* Windows 7 */
+    #main-window[sizemode="maximized"][tabsintitlebar]:not([privatebrowsingmode=temporary])
+    #toolbar-menubar[type="menubar"][autohide="true"][inactive="true"] ~ #nav-bar {
+        padding-right: 106px !important;
+    }
+    #main-window[sizemode="normal"][tabsintitlebar]:not([privatebrowsingmode=temporary])
+    #toolbar-menubar[type="menubar"][autohide="true"][inactive="true"] ~ #nav-bar {
+        padding-right: 101px !important;
+    }
+    #main-window[sizemode="maximized"][tabsintitlebar][privatebrowsingmode=temporary]
+    #toolbar-menubar[type="menubar"][autohide="true"][inactive="true"] ~ #nav-bar {
+        padding-right: 151px !important;
+    }
+    #main-window[sizemode="normal"][tabsintitlebar][privatebrowsingmode=temporary]
+    #toolbar-menubar[type="menubar"][autohide="true"][inactive="true"] ~ #nav-bar {
+        padding-right: 146px !important;
+    }
+}
+
+@media (-moz-os-version: windows-win10) { /* Windows 10 */
+    #main-window[tabsintitlebar]:not([privatebrowsingmode=temporary]):not([sizemode="fullscreen"])
+    #toolbar-menubar[type="menubar"][autohide="true"][inactive="true"] ~ #nav-bar {
+        padding-right: 136px !important;
+    }
+    #main-window[tabsintitlebar][privatebrowsingmode=temporary]:not([sizemode="fullscreen"])
+    #toolbar-menubar[type="menubar"][autohide="true"][inactive="true"] ~ #nav-bar {
+        padding-right: 181px !important;
+    }
+}
+
+/* Left and right borders on Win 7 & 8, but not on 10 and later: */
+@media (-moz-os-version: windows-win7), (-moz-os-version: windows-win8) {
+  /* Vertical toolbar border */
+  #main-window[sizemode=normal] #navigator-toolbox > toolbar#TabsToolbar {
+    border-left: 1px solid hsla(240,5%,5%,0.3) !important;;
+    border-right: 1px solid hsla(240,5%,5%,0.3) !important;;
+    background-clip: padding-box;
+  }
+}
+
+/* Background for Light and Dark themes on tabs bar*/
+#main-window[lwthemetextcolor="bright"] #TabsToolbar, 
+#main-window[lwthemetextcolor="dark"] #TabsToolbar {
+    background-color: var(--chrome-secondary-background-color) !important;
+    background-image: none !important;
+}
+#main-window[lwthemetextcolor="dark"] .scrollbutton-up,
+#main-window[lwthemetextcolor="dark"] .scrollbutton-down,
+#main-window[lwthemetextcolor="dark"] .tabs-newtab-button,
+#main-window[lwthemetextcolor="dark"] #new-tab-button,
+#main-window[lwthemetextcolor="dark"] #alltabs-button {
+    fill: var(--lwt-text-color) !important;
+}
+
+/* from https://github.com/Aris-t2/CustomCSSforFx/blob/master/classic/css/tabs/tabs_below_navigation_toolbar.css */
+/* remove 'dragging tab' margin/padding nonsense */
+#TabsToolbar[movingtab] {
+    padding-bottom: unset !important;
+}
+#TabsToolbar[movingtab] > .tabbrowser-tabs {
+    padding-bottom: unset !important;
+    margin-bottom: unset !important;
+}
+#TabsToolbar[movingtab] + #nav-bar {
+    margin-top: unset !important;
+}

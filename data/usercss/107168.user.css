@@ -1,0 +1,247 @@
+/* ==UserStyle==
+@name           about:pages Dark
+@namespace      USO Archive
+@author         niklasg
+@description    `Color theme, turns all the standard and some add-on about:-pages dark.This works mostly with inversion filters, so it should not be affected by changes of those pages that much,but it also means that it will un-darken any about:-pages that are already dark (due to other user styles, add-ons, system themes, ...).Requests to add additional add-on about:-pages are generally welcome.If you have any issues with this style, please open a ticket at https://github.com/NiklasGollenstede/stylish`
+@version        2017820.15.35
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+/**
+ * @name about:-pages Dark
+ * @stylish-id 107168
+ * @author Niklas Gollenstede
+ * @license CC-BY-SA-4.0 or MIT
+ * @description
+ *     Color theme, turns all the standard and some add-on about:-pages dark.
+ *     This works mostly with inversion filters, so it should not be affected by changes of those pages that much,
+ *     but it also means that it will un-darken any about:-pages that are already dark (due to other user styles, add-ons, system themes, ...).
+ *     Requests to add additional add-on about:-pages are generally welcome.
+ *
+ *     If you have any issues with this style, please open a ticket at https://github.com/NiklasGollenstede/stylish
+ *
+ *     It should affect every build-in about:-page that isn't already dark.
+ *     The CSS is clearly structured and documented, read that for details on what happens to which page.
+ */
+
+/* set vars */
+@-moz-document url-prefix(about:) { :root {
+    --filter-invert: invert(1) hue-rotate(180deg) saturate(1.666) brightness(1.5); /* the filter value that is used to turn the pages or their main element dark */
+    --filter-revert: brightness(0.666) saturate(.6) hue-rotate(180deg) invert(1); /* reversed filter to revert individual elements like imaged back to their original, revert each filter in reverse order */
+} }
+
+/**
+ *
+ * about:-pages, most of these are linked on 'about:about':
+ *
+ * about:                    : generic,
+ * about:about               : generic,
+ * about:accounts            : generic,
+ * about:addons              : vertical-tabs,
+ * about:blank               : specific,
+ * about:buildconfig         : generic,
+ * about:cache               : generic,
+ * about:certerror?...       : generic,
+ * about:checkerboard        : generic,
+ * about:config?...          : generic,
+ * about:configmania#...     : vertical-tabs, // from add-on
+ * about:crashes             : generic,
+ * about:credits             : // redirects to "https://www.mozilla.org/credits/" (see below)
+ * about:debugging           : vertical-tabs,
+ * about:devtools-toolbox    : // not useful (probably embedded somewhere ?)
+ * about:downloads           : generic,
+ * about:findbartweak        : vertical-tabs, // form add-on
+ * about:healthreport        : // only contains an iframe from "https://fhr.cdn.mozilla.net/en-US/v4/"
+ * about:home                : specific,
+ * about:lastpassvault       : generic,
+ * about:license             : generic,
+ * about:logo                : // just an image
+ * about:memory              : generic,
+ * about:mozilla             : // is deep red anyway
+ * about:neterror?...        : generic,
+ * about:networking          : vertical-tabs,
+ * about:newtab              : specific,
+ * about:performance         : generic,
+ * about:plugins             : generic,
+ * about:preferences#...     : vertical-tabs,
+ * about:privatebrowsing     : // already dark
+ * about:profiles            : generic,
+ * about:rights              : generic,
+ * about:robots              : generic,
+ * about:serviceworkers      : generic,
+ * about:sessionrestore      : generic, specific,
+ * about:sessionstore        : generic, // from add-on
+ * about:stylish-edit?...    : // already dark (with dark dev-tools theme)
+ * about:support             : generic,
+ * about:sync-log            : generic,
+ * about:sync-progress       : // has been removed
+ * about:sync-tabs           : // has been removed
+ * about:tabcrashed?...      : generic,
+ * about:tabgroups#...       : vertical-tabs, // from add-on
+ * about:telemetry           : generic,
+ * about:webrtc              : generic,
+ * about:welcomeback         : generic,
+ *
+ * Related pages:
+ *
+ * https://www.mozilla.org/credits/         : generic, // this is where about:credits redirects
+ */
+
+/* generic: invert :root, un-invert images */
+@-moz-document
+           url(about:),
+           url(about:about),
+           url(about:accounts),
+           url(about:buildconfig),
+           url(about:cache),
+    url-prefix(about:certerror),
+           url(about:checkerboard),
+    url-prefix(about:config),
+           url(about:crashes),
+           url(about:downloads),
+           url(about:lastpassvault),
+           url(about:license),
+           url(about:memory),
+    url-prefix(about:neterror),
+           url(about:performance),
+           url(about:plugins),
+           url(about:profiles),
+           url(about:permissions),
+           url(about:rights),
+           url(about:robots),
+           url(about:serviceworkers),
+           url(about:sessionrestore),
+           url(about:sessionstore),
+           url(about:support),
+           url(about:sync-log),
+           url(about:sync-tabs),
+    url-prefix(about:tabcrashed),
+           url(about:telemetry),
+           url(about:webrtc),
+           url(about:welcomeback),
+           url(https://www.mozilla.org/credits/)
+{
+    :root
+    { filter: var(--filter-invert); background-color: black; }
+
+    img, image /* image in html and xul */
+    { filter: var(--filter-revert); }
+}
+
+/* vertical-tabs: invert the content area, leave tab-bar as is */
+@-moz-document
+    url-prefix(about:addons),
+    url-prefix(about:confmania),
+    url-prefix(about:debugging),
+    url-prefix(about:findbartweak),
+    url-prefix(about:networking),
+    url-prefix(about:preferences),
+    url-prefix(about:tabgroups)
+{
+    .main-content, /* content area */
+    #main-footer, /* ??? */
+    #dialogBox /* modal dialogs frame */
+    { filter: var(--filter-invert); background-color: white; }
+
+    .main-content image, #dialogBox image, .main-content img, #dialogBox img, /* images in inverted areas */
+    #discover-browser, /* the browser on the "Get Add-ons" tab of about:addons, currently contains a page from discovery.addons.mozilla.org, so an amo style should take care of it */
+    #dialogFrame /* modal dialog contents, contains another document */
+    { filter: var(--filter-revert); }
+}
+
+/* specific: only apply to empty about:blank documents */
+@-moz-document
+    url(about:blank)
+{
+    html:root>head:empty ~ body:nth-child(2):last-child:empty
+    { filter: var(--filter-invert); background-color: black; }
+}
+
+/* specific: invert a lot for items. Use simple invert filter to un-invert without changes */
+@-moz-document
+    url(about:home)
+{
+    :root { background-color: black; } /* enforce bg-color */
+
+    html,
+    #searchText,
+    #searchSubmit,
+    #searchSuggestionTable
+    { filter: var(--filter-invert); }
+
+    body,
+    #searchText,
+    #searchSubmit,
+    #searchSuggestionTable img
+    { filter: var(--filter-revert); }
+}
+
+/* specific: custom styles, no inversion */
+@-moz-document
+    url(about:newtab)
+{
+    #newtab-scrollbox>#newtab-vertical-margin,
+    body
+    {
+        background-color: #333;
+    }
+    #newtab-scrollbox>#newtab-vertical-margin>#newtab-margin-bottom
+    {
+        background-color: inherit;
+    }
+
+    .newtab-site
+    {
+        box-shadow: none;
+    }
+
+    .newtab-site:hover,
+    .newtab-cell:not([ignorehover])>.newtab-site:hover
+    {
+        box-shadow: 0px 0px 10px rgb(20, 50, 130);
+        box-shadow: 0px 0px 10px rgb(20, 50, 130);
+        border-color: rgb(20, 50, 130);
+    }
+    .newtab-cell:hover
+    {
+        box-shadow: 0px 0px 10px rgb(20, 50, 130);
+        box-shadow: 0px 0px 10px rgb(20, 50, 130);
+    }
+    .newtab-cell .newtab-site .newtab-link:hover
+    {
+        border-color: black;
+    }
+
+    div.newtab-cell>div.newtab-site>a.newtab-link>span.newtab-title
+    {
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 0px 0px 5px #000;
+        background-color: rgba(0,0,0, .5);
+        background-image: none;
+    }
+
+    .newtab-thumbnail
+    {
+        opacity: 1;
+    }
+}
+
+/* specific: make tab list larger */
+@-moz-document
+    url(about:sessionrestore)
+{
+    body { padding: 0; }
+    .container.restore-chosen /* main container */
+    { /* reduce margin */
+        margin-top: 3vh;
+        margin-bottom: 3vh;
+    }
+
+    #tabList
+    {
+        min-height: calc(94vh - 300px); /* everything except 2 * 3hv margin and 300px for the text */
+    }
+}

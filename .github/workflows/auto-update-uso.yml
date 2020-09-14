@@ -1,0 +1,36 @@
+name: auto-update-uso
+
+on:
+  schedule:
+    - cron: "0 */4 * * *"
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: "Test"
+
+jobs:
+  auto-update-uso:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - run: npm i
+      - shell: bash
+        id: update
+        run: node updater.js
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: ${{ steps.update.outputs.changes }}
+          commit_user_name: actions-user
+          commit_user_email: actions@github.com
+          commit_author: GitHub Actions <actions@github.com>
+          skip_dirty_check: true

@@ -1,0 +1,134 @@
+/* ==UserStyle==
+@name           Youtube Watched Overlay
+@namespace      USO Archive
+@author         Andy Cormack
+@description    `A simple, customisable "Watched" overlay to go over thumbnails on Youtube so you can quickly see if you've watched them already.Originally part of my style 130610 theme, now an optional extra with a few basic settings.`
+@version        201737.2.56
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown dark-light "Dark or light overlay" {
+		dark "Dark*" <<<EOT /* Dark *\/
+.resume-playback-background {
+    background-color: rgba(34, 34, 37, 0.9);
+    color: #aaa;
+    text-shadow: 0 0 2em black;
+} EOT;
+	light "Light" <<<EOT /* Light *\/
+.resume-playback-background {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #666;
+    text-shadow: 0 0 2em white, 0 0 2em white, 0 0 2em white, 0 0 1em white, 0 0 1em white;
+} EOT;
+
+}
+@advanced dropdown hide-show "Hide or show when you hover" {
+		hide "Hide when you hover*" <<<EOT /* Hide on hover *\/
+.resume-playback-background {
+    opacity: 1;
+}
+.yt-lockup-thumbnail:hover .resume-playback-background,
+.thumb-wrapper:hover .resume-playback-background,
+.pl-video-thumb:hover .resume-playback-background {
+    opacity: 0;
+}
+
+.contains-percent-duration-watched + .yt-lockup-content {
+    opacity: 0.3;
+}
+.yt-lockup-grid:hover .yt-lockup-content {
+    opacity: 1;
+} EOT;
+	show "Show when you hover" <<<EOT /* Show on hover *\/
+.resume-playback-background {
+    opacity: 0;
+}
+.yt-lockup-thumbnail:hover .resume-playback-background,
+.thumb-wrapper:hover .resume-playback-background,
+.pl-video-thumb:hover .resume-playback-background {
+    opacity: 1;
+}
+
+.contains-percent-duration-watched + .yt-lockup-content {
+    opacity: 1;
+}
+.yt-lockup-grid:hover .contains-percent-duration-watched + .yt-lockup-content {
+    opacity: 0.3;
+} EOT;
+
+}
+@advanced text watched-text ""Watched" overlay text" "Watched"
+
+==/UserStyle== */
+
+@-moz-document domain("youtube.com") {
+/*================================================================
+
+	Youtube Watched Overlay
+	  by Andy Cormack
+
+	  http://ac-design.co.uk/
+	  @groundxaero
+
+	v1.0.0
+	Last updated: 2017/03/07
+
+================================================================*/
+/*[[dark-light]]*/
+
+/*[[hide-show]]*/
+
+/* Watched Text */
+.resume-playback-background:after {
+    content: '/*[[watched-text]]*/';
+}
+
+
+
+/* Rest of styles */
+.resume-playback-background:before,
+.resume-playback-background,
+.resume-playback-background:after {
+    position: absolute;
+    width: 100%;
+    left: 0;
+}
+.resume-playback-background:before {
+    content: '';
+    bottom: 0;
+    height: 4px;
+    background-color: rgba(128, 128, 128, 0.3);
+}
+.resume-playback-background {
+    top: 0;
+    height: 100%;
+    pointer-events: none;
+    transition: 0.2s;
+}
+.resume-playback-background:after {
+    z-index: 2;
+    top: 50%;
+    font-size: 1rem;
+    text-align: center;
+    text-transform: uppercase;
+}
+.thumb-wrapper .resume-playback-background:after {
+    top: 35%;
+}
+.pl-video-thumb .resume-playback-background:after {
+    top: 25%;
+    font-size: 0.8rem;
+}
+.resume-playback-progress-bar,
+.video-time {
+    z-index: 2;
+}
+}
+
+@-moz-document url("https://www.youtube.com/feed/history") {
+.resume-playback-background {
+	opacity: 0
+}
+.contains-percent-duration-watched + .yt-lockup-content {
+	opacity: 1
+}
+}

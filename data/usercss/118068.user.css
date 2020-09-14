@@ -1,0 +1,126 @@
+/* ==UserStyle==
+@name           Firefox 12-39: Addons Manager Remove Paddings
+@namespace      USO Archive
+@author         bernstein
+@description    `<ul><li>Remove paddings from about:addons</li><li>Pixel perfect badges on top of icon. For numbers 1-99.</li><li>Selected Category gets a border to the right (Windows: see below)</li><li>Below 710px width you get categories on hover only. (Like a hidden dock/taskbar, may get cut off at bottom with window-height ~&lt; 400px)</li><li>Merges the "Install Updates" button into the sorting bar. (in Available Updates)</li></ul><p>Tested on Firefox 13-39 on OSX/Win7/XP. <em>Defaults to OSX. Values for win7&xp provided in style. No longer maintained!</em></p><p><b>For up to date version see: style 66194</b></p><p>Other styles from user 142430.</p>`
+@version        2015826.13.40
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+@-moz-document url(chrome://mozapps/content/extensions/extensions.xul), url(about:addons)
+{
+    /* remove page padding */
+    #addons-page {
+    	padding: 0px !important;
+    }
+    #view-port-container {
+    	border-radius: 5px 0 0 0 !important;
+    	border-style: solid none none solid !important;
+    }
+    .category[selected] {
+    	border-radius: 0px !important;
+    }
+    #categories {
+    	margin-left: 0px !important;
+    	margin-top: 28px !important;
+    }
+    .category {
+		border-left-color: transparent !important;
+    }
+    /* remove padding, place header like navbar */
+    #header {
+    	margin: 5px 8px 5px 8px !important;
+    }
+    /* padding after forward button */
+    #forward-btn {
+        margin-right: 18px !important;
+    }
+    
+    /* Flexible Searchbar, allowing for a less wide window (especially with available updates)*/
+    #header-search {
+        -moz-box-flex: 50 !important;
+        min-width: 12.5em !important;
+        max-width: 22em !important;
+    }
+    
+    /***************************** CATEGORIES ******************************/
+    /* perfect selected category style */
+    .category[selected] {
+    	border-right-color: #B4B1B9 !important; /* win7/XP: comment this rule out */
+    	background-color: #C7CDD6 !important;   /* win7/XP: comment this rule out */
+    }
+    
+    /* overlay badges over icon */
+    .category-name {
+        -moz-box-ordinal-group: 3 !important;
+        margin-left: -1px !important;
+    }
+    .category-badge {
+        -moz-box-ordinal-group: 2 !important;
+        position: relative;
+        margin: -20px -3px 0 -10px !important;
+        padding: 0 3px !important;
+    }
+    .category-badge[value="0"] {
+        margin-right: 4px !important;
+    }
+    .category-badge:-moz-any([value="1"], [value="2"], [value="3"], [value="4"], [value="5"], [value="6"], [value="7"], [value="8"], [value="9"])
+    {
+        margin-right: 2px !important;
+        padding: 0 4px !important;
+    }
+
+    /* ultra small mode with popup bar */
+    @media all and (max-width: 710px) {
+        #categories {
+            position: fixed !important;
+            left: 0 !important;
+            z-index: 1 !important;
+            margin-left: 0 !important;
+            padding: 6px !important;
+            background-image: url("chrome://global/skin/inContentUI/background-texture.png"), -moz-linear-gradient(center top , rgb(173, 181, 194), rgb(191, 198, 209)) !important; /* win7: -moz-linear-gradient(rgb(214, 227, 244), rgb(204, 217, 234)) */ /* winXP: -moz-linear-gradient(rgb(241, 238, 221), rgb(236, 233, 216)) */
+            opacity: 0.97;
+            border: 1px solid rgba(50, 65, 92, 0.4) !important;
+            border-left: none !important;
+            border-radius: 0 5px 5px 0 !important;
+            -moz-transition: margin-left 0.5s !important;
+            box-shadow: 0px 1px 3px rgba(0,0,0,0.3);
+        }
+        #categories:not(:hover) {
+            margin-left: -52px !important;
+            -moz-transition: margin-left 0.5s 200ms !important;
+        }
+        #categories .category {
+            padding: 2px !important;
+        }
+        #view-port-container {
+            border-left: none !important;
+            border-radius: 0px !important;
+        }
+        #categories:hover .category[selected] {
+            border-color: rgba(50, 65, 92, 0.4) !important; /* win7/XP: rgb(195, 206, 223) */
+    	    background-color: #C7CDD6 !important; /* win7: -moz-cellhighlight */ /* winXP: rgba(255, 255, 255, 0.4) */
+            -moz-transition: background-color 0.5s, border-color 0.5s !important;
+        }
+        #categories .category[selected] {
+            border-radius: 5px !important;
+            background-color: transparent !important;
+            border: 1px solid transparent !important;
+            -moz-transition: background-color 0.5s 200ms, border-color 0.5s 200ms !important;
+        }
+    }
+
+    /************************ LIST ITEM AREA HEADER ************************/
+    /* available Updates : merge bars (inkl. compat warning) */
+    #categories[last-selected="category-availableUpdates"] + #view-port-container #update-actions {
+       display: block !important;
+       margin: -31px 0 3px 4px; /* winXP: set to -29px 0 2px 5px */ /* win7: set to -29px 0 3px 5px */
+    }
+    #categories[last-selected="category-availableUpdates"] + #view-port-container .global-warning-checkcompatibility {
+       margin-left: 104px;
+    }
+}

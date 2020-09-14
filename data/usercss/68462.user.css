@@ -1,0 +1,119 @@
+/* ==UserStyle==
+@name           Firefox OSX AwesomeBar Popup
+@namespace      USO Archive
+@author         bernstein
+@description    `<p>Great looking, compact, non-scrolling awesomebar popup. Single caveat: no ellipsis (text is cutoff without a …). Recommend setting <em>browser.urlbar.maxRichResults</em> in <em>about:config</em> to something between 16 to 36.</p><p>Tested on Firefox 14, 16 & 20 on OSX. <b>Not compatible with Windows.</b><p>Other styles from user 142430</p><p>Used this great windows style as template : style 19308</p>`
+@version        2013121.1.12
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+@namespace html url("http://www.w3.org/1999/xhtml");
+
+@-moz-document url(chrome://browser/content/browser.xul)
+{
+
+#PopupAutoCompleteRichResult {
+    -moz-appearance: none !important;/*needed for border-radius*/
+    padding: 0 !important;
+    margin-top: -1px !important;
+    border: 1px solid rgba(0,0,0,.05) !important;
+    background: white -moz-linear-gradient(left, rgb(242,242,242) 27px, transparent 0) repeat-y padding-box !important;
+    
+    border-radius: 4px !important;
+    /*opacity: 1 !important;*/
+}
+#PopupAutoCompleteRichResult .autocomplete-richlistbox {
+    background: none !important;
+    font-family: sans-serif !important;/*???*/
+}
+#PopupAutoCompleteRichResult .autocomplete-richlistbox > scrollbox {
+    overflow: visible !important;
+}
+
+/*** items ***/
+.autocomplete-richlistitem {
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+    padding: 2px 4px !important;
+}
+#PopupAutoCompleteRichResult .ac-site-icon {
+    margin: 0 10px 0 1px !important;
+}
+#PopupAutoCompleteRichResult .ac-title-box {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+#PopupAutoCompleteRichResult .ac-url-box {
+    margin: 0 !important;
+    padding: 1px 0 !important;
+    font-size: 95.5% !important;
+}
+
+/*** horizontal orient ***/
+#PopupAutoCompleteRichResult .autocomplete-richlistitem { -moz-box-orient: horizontal !important; }
+#PopupAutoCompleteRichResult .ac-title-box { -moz-box-flex: 1 !important; }
+#PopupAutoCompleteRichResult .ac-url-box { -moz-box-flex: 10000 !important; min-width: 0px !important; padding: 0 }
+#PopupAutoCompleteRichResult .ac-url-box .ac-site-icon { visibility: collapse !important; }
+#PopupAutoCompleteRichResult .ac-url description::before { content: "—"; padding: 0 5px; }
+/* this messes up ellipsis toggle algorithm, so hide them... */
+/* hide type & action icon as well (reinstated farther below) */
+#PopupAutoCompleteRichResult .autocomplete-richlistitem :-moz-any(.ac-ellipsis-after, .ac-action-icon, .ac-type-icon) { visibility: collapse !important; }
+/* reinstate ellipsis ?why doesn't this work? */
+#PopupAutoCompleteRichResult .ac-url description { overflow: hidden !important; white-space: nowrap !important; text-overflow: ellipsis !important; } 
+
+/*** hover/selected highlight ***/
+.autocomplete-richlistitem:first-child { border-radius: 2px 2px 0 0; }
+.autocomplete-richlistitem:last-child { border-radius: 0 0 2px 2px; }
+.autocomplete-richlistitem[current] {
+    background: border-box -moz-linear-gradient(left, rgba(255,255,255,0.2) 28px, transparent) repeat-y,
+                border-box #3875D6/*rgba(6,82,204,0.8)*/ repeat-x !important;
+    background-size: 28px auto, auto !important;
+}
+
+/*** show url only on hover/select *** 
+#PopupAutoCompleteRichResult .autocomplete-richlistitem:not([current]) .ac-url-box { visibility: collapse!important; }
+
+/*** highlight matched text ***/
+.autocomplete-richlistitem[current] html|span.ac-emphasize-text { text-decoration: underline !important; }
+.autocomplete-richlistitem:not([current]) html|span.ac-emphasize-text  {
+    text-decoration: none !important;
+    color: rgb(0,156,28)/*blue*/;
+}
+.autocomplete-richlistitem html|span.ac-emphasize-text {
+    background: none !important;
+    box-shadow: none !important;
+}
+
+/*** history highlight (includes mostused) ***/
+.autocomplete-richlistitem[type="favicon"] {}
+
+/*** bookmark highlight (includes tags) ***/
+.autocomplete-richlistitem[type="tag"] .ac-url-box::after,
+.autocomplete-richlistitem[type="bookmark"] .ac-url-box::after {
+    content:""; height:16px; width:16px; display:block; margin-left: 4px;
+    background-image: url("chrome://browser/skin/places/star-icons.png");
+    background-position: 48px 0;
+}
+.autocomplete-richlistitem[type="tag"][current] .ac-url-box::after,
+.autocomplete-richlistitem[type="bookmark"][current] .ac-url-box::after { background-position: 16px 0; }
+
+/*** switch to tab action ***/
+.autocomplete-richlistitem[type~="action"][actiontype="switchtab"]  .ac-url-box::after {
+    content:""; width:16px; height:10px; display:block; margin-left: 4px;
+    background-image: url("chrome://browser/skin/actionicon-tab.png");
+}
+.autocomplete-richlistitem[type~="action"][actiontype="switchtab"] .ac-url .ac-normal-text.ac-action-text { visibility: collapse !important; }
+
+/*** show url for switchtab ***
+.autocomplete-richlistitem[actiontype="switchtab"] .ac-normal-text.ac-url-text { visibility: visible !important; }
+
+/*???*
+.autocomplete-richlistitem[current]:not([selected]) {} 
+.autocomplete-richlistitem[selected]:active:hover {}
+.autocomplete-richlistitem[type*="suggest"] {}
+/**/
+
+}

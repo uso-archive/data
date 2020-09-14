@@ -1,0 +1,73 @@
+/* ==UserStyle==
+@name           Hide header - Freeware Files
+@namespace      USO Archive
+@author         hideheader
+@description    `A style that removes nothing from the page but clutter.(1) Collapses the page header to a thin horizontal strip at the top of the screen - mouse over the strip to expand the header again.(2) Collapses the left sidebar menu to a thin vertical strip at the left edge of the screen - mouse over the strip to expand the sidebar again.(3) Collapses the page footer to a thin horizontal strip at the bottom of the page - mouse over the strip to expand the footer again.The sidebar scrolls independently of the rest of the page, and never scrolls out of view when the page scrolls. The header can either be attached to the screen so that it never scrolls out of reach, or attached to the page so that it scrolls when the page scrolls. Ditto for the footer.`
+@version        2012612.12.41
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown headerPosition "Header position: top of the screen, or top of the page?" {
+		Top of the screen -  "Top of the screen - don't make me scroll to find it!*" <<<EOT fixed EOT;
+	Top of the page - it "Top of the page - it's not a header if it's not at the top" <<<EOT absolute EOT;
+
+}
+@advanced dropdown footerPosition "Footer position: bottom of the screen, or bottom of the page?" {
+		Bottom of the page - "Bottom of the page - it's not a footer if it's not at the foot*" <<<EOT absolute EOT;
+	Bottom of the screen "Bottom of the screen - don't make me scroll to find it!" <<<EOT fixed EOT;
+
+}
+@advanced dropdown opacity "Transparency - when collapsed, the placeholders should be..." {
+		Translucent - I want "Translucent - I want to see them, and see through them too*" <<<EOT 0.2 EOT;
+	Opaque - I want to s "Opaque - I want to see the placeholders, not see through them" <<<EOT 1 EOT;
+	Invisible - I don't  "Invisible - I don't need to see them to know that they're there" <<<EOT 0 EOT;
+
+}
+
+==/UserStyle== */
+
+@namespace url(http://www.w3.org/1999/xhtml);
+
+@-moz-document domain("freewarefiles.com") {
+
+ /* - - - - - auto-hide header - - - - - */
+ /*BODY > TABLE > TBODY > TR:first-child > TD > TABLE*/
+ BODY > TABLE > TBODY > TR:first-child {
+  position: /*[[headerPosition]]*/; top: 0px;
+  z-index: 2; /* else "Featured Software" is on top */
+ }
+ BODY > TABLE > TBODY > TR:first-child:not( :hover ) {
+  clip: rect(0, 9999px, 3mm, 0);
+  border-top: 3mm solid gray; opacity: /*[[opacity]]*/;
+ }
+
+
+ /* - - - - - auto-hide footer - - - - - */
+ BODY {position: relative}
+ HTML > BODY > TABLE > TBODY > TR:last-child {
+  position: /*[[footerPosition]]*/; bottom: 0px;
+  z-index: 2; /* else "Featured Software" is on top */
+ }
+ HTML > BODY > TABLE > TBODY > TR:last-child:not( :hover ) {
+  max-height: 0; overflow-y: hidden;
+  border-bottom: 3mm solid gray; opacity: /*[[opacity]]*/;
+ }
+
+
+ /* - - - - - auto-hide left sidebar menu - - - - - */
+ BODY > TABLE > TBODY > TR:nth-child(2) > TD > TABLE > TBODY > TR:first-child > TD > TABLE > TBODY > TR > TD:nth-child(2) > TABLE > TBODY > TR > TD:first-child {
+  position: fixed; left: 0; top: 0 !important;
+  max-height: 100%; overflow-y: auto;
+  width: auto !important;
+  background-color: white;
+  padding-right: 18px !important; /* assumes 18px scrollbar */
+  z-index: 2; /* else "Featured Software" is on top */
+ }
+ BODY > TABLE > TBODY > TR:nth-child(2) > TD > TABLE > TBODY > TR:first-child > TD > TABLE > TBODY > TR > TD:nth-child(2) > TABLE > TBODY > TR > TD:first-child:not( :hover ) {
+  clip: rect(0, 3mm, 9999px, 0);
+  border-left: 3mm solid gray; opacity: /*[[opacity]]*/;
+ }
+ BODY > TABLE > TBODY > TR:nth-child(2) > TD > TABLE > TBODY > TR:first-child > TD > TABLE > TBODY > TR > TD:nth-child(2) > TABLE > TBODY > TR > TD:last-child {
+  width: auto !important;
+   /* let content expand to use space left by sidebar */
+ }
+}

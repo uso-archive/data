@@ -1,0 +1,158 @@
+/* ==UserStyle==
+@name           Firefox 7+ addons manager small customizations
+@namespace      USO Archive
+@author         tinybutstrong
+@description    `Features:- Hide Add-on Buttons Until Selection;- Add id of each addon;- Add count of addons (total enabled/disabled);- Show installed date (disabled by default, remove comment to enable);- Remove annoyance messages like incompatible addon or compatibility checking is disabled;- and more..Tags: about:addons`
+@version        2012327.9.2
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown showid "Show add-on ID*" {
+		Yes (default) "Yes (default)*" <<<EOT /* show id of each addon *\/
+.addon[selected="true"]::after {
+    content: " ID: " attr(value) !important;
+    position: absolute !important;
+    margin-left: 68px !important;
+    color: #0066CC !important;
+    cursor: default;
+} EOT;
+	No "No" <<<EOT  EOT;
+
+}
+
+==/UserStyle== */
+
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+@-moz-document url("chrome://mozapps/content/extensions/extensions.xul"), url("about:addons") {
+
+/* Make addon row more slimmer */
+.addon {
+    padding: 2px 5px 2px 5px !important;
+}
+
+/* allow selection of addon title and description text (not version)
+to copy content using shortcut keys (ie. ctrl+c) */
+#detail-name, #detail-fulldesc, #detail-desc {
+    -moz-user-select: text !important;
+    cursor: text !important;
+}
+
+/* remove compatibility button from user styles if you are using stilysh and
+compatibility reporter addons */
+#addon-list richlistitem[type="userstyle"] button[anonid="compatibilityButton"] {
+    display: none !important;
+}
+
+/* keep the warning bar space always visible just to show addon conts */
+.view-header.global-warning-container {
+    display: -moz-box !important;
+    background: transparent !important;
+}
+
+/* remove message about incompatible addon */
+#list-view > #addon-list .warning {
+  display: none !important;
+}
+
+/* remove warning bar on top */
+.global-warning-container.global-warning {
+    display: none !important;
+}
+
+/* remove yellow zebra background from incompatible addons */
+.addon-view[notification="warning"] {
+    background: none !important;
+}
+
+/* remove background color for some disabled addons */
+.addon-view[active="false"] {
+    background: none !important;
+}
+
+/* background color of selected addon */
+.addon-view[selected="true"] {
+    background: rgba(148, 172, 204, 0.39) !important;
+}
+
+/* background effect of updated addon waiting restart to install */
+.addon-view[pending="enable"],
+.addon-view[pending="upgrade"],
+.addon-view[pending="install"] {
+    background-image: url("chrome://mozapps/skin/extensions/stripes-info-positive.png"),
+                    -moz-linear-gradient(rgba(0, 255, 0, 0.09),
+                                         rgba(0, 255, 0, 0.05)) !important;
+    background-repeat: repeat-x !important;
+}
+
+/* hover background color effect for addons entry */
+.addon.addon-view:hover:not([selected="true"]) {
+    background-color: rgba(135, 135, 135, 0.1) !important;
+} 
+
+/* show installed date of each addon (remove comment to enable)
+#list-view > #addon-list .date-updated {
+  display: -moz-box !important;
+} */
+
+/* hide the message 'add-on compatibility checking is disabled....' */
+.warning, .global-warning-checkcompatibility, .global-warning-container image {
+    display: none !important;
+}
+
+/* Hide Add-on Buttons Until Selection (thanks !K.WeEabo0o) */
+.details-container.fade > *:nth-child(2),
+.addon:not([selected="true"]) .control-container {
+    visibility: hidden !important;
+}
+
+/* addons counts & IDs from K.WeEabo0o - thanks! */
+.addon {
+    counter-increment: addoncount !important;
+    content: counter(addoncount) !important;
+}
+
+.addon:first-child {
+    counter-reset: addoncount !important;
+}
+
+.addon[active="false"] {
+    counter-increment: disabled !important;
+}
+
+#addon-list:after {
+    content: "("counter(addoncount)" enabled, "counter(disabled)" disabled)" !important;
+    position: fixed !important;
+    top: 68px !important;
+    left: 50% !important;
+    color: #916D15;
+    font-weight: bold;
+    text-shadow: #FFFFFF 1px 1px 1px;
+    cursor: default;
+    white-space: nowrap !important;
+}
+
+/*[[showid]]*/
+
+/* Arrow image credit: https://bugzilla.mozilla.org/show_bug.cgi?id=625465 */
+
+.details.button-link:before {
+    content: url(data:text/html;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MkNCRDBFRDEyQTlCMTFFMDk0RjRBNzJEQ0U0MkIyNTUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MkNCRDBFRDIyQTlCMTFFMDk0RjRBNzJEQ0U0MkIyNTUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoyQ0JEMEVDRjJBOUIxMUUwOTRGNEE3MkRDRTQyQjI1NSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoyQ0JEMEVEMDJBOUIxMUUwOTRGNEE3MkRDRTQyQjI1NSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PuELHjgAAAH9SURBVHjaTJIxaFpRFIbf02LVJhA1CGpC3+RUiEVrKFI0ajG2g6A4OUnRoa5CF6eidHDVRR3cHBwEQXATClUEEZR0kKIYGxLEIZggaszLy3/Sl+KF7517z7vn3HP/e1hBEBgaLMtKYF4DHVAx/8Y1uALn2Pcg+hiJGCCH+ZDJZE4Hg8HHzWbjJmhOPo1G47RYLEpma1CgvVQqxZDtB/hWqVS+w4ZFvhaLxS8cx502m00FVSZFAJdOp99Go1EN5n/y+bwilUq5R6MR7/F4hvAtTCbTajqdyobDodrpdE7oFL3X61XA/gazSCRy5nK5fvV6PWUymXwD3y2BBIt6vU4l6lh8Pq/X6x2ZTPZ3u+ZEImHrdru74XD4IhgMni2XS1alUqlXq9XFC9rA8/wY5mY7qN/vX89ms5darZbkFeYYUqmUVN2l8ublcnkJe/eMzWY76XQ6761W68Ruty/IV6vVWKPRSLILFHSZy+Wo1jURCoU4SH3scDh+ZrNZSjYB00Kh8CoQCNyTME+S4x3cyHoEOfeJWCzmhvWBd7SmfzjlE+7lwPqAId3NZrOS3sFgMJj8fv8BfDvgEAIYyEcB4/H4REwiYZ/bqNVqKarV6nGj0VC22216PwZdwPt8vvt4PH4nl8uprD5d4X/QVnfowT7YE31zej+6O3jqv0cBBgAY7PnFEyhUqAAAAABJRU5ErkJggg==);
+}
+
+.details.button-link:hover:before {
+    content: url(data:text/html;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NjQ0RjUyNUYyNzREMTFFMEE5RTA4MTc2OTRBRTUxN0UiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NjQ0RjUyNjAyNzREMTFFMEE5RTA4MTc2OTRBRTUxN0UiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo2NDRGNTI1RDI3NEQxMUUwQTlFMDgxNzY5NEFFNTE3RSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo2NDRGNTI1RTI3NEQxMUUwQTlFMDgxNzY5NEFFNTE3RSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PuWYru8AAAH2SURBVHjaTJI/aBpxFMfvroWiMUXNIfZiwD9DMLiFGoODRoV0MJRSBUEcHBx6QqBnIBQsQhFcgk4uDq7qJOjeoeDkH1CSgNShJK1QbihiY4nS2u9LveIPPvfe793v/e773jt2uVwytFiWfQSzD/bADvNv3YJr0MW536sYw60SnsIkUqnUq1ar5ZjP51sE+RTTaDSixWLRMmuLvvAml8tlcVsOnNfr9Q+w8RViJpNJ8zwvNRoNtaLMKYpiBpt3IFoqlSS73f5RkqQL7F8rRCKRt7FYLAyfI3mOUCj0C/YKyIlE4tLv97f6/b46m806EJsSwWDwFnJN8J+xeLyfzWafVSrVzbrmdDrt7vV6m/F4/Gs4HL6cTqecXq/3LxaLxmM6AOcLkibrSYPB4Icsy08MBgMVsYQ/4TjuD/xNkjfO5/Nk5wput/uo0+kcOp3OG4/Hc0excrm8IQjCT7qADl9Vq9Vt2HsiGo2ah8Phgdfr/VQsFqlWkv29VquZAoGADP/uoeWYw6nNZnuBzvBEMpkMwL4Ez2lP74xG4xnqOsLexFDfzWazluag0+lOXC6XHTEN2IHMXYpRQrfbPV5dwrHKsJrNprpSqQTb7bYwGo0epm+1Wic+n08uFArfoIbqGVAJ/5PWfisB8ED5bairVMsYUPeYvwIMAPz2/1UzfrzjAAAAAElFTkSuQmCC);
+}
+
+.details.button-link:active:before {
+    content: url(data:text/html;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NzY4M0E2RTgyQTlDMTFFMDk0RjRBNzJEQ0U0MkIyNTUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NzY4M0E2RTkyQTlDMTFFMDk0RjRBNzJEQ0U0MkIyNTUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoyQ0JEMEVENzJBOUIxMUUwOTRGNEE3MkRDRTQyQjI1NSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoyQ0JEMEVEODJBOUIxMUUwOTRGNEE3MkRDRTQyQjI1NSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PiMS7QUAAAIwSURBVHjaTFLPi1JhFH3PyUkcJ3+gZpYM2kKcVNRREFoYIuKijdtwU7hz41+giBt3rl1KgoK4EkGEVioU6iKzMDVNzWdiow7+qPesed1bTnTh8B73u+fec+73kSzLEhgkSR7B5wJwDlARf2MM+ABoQN2vQ44gkQSEO/D/LBAIPPR4PDyj0cjFw2azuS8Wiz+SyeRIKpW+HAwGK8wfRSIRnPA8FAqpg8HgsUQiWUEhK5PJekKh8NJut9PQVFSr1c51Ot1brVa7R4LN7/fbgHC9WCw+ZbNZXiKReDKdTn+azebPDMPs9Hr9qt/vnwJkXq+3zQGS3u12M7PZrL1erxdOp/MjdH/TbrdPMpmMjqbpLQJys2q1+gDq7yHpvkajoZbL5eVut9sgfD7fK5PJNKzX65xGo6HCnMFgmI9GI/Quv4XGKIoab7fbNfFftFqtFcg9lsvlLJfLJUDamsPhXMPRKU6icrkcAd2YG8RisccgzwpbnFit1h34oiuVCk+pVG6gnkXS+3K5LAc/DCKdTquGw+GFzWZ7HQ6Hv8/n8wk0+Aakuy6Xaw71WxLXLhAIAmKx+At4aaG0TqfzKBqNnsByZqVSaZhKpfT7/V7T7XYbUNv9c7lqtVq02WxegIyxQqEYgaSvDodDFI/Hb4PfMz6ff1YoFN5ZLJYFvg7y5hnl83k+SHsKl6js9XoizMFWr+AK5kCewAT00wTQ/0iHQI9KgBQgOuSuAOiFAuD2iN8CDADKwSWfIbXk9AAAAABJRU5ErkJggg==);
+}
+
+.details.button-link {
+    font-size: 0px !important; margin-top: 4px !important; margin-left: 3px !important;
+}
+
+.addon:not([selected="true"]) .details.button-link {
+    visibility: hidden !important;
+}
+
+}

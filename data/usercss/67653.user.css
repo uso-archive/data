@@ -1,0 +1,347 @@
+/* ==UserStyle==
+@name           autohide the header (+no ads) [Gannett newspapers]
+@namespace      USO Archive
+@author         hideheader
+@description    `Auto-hides the page header<!--, page footer, and sidebar-->; mouse over the blue placeholder to restore it. Hides ads, ad-like syndicated content (like Taboola), and other ad-like nuisances.`
+@version        2015110.21.27
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+@-moz-document url("http://www.usatoday.com/"),
+url-prefix("http://www.usatoday.com/?") {
+
+#hdSpacer {display: none}
+
+}
+
+
+@-moz-document
+
+  /* "squared-off" Gannett home page */
+  domain("usatoday.com"),                /*USA Today*/
+  domain("www.azcentral.com"),           /*The Arizona Republic*/
+  domain("www.freep.com"),               /*Detroit Free Press*/
+  domain("www.indystar.com"),            /*The Indianapolis Star*/
+  domain("www.courier-journal.com"),     /*The Courier-Journal [Louisville, KY]*/
+  domain("www.cincinnati.com"),          /*The Cincinnati Enquirer*/
+  domain("www.tennessean.com"),          /*The Tennessean [Nashville]*/
+  domain("www.democratandchronicle.com"),/*Democrat and Chronicle [Rochester, NY]*/
+  domain("www.app.com"),                 /*Asbury Park Press [NJ]*/
+  domain("www.desmoinesregister.com"),   /*The Des Moines Register*/
+  domain("www.delawareonline.com"),      /*The News Journal [Wilmington, DE]*/
+  domain("www.lohud.com"),               /*The Journal News [Lower Hudson Valley, NY]*/
+
+  /* "squared-off" MediaNews home page */
+   domain("detroitnews.com") /*The Detroit News*/ {
+  /*domain("www.twincities.com"), /*St. Paul Pioneer Press*/
+  /*domain("www.freebroadcaster.com"), /*The Nashua Broadcaster*/
+  /*domain("www.mercurynews.com"), /*San Jose Mercury News*/
+
+/* Most pages have separate header (#hd) and body (#bd) sections, but a few have include what should be #bd > * elements in the #hd element. So, we're gonna have to test for a missing #bd element, or have a whole lot of special cases for different sections. */
+
+/* NB: Element IDs are not unique on these pages. There are i.e. 2+ #hd */
+
+
+/* - - - - auto-hide header - - - - */
+
+/*body:not( .homepage ) {background-image: none !important}*/
+body {background-image: none !important}
+ /* gonna have to restore the image for non-auto-hidden headers */
+
+#custom-doc > #hd:not( :last-of-type ) {
+ position: absolute; top: 0px;
+ clip: rect(0px 9999px 3mm 0px);
+ background-repeat: repeat-x;
+  /* background-image is different for each section */
+ z-index: 101;
+  /* carousel title is z-index:100 */
+}
+#custom-doc > #hd:not( :last-of-type ):hover {
+ clip: auto;
+ /*background-color: darkblue;*/
+}
+#custom-doc > #hd:not( :last-of-type ):not( :hover ) {
+ background-color: transparent !important;
+ background-image: none !important;
+}
+#custom-doc > #hd:not( :last-of-type ):not( :hover ) > * {visibility: hidden}
+
+/** new header **/
+@media (max-width: 0px) {/*--*/
+HEADER.site-header {
+  position: fixed; top: 0; left: 0;
+  clip: rect(0, 5cm, 3mm, 16px);
+  transition: clip .3s .8s linear;
+  z-index: 114;
+  }
+HEADER.site-header:hover {
+  clip: rect(0, 1920px, 400px, 0);
+  transition-delay: 0s;
+  }
+HEADER.site-header:not(:hover) {
+  background: rgba(0,0,0,.1) !important;
+  }
+HEADER.site-header:not(:hover) > * {
+  visibility: hidden;
+  transition: visibility .5s 1s step-end;
+  transition-duration: inherit;
+  transition-delay: inherit;
+}
+/*--*/}
+
+HEADER.site-header {
+  position: fixed; top: 0; left: 0;
+  clip: rect(0, 3mm, 20mm, 0);
+  transition: clip .3s .8s linear;
+  transition-property: clip, border-left-width;
+  transition-timing-function: linear, step-end;
+  z-index: 114;
+  border-left: 3mm solid blue;
+  box-sizing: content-box;
+}  
+HEADER.site-header:hover {
+  clip: rect(0, 1920px, 400px, 0);
+  transition-delay: 0s;
+  border-left-width: 0;
+  transition-timing-function: linear, step-start;
+}
+
+/** though I do like the site's collapsing header... **/
+HEADER.site-header .site-masthead-search-wrap {
+  height: auto !important;
+}
+
+@media (max-width: 0px) {/*--*/
+/* - - - - auto-hide footer - - - - */
+
+body {position: relative}
+
+/*
+#footer {
+ position: absolute; bottom: 0px;
+ z-index: 1;
+}
+*/
+  /* body height is zero - http://www.w3.org/TR/CSS2/visudet.html#Computing_heights_and_margins */
+
+
+body.yourlifebody > #footer-container {
+ position: absolute; bottom: 0px;
+}
+body.yourlifebody > #footer-container:not( :hover ) {
+ height: 3mm; overflow: hidden;
+}
+ /* still a gap below footer in yourlife.usatoday.com  pages */
+
+
+/* - - - - auto-hide right sidebar - - - - */
+
+#rightrailNew:not( :hover ) {
+ opacity: 0.2;
+}
+
+/** no syndicated content (boo, Taboola!) **/
+.videoCube[data-item-syndicated=true] {
+  display: none;
+  }
+.grid-2x4 .trc_rbox_div {
+  height: auto !important;
+  }
+.asset .more-stories-content {
+  min-height: 0 !important;
+  }
+/*--*/}
+
+/** no syndicated content **/
+.syndicatedItemUB,
+[data-item-syndicated="true"],
+A[href*="taboola.com"], A[href*="taboola.com"] ~ *,
+
+/** no ads **/
+[id*="_ads_"], [id^="ad-"], [class*="-ad-"],
+
+/* no adverts */
+.site-footer-partner-logos,
+.site-footer-section-partners,
+
+/** no social **/
+.util-bar-module-share,
+.story-asset.inline-share-tools-asset,
+.twitter-module,
+
+/* - - - - no commment - - - - */
+
+.util-bar-module-comments,
+
+/*--.usat_comment_wrap,
+#pluck,
+#commentsText,--*/
+body.yourlifebody #uslComments,
+
+.partner-overlay,
+
+.\. {display:none!important}
+
+BODY.high-impact-ad-visible {display:block!important}
+
+}
+
+
+@-moz-document url-prefix("http://www.usatoday.com/life/") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ background-image: url("http://i.usatoday.net/_inside2011/_i/bg-hd-life.png");
+}
+}
+@-moz-document url("http://www.usatoday.com/life/index"),
+ url-prefix("http://www.usatoday.com/life/index?") {
+body {
+ background-image: url("http://www.usatoday.com/life/_common/images/bg-life.jpg") !important;
+}
+}
+
+@-moz-document url-prefix("http://www.usatoday.com/money/") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ /*background-color: green;*/
+ /*background-color: white;*/
+ background-image: url("http://i.usatoday.net/_inside2011/_i/bg-hd-money.png");
+}
+}
+@-moz-document url("http://www.usatoday.com/money/index") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ background-image: url("http://i.usatoday.net/money/_common/images/bg-money.jpg");
+}
+}
+
+@-moz-document url-prefix("http://www.usatoday.com/news/") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ /*background-color: darkblue;*/
+ background-image: url("http://i.usatoday.net/_inside2011/_i/bg-hd-news.png");
+}
+}
+@-moz-document url("http://www.usatoday.com/news/index") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ background-image: url("http://i.usatoday.net/news/_common/_images/bg-news.jpg");
+}
+}
+
+@-moz-document url-prefix("http://www.usatoday.com/sports/") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ /*background-color: maroon;*/
+ background-image: url("http://i.usatoday.net/_inside2011/_i/bg-hd-sports.png");
+}
+}
+@-moz-document url("http://www.usatoday.com/sports/index") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ background-image: url("http://i.usatoday.net/sports/_common/images/bg-sports.jpg");}
+}
+
+@-moz-document url-prefix("http://www.usatoday.com/tech/") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ /*background-color: darkblue;*/
+ background-image: url("http://i.usatoday.net/_inside2011/_i/bg-hd-tech.png");
+ background-color: transparent;
+}
+}
+@-moz-document url("http://www.usatoday.com/tech/index") {
+ #custom-doc > #hd { background-image: url("http://i.usatoday.net/tech/_common/images/bg-tech.jpg") }
+}
+
+@-moz-document url-prefix("http://www.usatoday.com/weather/") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ /*background-color: goldenrod;*/
+ background-image: url("http://i.usatoday.net/_inside2011/_i/bg-hd-weather.png");
+ /*background-color: transparent;*/
+}
+}
+@-moz-document url("http://www.usatoday.com/weather/index") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ background-image: url("http://i.usatoday.net/weather/_common/images/bg-weather.jpg");
+}
+}
+
+@-moz-document domain("travel.usatoday.com") {
+
+#custom-doc > #hd:not( :last-of-type ):hover {
+ /*background-color: skyblue;*/
+ background-image: url("http://i.usatoday.net/travel/_common/global/images/travel_bg.jpg");
+}
+
+#ft {
+ position: absolute; bottom: 0px;
+ min-width: 100%;
+}
+#ft:not( :hover ) {
+ height: 3mm; overflow: hidden;
+ background-color: skyblue !important;
+}
+}
+@-moz-document url("http://travel.usatoday.com/index") {
+ /* travel index uses same background as travel articles */
+}
+
+@-moz-document domain("yourlife.usatoday.com") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ /*background-color: purple;*/
+ background-image: url("http://i.usatoday.net/yourlife/_common/global/images/bg_yourlife2.jpg");
+}
+
+#contentWellRight:not( :hover ) {opacity: 0.2}
+}
+@-moz-document url("http://yourlife.usatoday.com/index"),
+  url("http://yourlife.usatoday.com/index/") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ background-image: url("http://i.usatoday.net/yourlife/_common/global/images/bg_yourlife3.jpg");
+}
+
+#rightRail:not( :hover ) {opacity: 0.2}
+}
+
+@-moz-document domain("books.usatoday.com") {
+#custom-doc > #hd:not( :last-of-type ):hover {
+ background-image: url("http://www.usatoday.com/life/_common/images/bg-life-sub.jpg");
+}
+
+#yui-main + .sidebar:not( :hover ) {opacity: 0.2}
+ /* auto-hide sidebar */
+
+#BOOK_PAGE + .tItem { display: none }
+ /* no comment */
+}
+@-moz-document url("http://books.usatoday.com/index") {
+ /* index and pages use the same background */
+}
+
+@-moz-document domain("content.usatoday.com") {
+
+#header-leaderboard {display: none}
+
+#master_header {
+ position: absolute; top: 0px;
+ z-index: 1;
+}
+
+#master_header:not( :hover ) {
+ clip: rect(0px 9999px 3mm 0px);
+ background-image: none !important;
+}
+
+#master_header:not( :hover ) > * {visibility: hidden}
+
+/*
+#footer {
+ position: absolute; bottom: 0px;
+}
+#footer:not( :hover ) {
+ height: 3mm; overflow:hidden;
+}
+*/
+
+#content-side:not( :hover ) {opacity: 0.2; background-color: white}
+
+#post-comments { display: none }
+
+#post-navigation-top {display: none}
+
+}

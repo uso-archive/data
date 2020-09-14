@@ -1,0 +1,53 @@
+/* ==UserStyle==
+@name           Firefox Addons Manager Show Addon Counts & ID
+@namespace      USO Archive
+@author         bernstein
+@description    `<p><b>designed for english gui and use with style 66194 & style 66180</b></p><ul><li>In Extension & Themes : Always show a header bar, with enabled/disabled counts & selected addon ID. Show counts in userstyles too.</li><li>Hide global warning message text, hover over icon to see the text.</li><li>Remove the "(disabled)" & "Update" title::after text.</li></ul><p>Tested on Firefox 13 & 15 on OSX. FF12 on Win7/XP.</p><p><em>Updated for Firefox beta on OSX!</em></p><p>Other styles from user 142430.</p>`
+@version        2012529.16.8
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+
+==/UserStyle== */
+
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+@-moz-document url(chrome://mozapps/content/extensions/extensions.xul), url(about:addons)
+{
+	/* always show header for counts & addon ids, minimize warnings to known size */
+	#list-view:-moz-any([type="extension"],[type="theme"]) .view-header.global-warning-container { display: -moz-box !important; }
+	#list-view:-moz-any([type="extension"],[type="theme"]) .global-warning-text { display: none !important; }
+	#list-view:-moz-any([type="extension"],[type="theme"]) .view-header.global-warning-container { padding-left: 150px !important; }
+	/* show id for extensions & themes */
+	#list-view:-moz-any([type="extension"],[type="theme"],[type="plugin"]) .addon[selected="true"]::after {
+		content: " ID: " attr(value) !important;
+		position: fixed !important;
+		top: 41px !important;
+		color: rgb(37, 47, 59);
+		text-shadow: 0px 1px rgba(255, 255, 255, 0.4);
+		white-space: nowrap !important;
+		right: 8px;
+	}
+	
+	/* show count of enabled/disabled extensions, themes & userstyles */
+	#list-view:-moz-any([type="extension"],[type="theme"],[type="userstyle"]) .addon:first-child     { counter-reset: enabled; counter-reset: disabled; }
+	#list-view:-moz-any([type="extension"],[type="theme"],[type="userstyle"]) .addon[active="true"]  { counter-increment: enabled; }
+	#list-view:-moz-any([type="extension"],[type="theme"],[type="userstyle"]) .addon[active="false"] { counter-increment: disabled; }
+	#list-view:-moz-any([type="extension"],[type="theme"],[type="userstyle"]) #addon-list::after {
+		content: "("counter(enabled)" enabled, "counter(disabled)" disabled)";
+		position: fixed;
+		top: 41px;
+		left: 210px;
+		color: rgb(37, 47, 59);
+		text-shadow: 0px 1px rgba(255, 255, 255, 0.4);
+		white-space: nowrap;
+	}
+	#list-view[type="userstyle"] #addon-list::after { left: 29em; }
+	@media all and (max-width:  800px) { #list-view:-moz-any([type="extension"],[type="theme"]) #addon-list::after { left: 63px; } #list-view[type="userstyle"] #addon-list::after { left: 16em; }}
+	@media all and (max-width:  710px) { #list-view:-moz-any([type="extension"],[type="theme"]) #addon-list::after { left:  8px; } #list-view[type="userstyle"] #addon-list::after { left: 11em; }}
+	
+	/* "(disabled)" & "(Update)" - Remove */
+	.disabled-postfix,
+	.update-postfix {
+		display: none !important;
+	}
+}

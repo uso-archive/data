@@ -1,0 +1,117 @@
+/* ==UserStyle==
+@name           Firefox Container Tabs Tweaks
+@namespace      USO Archive
+@author         _emmyemi
+@description    `Subtly tweaks visual indicators for the Container Tabs experiment currently available in Beta, Dev, and Nightly.`
+@version        2017220.20.8
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown usercontextcolors "Tweak colors?" {
+		colorchange "Yes*" <<<EOT [data-identity-color="red"] {
+  --identity-tab-color:#e31616;
+}
+[data-identity-color="purple"] {
+  --identity-tab-color:#8c2e99;
+}
+[data-identity-color="green"] {
+  --identity-tab-color:#14cc43;
+}
+.userContext-icon,
+.menuitem-iconic[data-usercontextid] > .menu-iconic-left > .menu-iconic-icon,
+.subviewbutton[usercontextid] > .toolbarbutton-icon,
+#userContext-indicator {
+  fill:var(--identity-tab-color);
+} EOT;
+	colorkeep "No" <<<EOT /* -- *\/ EOT;
+
+}
+@advanced dropdown thickness "Tab underline thickness:" {
+		underlinewidth1 "1px*" <<<EOT 2 EOT;
+	underlinewidth2 "2px" <<<EOT 3 EOT;
+
+}
+@advanced dropdown glow "Active tab glow thickness:" {
+		shadowthickness2 "1px*" <<<EOT 1 EOT;
+	shadowthickness1 "0.5px" <<<EOT .5 EOT;
+	shadowthickness3 "2px" <<<EOT 2 EOT;
+
+}
+@advanced dropdown underline "Apply underline to normal tabs?" {
+		tabunderline1 "No*" <<<EOT /* -- *\/ EOT;
+	tabunderline2 "Yes" <<<EOT .tabbrowser-tab,  EOT;
+
+}
+
+==/UserStyle== */
+
+/* 
+ * Written by Emmy <3
+ * Slightly changes up the look of User Context / Container tabs
+ */
+
+@-moz-document url(chrome://browser/content/browser.xul) {
+  /* -- usercontext colors -- */
+  /*[[colorchange]]*/
+  /*[[colorkeep]]*/
+  
+  /*[[tabunderline1]]*//*[[tabunderline2]]*/ .tabbrowser-tab[usercontextid] {
+    background-image: linear-gradient(to right, transparent, var(--identity-tab-color) 20%, var(--identity-tab-color) 80%, transparent);
+    background-size: auto 2px/*[[underlinewidth]]*/;
+    background-position: bottom;
+    background-repeat: no-repeat;
+  }
+  .tabbrowser-tab:not([usercontextid]) {
+    --identity-tab-color:#333;
+  }
+  
+  /*
+   * dirty hack to keep the drop shadow filter from applying to the
+   * tab shape before the shape itself renders
+   */
+  [fadein] {
+    transition:none;
+  }
+  .tabbrowser-tab[usercontextid]:hover .tab-background:not([selected=true]) {
+    background-image:none !important;
+    opacity:.55;
+  }
+  :-moz-any(.tab-background-start, .tab-background-end)::before {
+    content:"";
+    display:-moz-box;
+    min-height: var(--tab-min-height);
+    width: var(--tab-curve-width);
+  }
+  .tabbrowser-tab[usercontextid]:not([selected=true]):hover .tab-background-start::before {
+    background-image: url(chrome://browser/skin/tabbrowser/tab-selected-start.svg);
+    background-size: 100% 100%;
+  }
+  .tabbrowser-tab[usercontextid]:not([selected=true]):hover .tab-background-middle {
+    background-image:linear-gradient(transparent 2px,   rgba(255,255,255,.4) 2px, rgba(255,255,255,.4)), none;
+    background-repeat: repeat-x;
+    background-size: auto 100%;
+    padding-top: 2px;
+    background-size: 100% 100%;
+    background-clip: padding-box, content-box;
+    background-color: -moz-dialog;
+  }
+  .tabbrowser-tab[usercontextid]:not([selected=true]):hover .tab-background-end::before {
+    background-image: url(chrome://browser/skin/tabbrowser/tab-selected-end.svg);
+    background-size: 100% 100%;
+  }
+  /*
+   * end hack
+   */
+  
+  .tabbrowser-tab[usercontextid] .tab-background {
+  }
+  .tabbrowser-tab[usercontextid][selected=true] .tab-background {
+    filter:drop-shadow(0px 0px /*[[shadowthickness1]]*//*[[shadowthickness2]]*//*[[shadowthickness3]]*/px var(--identity-tab-color));
+    opacity:1;
+  }
+  #userContext-icons {
+    margin-left: 3px;
+  }
+  #userContext-indicator {
+    margin-inline-end: 3px;
+  }
+}
