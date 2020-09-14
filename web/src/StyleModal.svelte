@@ -49,15 +49,9 @@
 			<h3>{style.info.name} ({style.id})</h3>
 		</div>
 		<div class="modal-body">
-			<!-->
 			{#if style.screenshots.main}
-				{#if style.screenshots.isMainArchived}
-					<img src={`${dataPrefix}screenshots/${style.screenshots.main}`} alt="Screenshot">
-				{:else}
-					<img src={`https://userstyles.org/style_screenshots/${style.screenshots.main}`} alt="Screenshot">
-				{/if}
+				{#if style.screenshots.isMainArchived}<img class="img-fluid rounded mb-3" src={`${dataPrefix}screenshots/${style.screenshots.main}`} alt="Screenshot" />{:else}<img class="img-fluid rounded mb-3" src={`https://userstyles.org/style_screenshots/${style.screenshots.main}`} alt="Screenshot" />{/if}
 			{/if}
-			<-->
 			<h5>Information</h5>
 			<ul>
 				<li>Installs this week: {style.stats.installs.weekly}</li>
