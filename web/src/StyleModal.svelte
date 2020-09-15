@@ -50,26 +50,37 @@
 		</div>
 		<div class="modal-body">
 			{#if style.screenshots.main}
-				{#if style.screenshots.isMainArchived}<img class="img-fluid rounded mb-3" src={`${dataPrefix}screenshots/${style.screenshots.main}`} alt="Screenshot" />{:else}<img class="img-fluid rounded mb-3" src={`https://userstyles.org/style_screenshots/${style.screenshots.main}`} alt="Screenshot" />{/if}
+				{#if style.screenshots.isMainArchived}<img class="img-fluid rounded" src={`${dataPrefix}screenshots/${style.screenshots.main}`} alt="Screenshot" />{:else}<img class="img-fluid rounded" src={`https://userstyles.org/style_screenshots/${style.screenshots.main}`} alt="Screenshot" />{/if}
 			{/if}
-			<h5>Information</h5>
+			<h5 class="mt-3">Information</h5>
 			<ul>
+				<li>Rating: {style.stats.rating}</li>
+				<li>Applies to: {style.info.category}</li>
+				<li>Updated at: {new Date(style.info.updatedAt).toLocaleString()}</li>
+				{#if style.info.createdAt}
+					<li>Created at: {new Date(style.info.createdAt).toLocaleString()}</li>
+				{/if}
 				<li>Installs this week: {style.stats.installs.weekly}</li>
 				<li>Total installs: {style.stats.installs.total}</li>
-				<li>Applies to: {style.info.category}</li>
-				<li>License: {style.info.license}</li>
 				{#if style.info.author}
 					<li>Author: {style.info.author.name} ({style.info.author.id})</li>
 				{/if}
+				<li>License: {style.info.license}</li>
 			</ul>
 			{#if style.info.description}
-				<h5>Description</h5>
+				<h5 class="mt-3">Description</h5>
 				{@html processModalDescription(style.info.description)}
 			{/if}
 			{#if style.info.additionalInfo}
-				<h5>Notes from the last update</h5>
+				<h5 class="mt-3">Notes from the last update</h5>
 				{@html processModalDescription(style.info.additionalInfo)}
 			{/if}
+			<h5 class="mt-3">Other</h5>
+			<ul>
+				<li><a target="_blank" href={`${dataPrefix}usercss/${style.id}.user.css`}>UserCSS</a></li>
+				<li><a target="_blank" href={`${dataPrefix}styles/${style.id}.json`}>JSON</a></li>
+				<li><a target="_blank" href={`${dataPrefix}markdown/${style.id}.md`}>Markdown</a></li>
+			</ul>
 		</div>
 		<div class="modal-footer"><a class="btn btn-primary" target="_blank" href={`https://userstyles.org/styles/${style.id}`}>UserStyles.org</a> <a class="btn btn-primary" target="_blank" href={`${dataPrefix}usercss/${style.id}.user.css`}>Install</a> <button class="btn btn-secondary" on:click={close}>Close</button></div>
 	{:catch e}
