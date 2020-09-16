@@ -3,6 +3,7 @@ const path = require("path");
 const performance = require("perf_hooks").performance;
 const uso = require("./lib/uso");
 const utils = require("./lib/utils");
+const logger = require("./lib/logger");
 
 async function main() {
 	// Get list of downloaded pages
@@ -23,40 +24,29 @@ async function main() {
 		(async () => {
 			// Increment started page counter
 			startedPages++;
-			// Check if page isnt older than previous update
 			if (downloadedPages.includes(`${page}.json`)) {
-				console.log(`[Page: ${page}] Already downloaded`);
+				logger.info(["Get Newest"], `Page ${page} already exists`);
 				startedPages--;
 				return;
 			}
 			// Logging
-			console.log(`[Page: ${page}] Downloading...`);
+			logger.info(["Get Newest"], `Downloading page ${page}...`);
+
 			const p1 = performance.now();
-			// Download page data, retry on error
-			let errors = 0;
-			let pageData = undefined;
-			for (;;) {
-				try {
-					pageData = await uso.getPage(page, "recently_updated", 12);
-					break;
-				} catch (e) {
-					console.error(`[Page: ${page}, Error]`, e);
-					errors++;
-					if (errors > 50) process.exit(50);
-				}
-			}
-			console.log(`[Page: ${page}] Downloaded, took ${Math.round((performance.now() - p1) / 1000)}s`);
+			let pageData = utils.retry(async () => await uso.getPage(page, "recently_updated", 12), 50);
+			logger.info(["Get Newest"], `Page ${page} downloaded, took ${Math.round((performance.now() - p1) / 1000)}s`);
+
 			// Check if page is not empty
 			if (pageData.data.length === 0) {
 				stop = true;
-				if (!stop) console.log(`[Page: ${page}] Stopping, page is empty`);
+				if (!stop) logger.info(["Get Newest", `Stopping, page ${page} is empty`]);
 				startedPages--;
 				return;
 			}
 			// Save page
 			await fs.writeFile(path.resolve(__dirname, "data", "uso-pages", `${page}.json`), JSON.stringify(pageData), { encoding: "utf8" });
 			startedPages--;
-		})();
+		})().catch(e => logger.error(["Get Newest"], e));
 	}
 
 	for (;;) {
@@ -65,5 +55,5 @@ async function main() {
 	}
 }
 
-main();
+main().catch(e => logger.error(["Get Newest"], e));
 

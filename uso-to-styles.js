@@ -1,6 +1,7 @@
 const uso = require("./lib/uso");
 const path = require("path");
 const fs = require("fs").promises;
+const logger = require("./lib/logger");
 
 async function main() {
 	const files = await fs.readdir(path.resolve(__dirname, "data", "uso-styles"));
@@ -14,19 +15,19 @@ async function main() {
 				const filename = uso.filenameFromScreenshotUrl(screenshot);
 				await fs.stat(path.resolve(__dirname, "data", "screenshots", filename));
 				res = uso.toBetterFormat(json, true);
-				console.log(`[${json.id}] Converted, archived screenshot exists.`);
+				logger.info(["Uso To Styles"], `Converted ${json.id}, archived screenshot exists`);
 			}
 			else {
 				res = uso.toBetterFormat(json, false);
-				console.log(`[${json.id}] Converted.`);
+				logger.info(["Uso To Styles"], `Converted ${json.id}`);
 			}
 		} catch (e) {
 			res = uso.toBetterFormat(json, false);
-			console.log(`[${json.id}] Converted.`);
+			logger.info(["Uso To Styles"], `Converted ${json.id}`);
 		}
 		await fs.writeFile(path.resolve(__dirname, "data", "styles", file), JSON.stringify(res), { encoding: "utf8" });
 	}
 }
 
-main();
+main().catch(e => logger.error(["Uso To Styles"], e));
 
