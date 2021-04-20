@@ -1,0 +1,126 @@
+/* ==UserStyle==
+@name           autohide the menu & sidebar [Financial Post]
+@namespace      USO Archive
+@author         hideheader
+@description    `Hides the <i>Financial Post</i>'s header, footer, and sidebar. (But not permanently - hover at the edges of the screen to restore them.)`
+@version        20131030.11.36
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@-moz-document domain("nationalpost.com"), domain("financialpost.com") {
+
+/** autohide the header **/
+#npHeader, #npContentSide, #npFooter {
+  position: fixed; left: 0; top: 0;
+  z-index: 3; /* else .npStoryPhoto is on top */
+  background-color: white;
+  clip: rect(0, 2mm, 1080px, 0);
+  border-left: 2.2mm solid red;
+  transition: clip .3s .8s linear;
+  }
+#npHeader:hover, #npContentSide:hover, #npFooter:hover {
+  clip: rect(0, 1007px, 1080px, 0);
+  transition-delay: 0s;
+  }
+
+#npHeader {
+  border-right: thin solid black;
+  border-bottom: thin solid black;
+  clip: rect(0, 2mm, 20mm, 0);
+  }
+#npHeader:hover {
+  clip: rect(0, 949px, 244px, 0);
+  }
+
+
+/** autohide the sidebar **/
+#npContentSide:not(:hover) {
+  z-index: 2; /* else covers footer & header */
+  }
+#npContentSide {
+  border-left-color: blue;
+  height: 100%; overflow-y: auto; resize: horizontal;
+  }
+#npContentSide > * {resize: none} /*Chrome bug: resize is inherited */
+
+
+/** autohide the footer **/
+BODY {position: relative}
+#npFooter {
+  top: auto; bottom: 0; clip: auto;
+  position: absolute;
+  height: 20mm; width: 0;
+  overflow: hidden;
+  transition-property: height, width;
+  }
+#npFooter:hover {
+  height: 271px; width: 948px;
+  }
+
+
+/** no ads **/
+#npAdWallpaper,
+#npAdGoogle,
+#npLeaderboard, #npLeaderboardBot,
+.npAd,
+.npSponsorContent > P.npLogoTxtLeft,
+[id^="dartad"], /*FP*/
+
+/** no comment **/
+[id^="disqus"], [class^="dsq"],
+
+/** no social **/
+IFRAME[src*="facebook.com"],
+.npFindOnFacebookContainer,
+.npStoryShare,
+
+.npFskCatfish, /*Post Points*/
+
+.\. {display: none !important}
+
+
+/** readability **/
+/* widen the article on zoom, but not wider than the screen */
+#npContentMain {
+  width: 52em !important;
+  max-width: 100%;
+  }
+/* replace the "border" with a border */
+#npContent {
+  background-image: none !important;
+  }
+#npContentMain{
+  border-right: thin solid #888;
+  padding-right: 2mm !important;
+  }
+
+}
+
+
+@-moz-document domain("financialpost.com") {
+
+#npHeader:hover {clip: rect(0, 949px, 351px, 0)}
+#npContentSide {
+  resize: none;
+  width: 310px !important;
+  }
+
+}
+
+
+@-moz-document
+ url('http://www.nationalpost.com/'),
+ url('http://www.nationalpost.com/index.html'),
+ url('http://www.financialpost.com/'),
+ url('http://www.financialpost.com/index.html') {
+
+#npHeader, #npContentSide, #npFooter/*,
+#npHeader:hover, #npContentSide:hover, #npFooter:hover*/ {
+/* restore the header, footer, sidebar on the front page */
+  position: static; border-width: 0; clip: auto;
+  z-index: auto;
+  background-color: transparent;
+  }
+#npContentSide {width:300px !important}
+
+}

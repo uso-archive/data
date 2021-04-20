@@ -1,0 +1,971 @@
+/* ==UserStyle==
+@name           URL Bar Tweaks - Remove Visit/Search & Limit Width
+@namespace      USO Archive
+@author         Jefferson
+@description    `<p style="position:fixed;z-index:999;top:0;right:0;margin-top:0;width:calc(70% - 32px);padding:16px;color:#000;background-color:#ff6;text-align:center;font-size:20px!important;"><b>Firefox 57 or Stylish 3.0 users: Please go to <a href="https://www.jeffersonscher.com/gm/url-bar-tweaks.html">https://www.jeffersonscher.com/gm/url-bar-tweaks.html</a> to install.<br>Stylish 2.x users: Use the "Customize Settings" button before installation.</b></p>Remove the top line added in Firefox 43+ (site - Visit, text - Search with...) from the address bar autocomplete drop-down, reduce size of Firefox 48+ dropdown or use an older-style two-line layout or Firefox 2 Oldbar layout, keep the dropmarker displayed even when not hovering the address bar. URLbar AKA Location Bar AKA Awesomebar<br><br>To restore a two-line drop-down in Firefox 48+, see "Drop-down Style" choice (2) below. For Oldbar fixed width URL-title layout, see choice (3).`
+@version        20200311.0.8
+@license        CC-BY-4.0
+@preprocessor   uso
+@advanced dropdown fxver "Choose Your URL Bar Drop-down Style (then choose corresponding options)" {
+	fx49 "(Style 1) Title and URL on one line for Firefox 48+*" <<<EOT /* Set max-height for items visible without scrolling *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistbox,
+  #urlbarView-results, #urlbar-results {
+    /*[[photon]]*\/
+    max-height: calc(30.5px * /*[[richrows]]*\/) !important;
+  }
+/*[[maxwidth48]]*\/
+/*[[onelinefontsize]]*\/
+/*[[colorfx48]]*\/
+/*[[matchstyle]]*\/
+/* Prevent excess indenting of icons in Photon *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem [anonid="type-icon-spacer"],
+  #urlbar-results .autocomplete-richlistitem [anonid="type-icon-spacer"] {
+    display: none !important;
+  }
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+     --item-padding-start: 0 !important;
+     --item-padding-end: 0 !important;
+  } EOT;
+fx48two "(Style 2) Title and URL on separate lines for Firefox 48+" <<<EOT /* Set max-height for items visible without scrolling *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistbox,
+  #urlbarView-results, #urlbar-results {
+    /*[[photon]]*\/
+    max-height: calc(45.5px * /*[[richrows]]*\/) !important;
+  }
+/*[[dropwidth]]*\/
+/* Create sufficient height for two lines *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) {
+    position: relative !important;
+    height: 45.5px !important;
+  }
+  .urlbarView-row:not([type="search"]) {
+    position: relative !important;
+    height: 32px !important;
+  }
+/* Subtle border between results *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem,
+  .urlbarView-row {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important; /* light theme *\/
+  }
+/*[[topbot]]*\/
+/* Position bookmark tags *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem .ac-tags,
+  .urlbarView-row .urlbarView-tags {
+    position: absolute !important;
+    right: 0px;
+    top: 3px;
+  }
+/* Hide separator between title and URL *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-separator,
+  .urlbarView-row:not([type="search"]) .urlbarView-title-separator {
+    display: none !important;
+  }
+/* Position special icon (bookmark, switch-to-tab) *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem .ac-type-icon,
+  .urlbarView-row .urlbarView-type-icon {
+    margin-left: 4px !important;
+ }
+/* Prevent excess indenting of icons in Photon *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem [anonid="type-icon-spacer"],
+  #urlbar-results .autocomplete-richlistitem [anonid="type-icon-spacer"] {
+    display: none !important;
+  }
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+     --item-padding-start: 0 !important;
+     --item-padding-end: 0 !important;
+  }
+
+/*[[colorfx48]]*\/
+/*[[matchstyle]]*\/ EOT;
+oldbar "(Style 3) \"Oldbar\" (URL left) for Firefox 48+" <<<EOT /* Set max-height for items visible without scrolling *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistbox,
+  #urlbarView-results, #urlbar-results {
+    /*[[photon]]*\/
+    max-height: calc(30.5px * /*[[richrows]]*\/) !important;
+  }
+
+  /* Oldbar flex layout based on 
+     https://userstyles.org/styles/131235/firefox-autocomplete-prioritize-url 
+     used with permission, new errors my own *\/
+
+    .autocomplete-richlistitem[type="favicon"],
+    .autocomplete-richlistitem[type="bookmark"],
+    .autocomplete-richlistitem[type="switchtab"],
+    #urlbarView-results .urlbarView-row,
+    #urlbar-results .urlbarView-row  {
+      display: flex;
+    }
+
+    .autocomplete-richlistitem[type="favicon"] .ac-title,
+    .autocomplete-richlistitem[type="bookmark"] .ac-title,
+    .autocomplete-richlistitem[type="switchtab"] .ac-title,
+    #urlbarView-results .urlbarView-title, 
+    #urlbar-results .urlbarView-title {
+      order: 3;
+    }
+
+    .autocomplete-richlistitem[type="favicon"] .ac-separator,
+    .autocomplete-richlistitem[type="bookmark"] .ac-separator,
+    .autocomplete-richlistitem[type="switchtab"] .ac-separator,
+    #urlbarView-results .urlbarView-title-separator, 
+    #urlbar-results .urlbarView-title-separator {
+      order: 2;
+      -moz-margin-start: 2px;
+      -moz-margin-end: 4px;
+    }
+    .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-separator,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-title-separator, 
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-title-separator {
+      visibility: hidden !important;
+      -moz-margin-start: 0;
+      -moz-margin-end: 0;
+    }
+
+    .autocomplete-richlistitem[type="favicon"] .ac-url,
+    .autocomplete-richlistitem[type="bookmark"] .ac-url,
+    .autocomplete-richlistitem[type="switchtab"] .ac-url,
+    #urlbarView-results .urlbarView-url, 
+    #urlbar-results .urlbarView-url {
+      order: 1;
+      display: block !important; /* Force URL for Switch to Tab *\/
+    }
+
+    .autocomplete-richlistitem[type="switchtab"] .ac-action,
+    .autocomplete-richlistitem .ac-tags,
+    #urlbarView-results .urlbarView-row[type="switchtab"] .urlbarView-action, 
+    #urlbar-results .urlbarView-row[type="switchtab"] .urlbarView-action,
+    #urlbarView-results .urlbarView-tags, 
+    #urlbar-results .urlbarView-tags {
+      order: 4;
+    }
+
+/*[[oldblayout]]*\/
+
+    .autocomplete-richlistitem .ac-type-icon, 
+    .autocomplete-richlistitem .ac-site-icon,
+    .autocomplete-richlistitem .ac-tags,
+    #urlbarView-results .urlbarView-type-icon, 
+    #urlbar-results .urlbarView-type-icon,
+    #urlbarView-results .urlbarView-favicon, 
+    #urlbar-results .urlbarView-favicon,
+    #urlbarView-results .urlbarView-tags, 
+    #urlbar-results .urlbarView-tags {
+      margin-top: 6px;
+    }
+/* Prevent excess indenting of icons in Photon *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem [anonid="type-icon-spacer"],
+  #urlbar-results .autocomplete-richlistitem [anonid="type-icon-spacer"] {
+    display: none !important;
+  }
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+     --item-padding-start: 0 !important;
+     --item-padding-end: 0 !important;
+  }
+/*[[oldbsizing]]*\/
+/*[[colorfx48]]*\/
+/*[[matchstyle]]*\/
+  /* Firefox 70 *\/
+  .urlbarView:not(.megabar){
+    left: unset !important;
+    right: unset !important;
+  }
+  .urlbarView-row {
+    padding-top: 1px !important;
+  } EOT;
+fx43 "(Style 4) For Firefox 43-47 only (title and URL on separate lines)" <<<EOT /* Set max-height for items visible without scrolling *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistbox {
+    height: auto !important;
+    max-height: calc(45.5px * /*[[richrows]]*\/) !important;
+  }
+ EOT;
+
+}
+@advanced dropdown photon "Got Quantum? (Photon redesign is a little harder to size)" {
+	photonnot "No (Firefox 48-56)*" <<<EOT height: auto !important; EOT;
+photonyes "Yes (Firefox 57+)" <<<EOT height: unset !important; EOT;
+
+}
+@advanced dropdown maxwidth48 "[Style 1 - Fx48+ One-line] (A) Drop-down width" {
+	mw1200 "Max 1200 pixels*" <<<EOT   /* Constrain drop-down width *\/
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+    max-width: 1200px !important;
+    /* Removed for Firefox 70:
+      margin-left: -22px !important; *\/
+  }
+  .urlbarView-row-inner {
+    max-width:1185px !important;
+  }
+  .urlbarView-type-icon {
+    margin-left: 4px !important;  
+  }
+  /* Remove excess width of one-off search engine buttons *\/
+  #urlbar-results .searchbar-engine-one-off-item.dummy:not(.last-of-row) {
+    display: none !important;
+  }
+  /* Firefox 70 *\/
+  .urlbarView:not(.megabar){
+    left: unset !important;
+    right: unset !important;
+  } EOT;
+max900 "Max 900 pixels" <<<EOT   /* Constrain drop-down width *\/
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+    max-width: 900px !important;
+    /* Removed for Firefox 70:
+      margin-left: -22px !important; *\/
+  }
+  .urlbarView-row-inner {
+    max-width:885px !important;
+  }
+  .urlbarView-type-icon {
+    margin-left: 4px !important;  
+  }
+  /* Remove excess width of one-off search engine buttons *\/
+  #urlbar-results .searchbar-engine-one-off-item.dummy:not(.last-of-row) {
+    display: none !important;
+  }
+  /* Firefox 70 *\/
+  .urlbarView:not(.megabar){
+    left: unset !important;
+    right: unset !important;
+  }
+  .urlbarView { /* Avoid search one-offs being too wide *\/
+    --item-padding-start: 10px !important;
+    --item-padding-end: 10px !important;
+  } EOT;
+mw1000 "Max 1000 pixels" <<<EOT   /* Constrain drop-down width *\/
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+    max-width: 1000px !important;
+    /* Removed for Firefox 70:
+      margin-left: -22px !important; *\/
+  }
+  .urlbarView-row-inner {
+    max-width:985px !important;
+  }
+  .urlbarView-type-icon {
+    margin-left: 4px !important;  
+  }
+  /* Remove excess width of one-off search engine buttons *\/
+  #urlbar-results .searchbar-engine-one-off-item.dummy:not(.last-of-row) {
+    display: none !important;
+  }
+  /* Firefox 70 *\/
+  .urlbarView:not(.megabar){
+    left: unset !important;
+    right: unset !important;
+  } EOT;
+mwfull "Full width (default)" <<<EOT   /* Default drop-down width *\/ EOT;
+
+}
+@advanced dropdown onelinefontsize "[Style 1 - Fx48+ One-line] (B) Title and URL font size" {
+	fsdefault "Default sizes*" <<<EOT /* Default font sizes *\/ EOT;
+fs1414 "Title 14px / URL 14px" <<<EOT /* Font-sizes *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title,
+  .urlbarView-row:not([type="search"]) .urlbarView-title {
+    font-size: 14px !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url,
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-actiontitle,
+  .urlbarView-row:not([type="search"]) .urlbarView-secondary,
+  .urlbarView-row:not([type="search"]) .urlbarView-url {
+    font-size: 14px !important;
+  } EOT;
+fs1614 "Title 16px / URL 14px" <<<EOT /* Font-sizes *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title,
+  .urlbarView-row:not([type="search"]) .urlbarView-title {
+    font-size: 16px !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url,
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-action,
+  .urlbarView-row:not([type="search"]) .urlbarView-secondary,
+  .urlbarView-row:not([type="search"]) .urlbarView-url {
+    font-size: 14px !important;
+  } EOT;
+fs1212 "Title 12px / URL 12px" <<<EOT /* Font-sizes *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title, 
+  .urlbarView-row:not([type="search"]) .urlbarView-title {
+    font-size: 12px !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url,
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-action,
+  .urlbarView-row:not([type="search"]) .urlbarView-secondary,
+  .urlbarView-row:not([type="search"]) .urlbarView-url {
+    font-size: 12px !important;
+  } EOT;
+
+}
+@advanced dropdown dropwidth "[Style 2 - Fx48+ Two-line] (A) Drop-down width" {
+	wid700 "700 pixels wide*" <<<EOT /* Set drop-down width *\/
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+    width: 700px !important;
+    max-width: 700px !important;
+    margin-left: 0 !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title-text, 
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem .ac-url-text,
+  .urlbarView-row:not([type="search"]) .urlbarView-title, 
+  .urlbarView-row:not([type="search"]) .urlbarView-action, 
+  .urlbarView-row .urlbarView-url {
+    min-width: 610px !important;
+    max-width: 610px !important;
+  }
+  .urlbarView-row-inner {
+    max-width: 685px !important;
+  }
+  /* Remove excess width of one-off search engine buttons *\/
+  #urlbar-results .searchbar-engine-one-off-item.dummy:not(.last-of-row) {
+    display: none !important;
+  }
+  /* Firefox 70 *\/
+  .urlbarView:not(.megabar){
+    left: unset !important;
+    right: unset !important;
+  }
+  .urlbarView { /* Avoid search one-offs being too wide *\/
+    --item-padding-start: 10px !important;
+    --item-padding-end: 10px !important;
+  } EOT;
+wid800 "800 pixels wide" <<<EOT /* Set drop-down width *\/
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+    width: 800px !important;
+    max-width: 800px !important;
+    margin-left: 0 !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title-text, 
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem .ac-url-text,
+  .urlbarView-row:not([type="search"]) .urlbarView-title, 
+  .urlbarView-row:not([type="search"]) .urlbarView-action, 
+  .urlbarView-row .urlbarView-url {
+    min-width: 710px !important;
+    max-width: 710px !important;
+  }
+  .urlbarView-row-inner {
+    max-width: 785px !important;
+  }
+  /* Remove excess width of one-off search engine buttons *\/
+  #urlbar-results .searchbar-engine-one-off-item.dummy:not(.last-of-row) {
+    display: none !important;
+  }
+  /* Firefox 70 *\/
+  .urlbarView:not(.megabar){
+    left: unset !important;
+    right: unset !important;
+  }
+  .urlbarView { /* Avoid search one-offs being too wide *\/
+    --item-padding-start: 10px !important;
+    --item-padding-end: 10px !important;
+  } EOT;
+wid900 "900 pixels wide" <<<EOT /* Set drop-down width *\/
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+    width: 900px !important;
+    max-width: 900px !important;
+    margin-left: 0 !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title-text, 
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem .ac-url-text,
+  .urlbarView-row:not([type="search"]) .urlbarView-title, 
+  .urlbarView-row:not([type="search"]) .urlbarView-action, 
+  .urlbarView-row .urlbarView-url {
+    min-width: 810px !important;
+    max-width: 810px !important;
+  }
+  .urlbarView-row-inner {
+    max-width: 885px !important;
+  }
+  /* Remove excess width of one-off search engine buttons *\/
+  #urlbar-results .searchbar-engine-one-off-item.dummy:not(.last-of-row) {
+    display: none !important;
+  }
+  /* Firefox 70 *\/
+  .urlbarView:not(.megabar){
+    left: unset !important;
+    right: unset !important;
+  }
+  .urlbarView { /* Avoid search one-offs being too wide *\/
+    --item-padding-start: 10px !important;
+    --item-padding-end: 10px !important;
+  } EOT;
+widfull "full width" <<<EOT /* Don't set drop-down width *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title-text, 
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem .ac-url-text,
+  .urlbarView-row:not([type="search"]) .urlbarView-title, 
+  .urlbarView-row .urlbarView-secondary,
+  .urlbarView-row .urlbarView-url {
+    min-width: 610px !important;
+  } EOT;
+
+}
+@advanced dropdown topbot "[Style 2 - Fx48+ Two-line] (B) Top/Bottom Position and Font Size" {
+	topbott1412 "Title on top 14px/12px*" <<<EOT   /* Position page title, set font-size *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title,
+  .urlbarView-row:not([type="search"]) .urlbarView-title  {
+    position: absolute !important;
+    left: 54px;
+    top: 1px;
+    font-size: 14px !important;
+  }
+  /* Position page url / action, set font-size *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url,
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-action,
+  .urlbarView-row:not([type="search"]) .urlbarView-secondary,
+  .urlbarView-row:not([type="search"]) .urlbarView-url,
+  .urlbarView:not([actionoverride]) .urlbarView-row:not([type="search"]) .urlbarView-action:not(:empty) {
+    position: absolute !important;
+    left: 54px;
+    top: 20px;
+    font-size: 12px !important;
+  }
+ EOT;
+topbott1414 "Title on top 14px/14px" <<<EOT   /* Position page title, set font-size *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title,
+  .urlbarView-row:not([type="search"]) .urlbarView-title {
+    position: absolute !important;
+    left: 54px;
+    top: 1px;
+    font-size: 14px !important;
+  }
+  /* Position page url / action, set font-size *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url,
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-action,
+  .urlbarView-row:not([type="search"]) .urlbarView-secondary,
+  .urlbarView-row:not([type="search"]) .urlbarView-url,
+  .urlbarView:not([actionoverride]) .urlbarView-row:not([type="search"]) .urlbarView-action:not(:empty) {
+    position: absolute !important;
+    left: 54px;
+    top: 20px;
+    font-size: 14px !important;
+  }
+ EOT;
+topbott1614 "Title on top 16px/14px" <<<EOT   /* Position page title, set font-size *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title,
+  .urlbarView-row:not([type="search"]) .urlbarView-title {
+    position: absolute !important;
+    left: 54px;
+    top: 0px;
+    font-size: 16px !important;
+  }
+  /* Position page url / action, set font-size *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url,
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-action,
+  .urlbarView-row:not([type="search"]) .urlbarView-secondary,
+  .urlbarView-row:not([type="search"]) .urlbarView-url,
+  .urlbarView:not([actionoverride]) .urlbarView-row:not([type="search"]) .urlbarView-action:not(:empty) {
+    position: absolute !important;
+    left: 54px;
+    top: 22px;
+    font-size: 14px !important;
+  }
+ EOT;
+topbotb1414 "URL on top 14px/14px" <<<EOT   /* Position page url, set font-size *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url,
+  .urlbarView-row:not([type="search"]) .urlbarView-secondary,
+  .urlbarView-row:not([type="search"]) .urlbarView-url,
+  .urlbarView:not([actionoverride]) .urlbarView-row:not([type="search"]) .urlbarView-action:not(:empty) {
+    display: block !important;
+    position: absolute !important;
+    left: 54px;
+    top: 1px;
+    font-size: 14px !important;
+  }
+  /* Position page title / action, set font-size *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title,
+  .urlbarView-row:not([type="search"]) .urlbarView-title {
+    position: absolute !important;
+    left: 54px;
+    top: 20px;
+    font-size: 14px !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-action {
+    position: absolute !important;
+    top: 20px;
+    right: 0px;
+    font-size: 14px !important;
+  }
+ EOT;
+topbotb1412 "URL on top 14px/12px" <<<EOT   /* Position page url, set font-size *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url,
+  .urlbarView-row:not([type="search"]) .urlbarView-secondary,
+  .urlbarView-row:not([type="search"]) .urlbarView-url,
+  .urlbarView:not([actionoverride]) .urlbarView-row:not([type="search"]) .urlbarView-action:not(:empty) {
+    display: block !important;
+    position: absolute !important;
+    left: 54px;
+    top: 1px;
+    font-size: 14px !important;
+  }
+  /* Position page url / action, set font-size *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title,
+  .urlbarView-row:not([type="search"]) .urlbarView-title {
+    position: absolute !important;
+    left: 54px;
+    top: 20px;
+    font-size: 12px !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-action {
+    position: absolute !important;
+    top: 20px;
+    right: 0px;
+    font-size: 12px !important;
+  }
+ EOT;
+
+}
+@advanced dropdown oldwidth "[Style 3 - Fx48+ Oldbar] (A) Drop-down width " {
+	oldw1000 "1000 pixels*" <<<EOT 1000px EOT;
+oldw900 "900 pixels" <<<EOT 900px EOT;
+oldw1200 "1200 pixels" <<<EOT 1200px EOT;
+
+}
+@advanced dropdown oldblayout "[Style 3 - Fx48+ Oldbar] (B) URL/Title Allocation " {
+	oldb6040 "URL 60% / Title 40%*" <<<EOT   /*** Overall Layout of the "Oldbar" style at 60/40 ***\/
+  /* Drop-down width *\/
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+    max-width: /*[[oldwidth]]*\/ !important;
+    /* Removed for Firefox 70:
+      margin-left: -22px !important; *\/
+  }
+  .urlbarView-type-icon {
+    margin-left: 4px !important;  
+  }
+  /* Space allocated to URL and title *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url-text,
+  .urlbarView-row:not([type="search"]) .urlbarView-url {
+    min-width: calc(0.60 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+    max-width: calc(0.60 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title-text,
+  .urlbarView-row:not([type="search"]) .urlbarView-title {
+    min-width: calc(0.40 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+    max-width: calc(0.40 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+  }
+  /* Remove excess width of one-off search engine buttons *\/
+  #urlbar-results .searchbar-engine-one-off-item.dummy:not(.last-of-row) {
+    display: none !important;
+  } EOT;
+oldb6535 "URL 65% / Title 35%" <<<EOT   /*** Overall Layout of the "Oldbar" style at 65/35 ***\/
+  /* Drop-down width *\/
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+    max-width: /*[[oldwidth]]*\/ !important;
+    /* Removed for Firefox 70:
+      margin-left: -22px !important; *\/
+  }
+  .urlbarView-type-icon {
+    margin-left: 4px !important;  
+  }
+  /* Space allocated to URL and title *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url-text,
+  .urlbarView-row:not([type="search"]) .urlbarView-url {
+    min-width: calc(0.65 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+    max-width: calc(0.65 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title-text,
+  .urlbarView-row:not([type="search"]) .urlbarView-title {
+    min-width: calc(0.35 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+    max-width: calc(0.35 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+  }
+  /* Remove excess width of one-off search engine buttons *\/
+  #urlbar-results .searchbar-engine-one-off-item.dummy:not(.last-of-row) {
+    display: none !important;
+  } EOT;
+oldb5545 "URL 55% / Title 45%" <<<EOT   /*** Overall Layout of the "Oldbar" style at 55/45 ***\/
+  /* Drop-down width *\/
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+    max-width: /*[[oldwidth]]*\/ !important;
+    /* Removed for Firefox 70:
+      margin-left: -22px !important; *\/
+  }
+  .urlbarView-type-icon {
+    margin-left: 4px !important;  
+  }
+  /* Space allocated to URL and title *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url-text,
+  .urlbarView-row:not([type="search"]) .urlbarView-url {
+    min-width: calc(0.55 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+    max-width: calc(0.55 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title-text,
+  .urlbarView-row:not([type="search"]) .urlbarView-title {
+    min-width: calc(0.45 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+    max-width: calc(0.45 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+  }
+  /* Remove excess width of one-off search engine buttons *\/
+  #urlbar-results .searchbar-engine-one-off-item.dummy:not(.last-of-row) {
+    display: none !important;
+  } EOT;
+oldb5050 "URL 50% / Title 50%" <<<EOT   /*** Overall Layout of the "Oldbar" style at 50/50 ***\/
+  /* Drop-down width *\/
+  #PopupAutoCompleteRichResult,
+  #urlbar-results {
+    max-width: /*[[oldwidth]]*\/ !important;
+    /* Removed for Firefox 70:
+      margin-left: -22px !important; *\/
+  }
+  .urlbarView-type-icon {
+    margin-left: 4px !important;  
+  }
+  /* Space allocated to URL and title *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url-text,
+  .urlbarView-row:not([type="search"]) .urlbarView-url {
+    min-width: calc(0.50 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+    max-width: calc(0.50 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title-text,
+  .urlbarView-row:not([type="search"]) .urlbarView-title {
+    min-width: calc(0.50 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+    max-width: calc(0.50 * (/*[[oldwidth]]*\/ - /*[[oldspace]]*\/)) !important;
+  }
+  /* Remove excess width of one-off search engine buttons *\/
+  #urlbar-results .searchbar-engine-one-off-item.dummy:not(.last-of-row) {
+    display: none !important;
+  } EOT;
+
+}
+@advanced dropdown oldspace "[Style 3 - Fx48+ Oldbar] (C) Leave space on the right for tags/switch to tab?" {
+	oldbspyes "Yes (default)*" <<<EOT 200px EOT;
+oldbspno "No, expand the URL and title" <<<EOT 100px EOT;
+
+}
+@advanced dropdown oldbsizing "[Style 3 - Fx48+ Oldbar] (D) Title and URL font size" {
+	oldsize14 "Medium - 14px*" <<<EOT     /* Font-sizes *\/
+    #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title,
+    #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url,
+    #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-action,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-title,
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-title,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-title-separator,
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-title-separator,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-url,
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-url,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-action,
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-action {
+      font-size: 14px !important;
+    }
+    .autocomplete-richlistitem .ac-title,
+    .autocomplete-richlistitem .ac-separator,
+    .autocomplete-richlistitem .ac-url,
+    .autocomplete-richlistitem .ac-action,
+    #urlbarView-results .urlbarView-title,
+    #urlbar-results .urlbarView-title,
+    #urlbarView-results .urlbarView-title-separator,
+    #urlbar-results .urlbarView-title-separator,
+    #urlbarView-results .urlbarView-url,
+    #urlbar-results .urlbarView-url,
+    #urlbarView-results .urlbarView-action,
+    #urlbar-results .urlbarView-action {
+        margin-top: 4px;
+    } EOT;
+oldsize12 "Small - 12px" <<<EOT     /* Font-sizes *\/
+    #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title,
+    #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url,
+    #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-action,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-title,
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-title,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-title-separator,
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-title-separator,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-url,
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-url,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-action,
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-action {
+      font-size: 12px !important;
+    }
+    .autocomplete-richlistitem .ac-title,
+    .autocomplete-richlistitem .ac-separator,
+    .autocomplete-richlistitem .ac-url,
+    .autocomplete-richlistitem .ac-action,
+    #urlbarView-results .urlbarView-title,
+    #urlbar-results .urlbarView-title,
+    #urlbarView-results .urlbarView-title-separator,
+    #urlbar-results .urlbarView-title-separator,
+    #urlbarView-results .urlbarView-url,
+    #urlbar-results .urlbarView-url,
+    #urlbarView-results .urlbarView-action,
+    #urlbar-results .urlbarView-action {
+        margin-top: 6px;
+    } EOT;
+oldsize16 "Large - 16px" <<<EOT     /* Font-sizes *\/
+    #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-title,
+    #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-url,
+    #PopupAutoCompleteRichResult .autocomplete-richlistitem:not([actiontype="searchengine"]) .ac-action,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-title,
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-title,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-title-separator,
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-title-separator,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-url,
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-url,
+    #urlbarView-results .urlbarView-row:not([type="search"]) .urlbarView-action,
+    #urlbar-results .urlbarView-row:not([type="search"]) .urlbarView-action {
+      font-size: 16px !important;
+    }
+    .autocomplete-richlistitem .ac-title,
+    .autocomplete-richlistitem .ac-separator,
+    .autocomplete-richlistitem .ac-url,
+    .autocomplete-richlistitem .ac-action,
+    #urlbarView-results .urlbarView-title,
+    #urlbar-results .urlbarView-title,
+    #urlbarView-results .urlbarView-title-separator,
+    #urlbar-results .urlbarView-title-separator,
+    #urlbarView-results .urlbarView-url,
+    #urlbar-results .urlbarView-url,
+    #urlbarView-results .urlbarView-action,
+    #urlbar-results .urlbarView-action {
+        margin-top: 2px;
+    } EOT;
+
+}
+@advanced dropdown usingkeyw "[ALL Styles 1-4] (A) Hide the Visit / Search top row ?" {
+	keywdefault "Don't hide it, I like it!*" <<<EOT /* " - Visit" or " - Search with" bar NOT HIDDEN *\/
+ EOT;
+keywno "Always hide it" <<<EOT /* Remove " - Visit" or " - Search with" bar in the drop-down *\/
+  #PopupAutoCompleteRichResult richlistitem:first-of-type[type*="heuristic"],
+  #PopupAutoCompleteRichResult richlistitem:first-of-type[actiontype="searchengine"],
+  #PopupAutoCompleteRichResult richlistitem:first-of-type[actiontype="visiturl"],
+  #PopupAutoCompleteRichResult richlistitem:first-of-type[actiontype="keyword"],
+  #urlbar-results #urlbarView-row-0,
+  #urlbar-results .urlbarView-row:first-of-type {
+    display:none !important;
+  }
+/* Hide line for searching sld.tld below "Visit" Line *\/
+  #PopupAutoCompleteRichResult richlistitem:first-of-type[actiontype="visiturl"] +
+  richlistitem[actiontype="searchengine"] {
+    display:none !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistbox,
+  #urlbarView-results, #urlbar-results {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+ EOT;
+keywyes "Hide it unless using a search keyword (Fx48-67)" <<<EOT /* Remove " - Visit" or " - Search with" bar in the drop-down *\/
+  #PopupAutoCompleteRichResult richlistitem:first-of-type[type*="heuristic"],
+  #PopupAutoCompleteRichResult richlistitem:first-of-type[actiontype="searchengine"],
+  #PopupAutoCompleteRichResult richlistitem:first-of-type[actiontype="visiturl"],
+  #PopupAutoCompleteRichResult richlistitem:first-of-type[actiontype="keyword"] {
+    display:none !important;
+  }
+  /* Hide line for searching sld.tld below "Visit" Line *\/
+  #PopupAutoCompleteRichResult richlistitem:first-of-type[actiontype="visiturl"] +
+  richlistitem[actiontype="searchengine"] {
+    display:none !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistbox,
+  #urlbarView-results, #urlbar-results {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  /* EXCEPTION: Show "Search with" for keyworded search engines *\/
+  #PopupAutoCompleteRichResult richlistitem:first-of-type[actiontype="searchengine"][displayurl*=',"alias":'], 
+  #PopupAutoCompleteRichResult richlistitem:first-of-type[actiontype="searchengine"][url*=',"alias":']{
+    display:-moz-box !important;
+  }
+ EOT;
+
+}
+@advanced dropdown richrows "[ALL Styles 1-4] (B) Rows visible on drop-down without scrolling" {
+	rows10 "up to 10 (default in Fx48+)*" <<<EOT 10 EOT;
+rows6 "up to 6 (default before Fx48)" <<<EOT 6 EOT;
+rows8 "up to 8" <<<EOT 8 EOT;
+rows12 "up to 12" <<<EOT 12 EOT;
+rows15 "up to 15" <<<EOT 15 EOT;
+rows18 "up to 18" <<<EOT 18 EOT;
+rows20 "up to 20" <<<EOT 20 EOT;
+
+}
+@advanced dropdown dropmrkr "[ALL Styles 1-4] (C) Restore persistent display of the drop-marker icon" {
+	dropno "No, only show it when I hover the bar*" <<<EOT /* Display drop-marker only when URL bar is hovered (Firefox default) *\/ EOT;
+dropyes "Yes, always show the triangle" <<<EOT /* Restore persistent display of drop-marker *\/
+  #urlbar:not(:hover) > .urlbar-textbox-container > .urlbar-history-dropmarker,
+  .urlbar-history-dropmarker {
+    opacity: 1 !important;
+  } EOT;
+
+}
+@advanced dropdown colorfx48 "[Styles 1-3 for Firefox 48+] (48A) Firefox 48 Colors for Selected/Active Item or Dark Theme" {
+	themehighlight "Force Highlight colors*" <<<EOT   .autocomplete-richlistitem[selected=true],
+  .urlbarView-row[selected] {
+    background-color: Highlight !important;
+  }
+  .autocomplete-richlistitem[selected=true] .ac-title, 
+  .ac-title[selected],
+  .autocomplete-richlistitem[selected=true] .ac-url, 
+  .ac-url[selected],
+  .autocomplete-richlistitem[selected=true] .ac-action,
+  .ac-action[selected],
+  .autocomplete-richlistitem[selected=true] .ac-separator,
+  .ac-separator[selected],
+  .urlbarView-row[selected] .urlbarView-title,
+  .urlbarView-row[selected] .urlbarView-secondary,
+  .urlbarView-row[selected] .urlbarView-title-separator {
+    color: HighlightText !important;
+  } EOT;
+themedefault "Default Firefox drop-down colors" <<<EOT  EOT;
+osxhighlight "OSX Gradient Highlight style" <<<EOT   .autocomplete-richlistitem[selected=true],
+  .urlbarView-row[selected] {
+    background-color: Highlight !important;
+    background-image: linear-gradient(rgba(255,255,255,0.3), transparent) !important; /* Fx45 *\/
+  }
+  .autocomplete-richlistitem[selected=true] .ac-title, 
+  .ac-title[selected],
+  .autocomplete-richlistitem[selected=true] .ac-url, 
+  .ac-url[selected],
+  .autocomplete-richlistitem[selected=true] .ac-action,
+  .ac-action[selected],
+  .autocomplete-richlistitem[selected=true] .ac-separator,
+  .ac-separator[selected],
+  .urlbarView-row[selected] .urlbarView-title,
+  .urlbarView-row[selected] .urlbarView-secondary,
+  .urlbarView-row[selected] .urlbarView-title-separator {
+    color: HighlightText !important;
+  } EOT;
+themeyours "Choose your own (see below)" <<<EOT /* Custom theming *\/
+  .autocomplete-richlistitem[selected=true],
+  .urlbarView-row[selected] {
+    background-color: /*[[userbackcolor]]*\/ !important;
+  }
+  .autocomplete-richlistitem[selected=true] .ac-title, 
+  .ac-title[selected],
+  .autocomplete-richlistitem[selected=true] .ac-url, 
+  .ac-url[selected],
+  .autocomplete-richlistitem[selected=true] .ac-action,
+  .ac-action[selected],
+  .autocomplete-richlistitem[selected=true] .ac-separator,
+  .ac-separator[selected],
+  .urlbarView-row[selected] .urlbarView-title,
+  .urlbarView-row[selected] .urlbarView-secondary,
+  .urlbarView-row[selected] .urlbarView-title-separator {
+    color: /*[[usertextcolor]]*\/ !important;
+  } EOT;
+themedark "Dark theme drop-down" <<<EOT   /* Dark Themed Drop-down *\/
+  /* Dark Theme - Firefox 48+ *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistbox,
+  #urlbarView-results, #urlbar-results {
+    background-color: #111 !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem {
+    border-bottom-color: #333 !important;
+  }
+  .autocomplete-richlistitem .ac-title, 
+  .autocomplete-richlistitem .ac-action,
+  .autocomplete-richlistitem .ac-separator,
+  .urlbarView-row .urlbarView-title, 
+  .urlbarView-row .urlbarView-secondary,
+  .urlbarView-row .urlbarView-title-separator {
+    color: #777 !important;
+  }
+  .autocomplete-richlistitem[selected=true],
+  .urlbarView-row[selected] {
+    background-color: #666 !important;
+  }
+  .autocomplete-richlistitem[selected=true] .ac-title, 
+  .ac-title[selected],
+  .autocomplete-richlistitem[selected=true] .ac-action,
+  .ac-action[selected],
+  .autocomplete-richlistitem[selected=true] .ac-separator,
+  .ac-separator[selected],
+  .urlbarView-row[selected] .urlbarView-title,
+  .urlbarView-row[selected] .urlbarView-secondary,
+  .urlbarView-row[selected] .urlbarView-title-separator {
+    color: #eee !important;
+  }
+  .autocomplete-richlistitem[selected=true] .ac-url, 
+  .ac-url[selected],
+  .urlbarView-row[selected] .urlbarView-url {
+    color: #69f !important;
+  }
+  /* Subtle bottom border *\/
+  #PopupAutoCompleteRichResult .autocomplete-richlistitem,
+  .urlbarView-row {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; /* dark theme *\/
+  } EOT;
+
+}
+@advanced color userbackcolor "[Styles 1-3 for Firefox 48+] (48A-1) Custom background/highlight color" #3280D8
+@advanced color usertextcolor "[Styles 1-3 for Firefox 48+] (48A-2) Custom title, url, and action color" #F0F0F0
+@advanced dropdown matchstyle "[Styles 1-3 for Firefox 48+] (48B) Firefox 48 Matched text styling" {
+	matchbold "Bold text (Fx48 Default)*" <<<EOT   /* Use default text matching style *\/ EOT;
+matchboxwin "Boxed text - Windows (like Fx43-47)" <<<EOT   #PopupAutoCompleteRichResult .ac-emphasize-text,
+  .urlbarView-title strong,
+  .urlbarView-url strong {
+    font-weight: 400 !important;
+    box-shadow: inset 0 0 1px 1px rgba(208,208,208,0.5);
+    background-color: rgba(208,208,208,0.3);
+    border-radius: 2px;
+    text-shadow: 0 0 currentColor;
+  }
+  @media (-moz-windows-default-theme) {
+    @media not all and (-moz-os-version: windows-xp) {
+      #PopupAutoCompleteRichResult .ac-emphasize-text,
+      .urlbarView-title strong,
+      .urlbarView-url strong {
+        box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+        background-color: rgba(0,0,0,0.05);
+      }
+    }
+    @media (-moz-os-version: windows-xp) {
+      #PopupAutoCompleteRichResult .ac-url-text .ac-emphasize-text,
+      .urlbarView-title strong,
+      .urlbarView-url strong {
+        box-shadow: inset 0 0 1px 1px rgba(202,214,201,0.3);
+        background-color: rgba(202,214,201,0.2);
+      }
+    }
+  } EOT;
+matchboxosx "Boxed text - OSX (like Fx43-47)" <<<EOT   #PopupAutoCompleteRichResult .ac-emphasize-text,
+  .urlbarView-title strong,
+  .urlbarView-url strong {
+    font-weight: 400 !important;
+    box-shadow: inset 0 0 1px 1px rgba(208,208,208,0.4);
+    background-color: rgba(208,208,208,0.2);
+    border-radius: 2px;
+    text-shadow: 0 0 currentColor;
+  }
+  #PopupAutoCompleteRichResult .ac-url-text .ac-emphasize-text,
+  .urlbarView-title strong,
+  .urlbarView-url strong {
+    box-shadow: inset 0 0 1px 1px rgba(183,210,226,0.4);
+    background-color: rgba(183,210,226,0.3);
+  } EOT;
+matchboxnix "Boxed text - Linux (like Fx43-47)" <<<EOT   #PopupAutoCompleteRichResult .ac-emphasize-text,
+  .urlbarView-title strong,
+  .urlbarView-url strong {
+    font-weight: 400 !important;
+    box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 2px;
+    text-shadow: 0 0 currentColor;
+  }
+  #PopupAutoCompleteRichResult .ac-url-text .ac-emphasize-text,
+  .urlbarView-title strong,
+  .urlbarView-url strong {
+    box-shadow: none;
+  } EOT;
+
+}
+
+==/UserStyle== */
+/* 
+  Firefox 57-70 users: https://www.jeffersonscher.com/gm/url-bar-tweaks.html
+  You can copy/paste into a userChrome.css file, see https://www.userchrome.org/
+*/
+/*[[usingkeyw]]*/
+/*[[dropmrkr]]*/
+/*[[fxver]]*/
+/* Ability to scroll in Fx57 */
+  #PopupAutoCompleteRichResult .autocomplete-richlistbox > scrollbox,
+  #urlbarView-results, #urlbar-results {
+    overflow-y: auto !important; 
+    padding-right: 3px !important;
+  }
+  #PopupAutoCompleteRichResult .autocomplete-richlistbox {
+    padding-right: 0 !important;
+  }

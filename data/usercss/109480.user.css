@@ -1,0 +1,93 @@
+/* ==UserStyle==
+@name           Mozilla.org Inverted
+@namespace      USO Archive
+@author         niklasg
+@description    `Simple dark 'skin' for Mozilla pages.Mainly focuses on addond.mozilla.org and developer.mozilla.org, but handles other Mozilla pages as well.If you have any issues with this style, please open a ticket at https://github.com/NiklasGollenstede/stylish`
+@version        20170313.18.5
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+/**
+ * @name Mozilla.org Inverted
+ * @stylish-id 109480
+ * @author Niklas Gollenstede
+ * @licence CC-BY-SA-4.0 or MIT
+ * @description
+ *     Simple dark 'skin' for Mozilla pages.
+ *     Mainly focuses on addond.mozilla.org and developer.mozilla.org, but handles other Mozilla pages as well.
+ *
+ *     If you have any issues with this style, please open a ticket at https://github.com/NiklasGollenstede/stylish
+ */
+
+@namespace url(http://www.w3.org/1999/xhtml);
+
+@-moz-document
+    domain("firefox.com"),
+    regexp("^https?://(?!metrics)[^/]*\\.mozilla\\.com(\\/.*)?"),
+    domain("mozilla.net"),
+    regexp("^https?://(?!www|air|hacks|services\\.addons)[^/]*\\.mozilla\\.org(\\/.*)?")
+{
+    :root {
+        /* the filter value that is used to turn the pages or their main element dark */
+        --filter-invert: invert(1) hue-rotate(180deg) saturate(1.666) brightness(1.5);
+        /* reversed filter to revert individual elements like imaged back to their original */
+        --filter-revert: brightness(0.666) saturate(.6) hue-rotate(180deg) invert(1); /* revert each filter in reverse order */
+    }
+
+    html
+    {
+        background: black;
+        filter: var(--filter-invert);
+    }
+
+    img,
+    video,
+    canvas,
+    iframe,
+    [style*="background-image"],
+    [style*="background:url"],
+    [style*="background: url"]
+    {
+        filter: var(--filter-revert);
+    }
+
+    img[src$=".png"]
+    {   /* this doesn't work -.- */
+        transition: background-color 1.5s;
+        background-color: #fff0;
+    }
+
+    img[src$=".png"]:not(:hover), img[src$=".svg"]
+    {
+        filter: unset !important;
+    }
+
+    img[src$=".png"]:hover
+    {
+        background-color: #fff8 !important;
+    }
+}
+
+@-moz-document
+    domain("addons.mozilla.org")
+{
+    .header-bg, #lightbox
+    {
+        z-index: 1; /* setting a filter messes with the z-index (in Firefox) */
+        filter: var(--filter-revert);
+    }
+    .header-bg *, #lightbox *
+    { filter: unset !important; }
+}
+@-moz-document
+    domain("developer.mozilla.org")
+{
+    body
+    { background-color: #abd9ff !important; }
+}
+@-moz-document
+    domain("accounts.firefox.com")
+{
+    #fox-logo
+    { filter: var(--filter-revert); }
+}

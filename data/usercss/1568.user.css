@@ -1,0 +1,358 @@
+/* ==UserStyle==
+@name           Wikipedia, -tionary, -news: Blue Bars for "MySkin"
+@namespace      USO Archive
+@author         b0at
+@description    `This is style for the "MySkin" skin on Wikipedia, Wiktionary, and Wikinews (note: the default is Monobook; set to MySkin in your account preferences). It's reminiscent of Cologne Blue, but has a single, flexible column with the header doing more work.It's mostly for my own benefit, so it has only been tested on the English versions and may be missing something that I haven't encountered on a page since I started paying attention to things like info boxes and notices.  I also browse Wikipedia with script off,  so I didn't bother styling script-generated content. Updates will be forthcoming as it gets more organized.Notable effects: personal bar links ("my talk", "my contributions") appear on hover of the user name in the upper right, unobtrusive search box below that, lock icon appears translucent on the upper right like the default style, not-yet-created links are clearly denoted with italics and a superscript question mark at its end (at least with full-text new edit links turned on).Update (3/2): stopped hiding some of the usually-useless thumbnail-type-classed boxes; they actually have content in them sometimes, it turns outUpdate (2/4): added style for some standard Wikinews elements and added en.wikinews.org moz-document rules. If you don't want the region links visible on Wikinews, just hide #p-regions and comment out #column-one's modified height under "/* wikinews */" near the end.Update (1/11): "new" page links correctly styled when the anchor's inside an element with the class (e.g., in #p-actions where it has li.new).`
+@version        20070302.3.2
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@namespace url(http://www.w3.org/1999/xhtml);
+@-moz-document
+  domain(en.wikipedia.org), 
+  domain(en.wiktionary.org),
+  domain(en.wikinews.org)
+{
+
+/* main page style */
+body {
+  margin: 0 0 1em !important;
+  padding: 0 !important;
+  background: #efefee !important;
+  color: black !important;
+}
+
+a:link    { color: #038 !important; }
+a:visited { color: #720 !important; }
+a:link, a:visited {
+  text-decoration: none !important;
+}
+a:link:hover, a:visited:hover {
+  color: #13E !important;
+  text-decoration: underline !important;
+}
+
+a:link img, a:visited img { border: 0 !important; }
+input { font: inherit !important; }
+
+/* unvisited link style */
+a.new:link, a.new:visited
+.new a:link, .new a:visited /* inconsistent in the sidebar */
+{ font-style: italic !important; }
+a.new::after, .new a::after
+{
+  content: "?" !important;
+  font-size: 70% !important;
+  vertical-align: top !important; /* super causes line-height issues that're better to avoid */
+  margin-left: 0.3em; /* small bit of space to keep it visible */
+}
+
+/* stuff I don't use or need (you may want to change this) */
+.infobox.sisterproject,
+#siteSub,
+#p-lang, #p-navigation,
+#p-tb #t-upload, #p-tb #t-specialpages, #p-personal #pt-logout,
+#visualClear, #footer,
+div.magnify, /* just click on the image itself */
+#p-search input:not([type="text"]),
+p br:first-child:last-child /* completely pointless space */
+{ display: none !important; }
+  .printfooter { display: none !important; }
+
+
+
+/* floating things on the side and other meta-informational boxes */
+.thumb, .infobox, .toc, .floatright { /* "floatright" is an idiotic class name */
+  float: right !important;
+  clear: right !important; /* let them stack */
+  margin: 0 0 0.5em 1em !important;
+  text-align: justify !important;
+}
+.catlinks, .thumb, .infobox, .toc, .floatright {
+  background: white !important;
+  padding: 0.3em !important;
+  border: thin solid silver !important;
+  opacity: 0.8 !important;
+  font-size: 80% !important;
+}
+.toc #toctitle > * { margin: 0 !important; }
+.toc ul {
+  margin: 0 !important; padding: 0 !important;
+  list-style: none !important;
+} .toc ul ul { padding-left: 1em !important; }
+
+#contentSub {
+  font-size: 70% !important;
+  position: absolute !important;
+  top: 0 !important; right: 0 !important;
+}
+div + p { margin-top: 0 !important; } /* extra space below info boxes and scuch */
+
+/* Ugh. "see also" is a paragraph
+#bodyContent h1+:not(p),
+#bodyContent h2+:not(p),
+#bodyContent h3+:not(p),
+#bodyContent h4+:not(p),
+#bodyContent h5+:not(p),
+#bodyContent h6+:not(p)
+{
+  background: yellow;
+}
+*/
+
+/* protected article notice -> translucent lock icon in the corner */
+.messagebox.protected {
+  border: 0 !important; margin: 0 !important;
+  display: block !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+} .messagebox.protected img {
+  position: absolute !important;
+  top: 1.5em !important; /* below any text messages */
+  right: 0 !important;
+  opacity: 0.3 !important;
+}
+
+/* section editing on hover */
+h1, h2, h3, h4, h5, h6 {
+  position: relative !important;
+  font-family: serif !important;
+}
+.editsection {
+  display: none !important;
+  position: absolute !important;
+  top: 0.3em !important;
+  left: 40% !important;
+  font-size: 70% !important;
+  font-family: sans-serif !important;
+  font-weight: bold !important;
+}
+.editsection a {
+  padding: 0 0.5em !important;
+}
+*:hover > .editsection { display: block !important; }
+*:hover > .editsection + span {
+  opacity: 0.4 !important;
+  background: #ddd !important;
+  display: block !important;
+}
+
+/* main container for spacing and positioning */
+#globalWrapper {
+  position: relative !important;
+  margin: 0 !important;
+  padding: 4em 0 0 !important; /* #column-one size: 3.5em */
+}
+
+/* main heading -- make it stand out */
+h1.firstHeading::after { content: ":" !important; }
+h1.firstHeading {
+  margin: 0 !important;
+  color: #236 !important;
+  font-size: 200% !important;
+  font-style: italic !important;
+}
+
+/* main content */
+#content {
+  position: relative !important;
+  margin: 1em !important; /* enough space for light links */
+}
+
+
+/* sidebar */
+#column-one {
+  position: absolute !important;
+  top: 0 !important; left: 0 !important; right: 0 !important;
+  height: 3.5em !important;
+  padding: 0 !important;
+}
+/* container appearance */
+#column-one, html { background: #059 
+  url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAyCAMAAACqJUG4AAAALHRFWHRDcmVhdGlvbiBUaW1lAFN1biAyNCBEZWMgMjAwNiAxMzoyNDoyMSAtMDYwMJG30TgAAAAHdElNRQfWDBgTHBS6I1PqAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAABGdBTUEAALGPC%2FxhBQAAAJZQTFRFAFWYAFSXAVOVAVKUAVKSAlGQAlCPAlCNAk%2BMA06KA02JA02HBEyGBEuEBEqCBEqBBUl%2FBUh%2BBUh8Bkd7BkZ5BkV4BkV2B0R0B0NzB0JxB0JwCEFuCEBtCEBrCT9qCT5oCT1mCT1lCjxjCjtiCjpgCzpfCzldCzhcCzhaDDdYDDZXDDVVDTVUDTRSDTNRDTJPDjJODjFM4mJwxgAAAExJREFUeNoFwQcCgQAAAMDLSGRGdoXILv3%2Fc%2B60fhq1r4%2B3l6eHu8rNVeni7KSQyxwd7O1sbaylVpYSC3MzUxNjsZGhyECor6erI%2BAPQQ4Eyh6IbAgAAAAASUVORK5CYII%3D)
+  top repeat-x !important; }
+#column-one, body { border-bottom: 3px solid #006 !important; }
+
+.portlet h5 { display: none !important; }
+.portlet ul, .portlet li, .portlet a {
+  margin : 0 !important;
+  padding: 0 !important;
+}
+.portlet li { display: inline !important; }
+.portlet {
+  line-height: 1 !important;
+  height: 1em !important;
+  margin: 0 7px !important;
+  z-index: 2 !important;
+}
+.portlet a:link, .portlet a:visited { color: white !important; }
+
+#p-cactions {
+  position: absolute !important;
+  bottom: 0 !important; left: 0 !important;
+  padding-bottom: 0 !important; /* allowance for line box */
+}
+#p-cactions ul { overflow: auto !important; } /* clear floats */
+#p-cactions li {
+  float: left !important;
+  margin-right: 0.5em !important;
+}
+#p-cactions a {
+  display: block !important;
+
+  padding: 0.2em 0.5em !important;
+  background: #006 !important;
+  font-size: 80% !important;
+  font-weight: bold !important;
+  vertical-align: top !important;
+  text-transform: uppercase !important;
+}
+#p-cactions a:link:hover, #p-cactions a:visited:hover {
+  background: #000 !important; 
+}
+
+#p-personal {
+  position: absolute !important;
+  right: 0 !important;
+  top: 0 !important; 
+  padding: 0.2em !important;
+}
+#p-personal a {
+  font-size: 70% !important;
+  margin-left: 1em !important;
+  text-transform: lowercase !important;
+}
+#p-personal a:link, #p-personal a:visited {
+  opacity: .5 !important;
+}
+/* sliding */
+#p-personal li {
+  float: right !important;
+}
+#p-personal a {
+  display: block !important;
+}
+#p-personal li:first-child ~ li { display: none !important; }
+#p-personal:hover li:first-child       ~ li,
+#p-personal       li:first-child:hover ~ li {
+  display: block !important;
+}
+
+#p-logo a::after { content: "Wiki" !important; }
+#p-logo a {
+  width: auto !important; height: auto !important;
+  background: transparent !important;
+  color: white !important;
+  font-size: 30px !important; 
+  text-transform: uppercase !important;
+  font-family: serif !important;
+  letter-spacing: 2px !important;
+  font-weight: bold !important;
+  position: relative !important; z-index: 33 !important; /* above anything else */
+}
+
+#p-navigation {}
+
+/* search box */
+#p-search {
+  position: absolute !important;
+  bottom: 0 !important; right: 0 !important;
+}
+#p-search input:not([type="text"]) { display: none !important; }
+#p-search input[type="text"] {
+  position: absolute !important; /* best way to avoid weird sizing issues */
+  right: 0 !important; bottom: 3px !important;
+  border: thin solid navy !important;
+  padding: 0 2px !important;
+  font-size: 80% !important;
+  opacity: 0.8 !important;
+  /* reasonable width? */
+}
+
+
+#p-tb, #p-wikinews {
+  position: absolute !important;
+  left: 0 !important;
+  top: 3.6em !important; /* below the border */
+}
+#p-tb li, #p-wikinews li {
+  font-size: 70% !important;
+  margin-right: 1em !important;
+  text-transform: lowercase !important;
+  opacity: .5 !important;
+}
+#p-tb, #p-tb a:link, #p-tb a:visited,
+#p-wikinews, #p-wikinews a:link, #p-wikinews a:visited {
+  color: black !important;
+}
+
+/* diffs */
+.diff-context { background: #eed !important; }
+.diff-deletedline { background: #edd !important; }
+.diff-addedline { background: #ded !important; }
+.diffchange {
+  font-weight: bold !important;
+  color: blue !important;
+}
+
+/* references: don't screw with my line height! */
+sup.reference {
+  font-size: 60% !important;
+  vertical-align: top !important;
+}
+
+/* WIKTIONARY */
+.translations * { background: transparent !important; }
+/*
+.translations {
+  background: white !important;
+  border: 1px solid #e0e7ef !important;
+}
+*/
+
+/* EOL */}
+
+/* header titles for different sites */
+@-moz-document domain(en.wikipedia.org)  { #p-logo a::after { content: "Wikipedia"  !important; } }
+@-moz-document domain(en.wiktionary.org) { #p-logo a::after { content: "Wiktionary" !important; } }
+
+	/* wikinews */
+@-moz-document domain(en.wikinews.org) {
+	#p-logo a::after { content: "Wikinews" !important; }
+
+	/* --- for the wikinews links --- */
+	#p-wikinews { top: 5.6em !important; }
+	/*#p-wikinews{display:none!important;}*/
+	.firstHeading { padding-top: 0.8em !important; }
+	/* --- */
+
+	/* --- for the regions links --- */
+	#column-one { height: 4.3em !important; } /* from 3.5 */
+	#p-tb { top: 4.9em !important; } /* from 3.6 */
+	/*#p-regions{display:none!important;}*/
+	/* --- */
+
+	#p-regions li:first-child::before {
+	  content: "Regions: " !important;
+	  margin-right: 0.2em !important;
+	}
+	#p-regions {
+	  font-size: 80% !important;
+	  white-space: nowrap !important;
+	  position: absolute !important;
+	  top: 2.5em !important;
+	  padding: 1px 0 !important; /* room for anchors' borders */
+	  padding-left: 0.2em !important; /* align with title */
+	}
+	.portlet#p-regions a:link,
+	.portlet#p-regions a:visited {
+	}
+	.portlet#p-regions li ~ li { margin-left: 0 !important; }
+	.portlet#p-regions li ~ li::before { content: ", " !important; }
+	
+	.portlet#p-regions li ~ li::before,
+	#p-regions li:first-child::before
+	{ color: white !important; opacity: 0.8 !important; }
+
+}

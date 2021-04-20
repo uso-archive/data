@@ -1,0 +1,168 @@
+/* ==UserStyle==
+@name           autohide the menu & sidebar [The Verge]
+@namespace      USO Archive
+@author         hideheader
+@description    `Hides <i>The Verge</i>'s footer and "The Latest" at the left edge of the screen. Shrinks the article images, removes the self-quotes from the article body. (But not permanently - hover at the edges of the screen to restore them.)`
+@version        20161115.17.40
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@-moz-document domain("www.theverge.com") {
+
+ #leaderboard_ad {display: none !important}
+
+ #container-content > ARTICLE > ASIDE {z-index: 10}
+  /* else photo is on top */
+ #container > HEADER, #container > FOOTER {z-index: 10000 !important}
+  /* else #network-bar is on top */
+ #container > HEADER:hover {z-index: 9999 !important}
+  /* else open HEADER covers collapsed #network-bar */
+
+ /* - - - - - auto-hide header - - - - - */
+ /*--#container > HEADER--*/#header {
+  position: fixed !important; top: /*16px*/0; left: 0;
+  background-color: white !important;
+
+  margin-top: 0 !important;
+ }
+ /*--#network-bar:not(:hover),
+ #container > HEADER--*/#header:not(:hover) {
+  clip: rect(0, 16px, 16px, 0);
+  background: url("http://cdn2.sbnation.com/images/verge/favicon.vc44a54f.ico") left top !important;
+ }
+ /*--#container > HEADER--*/#header:hover {top: 0 !important}
+
+/*.m-nav__hub {background-color: black !important}*/
+/*.m-nav__tabs*/.m-nav__hub {background-color: #2c2c2c}
+
+
+ /* - - - - - auto-hide footer - - - - - */
+  /*
+ BODY {position: relative}
+ #container > FOOTER {
+  position: absolute !important; bottom: 0;
+ }
+ #container > FOOTER:not(:hover) {
+  max-width: 16px; max-height: 16px;
+  background: url("http://cdn2.sbnation.com/images/verge/favicon.vc44a54f.ico") !important;
+ }
+ #container > FOOTER:not(:hover) > * {visibility: hidden}
+  */
+  footer.c-footer {
+    position: fixed; bottom: 0; left: 0;
+    clip: rect(0, 3mm, 20mm, 0);
+    left: 0; top: calc(100% - 20mm);
+    transition: .2s .6s linear;
+    transition-property: top, clip;
+    z-index: 1;
+  }
+  footer.c-footer:hover {
+    top: calc(100% - 237px);
+    clip: rect(0, 980px, 237px, 0);
+    transition-delay: 0s;
+  }
+
+
+ /* - - - - - auto-hide right sidebar - - - - - */
+  /*
+ #container-content > ARTICLE > ASIDE {
+  position: fixed !important; left: 0; top: 0;
+  height: 100%; overflow-y: auto; resize: horizontal;
+  background-color: white;
+  padding: 0 20px !important;
+ }
+ #container-content > ARTICLE > ASIDE > * {margin-right: -18px !important}
+ #container-content > ARTICLE > ASIDE:not(:hover) {
+  clip: rect(0, 2mm, 9999px, 0);
+  border-left: 2mm solid gray !important; opacity: 0.2;
+ }
+  */
+  .c-river.c-river--.c-river__shortened {
+    position: fixed; top: 0; left: 0;
+    max-width: 20em; height: 100%;
+    background-color: whitesmoke;
+    z-index: 1;
+    overflow-y: auto;
+    clip: rect(0, 20em, 1080px, 0);
+    border-left: solid;
+    z-index: 5000000;
+    transition: .2s .1s linear;
+    transition-property: clip, border-left-width, z-index;
+    transition-timing-function: linear, step-start, step-start;
+  }
+  .c-river.c-river--.c-river__shortened:not(:hover) {
+    clip: rect(0, 3mm, 1080px, 0);
+    border-left-width: 3mm;
+    z-index: 1;
+    transition-delay: .6s;
+    transition-timing-function: linear, step-end, step-end;
+  }
+  .c-river.c-river--.c-river__shortened .c-entry-box__title {
+    font-size: inherit;
+  }
+
+/** no comment **/
+  .p-comment-notification,
+.comment-count,
+#comments,
+
+/** no social **/
+.c-social-buttons,
+.social-col,
+.follow-the-verge,
+.\. {display: none !important}
+
+
+/** readability **/
+  /* smaller headlines */
+.headline {font-size: 2em !important}
+.subheadline {font-size: 1.4em !important}
+.subheadline > P {font-size: inherit !important}
+.headline, .subheadline, .subheadline > P {line-height: 1 !important}
+
+  /* don't quote yourself */
+  q,
+.article-body Q {display: none !important}
+
+  /* wider article on zoom, but no wider than the screen */
+.c-contain.grid_8 {
+  width: /*640px*/ 40em !important;
+  }
+.article-body {
+  width: /*565px*/ auto !important;
+  max-width: 100%;
+  }
+#super {max-width: 100%}
+.c-contain.grid_8 {
+  max-width: -moz-calc(100% - 20px);
+  max-width: -webkit-calc(100% - 20px);
+  }
+
+.story-image { /*640x426*/
+  position: absolute !important; bottom: 0;
+  }
+.story-image ~ .article-body {
+  margin-bottom: 427px;
+  }
+
+  /* shrink lede image */
+  .l-col__main > figure:first-child {
+    max-width: 5cm;
+    float: right;
+    transition: max-width .2s .5s;
+  }
+  .l-col__main > figure:first-child:hover {
+    max-width: 100%;
+    transition-delay: .2s;
+  }
+  /* (oh heck, let's shrink all of 'em) */
+  .l-col__main .c-entry-content figure {
+    max-width: 5cm;
+    float: right;
+    transition: max-width .2s .5s;
+  }
+  .l-col__main .c-entry-content figure:hover {
+    max-width: 100%;
+    transition-delay: .2s;
+  }
+}

@@ -1,0 +1,196 @@
+/* ==UserStyle==
+@name           Twitch Chat Minimal Badges
+@namespace      USO Archive
+@author         Jimmie1717
+@description    `Requires <a href="http://frankerfacez.com">FrankerFaceZ</a>. The CSS selectors used in this stylish are mostly added in by this extension.The default colors for this stylish are intended to be used with Dark Mode on Twitch. If you are using the default Light Mode on Twitch you may want to change them.Removes all but four Twitch Chat Badges. Badges are displayed as a four pixel border at the left side of the Chat Line spanning 100% of the height (one pixel is taken off so consecutive lines that have badges don't blend together).The following are the Badges still shown:<ul><li>Twitch Staff</li><li>Global Moderator</li><li>Broadcaster</li><li>Moderator</li></ul>Chat Messages are formatted to be aligned with the Nick. So messages that are long enough to create a second line will not go under the timestamp if you are using them. Timestamps are fixed to be right aligned.`
+@version        20180818.13.54
+@license        CC-BY-SA-4.0
+@preprocessor   uso
+@advanced dropdown forceNickColor "Force Nick Color" {
+	No "No*" <<<EOT  EOT;
+Yes "Yes" <<<EOT .chat-line__message .chat-author__display-name,
+.chat-line__message .chat-author__intl-login
+{
+	color: /*[[nickColor]]*\/!important;
+	font-weight: bold!important;
+} EOT;
+
+}
+@advanced color nickColor "Nick Color" #FFFFFF
+@advanced dropdown forceMeColor "Force /me Color" {
+	No "No*" <<<EOT  EOT;
+Yes "Yes" <<<EOT .chat-line__message .message[style^="color:"] {
+	color: /*[[meColor]]*\/!important;
+} EOT;
+
+}
+@advanced color meColor "/me Color" #FFFFFF
+@advanced dropdown forceMessageColor "Force Message Color" {
+	No "No*" <<<EOT  EOT;
+Yes "Yes" <<<EOT .chat-line__message .message {
+	color: /*[[messageColor]]*\/!important;
+} EOT;
+
+}
+@advanced color messageColor "Message Color" #BEBEBE
+@advanced dropdown hideSubscriber "Hide Chat Subscriber Message" {
+	No "No*" <<<EOT  EOT;
+Yes "Yes" <<<EOT .chat-line__subscribe {						
+	display: none!important;	
+} EOT;
+
+}
+@advanced color staffColor "Twitch Staff Badge" #5021A6
+@advanced dropdown hideCheer "Hide Chat Cheers" {
+	No "No*" <<<EOT  EOT;
+Yes "Yes" <<<EOT [data-amount] {						
+	display: none!important;	
+} EOT;
+
+}
+@advanced color administratorColor "Global Mod Badge" #A61111
+@advanced dropdown chatlineAltColor "Alternate Chat Line Background" {
+	No "No*" <<<EOT  EOT;
+Light-Mode "Light Mode" <<<EOT .chat-line__message:nth-child(2n) {
+	background-color: rgba(0, 0, 0, 0.05);
+} EOT;
+Dark-Mode "Dark Mode" <<<EOT .chat-line__message:nth-child(2n) {
+	background-color: rgba(255, 255, 255, 0.05);
+} EOT;
+
+}
+@advanced color broadcasterColor "Broadcaster Badge" #0065B3
+@advanced dropdown timestamp "Using Timestamps" {
+	Yes "Yes*" <<<EOT 42px EOT;
+No "No" <<<EOT 10px EOT;
+
+}
+@advanced color moderatorColor "Moderator Badge" #006600
+@advanced dropdown hideStats "Hide Stats" {
+	None "None*" <<<EOT  EOT;
+Followers "Followers" <<<EOT [data-a-target="followers-channel-header-item"] .channel-header__item-count
+{						
+	display: none!important;	
+} EOT;
+Following "Following" <<<EOT [data-a-target="following-channel-header-item"] .channel-header__item-count
+{						
+	display: none!important;	
+} EOT;
+Viewers "Viewers" <<<EOT [data-a-target="channel-viewers-count"]
+{						
+	display: none!important;	
+} EOT;
+Total-Views "Total Views" <<<EOT [data-a-target="total-views-count"]
+{						
+	display: none!important;	
+} EOT;
+Followers---Followin "Followers / Following" <<<EOT [data-a-target="followers-channel-header-item"] .channel-header__item-count,
+[data-a-target="following-channel-header-item"] .channel-header__item-count
+{						
+	display: none!important;	
+} EOT;
+Viewers---Total-View "Viewers / Total Views" <<<EOT [data-a-target="channel-viewers-count"],
+[data-a-target="total-views-count"]
+{						
+	display: none!important;	
+} EOT;
+All "All" <<<EOT [data-a-target="followers-channel-header-item"] .channel-header__item-count,
+[data-a-target="following-channel-header-item"] .channel-header__item-count,
+[data-a-target="channel-viewers-count"],
+[data-a-target="total-views-count"]
+{						
+	display: none!important;	
+} EOT;
+
+}
+@advanced dropdown hidePrime "Hide Prime" {
+	No "No*" <<<EOT  EOT;
+Yes "Yes" <<<EOT [data-a-target="try-prime-link"],
+.top-nav__prime
+{
+	display: none!important;	
+} EOT;
+
+}
+
+==/UserStyle== */
+@-moz-document domain("twitch.tv") {
+
+div[data-a-target="chat-welcome-message"]:before {
+	display: block!important;
+	content: "Twitch Chat Minimal Badges v1.1";	
+}
+
+div[data-a-target="chat-welcome-message"]:nth-of-type(2) {
+	display: none!important;	
+}
+
+/*[[hidePrime]]*/
+
+/*[[hideStats]]*/
+
+/*[[chatlineAltColor]]*/
+
+.chat-line__message {
+	position: relative;
+	padding: 5px 5px 5px /*[[timestamp]]*/!important;
+	min-height: 30px;
+}
+
+.chat-line__timestamp {
+	position: absolute;
+	left: 6px;
+	margin: 0;
+	width: 31px;
+	text-align: right;
+}
+
+.chat-line__message--badges {
+	position: absolute;
+	top: 0px;
+	left: 0;
+	min-width: /*[[timestamp]]*/;
+	width: /*[[timestamp]]*/;
+	height: 100%;
+}
+.ffz-badge[data-replaced="2"] {
+	background: none!important;
+	background-image: none!important;
+}
+[data-badge] {
+	position: absolute;
+	min-width: /*[[timestamp]]*/;
+	width: /*[[timestamp]]*/;
+	height: calc(100% - 1px);
+	background: none!important;
+	background-image: none!important;
+	display: none!important;
+}
+[data-badge="staff"] {
+	border-left: 4px solid /*[[staffColor]]*/!important;
+	display: block!important;	
+}
+[data-badge="admin"], [data-badge="administrator"] {
+	border-left: 4px solid /*[[administratorColor]]*/!important;
+	display: block!important;	
+}
+[data-badge="broadcaster"] {
+	border-left: 4px solid /*[[broadcasterColor]]*/!important;
+	display: block!important;	
+}
+[data-badge="moderator"] {
+	border-left: 4px solid /*[[moderatorColor]]*/!important;
+	display: block!important;	
+}
+
+/*[[forceNickColor]]*/
+
+/*[[forceMeColor]]*/
+
+/*[[forceMessageColor]]*/
+  
+/*[[hideSubscriber]]*/
+  
+/*[[hideCheer]]*/
+
+}

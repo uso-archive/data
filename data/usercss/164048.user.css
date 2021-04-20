@@ -1,0 +1,475 @@
+/* ==UserStyle==
+@name           YouTube Glass Design
+@namespace      USO Archive
+@author         StashCat
+@description    `YouTube, but glassier.<blockquote><strong>!!!!!     IMPORTANT     !!!!!</strong>This style will not look like the screenshots unless your browser supports backdrop-filter. https://caniuse.com/#feat=css-backdrop-filterTo enable this in Chrome, go to <code>chrome://flags/#enable-experimental-web-platform-features</code> and enable it.Otherwise this just makes everything transparent.</blockquote>Blurring the player controls' background does not work well with opacity changes, therefore it slides out once enabled.`
+@version        20181019.13.57
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown transitionspeed "Transition speed" {
+	fast "Fast (0.1s)*" <<<EOT --transition: var(--transition-fast) var(--transition-method); EOT;
+medium "Medium (0.2s)" <<<EOT --transition: var(--transition-medium) var(--transition-method); EOT;
+slow "Slow (0.3s)" <<<EOT --transition: var(--transition-slow) var(--transition-method); EOT;
+off "Off" <<<EOT --transition: 0s linear; EOT;
+
+}
+@advanced dropdown hidesharetext "Hide share & save text" {
+	yes "Yes*" <<<EOT #top-level-buttons > ytd-button-renderer:nth-child(3) yt-formatted-string, #top-level-buttons > ytd-button-renderer:nth-child(4) yt-formatted-string {
+    display: none;
+} EOT;
+no "No" <<<EOT  EOT;
+
+}
+@advanced dropdown buttonhighlight "Highlight buttons on hover" {
+	yes "Yes*" <<<EOT yt-icon-button:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 100%;
+    opacity: 0;
+    background-color: #000;
+    transition: opacity var(--transition);
+    pointer-events: none;
+}
+
+[dark=true] yt-icon-button:after {
+    background-color: #fff;
+}
+
+yt-icon-button:hover:after,
+a:hover yt-icon-button:after {
+    opacity: 0.15;
+} EOT;
+no "No" <<<EOT  EOT;
+
+}
+@advanced dropdown buttonhover "Raise buttons on hover" {
+	yes "Yes*" <<<EOT paper-button,
+yt-icon-button,
+#target.ytd-share-target-renderer,
+paper-button[animated],
+#avatar-btn,
+#checkboxContainer,
+paper-radio-button #radioContainer,
+.ytp-cards-button,
+.iv-drawer-close-button {
+    transition: all var(--transition) !important;
+}
+
+paper-button:hover,
+yt-icon-button:hover,
+a:hover > yt-icon-button,
+#target.ytd-share-target-renderer:hover,
+#avatar-btn:hover,
+paper-checkbox:hover #checkboxContainer,
+paper-radio-button:hover #radioContainer,
+.ytp-cards-button:hover,
+.iv-drawer-close-button:hover {
+    transform: scale(1.1);
+}
+
+a:hover > yt-icon-button * {
+    color: var(--text-color) !important;
+}
+
+paper-button:active,
+yt-icon-button:active,
+a:active > yt-icon-button,
+paper-button paper-button,
+paper-button paper-button:hover,
+#target.ytd-share-target-renderer:active,
+#avatar-btn:active,
+paper-checkbox:active #checkboxContainer,
+paper-radio-button:active #radioContainer,
+.ytp-cards-button:active,
+.iv-drawer-close-button:active {
+    transform: scale(1);
+} EOT;
+no "No" <<<EOT  EOT;
+
+}
+@advanced dropdown playerlight "Player follows YouTube theme (always white on embeds)" {
+	yes "Yes*" <<<EOT .ytp-tooltip-bg {
+    background-color: none;
+}
+
+.ytp-popup,
+.ytp-tooltip-text,
+.iv-branding .branding-context-container-inner,
+.iv-drawer,
+.ytp-tooltip.ytp-preview {
+    background-color: var(--bg-color);
+}
+
+.ytp-popup,
+.ytp-tooltip-text,
+.iv-branding .branding-context-container-inner,
+.iv-drawer,
+.ytp-preview {
+    /*[[blur]]*\/
+}
+
+.ytp-panel-menu,
+.ytp-panel-header,
+.ytp-tooltip-text,
+.iv-branding .branding-context-container-inner,
+.iv-drawer {
+    color: var(--text-color);
+    text-shadow: none;
+}
+
+.ytp-menuitem-label-count,
+.ytp-menu-label-secondary {
+    color: var(--text-muted-color);
+}
+
+.ytp-menuitem:not([aria-disabled=true]):hover {
+    background-color: var(--bg-alt-color);
+}
+
+html:not([dark=true]) .ytp-menuitem[aria-haspopup=true] .ytp-menuitem-content,
+html:not([dark=true]) .ytp-panel-title,
+html:not([dark=true]) .ytp-menuitem[role=menuitemradio][aria-checked=true] .ytp-menuitem-label {
+    filter: invert(0.9);
+    color: var(--text-color);
+    --text-color: var(--text-alt-color);
+    --text-muted-color: var(--text-alt-muted-color);
+} EOT;
+no "No" <<<EOT  EOT;
+
+}
+@advanced dropdown controlslide "Blur & slide out player controls" {
+	yes "Yes*" <<<EOT html:not([dark=true]) .ytp-chrome-controls svg * {
+    fill: #000 !important;
+}
+
+.ytp-svg-shadow {
+    display: none;
+}
+
+.ytp-chrome-bottom,
+.ytp-progress-bar-container {
+    transition: all var(--transition) !important;
+}
+
+.ytp-chrome-bottom {
+    opacity: 1 !important;
+    transform: translateY(0);
+    pointer-events: inherit;
+}
+
+.ytp-autohide .ytp-chrome-bottom {
+    transform: translateY(100%);
+    pointer-events: none;
+}
+
+.ytp-chrome-controls:after {
+    content: "";
+    position: absolute;
+    left: -12px;
+    right: -12px;
+    bottom: 0;
+    top: 0;
+    /*[[blur]]*\/
+    z-index: -1;
+}
+
+.ytp-gradient-bottom {
+    display: none;
+}
+
+.ytp-time-display {
+    text-shadow: none;
+    color: var(--text-color);
+}
+
+.ytp-time-current {
+    color: var(--text-color);
+}
+
+.ytp-time-separator,
+.ytp-time-duration {
+    color: var(--text-muted-color);
+}
+
+.ytp-volume-slider-handle,
+.ytp-volume-slider-handle:before {
+    background-color: var(--text-color);
+}
+
+.ytp-volume-slider-handle:after {
+    background-color: var(--text-muted-color);
+} EOT;
+no "No" <<<EOT  EOT;
+
+}
+@advanced dropdown avatarcardbg "Avatar as background for channel card" {
+	yes "Yes*" <<<EOT iron-dropdown #header #avatar img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: auto !important;
+    width: 100% !important;
+    z-index: 0;
+    filter: blur(25px) saturate(8) brightness(0.5);
+    transform: translateY(-40%);
+    pointer-events: none;
+}
+
+.ytd-active-account-header-renderer {
+    overflow: hidden;
+}
+
+#account-name.ytd-active-account-header-renderer,
+#email.ytd-active-account-header-renderer {
+    text-align: center;
+    color: #fff;
+}
+
+#avatar.ytd-active-account-header-renderer {
+    width: 0;
+    margin: 0;
+}
+
+#channel-container.ytd-active-account-header-renderer {
+    margin: 0 auto;
+    z-index: 1;
+}
+
+#channel-container > * {
+    z-index: 2;
+} EOT;
+no "No" <<<EOT  EOT;
+
+}
+@advanced dropdown blur "Blur type" {
+	acrylic "Acrylic*" <<<EOT -webkit-backdrop-filter: var(--bg-blur);
+backdrop-filter: var(--bg-blur);
+background-color: var(--bg-color);
+background-image: url(/*[[noise]]*\/);
+background-repeat: repeat;
+background-attachment: fixed; EOT;
+basic "Basic" <<<EOT -webkit-backdrop-filter: var(--bg-blur);
+backdrop-filter: var(--bg-blur);
+background-color: var(--bg-color); EOT;
+
+}
+@advanced dropdown noise "Acrylic noise" {
+default "Default*" <<<EOT data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAH0UlEQVRoQ3XZ7W1bOxCEYeuHK3JqcmpyanJq8sUQfoQ3TK6B4Eg65H7Ozi6Zx9fX1+uvX79efv78+fL19fXy+/fv83nPff/x48fLx8fHy9vb28v+Ho/Hy+fn58v2bM3+7f2e7+/vz/37bWvs827Pyd/vez9Z1Wnd9k/3vu9v6+3b+v1t79bs3ePj4+N1i2fgNlu8hb7v/ZT6TvkEcojBnvudEfu8oEwHWZMxXfvOSAGyZr/P0Aa0QRbY2fX4/Px8JUh0t1gWpnx/skX4fuv6s+g7cjNofwydI33PUEEQGBnk3JwgUzBkg/x9/yMj20SgzwyZYL9NwD5X4AQVWv0MYuB3lH5nXyDAQ9ZBbk9BAEWZ9ST38f7+/ipaVVZDWwvgUZz6LDo3pls7lQsy9nGMIwIJIXuSbY9aeqzYFfAz/4HJNt8pbxGDmqzsuX8tbjDsPsYVgmQ0owxHEq0f2RqSVgCvi8zNJNiqTME4hoKbLIEgjFMk0vY3YIq59WQ/JHAWkSwLgiOQJyMES7sN+14KlHJ1UlbanlLpvks7yLbmym79HROSNV0NyL43K7J3WKsYLNUWCndUUCWDyMBEDQ64oW8RJb81wlAOFT7YtRmV5cfb29uhX1iE0xvD5fhy+WBVaEo5OLV2ND70fFNobbiDy0ZoaF86TLgaIbiF28Lb5jbBrhNdzjFGw8P/ZaA5VJ1trH5vOygNY7ratM/HEd5q+SBQ9oB5cKgiRcmIdntkoU5uBttezVbhqwu9o8FonbbRnhph8F4UUpT2KTOycs9CIAg2MN9uXRIgp/MaAzVI1EtWEWHtmbVqfJuaBjQBFBUWaLcDnuyUQhmgozPszEjfNUZWWUlmBIdj1YHyjyNwLYp31DkCq4OCosMgpd5/Tb7gVqbaHkyELQvn9hHsBP4gSf9zRKFAdBVVm1Droyyi4PWcjiSFloBNTpvjPdE24vfc16wctpJRI4pp18tSMrhJI7oVvTbG20AwAo9CFHRvJioD9mjRiYFO0/lhLVEDIdMtCvWUxtuxQnMKKDm0+Hj8cbgCoR4VyJVRmW/TxX7Go56fjp41xPYCm3voYZj5qzg2gtdZzZDDsizrPRIYizz/BXEZUnvkg+iRP0cY1szgcMzRdwTAq++l3EKohUyuotWhjTGeyKHnmbKe7Fn/7OwiQYAI94xSaHXSVRf/ms1kU63IUk+RdYKOdnMZoEcw1PGcerIWYZqfKN6wslkWQFCE2mfuYbBRJLfDoeCxpUcIsARBdkLFs7ODkIUcWeqbreJSVwWTc8D5vmAQNbAFkRmH9Yr5jh73ibDzF7sK9a0/5xEFq9NqVGAm3ZwlzLo78veM1gmg0BFVfWPOC0Yb7T1ta7516ulIu3dZrPilkIMT1BoyqzFI9++IIboyjwlFGPXrH6YIstWJngLqT9biJcx1uuX5Nom29+3mYIdd2l98dsWj+Auv3l8VBa1Lv4OfgBzWmrCyiggqRJi2RpYwVxuXLMiqCE4WYhCM1hFIdY6rA4UTSILc6SOuTNtL7iirjdZOI9yzRp0tcdxsA8p6T1lMgDhllIGWZ+/4vjw8juxeS/QMYEaL1g1FFabIkQXnGPJ/za9zXaGy9bKmZtr5W9x/EcocQaMKrHzezl6a7dhQpai6zUpAON71CEQwOzWUYt29db2mOQefd7/NRqNSbIueiIsseLQD35d+HAdPU2spt/fLbGBszzjahAyd7w5W7QVlqRZraVfk7hTLCKcQhugWmvdUYK8z0faga8ggt7PYqZHea2EDUPP9vjCG5SqRcopQtQsFRs54EEUSHYcKITVHlpo7UPo+UEHMcaTFikoJN1KAQrM1we0HdUbDkrlSJjZC1bLO0EJW5AUIjAVDpv+4jS/N3qe0KeEwBxiH0SgR/Tr5fzOWaGMnhCMbZjDv25RLDM/beKxBACNtNIne0UMAHRg5UDquc+qxA2bh0smg8AJ5mWfj0e1ei6E6qOx0pP4XjYKHfXVYPQiGjIl6i9rcVvo2hpS5jEatl8n96/8QyxzgVQba5xuf7TUyy/gyXfGtSDnVZifrKFcA7zuwTutn1tpGxSnt7SWH3sISKNRvHSBFiiPl/zJa5y5Z33vTsLpTl5x7Fve3PQL1x3kEHhUm2IiIDFXolHeo1NGLY9jGiHfhd5ZiKGoulPp/Na3l56zVga5jdX/f4p5TWi/YQ2QZ3uZYqhZtTgtYRyTvKmvr9K79LiCz83mv1dG9zISVyh5V3PqQBaOGPQ5LzRbH7KET4xWa4NqpALOReYpd5CxEa4qp16d3A2RsZzJ1VjllIxnshVxPkXfDlH1Bk9HqeV4H9dwuSmUFSlGmp0kZmzVDnL6LvCOHAXT71NocFbyeXFsX9yx3jroUdnayqcwkwvdt/N0MWxugWePUUmuqwynd6gMM2yhlg+1nRLmjggKxSUcQowq6bmMyINb4TquosszEaWd5PUpL6OWEemitaZqns1MgstI5I0SF4RrX3oliu3nxa3/hwXGQ5HSzY77Sv+4zTKcIE8GBlmLqXNX0UlpqbvfF9Z2QWxdqbvLvXkSnABRidx00iG0NJwH3UbfMpSZKvfd1jncaWEccTNbzBzKQ0ftmpU4X8pyQHbCn93mv1WZT1oLBOkX5hDsIyUoLVNRK2aBVOIKSeugc1j5jjywK0Nb8B8sMSFsxSamWAAAAAElFTkSuQmCC EOT;
+
+	noise-custom-dropdown "Custom" <<<EOT /*[[noise-custom]]*\/ EOT;
+}
+@advanced text noise-custom "Acrylic noise (Custom)" "https://example.com/image.png"
+@advanced text tfunc "Transition function (linear, ease, etc.)" "cubic-bezier(.1,1,.25,1)"
+
+==/UserStyle== */
+@-moz-document domain("youtube.com") {
+    :root {
+        --bg-blur: blur(25px) saturate(2);
+        --bg-color: rgba(255, 255, 255, 0.6);
+        --bg-alt-color: rgba(0, 0, 0, 0.1);
+        --search-color: rgba(0, 0, 0, 0.05);
+        --search-accent-color: rgba(0, 0, 0, 0.1);
+        --search-border-color: transparent;
+        --text-color: #000;
+        --text-muted-color: rgba(0, 0, 0, 0.6);
+		--text-alt-color: #fff;
+		--text-alt-muted-color: rgba(255,255,255,0.6);
+        --paper-item-min-height: 30px;
+        --transition-fast: .1s;
+        --transition-medium: .2s;
+        --transition-slow: .3s;
+        --transition-method: /*[[tfunc]]*/
+        ;
+        /*[[transitionspeed]]*/
+    }
+    [dark=true] {
+        --bg-color: rgba(0, 0, 0, 0.6);
+        --bg-alt-color: rgba(0, 0, 0, 0.3);
+        --search-color: rgba(0, 0, 0, 0.2);
+        --search-accent-color: rgba(255, 255, 255, 0.05);
+        --search-border-color: rgba(255, 255, 255, 0.05);
+        --text-color: #fff;
+        --text-muted-color: rgba(255, 255, 255, 0.8);
+        --text-alt-color: #000;
+		--text-alt-muted-color: rgba(0,0,0,0.6);
+        --yt-app-background: #000 !important;
+		--yt-main-app-background-tmp: var(--yt-app-background) !important;
+		--yt-sidebar-background: #000 !important;
+    }
+    /*
+    		Transitions
+    */
+    ytd-menu-service-item-renderer,
+    [role="option"],
+    .dropdown-content [role="menuitem"],
+    .dropdown-content a,
+    ytd-guide-entry-renderer a,
+    ytd-account-item-renderer,
+    ytd-compact-link-renderer,
+    paper-item[role="button"],
+    #items.yt-multi-page-menu-section-renderer > *.yt-multi-page-menu-section-renderer,
+    ytd-playlist-video-renderer,
+    .ytp-menuitem {
+        transition: background-color var(--transition);
+    }
+    yt-icon,
+    yt-formatted-string,
+    yt-formatted-string a {
+        transition: color var(--transition);
+    }
+    /*
+    		Colors
+    */
+    ytd-topbar-menu-button-renderer #button.ytd-topbar-menu-button-renderer,
+    .ytd-notification-topbar-button-renderer,
+    .guide-icon.ytd-guide-entry-renderer {
+        color: var(--text-muted-color);
+    }
+    [dark=true] ytd-app {
+		background-color: #000;
+    }
+    /*
+    		Nav bar
+    */
+    #masthead,
+    app-toolbar.ytd-c4-tabbed-header-renderer {
+        /*[[blur]]*/
+    }
+    #search-icon-legacy.ytd-searchbox,
+    ytd-searchbox[mode=legacy] #container.ytd-searchbox,
+    ytd-searchbox[mode=legacy-centered] #container.ytd-searchbox {
+        background-color: var(--search-color);
+        transition: background-color var(--transition);
+        border: none !important;
+        box-shadow: none !important;
+    }
+    ytd-searchbox[mode=legacy][has-focus] #container.ytd-searchbox,
+    ytd-searchbox[mode=legacy-centered][has-focus] #container.ytd-searchbox,
+    ytd-searchbox[mode=legacy] #search-icon-legacy.ytd-searchbox:hover,
+    ytd-searchbox[mode=legacy-centered] #search-icon-legacy.ytd-searchbox:hover,
+    ytd-searchbox[mode=legacy] #search-icon-legacy.ytd-searchbox:focus,
+    ytd-searchbox[mode=legacy-centered] #search-icon-legacy.ytd-searchbox:focus {
+        background-color: var(--search-accent-color);
+    }
+    #search-form {
+        border-radius: 15px;
+        overflow: hidden;
+        border: 1px solid var(--search-border-color);
+    }
+    /*
+    		Menus
+    */
+    .dropdown-content,
+    paper-listbox {
+        border-radius: 15px;
+    }
+    #sections.ytd-multi-page-menu-renderer > *.ytd-multi-page-menu-renderer,
+    paper-listbox {
+        padding: 15px 0;
+    }
+    #masthead-container.ytd-app {
+        overflow: hidden;
+    }
+    /*
+    		Sidebar
+    */
+    #guide-spacer.ytd-app {
+        background-color: var(--yt-guide-background);
+        margin-top: 0;
+        padding-top: var(--ytd-masthead-height, 56px);
+    }
+    app-drawer #guide-wrapper,
+    #guide-content.ytd-app {
+        background-color: transparent;
+    }
+    #contentContainer.app-drawer {
+        /*[[blur]]*/
+    }
+    #sections.ytd-guide-renderer > *.ytd-guide-renderer:not(:last-child),
+    #guide-links-primary.ytd-guide-renderer,
+    app-drawer.ytd-app:not([persistent]) #header.ytd-app {
+        border: none;
+    }
+    [dark=true] paper-listbox, [dark=true] ytd-multi-page-menu-renderer {
+		background-color: #000;
+		box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.2);
+    }
+    /*[[avatarcardbg]]*/
+    /*
+			Dialogs
+    */
+    [dark=true] paper-dialog {
+		background-color: #000;
+		border: 1px solid #222;
+    }
+    paper-dialog {
+        box-shadow: none;
+        border-radius: 20px;
+    }
+    #target.ytd-share-target-renderer {
+        border-radius: 0;
+        cursor: pointer;
+    }
+    #target.ytd-share-target-renderer:focus {
+        background: none;
+        outline: none;
+    }
+    #bar.ytd-copy-link-renderer {
+        border-radius: 20px;
+        overflow: hidden;
+		background-color: var(--bg-color);
+    }
+    #copy-button.ytd-copy-link-renderer {
+        padding: 0;
+    }
+    #copy-button.ytd-copy-link-renderer paper-button {
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+    yt-report-form-modal-renderer[dialog][dialog][dialog] {
+        background: none;
+    }
+    /*
+    	Player
+    */
+    .iv-drawer,
+    .ytp-iv-drawer-open .iv-drawer {
+        transition: transform var(--transition-slow) var(--transition-method);
+    }
+    .ytp-iv-drawer-open .iv-drawer {
+        transform: translatex(0%);
+    }
+    .iv-drawer {
+        transform: translatex(100%);
+    }
+    /*
+    		Channel header
+    */
+    #channel-header.ytd-c4-tabbed-header-renderer {
+		/*[[blur]]*/
+        padding: 16px 107px;
+		overflow: hidden;
+    }
+    #background.app-header {
+		height: calc(100vw / 6.2 - 1px);
+    }
+    #tabs-inner-container.ytd-c4-tabbed-header-renderer,
+    #channel-container.ytd-c4-tabbed-header-renderer,
+    #tabs-container.ytd-c4-tabbed-header-renderer {
+        background-color: transparent;
+    }
+    /*
+    		Other
+    */
+    /*[[buttonhover]]*/
+    /*[[hidesharetext]]*/
+    /*[[playerlight]]*/
+    /*[[controlslide]]*/
+    /*[[buttonhighlight]]*/
+}

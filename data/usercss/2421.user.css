@@ -1,0 +1,187 @@
+/* ==UserStyle==
+@name           Show URL Types
+@namespace      USO Archive
+@author         Wolfey
+@description    `This style will allow you to see what type of URL is present in a link.  For links to other pages, it will list where it's referencing it from (relative to the current directory, the parent directory, the root directory, or a full path) and shows it before the link.  Identification for fragment identifiers and query strings (starting with "#" and "?", respectively) will be shown after the link.Different protocols ("file", "mailto", "javascript", etc.) are also shown, and custom ones can be added to expand the number of protocols that can be identified with this style.`
+@version        20070527.0.59
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@namespace url(http://www.w3.org/1999/xhtml);
+
+/* Formatting to be used for all URL types */
+
+a:after {
+  background-color: lightgray ! important;
+  color: black ! important;
+}
+a:before {
+  background-color: black ! important;
+  color: white ! important;
+
+}
+a:before,
+a:after {
+  font-size: 75% ! important;
+  font-style: normal ! important;
+  font-variant: small-caps ! important;
+  font-weight: bold ! important;
+  padding: 3pt ! important;
+  text-decoration: underline ! important;
+}
+/* ------------------------------ */
+/* Relative (Current Directory)
+   No periods or slashes at the beginning. */
+
+a:not([href^="/"]):before {
+  content: "Current (*)" ! important;
+}
+
+/* Relative (Current Directory)
+   One period and a slash at the beginning. */
+
+a[href^="./"]:before {
+  content: "Current (./*)" ! important;
+}
+
+/* Relative (Parent Directory)
+   Two periods and a slash at the beginning. */
+
+a[href^="../"]:before {
+  content: "Parent (../*)" ! important;
+}
+
+/* Relative (Root Directory)
+   A slash at the beginning. */
+
+a[href^="/"]:before,
+a[href^="/"][href*=":"]:before
+ {
+  content: "Root (/*)" ! important;
+}
+
+/* Relative (Root)
+   A slash only and nothing else. */
+
+a[href="/"]:before {
+  content: "Root (/)" ! important;
+}
+
+/* Absolute (Full)
+   The entire address. */
+
+a[href^="http://"][href*=":"]:before {
+  content: "Full (http://*)" ! important;
+}
+
+a[href^="https://"][href*=":"]:before {
+  content: "Full (https://*)" ! important;
+}
+
+/* ------------------------------ */
+/* Special Cases */
+
+/* Bookmark
+   An octothorpe followed by the bookmark name. */
+
+a[href^="#"]:before,
+a[href*="#"]:not([href^="#"]):not([href="#"]):not([href*="?"]):after {
+  content: "Bookmark (#*)" ! important;
+}
+
+/* Placeholder
+   An octothorpe only. */
+
+a[href="#"]:before {
+  content: "Placeholder (#)" ! important;
+}
+
+/* Query String
+   A question mark and data following the page name. */
+
+a[href*="?"]:after {
+  content: "Query String (?*)" ! important;
+}
+
+/* Query String and Bookmark
+   A question mark and data following the page name, in turn
+   followed by an octothorpe and the bookmark name. */
+
+a[href*="?"][href*="#"]:after {
+  content: "Query String (?*) and Bookmark (#*)" ! important;
+}
+
+/* Empty
+   Nothing - works like the "Relative (Current Directory)" link. */
+
+a[href=""]:before {
+  content: "Empty" ! important;
+}
+
+/* ------------------------------ */
+
+/* Non-HTTP Protocols */
+
+/* (All Unknown Protocols) */
+
+a[href*=":"]:before {
+  content: "?" ! important;
+}
+
+/* Local/Remote Files */
+
+a[href^="file:"]:before {
+  content: "File (file:///*)" ! important;
+}
+
+/* E-Mail Addresses */
+
+a[href^="mailto:"]:before {
+  content: "E-Mail (mailto:*)" ! important;
+}
+
+/* JavaScript */
+
+a[href^="javascript:"]:before
+ {
+  content: "JavaScript (javascript:*) [href, no onclick]" ! important;
+}
+
+a[onclick]:before
+ {
+  content: "JavaScript (javascript:*) [onclick, no href]" ! important;
+}
+
+a[href][onclick]:before
+ {
+  content: "JavaScript (javascript:*) [onclick and href]" ! important;
+}
+
+a[href^="#"][onclick]:before
+ {
+  content: "JavaScript (javascript:*) [onclick and placeholder]" ! important;
+}
+
+/* FTP Pages */
+
+a[href^="ftp:"]:before {
+  content: "FTP (ftp://*)" ! important;
+}
+
+/* AOL Instant Messenger */
+
+a[href^="aim:"]:before {
+  content: "AIM (aim:*)" ! important;
+}
+
+/* MSN Instant Messenger */
+
+a[href^="msnim:"]:before {
+  content: "MSN (msnim:*)" ! important;
+}
+
+/* Mozilla/Firefox Chrome */
+
+a[href^="chrome:"]:before {
+  content: "Mozilla/Firefox Chrome (chrome://*)" ! important;
+}

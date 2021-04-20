@@ -1,0 +1,340 @@
+/* ==UserStyle==
+@name           YouTube player control bar on the outside
+@namespace      USO Archive
+@author         犬々
+@description    `<strong>スタイルの簡単な説明</strong>　<small>動画や生放送の映像を縮小し、映像外に操作バーを常時表示していますその為映像は通常より小さくなっており、黒枠が周りに表示されます。</small>　<small>シークバーや操作バーの経過時間はアクティブ時に動作し、シークバー位置にカーソルを置いたりすると常時アクティブ化する為オプションで操作バーホバー時に表示される物の表示／非表示オプションを設置しています。</small><strong>追記</strong>　<small>シークバーや操作バーの経過時間はアクティブ時に動きますが、常時アクティブ化はしていません。</small>　<small>動画終了間際の投稿主の設定している他動画へのサムネリンク等、一部表示の位置調整は出来ないのがあり諦めております。</small>　<small>個人の偏見と独断で表示に非表示、大きさや位置の調整を随時しています。</small>　<small>解像度など個人差で生じる物は保証出来ません(1920*1280／Chromeで作成しています)。</small>　<small>※現状個人の価値観以外での上方修正は見込めません。</small><strong>裏話にならない程度の裏話</strong>　<small>コードの理解が進み、当初作成したプレイヤー側のサイズ拡大での作成が出来る様にはなりましたが放送開始前のサムネ状態に画面モード等対応出来ない部分が出てくる為、現在の映像の縮小仕様で固定します。</small>`
+@version        20210106.3.35
+@license        CC0-1.0
+@preprocessor   uso
+@advanced dropdown Option-preview- "操作バーホバー時に表示される物" {
+	-- "表示*" <<<EOT 	[id="player-container"]:not([class="style-scope ytd-miniplayer"]) 		[class*="ytp-bottom"]
+	{
+		opacity: 1 !important;
+	} EOT;
+--- "非表示" <<<EOT 	[id="player-container"]:not([class="style-scope ytd-miniplayer"]) 		[class*="ytp-bottom"]
+	{
+		opacity: 0 !important;
+	} EOT;
+
+}
+@advanced dropdown Option-livetime- "生放送経過時間" {
+	--- "非表示*" <<<EOT 	[class*="ytp-live"] [class="ytp-time-current"]
+	{
+		display: none !important;
+	} EOT;
+-- "表示" <<<EOT 	[class*="ytp-live"] [class="ytp-time-current"]
+	{
+		display: inline-block !important;
+		padding-right: 10px !important;
+	} EOT;
+
+}
+
+==/UserStyle== */
+@-moz-document url-prefix("https://www.youtube.com/watch?v="),
+url-prefix("https://www.youtube.com/channel/"),
+url-prefix("https://www.youtube.com/c/")
+{
+/*視聴画面*/
+/* ----- プレイヤー外(デフォルト表示) ----- */
+[class="style-scope ytd-page-manager"]:not([page-subtype="channels"]) [id="player"]
+{
+	min-width: calc((var(--ytd-watch-flexy-chat-max-height)*var(--ytd-watch-flexy-width-ratio))/var(--ytd-watch-flexy-height-ratio)) !important;
+	height: var(--ytd-watch-flexy-chat-max-height) !important;
+}
+
+/* ----- プレイヤー外(シアターモード) ----- */
+ytd-watch-flexy[theater] [id="player-theater-container"][class="style-scope ytd-watch-flexy"]
+{
+	min-width: calc(((480px)*16)/9) !important;
+	height: calc(((100vw)*9)/16) !important;
+}
+
+/* ----- プレイヤー外(全画面) ----- */
+ytd-watch-flexy[fullscreen] [id="player-theater-container"][class="style-scope ytd-watch-flexy"]
+{
+	min-width: calc(((480px)*16)/9) !important;
+	max-width: none !important;
+	height: calc(((100vw)*9)/16) !important;
+}
+
+/* ----- プレイヤー枠(デフォルト表示) ----- */
+[id="movie_player"]
+{
+	min-width: calc((var(--ytd-watch-flexy-chat-max-height)*var(--ytd-watch-flexy-width-ratio))/var(--ytd-watch-flexy-height-ratio)) !important;
+	width: 100% !important;
+	height: var(--ytd-watch-flexy-chat-max-height) !important;
+}
+
+/* ----- プレイヤー枠(シアターモード) ----- */
+ytd-watch-flexy[theater] [id="player-theater-container"][class="style-scope ytd-watch-flexy"] [id="movie_player"]
+{
+	min-width: calc(((480px)*16)/9) !important;
+	width: 100% !important;
+	min-height: 480px !important;
+	height: calc(((100vw)*9)/16) !important;
+	max-height: calc(100vh - 169px) !important;
+}
+
+/* ----- プレイヤー枠(全画面) ----- */
+ytd-watch-flexy[fullscreen] [id="player-theater-container"][class="style-scope ytd-watch-flexy"] [id="movie_player"]
+{
+	min-width: calc(((480px)*16)/9) !important;
+	width: 100% !important;
+	min-height: 480px !important;
+	height: calc(((100vw)*9)/16) !important;
+	max-height: calc(100vh) !important;
+}
+
+/* ----- プレイヤー枠(ミニプレイヤー) ----- */
+[class="miniplayer style-scope ytd-miniplayer"] [id="movie_player"]
+{
+	width: 100% !important;
+	height: 100% !important;
+}
+
+/* ----- 映像(デフォルト表示) ----- */
+[id="movie_player"] [class="video-stream html5-main-video"]
+{
+	right: 0px !important;
+	left: 0px !important;
+	margin: auto !important;
+	width: calc(((var(--ytd-watch-flexy-chat-max-height) - var(--ytd-toolbar-height))*var(--ytd-watch-flexy-width-ratio))/var(--ytd-watch-flexy-height-ratio)) !important;
+	height: calc(var(--ytd-watch-flexy-chat-max-height) - var(--ytd-toolbar-height)) !important;
+}
+
+/* ----- 映像(シアターモード) ----- */
+ytd-watch-flexy[theater] [id="player-theater-container"][class="style-scope ytd-watch-flexy"] [id="movie_player"] [class="video-stream html5-main-video"]
+{
+	min-width: calc(((480px - (var(--ytd-toolbar-height)))*16)/9) !important;
+	width: 100% !important;
+	min-height: calc(480px - var(--ytd-toolbar-height)) !important;
+	height: calc((((100vw)*9)/16) - var(--ytd-toolbar-height)) !important;
+	max-height: calc((100vh - 169px) - var(--ytd-toolbar-height)) !important;
+}
+
+/* ----- 映像(全画面) ----- */
+ytd-watch-flexy[fullscreen] [id="player-theater-container"][class="style-scope ytd-watch-flexy"] [id="movie_player"] [class="video-stream html5-main-video"]
+{
+	min-width: calc(((480px - (var(--ytd-toolbar-height) * 1.5))*16)/9) !important;
+	width: 100% !important;
+	min-height: calc(480px - (var(--ytd-toolbar-height) * 1.5)) !important;
+	height: calc(((((100vw))*9)/16) - (var(--ytd-toolbar-height) * 1.5)) !important;
+	max-height: calc((100vh) - (var(--ytd-toolbar-height) * 1.5)) !important;
+}
+
+/* ----- 映像(ミニプレイヤー) ----- */
+[class="miniplayer style-scope ytd-miniplayer"] [id="movie_player"] [class="video-stream html5-main-video"]
+{
+	width: 100% !important;
+}
+
+/* ----- 映像(共通) ----- */
+[id="movie_player"]:not([class*="ended-mode"]) [class="video-stream html5-main-video"]
+{
+	top: 0px !important;
+}
+
+/* ----- プレイヤー外背景色 ----- */
+[id="player"]
+{
+	background-color: var(--yt-spec-general-background-a);
+}
+
+/* ----- プレイヤー枠背景色 ----- */
+[id="movie_player"]
+{
+	background-color: #000;
+}
+
+[id="player-container-outer"]
+{
+	min-width: calc((var(--ytd-watch-flexy-chat-max-height)*var(--ytd-watch-flexy-width-ratio))/var(--ytd-watch-flexy-height-ratio)) !important;
+	height: var(--ytd-watch-flexy-chat-max-height) !important;
+}
+
+/* ----- アクティブ時のスクリーン非表示 ----- */
+[id="movie_player"] [class*="ytp-gradient-bottom"]
+{
+	opacity: 0;
+}
+
+/* ----- 生放送終了後のスクリーン表示 ----- */
+[id="movie_player"][class*="ended-mode"]:not([class*="ytp-autohide"]) [class*="ytp-gradient-bottom"],
+[id="movie_player"][class*="buffering-mode"]:not([class*="ytp-autohide"]) [class*="ytp-chrome-bottom"]
+{
+	opacity: 1;
+}
+
+/* ----- 操作バー常時表示(強制) ----- */
+[id="movie_player"] [class*="ytp-chrome-bottom"]
+{
+	opacity: 1 !important;
+}
+
+/* ----- 操作バー放送終了時非表示 ----- */
+[id="movie_player"][class*="ended-mode"][class*="ytp-autohide"] [class*="ytp-chrome-bottom"],
+[id="movie_player"][class*="buffering-mode"][class*="ytp-autohide"] [class*="ytp-chrome-bottom"]
+{
+	opacity: 0 !important;
+}
+
+/* ----- 停止時表示タイトルを再生時非表示(全画面) ----- */
+[id="movie_player"][class*="playing-mode"] > [class="ytp-chrome-top"]
+{
+	display: none;
+}
+
+/* ----- 停止時表示タイトル背景スクリーンを再生時非表示(全画面) ----- */
+[id="movie_player"][class*="playing-mode"] > [class="ytp-gradient-top"]
+{
+	background-image: none !important;
+}
+
+/* ----- チャンネルアイコン常時表示 ----- */
+[class="branding-img iv-click-target"]
+{
+	opacity: 1 !important;
+}
+
+/* ----- チャンネルアイコン位置(デフォルト表示・シアターモード) ----- */
+[id="movie_player"] [class*="ytp-player-content ytp-iv-player-content"]
+{
+	right: 63px !important;
+	bottom: calc(var(--ytd-toolbar-height) + 12px) !important;
+}
+
+[id="movie_player"][class*="ended-mode"][class*="ytp-autohide"] [class*="ytp-player-content ytp-iv-player-content"]
+{
+	right: 12px !important;
+	bottom: 12px !important;
+}
+
+[id="movie_player"][class*="ended-mode"] [class*="ytp-player-content ytp-iv-player-content"]
+{
+	right: 12px !important;
+	bottom: calc(var(--ytd-toolbar-height) - 7px) !important;
+}
+
+/* ----- チャンネルアイコン位置(全画面) ----- */
+[id="player-theater-container"] [class*="fullscreen"] [class*="ytp-player-content ytp-iv-player-content"]
+{
+	right: 98px !important;
+	bottom: 107px !important;
+}
+
+[id="player-theater-container"] [id="movie_player"][class*="fullscreen"][class*="ended-mode"] [class*="ytp-player-content ytp-iv-player-content"]
+{
+	right: 24px !important;
+	bottom: 70px !important;
+}
+
+[id="player-theater-container"] [id="movie_player"][class*="fullscreen"][class*="ended-mode"][class*="ytp-autohide"] [class*="ytp-player-content ytp-iv-player-content"]
+{
+	right: 24px !important;
+	bottom: 24px !important;
+}
+
+/* ----- 字幕透明度変更 ----- */
+[id*="caption-window-"][class*="caption-window ytp-caption-window-bottom"]
+{
+	opacity: 1 !important;
+}
+
+/* ----- 字幕位置(デフォルト表示) ----- */
+[class*="caption-window"]
+{
+	margin-bottom: 53px !important;
+}
+
+/* ----- 字幕位置(シアターモード) ----- */
+ytd-watch-flexy[theater] [id="player-theater-container"][class="style-scope ytd-watch-flexy"] [id="movie_player"] [class*="caption-window"]
+{
+	margin-bottom: 53px !important;
+}
+
+/* ----- 字幕位置(全画面) ----- */
+ytd-watch-flexy[fullscreen] [id="player-theater-container"][class="style-scope ytd-watch-flexy"] [id="movie_player"] [class*="caption-window"]
+{
+	margin-bottom: 70px !important;
+}
+
+/* ----- 広告経過時間 ----- */
+[id="movie_player"] [class="ytp-ad-player-overlay-instream-info"]
+{
+	bottom: 53px !important;
+}
+
+ytd-watch-flexy[theater] [id="movie_player"] [class="ytp-ad-player-overlay-instream-info"]
+{
+	bottom: 53px !important;
+}
+
+ytd-watch-flexy[fullscreen] [id="movie_player"] [class="ytp-ad-player-overlay-instream-info"]
+{
+	bottom: 86px !important;
+}
+
+/* ----- 広告シークバー ----- */
+[id="movie_player"][class*="ad-showing"] [class*="ytp-ad-persistent-progress-bar-container"],
+[id="movie_player"][class*="ad-interrupting"] [class*="ytp-ad-persistent-progress-bar-container"]
+{
+	bottom: 40px;
+	opacity: 1;
+}
+
+[id="movie_player"][class*="ad-showing"] [class="ytp-chrome-bottom"] [class*="ytp-progress-bar-container"],
+[id="movie_player"][class*="ad-interrupting"] [class*="ytp-chrome-bottom"] [class*="ytp-progress-bar-container"]
+{
+	opacity: 0;
+}
+
+ytd-watch-flexy[theater] [id="movie_player"][class*="ad-showing"] [class*="ytp-ad-persistent-progress-bar-container"],
+ytd-watch-flexy[theater] [id="movie_player"][class*="ad-interrupting"] [class*="ytp-ad-persistent-progress-bar-container"]
+{
+	bottom: 40px;
+	opacity: 1;
+}
+
+ytd-watch-flexy[theater] [id="movie_player"][class*="ad-showing"] [class="ytp-chrome-bottom"] [class*="ytp-progress-bar-container"],
+ytd-watch-flexy[theater] [id="movie_player"][class*="ad-interrupting"] [class*="ytp-chrome-bottom"] [class*="ytp-progress-bar-container"]
+{
+	opacity: 0;
+}
+
+ytd-watch-flexy[fullscreen] [id="movie_player"][class*="ad-showing"] [class*="ytp-ad-persistent-progress-bar-container"],
+ytd-watch-flexy[fullscreen] [id="movie_player"][class*="ad-interrupting"] [class*="ytp-ad-persistent-progress-bar-container"]
+{
+	height: 5px;
+	bottom: 54px;
+	opacity: 1;
+}
+
+ytd-watch-flexy[fullscreen] [id="movie_player"][class*="ad-showing"] [class="ytp-chrome-bottom"] [class*="ytp-progress-bar-container"],
+ytd-watch-flexy[fullscreen] [id="movie_player"][class*="ad-interrupting"] [class*="ytp-chrome-bottom"] [class*="ytp-progress-bar-container"]
+{
+	opacity: 0;
+}
+
+/* ----- "プロモーションを含みます" ----- */
+[id="movie_player"] [class="ytp-paid-content-overlay"]
+{
+	bottom: calc(var(--ytd-toolbar-height)/1.35) !important;
+}
+
+ytd-watch-flexy[theater] [id="movie_player"] [class="ytp-paid-content-overlay"]
+{
+	bottom: calc(var(--ytd-toolbar-height)/1.35) !important;
+}
+
+ytd-watch-flexy[fullscreen] [id="movie_player"] [class="ytp-paid-content-overlay"]
+{
+	bottom: calc(var(--ytd-toolbar-height)/0.9) !important;
+}
+
+/* ----- 操作バーホバー時に表示される物 ----- */
+/*[[Option-preview-]]*/
+
+/* ----- 生放送経過時間 ----- */
+/*[[Option-livetime-]]*/
+}

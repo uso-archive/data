@@ -1,0 +1,87 @@
+/* ==UserStyle==
+@name           YouTube: Stealthy Progress
+@namespace      USO Archive
+@author         Tamschi
+@description    `Hides the progress bar and current time on YouTube videos - and shows them when you mouse over after a short delay.<br>Advertisements still show progress, but with a different progress bar element that may look slightly different.`
+@version        20171125.3.28
+@license        CC-BY-NC-SA-4.0
+@preprocessor   uso
+@advanced text bar-delay "Progress Bar Delay" "0.2s"
+@advanced text bar-fade "Progress Bar Fade" "0.3s"
+@advanced text time-delay "Current Time Delay" "0.2s"
+@advanced text time-fade "Current Time Fade" "0.3s"
+
+==/UserStyle== */
+@-moz-document domain("www.youtube.com") {
+.ytp-progress-bar {
+    opacity: 0;
+    transition: opacity /*[[bar-fade]]*/ /*[[bar-delay]]*/;
+}
+
+.html5-video-player:not(.ad-interrupting) .ytp-time-current,
+.html5-video-player:not(.ad-interrupting) .ytp-time-separator {
+    opacity: 0;
+    max-width: 0;
+    display: inline-block;
+    transition: opacity /*[[time-fade]]*/, max-width /*[[time-delay]]*/ /*[[time-fade]]*/;
+    animation: skip-fade-out /*[[time-fade]]*/;
+}
+
+@keyframes skip-fade-out {
+    from,
+    to {
+        opacity: 0
+    }
+}
+
+
+/* Show progress bar on hover, but not during ads since those will now always use the special ad progress bar instead. */
+.html5-video-player:not(.ad-interrupting) .ytp-progress-bar:hover {
+    opacity: 1;
+}
+
+.html5-video-player:not(.ad-interrupting) .ytp-time-display:hover > .ytp-time-current,
+.html5-video-player:not(.ad-interrupting) .ytp-time-display:hover > .ytp-time-separator {
+    opacity: 1;
+    /* Probably enough: */
+    max-width: 50px;
+    transition: opacity /*[[time-fade]]*/ /*[[time-delay]]*/, max-width /*[[time-delay]]*/;
+}
+
+.ytp-big-mode.html5-video-player:not(.ad-interrupting) .ytp-time-display:hover > .ytp-time-current,
+.ytp-big-mode.html5-video-player:not(.ad-interrupting) .ytp-time-display:hover > .ytp-time-separator {
+    /* TODO: Find a way to get the correct size automatically. */
+    max-width: 80px;
+}
+
+
+/* Skip the fade-in animation when entering an ad: */
+.ad-interrupting .ytp-time-display > .ytp-time-current,
+.ad-interrupting .ytp-time-display > .ytp-time-separator {
+    /* max-width is already unset during ads, so it doesn't animate. */
+    animation: skip-fade-in /*[[time-fade]]*/;
+}
+
+@keyframes skip-fade-in {
+    from,
+    to {
+        opacity: 1
+    }
+}
+
+
+/* Show alternative progress bar for ads.
+Normally it's hidden below the player when the controls come up,
+but this moves it where the normal progress bar normally is instead: */
+.ad-interrupting:not(.ytp-autohide) .ytp-ad-persistent-progress-bar-container {
+    opacity: 1;
+    bottom: 36px;
+    /* Match videoAdUiBottomBar: */
+    transition: bottom .25s cubic-bezier(0.0,0.0,0.2,1)
+}
+
+.ytp-big-mode.ad-interrupting:not(.ytp-autohide) .ytp-ad-persistent-progress-bar-container {
+    bottom: 52.5px;
+    height: 8px;
+}
+}

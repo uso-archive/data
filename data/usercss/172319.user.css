@@ -1,0 +1,122 @@
+/* ==UserStyle==
+@name           YouTube Big Theater/Cinema Mode
+@namespace      USO Archive
+@author         Sergey Rozhenko
+@description    `Makes theater mode occupy whole window. Supports hiding or shrinking of scrollbar. Only for the material (aka new) design of YouTube.`
+@version        20190701.20.5
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown scrollbar "Scrollbar" {
+	scrollbar_none "Hidden*" <<<EOT /* no scrollbar *\/
+[is-watch-page] ytd-watch-flexy[theater] {
+	height: 100vh !important;
+	overflow-y: auto !important;
+	overflow-y: -moz-scrollbars-none !important;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+[is-watch-page] ytd-watch-flexy[theater]::-webkit-scrollbar {
+	display: none;
+}
+html {
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+[is-watch-page]>#content {
+	margin-bottom: -15px !important;
+}
+ EOT;
+scrollbar_thin "Thin" <<<EOT /* thin scrollbar *\/
+[is-watch-page] ytd-watch-flexy[theater] {
+	height: 100vh !important;
+	overflow-y: auto !important;
+	scrollbar-width: thin;
+}
+[is-watch-page] ytd-watch-flexy[theater]::-webkit-scrollbar-track {
+	background-color: black;
+}
+[is-watch-page] ytd-watch-flexy[theater]::-webkit-scrollbar {
+	width: 4px;
+	background-color: black;
+}
+[is-watch-page] ytd-watch-flexy[theater]::-webkit-scrollbar-thumb {
+	background-color: /*[[scrollbar_color]]*\/;
+}
+[is-watch-page] ytd-watch-flexy[theater] > #columns {
+	box-shadow: inset -1px 0 0 0 black;
+}
+html {
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+[is-watch-page]>#content {
+	margin-bottom: -15px !important;
+}
+ EOT;
+scrollbar_std "Standard" <<<EOT  EOT;
+
+}
+@advanced color scrollbar_color "Thin scrollbar thumb color" #666666
+
+==/UserStyle== */
+@-moz-document domain("youtube.com") {
+/* main conversion */ 
+[is-watch-page] #page-manager {
+	margin-top: unset !important;
+}
+[is-watch-page] ytd-watch-flexy:not([theater]) {
+	margin-top: var(--ytd-masthead-height, 56px) !important;
+}
+
+[is-watch-page] ytd-watch-flexy[theater] #player-theater-container {
+	max-height: unset !important;
+	width: 100% !important;
+	height: 100vh !important;
+}
+
+/* masthead */
+[is-watch-page] ytd-masthead[dark]:not(:hover) {
+	margin-top: calc(-1*var(--ytd-masthead-height, 56px));
+	transition: margin-top .2s .2s ease-out;
+}
+[is-watch-page] ytd-masthead[dark]:hover {
+	transition: margin-top .2s ease-out;
+}
+[is-watch-page] ytd-masthead[dark]::before {
+	content: "";
+	position: absolute;
+	bottom: -14px;
+	height: 14px;
+	left: 0;
+	width: 100%;
+	z-index: 2050;
+	transition: margin-bottom 0s .21s;
+}
+[is-watch-page] ytd-masthead[dark]:hover::before {
+	margin-bottom: 14px;
+	transition: margin-bottom 0s .1s;
+}
+[is-watch-page] #masthead-container::after {
+	content: unset !important;
+}
+[is-watch-page] ytd-masthead::after {
+	bottom: -5px;
+	box-shadow: inset 0px 4px 8px -3px rgba(17, 17, 17, .06);
+	content: "";
+	height: 5px;
+	left: 0px;
+	opacity: 1;
+	pointer-events: none;
+	position: absolute;
+	right: 0px;
+	width: 100%;
+	z-index: 2050;
+}
+
+/* YT bug - hint area always there */
+paper-toast.yt-notification-action-renderer[allow-click-through] {
+	pointer-events: none !important;
+}
+
+/*[[scrollbar]]*/
+}

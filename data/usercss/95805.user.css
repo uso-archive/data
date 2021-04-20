@@ -1,0 +1,211 @@
+/* ==UserStyle==
+@name           autohide the menu & sidebar [Seeking Alpha]
+@namespace      USO Archive
+@author         hideheader
+@description    `Shrinks the header to an icon in the upper-left corner of the screen and dims the sidebar. Hover over either one to restore it.`
+@version        20131206.1.7
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@-moz-document domain('seekingalpha.com') {
+
+@-moz-keyframes mymove
+{
+0%   {opacity:0.1;}
+100% {opacity:1.0;}
+}
+
+@-webkit-keyframes mymove
+{
+0%   {opacity:0.1;}
+100% {opacity:1.0;}
+}
+
+@-webkit-keyframes fade {
+ 0%   {opacity: 1.0;}
+ 50%  {opacity: 1.0;}
+ 100% {opacity: 0.2;}
+}
+
+/* - - - - auto-hide header - - - - */
+
+#header,
+#footer {
+ background-image: url('http://static.seekingalpha.com/favicon.ico') !important;
+ background-repeat: no-repeat !important;
+}
+#header:hover,
+#footer:hover {
+ background-image: none !important;
+}
+#header > *,
+#footer > * {visibility: hidden}
+#header:hover > *,
+#footer:hover > * {visibility: visible}
+#header {
+ position: absolute;
+ height: 5mm; overflow: hidden;
+ /*outline: dotted yellow thin;*/
+ background-color: transparent !important;
+}
+#header:hover {
+ overflow: visible;
+ -moz-animation:mymove 1s;
+ -webkit-animation:mymove 1s;
+}
+  /* amazingly, this also works */
+/*
+#header {
+ position: absolute;
+ clip:rect(0px,100cm,5mm,0px);
+}
+#header:hover {
+clip:auto;
+}
+*/
+
+
+/* - - - - auto-hide footer - - - - */
+
+body {position: relative}
+ /* so footer can find the bottom of the page */
+
+#footer {
+ position: absolute; bottom: 0px;
+ height: 5mm !important; overflow: hidden;
+}
+#footer:hover {
+ height: auto !important; overflow: visible;
+ -moz-animation:mymove 1s;
+ -webkit-animation:mymove 1s;
+}
+
+#footer_break_3 {display: none}
+ /* else creates a gap below footer when footer expands */
+
+
+/* - - - - auto-dim right sidebar - - - - */
+
+#ads_and_tools {
+ opacity: 0.2;
+  -webkit-animation: fade 2s;
+}
+#ads_and_tools:hover {
+  opacity: 1.0;
+  -webkit-animation: mymove 1s;
+}
+ /* NB: w/opacity < 1, element stays above all position:static elements */
+
+/*
+#ads_and_tools {
+ position: relative; left: -20%;
+ z-index: -1 !important;
+}
+#ads_and_tools:hover {
+  z-index: 2 !important;
+}
+*/
+
+/* - - - - auto-hide social links - - - - */
+
+#page_toolbar > li.email,
+#page_toolbar > li.share_this_page_article_toolbar {
+ display: none;
+}
+#page_toolbar:hover > li {
+ display: list-item;
+}
+#page_toolbar {width: auto !important}
+
+.share_this_page_article_bottom {display: none} /* suppress bottom links */
+
+
+/* - - - - auto-hide author - - - - */
+
+  /* move author box to right of article */
+#article_body_container {
+ float: left !important;
+}
+
+#secondary_ads {
+ position: absolute; left: 513px; /*right: 324px;*/
+}
+#article_body_container,
+#article_body {width: auto !important}
+
+  /* auto-hide everything but link with author name: */
+  /* (#secondary_ads > #author_avatar > .follow_sidebar > #author_info > #author_image_header > a) */
+
+#secondary_ads > :not( #author_avatar ) {display: none !important}
+  /* no useful content is hidden, so don't bother to restore */
+#author_avatar > :not( .follow_sidebar ) {display: none}
+/*.follow_sidebar > :not( #author_info ) {display: none}*/
+/*#author_info > :not( #author_image_header ) {display: none}*/
+  /* .follow_sidebar, #author_info only contain 1 visible element */
+#author_image_header > :not( a ) {display: none}
+
+#author_avatar:hover > * {display: block} /* may break SPAN */
+#author_avatar:hover #author_image_header > :not( script ) {display: block}
+
+  /* auto-hide padding & margins, too */
+/*
+#author_info {border-top-width: 0px !important}
+#author_avatar, #aauthor_image_header {border-bottom-width: 0px !important}
+*/
+
+#author_avatar, #author_info, .author_info_name
+ {margin: 0px !important;}
+#author_avatar, #author_image_header, .author_info_name
+ {padding: 0px !important;}
+
+#author_avatar:hover {
+ margin-bottom: 23px;
+ padding-bottom: 11px;
+}
+#author_avatar:hover #author_info {
+ margin: 3px 0px 5px /*14px*/ 0px !important;
+}
+#author_avatar:hover #author_image_header {
+ padding-top: 15px; padding-bottom: 13px;
+}
+#author_avatar:hover a.author_info_name {
+ margin: 4px 0px;
+ padding: 0px 10px;
+}
+
+#author_avatar {background-color: white !important}
+
+#aauthor_image_header > a {float: none !important; display: inline !important}
+#aauthor_image_header > * {display: none; }
+
+/*#article_author_info {display: block} /* this is the author popup */
+#article_author_info {
+ left: auto !important; right: 87px !important;
+ bottom: -10px !important;
+}
+.followup_contributor_info_on_author_bottom { -moz-transform: scaleX(-1);}
+  /* reverse the nipple of the "speech bubble" */
+/*
+#article_author_info,
+.followup_contributor_info {-moz-transform: scaleY(-1)}
+*/
+
+/* - - - - suppress comments - - - - */
+
+.num_of_comments,
+.comments_with_more {display: none}
+
+
+/* - - - - auto-hide "You may also like" - - - - */
+
+#also_like_cnt > div {display: none}
+#also_like_cnt:hover > div {display: block}
+
+
+/* - - - - suppress ads (?) (dunno - I'm AdBlock'd) - - - - */
+
+.stickyad_wrapper {display: none !important}
+#floating_bar {display:none} /* not an ad, but annoying */
+.article_submit_an_article_big {display: none !important} /* ditto */
+
+}

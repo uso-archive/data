@@ -1,0 +1,1046 @@
+/* ==UserStyle==
+@name           Dark Flat Minimal Thunderbird [BOOM:Bird]
+@namespace      USO Archive
+@author         chihiro226
+@description    `It's dark, it's flat, it's minimal. You'll love it!`
+@version        20170629.13.51
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+/* Do not remove the @namespace line -- it's required for correct functioning */
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+@namespace xul "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+
+
+/* Title: BOOM!Bird */
+/* Creation date: 23. Jun. 2017 */
+
+
+/* CSS-STRUCTURE:
+
+  * Colors
+	* Fonts and Fixes
+	* Basic Cleanup and Removes
+	* Titlebar
+	* Tabs
+	* Mainwindow
+	* Toolbox + Buttons
+	* Mixed UI dialogs and settings
+	* Foldertree Basic
+	* Foldertree: Accounts + Folders
+	* Messages
+	* Pretty Labels
+	* Clean Notification Alerts
+	* Calendar + Lightning CleanUp
+	* Last Orders
+
+*/
+
+
+/* ============================================================================ */
+/* Global Variables */
+:root {
+	
+  --background-color-0: #242a34;
+  --background-color-1: #2b303b;
+  --background-color-2: #323642;
+	
+	--active-tab-color: Highlight;
+	--inactive-tab-color: #a7adba;
+	
+	--replied-color: #eff1f5;
+	--read-color: #a7adba;
+	--unread-color: #a3be8c;
+	
+	--tab-height: 52px;
+	
+	--scrollbar-thumb-color: Highlight;
+	--scrollbar-thumb-hover-color: Hightlight;
+	--slider-width: 7px;
+
+  --thread-height: 72px; /* default: 72px - mail entry height */
+	--thread-margin: 5px;  /* default:  5px - space between mail entries */
+	--thread-shadow: 3px;  /* default:  3px - shadow beneath mail entry*/
+}
+
+
+/* ============================================================================ */
+/* Fonts and Fixes */
+
+* {
+	font-family: Lato, Ubuntu, 'Droid Sans', Verdana, Arial !important; /* For 'Segoe UI' or Tahoma change the font-size to 11pt */
+	font-size: 10pt;
+	font-weight: normal !important;
+	-webkit-font-smoothing: antialiased !important;
+}
+
+/* Increase small fonts a little */
+small {
+	font-size: 95% !important;
+}
+
+/* Remove dotted line around tab lables. Don't know why they appeared. */
+a, a:link, a:hover, a:active, a:focus, a:visited
+{
+  outline: 0 !important;
+}
+
+
+
+/* ============================================================================ */
+/* Basic Cleanup and Removes */
+
+/* Remove ALL gradient-background-images first, some (for arrows) are forced back later */
+*
+{
+  background-image: none !important;
+}
+
+/* Remove ALL shadows under toolbars */
+*
+{
+  box-shadow: none !important;
+}
+
+/* Remove the throbber */
+#throbber-box
+{
+  display: none !important;
+}
+
+/* Make ALL button-icons a little lighter */
+.toolbarbutton-icon
+{
+  opacity: 0.7 !important;
+}
+
+/* Toolbar */
+#menubar-items,
+toolbarspring {
+	background-color: var(--background-color-1);
+	padding-bottom: 5px;
+}
+
+/* Remove white line below tabs */
+.mail-toolbox::after,
+.contentTabToolbox::after {
+  content: "";
+  display: none !important;
+  height: 0px !important;
+}
+
+/* ============================================================================ */
+/* Titlebar */
+
+/* The titlebar is currently white, but I prefer to force it in case the change it in future versions */
+#titlebar,
+#titlebar-content,
+#titlebar-spacer
+{
+}
+
+#navigation-toolbox
+{
+  background-color: #ff00ff  !important;
+}
+
+
+
+/* ============================================================================ */
+/* Tabs */
+
+/* This is the whole container for all tabs */
+.tabmail-tabs
+{
+  margin-top: 0px !important;
+  margin-left: -16px !important;
+ /* Starting directly at left window border. 15px was standard + 1px boder */
+  margin-bottom: 0px !important;
+ /* Margin-bottom 0 leves a light pseudo-divider below the tabs. Move -1px down to remove it. */;
+	background-color: var(--background-color-1) !important;
+}
+
+/* Remove rounded corners from tabs */
+.tab-background-start,
+.tab-background-end
+{
+  display: none;
+}
+
+/* Remove icons from tabs, there are not so many... */
+.tab-icon-image
+{
+  visibility: hidden !important;
+}
+
+/* FIX 1/3 for overlapping tabs */
+.tab-background
+{
+  margin: 0;
+}
+/* FIX 2/3 for overlapping tabs, also removes the vertical dividers inbetween. */
+.tabmail-tab:before
+{
+  display: none !important;
+}
+/* FIX 3/3 for overlapping tabs (margin) */
+.tab-background-middle
+{
+  background: transparent !important;
+ /* See the below defined tab-color */
+  margin: 0 !important;
+}
+
+/* This is the height for the tabs */
+.tabmail-tab
+{
+  height: var(--tab-height);
+}
+
+/* Single tabs 'active - inactive - hover. */
+/* This is the active tab */
+.tabmail-tab[selected="true"] .tab-background {
+	background-color: var(--background-color-1);
+	border: none;
+	/* Remove doubble-borders between tabs */
+	margin-left: -1px !important;
+	margin-right: -1px !important;
+}
+
+/*.tabmail-tab .tab-text {
+	font-size: 105%;
+}*/
+
+/* Active Tab Text Color */
+.tabmail-tab[selected]:not(:-moz-lwtheme) > .tab-stack > .tab-content > .tab-text {
+    color: var(--active-tab-color);
+}
+
+/* This is the inactive tab on hover */
+.tabmail-tab:hover:not([selected]) .tab-background {
+	border: none;
+	/*border-bottom: solid #bf616a 3px;*/
+ }
+
+/* Text for inactive tabs */
+.tabmail-tab:not([selected]) .tab-text {
+	color: var(--inactive-tab-color) !important;
+}
+
+/* Close button on tabs... */
+
+/* Show only on mouseover and active tab */
+.tabmail-tab .tab-close-button {
+	visibility: hidden !important;
+}
+.tabmail-tab:not([selected]):hover .tab-close-button {
+	visibility: visible !important;
+}
+
+/* Replaced the standard 'x', because the ugly close-button is hardcoded and base64 images are somehow not working for mouseover */
+.tab-close-button {
+	border: 1px solid #a7adba !important;
+	border-radius: 5px !important;
+	list-style-image: none !important;
+	-moz-image-region: rect(0px, 5px, 5px, 0px) !important;
+}
+.tab-close-button:hover, .tab-close-button:active, .tab-close-button:focus
+{
+	background-color: #bf616a !important;
+	border: 1px solid #bf616a !important;
+}
+
+/*.tabmail-arrowscrollbox {
+	border-bottom: 2px solid transparent;
+}*/
+
+/* ============================================================================ */
+/* Mainwindow = Toolbar and below. Somehow a misleading ID-name! This is everything BELOW the tabs */
+#tabmail-container {
+	border-top: 1px solid var(--background-color-1);
+}
+
+
+
+/* ============================================================================ */
+/* Toolbox + Buttons */
+
+/* Coloring for the whole toobox bar */
+#mail-toolbox, /* Thunderbird main + add-on windows */
+#event-toolbox /* Calendar + lightning windows, accepts only color */
+{
+	background-color: var(--background-color-0) !important;
+	border: none !important;
+}
+
+/* Spacing for ALL toolboxes */
+.mail-toolbox:not([mode="full"]) > toolbar:only-of-type,
+.mail-toolbox[mode="full"][labelalign="end"] > toolbar:only-of-type,
+#composeToolbar2, /* New Message... */
+#ab-bar2, /* Address Book... */
+#event-toolbar /* Calendar and lightning dialogs */
+{
+	margin-top: 5px;
+	margin-bottom: 5px;
+	margin-left: 5px !important;
+}
+
+/* Sizing for All toolbar buttons */
+:-moz-any(.chromeclass-toolbar) .toolbarbutton-1 > .toolbarbutton-menubutton-button,
+:-moz-any(.chromeclass-toolbar) .toolbarbutton-1 > .toolbarbutton-menubutton-dropmarker,
+:-moz-any(.chromeclass-toolbar) .toolbarbutton-1
+{
+	min-height: 50px !important;
+	padding: 15px;
+	border-radius: 0px !important;
+}
+
+/* Hover-Effect for ALL toolbar buttons */
+.toolbarbutton-1 > .toolbarbutton-menubutton-button:hover,
+.toolbarbutton-1 > .toolbarbutton-menubutton-dropmarker:hover,
+.toolbarbutton-1:hover
+{
+	border: 1px solid transparent !important;
+}
+
+/* No effects for disabled buttons. Optional, because disabled buttons are hidden below. */
+toolbarbutton[disabled="true"]:hover {
+	background-color: transparent !important;
+}
+
+/* Remove disabled toolbar buttons until enabled */
+toolbarbutton[disabled="true"] {
+	display: none !important;
+}
+
+/* On-Off buttons, here for state 'checked' = ON */
+toolbarbutton[checked="true"] {
+	background-color: #d0e1f5 !important;
+	box-shadow: none !important;
+}
+
+/* Remove seperator line */
+.inline-toolbar toolbarseparator {
+  display: none;
+}
+
+#searchInput {
+  background-color: var(--background-color-2);
+	border: none;
+	border-radius: 5px;
+	width: 300px;
+}
+
+#searchInput * {
+	padding: 3px;
+}
+
+#tabbar-toolbar {
+	border: 1px solid var(--background-color-1);
+	background-color: var(--background-color-1);
+}
+#button-newmsg,
+#button-address,
+#button-appmenu {
+	background-color: var(--background-color-1);
+}
+
+/* ============================================================================ */
+/* Mixed UI dialogs and settings */
+
+#threadTree > xul:stack > xul:treerows > xul:scrollbar {
+	padding-left: 15px;
+}
+
+#folderpane_splitter {
+	border-left: 1px solid var(--background-color-0);
+}
+
+/* New Message - FIX for the distorted color-picker after increasing button-heights */
+.color-button {
+	height: 10px !important; /* Not really changeable */
+	width: 30px !important;
+}
+
+/* New Message - Text for Enigmail GPG was too red */
+.enigmailStrong {
+	color: #f00000 !important;
+}
+
+/* Address book. Make detail-title bigger */
+#CardTitle {
+	border-bottom-color: #4fa6fd;
+	color: #438ed9;
+	font-size: 120% !important;
+	font-weight: normal !important;
+	margin-top: 10px;
+}
+
+/* Account Settings, the background for title top-right. Not possible for all iframes. */
+#am-main-title, .dialogheader, iframe {
+	border:none !important;
+	outline: none !important;
+}
+/* Account Settings, the title top-right. */
+.dialogheader-title {
+	font-size: 120% !important;
+	font-weight: normal !important;
+}
+
+
+/* ============================================================================ */
+/* Right side */
+
+#acctCentralGrid {
+  background-color: #2b303b;
+}
+
+.acctCentralRowTitleBox {
+  padding-top: 10px;
+  padding-bottom: 8px;
+  padding-inline-start: 10px;
+}
+
+/* ============================================================================ */
+/* Foldertree Basic (on the left) */
+
+/* Remove white lines in the foldertree. Don't know why they appear sometimes. */
+treechildren:not(.autocomplete-treebody)::-moz-tree-row {
+  outline-color: transparent !important;
+}
+
+
+
+/* ============================================================================ */
+/* Foldertree: Accounts + Folders (on the left) */
+
+treerows {
+  padding: 10px;
+}
+
+#folderTree {
+	background-image: none !important;
+	background-color: var(--background-color-0) !important;
+	border: none;
+}
+
+/* Set Font Size In Folder Pane */
+#folderTree >treechildren::-moz-tree-cell-text {
+  font-size: 110% !important;
+}
+
+/* folder list spacing */
+#folderTree treechildren::-moz-tree-row {
+  height: 32px !important;
+	background-color: var(--background-color-0) !important;
+}
+#folderTree treechildren::-moz-tree-row(odd) {
+  background-color: var(--background-color-0) !important;
+}
+
+/* Style ACCOUNT name with no new mail */
+#folderTree > treechildren::-moz-tree-cell-text(isServer-true)
+{
+  font-weight: normal !important;
+}
+
+/* Style ACCOUNT name with new mail */
+#folderTree > treechildren::-moz-tree-cell-text(isServer-true, biffState-NewMail)
+{
+  color: #034675 !important;
+  font-weight: normal !important;
+}
+
+/* Style FOLDER with unread messages */
+#folderTree > treechildren::-moz-tree-cell-text(hasUnreadMessages-true)
+{
+  color: #034675 !important;
+  font-weight: normal !important;
+}
+
+/* Style CLOSED FOLDER CONTAINING SUBFOLDERS with unread messages */
+#folderTree > treechildren::-moz-tree-cell-text(closed, subfoldersHaveUnreadMessages-true)
+{
+  color: #034675 !important;
+  font-weight: normal !important;
+}
+
+/* Style OPEN FOLDER CONTAINING SUBFOLDERS with unread messages. Disabled because you are already inside that folder */
+/*
+#folderTree > treechildren::-moz-tree-cell-text(subfoldersHaveUnreadMessages-true) {
+	color: #034675 !important;
+	font-weight: normal !important;
+}
+*/
+
+#folderTree treechildren::-moz-tree-row(selected) {
+  -moz-appearance: none !important;
+  background-image: none !important;
+  /*background-color: Highlight !important;*/
+}
+#folderTree treechildren::-moz-tree-row(selected, focus) {
+  -moz-appearance: none !important;
+  background-image: none !important;
+  /*background-color: Highlight !important;*/
+	border: none !important;
+}
+
+#folderTree treechildren::-moz-tree-cell-text {
+	padding-left: 10px;
+}
+#folderTree treechildren::-moz-tree-cell-text(selected) {
+	color: Highlight !important;
+}
+#folderTree treechildren::-moz-tree-cell-text(selected, focus) {
+	color: Highlight !important;
+}
+
+/* ============================================================================ */
+/* Read Message */
+
+#threadpane-splitter:not([orient="vertical"]) {
+    border-inline-end: 0px solid ThreeDShadow !important;
+}
+
+#messagepanebox {
+	border: none !important;
+}
+
+#msgHeaderView {
+	background-color: var(--background-color-2);
+	border: none;
+}
+
+#expandedHeadersBox {
+	padding: 20px 10px 15px 10px !important;
+}
+
+#header-view-toolbox {
+	padding-top: 7px;
+}
+
+#msgNotificationBar {
+	padding: 5px;
+	padding-bottom: 0px;
+	background-color: var(--background-color-0);
+}
+
+.notification-inner {
+	padding-bottom: 5px;
+	background-color: var(--background-color-0);
+}
+
+
+
+
+/* ============================================================================ */
+/* THREAD */
+/* Messages: unread, replied, deleted (Right Side) */
+
+/* Columns */
+#threadCol,
+#flaggedCol,
+#attachmentCol,
+#subjectCol,
+#unreadButtonColHeader,
+#senderCol,
+#recipientCol,
+#correspondentCol,
+#junkStatusCol,
+#receivedCol,
+#dateCol,
+#statusCol,
+#sizeCol,
+#tagsCol,
+#accountCol,
+#priorityCol,
+#unreadCol,
+#totalCol,
+#locationCol,
+#idCol,
+#threadCols .treecol-image {
+	-moz-appearance: none;
+	border: none;
+	padding-top: 5px;
+	background-color: var(--background-color-1);
+	margin-bottom: -10px;
+}
+
+#threadCols .treecol-text,
+#threadCols .treecol-image {
+	padding: 12px;
+}
+
+#threadTree {
+  background-color: var(--background-color-1) !important;
+	border: none !important;
+}
+
+/* Set Font Size In Thread Pane */
+#threadTree >treechildren::-moz-tree-cell-text {
+  font-size: 120% !important;
+}
+
+#threadTree treechildren::-moz-tree-row    {
+	-moz-appearance: none !important;
+        background-image: none !important;
+	margin: var(--thread-margin) 0 var(--thread-margin) 0 !important;
+	background-color: var(--background-color-2);
+        border-bottom: var(--thread-shadow) solid var(--background-color-0) !important;
+        height: var(--thread-height) !important;
+}
+
+#threadTree treechildren::-moz-tree-row(odd) {
+        -moz-appearance: none !important;
+        background-image: none !important;
+	margin: var(--thread-margin) 0 var(--thread-margin) 0 !important;
+	border-bottom: var(--thread-shadow) solid var(--background-color-0) !important;
+}
+
+#threadTree treechildren::-moz-tree-row(selected) {
+	border-bottom: var(--thread-shadow) solid -moz-Dialog !important;
+	/*background-color: Highlight !important;*/
+        /*background-color: -moz-Dialog !important;*/
+}
+#threadTree treechildren::-moz-tree-row(selected, focus) {
+	border: none;
+	border-bottom: var(--thread-shadow) solid var(--background-color-0) !important;
+	/*background-color: Highlight !important;*/
+}
+
+#threadTree treechildren::-moz-tree-cell-text(selected) {
+	color: Highlight !important;
+}
+#threadTree treechildren::-moz-tree-cell-text(selected, focus) {
+	color: Highlight !important;
+}
+
+/* Set no-label (default) bottom border */
+/*#threadTree treechildren::-moz-tree-cell {
+  border-bottom: 0px solid #2b303b !important;
+}*/
+
+#threadTree treechildren::-moz-tree-cell(read) {
+	-moz-appearance: none !important;
+  /*background-color: #2b303b;*/
+}
+#threadTree treechildren::-moz-tree-cell-text(read) {
+  color: var(--read-color);
+}
+
+/* UNREAD messages */
+/* Unread messages : Cell */
+#threadTree treechildren::-moz-tree-cell(unread) {
+  -moz-appearance: none !important;
+}
+/* Unread messages : Text */
+#threadTree treechildren::-moz-tree-cell-text(unread) {
+  -moz-appearance: none !important;
+  font-weight: normal !important;
+	color: var(--unread-color);
+}
+
+
+/* REPLIED messages */
+treechildren::-moz-tree-cell(replied),
+treechildren::-moz-tree-cell(replied,selected),
+treechildren::-moz-tree-cell(replied,current)
+{
+  /* background-color: #a7adba !important; */
+}
+/* Replied messages text-color. Optional, disabled! Only activate and change this if you use a darker backgroud above. */
+treechildren:-moz-tree-cell-text(replied) {
+	color: var(--replied-color) !important;
+}
+
+
+/* DELETED IMAP messages (not available for directly deleted POP messages. */
+treechildren::-moz-tree-cell(imapdeleted) {
+  background-color: #999999 !important;
+}
+
+treechildren:-moz-tree-cell-text(imapdeleted) {
+  color: #FFFFFF !important;
+  text-decoration: line-through !important;
+}
+
+treechildren::-moz-tree-cell(imapdeleted,selected) {
+  background-color: #333333 !important;
+}
+
+treechildren::-moz-tree-cell(imapdeleted,current) {
+  background-color: #666666 !important;
+}
+
+treechildren:-moz-tree-cell-text(imapdeleted,selected),
+treechildren:-moz-tree-cell-text(imapdeleted,current) {
+  color: #DDDDFF !important;
+}
+
+treechildren::-moz-tree-cell-text(imapdeleted, offline) {
+  background-color: #DDDDDD !important;
+  text-decoration: line-through !important;
+}
+
+
+/* ============================================================================ */
+/* Scrollbar */
+
+scrollbar {
+	/*margin-right: 5px !important;*/
+	margin-left: 5px !important;
+	width: var(--slider-width) !important;
+	max-width: var(--slider-width) !important;
+	-moz-appearance: none !important;
+	background: none !important;
+	/*border: none !important;*/
+}
+
+srollbarbutton {
+	width: var(--slider-width) !important;
+	max-width: var(--slider-width) !important;
+}	
+
+slider {
+	width: var(--slider-width) !important;
+	max-width: var(--slider-width) !important;
+	-moz-appearance: none !important;
+	background: none !important;
+	border: none !important;
+}
+
+thumb {
+	width: var(--slider-width) !important;
+	max-width: var(--slider-width) !important;
+	-moz-appearance: none !important;
+	min-height: 100px !important;
+	/*border: none !important;*/
+	border: 1px solid Highlight;
+	border-radius: 5px;
+	background: var(--scrollbar-thumb-color) !important;
+}
+
+thumb:hover {
+	background: var(--scrollbar-thumb-hover-color) !important;
+}
+
+/* ============================================================================ */
+/* Pretty Labels */
+
+/* Default Important Label */
+treechildren::-moz-tree-cell(lc-FF0000)
+{
+  border-bottom: 1px solid #FF0000 !important;
+  background-color: #FFCCCC !important;
+}
+
+treechildren::-moz-tree-cell-text(lc-FF0000)
+{
+  color: #000000 !important;
+}
+
+treechildren::-moz-tree-cell(lc-FF0000, selected)
+{
+  background-color: #FF0000 !important;
+}
+
+treechildren::-moz-tree-cell-text(lc-FF0000, selected)
+{
+  color: #FFFFFF !important;
+}
+
+/* Default Work Label */
+treechildren::-moz-tree-cell(lc-FF9900)
+{
+  border-bottom: 1px solid #FF9900 !important;
+  background-color: #FFCC99 !important;
+}
+
+treechildren::-moz-tree-cell-text(lc-FF9900)
+{
+  color: #000000 !important;
+}
+
+treechildren::-moz-tree-cell(lc-FF9900, selected)
+{
+  background-color: #FF9900 !important;
+}
+
+treechildren::-moz-tree-cell-text(lc-FF9900, selected)
+{
+  color: #FFFFFF !important;
+}
+
+/* Default Personal Label */
+treechildren::-moz-tree-cell(lc-009900)
+{
+  border-bottom: 1px solid #22b222 !important;
+  background-color: #22b222 !important;
+}
+
+treechildren::-moz-tree-cell-text(lc-009900)
+{
+  color: #000000 !important;
+}
+
+treechildren::-moz-tree-cell(lc-009900, selected)
+{
+  background-color: #22b222 !important;
+}
+
+treechildren::-moz-tree-cell-text(lc-009900, selected)
+{
+  color: #FFFFFF !important;
+}
+
+/* Default Todo Label */
+treechildren::-moz-tree-cell(lc-3333FF)
+{
+  background-color: #CCCCFF !important;
+  border-bottom: 1px solid #6262f1 !important;
+}
+
+treechildren::-moz-tree-cell-text(lc-3333FF)
+{
+  color: #000000 !important;
+}
+
+treechildren::-moz-tree-cell(lc-3333FF, selected)
+{
+  background-color: #6262f1 !important;
+}
+
+treechildren::-moz-tree-cell-text(lc-3333FF, selected)
+{
+  color: #FFFFFF !important;
+}
+
+/* Default Later Label */
+treechildren::-moz-tree-cell(lc-993399)
+{
+  background-color: #FFCCFF !important;
+  border-bottom: 1px solid #993399 !important;
+}
+
+treechildren::-moz-tree-cell-text(lc-993399)
+{
+  color: #000000 !important;
+}
+
+treechildren::-moz-tree-cell(lc-993399, selected)
+{
+  background-color: #993399 !important;
+}
+
+treechildren::-moz-tree-cell-text(lc-993399, selected)
+{
+  color: #FFFFFF !important;
+}
+
+
+
+/* ============================================================================ */
+/* Clean Notification Alerts */
+
+#alertImageBox
+{
+  display: none;
+}
+
+#alertContainer
+{
+  width: 400px;
+  border-radius: 0px !important;
+}
+
+#alertTitle, folderSummaryMessage
+{
+  width: 350px;
+}
+
+#newMailAlertNotification
+{
+  border: 1px solid #a2a2a2 !important;
+  border-radius: 0px !important;
+  background: #ebebeb !important;
+}
+
+#newMailAlertNotification #closeButton
+{
+  padding-top: 4px !important;
+}
+
+/* New Mail */
+#composeContentBox {
+	background-color: var(--background-color-1);
+}
+
+
+/* ============================================================================ */
+/* Calendar + Lightning CleanUp */
+
+/* MAIN tabs */
+/* Add a divider under the toolboxes in calendar and tasks */
+#calendar-toolbox,
+#task-toolbox
+{
+  border-bottom: 1px solid #a9b7c9 !important;
+}
+
+/* Sidebar: Set same background-color as in the main thunderbird-window. */
+#ltnSidebar,
+#ltnSidebar .tree-stack
+{
+  background-color: #f0f0f0 !important;
+}
+
+/* FIX - Hide the newly appeard string 'calendarname' inside the left pane */
+calendar-list-tree .tree-scrollable-columns
+{
+  background-color: #f0f0f0 !important;
+  height: 0px !important;
+}
+/* Hide the additional text also */
+calendar-list-tree treecol[hideheader="true"]
+{
+  visibility: hidden !important;
+}
+
+/* Make the searchbox in CALENDAR the same hight as the searchbox in TASKS */
+#unifinder-searchBox
+{
+  height: 34px !important;
+}
+
+/* Calendarview: Current Day in different views */
+window
+{
+  --viewHeaderSelectedBackground: #ffd98e !important;
+  --viewDayBoxSelectedBackground: #ffd98e !important;
+  --viewDayBoxOtherSelectedBackground: #ffd98e !important;
+  --viewDayBoxOffSelectedBackground: #ffd98e !important;
+  --viewMonthDayBoxSelectedBackground: #ffd98e !important;
+}
+
+/* Remove old-school rounded borders from 'Day, Week, Month...' */
+tab[calview],
+tab[calview][selected="true"]
+{
+  border-radius: 0px !important;
+}
+
+/* Calendar main: Remove 'jumps' when switching between Day, Week, Month... This was a f**** nightmare! DOM chrome://calendar/content/calendar-views.xul */
+/* All tabs: lighter, active is defined below */
+tab[calview]
+{
+  background-color: rgba(255,255,255, .3);
+  padding: 3px 10px !important;
+}
+
+tab[calview][selected="true"],
+tab[calview][selected="true"]:hover
+{
+  background-color: -moz-Field;
+  border-top: solid #ffcc66 3px;
+  padding-top: 0 !important;
+}
+
+tab[calview]:hover
+{
+  background-color: ButtonHighlight;
+  border-top: solid #4fa6fd 3px;
+  padding-top: 0 !important;
+}
+
+/* Calendar lighter fonts in mouseover-tooltips */
+.tooltipHeaderLabel
+{
+  color: #747373 !important;
+}
+
+
+/* OTHER CALENDAR windows integration */
+
+/* Small buttons top-right to call calendar and tasks window */
+#calendar-tab-button:hover,
+#calendar-tab-button:focus,
+#task-tab-button:hover,
+#task-tab-button:focus
+{
+  background-color: #ffcc66 !important;
+}
+
+/* Mini-Calendar in all windows */
+.minimonth-day[today="true"],
+.minimonth-day[selected="true"]
+{
+  border: none !important;
+  padding-top: 1px !important;
+}
+
+.minimonth-day[selected="true"]
+{
+  background-color: #ffcc66 !important;
+}
+
+/* Mini-Tasks: Adjust height and color to fit new toolbox-height */
+#today-pane-panel > sidebarheader
+{
+  background-color: #f0f0f0;
+  border-top: none !important;
+ /* Removes white pseudo-3D line */
+  padding: 3px 0 2px 0 !important;
+}
+
+/* Mini-Tasks: today */
+#today-header .agenda-checkbox
+{
+  background-color: #ffd98e !important;
+}
+/* Mini-Tasks: remove border from the small colored calendar-squares (is an overlay) */
+.agenda-calendar-image
+{
+  list-style-image: none !important;
+}
+
+/* Force back the arrow-images for opening/closing future tasks after forbidding all images first, today-pane.xul */
+treenode-checkbox > .checkbox-check
+{
+  background-image: url(chrome://global/skin/tree/twisty-clsd.png) !important;
+}
+
+treenode-checkbox[checked="true"] > .checkbox-check
+{
+  background-image: url(chrome://global/skin/tree/twisty-open.png) !important;
+}
+
+/* Small calendar day-date in the bottom-right button */
+.toolbarbutton-day-text
+{
+  font-weight: normal !important;
+  font-size: 8pt !important;
+  margin-top: 1px !important;
+	/* OR disable completely */
+	/*
+	display: none !important;
+	*/;
+}
+
+
+
+/* ============================================================================ */
+/* Last Orders */
+
+/* Style the Add-on Extensions and Styles names */
+.basicinfo-container .name-container .name
+{
+  font-size: 150% !important;
+}
+
+#userstyle-sorting .sorter
+{
+  border: 1px solid #a9b7c9  !important;
+  border-radius: 0px  !important;
+}
+
+/* Puhhhh ... finished! But I like it^^ */

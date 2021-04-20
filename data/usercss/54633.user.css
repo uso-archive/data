@@ -1,0 +1,348 @@
+/* ==UserStyle==
+@name           ABC News: hide the menu & sidebar
+@namespace      USO Archive
+@author         hideheader
+@description    `Auto-hide the page header, <s>page footer,</s> and article sidebar. Each is reduced to a thin placeholder (at the top, bottom, and left edge of the page, respectively) that expands and floats over the body of the article when the mouse hovers over it.<s>The article now fills the width of the browser, no matter the size of the browser window. Comments are suppressed, as are social networking links within the article text. The "tools" menu (Print, Font size, etc.) also auto-hides, collapsing to the ABC icon.</s> (Well, maybe, but so much has broken I expect that's all broken too.)`
+@version        20151223.18.17
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@-moz-document domain("abcnews.go.com") {
+  /*
+    hide the header
+  */
+  BODY.story #header-wrapper {
+    position: fixed;
+    clip: rect(0, 2.5mm, 10mm, 0);
+    border-left: 2.5mm solid #3467B0;
+    transition: .8s step-end;
+    transition-property: clip, border-left-width;
+  }
+  BODY.story #header-wrapper:hover {
+    clip: rect(0, 1920px, 350px, 0);
+    border-left-width: 0;
+    transition-duration: 0s;
+  }
+  BODY.story #pane-main#pane-main#pane-main,
+  BODY.story DIV#global-viewport.alert-transition #pane-main {padding-top: 0}
+
+  /*
+    hide the sidebar
+  */
+  BODY.story #news-feed {
+    position: fixed;
+    left: 0; top: 0px;
+    height: 100%;
+    z-index: 1000031; /*else #abcn-videoplayer is on top - nope, that's not fixable*/
+    border-left: 2.5mm solid #3467B0;
+    clip: rect(15mm, 2.5mm, 60mm, 0);
+    transition: .8s step-end;
+    transition-property: clip, border-left-width;
+  }
+  BODY.story #news-feed-content {top: 0 !important}
+  BODY.story #news-feed:hover {
+    transition-duration: 0s;
+    border-left-width: 0;
+    clip: rect(0, 1920px, 1080px, 0);
+  }
+  BODY.story #abcn-videoplayer {
+    left: 400px !important; /*for now, just move it away from the sidebar*/
+  }
+  BODY.story #abcn-videoplayer.docked {
+    left: auto !important;
+    right: 32px;
+  }
+
+  /*
+    ads & other nuisances
+  */
+  [class^="ad-"], [class*=" ad-"] {display: none !important}
+}
+@media (max-width:0) {
+@-moz-document domain("abcnews.go.com") {
+/* - - - - auto-hide header - - - - */
+
+._headerBgContainer {display: none}
+  ._headerbg {/*TODO replace background image with linear-*/
+    position: fixed !important; top: 0; left: 0;
+    clip: rect(0, 1600px, 1600px, 0);
+/*    background-image: url("http://a.abcnews.com/assets/images/v2/default_nav_bg.gif");  /* 8 Jun */
+/*    background: linear-gradient( 0deg, blue 50px, green 100px, red 150px );/**/
+    background: #4b698d linear-gradient( 180deg, #4b698d 59px, #70859f 60px, #4b698d 61px, #4b698d 118px, #374c66 166px, #2e3641 167px );/**/
+    transition: clip .5s linear, background .5s step-start;
+    -webkit-transition: clip .5s linear, background .5s step-start;
+  }
+  ._headerbg:not(:hover) {
+    clip: rect(0, 24px, 24px, 0);
+    background: left top no-repeat url("http://abcnews.go.com/favicon.ico");
+    background-size: 24px 24px;
+    transition-delay: 1s;
+    -webkit-transition-delay: 1s;
+    transition-timing-function: linear, step-end;
+    -webkit-transition-timing-function: linear, step-end;
+  }
+  ._headerbg #siteSubNav {height: auto !important}
+
+/*--.headerbg > * {visibility: hidden}
+.headerbg:hover > * {visibility: visible}--*/
+
+
+.window > #nav {
+  position: fixed !important; top: 0; left: 0;
+  z-index: 1;
+/*  clip: rect(0, 55mm, 3mm, 5mm);*/
+  clip: rect(0, 2mm, 20mm, 0);
+  border-left: 2.2mm solid red;
+  background-color: rgba(173,216,230,.5) !important;
+  transition: clip .3s .8s linear;
+/*  transition-property: clip, background-color;*/
+  transition-property: clip, border-left-width;
+  transition-timing-function: linear, step-end;
+  padding-bottom: 0 !important;
+  }
+.window > #nav:hover {
+  clip: rect(0, 1007px, 118px, 0);
+  border-left-width: 0;
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+  }
+/*--#nav:not(:hover) > * {
+  visibility: hidden;
+  transition: inherit;
+  transition-property: visibility;
+  transition-timing-function: step-end;
+  }
+#nav:not(:hover) #search_form {display: none}--*/
+
+.short_nav_wrapper,
+.short_bg_wrapper { /* site's fixed header */
+  display: none;
+  }
+
+
+/* - - - - auto-hide footer - - - - */
+
+body {position: relative}
+.bodycontainer {position: static !important} /* 8 Jun */
+
+.footercontainer {
+ position: absolute !important; bottom: 0 !important /*-3mm*/;
+ height: 3mm; overflow: hidden;
+ /*border-top: 3mm solid rgba(0, 0, 255, .5) !important;*/
+ /*opacity: 0.2;*/
+ z-index: 1; /* 8 Jun */
+  transition: height .3s .8s linear;
+}
+.footercontainer:hover {
+ height: 385px; /*overflow: visible;*/
+  border-top-width: 0;
+  transition-delay: 0s;
+  }
+.footer {
+  padding: 0 !important;
+  }
+.footer_bg {display: none !important}
+/*.footercontainer > * {visibility: hidden}
+.footercontainer:hover > * {visibility: visible}*/
+
+
+/* - - - - move right sidebar to the left and auto-hide it - - - - */
+
+/*--.story_rail {
+  position: fixed; left: 0; top: 0;
+  height: 100%; overflow-y: scroll; resize: horizontal;
+  width: -moz-calc(336px + 18px) !important;
+  width: -webkit-calc(336px + 18px) !important;
+  margin-top: 0 !important; float: none !important;
+  background-color: white;
+  border-right: 0 dotted lightblue;
+  transition: left .5s linear, border-right-width .5s step-start;
+  -webkit-transition: left .5s linear, border-right-width .5s step-start;
+}
+  .story_rail:not(:hover) {
+    left: -moz-calc(-336px - 18px) !important;
+    left: -webkit-calc(-336px - 18px) !important;
+    border-right-width: 3mm;
+    transition-delay: 1s;
+    -webkit-transition-delay: 1s;
+    transition-timing-function: linear, step-end;
+    -webkit-transition-timing-function: linear, step-end;
+  }--*/
+
+.story_rail > * {resize: none} /* bug: Chrome inherits resize */
+.story_rail {
+  position: fixed; left: 0; top: 0;
+  height: 100%; overflow-y: auto !important; resize: horizontal;
+  background: white;
+/*--  clip: rect(0, 3mm, 1080px, 0); overflow: hidden;
+  border-left: 3mm solid rgba(173,216,230,.5);--*/
+  clip: rect(0, 2mm, 1080px, 0); overflow: hidden;
+  border-left: 2.2mm solid rgb(214,235,242);
+  transition: clip .3s .8s linear;
+  transition-property: clip, border-left-width;
+  transition-timing-function: linear, step-end;
+  }
+.story_rail:hover {
+  clip: rect(0, 365px, 1080px, 0);
+  border-left-width: 0;
+  z-index: 1;
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+  }
+#story_core {
+  margin-left: 3mm !important;
+  }  
+.story_rail:not(:hover) > * {
+  visibility: hidden !important;
+  transition: visibility .3s .8s linear;
+  }
+
+.story_widget .mostpopular,
+.story_widget .seeitshareit,
+.story_widget .gallery,
+.story_widget #show_promo,
+.story_widget #socialtoolkit,
+.story_widget #rsslisting,
+.story_widget #moreWidget,
+.story_widget .ad,
+.story_widget #homead,
+.story_widget .quigo,
+.story_widget .canvas,
+.story_widget .outbrain
+ {margin-left: 0.4em !important}
+
+.header, .upperheader,
+.developingnews,
+.bodycontainer,
+.core_container,
+.core_offset /*g_1*/,
+#story_core {
+ /*width: auto !important;*/
+}
+
+/*#storyText {
+  -moz-columns: 2 5in;
+  }*/
+
+
+/* - - - - no comments - - - - */
+#disqus, .dsq-brlink,
+.comments,
+
+/* - - - - no ads - - - - */
+#homead,
+#bannerad,
+  .quigo,
+  [class^="ad-"],
+  #leaderboard,
+  #sponsoredByAd,
+.ad_container,
+
+/** no social **/
+.nav_social, /* header */
+#shareTop,
+#shareBottom > :not(.share-container),
+#shareBottom > .share-container > :not(.share-group-last),
+#shareBottom > .share-container > .share-group-last > :not(.share-btn-last),
+  .share_left, .share_bottom,
+  #social-bar,
+  .story_widget > #stk-other, /* sidebar, "GMA on Facebook" */
+  .story_widget > #rsslisting, /* sidebar, "Connect with GMA" */
+/*#storyText*/ [href*="twitter.com"],
+/*#storyText*/ [href*="facebook.com"],
+
+/** no syndicated "content" **/
+.OUTBRAIN, /* this could include links back to ABC */
+.marketplace,
+.marketplacepromos, .marketplacebing, .bing, [id*="adsonar"],
+#ff_lite + .canvas, [id*="sodahead"], /* poll */
+
+.\. {display: none !important}
+
+
+/* - - - -  auto-hide article tools - - - - */
+
+/*#share-left {display: none}*/
+/*--.show_tools:hover > #share-left {display: block}--*/
+
+#storyText p {
+ padding-left: 0px !important;
+}
+
+/* - - - -  no social - - - - */
+#shareBottom > .share-container > .share-group-last { /* Print */
+  border-left: none !important;
+  padding-left: 0 !important;
+  }
+.nav_signin {
+  margin-left: 5em;
+  }
+
+}/*domain("abcnews.go.com")*/
+
+
+@-moz-document url-prefix("http://abcnews.go.com/blogs/") {
+
+#container > HEADER,
+#main .sidebar:hover {z-index: 1} /*else sidebar is on top*/
+/** autohide: common properties **/
+#container > HEADER,
+#main .sidebar {
+  position: fixed; top: 0; left: 0;
+  background-color: white;
+  clip: rect(0, 2mm, 1080px, 0);
+  border-left: 2.2mm solid red !important;
+  transition: .3s .8s;
+  transition-property: clip, border-left-width;
+  transition-timing-function: linear, step-end;
+  }
+#container > HEADER:hover,
+#main .sidebar:hover {
+  clip: rect(0, 1920px, 1080px, 0);
+  border-left-width: 0 !important;
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+  }
+
+/** autohide the header **/
+#container > HEADER {
+  clip: rect(0, 2mm, 20mm, 0);
+  }
+#container > HEADER:hover {
+  clip: rect(0, 1007px, 301px, 0);
+  }
+
+#nav_top {width: auto !important}
+.single-cat.icon.icon-headlines {
+  margin-top:-50px!important;
+  }
+
+
+/** autohide the sidebar **/
+#main .sidebar {
+  clip: rect(0, 2mm, 1080px, 0);
+  height: 100%; overflow-y: auto;
+  border-left-color: blue !important;
+  padding-right: 35px !important;
+  padding-left: 5px !important;
+  }
+#main .sidebar:hover {
+  clip: rect(0, 350px, 1080px, 0);
+  }
+
+/** no ads **/
+.ad-rs-container,
+[data*="saymedia"], .footercontainer ~ *,
+
+/** no comment **/
+DIV[id^="disqus"], .disqus_count,
+.share-comment-count,
+
+/** no social **/
+/*.top_headline .social-buttons,*/
+.social-buttons > DIV > [class^="addthis"],
+
+
+.\. {display: none !important}
+}/*url-prefix("http://abcnews.go.com/blogs/")*/
+}/*@media*/

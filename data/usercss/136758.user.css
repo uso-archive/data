@@ -1,0 +1,238 @@
+/* ==UserStyle==
+@name           A less crap-tastic popup [Stylish/Chrome]
+@namespace      USO Archive
+@author         hideheader
+@description    `In the 'Installed Styles' popup tab, (1) restores the "click to toggle enable" behaviour, (2) shrinks the screenshot, (3) removes the installs count. (4) Moves the master 'Off' switch to the top of both tabs. If you've opted-out of the spyware (as you should), (5) the 'Style Library' tab reverts to the old 'More styles for this site' link and (6) the hated 're-enable the spyware' nag is removed.`
+@version        20161222.2.31
+@license        CC-BY-NC-SA-4.0
+@preprocessor   uso
+@advanced dropdown changes "​" {
+	complete "Change it all*" <<<EOT body {
+  --image-width: 30%;
+  --disable-all-width: 60px;
+}
+
+#sitename,
+#noServerConnection {
+  display: none;
+}
+
+/*
+    Rearrange the descriptions (.tab-installed only)
+*\/
+
+#installed { /* styles list *\/
+  padding-right: calc(20px - 15px); /* centered, sans scroller *\/
+}
+.tab-installed .installed.entry { /* style description *\/
+  /* set height proportional to width of #installed *\/
+  height: 0;
+  padding-bottom: calc(var(--image-width) * 0.75); /* 350x263 (4:3) thumbs *\/
+
+  position: relative;
+}
+.tab-installed .main-controls {
+    /* just a container *\/
+}
+.tab-installed .thumbnail-holder {
+  position: absolute;
+  z-index: 1; /* above the whole description, but probably not necessary now... *\/
+  top: 0;
+  height: calc(100%);
+}
+.tab-installed .thumbnail-holder:hover {
+  z-index: 2; /*??? over the thumbnail*\/
+}
+.tab-installed div.thumbnail-holder .thumbnail-mask {
+  /* shows on hover *\/
+  position:absolute;
+  top: 100%;
+}
+.tab-installed img.thumbnail {
+  max-width: var(--image-width);
+  float: right;
+-margin-bottom: 10px;
+}
+.tab-installed img.thumbnail[src=""] { /* de novo style; no screenshot *\/
+  display: none;
+}
+.tab-installed .activation_info {
+  display: none; /* we'll recolor the name instead *\/
+}
+.tab-installed .style-name,
+.tab-installed .style-author {
+  max-width: calc(100% - var(--image-width) - 9px);
+}
+.tab-installed .info {
+  display: none; /* don't care how many *other* people have installed it *\/
+}
+.tab-installed .disabled .actions .disable,
+.tab-installed .enabled .actions .enable { /* mimic a one-button toggle *\/
+  display: none;
+}
+
+.tab-installed .disabled .style-name {
+  color: #999;
+}
+.tab-installed .disabled .style-author {
+  color: #ccc;
+}
+
+
+/*
+    Toggle 'enabled' when the description is clicked
+*\/
+.tab-installed .thumbnail_activate:before,
+.tab-installed .thumbnail_deactivate:before {
+  content: "";
+  -background: rgba(255,0,255,.2);
+  position: absolute;
+  top: -100%; left: 0;
+  height: 100%; width: calc(100% - var(--image-width));
+  z-index: 1000;
+}
+
+/* enable the toggle immediately, reveal the menu later *\/
+.tab-installed .thumbnail-holder .thumbnail-mask {
+  z-index: 1;
+  clip: rect(-200px, 350px, 0px, 0);
+  transition-delay: 0s;
+  transition-property: clip, z-index, opacity;
+  transition-duration: 0s, 0s, .5s;
+}
+.tab-installed .thumbnail-holder:hover .thumbnail-mask {
+  z-index: 2;
+  clip: rect(-200px, 350px, 100px, 0);
+  transition-delay: .8s;
+}
+
+::-webkit-scrollbar {
+  display: inherit !important;
+    /* there doesn't seem to be a way to unset this *\/
+}
+
+/*
+    Shrink the tabs and move the master switch to that row
+*\/
+div.tabs-container header .tab-header {
+  width: calc(135px - var(--disable-all-width) / 2);
+}
+
+/* always display the master switch *\/
+#tab-item-installed {
+  display: block;
+}
+#tab-item-installed:not(.active) > :not(#disable-all-container) {
+  display: none;
+}
+
+/* move the switch, lose the text *\/
+#disable-all-container {
+  height: 0;
+}
+.disable-all-lable {
+  display: none;
+}
+#disable-all-block {
+  position: absolute;
+  right: 0; top: 0;
+  padding: 0;
+  width: var(--disable-all-width); height: 22px;
+
+  line-height: inherit; /*???*\/
+  margin-right: -2px;
+  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.13), -1px 0 0 0 #cfd6d9;
+}
+
+/* reposition the button within its container *\/
+#disable-all-block .swipe-button {
+  margin-right: 4px;
+  margin-top: 1px;
+}
+/* give it a tooltip *\/
+#disable-all-block:hover::after {
+  content: "Switch all styles on/off";
+  position: absolute;
+  right: 2px; top: 2.2em;
+  white-space: nowrap;
+  padding: 2px .25em;
+  background-color: white;
+  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.13);
+  z-index: 2;
+}
+
+/*
+    Replace the 'Styles Library' tab with the old 'More styles for this site' link
+*\/
+#noServerConnection:not(.hide) + .tabs-container #find-styles {
+  display: inline-block !important;
+  position: absolute;
+  top: 0; left: 0;
+  width: 105px;
+  height: 22px;
+  padding: 0;
+  background: #ecf0f1;
+    /*should be a box shadow here*\/
+}
+#noServerConnection:not(.hide) + .tabs-container #find-styles-link {
+  display: block;
+  font-size: 0;
+  margin: 0;  
+}
+#noServerConnection:not(.hide) + .tabs-container #find-styles-link::after {
+  content: "More styles";
+  font-size: 12px;
+  line-height: 22px;
+  display: block;
+  color: #000;
+}
+
+
+/*
+    when #noServerConnection... 
+      `#noServerConnection.hide` == opted-in to 'Styles Library' 
+      `#noServerConnection:not(.hide)` == opted out
+*\/
+
+/* ... always show 'Installed Styles'... *\/
+#noServerConnection:not(.hide) + .tabs-container > #tab-item-installed:not(.active) > :not(.hide) {
+  display: block;  
+}
+#noServerConnection:not(.hide) + .tabs-container > header > .tab-header:last-child {
+  background-color: #fff;
+}
+
+/* ... don't show 'Styles Library'; replace the tab with 'Find styles for this site...' *\/
+#noServerConnection:not(.hide) + .tabs-container > #tab-item-recommended {
+  display: block;
+}
+#noServerConnection:not(.hide) + .tabs-container > #tab-item-recommended > #find-styles {
+  display: inline-block !important;
+}
+#noServerConnection:not(.hide) + .tabs-container > #tab-item-recommended > :not(#find-styles) {
+  display: none;
+}
+
+#noServerConnection:not(.hide) #find-styles {
+  margin-right: -2px;
+  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.13), -1px 0 0 0 #cfd6d9;
+}
+#noServerConnection:not(.hide) #find-styles-link::after {
+  background-color: #ecf0f1;
+  /*cursor: default;*\/
+}
+
+ EOT;
+simple "Remove the nag, leave the rest alone" <<<EOT #noServerConnection {
+  display: none;
+}
+ EOT;
+
+}
+
+==/UserStyle== */
+@-moz-document
+  regexp("chrome-extension://fjnbnpbmkenffdnngjfgmeleoegfcffe/popup.html"),
+  regexp("chrome-extension://[a-p]{32}/popup.html") {
+/*[[changes]]*/
+}

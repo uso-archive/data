@@ -1,0 +1,256 @@
+/* ==UserStyle==
+@name           Tumblr Redesign Redesign
+@namespace      USO Archive
+@author         Pandu Poluan
+@description    `In the beginning of September 2015, Tumblr made a major redesign that totally threw out the previous "nested blockquote" commenting presentation with a linear, forum-like commenting presentation. However, whoever designed the layout wasted a HUGE amount of vertical space causing "wastelands". This CSS tries to fix that stupidity.`
+@version        20191120.17.14
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced color contributiontint "Tint for reblog comment" #F0E8F0
+@advanced color closebtnclr "Close button color" #FA8072
+
+==/UserStyle== */
+@namespace url(http://www.w3.org/1999/xhtml);
+
+/* ===== METADATA
+Name    : Tumblr Redesign Redesign
+Author  : pepoluan
+Created : 2015-09-03
+Repo    : https://bitbucket.org/pepoluan/tumblr_tweaks
+License : CC-BY-SA 4.0
+Revision: 81
+*/
+
+/* ===== DESCRIPTION
+On 2015-09-03, Tumblr again redesigned the dashboard, changing the nested blockquotes that were used to show comments added
+by rebloggers, into a linear list of comments-with-user-signature.
+
+The implementation sucks, though. Mostly: Too much whitespace (vertical wasteland), and due to no text color differences,
+a bit difficult to focus on the contents.media
+
+I fixed things that annoyed me most. Plus, while at it, fixes things that had _always_ been annoying for me, but was too
+lazy to fix :)
+
+~P
+*/
+
+/* ===== CHANGELOG
+
+Rev 65: Initial release to public
+Rev 66: Fix blockquote presentation
+Rev 67: Fix figure indentation
+Rev 68: Fix h1/h2 indentation
+Rev 69: Fix empty <p>
+Rev 70: More fixes for empty <p>
+Rev 71: Fix for 'contributed content'
+Rev 72: Fix for <ol>, also reduce vertical gap of lists
+Rev 73: Fixes for the 'Editor' pop-up
+Rev 74: Fixes for the Fan Mail editor pop-up
+Rev 75: Rationalization / simplification -- also fixes reblog text 'naked' in <div> (not inside <p>, <h>, etc.)
+Rev 76: Fix nested list spacing
+Rev 77: Fix typo in post_body name, tweak blockquote slightly
+Rev 78: Add link to the MOST canonical repository
+Rev 79: Fix the jarring "shrink/grow" effect when mouse cursor moves around the page
+Rev 80: Fix figure indentation, again. Something seems add a negative left-margin to it.
+Rev 81: Fix .reblog-content margin (accidentally undone when increasing specificity)
+Rev 82: Blog selector now moved to between the Cancel & Reblog buttons.
+*/
+
+@-moz-document domain("www.tumblr.com") {
+div.note_item {
+  /* This is the gap within the Ask/Answer bubbles */
+  padding-top: 5px !important;
+  padding-bottom: 9px !important;
+}
+.reblog-list,
+.reblog-list-item {
+  /* Remove the top border -- made the bottom border for .reblog-list-item to be too thick */
+  border-top-style: none !important;
+}
+.reblog-list-item.contributed-content {
+  /* Specially highlight the "contributed content" */
+  margin-top: 9px !important;
+  border-top: 1px dashed #BBB !important;
+  padding-top: 15px !important;
+  padding-bottom: 4px !important;
+  background-color: /*[[contributiontint]]*/;
+}
+.reblog-list-item {
+  /* This is the gap between two reblog comments */
+  padding: 8px 20px;
+  border-bottom: 1px dashed #BBB !important;
+}
+.reblog-list-item .reblog-header {
+  /* This is the gap below a reblog's "headers" (username of the reblog-er) */
+  margin-bottom: 0px !important;
+}
+.reblog-list-item .reblog-header a.reblog-tumblelog-name {
+  /* This is to shift the reblog-er's username higher so the x-height aligns with the reblog-er's icon */
+  /* Also, make the color subdued to help focus on the content instead. */
+  position: absolute;
+  top: -8px !important;
+  left: 40px !important;
+  color: lightslategray;
+}
+.reblog-list-item div.reblog-content {
+  /* Gap between the reblog comment and the reblog header */
+  margin-top: 15px !important;
+}
+.reblog-list .reblog-title,
+.reblog-list .reblog-content,
+.reblog-list-item .reblog-content {
+  /* Left-aligns the reblog contents (comments, figures, h1/h2, etc) to the reblog-er username */
+  /* Also, left-aligns the "Text Post Title" */
+  margin-left: 40px !important;
+}
+.reblog-content > figure {
+  margin-left: 0px !important;
+}
+.reblog-content > h1,
+.reblog-content > h2 {
+  /* Add a bit more space for h1/h2 comments */
+  margin-bottom: 6px !important;
+}
+.reblog-content p,
+.post_body p {
+  /* Set spacing between paragraphs */
+  padding-top: 2px !important;
+  padding-bottom: 6px !important;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+}
+.reblog-content blockquote {
+  /* Fix blockquote 'bar' too far to the left */
+  padding-left: 10px !important;
+  margin-left: 2px !important;
+}
+.reblog-content blockquote p {
+  /* Remove padding of <p> in the above blockquote */
+  padding-left: 0px !important;
+}
+.reblog-list .reblog-title {
+  /* If the reblogged item is a Text post with a Title, this fixes the Title's positioning */
+  margin-top: 16px;
+  margin-bottom: 0px;
+}
+div.post-form--tag-editor {
+  /* Add gap between the entry field and the tag editor, and make the boundary more visible. */
+  z-index: 5 !important;
+  border-top: 1px dotted #888 !important;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+hr {
+  /* Make the horizontal line separator more significant */
+  border-top: 1px solid #ccc !important;
+  width: 80% !important;
+  max-width: 350px !important;
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+}
+div.post_media {
+  /* Add gap below media (photos, movies, etc.) */
+  margin-bottom: 6px !important;
+}
+div.post_content p:empty {
+  /* Collapses empty paragraph blocks <p></p> _anywhere_ within the div.post_content hierarchy (now covers both in-dash and in-peeper parablocks) */
+  height: 0px !important;
+  margin: 0px !important;
+  padding: 0px !important;
+}
+div.post_content + div.post_footer {
+  /* Push the post_footer content down, away from the border */
+  margin-top: 12px !important;
+}
+/* Fixes for the Editor pop-up */
+.editor p  {
+  /* Reduce gap */
+  margin-top: 0px !important;
+  margin-bottom: 8px !important;
+}
+.editor p:first-child {
+  /* Reintroduce gap for topmost <p> */
+  margin-top: 4px !important;
+}
+.editor ul,
+.editor ol {
+  /* Reduce gaps */
+  margin-top: -5px !important;
+  margin-bottom: 15px !important;
+}
+/* Fixes for the "Fan Mail" writer */
+#fan_mail textarea {
+  /* Make fonts smaller, add scrollbars, make the field taller */
+  overflow-y: scroll !important;
+  font-size: 14px !important;
+  line-height: 17px !important;
+  height: 300px !important;
+}
+#fan_mail select {
+  /* The "sender" blog; make it smaller and move lower */
+  font-size: 16px !important;
+  bottom: 14px !important;
+  border-bottom: 1px dotted black !important;
+}
+.font_mono-1 {
+  /* Finally, for Windows, the "Consolas" font is MUCH more pleasant-looking than Courier font */
+  font-family: Consolas,"Courier New",Courier,monospace !important;
+}
+/* Fixes for lists */
+div.post_content div.post_container ol,
+div.post_content div.post_container ul {
+  /* Replaces the older (now-deleted) too-specific selector */
+  margin-top: -5px !important;
+  margin-bottom: 15px !important;
+}
+div.editor-wrapper div.editor.editor-richtext ol > ol,
+div.editor-wrapper div.editor.editor-richtext ol > ul,
+div.editor-wrapper div.editor.editor-richtext ul > ol,
+div.editor-wrapper div.editor.editor-richtext ul > ul,
+div.post_content div.post_container ol > ol,
+div.post_content div.post_container ol > ul,
+div.post_content div.post_container ul > ol,
+div.post_content div.post_container ul > ul {
+  /* Fixes spacing for nested lists */
+  /* Note: Due to CSS "specificity", we're forced to add 2 <element>s and 2 .classes */
+  margin-top: 0px !important;
+  margin-bottom: 2px !important;
+}
+/* Fix the exasperating 'shifty' effect when mouse pointer repeatedly goes in and out of post region */
+/* Took me A KRIFFING LOT OF EXPERIMENTATION to find the culprit. */
+div.post_content.clearfix::after {
+  content: '#' !important;
+  position: relative !important;
+  display: block !important;
+  height: 0px !important;
+  margin: 0px !important;
+  padding: 0px !important;
+}
+/* Move the blog selector drop-down to beside the reblog button */
+button.tumblelog-select {
+  position: absolute !important;
+  bottom: 15px !important;
+  right: 160px;
+}
+/* Make the Close button reddish, and hide the text ... */
+button.tx-button, button.tx-button:active {
+  background-color: /*[[closebtnclr]]*/;
+  padding-left: 7px !important;
+  padding-right: 7px !important;
+  color: transparent;
+  text-indent: -2.8em;
+}
+/* ... and replace the text with a simple X. */
+button.tx-button::after {
+  content: "X";
+  color: white;
+  line-height: initial;
+}
+/* NOTE: The above 2 CSS are hack-ish, and upon clicking the "Close" button,
+   the text "Close" actually appeared for a split-second. I don't know what
+   causes that, nor do I have any motivation to fix that. Live with it. */
+/* Emsmallen the control area to give more space to the blog selector drop-down */
+div.controls-container {
+  padding: 10px 10px 10px 0 !important;
+}
+}

@@ -1,0 +1,92 @@
+/* ==UserStyle==
+@name           Firefox Sliding Bookmarks Bar [Mac]
+@namespace      USO Archive
+@author         zvuc
+@description    `<strong>Hey 2019, Looking for updates?</strong> <a href="https://github.com/zvuc/firefox-sliding-bookmarks-bar">This userstyle now lives in github.</a><br>Hides the bookmark bar by default, only appears when hovering over the tabs and the navigation toolbar. (slides down)<br><br><strong>If you're using Firefox 57 and above, installing this style through Stylish will not work.</strong> Please paste the code into userChrome.css file in your profiles folder (<a href="https://www.userchrome.org/how-create-userchrome-css.html">See how</a>) to apply. (Make sure you set the correct pixel value for <code>--toolbar-offset-height</code> variable depending on your theme configuration.<br><br>2017-08-12 Last Updated / Tested for 55.0<br>2017-11-15 Tested for 57.0<br><br><br>Recommended to use with style 105363<br><br>Windows version: style 57368`
+@version        20171115.5.6
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown options "Theme Variants (53+)" {
+	firefox_57_normal "Current (57) Normal*" <<<EOT --toolbar-offset-height: 42px; EOT;
+firefox_53 "Legacy (53-54)" <<<EOT --toolbar-offset-height: 34px; EOT;
+firefox_55 "Legacy (55-56)" <<<EOT --toolbar-offset-height: 28px; EOT;
+firefox_57_compact "Current (57) Compact" <<<EOT --toolbar-offset-height: 28px; EOT;
+
+}
+
+==/UserStyle== */
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+:root {
+   --toolbar-offset-height: 28px;
+   /*[[options]]*/
+}
+
+#PersonalToolbar:not([customizing]) {
+   position: fixed !important;
+   padding-top: 4px !important;
+   padding-bottom: 5px !important;
+   height: auto !important;
+   width: 100% !important;
+ 
+   border: none !important; 
+   box-shadow: 0 1px 0 0 rgba(0,0,0,0.3);
+   
+   transform: scaleY(0.8);
+   transform-origin: center bottom;
+   transition: transform cubic-bezier(.22,.61,.36,1) 0.15s !important;
+   z-index: 2;
+}
+
+#PersonalToolbar:not([customizing]) #personal-bookmarks {
+   opacity: 0;
+   transition: opacity 0.15s;
+}
+
+#nav-bar {
+   z-index: 3 !important;
+}
+
+.tabbrowser-tab[selected="true"] {
+   z-index: 4 !important;
+}
+#navigator-toolbox:hover #nav-bar:not([customizing]) { 
+
+}
+
+#navigator-toolbox:hover > #PersonalToolbar:not([customizing]) {
+   position: fixed !important;
+   
+   transform: translateY(100%) scaleY(1);
+}
+
+#navigator-toolbox:hover > #PersonalToolbar:not([customizing]) #personal-bookmarks {
+   opacity: 1;
+}
+
+/* Hide 1px border-bottom */
+#navigator-toolbox:after {
+   display: none !important;
+}
+
+/* compact theme */
+:root[lwtheme="true"] #PersonalToolbar:not([customizing]) {
+   top: var(--toolbar-offset-height) !important;
+}
+
+/* compact + titlebar active */
+:root[lwtheme="true"]:not([tabsintitlebar="true"])
+#nav-bar ~ #PersonalToolbar:not([customizing]) {
+   top: calc(var(--toolbar-offset-height) + 20px) !important;
+}
+
+/* default theme */
+:root:not([lwtheme="true"]) #PersonalToolbar:not([customizing]) {
+   top: calc(var(--toolbar-offset-height) + 17px) !important;
+}
+
+/* default + titlebar active */
+:root:not([lwtheme="true"]):not([tabsintitlebar="true"])
+#nav-bar ~ #PersonalToolbar:not([customizing]) {
+   top: calc(var(--toolbar-offset-height) + 8px) !important;
+}

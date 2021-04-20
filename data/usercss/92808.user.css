@@ -1,0 +1,446 @@
+/* ==UserStyle==
+@name           autohide the menu & sidebar [CNN]
+@namespace      USO Archive
+@author         hideheader
+@description    `Hides the CNN header, footer, and sidebar. (But not permanently - hover at the edges of the screen to restore them.)`
+@version        20150107.17.56
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@-moz-document url("http://www.cnn.com/"), url-prefix("http://www.cnn.com/?") {
+.bin_4,
+.bin_8,
+.bin_12,
+.bin_15, .bin_16,
+.bin_17, .bin_18, .bin_19 
+ { /*display: none/**/ }
+}
+
+@-moz-document domain("www.cnn.com"),
+ domain("money.cnn.com"),
+ domain("tech.fortune.cnn.com"), domain("cnn.com") {
+
+  .cnn_contentarea {margin-left: 2mm}
+    /* space between article & collapsed headers */
+  #cnn_ftrcntnt {margin-left: -8px;}
+    /* offsets BODY's margin-left for absolute footer */
+  .cnn_strylftcntnt {margin-right: -10px;}
+    /* space between article text and article inclusions, now to right of article */
+  .cnn_strybtntools {
+    float: right;
+    width: 0;
+    margin-right: -10px;
+  } /* move article tools to right of article & let headline expand */
+
+  /* CNN is better if you block its stylesheets, but then we need this */
+  #cnnContainer {text-align: left !important} /*else article is centered*/
+  #cnnContentContainer {max-width: 16cm} /*else article screen-width*/
+  .cnn_strylctcntr {min-width: 166px;} /*repositioned article inclusions*/
+  #cnn_hdr {background-color: #fff} /*else header is black on transparent*/
+
+  /* advertisements */
+  [class*="adcntr"], [id^="ad-"] {display: none !important}
+
+/* - - - - - autohide header - - - - - */
+#cnnBannerContainer {display:none}
+  /* Yeah, sure, it's all "breaking news" */
+
+BODY:not(#home) .cnnCol_side > *, .cnn_strycntntrgt > * {resize:none}
+  /* bug - resize is inherited in Chrome */
+  BODY:not(#home):not(.home) #cnnHeader.moneyTechNav { /* tech.fortune.cnn.com */
+    /* :not(#home) only to make it more specific than money.cnn.com */
+    background: lightblue;
+    min-width: 0 !important;
+    padding: 10px;
+    /*border: thin solid black;
+    border-width: 0 1px 1px 0;*/
+  }
+  #cnnHeader { /* money.cnn.com */
+    z-index: 1;
+  }
+@media(max-width:0) {
+  BODY:not(#home):not(.home) #cnnHeader, /* money.cnn.com, tech.fortune.cnn.com */
+  BODY:not(#cnnMainPage) #cnn_hdr /* www.cnn.com */ {
+    position: fixed; left: 0; top: 0;
+    min-width: 100% !important;
+    clip: /*auto;*/rect(0, 1600px, 1600px, 0);
+    transition: clip .3s linear, background .3s step-start;
+    z-index: 4;/*else .cnn_strybtntools is on top*/
+  }
+  BODY:not(#home):not(.home) #cnnHeader:not(:hover),
+  BODY:not(#cnnMainPage) #cnn_hdr:not(:hover) {
+    clip: rect(0, 16px, 16px, 0);
+    background: left top #d00 no-repeat url("http://www.cnn.com/favicon.ico") !important;
+    transition-delay: 1s;
+    transition-timing-function: linear, step-end;
+  }
+  BODY:not(#home):not(.home) #cnnHeader:not(:hover) > *,
+  BODY:not(#cnnMainPage) #cnn_hdr:not(:hover) > * {
+    visibility: hidden;
+    transition: visibility .3s .8s step-end;
+  }
+}
+BODY:not(#home):not(.home) #cnnHeader, /* money.cnn.com, tech.fortune.cnn.com */
+BODY:not(.pg-homepage) #nav-header, /* new (2015-01-07) www.cnn.com */
+BODY:not(#cnnMainPage) #cnn_hdr /* www.cnn.com */ {
+  position: fixed; left: 0; top: 0;
+  clip: rect(0, 2mm, 15mm, 0);
+  border-left: 2.2mm solid #d00 !important;
+  transition: clip .3s .8s linear;
+  transition-property: clip, border-left-width;
+  transition-timing-function: linear, step-end;
+  z-index: 4;/*else .cnn_strybtntools is on top*/
+  z-index: 10001; /*else #infoBox is on top*/
+  }
+BODY:not(#home):not(.home) #cnnHeader:hover,
+BODY:not(.pg-homepage) #nav-header:hover, /* new (2015-01-07) www.cnn.com */
+BODY:not(#cnnMainPage) #cnn_hdr:hover {
+  clip: rect(0, 1011px, 443px, 0);
+  border-left-width: 0 !important;
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+  }
+BODY/*:not(.pg-homepage)*/ {padding-top: 0 !important;}
+
+
+/* - - - - - autohide footer - - - - - */
+BODY {position: relative; height: auto !important}
+
+@media (max-width: 0) {
+  /*--.cnn_containerwht--*/#cnn_ftrcntnt {
+    position: absolute; bottom: 0;
+    width: 980px; height: 226px;
+    background: left top no-repeat url("http://www.cnn.com/favicon.ico");
+    transition: height .3s linear, width .3s linear, background .3s step-start;
+    /* nice, but requires 
+    (1) container element within container element,
+    (2) a priori knowledge of both width & height */
+  }
+  /*--.cnn_containerwht--*/#cnn_ftrcntnt:not(:hover) {
+    width: 16px; height: 16px; overflow: hidden;
+  }
+}
+/*BODY:not(.pg-homepage)*/ footer.l-footer, /* new (2015-01-07) www.cnn.com */
+#cnn_ftrcntnt {
+  position: absolute !important; bottom: 0; left: 0;/**/
+  /*position: fixed; top: 0; left: 0;*/
+  overflow: hidden;
+  z-index: 5;
+  z-index: 10000; /*else #infoBox is on top*/
+  /*background-color: white;*/ /* new (2015-01-07) www.cnn.com */
+  padding: 0 .5em !important;
+  height: 20mm; /*width: 0;*/ min-width: 0 !important;
+  clip: /*rect(0, 2mm, 186px, 0)*/rect(0, 2mm, 674px, 0);
+  border-left: 2.2mm solid /*#d00*/#000 !important;
+  transition: width .3s .8s linear;
+  transition-property: clip, border-left-width, height;
+  transition-timing-function: linear, step-end;
+  }
+/*BODY:not(.pg-homepage)*/ footer.l-footer:hover, /* new (2015-01-07) www.cnn.com */
+#cnn_ftrcntnt:hover {
+  height: /*186px*/674px; /*--width: 980px;--*/ /* new (2015-01-07) www.cnn.com */
+  height: auto;
+  clip: /*rect(0, 1007px, 186px, 0)*/rect(0, 1920px, 674px, 0); /* new (2015-01-07) www.cnn.com */
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+  border-left-width: 0 !important;
+/*--  padding: 0 .5em !important;--*/
+  }
+
+
+/* - - - - - autohide sidebar - - - - - */
+@media (max-width:0) {
+  BODY:not(#home) .cnnCol_side, /* money.cnn.com */
+  .cnn_strycntntrgt /* www.cnn.com */ {
+    position: fixed; left: 0; top: 0;
+    height: 100%; overflow-y: scroll; resize: horizontal;
+    width: -moz-calc(336px + 17px) !important;
+    width: -webkit-calc(336px + 17px) !important;
+    border-right: 0 dotted lightblue !important;
+    transition: left .3s linear, background-color .3s step-start, border-right-width .3s step-start;
+  }
+  BODY:not(#home) .cnnCol_side:hover,
+  .cnn_strycntntrgt:hover {background-color: white /*money*/!important}
+  .cnnCol_side:not(:hover),
+  .cnn_strycntntrgt:not(:hover) {
+    left: -moz-calc(-336px - 17px) !important;
+    left: -webkit-calc(-336px - 17px) !important;
+    border-right-width: 3mm !important;
+    transition-delay: .8s;
+    transition-timing-function: linear, step-end, step-end;
+  }
+}
+
+BODY:not(#home) .cnnCol_side, /* money.cnn.com */
+BODY:not(.pg-homepage) .pg-rail, /* new (2015-01-07) www.cnn.com */
+.cnn_strycntntrgt /* www.cnn.com */ {
+  position: fixed !important; left: 0; top: 0;
+  height: 100%; overflow-y: scroll; /*resize: horizontal;*/
+  background-color: white !important;
+  z-index: 10000 !important; /*else #infoBox is on top*/
+  clip: /*rect(0, 2mm, 1080px, 0)*/rect(15mm, 2mm, 30mm, 0); /* new (2015-01-07) www.cnn.com */
+  border-left: 2.2mm solid lightblue !important;
+  transition: clip .3s .8s linear;
+  transition-property: clip, border-left-color/*width*/; /* new (2015-01-07) www.cnn.com */
+  transition-timing-function: linear, step-end;
+
+  box-sizing: content-box; /* new (2015-01-07) www.cnn.com */
+  width: 318px;
+  }
+BODY:not(.pg-homepage) .pg-rail:hover, /* new (2015-01-07) www.cnn.com */
+BODY:not(#home) .cnnCol_side:hover,
+.cnn_strycntntrgt:hover {
+  clip: rect(0, 500px, 1080px, 0);
+  /*border-left-width: 0 !important;*/ /* new (2015-01-07) www.cnn.com */
+  border-color: white !important; /* new (2015-01-07) www.cnn.com */
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+  }
+BODY:not(.pg-homepage) .pg-rail {margin-left: 0}  /* new (2015-01-07) www.cnn.com */
+BODY:not(.pg-homepage) .pg-left-rail-short__wrapper,
+BODY:not(.pg-homepage) .pg-left-rail-tall__wrapper {padding-left: 0}
+
+
+
+
+/* - - - - - no ads - - - - - */
+.ad, [class^= "ad-"], [class*= " ad-"], /* new (2015-01-07) www.cnn.com */
+[id^="ad_"], [id*="_ads_"],
+
+[class^="cnn_adspc"],
+[id^="prf"], /* Pointroll */
+IFRAME[src*="ads.cnn"],
+[id^="ad-"],
+.cnn_strycrcntrad, /* SToRY Column Right CoNTaineR AD */
+._fwac {display: none} /* ad container */
+
+/** no syndicated content **/
+[data-zone-label="From Our Partners"],
+[class*="outbrain"] {display: none} /* new (2015-01-07) www.cnn.com */
+
+/*.OUTBRAIN,*/
+.ob_dual_container > * {display: none}
+.ob_dual_container > .ob_dual_right {
+  display: block;
+  }
+.cnn_strycntntrgt .OUTBRAIN:nth-last-of-type(1)
+/*#outbrain_widget_3*/ {
+  display: none;
+  }
+
+/* - - - - - no comment - - - - - */
+  /* money.cnn.com */
+  [id*="disqus"], [class*="disqus"],
+  .cmmtcount, /* comment count */
+  /* www.cnn.com */
+  .cnn_stryshrwdgtbtm .cnn_stryswdgtbtm1, /* "0 comments */
+  [id*="comment"], [class*="comment"] {display: none !important}
+
+/* - - - - - no social - - - - - */
+  .cnn_stryshrwdgtbtm {height: auto !important; margin-bottom: 0 !important;}
+
+.cnnm_sharebar, /*CNN Money*/
+.c_sharebar_cntr > *,
+.cnn_stryswdgtbtm2 > *,
+  #cnn_sharebar1 .cnn_sswdgtweb2, /* "Email" */
+  #cnn_sharebar1 .cnn_sswdgtweb3, /* "More sharing" */
+  .cnn_stryshrwdgtbtm .cnn_sswdgtweb2,
+  .cnn_stryshrwdgtbtm .cnn_sswdgtweb3,
+  
+  [id*="facebook"], [class*="facebook"],
+  [id*="twitter"], [class*="twitter"] {display: none !important}
+
+.c_sharebar_cntr > .c_sharergtcol,
+.cnn_stryswdgtbtm2 > .c_sharebtmcol3 {
+  display: block !important;
+  }
+
+/* - - - - - no nonsense - - - - - */
+  .cnn_strylctcquote /* don't quote yourself */ {display: none}
+
+  .cnn_strylftcntnt {
+    float: right !important;
+    width: 1px !important; overflow: visible !important;
+    clear: both !important;
+  }
+  .cnn_storyarea P {
+    padding-left: 0 !important;
+  }
+
+  /* move lead photo below article text */
+  /*640w x 360h image, 640w x 25h text, 1 line */
+  .cnn_strycntntlft {position: relative}
+  .cnn_stryimg640captioned  ~ .cnn_strybtmcntnt > :last-child {
+    margin-bottom: 360px !important;
+  }
+  .cnn_stryimg640captioned {
+    position: absolute !important; bottom: 0 !important;
+    top: auto !important;
+  }
+  .cnn_stryimg640caption {
+    position: absolute; bottom: 0;
+    background: rgba(0,0,0,.7);
+    margin-bottom: 0 !important;
+  }
+
+  /* ...and the slideshow */
+  /* 640x360h in 667x443h frame */
+  .cnn_html_slideshow {
+    position: absolute !important; bottom: 0 !important;
+  }
+.cnn_html_slideshow ~ .cnn_strybtmcntnt > :last-child {
+  margin-bottom: 443px !important;
+  /* overlays CNN via Outbrain - oh well... */
+  }
+
+  /* ...and the video */
+  /* 640x384h in 640x384h frame */
+  .cnnStryVidCont {
+    position: absolute !important; bottom: 0 !important;
+    outline: thin solid lightblue !important;
+    background: rgba(250,250,255,.9) !important;
+  }
+  .cnnStryVidCont  ~ .cnn_strybtmcntnt {
+    margin-bottom: 384px !important;
+    }
+
+  /* smaller headline */
+  H2.pg-headline {font-size: 2.5em;} /* smaller headline */
+  .user-msg {display: none !important} /* no Terms of Service nag */
+  .m-ticker {display: none} /* no scrolling new ticker */
+
+  /* move lead photo below article text (this will depend on display size and content type) */
+  .pg-left-rail-tall__wrapper > .pg-left-rail-tall__right-side {position: relative} 
+  .pg-left-rail-tall__wrapper > .pg-left-rail-tall__right-side > .pg-left-rail-tall__head > .zn-large-media {
+    position: absolute;
+    bottom: 0;
+  } 
+  .pg-left-rail-tall__wrapper > .pg-left-rail-tall__right-side > .pg-left-rail-tall__body {
+    padding-bottom: 889px; /*medium, 460pt(=593px) h:684px */ /*large, 780pt(=1020px) h:889px*/
+  }
+  .pg-left-rail-tall__wrapper > .pg-left-rail-tall__right-side > .pg-left-rail-tall__head > .zn-large-media[data-eq-state="medium"] {
+    padding-bottom: 205px;
+  }
+   
+
+}
+
+
+@-moz-document domain('money.cnn.com') {
+
+/** autohide footer **/
+#cnnFooter > :not(.innershell) {display: none !important}
+  /* wow, that's a lot of advertising */
+
+#cnnFooter {
+  position: absolute; bottom: 0; left: 0;
+  overflow: hidden;
+  z-index: 4;
+  height: 20mm; width: 0; min-width: 0 !important;
+  border-left: 2.2mm solid #d00;/**/
+  transition: width .3s .8s linear;
+  transition-property: width, height, border-left-width;
+  transition-timing-function: linear, linear, step-end;
+  }
+#cnnFooter:hover {
+  height: 546px; width: 1011px;
+  transition-delay: 0s;
+  transition-timing-function: linear, linear, step-start;
+  border-left-width: 0;
+  }
+
+
+/** no syndicated "content" **/
+.trc_related_container,
+.trc_spotlight_widget {display:none!important}
+
+.ob_dual_container.AR_1 > .ob_dual_left {display: block !important}
+.ob_dual_container.AR_1 > .ob_dual_right {display: none !important}
+  /* Are native links always in the left column on money.cnn.com? Dunno, but if native links
+     can't be distinguished from exogenous links, remove 'em all (if you lie down with dogs...) */
+.ob_dual_container.AR_1 > .ob_dual_left {
+  /*-moz-columns: 2;
+  -webkit-columns: 2;
+  columns: 2;*/
+  width: 100% !important;
+  }
+
+}
+
+
+@-moz-document domain('www.cnn.com') {
+
+/** no syndicated "content" **/
+.ob_dual_container.AR_2 > .ob_dual_left {display: none !important}
+.ob_dual_container.AR_2 > .ob_dual_right {
+  display: block !important;
+  float: none !important;
+  width: 100% !important;
+  }
+  /* Are native links always in the right column on www.cnn.com?
+     Dunno, but if native links can't be distinguished from exogenous
+     links, remove 'em all
+  */
+
+}
+
+@-moz-document domain('sportsillustrated.cnn.com') {
+
+#sitiHeader,
+#cnnSideColumn,
+.cnnFooterBox {
+  position: fixed !important; top: 0; left: 0;
+  margin-top: 0 !important;
+  border-left: 2.2mm solid red !important;
+  transition: .3s .8s;
+  transition-property: clip, border-left-width;
+  transition-timing-function: linear, step-end;
+  }
+#sitiHeader:hover,
+#cnnSideColumn:hover,
+.cnnFooterBox:hover {
+  border-left-width: 0;
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+  }
+#sitiHeader {
+  clip: rect(0, 2mm, 20mm, 0);
+  }
+#sitiHeader:hover {
+  clip: rect(0, 1000px, 150px, 0);
+  }
+#cnnSideColumn {
+  clip: rect(0, 2mm, 1080px, 0);
+  border-left-color: blue !important;
+  background-color: white;
+  height: 100%; overflow-y: auto;
+  width: 320px !important;
+  }
+#cnnSideColumn:hover {
+  clip: rect(0, 350px, 1080px, 0);
+  }
+
+BODY#cnnArticle {padding-top: 0 !important}
+
+
+.cnnFooterBox {
+  position: absolute; bottom: 0; top: auto; left: 0;
+  height: 20mm;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  clip: rect(0, 2mm, 360px, 0);
+  transition-property: clip, border-left-width, height;
+  /*padding-bottom: 0 !important;*/
+  }
+.cnnFooterBox:hover {
+  height: 360px;
+  clip: rect(0, 888px, 360px, 0);
+  }
+
+/** no ads **/
+#cnnViewerAd,
+#cnnTowerAd,
+.cnnBannerFooter,
+#cnnSponAd,
+.\. {display: none !important}
+}

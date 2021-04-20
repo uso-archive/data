@@ -1,0 +1,300 @@
+/* ==UserStyle==
+@name           Obsolete 01 Parsing
+@namespace      USO Archive
+@author         J Luko
+@description    `Tries to detect common HTML errors. There are better tools than this.`
+@version        20181106.22.29
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@-moz-document regexp("^https?\\:\\/\\/.*") {
+/* nested main */
+
+main main::before,
+span div:before{
+    color: #FFF !important;
+    background: rgba(124, 0, 195, 1) !important;
+    font-size: 14px !important;
+    padding: 0 5px !important;
+    display: block !Important;
+}
+
+main main::before {
+    content: "nesting error: MAIN within MAIN" !important;
+}
+span div {
+    outline: 3px dashed rgba(124, 0, 195, 1) !important;
+}
+span div:before {
+    content: "nesting error: SPAN contains DIV" !important;
+}
+span div div {
+    outline: none !important;
+}
+span div div:before {
+    content: "" !important;
+    color: inherit !important;
+    background: transparent !important;
+    font-size: 12px !important;
+    padding: inherit !important;
+}
+
+/*
+div[title]:before {
+    content: "DIV contains TITLE" !important;
+    content: "DIV contains TITLE=\"" attr(title) "\"" !important;
+    color: #FFF !important;
+    background: purple !important;
+    font-size: 12px !important;
+}
+div[title] {
+    outline: 2px dashed purple !important;
+}
+*/
+[role='tabpanel'] section[aria-label]::before,
+[role='tabpanel'] section[aria-labelledby]::before,
+[role='tabpanel'] [role='region'][aria-labelledby]::before,
+[role='tabpanel'] [role='region'][aria-label]::before,
+div[role='presentation']::before {
+    color: #FFF !important;
+    background-color: #cc0000 !Important;
+    outline: 1px solid #cc0000 !important;
+    display: block !important;
+}
+div[role='presentation']::before {
+    content: "DIV contains explicit, redundant role=presentation name='" attr(aria-label)attr(aria-labelledby) "' id=" attr(id) !important;
+}
+[role='tabpanel'] section[aria-label]::before,
+[role='tabpanel'] section[aria-labelledby]::before,
+[role='tabpanel'] [role='region'][aria-labelledby]::before,
+[role='tabpanel'] [role='region'][aria-label]::before {
+    content: "region landmark inside tabpanel name='" attr(aria-label)attr(aria-labelledby) "' id=" attr(id) !important;
+}
+dl,
+dt,
+dd {
+    outline: 1px dashed blue !important;
+    box-shadow: 0 0 0 1px #fff;
+}
+div[role="img"] > img {
+    outline: 2px dashed #f29800 !important;
+}
+
+/* unordered list improper direct decendent */
+ul > span,
+ul > div,
+ul > img,
+ol > span,
+ol > div,
+ol > img {
+    outline: 2px dashed red !important;
+}
+ul > span:before,
+ul > div:before,
+ul > img:before,
+ol > span:before,
+ol > div:before,
+ol > img:before {
+    content: "list " attr(id) " contains improper child nodes" !important;
+    color: #FFF !important;
+    background: rgba(218, 88, 0, 1) !important;
+    font-size: 14px !important;
+    padding: 0 3px !important;
+}
+
+/* div contains li */
+a > *[role="link"]:before,
+a > *[role="button"]:before {
+    content: "anchor contains improper child roles" !important;
+    color: #000 !important;
+    background: yellow !important;
+    font-size: 14px !important;
+    padding: 0 3px !important;
+}
+span > li::before,
+p > li::before,
+div > li::before {
+    content: "list item missing required parent" !important;
+    color: #000 !important;
+    background: yellow !important;
+    font-size: 14px !important;
+    padding: 0 3px !important;
+}
+span > li,
+p > li,
+div > li {
+    outline: 1px dashed red !important;
+    box-shadow: 0 0 0 1px #fff;
+}
+
+/* anchor styled as button */
+
+/*
+a.button {
+    outline: 2px dashed red;
+}
+a.button::before {
+    content: " FYI: anchor styled as button w/o role=button ";
+    color: #FFF !important;
+    background: rgba(195, 0, 124, .6) !important;
+    font-size: 12px !important;
+}
+a.button[role='button'] {
+    outline: none !important;
+}
+*/
+a[aria-label*="click"] {
+    outline: 2px dashed #cc0000;
+}
+a[aria-label*="click"]::before {
+    content: "FYI anchor contains \"click\" ";
+}
+footer[role=presentation]::before {
+    content: "FOOTER element has explicit role=\"presentation\"";
+    color: #FFF !important;
+    background: #cc0000 !important;
+    font-size: 14px !important;
+}
+footer footer,
+footer[role=presentation] {
+    outline: 2px dashed #cc0000;
+}
+a[aria-label*="click"]::before,
+footer footer::before,
+footer *[role="contentinfo"]::before,
+nav[aria-label~=links]::before,
+nav[aria-label~=nav]::before,
+footer[aria-label~=footer]::before,
+[role=contentinfo][aria-label~=footer]::before,
+[role=navigation][aria-label~=links]::before,
+banner[aria-label~=banner]::before,
+banner[aria-label~=header]::before,
+banner[aria-label~=top]::before,
+[role=banner][aria-label~=banner]::before,
+[role=banner][aria-label~=header]::before,
+[role=banner][aria-label~=top]::before,
+p ul::before,
+p ol::before{
+    color: #FFF !important;
+    background: #cc0000 !important;
+    font-size: 14px !important;
+}
+p ul::before{
+    content: "P contains invalid child element UL"
+}
+p ol::before{
+    content: "P contains invalid child element OL"
+}
+
+p ul,
+p ol {
+    outline: 2px dashed #cc0000;
+}
+
+
+footer footer::before {
+    content: "FOOTER nested within FOOTER element";
+}
+footer *[role="contentinfo"] {
+    outline: 2px dashed #cc0000;
+}
+footer *[role="contentinfo"]::before {
+    content: "role=\"contentinfo\" nested within FOOTER element ";
+}
+iframe {
+    outline: 2px dashed #cc0000;
+    left: 0 !Important;
+    min-width: 50px !Important;
+    min-height: 50px !Important;
+    visibility: visible !important;
+}
+iframe::before {
+    content: " iframe missing required title attribute ";
+    color: #FFF !important;
+    background: #cc0000 !important;
+    font-size: 12px !important;
+}
+iframe[title]::before {
+    content: "";
+}
+
+/* presentation with alternate text */
+[role=presentation][aria-label]::before,
+[role=none][aria-label]::before{
+    content: " role=" attr(role) " has aria-label ";
+    color: #FFF !important;
+    background: #cc0000 !important;
+    font-size: 12px !important;
+}
+[role=presentation][aria-labelledby]::before,
+[role=none][aria-labelledby]::before{
+    content: " role=" attr(role) " has aria-labelledby ";
+    color: #FFF !important;
+    background: #cc0000 !important;
+    font-size: 12px !important;
+}
+
+[role=navigation][aria-label~=links]{
+    outline: 2px dashed #cc0000;
+}
+nav[aria-label~=links]::before,
+nav[aria-label~=nav]::before,
+[role=navigation][aria-label~=links]::before,
+[role=navigation][aria-label~=nav]::before{
+    content: "navigation landmark: redundancy in name: " attr(aria-label);
+}
+
+/* landmarks invalid roles */
+nav[role='presentation'],
+nav[role='none'],
+nav[role='section'],
+nav[role='contentinfo']{
+    outline: 2px dashed #000000;
+}
+nav[role='presentation']::before,
+nav[role='none']::before,
+nav[role='section']::before,
+nav[role='contentinfo']::before{
+    color: #000000 !important;
+    background: #FE0 !important;
+    font-size: 12px !important;
+}    
+nav[role='presentation']::before,
+nav[role='none']::before,
+nav[role='section']::before,
+nav[role='contentinfo']::before{
+    content: "NAV has invalid role=\"" attr(role) "\"" !important;
+}
+
+
+footer[aria-label~=footer]::before,
+[role=contentinfo][aria-label~=footer]::before{
+    content: "contentinfo landmark: redundancy in name: " attr(aria-label);
+}
+
+banner[aria-label~=banner]::before,
+banner[aria-label~=header]::before,
+banner[aria-label~=top]::before,
+[role=banner][aria-label~=banner]::before,
+[role=banner][aria-label~=header]::before,
+[role=banner][aria-label~=top]::before {
+    content: "banner landmark: redundancy in name: " attr(aria-label);
+}
+
+a[alt]::before{
+    content: "anchor contains alt attribute" !important;
+    color: #FFF !important;
+    background: #cc0000 !important;
+    font-size: 13px !important;
+    padding: 3px 8px !important;
+}
+
+/*
+section {
+    outline: 1px solid gray !important;
+    padding: 3px !important;
+}
+*/
+
+/* img alt analyze */
+}

@@ -1,0 +1,802 @@
+/* ==UserStyle==
+@name           PixivUserBatchDownload UI
+@namespace      USO Archive
+@author         mapaler
+@description    `P站画师个人作品批量下载工具v5.x的UI，配合PUBDv5使用The UI for PixivUserBatchDownload, must be used with the PUBDhttps://github.com/Mapaler/PixivUserBatchDownload`
+@version        20190110.18.35
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@namespace url(http://www.w3.org/1999/xhtml);
+
+@-moz-document domain("www.pixiv.net") {
+.display-none,.pubd-alert-9
+{/*任何需要隐藏的*/
+	display:none !important;
+}
+.height-none
+{
+	height: 0px !important;
+	overflow: hidden !important;
+}
+.pubd-btnStartInsertPlace
+{
+	position: relative;
+	margin: 0 0 0 auto;
+}
+.pubd-start
+{/*开始按钮*/
+	color: #1A4483;
+	background-image: linear-gradient(to bottom, #FCFDFE 0%, #87DCFF 100%);
+	background-color: #CCEEFF;
+	text-shadow: #fcfcf8 0 1px 2px;
+	border: 1px solid #cfe0e9;
+	border-radius: 5px;
+	padding: 2px 0px;
+	margin: 0;
+	display: inline-block;
+	width: 152px;
+	position: relative;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+	font-size: 12px;
+	line-height: 18px;
+	word-wrap: break-word;
+	text-decoration: none !important;
+}
+.pubd-start::after
+{/*开始按钮后面的箭头*/
+	content: "▾";
+	position: absolute;
+	right: 6px;
+	padding-left: 5px;
+	color: #1A4483;
+	border-left: 1px solid #77AAB1;
+}
+.pubd-start:hover
+{/*开始按钮悬停*/
+	background-image: linear-gradient(to bottom, #FAFBFD 0%, #43B8D5 100%);
+}
+.pubd-icon
+{/*所有图标，来自._icon*/
+	display: inline-block;
+	overflow: hidden;
+	text-indent: -999px;
+	white-space: nowrap;
+	vertical-align: middle;
+	height: 20px;
+	width: 20px;
+	background-size: 20px;
+	background-repeat: no-repeat;
+}
+.pubd-start .pubd-icon
+{/*开始按钮图标*/
+	position: absolute;
+	top: 0px;
+	left: 3px;
+	background-image: url('https://material.io/tools/icons/static/icons/baseline-image_search-24px.svg');
+}
+.pubd-menu
+{/*菜单*/
+	z-index: 1000;
+	position: absolute;
+	margin: 0;
+	text-align: left;
+	width: 152px;
+	background-color: #fafafa;
+	border: 1px solid #979797;
+	box-shadow: #666 2px 2px 3px;
+	list-style: none;
+	padding: 0;
+}
+.pubd-menu-item
+{/*菜单项*/
+	position: relative;
+	border: transparent 1px solid;
+	margin: 2px;
+}
+.pubd-menu-item:hover
+{/*菜单项悬停变色*/
+	/*background-color: #CEE7FF;*/
+	border: #AECFF7 1px solid;
+	border-radius: 3px;
+	background-image: 
+		linear-gradient(to bottom, RGBA(237,242,247,0.3) 0%,RGBA(188,220,238,0.2) 20%,RGBA(239,246,252,0.4) 40%,RGBA(192,217,238,0.4) 41%, RGBA(195,219,243,0.6) 100%)
+		;
+	background-repeat: no-repeat;
+	box-shadow: white 0 0 1px inset;
+}
+.pubd-menu-includesub::after
+{/*子菜单后面的箭头*/
+	content: "►";
+	font-size: 8px;
+	position: absolute;
+	top:5px;
+	right: 6px;
+}
+.pubd-menu-includesub:hover>.pubd-menu-submenu
+{/*让子菜单鼠标悬停显示*/
+	display:block !important;
+}
+.pubd-menu-submenu
+{/*子菜单*/
+	position: absolute;
+	top: 0;
+	left: 145px;
+}
+.pubd-menu-item-a
+{/*菜单项链接*/
+	padding-left: 2px;
+	padding-right: 9px;
+	font-size: 12px;
+	cursor: pointer;
+	display: block;
+	color: black !important;
+	text-decoration: none !important;
+}
+.pubd-menu-item-a .text
+{/*菜单项链接文字部分*/
+	vertical-align: middle;
+	line-height: 2;
+}
+.pubd-menu-line
+{/*菜单项，线*/
+	border-top: 1px solid #e0e0e0;
+	border-bottom: 1px solid white;
+	height: 0;
+	margin: 0 4px;
+}
+.pubd-menu-setting
+{/*菜单项“选项”*/
+}
+.pubd-menu-item .pubd-icon
+{/*菜单项图标*/
+	margin: 0 2px;
+	line-height: 2;
+}
+.pubd-menu-this-user .pubd-icon
+{/*菜单项-选项的图标*/
+	background-image: url('https://material.io/tools/icons/static/icons/baseline-get_app-24px.svg');
+}
+.pubd-menu-setting .pubd-icon
+{/*菜单项-选项的图标*/
+	background: url('https://material.io/tools/icons/static/icons/baseline-settings-20px.svg');
+}
+.pubd-menu-close .pubd-icon
+{/*菜单项-关闭的图标*/
+	background-position-y: -701px;
+}
+
+dt
+{/*列表标题*/
+	margin-top: 5px;
+}
+dt:first-child
+{/*列表标题-第一个*/
+	margin-top: 0;
+}
+.pubd-dialog
+{/*对话框*/
+	position: absolute;
+	overflow: auto;
+	left: calc(50vw - 210px);
+	top: 120px;
+	z-index: 9000;
+	min-width: 210px;
+	resize:both;
+	padding: 30px 8px 8px 8px;
+	background-color: RGBA(191,214,236,0.7);
+	background-image: 
+		linear-gradient(150deg, RGBA(255,255,255,0.6) 10%,RGBA(255,255,255,0.4) 30%, RGBA(255,255,255,0) 50%),
+		linear-gradient(210deg, RGBA(255,255,255,0.6) 10%,RGBA(255,255,255,0.4) 30%, RGBA(255,255,255,0) 50%),
+		linear-gradient(70deg,RGBA(255,255,255,0) 20%,RGBA(255,255,255,0.7) 22%,RGBA(255,255,255,0.2) 24%,RGBA(255,255,255,0.7) 26%,RGBA(255,255,255,0) 28%,RGBA(255,255,255,0) 46%,RGBA(255,255,255,0.7) 48%,RGBA(255,255,255,0.2) 50%,RGBA(255,255,255,0.7) 52%,RGBA(255,255,255,0) 54%,RGBA(255,255,255,0) 72%,RGBA(255,255,255,0.7) 74%,RGBA(255,255,255,0.2) 76%,RGBA(255,255,255,0.7) 78%,RGBA(255,255,255,0) 80%),
+		linear-gradient(to bottom, RGBA(237,242,247,0.3) 0%,RGBA(188,220,238,0.6) 20%,RGBA(239,246,252,0.8) 40%,RGBA(192,217,238,0.8) 41%, RGBA(195,219,243,0) 100%)
+		;
+	background-repeat: no-repeat;
+	background-size: 160px 80px, 160px 80px,100vw 100vh, 100% 300px; /*100vw 100vh*/
+	background-position: top left, top right, top left,top left;
+	background-attachment: scroll,scroll,fixed,scroll; 
+	border: #147DF2 solid 1px;
+	border-radius: 5px;
+	box-shadow: white 0 0 3px inset,white 0 0 3px inset,#72BBFE 0 0 4px;
+	/*transition: box-shadow ease-in-out 0.1s;*/
+
+}
+.pubd-dialog:hover
+{/*对话框悬停*/
+}
+.pubd-dlg-active
+{/*对话框激活*/
+	box-shadow: white 0 0 3px inset,white 0 0 3px inset,#72BBFE 0 0 8px,#72BBFE 0 0 8px;
+	z-index: 9001;
+}
+.pubd-dialog .dlg-cpt-btns
+{/*对话框标题按钮组*/
+	position: absolute;
+	top: 0;
+	right: 8px;
+}
+.dlg-cpt-btns .dlg-cpt-btn
+{/*对话框标题按钮*/
+	background-color: RGBA(191,214,236,0.5);
+	background-image: 
+		linear-gradient(to bottom, RGBA(255,255,255,0.6) 0%, RGBA(239,246,252,0.8) 40%, RGBA(200,210,222,0.8) 100%);
+	display: inline-block;
+	border: #147DF2 solid 1px;
+	border-right-width: 0px;
+	border-top: none;
+	border-radius: 0;
+	width: 50px;
+	height: 20px;
+	cursor: pointer;
+	overflow: hidden;
+	transition: background-image ease-in-out 0.1s,box-shadow ease-in-out 0.1s;
+	text-decoration: none !important;
+}
+.dlg-cpt-btns .dlg-cpt-btn:first-child
+{/*对话框标题按钮第一个*/
+	border-bottom-left-radius:5px;
+}
+.dlg-cpt-btns .dlg-cpt-btn:last-child
+{/*对话框标题按钮最后一个*/
+	border-bottom-right-radius:5px;
+	border-right-width: 1px;
+}
+.dlg-cpt-btns .dlg-cpt-btn:hover
+{/*对话框按钮悬停*/
+	background-image: 
+		linear-gradient(to bottom, RGBA(255,255,255,0.6) 0%, RGBA(158,197,215,0.8) 40%, RGBA(118,175,252,0.8) 100%);
+	box-shadow: #72BBFE 0 0 8px,#72BBFE 0 0 8px;
+}
+.dlg-cpt-btn .dlg-cpt-btn-text
+{/*对话框按钮上的文字*/
+	text-align: center;
+	line-height: 20px;
+	font-size: 12px;
+	font-family: HiraginoSans-W3,Hiragino Kaku Gothic Pro,\\30E1イリオ,Meiryo,Verdana,sans-serif;
+	font-weight: bold;
+	color: #fff;
+	text-shadow: -1px -1px 1px #147DF2,1px 1px 1px #147DF2,-1px 1px 1px #147DF2,1px -1px 1px #147DF2;
+	transform:scaleX(1.5);
+}
+.dlg-cpt-btns .dlg-btn-close
+{/*对话框关闭按钮特殊颜色*/
+	background-image: 
+		linear-gradient(to bottom, RGBA(255,255,255,0.6) 0%, RGBA(248,142,142,0.8) 40%, RGBA(237,112,112,0.8) 100%);
+}
+.dlg-cpt-btns .dlg-btn-close:hover
+{/*对话框关闭按钮悬停特殊颜色*/
+	background-image: 
+		linear-gradient(to bottom, RGBA(255,255,255,0.6) 0%, RGBA(236,38,38,0.8) 40%, RGBA(211,26,26,0.8) 100%);
+	box-shadow: #F40000 0 0 8px,#F40000 0 0 8px;
+}
+.dlg-cpt-btns .dlg-btn-close .dlg-cpt-btn-text
+{/*对话框关闭按钮文字*/
+	text-shadow: -1px -1px 1px #a00,1px 1px 1px #a00,-1px 1px 1px #a00,1px -1px 1px #a00;
+}
+.pubd-dialog .caption .pubd-icon
+{/*对话框图标*/
+}
+.pubd-dialog .caption
+{/*对话框标题*/
+	position: absolute;
+	font-size: 14px;
+	line-height: 28px;
+	top: 0;
+	left: 0;
+	width: calc(100% - 5px);
+	height: 30px;
+	padding-left: 5px;
+	cursor: move;
+	text-shadow: white 0 0 5px,white 0 0 5px,white 0 0 5px,white 0 0 5px;
+	/*background: RGBA(0,0,0,0.2); */
+}
+.pubd-dialog .caption span
+{/*对话框标题文字*/
+	margin-left: 3px;
+}
+.pubd-dialog .dlg-content
+{/*对话框内容*/
+	padding: 5px;
+	margin: 0;
+	border: #147DF2 solid 1px;
+	outline: white solid 1px;
+	height:calc(100% - 12px);
+	overflow: auto;
+}
+.pubd-dialog .dlg-content,.pubd-frame .pubd-frame-caption
+{/*对话框内容和框架标题都要设置相同的背景颜色*/
+	background-color: #F0F0F0;
+}
+.pubd-dialog dl:first-child
+{/*对话框内容内的列表*/
+	width:100%;
+	height:100%;
+	padding: 0;
+	margin: 0;
+	overflow: auto;
+}
+.pubd-dialog dl dd
+{/*列表名内容*/
+	margin: 0;
+}
+.pubd-progress
+{/*进度*/
+	width: 100%;
+	box-sizing: border-box;
+	text-align: center;
+	position: relative;
+	display:inline-block;
+	background-color: #CDCDCD;
+	border: #8C8C8C solid 1px;
+	box-shadow: 0 0 1px #fff inset, 0px 5px 4px #FFF inset,0px -3px 2px #DDD inset, 0px 0px 4px #000 inset;
+	overflow: hidden;
+}
+.pubd-progress,.pubd-progress .pubd-progress-bar,.pubd-progress .pubd-progress-text
+{/*进度条三个部分的通用设置*/
+	height: 20px;
+	line-height: 20px;
+	font-size: 15px;
+	border-radius: 3px;
+}
+@keyframes progressMoveOverlay
+{
+from {background-position-x:calc(0% - 100px),0,0,0;}
+50% {background-position-x:calc(100% + 100px),0,0,0;}
+to {background-position-x:calc(100% + 100px),0,0,0;}
+}
+.pubd-progress .pubd-progress-bar
+{/*进度条*/
+	position: absolute;
+	top:0;
+	left:0;
+	transition: width 0.2s ease-in-out;
+	background-color: #00D328;
+	background-image:
+		linear-gradient(to right, transparent 0%,RGBA(255,255,255,0.6) 50%, transparent 100%),
+		linear-gradient(to bottom, RGBA(255,255,255,0.8) 0%,RGBA(255,255,255,0.6) 6px,transparent 6px),
+		linear-gradient(to top, RGBA(255,255,255,0.6) 0%,transparent 6px),
+		linear-gradient(to right, transparent 1px, RGBA(100,100,100,0.1) 1px, RGBA(100,100,100,0.3) 5px, RGBA(100,100,100,0.1) 13px, transparent 20px,transparent calc(100% - 20px), RGBA(100,100,100,0.1) calc(100% - 13px),RGBA(100,100,100,0.3) calc(100% - 5px),RGBA(100,100,100,0.1) calc(100% - 1px), transparent calc(100% - 1px))
+		;
+	background-position: center center,top left,top left,top left;
+	background-repeat: no-repeat;
+	background-size: 60px 100%,100% 100%,100% 100%,100% 100%;
+	background-position-x: 110%,0,0,0;
+	animation: progressMoveOverlay 3s linear infinite;
+}
+.pubd-progress-right .pubd-progress-bar
+{/*进度条*/
+	position: absolute;
+	left:unset;
+	top:0;
+	right:0;
+}
+.pubd-progress .pubd-progress-text
+{/*进度文字*/
+	position: relative;
+	text-shadow: white 0 0 1px,white 0 0 1px,white 0 0 2px;
+}
+.pubd-select
+{/*下拉框*/
+	width: 100%;
+}
+.pubd-frame
+{/*窗口内框架*/
+	border: 1px solid #D5DFE5;
+	border-radius: 4px;
+	position: relative;
+	margin:10px 1px 1px 1px;
+	padding: 12px 5px 5px 5px;
+}
+.pubd-frame .pubd-frame-caption
+{/*窗口内框架标题*/
+	top:-10px;
+	left: 8px;
+	position: absolute;
+	padding-left: 2px;
+	padding-right: 4px;
+}
+.pubd-user-info
+{/*一个用户信息框*/
+	width: calc(100% - 12px);
+	min-width: 270px;
+	overflow: hidden;
+	height: 50px;
+	background-color: white;
+	border: 1px #888 solid;
+	border-radius: 5px;
+	padding: 5px;
+}
+.pubd-user-info .pubd-user-info-head
+{/*用户信息框头像*/
+	width:50px;
+	height:50px;
+	line-height: 50px;
+	display: inline-block;
+	top:0;
+	margin: 0;
+	padding: 0;
+	vertical-align:top;
+}
+.pubd-user-info .pubd-user-info-head img
+{/*用户信息框头像图片*/
+	max-width:50px;
+	max-height:50px;
+}
+.pubd-user-info-dl
+{/*用户信息框文字列表区域*/
+	height:50px;
+	line-height: 25px;
+	margin: 0;
+	padding: 0;
+	display: inline-block;
+	width : calc(100% - 50px);
+}
+.pubd-user-info-dl dt
+{/*用户信息框文字标题*/
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	left:0;
+	position:relative;
+	width : 40px;
+	height: 25px;
+	line-height: 25px;
+	vertical-align:top;
+	text-align: right;
+}
+.pubd-user-info-dl dt::after
+{/*用户信息框文字标题-冒号*/
+	content: "：";
+}
+.pubd-user-info-dl dd
+{/*用户信息框文字内容*/
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	left:0;
+	position:relative;
+	width : calc(50% - 40px);
+	height: 25px;
+	line-height: 25px;
+	vertical-align:top;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.pubd-user-info-dl .pubd-user-info-id-dt,.pubd-user-info-dl .pubd-user-info-name-dt
+{/*用户信息前两个标题*/
+	width : 45px;
+}
+.pubd-user-info-dl .pubd-user-info-illusts-dt,.pubd-user-info-dl .pubd-user-info-bookmarks-dt
+{/*用户信息后两个标题*/
+	width : 85px;
+}
+.pubd-user-info-dl .pubd-user-info-id-dd,.pubd-user-info-dl .pubd-user-info-name-dd
+{/*用户信息前两个内容*/
+	width : calc(100% - 185px);
+}
+.pubd-user-info-dl .pubd-user-info-illusts-dd,.pubd-user-info-dl .pubd-user-info-bookmarks-dd
+{/*用户信息后两个内容*/
+	width : 55px;
+}
+/*▼选项对话框相关*/
+.pubd-config
+{/*选项对话框宽度*/
+	width: 400px;
+	left: calc(50vw - 200px);
+	top: 120px;
+}
+.pubd-config input[type="text"],.pubd-config input[type="email"],.pubd-config input[type="password"],.pubd-config input[type="url"],.pubd-config textarea
+{/*文本输入框*/
+	height: 20px;
+padding: 0 4px;
+color: #333;
+font-size: 12px;
+border: 1px solid #becad7;
+	box-sizing: border-box;
+}
+.pubd-config .pubd-icon
+{/*选项对话框图标*/
+	background: url('https://material.io/tools/icons/static/icons/baseline-settings-20px.svg');
+}
+.pubd-tologin,.pubd-downscheme-new,.pubd-downscheme-remove,.pubd-rpcchk,.pubd-reset,.pubd-save
+{/*选项面板按钮*/
+	width: 80px;
+	margin-left: 5px;
+	box-sizing: border-box;
+}
+.pubd-browsing-restriction
+{/*访问P站设置的链接*/
+	float:right;
+}
+.pubd-token-info
+{/*token信息栏*/
+	transition: height 0.5s ease-in-out;
+	overflow: hidden;
+	height: 30px;
+}
+.pubd-config
+{/*设置初始宽度与高度*/
+	/*width: 400px;
+	height: 700px;*/
+}
+.pubd-config .pubd-token-expires
+{/*token进度条*/
+	top: 5px;
+	width: calc(100% - 87px);
+}
+.pubd-config .pubd-frm-downthis label,
+.pubd-config .pubd-frm-clicknotification label,
+.pubd-config .pubd-frm-termwisetype label
+{/*下载该画师窗口设置,点击通知设置,逐项发送设置*/
+	width: 50%;
+}
+
+.pubd-config .pubd-downscheme
+{/*下载方案下拉框*/
+	width: calc(100% - 170px);
+	box-sizing: border-box;
+}
+.pubd-config .pubd-selectscheme-bar
+{/*下载方案详细栏-dd*/
+	height: calc(100% - 389px);
+}
+.pubd-config .pubd-selectscheme
+{/*下载方案详细栏-frame*/
+	height: 100%;
+	box-sizing: border-box;
+}
+.pubd-config .pubd-selectscheme .pubd-frame-content
+{/*下载方案详细栏-frame-具体内容*/
+	height: 100%;
+	box-sizing: border-box;
+}
+.pubd-config .pubd-rpcurl
+{/*RPC地址*/
+	width: calc(100% - 85px);
+}
+.pubd-config .pubd-rpcchk-info
+{/*RPC地址检测信息*/
+	float: right;
+}
+.pubd-config .pubd-downfilter,.pubd-config .pubd-savedir,.pubd-config .pubd-savepath,.pubd-config .pubd-textout
+{/*下载目录与保存目录，文本输出格式*/
+	width: 100%;
+}
+.pubd-config .pubd-mask-name
+{/*自定义掩码-名*/
+	width: 100px;
+}
+.pubd-config .pubd-mask-logic
+{/*自定义掩码-逻辑条件*/
+	width: calc(100% - 165px);
+	margin-left: 5px;
+}
+.pubd-config .pubd-mask-content
+{/*自定义掩码-内容*/
+	width: 100%;
+}
+.pubd-config .pubd-textout-bar
+{/*文本输出模式格式-dd*/
+	height: calc(100% - 360px);
+	min-height: 32px;
+}
+.pubd-config .pubd-mask-list-bar
+{/*自定义掩码列表-dd*/
+	height: 71px;
+	box-sizing: border-box;
+}
+.pubd-config .pubd-textout,.pubd-config .pubd-mask-list
+{/*文本输出模式格式、掩码列表*/
+	resize: none;
+	min-height:32px;
+	height:100%;
+	box-sizing: border-box;
+}
+.pubd-config .pubd-mask-add,.pubd-config .pubd-mask-remove
+{/*自定义掩码-加减*/
+	padding: 0;
+	text-align: center;
+	width: 25px;
+	margin-left: 5px;
+	box-sizing: border-box;
+}
+.pubd-config .pubd-config-savebar
+{/*保存按钮栏*/
+	text-align: right;
+	margin-top: 5px;
+}
+.pubd-config .pubd-reset
+{/*重置按钮*/
+	float: left;
+}
+/*▲选项对话框相关*/
+/*▼登陆对话框相关*/
+.pubd-login
+{/*登陆对话框*/
+	left: calc(50vw - 180px);
+	top: 150px;
+	resize: none;
+}
+.pubd-login .dlg-content
+{/*登陆对话框内容*/
+	background: transparent;
+	border: none;
+	outline: none;
+	width: 363px;
+	text-align: center;
+}
+.pubd-login .logo-box
+{
+	margin-bottom: 40px;
+}
+.pubd-login .logo
+{
+	display: inline-block;
+	width: 180px;
+	height: 70px;
+	background: url("https://source.pixiv.net/accounts/assets/c31c0a3245d691c0b64af508293fa2f4.svg") no-repeat;
+	margin-bottom: 6px;
+}
+.pubd-login .catchphrase
+{
+	color: #757c80;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.pubd-login .input-field
+{
+	position: relative;
+	width: 300px;
+	padding: 0;
+	border: 1px solid #dfebf2;
+	background-color: #fff;
+	margin: 0 auto;
+	border-bottom: none;
+}
+.pubd-login .input-field:first-child
+{
+	border-radius: 4px 4px 0 0;
+}
+.pubd-login .input-field:last-child
+{
+	border-radius: 0 0 4px 4px;
+	border-bottom: 1px solid #dfebf2;
+}
+.pubd-login .input-field input
+{
+	width: 290px;
+	height: 40px;
+	color: #000;
+	display: block;
+	outline: 0;
+	margin: 0;
+	padding: 0;
+	padding-left: 10px;
+	line-height: normal;
+	border: none;
+	border-radius: 4px;
+}
+.pubd-login .error-msg-list
+{
+	list-style-type: none;
+	padding-left: 0;
+	margin: 8px auto;
+}
+.pubd-login .error-msg-list-item
+{
+	width: 280px;
+	background-color: rgba(0,0,0,.3);
+	margin: 0 auto;
+	margin-bottom: 2px;
+	padding: 13px 10px;
+	font-size: 14px;
+	line-height: 1.5;
+	color: #fff;
+	text-align: left;
+	border: none;
+	border-radius: 4px;
+}
+.pubd-login .submit
+{
+	display: block;
+	margin: 0 auto;
+	margin-bottom: 8px;
+	width: 300px;
+	height: 40px;
+	line-height: 40px;
+	background-color: #25c6ff;
+	color: #fff;
+	font-weight: 700;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	border: none;
+	border-radius: 4px;
+}
+.pubd-login .signup-form-nav
+{
+	list-style: none;
+	width: 300px;
+	margin: 0 auto;
+	color: #666;
+	font-size: 12px;
+	overflow: hidden;
+}
+/*▲登陆对话框内容*/
+/*▼下载当前画师窗口内容*/
+.pubd-downthis
+{/*下载当前画师*/
+	left: calc(50vw - 240px);
+	top: 180px;
+	width: 400px;
+}
+.pubd-downthis .pubd-icon
+{/*选项对话框图标*/
+	background: url('https://material.io/tools/icons/static/icons/baseline-get_app-24px.svg');
+}
+.pubd-dialog label
+{/*下载内容单选框*/
+	display: inline-block;
+}
+.pubd-downthis .pubd-down-content
+{/*下载内容单选框*/
+	width: 50%;
+}
+.pubd-downthis dt
+{/*中断按钮*/
+	position: relative;
+}
+.pubd-downthis .pubd-breakdown
+{/*中断按钮*/
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	padding: 0;
+	height: 19px;
+	line-height: 11px;
+	font-size:12px;
+}
+.pubd-downthis .pubd-downthis-log
+{/*下载日志*/
+	min-width: 100px;
+	min-height: 40px;
+	width : calc(100% - 10px);
+	height : 100px;
+resize:none;
+}
+.pubd-downthis .pubd-downthis-downbar
+{
+}
+.pubd-downthis .pubd-textdown
+{/*文本下载按钮*/
+	width: calc(20% - 5px);
+	height: 50px;
+	margin-right: 5px;
+	vertical-align: middle;
+}
+.pubd-downthis .pubd-startdown
+{/*开始下载按钮*/
+	width: 80%;
+	height: 50px;
+	font-size: 30px;
+	vertical-align: middle;
+}
+.pubd-downthis .pubd-downthis-textout-bar
+{
+	height : calc(100% - 400px);
+}
+.pubd-downthis .pubd-downthis-textout
+{/*文本输出*/
+	min-width: 100px;
+	min-height: 40px;
+	width : calc(100% - 10px);
+	height : 100%;
+	resize:none;
+}
+/*▲下载当前画师窗口内容*/
+}

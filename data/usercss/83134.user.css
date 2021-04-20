@@ -1,0 +1,259 @@
+/* ==UserStyle==
+@name           Customize Menu Bar for Theme
+@namespace      USO Archive
+@author         noisys
+@description    `Theme (skin) can be extended to the end of a screen, with a menu bar displayed.メニューバーを表示したまま、テーマ(スキン)を画面の端まで広げられます。*Please adjust using "toolbarspring" from customization of a ToolBar. ※アイコンの配置は、ツールバーのカスタマイズから「伸縮自在のスペース」を使って調整してください1.display MenuList @MouseOver(upper left)2.display MenuList @FullScreen1、左上にマウスを持っていくとメニューリストを表示2、フルスクリーン時にもメニューリスト表示=======================preparations=========================Uncheck menubar.[view-menu]-[toolbar]-[menubar]メニューバーのチェックを外す「表示」-「ツールバー」-「メニューバー」`
+@version        20160715.4.13
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown myurlbarwidth "Choose width of urlbar" {
+	500px "500px*" <<<EOT 500px EOT;
+300px "300px" <<<EOT 300px EOT;
+400px "400px" <<<EOT 400px EOT;
+600px "600px" <<<EOT 600px EOT;
+700px "700px" <<<EOT 700px EOT;
+max "max" <<<EOT none EOT;
+
+}
+@advanced dropdown mysearchbarwidth "Choose width of searchbar" {
+	300px "300px*" <<<EOT 300px EOT;
+200px "200px" <<<EOT 200px EOT;
+400px "400px" <<<EOT 400px EOT;
+500px "500px" <<<EOT 500px EOT;
+600px "600px" <<<EOT 600px EOT;
+700px "700px" <<<EOT 700px EOT;
+max "max" <<<EOT none EOT;
+
+}
+@advanced dropdown myurl_before "マウスオーバーでURLバーが長くなるまでの時間 Time until a URLBar becomes long by mouseover " {
+	1s "1s*" <<<EOT 1s EOT;
+0s "0s" <<<EOT 0s EOT;
+2s "2s" <<<EOT 2s EOT;
+3s "3s" <<<EOT 3s EOT;
+4s "4s" <<<EOT 4s EOT;
+5s "5s" <<<EOT 5s EOT;
+
+}
+@advanced dropdown myurl_after "URLバーが元に戻るまでの時間 Time until URL Bar returns " {
+	2s "2s*" <<<EOT 2s EOT;
+0s "0s" <<<EOT 0s EOT;
+1s "1s" <<<EOT 1s EOT;
+3s "3s" <<<EOT 3s EOT;
+4s "4s" <<<EOT 4s EOT;
+5s "5s" <<<EOT 5s EOT;
+
+}
+@advanced dropdown mysearch_before "マウスオーバーで検索バーが長くなるまでの時間 Time until a SearchBar becomes long by mouseover " {
+	1s "1s*" <<<EOT 1s EOT;
+0s "0s" <<<EOT 0s EOT;
+2s "2s" <<<EOT 2s EOT;
+3s "3s" <<<EOT 3s EOT;
+4s "4s" <<<EOT 4s EOT;
+5s "5s" <<<EOT 5s EOT;
+
+}
+@advanced dropdown mysearch_after "検索バーが元に戻るまでの時間 Time until Search Bar returns " {
+	2s "2s*" <<<EOT 2s EOT;
+0s "0s" <<<EOT 0s EOT;
+1s "1s" <<<EOT 1s EOT;
+3s "3s" <<<EOT 3s EOT;
+4s "4s" <<<EOT 4s EOT;
+5s "5s" <<<EOT 5s EOT;
+
+}
+@advanced dropdown mymenu_before "マウスオーバーでメニューが表示されるまでの時間 Time until a menu is visible by mouseover" {
+	0s "0s*" <<<EOT 0s EOT;
+1s "1s" <<<EOT 1s EOT;
+2s "2s" <<<EOT 2s EOT;
+
+}
+@advanced dropdown mymenu_after "メニューが元に戻るまでの時間 Time until a menu returns " {
+	1s "1s*" <<<EOT 1s EOT;
+0s "0s" <<<EOT 0s EOT;
+2s "2s" <<<EOT 2s EOT;
+
+}
+
+==/UserStyle== */
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+@-moz-document url(chrome://browser/content/browser.xul) {
+
+/*********************** not FullScreen ***************************/
+/* menu list */
+#toolbar-menubar{
+    z-index:9999!important;
+    overflow:visible!important;
+}
+
+/* tabsbar fixed */
+#titlebar-placeholder-on-TabsToolbar-for-captions-buttons{
+    display:none;
+}
+
+#file-menu,
+#edit-menu,
+#view-menu,
+#history-menu,
+#bookmarksMenu,
+#tools-menu,
+#helpMenu{
+    visibility:hidden !important;
+    transition:all /*[[mymenu_after]]*/ ease!important;
+}
+#menubar-items:hover #file-menu,
+#menubar-items:hover #edit-menu,
+#menubar-items:hover #view-menu,
+#menubar-items:hover #history-menu,
+#menubar-items:hover #bookmarksMenu,
+#menubar-items:hover #tools-menu,
+#menubar-items:hover #helpMenu{
+    visibility:visible !important;
+    transition:all /*[[mymenu_before]]*/ /*[[mymenu_before]]*/ ease!important;
+}
+
+/* Tab Bar */
+#TabsToolbar:not([inFullscreen="true"])[tabsontop="true"]{
+    padding-top:20px!important;
+}
+
+/* Selected Tab Title */
+#main-window:not([inFullscreen="true"])[chromemargin="0,2,2,2"] .tabbrowser-tab[selected="true"]:not([style^="transform"]):after { 
+    position: fixed; top: 13px; left: 0%;right:0%;
+    content: attr(label);
+    z-index:-100;
+    background: none;
+    opacity: 1;
+    margin:0 auto;
+    display:table-cell;
+    width:1000px!important;
+    text-align: center;
+    white-space: nowrap;  /*横幅のMAXに達しても改行しない */
+    overflow: hidden;  /*ハミ出した部分を隠す */
+    text-overflow: ellipsis;  /*「…」と省略 */
+} 
+
+/**************** in FullScreen ******************************/
+/* menu bar */ 
+#toolbar-menubar[inFullscreen],#menubar-items,#main-menubar{
+    min-width:400px!important;
+    min-height:25px!important;
+}
+#main-window[inFullscreen="true"] #toolbar-menubar{
+    visibility:visible !important;
+    overflow:visible !important;
+}
+
+/******************** MouseOver Bar ***************************/
+/* URL Bar */ 
+#urlbar{
+    background-color: rgba(255, 255, 255, 0.1)!important;
+    transition:all /*[[myurl_after]]*/ ease!important;
+}
+#urlbar:hover{
+    background-color: rgba(255, 255, 255, 0.5)!important;
+    transition:all /*[[myurl_before]]*/ ease!important;
+}
+#urlbar-container{
+    max-width:/*[[myurlbarwidth]]*/ !important;
+    transition:all  /*[[myurl_after]]*/ /*[[myurl_after]]*/ ease!important;
+}
+#urlbar-container:hover{
+    max-width:100%!important;
+    transition:all  /*[[myurl_before]]*/ /*[[myurl_before]]*/ ease!important;
+}
+
+
+/* Search Bar */
+.searchbar-textbox{
+    background-color: rgba(255, 255, 255, 0.1)!important;
+    transition:all /*[[mysearch_after]]*/ ease!important;
+
+}
+.searchbar-textbox:hover{
+    background-color: rgba(255, 255, 255, 0.5)!important;
+    transition:all /*[[mysearch_before]]*/ ease!important;
+}
+#search-container{
+    max-width:/*[[mysearchbarwidth]]*/ !important;
+    transition:all  /*[[mysearch_after]]*/ /*[[mysearch_after]]*/ ease!important;
+}
+#search-container:hover{
+    max-width:100%!important;
+    transition:all  /*[[mysearch_before]]*/ /*[[mysearch_before]]*/ ease!important;
+}
+
+
+/******************** ToolBar icon *****************************/
+/* toolbarbutton */
+toolbarbutton:not(.titlebar-button){
+    margin: 0 0.5px !important; 
+    padding: 0 !important;
+}
+toolbarbutton dropmarker{
+    padding: 0.5px !important;
+}
+
+
+/************************tabs on bottom****************************/
+
+#toolbar-menubar{
+    -moz-box-ordinal-group: 0 !important;
+}
+#TabsToolbar:not([inFullscreen="true"]){
+    -moz-box-ordinal-group: 3 !important;
+}
+#nav-bar:not([inFullscreen="true"]){
+    -moz-box-ordinal-group: 1 !important;
+    background:none!important;
+    border:none!important;
+    box-shadow:none!important;
+}
+#PersonalToolbar{
+    -moz-box-ordinal-group: 2 !important;
+}
+
+/*********************** PanelUI ******************************/
+#PanelUI-button{
+    background:none!important;
+    height:30px!important;
+    width:30px!important;
+    position:fixed;
+    top:7px;
+    left:0;
+}
+#PanelUI-menu-button{
+    list-style-image:url("chrome://branding/content/icon16.png")!important;
+    padding:0px 10px 0px 10px!important;
+    margin:0!important;
+    height:30px!important;
+    width:30px!important;
+    -moz-image-region: rect(0px, 20px, 20px, 0px)!important;
+}
+#main-menubar{
+    padding-left:30px!important;
+}
+
+/**************** Fix windows7 **************************/
+#main-menubar,
+#PersonalToolbar,
+#TabsToolbar,
+#browser-bottombox
+{
+    background-color:transparent!important;
+    background-image:none;
+    border:none!important;
+    text-shadow:none!important;
+}
+#PersonalToolbar{
+    background-image:none !important;
+}
+
+/**************** Fix Theme skin ************************/
+#main-window[sizemode="maximized"]{
+  background-position: right 0px top 7px;
+}
+#main-window[sizemode="normal"]{
+  background-position: right 0px top 2px;
+}
+
+}/* end */

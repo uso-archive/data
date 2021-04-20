@@ -1,0 +1,137 @@
+/* ==UserStyle==
+@name           autohide the menu & sidebar [Detroit Free Press]
+@namespace      USO Archive
+@author         hideheader
+@description    `Auto-hides the page header, page footer, and sidebar; mouse over the blue placeholder to restore it. Hides ads, ad-like syndicated content (like Taboola), and other ad-like nuisances.For old/archived articles. For new articles, there is this: style 67653.`
+@version        20150111.0.24
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@-moz-document domain("freep.com") {
+
+/* - - - - - transitions - - - - - */
+  .header-container, .footer-container, .ody-aside,
+  .header-container:not(:hover) > *, .footer-container:not(:hover) > * {
+    -webkit-transition-duration: .5s;
+    transition-duration: .5s;
+    -webkit-transition-delay: 1s;
+    transition-delay: 1s;
+
+    -webkit-transition-property: clip, background, border-right-width;
+    transition-property: clip, background, border-right-width;
+    -webkit-transition-timing-function: linear, step-end, step-end;
+    transition-timing-function: linear, step-end, step-end;
+  }
+  .header-container:hover, .footer-container:hover, .ody-aside:hover {
+    -webkit-transition-delay: 0s;
+    transition-delay: 0s;
+
+    -webkit-transition-timing-function: linear, step-start, step-start;
+    transition-timing-function: linear, step-start, step-start;
+  }
+  .header-container:not(:hover) > *, .footer-container:not(:hover) > * {
+    visibility: hidden;
+    -webkit-transition-property: visibility;
+    transition-property: visibility;
+  }
+
+/* - - - - - autohide header - - - - - */
+  .header-container {
+    position: fixed !important; top: 0; left: 0;
+    z-index: 2; /* else FLOATs are on top */
+    min-width: 100%;
+    clip: rect(0, 1600px, 1600px, 0);
+  }
+  .header-container:not(:hover) {
+/*    clip: rect(0, 16px, 16px, 0);*/
+/*    background: left top no-repeat url("http://www.freep.com/favicon.ico") !important;*/
+    clip: rect(0,3mm, 15mm, 0);
+    background-color: lightblue !important;
+  }
+
+
+/* - - - - - autohide footer - - - - - */
+  BODY {position: relative}
+  .footer-container {/*TODO shrink the absurdly large footer*/
+    position: absolute !important; bottom: 0; left: 0;
+    z-index: 1;
+    min-width: 100%;
+    clip: rect(0, 1600px, 1600px, 0);
+  }
+  .footer-container:not(:hover) {
+    background: left bottom no-repeat url("http://www.freep.com/favicon.ico") !important;
+    clip: rect(824px, 16px, 840px, 0);
+    clip: rect(-webkit-calc(840px - 16px), 16px, 840px, 0);
+  }
+
+
+/* - - - - - autohide sidebar - - - - - */
+  .ody-aside {
+    position: fixed !important; left: 0 !important; top: 0;
+    margin-top: 0 !important;
+    height: 100%; overflow-y: scroll;
+    width: -moz-calc(320px + 17px) !important;
+    z-index: 1;
+    border-right: 0 dotted lightblue;
+    transition-property: left, background, border-right-width;
+  }
+  .ody-aside:hover {
+    background: white;
+  }
+  .ody-aside:not(:hover) {
+    left: -moz-calc(-320px - 17px) !important;
+    border-right-width: 3mm;
+  }
+
+/* - - - - - no ads - - - - - */
+  [id*="sponsor"], [class*="sponsor"],
+  [class*="leaderboard"] {display: none !important}
+
+/* - - - - - no comment - - - - - */
+  [id*="comment"], [class*="comment"] {display: none !important}
+
+/* - - - - - no nonsense - - - - - */
+  /* move superfluous photo to end of article */
+  #article-bodytext {position: relative}
+  #ody-mainphoto {position: absolute !important; bottom: 0; border: thin solid magenta;}
+  #ody-mainphoto ~ DIV:nth-last-of-type(2) {
+    margin-bottom: 459px !important;
+    position: static !important; /*#ody-nextstoryslider is fixed*/
+  }
+    /*459px = 534w × 401h in 640w x 401h box, 1 line text */
+    /*407px = 640w × 346h in 640w x 346h box, 2 line text */
+    /*486h = 640w x 427h (6x4") in 640w x 486h, 2 line text
+  #ody-nextstoryslider {border: thin solid lightblue !important}
+
+  /* move superfluous video to end of article */
+  #article-bodytext {position: relative}
+  #ody-video {position: absolute !important; bottom: 0; border: thin solid magenta;}
+  #ody-video ~ DIV:nth-last-of-type(2) {padding-bottom: 434px}
+    /* 434px = 640w x 360h, 3 lines text */
+  #ody-nextstoryslider {border: thin solid lightblue !important}
+
+  /* move byline to right of article text */
+  #article-bodytext > .ody-bo-sm {
+    float: right !important;
+    width: 0 !important; overflow: visible !important;
+  }
+  .ody-skin .ody-article P {padding-left: 0 !important}
+  .ody-skin .ody-article .ody-bo-sm .ody-byline {
+  /*TODO not working - byline isn't displayed */
+/*    float: right;*/
+    width: 138px !important;
+  }
+
+  /* move inline sidebar to right of text */
+  #article-bodytext {overflow: visible !important}
+  #ody-asset-breakout {
+    float: right !important;
+    width: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+@-moz-document url("http://www.freep.com/") {
+  .header-container {position: static}
+  .header-container:not(:hover) > * {visibility: inherit}
+}

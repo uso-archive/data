@@ -1,0 +1,313 @@
+/* ==UserStyle==
+@name           Autohide the menu & sidebar [CNET | Download.com]
+@namespace      USO Archive
+@author         hideheader
+@description    `<ul><li>The page header and footer are reduced to thin horizontal strips at the top and bottom of the screen - mouse over them, and they expand again. <li>On most pages the right sidebar is reduced to a thin vertical strip and moved to the left edge of the screen - mouse over the strip to expand the sidebar. (In software reviews, user reviews are parked there instead.) <li>The CNET toolbar is moved from the bottom of the screen to the end of the page. Forgotten, but not gone.`
+@version        20131119.10.16
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@-moz-document domain("cnet.com") {
+
+ /* - - - - - auto-hide header - - - - - */
+/*-- #rbHeader {
+  position: fixed;
+  z-index: 1;
+  background-color: blue !important;
+ }
+ #rbHeader:not( :hover ) {
+  clip: rect(0px 9999px 3mm 0px);
+  opacity: 0.2;
+ }
+ #rbHeader:not( :hover ) > * { visibility: hidden !important }--*/
+
+/** transitions **/
+#rbHeader, #contentAux,
+#userOpinions  {
+  position: fixed !important; left: 0; top: 0;
+  border-left: 2.5mm solid red !important;
+  transition-duration: 0.2s;
+  transition-delay: 0.8s;
+  transition-property: clip, border-left-width;
+  transition-timing-function: linear, step-end;
+  }
+#rbHeader:hover, #contentAux:hover,
+#userOpinions:hover {
+  border-left-width: 0 !important;
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+  }
+
+/** autohide the header **/
+#rbHeader {
+  z-index: 1;
+  z-index: 4; /*else sidebar is on top*/
+  clip: rect(0, 2mm, 15mm, 0);
+  overflow: hidden !important;
+  }
+#rbHeader > * {overflow: hidden !important}
+#rbHeader:hover {
+  clip: rect(0, 980px, 88px, 0); /**/
+  clip: rect(0, 980px, 132px, 0); /* download.cnet: 940x132h */
+  }
+
+/** autohide the sidebar **/
+#contentAux {
+  z-index: 3; /*else FIGURE is on top*/
+  margin: 0px !important;
+  height: 100%; overflow-y: auto;
+  width: 318px !important; /* assumes 18px scroller */
+  background-color: white;
+  clip: rect(0, 2mm, 9999px, 0);
+  border-left-color: blue !important;
+ }
+#contentAux:hover {
+  clip: rect(0, 325px, 9999px, 0);
+  }
+ARTICLE ~ #contentAux:hover { z-index: 5100001 }
+  /* on top of CNET toolbar when open */
+
+
+/* - - - - - auto-hide footer - - - - - */
+ BODY {position: relative}
+/* FOOTER {
+  position: fixed; bottom: 0px;
+  overflow-y: hidden;
+}
+ FOOTER:not( :hover ) {
+  height: 3mm;
+  opacity: 0.2;
+ }*/
+FOOTER#rbFooter {
+  position: fixed; bottom: 0;
+  overflow-y: hidden;
+  clip: rect(0, 1920px, 9999px, 0);
+  height: 20mm;
+}
+ FOOTER#rbFooter:not( :hover ) {
+  height: 20mm;
+  clip: rect(0, 2mm, 9999px, 0);
+ }
+
+
+ #cnetToolbarWrap { position: absolute !important }
+  /* force floating CNET toolbar to bottom of page */
+
+ #rbHeader:hover, FOOTER:hover { z-index: 5100001 }
+  /* these overlay CNET personal menu bar (#cnetToolbarWrap) when expanded */
+
+
+/** no ads **/
+#omnibarAd,
+#leaderboard, .leaderboard, .leaderBoard, .leaderboardBottom,
+.ad,
+[class*="promo"], [id*="_ads_"],
+.ad-leader-bottom,
+.bidwar,
+
+/** no comment **/
+#livefyreConversation, /* new comments popup */
+.livefyreFooter,
+.commentTeaser,
+
+/** no social **/
+#mostPopular .count,
+/*#mostPopular > UL > LI > DIV*/
+#globalSocialPromoWrap, /* social popup */
+.shareBar,
+
+.postByline > A[rel="author"],
+.postByline > #nameAndTime > MENU,
+.editorBio,
+
+/** no syndicated content **/
+#nrelate_related_placeholder,
+
+.\. {display:none!important}
+
+/*#mostPopular > UL > LI {
+  min-height: 0 !important;
+  }
+#mostPopular > UL > LI > A {
+  float: none !important;
+  }*/
+
+}
+
+
+
+@-moz-document url("http://www.cnet.com/") {
+
+ HEADER, FOOTER { z-index: 101 }
+  /* overlay the "Share" buttons when collapsed */
+
+}
+
+
+
+@-moz-document domain("download.cnet.com") {
+
+ #rb_skin .skinClick {display: none !important}
+  /* else can't click links in category pages when style enabled */
+
+#rbHeader {z-index: 2}
+#contentAux {z-index:1}
+#userOpinions {z-index: 1}
+  /* else  #topStories>.subStoryMain>span is on top */
+
+#rbHeader:hover,
+#contentAux:hover,
+#userOpinions:hover {z-index: 5100001}
+  /* so they overlay CNET toolbar when open */
+
+#contentAux {
+ clip: rect(15mm, 2mm, 30mm, 0);
+ border-left-color: lightblue !important;
+}
+
+/** fix footer overflow issue **/
+.footWrap {
+  padding: 0 !important;
+  display: inline !important;
+  }
+.rbFooterCopy {width: auto !important}
+
+
+ #floatingDLCTABar {display: none !important}
+  /* suppress "Download Now" floating toolbar */
+
+ /* "Software Publisher Profile" */
+ #leftNav { /* "Narrow Results" sidebar */
+  position: fixed; left: 0px; top: 0px;
+  margin: 0px !important; padding: 0px !important;
+  max-height: 100%; overflow-y: auto;
+ }
+ #leftNav:not( :hover ) { clip: rect(0px 3mm 9999px 0px) }
+
+ /* download categories: "Windows Browsers", i.e. */
+/*-- #main > .__nav { /* "Narrow Results" sidebar */
+/*--  position: fixed !important; left: 0px; top: 0px;
+  margin: 0px !important;
+  width: auto !important;
+  max-height: 100%; overflow-y: auto;
+  overflow-x: visible;
+ }
+ #main > .__nav:not( :hover ) { clip: rect(0px 3mm 9999px 0px) }
+ #main > .__nav:not( :hover ) > * { visibility: hidden }
+ #main > .__nav:hover {
+  background-color: white;
+ }--*/
+
+ #centerColumn, /* with #leftNav */
+ BODY.pageType3260 #main > SECTION /* "Software Publisher Profile" */
+ {float: none !important }
+  /* left-align main content */
+  
+ #rb_content { /* "Windows downloads" */
+  position: static !important;
+ }
+ /* BUG: "Categories" menus in sidebar are clipped in "Windows downloads" */
+
+
+ /* - - - - - auto-hide comments - - - - - */
+ #submitOrUpdateArea { display: none }
+  /* prevent comment submission */
+ 
+ #userOpinions {
+  position: fixed; left: 0px; top: 0px;
+  height: 100%; overflow-y: scroll;
+  width: 50%; /*--min-width: 5in;--*/resize: horizontal;
+  background-color: white;
+  padding: 0em 1em !important;
+  clip: rect(0, 1000px, 9999px, 0);
+ }
+ #userOpinions:not( :hover ) {
+  clip: rect(0, 2mm, 9999px, 0);
+  border-left: 2.5mm solid blue !important;
+ }
+/*-- #userOpinions:hover {
+  background-color: white;
+  z-index: 2; /* on top of header, footer when expanded */
+/*-- }--*/
+}
+
+
+
+@-moz-document domain("news.cnet.com") {
+
+#rbHeader, #contentAux:hover, #rbFooter:hover {z-index: 14}
+#contentAux, #rbFooter {z-index:13}
+  /* else  #topStories>.subStoryMain>span is on top */
+
+.comments {display:none!important}
+}
+
+
+
+@-moz-document domain("reviews.cnet.com") {
+
+ /* - - - - - auto-hide header - - - - - */
+/*-- #leaderboard { display: none !important }--*/
+
+ HEADER, FOOTER { z-index: 11 }
+  /* else "Don't Miss" pictures are on top */
+ 
+/* - - - - - auto-hide related content sidebar - - - - - */
+ #contentNav {
+  position: fixed; left: 0px; top: 0px;
+  height: 100%; overflow-y: auto;
+  z-index: 1;
+  margin: 0px !important;
+  padding: 0px 0.5em !important;
+  width: auto !important; max-width: 2.5in;
+ }
+ #contentNav:not( :hover ) { clip: rect(0px 3mm 9999px 0px) }
+ #contentNav:not( :hover ) > * { visibility: hidden }
+ #contentNav:hover {
+  background-color: beige;
+ }
+ #contentNav:hover { z-index: 5100001 }
+  /* these overlay CNET personal menu bar (#cnetToolbarWrap) when expanded */
+}
+
+
+@-moz-document domain("download.cnet.com")
+, domain("news.cnet.com")
+, domain("reviews.cnet.com")
+, domain("howto.cnet.com") {
+
+ /* - - - un-autohide article header (also a HEADER element) - - - */
+/*
+ #contentBody HEADER {
+  position: static !important;
+  background-color: transparent !important;
+  opacity: 1 !important;
+ }
+ #contentBody HEADER > * { visibility: visible !important }
+*/
+
+ /* - - - - - auto-hide right sidebar on left edge - - - - - */
+ /* ARTICLE ~ #contentAux in articles, */
+ /* SECTION ~ #contentAux in "News" home page */
+/*-- ARTICLE ~ #contentAux {
+  position: fixed; left: 0px; top: 0px;
+  margin: 0px !important;
+  max-height: 100%; overflow-y: auto;
+  width: 318px !important; /* assumes 18px scroller */
+/*--  background-color: white;
+ }
+ ARTICLE ~ #contentAux:not( :hover ) {
+  clip: rect(0, 2mm, 9999px, 0);
+  border-left: 2.5mm solid blue !important;
+  }
+ ARTICLE ~ #contentAux:not( :hover ) > * { visibility: hidden }
+ ARTICLE ~ #contentAux:hover { z-index: 5100001 }
+  /* on top of CNET toolbar when open */
+
+  /* - - - - - suppress comments - - - - - */
+  #fixedCommentBox { display: none !important }
+   /* no comment submissions */
+  #postComments { display: none !important }
+   /* no comment display */
+  
+}

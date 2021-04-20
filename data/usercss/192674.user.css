@@ -1,0 +1,144 @@
+/* ==UserStyle==
+@name           Bilibili收藏夹美化
+@namespace      USO Archive
+@author         xdcedar
+@description    `更好看更好用的Bilibili收藏夹`
+@version        20210415.7.51
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@-moz-document regexp("https://space.bilibili.com/\\d+/favlist.*") {
+/* ====== 用户收藏页面 ====== */
+/* 收藏夹sidenav扩展为全长 */
+#page-fav .fav-sidenav {
+    width: 100%;
+}
+
+/* 收藏夹列表容器 */
+#page-fav .fav-sidenav .fav-list-container {
+    max-height: 300px;
+}
+
+/* 收藏夹列表. grid布局. 右侧留出15px给滚动条 */
+#page-fav .fav-list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    justify-content: stretch;
+    margin-right: 15px;
+}
+/* 默认收藏夹不在 .fav-list 中, 宽度要单独调整以与 .fav-list>li 保持统一
+   计算方式是: (全长100% - 在.fav-list右侧有15px的margin留给了滚动条) / 4列的收藏夹布局 - 20px的padding
+   然后化简. */
+#page-fav .fav-list-container>.fav-item {
+    width: calc(25% - 15px / 4 - 20px);
+}
+
+/* 收藏夹项目. 内部是flex布局 */
+#page-fav .fav-item {
+    display: flex;
+    align-items: center;
+}
+
+/* 收藏夹文字宽和高. 只涉及视频收藏夹(.fav-container), 不涉及专项收藏夹(即话题收藏夹 专栏收藏夹etc)(.playlist-container)
+   原本采用 calc 确定长度 width: calc(100% - 10px - 32px - 32px);
+   计算方法为: 全长100% - B站设置的marin-right:10px - 收藏视频数.num的宽度32px - 菜单项.be-dropdown的宽度32px,
+   现在改为 flex-grow: 1 自动填满多余空间 */
+#page-fav .fav-container .text {
+    line-height: 35px;
+    flex-grow: 1;
+}
+/* 收藏夹的收藏视频数. 宽度改为不固定, 配合上面的 flex-grow 可以留出更多空间显示收藏夹的名字 */
+#page-fav .fav-sidenav .num {
+    width: auto;
+    margin-right: 5px;
+}
+
+/* 鼠标在收藏夹上悬浮时, 收藏夹显示的视频收藏数保持显示 */
+#page-fav .col-full.master .fav-container .fav-item:hover .num {
+    display: inline-block;
+}
+
+/* 视频区域. 设置宽度, 设置border-top以此分割收藏夹列表 */
+#page-fav .fav-main {
+    width: 100%;
+    border-top: 10px solid #eee;
+    /* border-top: 10px solid rgba(196, 229, 255, 0.4); */
+}
+
+/* 视频列表. grid布局 */
+#page-fav .fav-main .fav-video-list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    row-gap: 20px;
+}
+/* 视频列表项. 记得去掉奇葩的第五个视频无margin-right的设置, 底部的20px的margin也去掉 交给row-gap实现 */
+#page-fav .fav-main .small-item,
+#page-fav .fav-main .small-item:nth-child(5n) {
+    margin: 0px 5px;
+    justify-self: center;
+}
+}
+
+@-moz-document url-prefix("https://www.bilibili.com/video/") {
+/* ====== 视频收藏界面 ====== */
+/* 收藏弹窗. 宽度拉宽指定长度(本想设置成可变长度的70vw, 但效果不太好) */
+.collection-m {
+    width: 950px;
+}
+/* 收藏弹窗中收藏列表的高度 (暂时不改) */
+/* .collection-m .content {
+    min-width: 300px;
+    max-width: 50vh;
+} */
+
+/* 收藏列表的container. 不需要设置最大高度 */
+.collection-m .content .group-list {
+    max-height: unset;
+}
+/* 收藏列表. 采用grid布局 */
+.collection-m .content .group-list ul {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 2px;
+    justify-content: stretch;
+}
+/* 收藏夹列表项 */
+.collection-m .content .group-list li {
+    height: 25px;
+    padding: 3px 10px;
+}
+
+/* 收藏夹项目. 内部是flex布局 */
+.collection-m .content .group-list li label {
+    display: flex;
+    align-items: center;
+}
+/* 勾选框. 右侧.fav-title的间距, 加上min-width才能防止标题过长时把它挤扁 */
+.collection-m .content .group-list li input[type=checkbox] + i {
+    margin-right: 10px;
+    min-width: 20px;
+}
+/* 收藏夹标题最大长度, 其实它的最大长度是由其它元素动态决定的 设置了的效果反而更差 */
+/* .collection-m .content .group-list li .fav-title {
+    max-width: 150px;
+} */
+/* 收藏夹的[私密]tag. 防止它在标题过长时被挤扁换行 */
+.collection-m .content .group-list li label .personal {
+    white-space: nowrap;
+}
+/* 收藏夹的已收藏数量. 用 margin-left: auto 让其自动居右侧 */
+.collection-m .content .group-list li label .count {
+    margin-left: auto;
+}
+
+/* 确定按钮 */
+.collection-m .bottom .btn {
+    position: absolute;
+    right: 40px;
+}
+/* 新建收藏夹的输入框 */
+.collection-m .content .group-list .add-group {
+    position: absolute;
+    bottom: 18px;
+}
+}

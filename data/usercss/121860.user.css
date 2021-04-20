@@ -1,0 +1,720 @@
+/* ==UserStyle==
+@name           Thunderbird - Chris' CLEAN ADAPTION no1
+@namespace      USO Archive
+@author         chrissi4u
+@description    `A very cleaned-up style for the User Interface only. Inspired by Material design, Outlook and Postbox. Affects the main-interface and the calendar/lightning add-on.Detailed description and comments inside the CSS. Please read the additional information here, or the one inside the code.Updated (1) 15.Dec.2015 - force white titlebar also with cuxtom visual styles.`
+@version        20151215.14.5
+@license        CC-BY-NC-4.0
+@preprocessor   uso
+==/UserStyle== */
+/* Do not remove the @namespace line -- it's required for correct functioning */
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+@namespace xul "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+
+
+/* Title: Chris' CLEAN ADAPTION no1 */
+/* Author: Chris, E-mail: chrissi4u@gmail.com */
+/* Creation date: 14. Nov. 2015 */
+
+
+/* IMPORTANT INFOS:
+
+	! Hiding the menus like in the preview is NOT FORCED through this CSS, although possible, because in some calendar dialogs it could not be revoced by pressing [Alt].
+	! When using this CSS only as 'userChrome.css' instead as a style for 'Stylish', the titlebar tabs overlap a little. I don't know why, but I guess 'Stylish' is adding some minor tweaks itself.
+	! I left some double-declarations like font-weight:normal and more... in case something is to 'uniform', so you don't have to search for the styles in the 1000+1 CSS'.
+
+	To make the UI look like in the preview, I changed the following manually:
+	* View > Bars > Menubar : disabled
+	* View > Dayplan > Show Dayplan : activated (and below...)
+	* View > Dayplan > Show nothing : activated
+
+	Fonts:
+	* For readability I use Ubuntu > Droid Sans > Verdana > Arial. If you want to use the smaller Segoe UI or Tahoma, increase the main * font-size to 11pt. Most other sizes are relatively in %.
+	* I force font-smoothing (should be webkit^^), allthough I don't really see a difference.
+	* All 'bold' texts are set to 'normal', but some Add-ons force their own fonts and rules.
+	* After some testing, I recommend using Ubuntu. You only need the 'normal' (400) font.
+		Get it here: https://www.google.com/fonts#UsePlace:use/Collection:Ubuntu
+
+	Add-ons:
+	* I use the add-on 'Mail Summaries' for the home-tab.
+		Get it here: https://addons.mozilla.org/de/thunderbird/addon/mail-summaries/
+	* I use Enigmail PGP and changed their notification-font in the 'New Message' window to a darker red, not bold.
+
+	Userstyles.org and other sources:
+	* Implemented and slightly modified 'THUNDERBIRD - CLEAN NOTIFICATION ALERTS' from the author 'r-a-y'.
+		Details: https://userstyles.org/styles/102949/thunderbird-clean-notification-alerts
+	* Implemented and slightly modified 'Pretty Lables' from the author 'gist'.
+		Details: https://gist.github.com/eriwen/757944
+	* Implemented some cool tweaks from the author 'eriwen'.
+		Details: http://www.eriwen.com/css/tweaking-thunderbirds-chrome/
+	* Quite some solutions come from the authors of 'thunderbird-mail.de'.
+		Details: https://www.thunderbird-mail.de/
+
+	... and a lot of other things I can't remember where I found it. Big thanks to all!
+
+	So, I hope you like it^^ - do PRIVATELY whatever you want with this Style. If you want to use this Style commercially, then contact me via: chrissi4u(at)gmail.com
+
+	Greetings, Chris
+
+*/
+
+
+/* INTREFACE STRUCTURE (not exactly the same for calendar/lightning):
+
+	| #titlebar (window-titlebar with minimize, maximize/restore, close)
+	-------------------------------------------------------------------------------------------
+	| .tabmail-tabs (top container for tabs: local folders, calendar, task, add-on manager)
+	| .tabmail-tab | .tabmail-tab | .tabmail-tab ... (single tabs)
+	-------------------------------------------------------------------------------------------
+	| #tabmail-container (sounds false, but holds everything BELOW the .tabmail-tabs)
+	-------------------------------------------------------------------------------------------
+	| toolboxes (different names in different dialogs, they are holding the buttons):
+	| 1) #mail-toolbox (main window, whole container)
+	| 1.1) .mail-toolbox (holding only the buttons)
+	| 1.2) #composeToolbar2 (Write message...)
+	| 1.3) #ab-bar2 (Addressbook)
+	| 2) #event-toolbox (calendar/lightning)
+	| 2.1) #event-toolbar (New event, New task)
+	-------------------------------------------------------------------------------------------
+	| Buttons inside the toolboxes:
+	| .toolbar-button, .toolbar-button-1 (standardbutton depending on the dialog)
+	| .toolbarbutton (checked = On-Off)
+
+*/
+
+
+/* CSS-STRUCTURE:
+
+	* Fonts and Fixes
+	* Basic Cleanup and Removes
+	* Titlebar
+	* Tabs
+	* Mainwindow
+	* Toolbox + Buttons
+	* Mixed UI dialogs and settings
+	* Foldertree Basic
+	* Foldertree: Accounts + Folders
+	* Messages
+	* Pretty Labels
+	* Clean Notification Alerts
+	* Calendar + Lightning CleanUp
+	* Last Orders
+
+*/
+
+
+/* COLORS USED:
+
+	Dividers and lines: light grey-blue = #a9b7c9
+	Tabs ACTIVE: grey-blueish = #f2f2f5
+	Tab-borders ACTIVE: orange = #ffcc66
+	Tab-borders HOVER: blue = #4fa6fd
+	Text for inactive tabs: dark-grey = #747373
+	Toolboxes holding the big buttons: typical grey = #f2f2f5
+	Big buttons HOVER effects: light-blue = #c1dbfc
+	On-Off buttons ('checked'): even lighter blue = #d0e1f5
+	Enigmail GPG warnings: dark red = #f00000
+	Accounts and Folders with NEW messages: dark-blue = #034675
+	Unread messages background: light-orange = #ffd98e
+	Replied messages background: light-green = #CCFFCC
+	... plus some personal preferences for close-buttons, deleted IMAP messages and calendar:today backgrounds
+
+*/
+
+
+
+/* ============================================================================ */
+/* Fonts and Fixes */
+
+* {
+	font-family: Ubuntu, 'Droid Sans', Verdana, Arial !important; /* For 'Segoe UI' or Tahoma change the font-size to 11pt */
+	font-size: 10pt !important;
+	font-weight: normal !important;
+	-webkit-font-smoothing: antialiased !important;
+}
+
+/* Increase small fonts a little */
+small {
+	font-size: 90% !important;
+}
+
+/* Remove dotted line around tab lables. Don't know why they appeared. */
+a, a:link, a:hover, a:active, a:focus, a:visited {
+	outline:0 !important;
+}
+
+
+
+/* ============================================================================ */
+/* Basic Cleanup and Removes */
+
+/* Remove ALL gradient-background-images first, some (for arrows) are forced back later */
+* {
+	background-image: none !important;
+}
+
+/* Remove ALL shadows under toolbars */
+* {
+	box-shadow: none !important;
+}
+
+/* Remove the throbber */
+#throbber-box {
+	display: none !important;
+}
+
+/* Make ALL button-icons a little lighter */
+.toolbarbutton-icon {
+	opacity: 0.7 !important;
+}
+
+
+/* ============================================================================ */
+/* Titlebar */
+
+/* The titlebar is currently white, but I prefer to force it in case the change it in future versions */
+#titlebar,
+#titlebar-content,
+#titlebar-spacer
+{}
+
+#navigation-toolbox
+{
+	background-color: #ffffff  !important;
+}
+
+
+
+/* ============================================================================ */
+/* Tabs */
+
+/* This is the whole container for all tabs */
+.tabmail-tabs { 
+	margin-top: 0px !important;
+	margin-left: -16px !important; /* Starting directly at left window border. 15px was standard + 1px boder */
+	margin-bottom: 0px !important; /* Margin-bottom 0 leves a light pseudo-divider below the tabs. Move -1px down to remove it. */
+}
+
+/* Remove rounded corners from tabs */
+.tab-background-start,
+.tab-background-end
+{
+	display: none;
+}
+
+/* Remove icons from tabs, there are not so many... */
+.tab-icon-image {
+	visibility: hidden !important;
+}
+
+/* FIX 1/3 for overlapping tabs */
+.tab-background {
+	margin: 0;
+}
+/* FIX 2/3 for overlapping tabs, also removes the vertical dividers inbetween. */
+.tabmail-tab:before { 
+	display: none !important;
+}
+/* FIX 3/3 for overlapping tabs (margin) */
+.tab-background-middle {
+	background: transparent !important; /* See the below defined tab-color */
+	margin: 0 !important;
+}
+
+/* This is the height for the tabs */
+.tabmail-tab {
+	height: 46px;
+}
+
+/* Single tabs 'active - inactive - hover. Colors used: orange = #ffcc66, blue = #4fa6fd */
+/* This is the active tab */
+.tabmail-tab[selected="true"] .tab-background {
+	background-color: #f2f2f5;
+	border-bottom: solid #ffcc66 3px; 
+	border-top: 1px solid #a9b7c9;
+	border-right: 1px solid #a9b7c9;
+	border-left: 1px solid #a9b7c9;
+	/* Remove doubble-borders between tabs */
+	margin-left: -1px !important;
+	margin-right: -1px !important;
+}
+
+/* This is the inactive tab on hover */
+.tabmail-tab:hover:not([selected]) .tab-background {
+	border-bottom: solid #4fa6fd 3px;
+	border-top: 1px solid #eeeeef;
+	border-right: 1px solid #eeeeef;
+	border-left: 1px solid #eeeeef;
+ }
+
+/* Text for inactive tabs */
+.tabmail-tab:not([selected]) .tab-text {
+	color: #747373 !important;
+}
+
+/* Close button on tabs... */
+
+/* Show only on mouseover and active tab */
+.tabmail-tab:not([selected]) .tab-close-button {
+	visibility: hidden !important;
+}
+.tabmail-tab:not([selected]):hover .tab-close-button {
+	visibility: visible !important;
+}
+
+/* Replaced the standard 'x', because the ugly close-button is hardcoded and base64 images are somehow not working for mouseover */
+.tab-close-button {
+	border: 2px solid #d0d0d0 !important;
+	border-radius: 8px !important;
+	list-style-image: none !important;
+	-moz-image-region: rect(0px, 7px, 7px, 0px) !important;
+}
+.tab-close-button:hover, .tab-close-button:active, .tab-close-button:focus
+{
+	background-color: #f00000 !important;
+	border: 2px solid #f00000 !important;
+}
+
+
+
+/* ============================================================================ */
+/* Mainwindow = Toolbar and below. Somehow a misleading ID-name! This is everything BELOW the tabs */
+#tabmail-container {
+	border-top: 1px solid #a9b7c9;
+}
+
+
+
+/* ============================================================================ */
+/* Toolbox + Buttons */
+
+/* Coloring for the whole toobox bar */
+#mail-toolbox, /* Thunderbird main + add-on windows */
+#event-toolbox /* Calendar + lightning windows, accepts only color */
+{
+	background-color: #f2f2f5 !important;
+	border-bottom: 1px solid #a9b7c9; /* A divider, because I removed ALL box-shadows. */
+}
+
+/* Spacing for ALL toolboxes */
+.mail-toolbox:not([mode="full"]) > toolbar:only-of-type,
+.mail-toolbox[mode="full"][labelalign="end"] > toolbar:only-of-type,
+#composeToolbar2, /* New Message... */
+#ab-bar2, /* Address Book... */
+#event-toolbar /* Calendar and lightning dialogs */
+{
+	margin-top: 7px;
+	margin-bottom: 7px;
+	margin-left: 10px !important;
+}
+
+/* Sizing for All toolbar buttons */
+:-moz-any(.chromeclass-toolbar) .toolbarbutton-1 > .toolbarbutton-menubutton-button,
+:-moz-any(.chromeclass-toolbar) .toolbarbutton-1 > .toolbarbutton-menubutton-dropmarker,
+:-moz-any(.chromeclass-toolbar) .toolbarbutton-1
+{
+	min-height: 40px !important;
+}
+
+/* Hover-Effect for ALL toolbar buttons */
+.toolbarbutton-1 > .toolbarbutton-menubutton-button:hover,
+.toolbarbutton-1 > .toolbarbutton-menubutton-dropmarker:hover,
+.toolbarbutton-1:hover
+{
+	background-color: #c1dbfc !important;
+}
+
+/* No effects for disabled buttons. Optional, because disabled buttons are hidden below. */
+toolbarbutton[disabled="true"]:hover {
+	background-color: transparent !important;
+}
+
+/* Remove disabled toolbar buttons until enabled */
+toolbarbutton[disabled="true"] {
+	display: none !important;
+}
+
+/* On-Off buttons, here for state 'checked' = ON */
+toolbarbutton[checked="true"] {
+	background-color: #d0e1f5 !important;
+	box-shadow: none !important;
+}
+
+
+
+/* ============================================================================ */
+/* Mixed UI dialogs and settings */
+
+/* New Message - FIX for the distorted color-picker after increasing button-heights */
+.color-button {
+	height: 10px !important; /* Not really changeable */
+	width: 30px !important;
+}
+
+/* New Message - Text for Enigmail GPG was too red */
+.enigmailStrong {
+	color: #f00000 !important;
+}
+
+/* Address book. Make detail-title bigger */
+#CardTitle {
+	border-bottom-color: #4fa6fd;
+	color: #438ed9;
+	font-size: 120% !important;
+	font-weight: normal !important;
+	margin-top: 10px;
+}
+
+/* Account Settings, the background for title top-right. Not possible for all iframes. */
+#am-main-title, .dialogheader, iframe {
+	border:none !important;
+	outline: none !important;
+}
+/* Account Settings, the title top-right. */
+.dialogheader-title {
+	font-size: 120% !important;
+	font-weight: normal !important;
+}
+
+
+
+/* ============================================================================ */
+/* Foldertree Basic (on the left) */
+
+/* Remove white lines in the foldertree. Don't know why they appear sometimes. */
+treechildren:not(.autocomplete-treebody)::-moz-tree-row {
+	outline-color: transparent !important;
+}
+
+/* Push the whole foldertree further down. IMO it is to high */
+#folderPaneBox {
+	padding-top: 8px !important;
+}
+
+
+
+/* ============================================================================ */
+/* Foldertree: Accounts + Folders (on the left) */
+
+/* Style ACCOUNT name with no new mail */
+#folderTree > treechildren::-moz-tree-cell-text(isServer-true) {
+	font-weight: normal !important;
+}
+
+/* Style ACCOUNT name with new mail */
+#folderTree > treechildren::-moz-tree-cell-text(isServer-true, biffState-NewMail) {
+	color: #034675 !important;
+	font-weight: normal !important;
+}
+
+/* Style FOLDER with unread messages */
+#folderTree > treechildren::-moz-tree-cell-text(hasUnreadMessages-true) {
+	color: #034675 !important;
+	font-weight: normal !important;
+}
+
+/* Style CLOSED FOLDER CONTAINING SUBFOLDERS with unread messages */
+#folderTree > treechildren::-moz-tree-cell-text(closed, subfoldersHaveUnreadMessages-true) {
+	color: #034675 !important;
+	font-weight: normal !important;
+}
+
+/* Style OPEN FOLDER CONTAINING SUBFOLDERS with unread messages. Disabled because you are already inside that folder */
+/*
+#folderTree > treechildren::-moz-tree-cell-text(subfoldersHaveUnreadMessages-true) {
+	color: #034675 !important;
+	font-weight: normal !important;
+}
+*/
+
+
+
+/* ============================================================================ */
+/* Messages: unread, replied, deleted */
+
+/* UNREAD messages */
+/* Unread messages : Cell */
+#threadTree treechildren::-moz-tree-cell(unread) {
+	-moz-appearance: none !important;
+	background-color: #ffd98e !important; /* light orange = #ffd98e, pale green = #CCFFCC  */
+}
+/* Unread messages : Text */
+#threadTree treechildren::-moz-tree-cell-text(unread) {
+	-moz-appearance: none !important;
+	font-weight: normal !important;
+}
+
+/* REPLIED messages */
+treechildren::-moz-tree-cell(replied),
+treechildren::-moz-tree-cell(replied,selected),
+treechildren::-moz-tree-cell(replied,current)
+{
+	background-color: #CCFFCC !important;
+}
+/* Replied messages text-color. Optional, disabled! Only activate and change this if you use a darker backgroud above. */
+/*
+treechildren:-moz-tree-cell-text(replied,current) {
+	color: #FFFFFF !important;
+}
+*/
+
+/* DELETED IMAP messages (not available for directly deleted POP messages. */
+treechildren::-moz-tree-cell(imapdeleted) {
+	background-color: #999999 !important;
+}
+treechildren:-moz-tree-cell-text(imapdeleted) {
+	color: #FFFFFF !important;
+text-decoration: line-through !important;
+}
+treechildren::-moz-tree-cell(imapdeleted,selected) {
+	background-color: #333333 !important;
+}
+treechildren::-moz-tree-cell(imapdeleted,current) {
+	background-color: #666666 !important;
+}
+treechildren:-moz-tree-cell-text(imapdeleted,selected),
+treechildren:-moz-tree-cell-text(imapdeleted,current)
+{
+	color: #DDDDFF !important;
+}
+treechildren::-moz-tree-cell-text(imapdeleted, offline) {
+	background-color: #DDDDDD !important;
+	text-decoration: line-through !important;
+}
+
+
+
+/* ============================================================================ */
+/* Pretty Labels */
+
+/* Default Important Label */
+treechildren::-moz-tree-cell(lc-FF0000) {
+	border-bottom: 1px solid #FF0000 !important; background-color: #FFCCCC !important;
+}
+treechildren::-moz-tree-cell-text(lc-FF0000) {
+	color: #000000 !important;
+}
+treechildren::-moz-tree-cell(lc-FF0000, selected) {
+	background-color: #FF0000 !important;
+}
+treechildren::-moz-tree-cell-text(lc-FF0000, selected) {
+	color: #FFFFFF !important;
+}
+
+/* Default Work Label */
+treechildren::-moz-tree-cell(lc-FF9900) {
+	border-bottom: 1px solid #FF9900 !important;
+	background-color: #FFCC99 !important;}
+treechildren::-moz-tree-cell-text(lc-FF9900) {
+	color: #000000 !important;
+}
+treechildren::-moz-tree-cell(lc-FF9900, selected) {
+	background-color: #FF9900 !important;
+}
+treechildren::-moz-tree-cell-text(lc-FF9900, selected) {
+	color: #FFFFFF !important;
+}
+
+/* Default Personal Label */
+treechildren::-moz-tree-cell(lc-009900) {
+	border-bottom: 1px solid #22b222 !important;
+	background-color: #22b222 !important;}
+treechildren::-moz-tree-cell-text(lc-009900) {
+	color: #000000 !important;
+}
+treechildren::-moz-tree-cell(lc-009900, selected) {
+	background-color: #22b222 !important;
+}
+treechildren::-moz-tree-cell-text(lc-009900, selected) {
+	color: #FFFFFF !important;
+}
+
+/* Default Todo Label */
+treechildren::-moz-tree-cell(lc-3333FF) {
+	background-color: #CCCCFF !important;
+	border-bottom: 1px solid #6262f1 !important;
+}
+treechildren::-moz-tree-cell-text(lc-3333FF) {
+	color: #000000 !important;
+}
+treechildren::-moz-tree-cell(lc-3333FF, selected) {
+	background-color: #6262f1 !important;
+}
+treechildren::-moz-tree-cell-text(lc-3333FF, selected) {
+	color: #FFFFFF !important;
+}
+
+/* Default Later Label */
+treechildren::-moz-tree-cell(lc-993399) {
+	background-color: #FFCCFF !important;
+	border-bottom: 1px solid #993399 !important;
+}
+treechildren::-moz-tree-cell-text(lc-993399) {
+	color: #000000 !important;
+}
+treechildren::-moz-tree-cell(lc-993399, selected) {
+	background-color: #993399 !important;
+}
+treechildren::-moz-tree-cell-text(lc-993399, selected) {
+	color: #FFFFFF !important;
+}
+
+
+
+/* ============================================================================ */
+/* Clean Notification Alerts */
+
+#alertImageBox {display:none;}
+#alertContainer {width:400px; border-radius: 0px !important;}
+#alertTitle, folderSummaryMessage {width:350px;}
+#newMailAlertNotification {border:1px solid #a2a2a2 !important; border-radius: 0px !important; background:#ebebeb !important;}
+#newMailAlertNotification #closeButton {padding-top:4px !important;}
+
+
+
+/* ============================================================================ */
+/* Calendar + Lightning CleanUp */
+
+/* MAIN tabs */
+/* Add a divider under the toolboxes in calendar and tasks */
+#calendar-toolbox,
+#task-toolbox
+{
+	border-bottom: 1px solid #a9b7c9 !important;
+}
+
+/* Sidebar: Set same background-color as in the main thunderbird-window. */
+#ltnSidebar,
+#ltnSidebar .tree-stack
+{
+	background-color: #f0f0f0 !important;
+}
+
+/* FIX - Hide the newly appeard string 'calendarname' inside the left pane */
+calendar-list-tree .tree-scrollable-columns {
+	background-color: #f0f0f0 !important;
+	height: 0px !important;
+}
+/* Hide the additional text also */
+calendar-list-tree treecol[hideheader="true"] {
+	visibility: hidden !important;
+}
+
+/* Make the searchbox in CALENDAR the same hight as the searchbox in TASKS */
+#unifinder-searchBox {
+	height: 34px !important;
+}
+
+/* Calendarview: Current Day in different views */
+window {
+	--viewHeaderSelectedBackground: #ffd98e !important;
+	--viewDayBoxSelectedBackground: #ffd98e !important;
+	--viewDayBoxOtherSelectedBackground: #ffd98e !important;
+	--viewDayBoxOffSelectedBackground: #ffd98e !important;
+	--viewMonthDayBoxSelectedBackground: #ffd98e !important;
+}
+
+/* Remove old-school rounded borders from 'Day, Week, Month...' */
+tab[calview],
+tab[calview][selected="true"]
+{
+	border-radius: 0px !important;
+}
+
+/* Calendar main: Remove 'jumps' when switching between Day, Week, Month... This was a f**** nightmare! DOM chrome://calendar/content/calendar-views.xul */
+/* All tabs: lighter, active is defined below */
+tab[calview] {
+	background-color: rgba(255,255,255, .3);
+	padding: 3px 10px !important;
+}
+tab[calview][selected="true"],
+tab[calview][selected="true"]:hover {
+	background-color: -moz-Field;
+border-top: solid #ffcc66 3px;
+padding-top: 0 !important;
+}
+tab[calview]:hover {
+	background-color: ButtonHighlight;
+border-top: solid #4fa6fd 3px;
+padding-top: 0 !important;
+}
+
+/* Calendar lighter fonts in mouseover-tooltips */
+.tooltipHeaderLabel
+{
+	color: #747373 !important;
+}
+
+
+/* OTHER CALENDAR windows integration */
+
+/* Small buttons top-right to call calendar and tasks window */
+#calendar-tab-button:hover,
+#calendar-tab-button:focus,
+#task-tab-button:hover,
+#task-tab-button:focus
+{
+	background-color: #ffcc66 !important;
+}
+
+/* Mini-Calendar in all windows */
+.minimonth-day[today="true"],
+.minimonth-day[selected="true"]
+{
+	border: none !important;
+	padding-top: 1px !important;
+}
+.minimonth-day[selected="true"] {
+	background-color: #ffcc66 !important;
+}
+
+/* Mini-Tasks: Adjust height and color to fit new toolbox-height */
+#today-pane-panel > sidebarheader {
+	background-color: #f0f0f0;
+	border-top: none !important; /* Removes white pseudo-3D line */
+	padding: 3px 0 2px 0 !important;
+}
+
+/* Mini-Tasks: today */
+#today-header .agenda-checkbox {
+	background-color: #ffd98e !important;
+}
+/* Mini-Tasks: remove border from the small colored calendar-squares (is an overlay) */
+.agenda-calendar-image {
+	list-style-image: none !important;
+}
+
+/* Force back the arrow-images for opening/closing future tasks after forbidding all images first, today-pane.xul */
+treenode-checkbox > .checkbox-check {
+	background-image: url(chrome://global/skin/tree/twisty-clsd.png) !important;
+}
+treenode-checkbox[checked="true"] > .checkbox-check {
+	background-image: url(chrome://global/skin/tree/twisty-open.png) !important;
+}
+
+/* Small calendar day-date in the bottom-right button */
+.toolbarbutton-day-text {
+	font-weight: normal !important;
+	font-size: 8pt !important;
+	margin-top: 1px !important;
+	/* OR disable completely */
+	/*
+	display: none !important;
+	*/
+}
+
+
+
+/* ============================================================================ */
+/* Last Orders */
+
+/* Style the Add-on Extensions and Styles names */
+.basicinfo-container .name-container .name {
+	font-size: 150% !important;
+}
+#userstyle-sorting .sorter {
+	border: 1px solid #a9b7c9  !important;
+	border-radius: 0px  !important;
+}
+
+/* Puhhhh ... finished! But I like it^^ */

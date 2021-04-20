@@ -1,0 +1,284 @@
+/* ==UserStyle==
+@name           Chicago Tribune: fewer nuisances for casual users
+@namespace      USO Archive
+@author         hideheader
+@description    `Removes items that are nuisances for drive-by "not-my-city, not-a-subscriber" readers from Tribune properties - "Promoted stories", "Share" links, advertising, subscriber-only controls, "Premium Content" teaser links and other self-promotion, "Start Trial" and "Subscribe" nags.Optionally shrinks the useless lede photo and restores it on hover.`
+@version        20161116.20.39
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown lede-photo "Shrink the lede photo" {
+	shrink "Yes, shrink it*" <<<EOT   /* lede photo *\/
+  .trb_ar_main .trb_ar_la {
+    float: right;
+    width: 4cm;
+    transition: width .2s .7s linear;
+  }
+  .trb_ar_main .trb_ar_la:hover {
+    width: 100%;
+    transition-delay: 0s;
+  }
+  /* in the "endless scroll" list *\/
+  .lb-widget.lb-widget-image {
+    float: right;
+    max-width: 5cm;
+    transition: max-width .2s .7s linear;
+  }
+  .lb-widget.lb-widget-image:hover {
+    max-width: 100%;
+    transition-delay: .1s;
+  }
+ EOT;
+ignore "No, leave it alone" <<<EOT  EOT;
+
+}
+
+==/UserStyle== */
+@-moz-document domain(chicagotribune.com) {
+  .ntvClickOut, /*inline ads on 'Breaking News' list*/
+  /* "Promoted stories from PoliticsChatter.com" */
+  .trb_ar_ctrb,
+  .trb_ar_sponsoredmod {display: none}
+}
+
+@-moz-document domain("latimes.com"), domain("hoylosangeles.com") {
+  /* 'subscribe' nag */
+  .trb_bnn /*[data-content-slug$="-ad"]*/ {display: none}
+ 
+  /* 'content masthead' is the secondary blog or section masthead*/
+  .trb_contentmasthead {display: none}
+  
+  /* less padding = more article */
+  .trb_ar.trb_ar {padding: 0 20px}
+  
+  /* remove twitter by-line */
+  .trb_ar_page > p:last-of-type > STRONG {color: brown}
+  
+  /* auto-shrink useless lede photo */
+/*  .trb_embed[data-content-size] .trb_embed_imageContainer_figure {float: right}
+  .trb_embed[data-content-size] A.trb_embed_imageContainer_figure:not(:hover) img {
+    width: 2in !important;
+  }
+  FIGURE.trb_outfit_primaryItem_leadArt {
+    float: right;
+    display: inline;
+    width: auto;
+  }*/
+}
+
+@-moz-document domain("www.chicagotribune.com"),
+  domain("latimes.com"), /* Los Angeles Times (Los Angeles, California)  */
+  domain("hoylosangeles.com"),
+
+    /* Maryland */
+  domain("www.baltimoresun.com"), /* Baltimore Sun (Baltimore, Maryland) */
+  domain("www.citypaper.com"), /* Baltimore City Paper (Baltimore, Maryland) */
+  domain("www.capitalgazette.com"), /* The Capital (Annapolis, Maryland) */
+  domain("www.carrollcountytimes.com"), /* Carroll County Times (Westminster, Maryland) */
+  
+    /* Virginia */
+  domain("www.dailypress.com"), /* Daily Press (Newport News, Virginia) */
+  domain("www.courant.com"), /* The Hartford Courant (Hartford, Connecticut) */
+  domain("www.mcall.com"), /* The Morning Call (Allentown, Pennsylvania) */
+  domain("orlandosentinel.com"), /* Orlando Sentinel (Orlando, Florida) */
+  domain("www.sun-sentinel.com"), /* Sun-Sentinel (Fort Lauderdale, Florida) */
+  domain("www.dailypress.com"), /* Daily Press (Newport News, Virginia) */
+  domain("www.vagazette.com") /* The Virginia Gazette (Williamsburg, Virginia) */
+{
+/* Tribune papers */
+
+  /* header / masthead */
+  header.trb_mh {
+    margin-top: 130px;
+  }
+
+/*[[lede-photo]]*/
+  /* "Start Trial" */
+  .met-prompt, .met-promo {display: none}
+  
+  /* no advert */
+  div.trb_bnn {display: none} /* "Subscribe */
+  .trb_mh_adB, .trb_masthead_adBanner,
+  .lb-advert-container,
+  .trb_navhead_upperNav_li > a[href*='partner-sites'],
+  .trb_navhead_upperNav_li > a[href*='partner-sites'] ~ *,
+  .trb_gptAd,
+  [class*="adBanner"],
+  aside.trb_barker,
+  .trb_barker,
+  .trb_outfit_sponsorship, /* Top news, "Presented by ..." */
+  #trb_ad_oop,
+  DIV.trb_taboola,
+  .trb_outfit_classified[data-outfit-type="homefinder"],
+  .sponsoredmod, [data-adloader-networktype],
+  [data-load-method^="trb.vendor."], /* "Promoted Stories from the Chatter Network" e.g. */
+
+  /* no social */
+  .trb_socialize,
+  [id*=gigya], .gig-share,
+  .trb_ar_sl, /* "Share this" article banner */
+  .trb_nls_c, /* "Get the newsletter" article banner */
+  .trb_ar_shpq[data-role*=socialshare],
+  .trb_ar_h > .trb_sc, /* 'share' icons in the headline */
+  .trb_ar_main > .trb_sc, /* 'share' icons after the article */
+  .trb_ar_shpq, /* 'share' icons in 'related' boxes */
+  
+  /* subscriber-only */
+  DIV.trb_nh_dss, .trb_navhead_dss, /* subscribe/login */
+
+  iframe { /* all of the above */
+    display: none !important;
+  }
+  
+  /* premium content */
+    /* (0) mark it */
+  [data-content-premiumoverride="premium"] {outline: medium solid purple}
+
+    /* (1) remove it completely */
+  [-data-content-premiumoverride="premium"] {display: none}
+
+    /* (2) leave the summaries, remove links to the full article */
+  [data-content-premiumoverride="premium"] a:not(.trb_outfit_categorySectionHeading_a) {
+    -pointer-events: none;
+    cursor: not-allowed;
+  }
+      /* article summary */
+  article[data-content-premiumoverride="premium"] {
+    outline: thin solid purple;
+  }
+  article[data-content-premiumoverride="premium"] a:not(.trb_ar_sum_hl_a) {
+    pointer-events: auto;
+  }
+  section[data-content-svgtype="PremiumLogoSmall"] {/* "Read full digitalPlus article" (Chicago Tribune) */
+    display: none;
+  }
+      /* headline-only? remove it */
+  .trb_outfit_list_headline[data-content-premiumoverride="premium"],
+  .trb_outfit_group_list_item[data-content-premiumoverride="premium"] {
+    /*display: none;*/
+    outline: none;
+  }
+  .-trb_outfit_group_list_item[data-content-premiumoverride="premium"] .trb_outfit_group_list_item_img {
+    display: none;
+  }
+  .trb_outfit_primaryItem.trb_outfit_section[data-content-premiumoverride="premium"] .trb_outfit_primaryItem_article_title_a, /*front page, headline story box*/
+  .trb_outfit_group_list_item_EmbeddedList_item[data-content-premiumoverride="premium"] .trb_outfit_contentType_a, /*front page list box*/
+  a[data-content-premiumoverride="premium"], /* in article sidebar */
+  .trb_outfit_group_list_item[data-content-premiumoverride="premium"] .trb_outfit_relatedListTitle_a,
+  .trb_outfit_list_headline[data-content-premiumoverride="premium"] .trb_outfit_list_headline_a,
+  aside.trb_embed[data-content-premiumoverride="premium"] .trb_embed_related_title, /* "Related" box in story */
+  article.trb_ar[data-content-premiumoverride="premium"] .trb_ar_sum_hl_a /* article list below article body */
+  {
+    color: #888 !important;
+    pointer-events: /*none*/auto;
+    outline: none;
+  }
+  .trb_outfit_primaryItem.trb_outfit_section[data-content-premiumoverride="premium"], /*front page, headline story box*/
+  .trb_outfit_group_list_item_EmbeddedList_item[data-content-premiumoverride="premium"],
+  .trb_outfit_group_list_item[data-content-premiumoverride="premium"],
+  aside.trb_embed[data-content-premiumoverride="premium"],
+  article.trb_ar[data-content-premiumoverride="premium"]
+  {
+    outline: none;
+  } /* headline only? then no teaser photo */
+
+  /* paywall */
+  #reg-overlay {display: none !important}
+  
+  -html[data-dss-meterup] {
+    overflow-y: auto !important;
+  }
+  -html[data-dss-meterup] body {
+    -overflow-y: auto;
+  }
+  .-trb_allContentWrapper {
+    overflow-y: visible !important;
+  }
+
+  html[data-dss-meterup] body {
+    position: absolute;
+    top: 0; bottom: 0;
+    overflow-y: auto;
+  }
+  [data-dss-meterup] .trb_nh {
+    -width: calc(100% - 16px);
+    position: absolute;
+  }
+}
+
+@-moz-document url-prefix("http://www.chicagotribune.com/suburbs/") {
+  .trb_allContentWrapper[data-c-url^="/suburbs/"] ~ .trb_nh .trb_nh_l {
+    background-image: url('data:image/svg+xml,\
+<svg xmlns="http://www.w3.org/2000/svg"\
+     viewBox="0 0 350 52.297" preserveAspectRatio="xMidYmid meet">\
+  <style>text {font-size: 60px}</style>\
+  <text x="0" y="50">Suburbs</text>\
+</svg>');
+  }
+  .trb_allContentWrapper[data-c-url^="/suburbs/daily-southtown/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.chicagotribune.com/as/prod/subpa/chinews/southtown/images/masthead.1q2w3_d7d9b23923dcd90adcafcb99427f5bc1.svg");
+  }
+  .trb_allContentWrapper[data-c-url^="/suburbs/post-tribune/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.chicagotribune.com/as/prod/subpa/chinews/posttrib/images/masthead.1q2w3_418962b760306513ef6ddbbd877ad17b.svg");
+  }
+  .trb_allContentWrapper[data-c-url^="/suburbs/naperville-sun/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.chicagotribune.com/as/prod/subpa/chinews/naperville/images/masthead.1q2w3_b2a6bab29341e4b25e185274ffbd7ee0.svg");
+  }
+  .trb_allContentWrapper[data-c-url^="/suburbs/lake-county-news-sun/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.chicagotribune.com/as/prod/subpa/chinews/lakecounty/images/masthead.1q2w3_9f6c812b3a88cba17445f43e43812a28.svg");
+  }
+  .trb_allContentWrapper[data-c-url^="/suburbs/elgin-courier-news/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.chicagotribune.com/as/prod/subpa/chinews/elgin/images/masthead.1q2w3_ac278966cf0aec28af3a756296bd5b5e.svg");
+  }
+  .trb_allContentWrapper[data-c-url^="/suburbs/aurora-beacon-news/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.chicagotribune.com/as/prod/subpa/chinews/aurora/images/masthead.1q2w3_c10137b44c59b5ac0c0df236e5d5ba51.svg");
+  }
+
+  .trb_allContentWrapper[data-c-url^="/suburbs/barrington/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.chicagotribune.com/as/prod/subpa/chinews/barrington/images/masthead.1q2w3_c7f4db8be69ac22da22bc49312a8256f.svg");
+  }
+  .trb_allContentWrapper[data-c-url^="/suburbs/river-forest/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.chicagotribune.com/as/prod/subpa/chinews/fstleaves/images/masthead.1q2w3_7819bd90dcc7b3c46fe50ced1e9919c3.svg");
+  }
+  .trb_allContentWrapper[data-c-url^="/suburbs/downers-grove/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.chicagotribune.com/as/prod/subpa/chinews/dwnsgrove/images/masthead.1q2w3_6ab581354251e4208eb5cfc8c4b5a2d1.svg");
+  }
+  .trb_allContentWrapper[data-c-url^="/suburbs/arlington-heights/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.chicagotribune.com/as/prod/subpa/chinews/arlheights/images/masthead.1q2w3_02dc1140e1040a1554970ad41ccd9ee7.svg");
+  }
+  .trb_masthead + .trb_ar {margin-top: 80px} /*no tertiary menu*/
+}
+
+@-moz-document url-prefix("http://www.latimes.com/socal/") {
+  .trb_allContentWrapper[data-c-url^="/socal/burbank-leader/"] ~ .trb_nh .trb_nh_l {
+    background-image: url(http://www.latimes.com/as/prod/subpa/lanews/burbank/images/masthead.1q2w3_922b605061bc23f9aabe9ab38b641303.svg);
+  }
+  .trb_allContentWrapper[data-c-url^="/socal/coastline-pilot/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.latimes.com/as/prod/subpa/lanews/coastline/images/masthead.1q2w3_1ce992b5032d95d739eba9ac78f0845f.svg");
+  }
+  .trb_allContentWrapper[data-c-url^="/socal/daily-pilot/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.latimes.com/as/prod/subpa/lanews/dailypilot/images/masthead.1q2w3_a8fdc61d8f1f19f92b8fe5569c61cdde.svg")
+  }
+  .trb_allContentWrapper[data-c-url^="/socal/hb-independent/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.latimes.com/as/prod/subpa/lanews/hbindependent/images/masthead.1q2w3_9e62a2d57f797c8b2d7863b969dc6ee4.svg")
+  }
+  .trb_allContentWrapper[data-c-url^="/socal/glendale-news-press/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.latimes.com/as/prod/subpa/lanews/glendale/images/masthead.1q2w3_e53f3e090c9d1b502554155945a92cb1.svg")
+  }
+  .trb_allContentWrapper[data-c-url^="/socal/la-canada-valley-sun/"] ~ .trb_nh .trb_nh_l {
+    background-image: url("http://www.latimes.com/as/prod/subpa/lanews/lacanada/images/masthead.1q2w3_73336c1a7aaf5701d37abb1d3af3741f.svg")
+  }
+}
+
+@-moz-document url-prefix("http://www.chicagotribune.com/suburbs/"), url-prefix("http://www.latimes.com/socal/") {
+  .trb_allContentWrapper ~ .trb_nh .trb_nh_l {
+    filter: invert(1) hue-rotate(180deg);
+  }
+  .trb_masthead {display: none}
+  .trb_subNavigation {/*margin-top: 80px*/
+    position: fixed; top: 0; margin-top: 0;
+  }
+  .trb_nh .trb_nh_lw {display: none}
+  .trb_outfit {
+    margin-top: 80px;
+  }
+}

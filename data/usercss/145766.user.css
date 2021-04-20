@@ -1,0 +1,229 @@
+/* ==UserStyle==
+@name           Pamage
+@namespace      USO Archive
+@author         hirin
+@description    `マストドンのタイムラインを画像で埋めるスタイルです。<br />元々はPixivのインスタンス「Pawoo」のために作りましたが、なんか他のインスタンスでも使えそうなので適用範囲を広げました。<br /><strong style="font-weight: bold;">画像を眺めたい人向け</strong>になっていますが、気になるトゥートは通常通り全文を読むこともできます。<br />また別にリリースしたスタイルの<a href="https://userstyles.org/styles/145911/tootdeck" target="_blank" style="font-weight:bold;">TootDeck</a>と併用すれば画面を最大限広く使え、より画像を楽しむことができます。<ul><li>一番右の<strong style="font-weight: bold;">スタートカラムだけは通常表示</strong>になっているので文字も読みたいTLはそちらで表示できます</li><li>画像にマウスカーソルを合わせると投稿者とブーストボタンなどが表示されます</li><li>さらに投稿者にマウスカーソルを合わせると投稿本文が表示されます</li><li>一応動画の投稿にも対応しているつもりですがテストが少ないので不具合はあるかもしれません</li><li>各トゥートの高さや横幅をもっと大きくしたい場合は下記の<strong style="font-weight: bold;">「Advanced Style Settings」</strong>で変えられます</li><li>デフォルトではウインドウサイズに合わせて各カラムを拡大・縮小する設定になっていますが、下記の<strong style="font-weight: bold;">「Advanced Style Settings」</strong>で変えることもできます</li></ul>動作確認（最低限しかやってません）<ul><li>Chrome 59</li><li>Firefox 54</li><li>Vivaldi 1.10</li></ul>`
+@version        20170809.20.3
+@license        CC0-1.0
+@preprocessor   uso
+@advanced text width "横幅[width] (default:0)" "0"
+@advanced text height "高さ[height] (default:220)" "220"
+@advanced dropdown column-flex "ウインドウサイズに合わせてカラム幅を変える[fit columns] (default:常に合わせる)" {
+	always "常に合わせる*" <<<EOT 1 1 EOT;
+max "ウインドウサイズの方が大きい時だけ" <<<EOT 1 0 EOT;
+min "ウインドウサイズの方が小さい時だけ" <<<EOT 0 1 EOT;
+none "ウインドウサイズを無視する" <<<EOT 0 0 EOT;
+
+}
+
+==/UserStyle== */
+@-moz-document url-prefix("https://mstdn.jp/web"),url-prefix("https://pawoo.net/web"),url-prefix("https://friends.nico/web"){
+
+/**
+* Package: Pamage
+* Version: 1.4
+* Author: hirin
+* Release date: 2017/07/27
+* Last update: 2017/08/09
+* Lisence: CC0
+* URL: https://userstyles.org/styles/145766/pamage
+**/
+
+/* 横幅を変更 （デフォルト：0px）*/
+.column:not(:last-of-type) {
+    min-width: /*[[width]]*/px;
+}
+
+/* 高さを変更 （デフォルト：220px）*/
+.column:not(:last-of-type) .status .media-gallery,
+.column:not(:last-of-type) .status .media-spoiler,
+.column:not(:last-of-type) .status .media-spoiler-video,
+.column:not(:last-of-type) .status .status__video-player{
+    min-height: /*[[height]]*/px;
+}
+
+/* Base */
+.column {
+    flex: /*[[column-flex]]*/ auto;
+}
+.column:last-of-type{
+    flex: 0 0 auto;
+}
+.column:not(:last-of-type) .status{
+    position: relative;
+    padding: 0;
+    min-height: 0 !important;
+    border: 0 !important;
+    overflow: hidden;
+}
+.column:not(:last-of-type) .status:hover{
+    overflow: visible;
+}
+.column:not(:last-of-type) .status:after {
+    content:"";
+    display:block;
+    clear:both;
+}
+.column:not(:last-of-type) .status > div:not(.status__info),
+.column:not(:last-of-type) .status__prepend{
+    display: none;
+}
+.column:not(:last-of-type) .media-gallery {
+    display: block !important;
+    margin: 0 auto 3px;
+}
+.column:not(:last-of-type) .status .media-spoiler,
+.column:not(:last-of-type) .status .media-spoiler-video,
+.column:not(:last-of-type) .status .status__video-player {
+    display: flex !important;
+    flex: 1 1 auto;
+    margin: 0 auto 3px;
+    border-bottom: 1px solid #393f4f;
+}
+
+/* Toot's information */
+.column:not(:last-of-type) .status .status__info{
+    display: block !important;
+    position: absolute;
+    z-index: 999;
+    width: 100%;
+    height: 0;
+    box-sizing: border-box;
+    padding-top: 15px;
+    padding-right: 8px;
+    background: rgba(0,0,0,0.75);
+    transition: all 400ms 0s ease;
+    opacity: 0;
+    overflow: hidden;
+}
+.column:not(:last-of-type) .status .status__avatar,
+.column:not(:last-of-type) .status .account__avatar,
+.column:not(:last-of-type) .status .account__avatar-overlay{
+    width: 28px !important;
+    height: 28px !important;
+    background-size: 28px !important;
+}
+.column:not(:last-of-type) .status .account__avatar-overlay-base {
+    width: 22px;
+    height: 22px;
+    background-size: 22px;
+}
+.column:not(:last-of-type) .status .account__avatar-overlay-overlay{
+    width: 16px;
+    height: 16px;
+    background-size: 16px;
+}
+.column:not(:last-of-type) .status .display-name{
+    margin-left: 48px;
+}
+.column:not(:last-of-type) .status .status__relative-time{
+    padding-right: 10px;
+}
+.column:not(:last-of-type) .status:hover > .status__info{
+    opacity: 1;
+    height: 50px;
+}
+
+/* Toot's content */
+.column:not(:last-of-type) .status .status__content{
+    display: block !important;
+    position: absolute;
+    top: 100%;
+    bottom: 0;
+    z-index: 999;
+    width: 100%;
+    height: 0;
+    background: rgba(0,0,0,0.75);
+    box-sizing: border-box;
+    padding: 0 8px;
+    transition: opacity,top 400ms 0s ease;
+    opacity: 0;
+    overflow: hidden;
+}
+.column:not(:last-of-type) .status .status__content:hover,
+.column:not(:last-of-type) .status .status__info:hover + .status__content{
+    opacity: 1;
+    top: 50px;
+    overflow: auto;
+    height: auto;
+}
+
+/* spoiler icon */
+.column:not(:last-of-type) .media-gallery .spoiler-button,
+.column:not(:last-of-type) .media-spoiler-video  .status__video-player-spoiler,
+.column:not(:last-of-type) .status__video-player  .status__video-player-spoiler{
+    opacity: 0;
+    top: 50px;
+    right: -24px;
+    left: auto;
+    margin-top: 4px;
+    height: auto;
+    transition: all 400ms 0s ease;
+}
+.column:not(:last-of-type) .media-spoiler-video,
+.column:not(:last-of-type) .status__video-player{
+     width: 100% !important;
+}
+.column:not(:last-of-type) .status__video-player-mute{
+    top: 50px;
+    right: -24px;
+    margin-top: 32px;
+    opacity: 0;
+    transition: all 400ms 0s ease;
+}
+.column:not(:last-of-type) .status__video-player-expand{
+    top: 50px;
+    right: -24px;
+    margin-top: 60px;
+    opacity: 0;
+    transition: all 400ms 0s ease;
+}
+.column:not(:last-of-type) .status:hover .spoiler-button,
+.column:not(:last-of-type) .status:hover .status__video-player > div
+{
+    right: 4px;
+    opacity: 1;
+}
+.column:not(:last-of-type) .status .status__info:hover + .status__content + .media-gallery .spoiler-button,
+.column:not(:last-of-type) .status .status__info:hover + .status__content + .status__video-player > div,
+.column:not(:last-of-type) .status .status__content:hover + .media-gallery .spoiler-button,
+.column:not(:last-of-type) .status .status__content:hover + .status__video-player > div{
+    right: -24px;
+    opacity: 0;
+}
+
+/* action buttons */
+.column:not(:last-of-type) .status .media-gallery + .status__action-bar,
+.column:not(:last-of-type) .media-spoiler-video  + .status__action-bar,
+.column:not(:last-of-type) .status__video-player + .status__action-bar{
+    display: block !important;
+    opacity: 0;
+    position: absolute;
+    bottom: 4px;
+    right: -100px;
+    background: rgba(0,0,0, 0.7);
+    padding:  2px 8px;
+    border-radius: 18px;
+    transition: all 400ms 0s ease;
+    z-index: 9999;
+    box-sizing: border-box;
+}
+.column:not(:last-of-type)  .status__action-bar .status__action-bar-button{
+     margin-right: 6px;
+}
+.column:not(:last-of-type) .status  > *:hover + .status__action-bar,
+.column:not(:last-of-type) .status .status__action-bar:hover{
+    right: 4px;
+    opacity: 1;
+}
+
+/* more button dropdown */
+.column:not(:last-of-type) .status .dropdown__content{
+    top: 25px;
+}
+.column:not(:last-of-type) .status .dropdown--active:after {
+    bottom: 0;
+    right: 12px;
+}
+
+}

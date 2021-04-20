@@ -1,0 +1,214 @@
+/* ==UserStyle==
+@name           Hide header - The Spokesman-Review
+@namespace      USO Archive
+@author         hideheader
+@description    `Auto-hide the page header and footer and the sidebar on the right side of the page. Each is reduced to a thin, horizontal placeholder, but expands again when you mouse over it.`
+@version        20120628.15.37
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown headerColor "I want to see the collapsed headers" {
+	No--make-them-invisi "No, make them invisible*" <<<EOT transparent EOT;
+Yes--color-them-in "Yes, color them in" <<<EOT rgb(229, 231, 218) EOT;
+
+}
+@advanced dropdown sidebarColor "I always want to see the sidebar" {
+	Yes--but-make-it-dim "Yes, but make it dimmer*" <<<EOT 0.2 EOT;
+Yes--just-leave-it-a "Yes, just leave it as it is" <<<EOT 0.99 EOT;
+No--only-show-it-whe "No, only show it when I mouse over it" <<<EOT 0 EOT;
+
+}
+
+==/UserStyle== */
+@namespace url(http://www.w3.org/1999/xhtml);
+
+@-moz-document domain("www.spokesman.com") {
+
+/* - - - - auto-hide header - - - - */
+
+#header {
+ position: absolute; top: 0px;
+ height: 3mm; overflow: hidden;
+ background-color: /*[[headerColor]]*/ !important;
+}
+#header:hover {
+ height: auto; overflow: visible;
+ background-color: white !important;
+   /* "Quick Links" has a transparent background */
+ z-index: 2;
+   /* keep expanded header above "Stories" sidebar */
+
+ border-bottom: solid black thin !important;
+}
+
+#header > * {visibility: hidden}
+#header:hover > * {visibility: visible}
+
+ul.story-nav {position: relative; top: 3mm}
+  /* move "Story" and "Photos" buttons below collapsed header */
+
+
+/* - - - - auto-hide sidebar - - - - */
+
+#sidebar {opacity: /*[[sidebarColor]]*/}
+#sidebar:hover {opacity: 0.99}
+  /* translucency keeps active sidebar above collapsed header */
+
+
+/* - - - - auto-hide footer - - - - */
+
+body {position: relative}
+  /* footer location is relative to page, not relative to screen */
+
+  /* footer collapses to the bottom */
+  /* using height: and overflow: (NB: padding: is always rendered!) */
+#footer {
+ position: absolute; bottom: 0px;
+ height: 5mm; overflow: hidden;
+ min-width: 100%;
+ background-color: /*[[headerColor]]*/ !important;
+ padding: 0px !important;
+ /*padding-top: 0px !important; padding-bottom: 0px !important;*/
+}
+#footer:hover {
+ height: auto; overflow: visible !important;
+ background-color: rgb(229, 231, 218) !important;
+ /*padding: 14px 21px 42px 21px !important;*/
+   /* I don't know why re-adding padding: causes problems, but it does */
+
+ border-top: solid black thin !important;
+}
+
+#footer > * {visibility: hidden}
+#footer:hover > * {visibility: visible}
+  /* when footer is collapsed, hide its contents */
+
+
+/* - - - - other ways to auto-hide the footer - - - - */
+
+  /* footer collapses to the bottom */
+  /* using clip: (total height (incl. padding:) must be known) */
+#XX_footer {
+ position: absolute; bottom: 0px;
+ clip: rect(505px, 2000px, 2000px, 0px);
+   /* height: 460.5px; padding-top: 14px; padding-bottom: 42px; */
+   /* --> collapsed height = 11.5 px (~ 5mm) (not so slick, eh?) */
+}
+#XX_footer:hover {
+ clip: auto;
+}
+
+  /* footer collapses to the left */
+
+  /* using width: and overflow: (NB: padding: is always rendered!) */
+#XX_footer {
+ position: absolute; bottom: 0px;
+ width: 5mm; overflow: hidden;
+ padding: 0px !important;
+}
+#XX_footer:hover {
+ width: auto; overflow: visible;
+ padding: 14px 21px 42px 21px !important;
+}
+
+  /* using clip: (the padding: isn't an issue now) */
+#XX_footer {
+ position: absolute; bottom: 0px;
+ clip: rect(0px, 5mm, 1000px, 0px);
+}
+#XX_footer:hover {
+ clip: auto;
+}
+
+
+/* - - - - no comments (they just angry-up the blood) - - - - */
+
+#comments {display: none}
+
+a[title=comments] {display: none !important}
+  /* you can't ignore the comments if you can see the "Comments" count */
+
+
+/* - - - - no social site chatter - - - - */
+
+.fb-share, .fb-like,
+  /* Facebook "Share" & "Recommend", article body */
+
+.tw-share,
+  /* Twitter "Share", article body */
+
+.fb-likebox, .fb-activity,
+  /* Facebook, right column */
+
+#twtr_widget_sr_300,
+  /* Twitter, right column */
+
+#null {display: none}
+
+
+/* - - - - suppress ads - - - - */
+  /* ordinarily I wouldn't bother, but Chrome isn't AdBlock'd */
+  /* and the huge ad in the corner was *really* annoying */
+
+[id^=google_ads],
+  /* every element w/ id="google_ads"-something, incl. the huge ad in the UR corner of the home page */
+
+.ad_top_leaderboard,
+.ad_bottom_leaderboard,
+  /* banner ads */
+
+#header_topics .nohlt,
+  /* small ad to the right of "Quick links"
+     - advertises other S-R websites, so you may want to keep it
+     - NB: .nohlt is also the "larger" link that wraps pictures in articles
+  */
+
+.ad_label, .ad_label + center, .ad_label + center + span,
+  /* ad in the body of the story ("Advertise here") */
+
+.ad,
+  /* right-column ads (but not "teasers") */
+
+.nav_ad,
+  /* right side of drop-down menus; currently unused */
+
+#lets_have_chili_for_lunch {display: none}
+
+[id^="unscrewgoogle"],
+[class^="ad_"], [id^="ad_"],
+[class$="_ad"], [id$="_ad"], /*28Jun*/
+
+.ad_label {display: none !important}
+  /* not a DIV, but a SPAN.ad_label with display:block */
+
+
+/* - - - - no distractions in right sidebar - - - - */
+
+#sidebar > .ad,
+#sidebar > .teaser > * {display: none}
+
+#sidebar > .teaser > #accordion {display: block !important}
+  /* keep "Related stories" & "Stories"/"Videos"/"Galleries" */
+
+}
+
+
+@-moz-document url("http://www.spokesman.com/") {
+
+/* - - - - homepage idiosyncracies - - - - */
+
+body.homepage > div:nth-of-type(3) > * {display: none}
+body.homepage > #header {top: -15px !important}
+  /* 3rd div in body is yet another Google ad - its margin-bottom:15px creates a gap above the header. However, auto-hide header obscures content in the first content box (div#homepage-dashboard), so make lemonade from lemons and move header up 15px instead of suppressing the margin. */
+
+/*#homepage-bottom {margin-bottom: 0px !important}*/
+#footer {bottom: -35px !important}
+  /* The bottom of the home page is div#homepage-bottom, which has margin-bottom:35px. The footer is placed at the bottom of the page - on the homepage that's the bottom of div#homepage-bottom, *not* the bottom of the margin below the div, which leaves a gap below the footer and makes the footer obscure content in the div. */
+  /* Make lemonade from lemons - move footer down 35px on the homepage. */
+
+body.homepage .homepage-dashboard-ad {display: none}
+  /* yet another google ad */
+
+body.homepage .homepage-dashboard-buttons {display: none}
+  /* social buttons ("Facebook", "Twitter") */
+
+}

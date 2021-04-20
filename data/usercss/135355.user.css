@@ -1,0 +1,105 @@
+/* ==UserStyle==
+@name           Fix YouTube Watched Badges and Progress Bars
+@namespace      USO Archive
+@author         Anthony Martinez
+@description    `YouTube has recently changed the way they mark videos as "Watched", by adding a red progress bar under the thumbnails of videos you've seen. While it's not terrible in theory, the current execution seems broken. Sometimes the progress bar doesn't get to 100%, even if you do actually watch the whole video. That in turn may prevent the "Watched" badge from showing up, if it even comes up at all anymore. My code sidesteps that mess by adding a "Watched" badge to any watched video, regardless of how much of it you've seen, and it optionally forces the progress bar to be 100%, or hides the progress bar.`
+@version        20161124.17.58
+@license        CC-BY-4.0
+@preprocessor   uso
+@advanced dropdown redbar "Configure Red Progress Bars" {
+	default "Keep default behavior*" <<<EOT  EOT;
+force100 "Force 100% width" <<<EOT 	/* Force progress bar to be full *\/
+	.resume-playback-progress-bar {
+		width: 100% !important;
+	}
+
+ EOT;
+disable "Hide altogether" <<<EOT 	/* Hide red portion of progress bar *\/
+	.resume-playback-progress-bar {
+		display: none;
+	}
+
+	/* Hide grey portion of progress bar *\/
+	.resume-playback-background {
+		background: rgba(0, 0, 0, 0);
+	}
+
+ EOT;
+
+}
+
+==/UserStyle== */
+@namespace url(http://www.w3.org/1999/xhtml);
+@-moz-document domain("youtube.com") {
+	
+	/* Hide existing native 'watched' badges so they don't conflict with the code below. */
+	.watched-badge {
+		display: none;
+	}
+	
+	/* Add 'watched' badge for videos you've watched;
+	should work on more pages than YouTube's native badges */
+	.resume-playback-background:before {
+		content: "WATCHED";
+		position: absolute;
+		display: block;
+		z-index: 1;
+		top: -96px;
+		left: 10px;
+		padding: 2px 4px;
+		background: #000;
+		opacity: 0.5;
+		line-height: 1.3em;
+		font-size: 11px;
+		font-weight: 500;
+		color: #fff;
+		pointer-events: none;
+	}
+	
+	/* Add an overlay to dim watched videos */
+	.resume-playback-background:after {
+		content: "";
+		position: absolute;
+		display: block;
+		top: -107px;
+		width: 196px;
+		height: 111px;
+		background: #fff;
+		opacity: 0.5;
+		pointer-events: none;
+	}
+  
+	/* Makes time in video thumbnails stand out properly */
+	.video-time {
+		z-index: 1;   
+	}
+	
+/*[[redbar]]*/	/* Fix opacity on thumbnail images */
+	.resume-playback-background, .watched .video-thumb {
+		opacity: 1;
+	}
+
+	/* Fix position of 'watched' badges on playlist pages */
+	.pl-video-thumb .resume-playback-background:before {
+		top: -31px;
+		left: 5px;
+	}
+	
+	/* Fix position of 'watched' badges in recommended sidebars */
+	.related-list-item .resume-playback-background:before {
+		top: -79px;
+	}
+  
+  	/* Fixes 'watched' badges on search pages. */
+	.search .resume-playback-background:before {
+		top: -123px;
+	}
+	
+	/* Fixes overlay on watched videos on search pages. */
+	.search .resume-playback-background:after {
+		top: -134px;
+		width: 246px;
+		height: 138px;
+	}
+  
+}

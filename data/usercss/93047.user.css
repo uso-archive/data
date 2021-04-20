@@ -1,0 +1,156 @@
+/* ==UserStyle==
+@name           autohide the menu & sidebar [Business Week]
+@namespace      USO Archive
+@author         hideheader
+@description    `Hides the Bloomberg Businessweek header, footer, and sidebar. (But not permanently - hover at the edges of the screen to restore them.) It also removes ads and ad-like "content". (That's right, Taboola, I mean you.)`
+@version        20150117.1.12
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+==/UserStyle== */
+@-moz-document domain("www.businessweek.com") {
+
+#global_nav, 
+#header,
+.column.rail,
+#footer {
+  position: fixed; left: 0; top: 0;
+  background: white;
+  z-index: 7778; /*else .navigation > LI are on top */
+  z-index: 55554; /* else "Premium" drop-down menu is on top */
+  clip: rect(0, 2mm, 1080px, 0);
+  border-left: 2.5mm solid blue !important;
+
+  transition: clip .3s /*.8s*/.5s linear;
+  transition-property: clip, border-left-width;
+  transition-timing-function: linear, step-end;
+  }
+#global_nav:hover,
+#header:hover,
+.column.rail:hover,
+#footer:hover {
+  z-index: /*7779*/55555; /* else sidebar is on top */
+  clip: rect(0, 1920px, 1080px, 0);
+  border-left-width: 0 !important;
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+  }
+
+/** autohide header **/
+#global_nav {
+  z-index: /*7779*/55555; /* else sidebar is on top */
+  border-left-color: red !important;
+  }
+#global_nav .navigation {margin: 0 !important}
+
+#header {
+  top: 10mm !important;
+  z-index: /*7779*/55555 !important;
+  border-left-color: #aaa !important;
+  border-top: thin solid black !important;
+  border-bottom: thin solid black !important;
+  }
+
+/** autohide sidebar **/
+.column.rail {
+  height: 100%; overflow-y: auto;
+  background: white;
+}
+.column.rail:hover {
+}
+
+/*.column.rail {padding-right: 17px !important}*/
+/*.column.rail > * {margin-right: -17px !important}*/
+.column.rail {
+  width: 338px;
+  padding: 0 2mm;
+} 
+
+/** autohide footer **/
+BODY {position: relative}
+#footer {
+  position: absolute; bottom: 0; top: auto; left: 0;
+  background-color: white;
+  border-left-color: red !important;
+  height: 20mm !important;
+  overflow: hidden;
+  border-top: medium solid black !important;
+  z-index: 7779;
+  transition-property: clip, border-left-width, height;
+  /*transition-timing-function: linear, step-end, linear;*/
+  }
+#footer:hover {
+  height: 561px !important;
+  /*transition-timing-function: linear, step-start, linear;*/
+  }
+#_footer .copyright {
+  margin-bottom: 0 !important;
+  }
+
+/** no adverts **/
+#promo,
+/*.banner_ad, .top_banner_ad, .non_blank_ad,*/
+.sub_sales,
+.advertisement,
+[id$="_ads"], /*#google_ads, #bottom_ads,*/ .advertisement, [class*="_ads_"], [class$="_ad"],
+
+/** no comment **/
+#disqus_thread,
+.dsq-brlink,
+
+/** no social **/
+#authorial + HR + .share_buttons,
+  /* top share buttons */
+.share_buttons > .clickable:not(.kindleWidget),
+  /* all but Print and Send to Kindle */
+#share-email,
+
+/** no syndicated "content" **/
+    /*Taboola*/
+#taboola_wrapper, /* may as well drop the click harvested BW links, too */
+#taboola-below-main-column,
+[data-item-syndicated="true"],
+
+.sponsored_holder,
+
+/** no surveys **/
+.fsrC, /*ForeSee*/
+
+.\. {display:none!important}
+
+
+/** readability **/
+  /* wider article on zoom, but no wider than screen */
+.primary {
+  width: /*630px*/ 48.5em !important;
+  max-width: 100%;
+  }
+
+#lead_graphic { /* shrink this useless bit of eye-candy */
+  float: right;
+  margin-left: 2mm; margin-right: -2mm;
+  /*width: 0;*/ /*overflow: visible !important;*/
+}
+body.article DIV#lead_graphic > IMG {max-width: none}
+body.article #lead_graphic > IMG:not(:active):not(:hover) {
+  height: 1in; width: auto;
+  /*float: left;*/
+}
+/*body.article #lead_graphic > IMG {
+  float: right;
+}*/
+#lead_graphic:not(:hover) P {display: none}
+
+
+  /* "Read this next" is obtrusive */
+  .slideout_container[data-show-slideout\?="yes"] .slideout {
+    transition: right .3s .3s linear;
+  }
+  .slideout_container[data-show-slideout\?="yes"] .slideout:not(:hover):not(:active) {
+    right: -300px !important;
+    transition-delay: 1s;
+  }
+  .slideout_container[data-show-slideout\?="yes"] .slideout:hover {
+    right: 0 !important;
+  }
+
+}

@@ -1,0 +1,320 @@
+/* ==UserStyle==
+@name           Toolbar Bookmarks
+@namespace      USO Archive
+@author         Gotolei
+@description    `1 NOV 2017 - this is abandoned in light of webextensions basically neutering Stylish. 57+-compatible userChrome.css version here: https://www.reddit.com/r/FirefoxCSS/comments/7a1xsl/bookmarks_in_toolbar/Stylizes bookmarks to look like toolbar buttons so they can cleanly fit in the navigation toolbar.Has options to match Windows Aero (7/Vista), Win8, Linux, OSX, Dev Edition Dark/Light, DeepDark and SimpleWhite. Also has an option that tries to match Firefox's theme outright, using the global CSS variables.The themes change the appearance of the buttons when hovered/clicked, ideally to fit in. The icons use the Toolbar.png (chrome://browser/skin/Toolbar.png) built into Firefox and should always match (except for probably hi-DPI).Has options to override bookmark favicons and use custom-defined icons (see details). They invert if necessary for personas, dark themes etc.JS applets/bookmarklets default to a gear icon, RSS feeds default to an RSS icon.`
+@version        20160325.7.46
+@license        CC0-1.0
+@preprocessor   uso
+@advanced dropdown theme-option "Theme" {
+	winaero "Windows 7/Vista*" <<<EOT /* Windows Aero theme *\/
+
+#PlacesToolbarItems > .bookmark-item {
+  -moz-appearance: none;
+  padding: 2px 4px;
+  margin: 8px 4px;
+  max-height: 24px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  transition-property: background-color, border-color;
+  transition-duration: 150ms;
+}
+
+#PlacesToolbarItems > .bookmark-item:hover {
+  background: linear-gradient(hsla(0,0%,100%,.6), hsla(0,0%,100%,.1));
+  border: 1px solid hsla(210,54%,20%,.2);
+  box-shadow: 0 1px hsla(0,0%,100%,.3) inset,
+              0 1px hsla(210,54%,20%,.03),
+              0 0 2px hsla(210,54%,20%,.1);
+
+}
+
+#PlacesToolbarItems > .bookmark-item:active,
+#PlacesToolbarItems > .bookmark-item[open] {
+  background: hsla(210,54%,20%,.15) linear-gradient(hsla(0,0%,100%,.6), hsla(0,0%,100%,.1));
+  border: 1px solid hsla(210,54%,20%,.35);
+  box-shadow: 0 1px 1px hsla(210,54%,20%,.1) inset,
+              0 0 1px hsla(210,54%,20%,.2) inset,
+              0 1px 0 hsla(210,54%,20%,0),
+              0 0 2px hsla(210,54%,20%,0);
+  transition-duration: 10ms;
+} EOT;
+win8 "Windows 8" <<<EOT /* Windows 8 theme *\/
+
+#PlacesToolbarItems > .bookmark-item {
+  -moz-appearance: none;
+  padding: 2px 4px;
+  margin: 8px 4px;
+  max-height: 24px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  transition-property: background, border-color;
+  transition-duration: 150ms;
+}
+
+#PlacesToolbarItems > .bookmark-item:hover {
+  background: hsla(210,4%,10%,.08);
+  border: 1px solid hsla(210,4%,10%,.1);
+  box-shadow: none;
+}
+
+#PlacesToolbarItems > .bookmark-item:active,
+#PlacesToolbarItems > .bookmark-item[open] {
+  background: hsla(210,4%,10%,.12);
+  border: 1px solid hsla(210,4%,10%,.2);
+  box-shadow: 0 1px 0 0 hsla(210,4%,10%,.1) inset;
+  transition-duration: 10ms;
+} EOT;
+linux "Linux" <<<EOT /* Linux theme *\/
+
+#PlacesToolbarItems > .bookmark-item {
+  -moz-appearance: none;
+  padding: 2px 4px;
+  margin: 6px 3px;
+  max-height: 24px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  transition-property: background-color, border-color;
+  transition-duration: 150ms;
+}
+
+#PlacesToolbarItems > .bookmark-item:hover {
+  background-color: hsla(0,0%,100%,.3);
+  background-image: linear-gradient(hsla(0,0%,100%,.7), hsla(0,0%,100%,.2));
+  border: 1px solid rgb(154,154,154);
+  box-shadow: 0 1px 0 hsla(0,0%,100%,.3) inset,
+              0 0 0 1px hsla(0,0%,100%,.2) inset,
+              0 1px 0 hsla(0,0%,0%,.03);
+}
+
+#PlacesToolbarItems > .bookmark-item:active,
+#PlacesToolbarItems > .bookmark-item[open] {
+  background-color: rgba(154,154,154,.5);
+  background-image: linear-gradient(hsla(0,0%,100%,.7), hsla(0,0%,100%,.4));
+  border: 1px solid rgb(154,154,154);
+  box-shadow: 0 1px 1px hsla(0,0%,0%,.1) inset,
+              0 0 1px hsla(0,0%,0%,.3) inset;
+  transition-duration: 10ms;
+} EOT;
+osx "OSX" <<<EOT /* OSX theme *\/
+
+#PlacesToolbarItems > .bookmark-item {
+  -moz-appearance: none;
+  padding: 2px 4px;
+  margin: 6px 3px;
+  max-height: 24px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  transition-property: background, border-color;
+  transition-duration: 150ms;
+}
+
+#PlacesToolbarItems > .bookmark-item:hover {
+  background: hsla(0,0%,100%,.1) linear-gradient(hsla(0,0%,100%,.3), hsla(0,0%,100%,.1)) padding-box;
+  border: 1px solid hsla(0,0%,0%,.2);
+  box-shadow: 0 1px 0 hsla(0,0%,100%,.5),
+              0 1px 0 hsla(0,0%,100%,.5) inset;
+}
+
+#PlacesToolbarItems > .bookmark-item:active,
+#PlacesToolbarItems > .bookmark-item[open] {
+  background: hsla(0,0%,0%,.02) linear-gradient(hsla(0,0%,0%,.12), transparent) border-box;
+  border: 1px solid hsla(0,0%,0%,.3);
+  box-shadow: 0 1px 0 hsla(0,0%,100%,.5),
+              0 1px 0 hsla(0,0%,0%,.05) inset,
+              0 1px 1px hsla(0,0%,0%,.2) inset;
+  transition-duration: 10ms;
+} EOT;
+devdark "Dev Edition Dark" <<<EOT /* Dev Edition Dark theme *\/
+
+#PlacesToolbarItems > .bookmark-item:hover {
+  background: #1B2127;
+  border: 1px solid rgba(25,33,38,.6);
+  box-shadow: none;
+}
+
+#PlacesToolbarItems > .bookmark-item:active,
+#PlacesToolbarItems > .bookmark-item[open] {
+  background: #1B2127;
+  border: 1px solid rgba(25,33,38,.8);
+  box-shadow: inset 0 0 3px rgba(25,33,38,.8);
+  transition-duration: 10ms;
+} EOT;
+devlight "Dev Edition Light" <<<EOT /* Dev Edition Light theme *\/
+
+#PlacesToolbarItems > .bookmark-item:hover {
+  background: #D7D7D8;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: none;
+}
+
+#PlacesToolbarItems > .bookmark-item:active,
+#PlacesToolbarItems > .bookmark-item[open] {
+  background: #f0f1f2;
+  border: 1px solid rgba(0,0,0,0.3);
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
+  transition-duration: 10ms;
+} EOT;
+deepdark "DeepDark" <<<EOT /* DeepDark theme *\/
+
+#PlacesToolbarItems > .bookmark-item {
+  -moz-appearance: none;
+  padding: 2px 4px;
+  margin: 5px 3px;
+  max-height: 24px;
+  border: 1px solid transparent;
+  border-radius: 1px;
+  transition: background .1s ease-in,
+              border .15s ease-in !important;
+}
+
+#PlacesToolbarItems > .bookmark-item:hover {
+  background: rgba(6,136,184,1);
+  border: 1px solid rgba(0,173,238,.5);
+  box-shadow: 0px 0px 5px rgba(0,173,238,.5);
+  transition: background .1s ease-in,
+              border .15s ease-in !important;
+}
+
+#PlacesToolbarItems > .bookmark-item:active,
+#PlacesToolbarItems > .bookmark-item[open] {
+  background: rgb(24,24,24) !important;
+  border: 1px solid rgb(0,0,0);
+  box-shadow: 0px 2px 5px rgba(0,0,0,.5),
+              0px 1px rgba(255,255,255,.05);
+  transition: background .1s ease-in,
+              border .15s ease-in !important;
+} EOT;
+simplewhite "SimpleWhite" <<<EOT /* SimpleWhite theme *\/
+
+#PlacesToolbarItems > .bookmark-item,
+#PlacesToolbarItems > .bookmark-item:hover {
+  -moz-appearance: none;
+  padding: 2px 4px;
+  margin: 6px 3px;
+  max-height: 24px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+
+#PlacesToolbarItems > .bookmark-item:active,
+#PlacesToolbarItems > .bookmark-item[open] {
+  background: linear-gradient(hsla(0,0%,100%,.6), hsla(0,0%,100%,.1)) hsla(0,0%,0%,.1);
+  border: 1px solid hsla(0,0%,0%,.2);
+  box-shadow:0 1px 1px hsla(0,0%,0%,.06) inset,
+             0 0 1px hsla(0,0%,0%,.12) inset,
+             0 1px 0 hsla(0,0%,0%,0),
+             0 0 2px hsla(0,0%,0%,0);
+} EOT;
+adaptive "Adaptive" <<<EOT /* Adaptive theme *\/
+
+#PlacesToolbarItems > .bookmark-item {
+  -moz-appearance: none;
+  padding: 2px 6px;
+  margin: 3px 2px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  -moz-margin-start: 0 !important;
+  -moz-margin-end: 0 !important;
+}
+
+#PlacesToolbarItems > .bookmark-item:hover {
+  background: var(--toolbarbutton-hover-background) !important;
+  border-color: var(--toolbarbutton-hover-bordercolor);
+  box-shadow: var(--toolbarbutton-hover-boxshadow);
+  -moz-margin-start: 0 !important;
+  -moz-margin-end: 0 !important;
+}
+
+#PlacesToolbarItems > .bookmark-item:active,
+#PlacesToolbarItems > .bookmark-item[open] {
+  background: var(--toolbarbutton-active-background) !important;
+  border-color: var(--toolbarbutton-active-bordercolor);
+  box-shadow: var(--toolbarbutton-active-boxshadow);
+} EOT;
+
+}
+@advanced dropdown favicon-override "Override favicons?" {
+	yes "Yes*" <<<EOT /* override favicons *\/
+
+.bookmark-item[image*="favicon"] .toolbarbutton-icon {
+  background: -moz-image-rect(url(chrome://browser/skin/Toolbar.png), 0, 252, 18, 234);
+  width: 0;
+  height: 0;
+  padding: 0 0 18px 0;
+}
+
+#nav-bar[brighttext] .bookmark-item[image*="favicon"] .toolbarbutton-icon {
+  background: -moz-image-rect(url(chrome://browser/skin/Toolbar-inverted.png), 0, 252, 18, 234) !important;
+} EOT;
+no "No" <<<EOT /* pad favicons to fit *\/
+
+.bookmark-item[image*="favicon"] .toolbarbutton-icon {
+  padding: 1px;
+} EOT;
+
+}
+
+==/UserStyle== */
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+#main-window[chromehidden*="toolbar"] #nav-bar #personal-bookmarks {
+/* hide bookmarks in popup windows etc */
+  display: none;
+}
+
+/*[[theme-option]]*/
+
+#PlacesToolbarItems > .bookmark-item > .toolbarbutton-icon {
+  list-style-image: url("chrome://browser/skin/Toolbar.png");
+  -moz-image-region: rect(0, 252px, 18px, 234px);
+  height: 18px;
+  width: 18px;
+  margin-right: 0;
+}
+
+toolbar[brighttext] #PlacesToolbarItems > .bookmark-item > .toolbarbutton-icon {
+  list-style-image: url("chrome://browser/skin/Toolbar-inverted.png");
+}
+
+/*[[favicon-override]]*/
+
+.bookmark-item > .toolbarbutton-text,
+.bookmark-item[container] > .toolbarbutton-menu-dropmarker {
+  display: none !important;
+}
+
+.bookmark-item[container] > .toolbarbutton-icon {
+  -moz-image-region: rect(0, 234px, 18px, 216px) !important;
+}
+
+.bookmark-item[scheme="javascript"] > .toolbarbutton-icon,
+.bookmark-item[label*="gear-icon"] > .toolbarbutton-icon {
+  -moz-image-region: rect(0, 468px, 18px, 450px) !important;
+}
+
+.bookmark-item[livemark] > .toolbarbutton-icon,
+.bookmark-item[label*="rss-icon"] > .toolbarbutton-icon  {
+  -moz-image-region: rect(0, 288px, 18px, 270px) !important;
+}
+
+.bookmark-item[label*="page-icon"] > .toolbarbutton-icon {
+  -moz-image-region: rect(0, 252px, 18px, 234px) !important;
+}
+
+.bookmark-item[label*="search-icon"] > .toolbarbutton-icon {
+  -moz-image-region: rect(0, 396px, 18px, 378px) !important;
+}
+
+.bookmark-item[label*="wrench-icon"] > .toolbarbutton-icon {
+  -moz-image-region: rect(0, 450px, 18px, 432px) !important;
+}
+
+.bookmark-item[label*="video-icon"] > .toolbarbutton-icon {
+  -moz-image-region: rect(0, 594px, 18px, 576px) !important;
+}
+
+.bookmark-item[label*="mail-icon"] > .toolbarbutton-icon {
+  -moz-image-region: rect(0, 666px, 18px, 648px) !important;
+}

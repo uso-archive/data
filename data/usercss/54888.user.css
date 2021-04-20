@@ -1,0 +1,318 @@
+/* ==UserStyle==
+@name           autohide the menu & sidebar [Forbes]
+@namespace      USO Archive
+@author         hideheader
+@description    `(1) Collapses the header and the footer into thin strips at the top and bottom of the page, and redisplays them when you mouse over one of the strips.(2) Moves the sidebar from the right side of the page to the left side, and auto-hides it as a thin vertical strip at the left edge of the page.(3) Auto-hides the galleries "filmstrip" in the body of the article, and restores it when you mouse over it`
+@version        20131115.12.55
+@license        NO-REDISTRIBUTION
+@preprocessor   uso
+@advanced dropdown noComment "Show the comments?" {
+	No--they-just-angry- "No, they just angry-up the blood*" <<<EOT display: none EOT;
+Yes--other-peoples-- "Yes, other peoples' comments make me feel smart" <<<EOT  EOT;
+
+}
+@advanced dropdown toolbarPosition "\"Follow bar\" position: Bottom of the screen, or bottom of the page?" {
+	Bottom-of-the-page-- "Bottom of the page - screen space is a scarce commodity*" <<<EOT  #follow_bar {
+  position: absolute !important;
+  bottom: 3mm !important;
+ }
+  /* park it at the bottom of the page, *\/
+ #follow_bar > .button-hide.button-shown {display: none !important}
+  /* and once it's visible, keep it that way *\/
+
+ EOT;
+Bottom-of-the-screen "Bottom of the screen - it's not terribly obtrusive" <<<EOT  EOT;
+
+}
+
+==/UserStyle== */
+@-moz-document domain("www.forbes.com") {
+
+body {position: relative}
+
+ /* login links are orphaned on the right - move 'em to the left */
+ .top_link_strip > :first-child {width: auto !important}
+ #header_userinfo { /*8 Jun*/
+  float: left !important;
+  width: auto !important;
+  margin-left: 5em !important;
+ }
+ #follow_bar {
+  position: absolute !important;
+  bottom: 3mm !important;
+ }
+  /* park it at the bottom of the page, */
+ #follow_bar > .button-hide.button-shown {display: none !important}
+  /* and once it's visible, keep it that way */
+
+@media (max-width:0) {
+ HEADER, .universal-footer, #abovefold > ASIDE,
+ #globalfooter {z-index: 1000001 !important} /*8 Jun*/
+  /* else .topAd is on top */
+ .topAd, .blockAd, .googleAdd, [href*="ads.forbes.com"], #eyeDiv {display: none !important}
+  /* (or not...)
+
+/* - - - - auto-hide header - - - - */
+
+header {
+ position: absolute; top: 0px;
+ clip: rect(0px, 9999px, 3mm, 0px);
+/* z-index: 26;
+  /* else slideshow title (#galleryhed, z-index:25) is on top */
+
+ padding: 0em 0.5em;
+}
+header:hover {
+ clip: auto;
+ border: solid black thin !important;
+}
+header > * {visibility: hidden}
+header:hover > * {visibility: visible}
+
+body {padding-top: 3mm !important}
+ /* make space for the header above the article content */
+}/*@media (max-width:0)*/
+
+.universal-footer,
+#abovefold > ASIDE {z-index: 999}
+HEADER,
+.universal-footer:hover,
+#abovefold > ASIDE:hover {
+  z-index: 1000;
+  }
+
+BODY:not(.body_homepage) HEADER,
+#abovefold > ASIDE {
+  position: fixed; top: 0; left: 0;
+  clip: rect(0, 2mm, 20mm, 0);
+  border-left: 2.2mm solid red;
+  transition: .3s .8s;
+  transition-property: clip, border-left-width, clip, z-index;
+  transition-timing-function: linear, step-end;
+  }
+BODY:not(.body_homepage) HEADER:hover,
+#abovefold > ASIDE:hover {
+  clip: rect(0, 1024px, 1080px, 0);
+  border-left-width: 0;
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+  }
+
+/** autohide the header **/
+HEADER:hover {
+  clip: rect(0, 1024px, 71px, 0);
+  }
+
+/** autohide the sidebar **/
+#abovefold > ASIDE {
+  height: 100%; overflow-y: auto;
+  background-color: white;
+  clip: rect(0, 2mm, 1080px, 0);
+  border-left-color: blue;
+  }
+#abovefold > ASIDE:hover {
+  clip: rect(0, 350px, 1080px, 0);
+  }
+
+
+#anchorhack {display: none}
+ /* position:absolute div that is 1000px high - causes footer to be placed at the bottom of the screen, not the page, in /pictures because the body is no higher than the screen */
+
+
+/* - - - - auto-hide footer - - - - */
+/*
+ The two large footers, stacked but without a containing element
+ in common, have been replaced by three (!) large footers with
+ an element containing all three (DIV.universal-footer). For now
+ I'll auto-hide the container instead of auto-hiding the three
+ footers individually, and reduce the whitespace to reduce the
+ height of the stack.
+*/
+ /* reduce the height of this absurdly big page footer */
+ .universal-footer > DIV > * {
+  height: auto !important;
+  margin: 0px !important; padding: 0px !important;
+ }
+
+ /* "Photo Galleries and More" */
+BODY:not(.body_homepage) .universal-footer /*#globalfooter*/ {
+ position: absolute !important; bottom: 0px;
+ height: 3mm; overflow: hidden;
+/* z-index: 25 !important;
+  /* else slideshow title (#galleryhed, z-index:25) is on top */
+ padding: 0px 0.5em !important;
+ margin: 0px !important;
+}
+BODY:not(.body_homepage) .universal-footer:hover /*#globalfooter:hover*/ {
+ height: auto; overflow: visible;
+ /*padding-bottom: 2em !important;*/
+}
+
+ /* "Photo Galleries and More" */
+#globalfooter { /*8 Jun: still exists on home page*/
+ position: absolute !important; bottom: 0px;
+ height: 3mm; overflow: hidden;
+/* z-index: 25 !important;
+  /* else slideshow title (#galleryhed, z-index:25) is on top */
+ padding: 0px 0.5em !important;
+ margin: 0px !important;
+}
+#globalfooter:hover {
+ height: auto; overflow: visible;
+ /*padding-bottom: 2em !important;*/
+}
+/* NB: gap opens below footer when footer expands - dunno why */
+/* (but not when padding (but not margin) rule is removed from #globalfooter) */
+/* Here's why: Advert for magazines is position:absolute and extends below bottom of page. To give it a black background, #globalfooter was made padding-bottom:70px. With padding-bottom:0px the bottom of the advert extends below the bottom of the page, but because it is supposed to be white text on a black background it can't be seen without the larger margin, and appears just to be a white space. */
+
+._universal-footer > DIV /*#globalfooter*/ > * {visibility: hidden}
+._universal-footer:hover > DIV /*#globalfooter:hover*/ > * {visibility: visible}
+
+.universal-footer > DIV /*#globalfooter*/ > section {padding-top: 0px !important}
+ /* reduce the size of this REALLY big footer */
+
+#globalfooter > * {visibility: hidden}
+#globalfooter:hover > * {visibility: visible}
+
+#globalfooter > section {padding-top: 0px !important}
+ /* reduce the size of this REALLY big footer */
+
+#footer_magazines {top: -60px !important}
+ /* move magazine ad up so it doesn't extend past bottom of page */
+
+
+ /* "The Forbes 400, Celebrity 100" etc. */
+/*8 Jun: deprecated - #listwatch is gone [oops, no it's not] */
+#listwatch {
+ position: absolute !important; bottom: 3mm;
+ height: 3mm; overflow: hidden;
+ margin-bottom: 0px !important;
+ padding: 0px !important;
+}
+#listwatch:hover {
+ height: auto; overflow: visible;
+}
+#listwatch > * {visibility: hidden}
+#listwatch:hover > * {visibility: visible}
+
+
+
+/** no ads **/
+.leaderboard, #leaderboardad, .oasad,
+.ad,
+#omniture,
+.sponsorship,
+[class*="_promo_"],
+.forbes_flyer, /* internal ad, and a very annoying one at that */
+.fsrFloatingContainer, .fsrC, /* modal survey forms */
+.advoice, /* "content" by advertisers */
+IFRAME[id*="google"],
+[id*="shortTail"],
+
+/** no social **/
+#sticky_sharing,
+.article_actions > UL,
+.follow_links,
+.followable_block > .followable_block,
+[class^="fb-"],
+#galleryhed > .follow,
+#galleryhed > .shareholder,
+ /* remove social links in slideshows so title needn't wrap */
+
+.\. {display: none !important}
+
+}
+
+
+@-moz-document url-prefix("http://www.forbes.com/sites/") {
+
+/* - - - - auto-hide header - - - - */
+
+#contentwrapper {margin-top: 0px !important}
+ /* else there's a gap above the header */
+
+#header_fakeit {display: none}
+/* This is a full-width blue band behind the promos ribbon on the header. It's position:absolute, so it could be used to position the header so that it's only available at the top of the display. */
+
+
+/* - - - - auto-hide sidebar - - - - */
+@media (max-width:0) {
+#contentwrapper, #abovefold {position: static !important}
+
+#abovefold > aside {
+ position: absolute; left: 0px; top: 0px;
+ clip: rect(0px, 3mm, 9999px, 0px);
+ /*background-color: transparent !important;*/
+}
+#abovefold > aside:hover {
+ clip: auto;
+ border: solid black thin;
+ background-color: white;
+ z-index: 1001 /*26*/; /*8 Jun*/
+  /* so open sidebar is on top of author's photo (z-index:1) */
+  /* so open sidebar is on top of header, and open header is on top of sidebar */
+  /* else floating toolbar is on top */
+}
+
+#abovefold > aside > * {visibility: hidden}
+#abovefold > aside:hover > * {visibility: visible}
+}/*@media (max-width:0)*/
+
+#abovefold .user_block {display: none}
+ /* same author information is available in sidebar */
+
+#storyCo11 {width: auto !important}
+ /* let story expand to width of top menu */
+
+
+#leftRail aside > .box {display: none}
+#leftRail aside:hover > .box {display: block}
+
+
+ /* - - - - no comments - - - - */
+ #comments { /*[[noComment]]*/ }
+}
+
+
+@-moz-document domain("video.forbes.com") {
+
+
+/* - - - - auto-hide header - - - - */
+
+body > table:nth-of-type(1) {
+ position: absolute; top: 0px !important;
+ clip: rect(0px, 9999px, 3mm, 0px);
+ z-index:1;
+  /* else second-level horizontal menu (#hRO, position:relative) is on top */
+ /*background-color: transparent !important;*/
+}
+body > table:nth-of-type(1):hover {
+ clip: auto;
+}
+body > table:nth-of-type(1) > * {visibility: hidden}
+body > table:nth-of-type(1):hover > * {visibility: visible}
+
+body {padding-top: 3mm !important}
+ /* make space for collapsed header above content */
+
+
+/* - - - - auto-hide footer - - - - */
+
+#footContainer, /* www.forbes.com/2011/10/07/ */
+body > .footcontainer {
+ position: absolute; bottom: 0px;
+ height: 3mm; overflow:hidden;
+ border: solid black thin;
+ /*width: 100% !important;*/
+}
+#footContainer:hover,
+body > .footcontainer:hover {
+ height: auto; /*overflow: visible;*/
+ background-color: white;
+}
+#footContainer > *,
+body > .footcontainer > * {visibility: hidden}
+#footContainer:hover > *,
+body > .footcontainer:hover > * {visibility: visible}
+
+}
