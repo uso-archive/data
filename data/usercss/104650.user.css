@@ -3,7 +3,7 @@
 @namespace      USO Archive
 @author         wOxxOm
 @description    `Compact v2: solid.Customizable background color, looks good in close-to-white range.Works on that "alter ego" site as well.`
-@version        20200802.11.12
+@version        20210506.4.29
 @license        NO-REDISTRIBUTION
 @preprocessor   uso
 @advanced color bgcolor "Background color" #F2F3F4
@@ -29,12 +29,21 @@
     margin: 0;
     background-color: /*[[bgcolor]]*/
   }
+  .text-content > p:first-child, /* 404 error */
+  .text-content > p:first-child + p:last-child {
+    text-align: center;
+  }
   :target {
     outline: 1px solid #ffc000;
   }
+  .width-constraint {
+    margin: 0;
+    padding: 0 2rem;
+    max-width: 100%;
+    min-width: 1000px;
+  }
   #main-header,
   #Head {
-    background-color: #123 !important;
     background: linear-gradient(#123 48px, #234 48px) !important;
     border-bottom: 4px solid #506880;
     height: 64px;
@@ -162,14 +171,16 @@
   }
   pre,
   code {
-    padding: 1px 8px 3px;
     font-size: 9.5pt;
     line-height: 1.2;
     background: #F7F7EF;
     border: 1px solid #D2D2C7;
+    white-space: pre-wrap;
   }
-  pre code {
-    white-space: pre-wrap
+  :not(pre) > code,
+  pre {
+    padding: 1px 6px 3px;
+    overflow-wrap: anywhere;
   }
   /* more menu on top */
   .SiteMenu nav {
@@ -221,6 +232,13 @@
   html {
     overflow-y: auto;
   }
+  .previewable {
+    margin-right: 2rem;
+  }
+  .user-content {
+    overflow-wrap: anywhere;
+    overflow: visible;
+  }
 }
 @-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?search/?.*") {
   h3 {
@@ -262,6 +280,9 @@
 }
 @-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?(scripts(|/|(/page|/by-site|/search|/?\\?|/requested_permanent_deletion|/reported|/minified).*)|users/\\d+.*)$") {
   /* SCRIPT LIST (global and inside user profile) *******************************************************************/
+  .width-constraint {
+    padding: 0;
+  }
   #script-language-filter {
     position: absolute;
     right: 1rem;
@@ -271,11 +292,6 @@
   }
   .list-option-groups ~ ol {
     width: auto!important;
-  }
-  .width-constraint {
-    margin: 0px;
-    max-width: 100%;
-    min-width: 1000px;
   }
   .width-constraint > p:first-child {
     text-align: center;
@@ -302,6 +318,9 @@
     font-size: 0.7rem;
   }
   /******** SORT OPTIONS ********************/
+  .sidebarred-main-content {
+    max-width: none;
+  }
   .list-option-groups {
     float: none;
     width: 100%;
@@ -577,9 +596,6 @@
     background-color: rgba(0, 20, 40, 0.1);
     transition: background-color 0.5s
   }
-  #site-nav > nav {
-    right: 10rem;
-  }
   .sidebar-search input[type=search] {
     top: -2.2em;
     right: 2rem;
@@ -624,16 +640,20 @@
     background: antiquewhite;
   }
 }
+@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?(scripts(/|(/page|/by-site/.*|/search)?([#?].*)?))") {
+  #site-nav > nav {
+    right: 10rem;
+  }
+}
 @-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?scripts/.*?\\?.+") {
   #script-list-sort {
     right: 36rem;
   }
 }
-@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?(scripts/\\d+|moderator_actions).*") {
+@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?(scripts/\\d+[^/]*(/[^/]*|/discussions/\\d+.*)?|moderator_actions)([?#].*)?") {
   /* SCRIPT *******************************************************************/
   .width-constraint {
-    max-width: 100%;
-    text-align: center
+    padding: 0;
   }
   .width-constraint > * {
     text-align: left
@@ -737,14 +757,20 @@
     left: 0;
     margin-top: 1ex;
   }
+  #script-feedback-suggestion {
+    background: white;
+    margin: 0;
+    padding-top: 1em;
+    padding-bottom: .5em;
+  }
   #script-meta {
-    padding-bottom: 1em
+    padding: 1rem calc(100% - 40em - 2rem) 1rem 96px;
+    background: white;
+    max-width: none;
   }
   #script-content {
     margin: 0;
     padding: 0;
-    background: white;
-    /*border-bottom: 0.4ex solid rgba(0,20,40,0.2);*/
   }
   #script-content::before {
     border-top: 1px solid black;
@@ -752,8 +778,21 @@
     height: 0;
     content: " ";
   }
+  #script-content > h3 {
+    margin: 1em 0 0 calc(96px + 1.5rem);
+  }
   #install-area {
     padding-top: 1em;
+    padding-bottom: 1em;
+    margin-bottom: 0;
+    background: white;
+  }
+  #script-show-info-ad {
+    margin: 0;
+    mix-blend-mode: multiply;
+  }
+  form.script-in-sets {
+    background: #fff8;
   }
   #additional-info {
     background: /*[[bgcolor]]*/;
@@ -774,41 +813,8 @@
   #additional-info > h3 {
     display: none
   }
-  #code-container {
-    font-size: 9pt;
-    line-height: 1.2em;
-    overflow: visible!important;
-    -moz-tab-size: 4;
-    tab-size: 4;
-    background: #EEF1F3;
-  }
-  table.CodeRay {
-    width: 100%;
-    max-width: 100vw;
-    background: #EEF1F3;
-    border-top: 0.4ex solid rgba(0, 20, 40, 0.2)!important;
-    border-left: none!important;
-    border-right: none!important;
-    border-bottom: none!important;
-  }
-  #code-container .CodeRay .line-numbers {
-    background: rgba(0, 0, 0, 0.05)!important;
-  }
-  #code-container .CodeRay .line-numbers a {
-    background-color: transparent!important;
-    color: #95AFC1!important;
-  }
-  #code-container .CodeRay .string {
-    background-color: transparent
-  }
-  #code-container .CodeRay .string .content {
-    color: #079E81
-  }
-  #code-container .CodeRay .string .delimiter {
-    color: #91BAC2
-  }
-  #code-container .CodeRay .comment {
-    color: #947C46
+  .code-container {
+    max-height: none;
   }
   @media (min-width: 2500px) {
     #script-content > ul {
@@ -828,10 +834,46 @@
   }
   .prettyprint {
     max-height: none;
-    padding: .5rem .5rem .5rem calc(96px + 4ex) !important;
+    min-width: auto;
+    max-width: 100%;
+    width: auto;
+    padding: .5rem .5rem .5rem 96px !important;
     border-style: solid none none none !important;
-    background: /*[[bgcolor]]*/
-    !important;
+    background: /*[[bgcolor]]*/ !important;
+    white-space: pre-wrap;
+  }
+  #script-feedback-suggestion + .prettyprint {
+    margin-top: 0;
+  }
+}
+@-moz-document regexp("https://(greasy|sleazy)fork.org/([^/]+/)?scripts/\\d+.*?/stats.*") {
+  /* SCRIPT STATS *******************************************************************/
+  #script-content {
+    background: /*[[bgcolor]]*/;
+    padding-bottom: 1rem;
+    text-align: center;
+  }
+  #script-content h3 {
+    background: white;
+    margin: 0;
+    padding: 1rem;
+  }
+  #script-content table {
+    margin: 1rem auto;
+  }
+  [id$=stats-chart-container] {
+    padding: 2rem;
+    margin-top: 1rem;
+  }
+  canvas {
+    overflow-x: hidden;
+    max-width: 100%
+  }
+}
+@-moz-document regexp("https://(greasy|sleazy)fork.org/([^/]+/)?scripts/\\d+.*?/derivatives.*") {
+  /* SCRIPT DERIVATIVES *******************************************************************/
+  #script-content > p:first-child, form {
+    background: white;
   }
 }
 @-moz-document regexp("https://(greasy|sleazy)fork.org/([^/]+/)?scripts/\\d+.*?/feedback.*") {
@@ -858,6 +900,7 @@
   #script-content > h3 {
     padding: 1ex 2ex 0 calc(96px + 2.5ex)
   }
+  #contribution,
   #support-url {
     background-color: white;
     margin-bottom: -1em !important;
@@ -870,11 +913,13 @@
     display: none
   }
   .post-discussion h3 + p {
-    padding-left: 2rem;
     margin-top: 0;
     margin-bottom: 0;
     padding: 2ex 0 2ex 2rem !important;
     font-weight: bold
+  }
+  .post-discussion a[href="#post-discussion"] {
+    margin-left: 2rem;
   }
   #start-discussion-top {
     font-weight: bold
@@ -1021,18 +1066,16 @@
   .discussion-list-item:nth-child(odd) {
     background: rgba(0, 20, 40, 0.08);
   }
-  .previewable {
-    margin-right: 2rem;
-  }
 }
 @-moz-document regexp("https://(greasy|sleazy)fork.org/([^/]+/)?discussions([?/].*)?$") {
+  .width-constraint {
+    padding: 0;
+  }
+  .sidebarred-main-content {
+    max-width: none;
+  }
   #main-header {
     margin-bottom: 2rem;
-  }
-  .width-constraint {
-    margin: 0px;
-    max-width: 100%;
-    min-width: 1000px;
   }
   .script-list,
   .user-list,
@@ -1098,10 +1141,19 @@
     padding: 2px 1em;
     background: #b9c8d4;
   }
+  .discussion-actions > a[href*="/mark_all_read"] {
+    font-weight: bold;
+    background: #4e7cab;
+    color: white;
+    padding: .25em 1em;
+    margin: 0 2rem;
+    border-radius: .5em;
+  }
+
 }
-@-moz-document regexp("https://(greasy|sleazy)fork.org/([^/]+/)?(scripts/\\d+.*?/)?discussions/([^/]+/)?\\d+.*") {
-  .previewable {
-    margin-right: 1rem;
+@-moz-document regexp("https://(greasy|sleazy)fork.org/([^/]+/)?((scripts/\\d+.*?/)?discussions/([^/]+/)?\\d+.*|users/\\d+[^/]*/conversations/\\d+.*)") {
+  .text-content {
+    padding-left: 0 !important;
   }
   .discussion-header,
   .post-reply {
@@ -1235,14 +1287,20 @@
     padding: .25em .5em;
   }
 }
-@-moz-document regexp("https://(greasy|sleazy)fork.org/([^/]+/)?scripts/\\d+.*?/(versions(/?|\\?show_all_versions.*)$|stats.*)") {
+@-moz-document regexp("https://(greasy|sleazy)fork.org/([^/]+/)?scripts/\\d+.*?/(versions(.*|\\?show_all_versions.*)$|stats.*)") {
   /* SCRIPT HISTORY *******************************************************************/
+  #script-content > p {
+    background: white;
+  }
   #script-content form {
-    margin-top: -4ex
+    padding: 0 0 2ex;
+  }
+  #script-content form > input {
+    margin-left: calc(96px + 2.5ex);
   }
   #script-content form ul {
-    padding-left: 0;
-    overflow-x: auto
+    padding: 0 1ex 2ex calc(96px + 2.5ex);;
+    overflow-x: auto;
   }
   #script-content form ul:not(.errors) li {
     display: table-row;
@@ -1251,18 +1309,6 @@
   #script-content form ul:not(.errors) li > * {
     display: table-cell;
     padding-right: 1em
-  }
-  /* SCRIPT STATS *******************************************************************/
-  #script-content h3,
-  #script-content table {
-    margin-left: calc(96px + 2.5ex)
-  }
-  canvas {
-    overflow-x: hidden;
-    max-width: 100%
-  }
-  #script-content table {
-    margin-bottom: 1em
   }
 }
 @-moz-document regexp("https://(greasy|sleazy)fork.org/([^/]+/)?scripts/\\d+.*?/diff\\?v1=\\d+&v2=\\d+.*") {
@@ -1318,27 +1364,15 @@
 }
 @-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?users/.*") {
   /* USER PROFILE *******************************************************************/
-  .width-constraint {
-    margin: 0px;
-    max-width: 100%;
-    min-width: 1000px;
-    padding: 0 1em
-  }
   #main-header {
     padding-left: 2ex;
     padding-right: 2ex;
     margin-bottom: 0;
   }
   body > .width-constraint > * {
-    padding-left: 108px;
+    padding-left: 2rem;
     margin-top: 3ex;
     display: block
-  }
-  .width-constraint > h2 {
-    background: linear-gradient(rgba(0, 15, 40, 0.2), rgba(0, 15, 40, 0.3) 90%, rgba(0, 15, 40, 0.5) 100%);
-    font-size: 24pt;
-    margin: 0 -0.5em;
-    padding: 1.5ex 1ex 1.5ex calc(96px + 1.5ex);
   }
   .discussion-list {
     max-width: 100em
@@ -1348,12 +1382,11 @@
     border: none;
   }
   .width-constraint > section {
-    margin: 0 -1em -1ex -1em;
-    padding: 1ex 0 0 calc(96px + 3ex);
+    padding: 1ex 0 0 2rem;
   }
   header h3 {
-    margin-left: calc(-96px - 3ex - 1em);
-    padding: 1ex 2ex 1ex calc(96px + 3ex + 1em);
+    margin-left: -2rem;
+    padding: 1ex 2ex 1ex 2rem;
     border-top: 0.2ex solid rgba(0, 20, 40, 0.1);
     background: rgba(0, 20, 40, 0.1);
   }
@@ -1506,987 +1539,6 @@
     margin-top: .5ex
   }
 }
-@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?forum(?!/(plugin|dashboard)).*") {
-  /* FORUM  *******************************************************************/
-  #Body,
-  #Content {
-    max-width: none;
-    padding: 0;
-    margin: 0;
-    border: none;
-    box-shadow: none;
-    background: none;
-  }
-  body > #Frame > .Head {
-    padding: 0.25em 2ex;
-    margin-bottom: 0
-  }
-  body:not(.Settings) #Head {
-    padding-top: 0.25em!important
-  }
-  #Head > .Row {
-    padding: 0;
-    width: 100%;
-    font-size: 12pt
-  }
-  #Head a {
-    text-decoration: none
-  }
-  .subtitle {
-    margin-top: -1ex
-  }
-  body,
-  .Message {
-    line-height: 1.4
-  }
-  .SiteMenu a {
-    font-size: inherit
-  }
-  body:not(.Settings) a:not(.Button):not(.ChangePicture) {
-    color: #149
-  }
-  body:not(.Settings) a:visited:not(.Button) {
-    color: #578
-  }
-  .InformMessages a {
-    color: yellow !important;
-  }
-  body {
-    background: none
-  }
-  #Body .Row {
-    min-width: 960px;
-    width: auto;
-    font-size: 11pt;
-    padding: 0 1rem;
-    display: flex;
-    position: relative;
-  }
-  #Body #Content,
-  #Body .ContentColumn {
-    padding: 0;
-    margin: 0;
-  }
-  #Panel {
-    float: none;
-    width: 24ex;
-    min-width: 24ex;
-    line-height: 2;
-    font-size: 11pt;
-    margin: 80px 0 0 -2ex;
-    padding: 2ex 1ex 0 2ex;
-    background: linear-gradient(rgba(0, 30, 40, 0.1), transparent);
-  }
-  #Panel .FilterMenu,
-  #Panel .PanelCategories {
-    box-shadow: none;
-    background: none;
-    border: none;
-    margin: 0;
-    padding: 0;
-  }
-  #Panel .FilterMenu a,
-  #Panel .PanelCategories a {
-    padding: .5ex 0;
-  }
-  #Panel .FilterMenu .Active a,
-  #Panel .PanelCategories .Active a {
-    background: none;
-    border: none;
-    box-shadow: none;
-    padding: 1ex 0 1ex 2.5ex;
-  }
-  #Panel .FilterMenu li,
-  .PanelInfo li {
-    border: none
-  }
-  #Panel .FilterMenu .Active,
-  .PanelInfo .Active {
-    background: rgba(17, 34, 51, 0.15);
-    margin-left: -2.2ex;
-    margin-right: -1ex;
-  }
-  #Panel li {
-    position: relative
-  }
-  #Panel li a {
-    width: 21ex;
-    display: inline-block;
-    line-height: 1.3
-  }
-  #Panel li .Aside {
-    float: none;
-    position: absolute;
-    top: calc(1ex - 2px);
-    right: 0
-  }
-  #Panel .Active .Aside {
-    right: 1ex
-  }
-  #Panel .FilterMenu .Active a,
-  .PanelInfo .Active a {
-    color: black
-  }
-  .SiteSearch .Button {
-    top: 7px
-  }
-  .BoxDiscussionFilter,
-  .PanelCategories {
-    font-size: 10.5pt;
-    letter-spacing: 0;
-  }
-  .Count {
-    background: rgba(0, 20, 40, 0.1);
-    color: black
-  }
-  #Content {
-    font-size: 11pt;
-    flex: auto
-  }
-  .SplashMessage #Body h1 {
-    font-size: 18pt;
-    padding: 1em 2em 1em
-  }
-  #Content h1.H,
-  .EditMode h2.H,
-  .PageTitle h1 {
-    font-weight: bold;
-    height: 48px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    margin: 0;
-    padding: 24px 3ex 8px calc(26px + (28ex / 18) * 11);
-    font-size: 18pt;
-    display: block;
-    background: linear-gradient(rgba(0, 15, 40, 0.2), rgba(0, 15, 40, 0.3) 90%, rgba(0, 15, 40, 0.5) 100%);
-    border-top: none;
-  }
-  #Content h1.H + *,
-  .EditMode h2.H + * {
-    display: block;
-    margin-top: calc(64px + 8px - 16px);
-    position: relative;
-    z-index: 99
-  }
-  .DataList.Drafts,
-  #Content .MessageList.Conversation {
-    margin-top: 90px;
-    padding-left: 2ex;
-    font-size: 11pt
-  }
-  .DataList .Item:last-of-type,
-  .NarrowList .Item:last-of-type {
-    border-bottom: none
-  }
-  .Item:after {
-    clear: both;
-    display: block;
-    content: " "
-  }
-  .FormWrapper {
-    background: none
-  }
-  .Form-Header .ProfilePhoto {
-    margin-top: 3ex
-  }
-  .PageControls .BoxNewConversation {
-    display: none
-  }
-  /* forum/messages */
-  h2.CommentHeading,
-  .CommentForm h2 {
-    display: none
-  }
-  .Pager {
-    float: none;
-    text-align: right;
-  }
-  .Pager a,
-  .Pager span {
-    padding: 1px 6px;
-    margin: 0;
-    background: none;
-  }
-  .Pager a:hover {
-    background: rgba(0, 80, 160, 0.2)
-  }
-  .RecentDiscussionFilterOptions {
-    clear: both;
-  }
-  .RecentDiscussionFilter a {
-    background: none;
-  }
-  #Panel .FilterMenu a:hover,
-  #Panel .PanelCategories a:hover,
-  #Panel .FilterMenu a:focus,
-  #Panel .PanelCategories a:focus {
-    background: none;
-    border: none;
-    box-shadow: none;
-    text-decoration: underline;
-  }
-  #Panel .MeBox {
-    border: none;
-    box-shadow: none;
-    background: none;
-    padding-top: 0;
-  }
-  img.ProfilePhoto[src$="/defaulticon.png"] {
-    opacity: 0.3
-  }
-}
-@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?forum/messages/\\d+.*") {
-  /* FORUM PRIVATE MESSAGES *******************************************************************/
-  #Panel li a {
-    width: auto
-  }
-  .DataList .Item,
-  .NarrowList .Item {
-    margin: 0 -2ex 0 -2ex;
-    position: relative;
-    padding: 2ex;
-    font-size: 11pt
-  }
-  .Item:nth-child(even) {
-    background-color: rgba(0, 20, 40, 0.02)!important
-  }
-  .Item .Message {
-    margin-top: -2px;
-    display: inline-block;
-    white-space: normal;
-    width: calc(100% - 24ex)
-  }
-  .Message > p:first-child {
-    margin-top: 0px
-  }
-  .Meta {
-    display: inline-block;
-    vertical-align: top;
-    width: calc(22ex + 44px)
-  }
-  .Meta .Author a {
-    line-height: 1.1;
-    display: block;
-    font-size: 11pt;
-  }
-  .PhotoWrap + .Username {
-    top: 5px;
-    position: relative;
-    width: calc(22ex - 40px);
-    margin-bottom: 1ex;
-    float: left;
-  }
-  .DateCreated {
-    margin: 0
-  }
-  .Author .PhotoWrap {
-    margin-right: 4px
-  }
-  .ConversationMessage .Author .PhotoWrap img {
-    margin-bottom: 0;
-  }
-}
-@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?forum(|/|/index.+?|/categories/.*|/discussions(/p\\d+|/mine|/bookmarked)?)$") {
-  /* FORUM TOPIC LIST *******************************************************************/
-  .PageControls.Top {
-    margin-bottom: 0;
-    height: 16px;
-    top: -2em;
-  }
-  .PageDescription + .PageControls.Top {
-    margin-top: -16px
-  }
-  .PageDescription {
-    position: relative;
-    font-size: 11pt;
-    padding-left: 3ex;
-    height: 16px;
-    margin: 0
-  }
-  li.Item {
-    border: none !important;
-  }
-  .Item.Read {
-    background: none;
-    opacity: 1.0
-  }
-  .ItemContent.Discussion {
-    width: calc(100% - 40px);
-  }
-  .DataList .Item {
-    padding: 6px 8px 0
-  }
-  .ItemDiscussion:first-child {
-    padding-top: 2ex
-  }
-  .ItemDiscussion:nth-child(even) {
-    background: rgba(0, 20, 40, 0.05);
-  }
-  .ItemDiscussion.Read {
-    border-right: 4px solid #CCC3C3 !important;
-    margin-right: -4px;
-  }
-  .ItemDiscussion.Read:nth-child(odd) {
-    border-color: #E0D7D7 !important;
-  }
-  .ItemDiscussion:first-child .MCount {
-    visibility: visible;
-    position: relative;
-    top: -4.5em;
-    color: gray;
-  }
-  .ItemDiscussion:first-child .MCount span {
-    position: relative;
-    top: 4.5em;
-  }
-  .ItemContent.Discussion .Title {
-    display: inline-block;
-    width: calc(100% - 28em);
-  }
-  .ItemContent.Discussion .Title > a {
-    float: left;
-    line-height: 1.2;
-    margin-left: 18px;
-    margin-right: 1em;
-    width: calc(65% - 18px);
-  }
-  .ItemContent.Discussion .Title > a:last-child {
-    display: block;
-    float: none;
-    width: 90%;
-  }
-  .ItemContent.Discussion .Title > span {
-    float: left;
-    font-size: 85%;
-    font-weight: normal;
-    line-height: 1.1;
-    margin-left: -1ex;
-    padding-left: 1ex;
-    text-indent: -1ex;
-    width: calc(35% - 30px * 0.85);
-    word-wrap: break-word;
-  }
-  .ItemContent.Discussion .Title > .AdminCheck {
-    width: 1em;
-  }
-  .ItemContent.Discussion .Title img {
-    left: 4px;
-    position: absolute;
-  }
-  .Meta.Meta-Discussion {
-    display: inline-block;
-    vertical-align: top;
-    width: 35em;
-  }
-  .MItem {
-    white-space: normal !important;
-  }
-  .Meta.Meta-Discussion > * {
-    display: block;
-    float: left;
-  }
-  .Meta.Meta-Discussion > .Hidden,
-  .Meta.Meta-Discussion > .JustNew {
-    display: none;
-  }
-  .Meta .Tag {
-    position: absolute;
-    top: -1ex;
-    left: 24px;
-  }
-  .Meta .Tag + .MItem {
-    margin-left: 0;
-  }
-  .MItem.MCount {
-    visibility: hidden;
-    line-height: 1.0;
-    text-align: right;
-    width: 2em;
-  }
-  .MItem.MCount span {
-    visibility: visible;
-    color: #B9BBC6;
-    display: block;
-    font-weight: bold;
-    margin-right: -0.5em;
-  }
-  .MItem.MCount.CommentCount {
-    width: 1.2em;
-  }
-  .MItem.MCount.CommentCount span {
-    color: #9295A1;
-  }
-  .MItem.LastCommentBy {
-    visibility: hidden
-  }
-  .MItem.LastCommentBy a {
-    visibility: visible;
-    margin-top: -1.2em
-  }
-  .MItem.LastCommentBy {
-    line-height: 1.2;
-    margin-top: -1px;
-    width: 8em;
-  }
-  .MItem.LastCommentBy a {
-    display: block;
-  }
-  .MItem.LastCommentDate {
-    line-height: 1.0;
-    text-align: right;
-    width: 7em;
-  }
-  .MItem.Category {
-    line-height: 1.2;
-    margin-top: -1px;
-    width: 10em;
-  }
-  .HasNew {
-    margin-left: 8ex;
-    position: absolute;
-    margin-top: 12px;
-  }
-  .Meta.Meta-Discussion::after {
-    clear: both;
-    content: "";
-    display: block;
-    height: 6px;
-  }
-}
-@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?forum/categories/.+") {
-  .ItemContent.Discussion .Title {
-    width: calc(100% - 20em);
-  }
-  .ItemContent.Discussion .Title > a {
-    width: calc(45% - 18px);
-  }
-  .ItemContent.Discussion .Title > span {
-    width: calc(55% - 32px * 0.85);
-  }
-  .Meta.Meta-Discussion {
-    width: 23em;
-  }
-}
-@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?forum/((post/)?discussion[?/]|messages/\\d+).*") {
-  /* FORUM DISCUSSION *******************************************************************/
-  body {
-    line-height: 1.4
-  }
-  .PageTitle {
-    height: 80px
-  }
-  .PageTitle .Options {
-    margin-top: 26px;
-    z-index: 9999;
-    position: relative
-  }
-  .PageTitle h1 {
-    line-height: 1.0
-  }
-  .PageTitle h1 + span {
-    display: block;
-    padding-left: calc(28.2ex)
-  }
-  .MessageList.Discussion .Item {
-    margin-top: 1ex
-  }
-  .DiscussionAboutShowDiscussion {
-    padding-left: 1.5em;
-    line-height: 3em;
-    background: white;
-    display: block;
-    margin-right: -2ex;
-  }
-  .rating-image {
-    position: absolute;
-    width: 0!important;
-    height: 0!important;
-    padding-left: 32px;
-    padding-top: 32px;
-    top: 20px;
-    float: none;
-    margin-right: 5px;
-    margin-left: -16px;
-    -webkit-filter: drop-shadow(1px 1.5px 2px rgba(0, 0, 0, 0.3));
-    -moz-filter: drop-shadow(1px 1.5px 2px rgba(0, 0, 0, 0.3));
-    filter: drop-shadow(1px 1.5px 2px rgba(0, 0, 0, 0.3));
-  }
-  .rating-image[src*="blue"] {
-    background: url(https://i.imgur.com/TuVbmA0.png)
-  }
-  .rating-image[src*="green"] {
-    background: url(https://i.imgur.com/tvuagGR.png)
-  }
-  .rating-image[src*="yellow"] {
-    background: url(https://i.imgur.com/7MoyvYn.png)
-  }
-  .rating-image[src*="red"] {
-    background: url(https://i.imgur.com/ZgSLdbl.png)
-  }
-  .rating-image[src*="report"] {
-    background: url(https://i.imgur.com/YCZOQBZ.png);
-    top: 16px;
-    margin-left: -20px;
-    padding-left: 40px;
-    padding-top: 40px
-  }
-  .DataList .Item,
-  .NarrowList .Item {
-    margin-right: -2ex;
-    padding-right: 2ex
-  }
-  .ItemDiscussion {
-    position: relative
-  }
-  .ItemDiscussion .Message {
-    font-size: 11pt
-  }
-  .ItemComment:first-child {
-    border-top-width: 1px
-  }
-  .ItemComment {
-    background-color: transparent!important
-  }
-  .ItemComment:nth-child(odd) {
-    background-color: rgba(0, 20, 40, 0.02)!important
-  }
-  .Discussion {
-    white-space: nowrap
-  }
-  .Comment {
-    padding: 1ex 0;
-    position: relative;
-    white-space: nowrap
-  }
-  .Comment > *,
-  .Discussion > * {
-    white-space: normal
-  }
-  .CommentsWrap .Message {
-    margin-top: 0
-  }
-  .CommentsWrap .Message > p:first-child {
-    margin-top: -2px
-  }
-  .Item-Header {
-    display: inline-block;
-    vertical-align: top;
-    width: 22ex;
-    padding-left: 18px
-  }
-  .Item .Author a {
-    line-height: 1.1;
-    display: block;
-    font-size: 11pt;
-  }
-  .PhotoWrap + .Username {
-    top: 5px;
-    position: relative;
-    width: calc(20ex - 40px);
-    margin-bottom: 1ex;
-    float: left;
-  }
-  .Author > .Username:first-child::before {
-    height: calc(44px + 1.5em + 2px);
-    width: 44px;
-    display: block;
-    float: left;
-    content: "";
-  }
-  .DateCreated {
-    margin-right: 0
-  }
-  .UserAgent {
-    position: absolute;
-    top: calc(8px + 2.5ex);
-    left: 0;
-    margin-left: 0;
-    opacity: 0.3;
-    transition: opacity 0.5s;
-    width: 18px;
-    line-height: 0.85;
-    word-break: break-all;
-    font-size: 90%;
-  }
-  .DiscussionHeader .UserAgent {
-    left: 8px;
-  }
-  .ItemDiscussion:hover .UserAgent,
-  .ItemComment:hover .UserAgent {
-    opacity: 1.0;
-  }
-  .CommentFlag {
-    opacity: 0.2;
-    line-height: 1.0;
-    margin-top: 0.5ex;
-  }
-  .CommentFlag:hover {
-    opacity: 1.0;
-  }
-  .Item-BodyWrap {
-    display: inline-block;
-    vertical-align: top;
-    width: calc(100% - 22ex - 44px)
-  }
-  .ReactButton {
-    opacity: 0.2;
-    transition: opacity 0.5s;
-  }
-  .Item:hover .ReactButton {
-    opacity: 1.0;
-  }
-  .Item-Body {
-    margin-top: -2px;
-  }
-  .Message {
-    word-break: break-word;
-  }
-  .Message pre > code {
-    padding: 0;
-  }
-  .Author .PhotoWrap {
-    margin-right: 4px
-  }
-  .Author .PhotoWrap img {
-    margin-bottom: calc(1.5em + 8px);
-  }
-  .MItem {
-    display: block;
-    white-space: normal !important;
-  }
-  .BeforeCommentHeading {
-    position: absolute;
-    z-index: 999;
-    top: 6.5ex;
-    right: 2ex;
-  }
-  .Message .ControlOptions,
-  .Message .Options {
-    float: none;
-    position: absolute;
-    right: -1ex
-  }
-  .Message .OptionsMenu .Flyout {
-    right: 0
-  }
-  blockquote {
-    padding: 1ex 16px;
-    margin: 1em 0;
-    background: #f3f3f3;
-    background: rgba(0, 0, 0, 0.05);
-    border-left: 4px solid rgba(0, 0, 0, 0.1);
-    font-size: 90%;
-    line-height: 1.2;
-  }
-  blockquote * > br:first-child,
-  blockquote li + br,
-  blockquote p + br {
-    display: none
-  }
-  .Message code {
-    padding: 1px 5px 3px;
-    word-break: break-word
-  }
-  .Message pre {
-    padding-bottom: 2px
-  }
-  .Message pre li {
-    margin: 0;
-    text-indent: -4px
-  }
-  pre.linenums {
-    color: #ddd;
-    background: #EDEDE3;
-    padding-right: 0;
-    white-space: pre-wrap
-  }
-  ol.linenums {
-    color: #aaa;
-    background: #F9F8EF;
-    margin-bottom: -2px;
-    padding: 6px 8px 6px 6px
-  }
-  li.L1,
-  li.L3,
-  li.L5,
-  li.L7,
-  li.L9 {
-    background: none
-  }
-}
-@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?forum/profile.*") {
-  /* FORUM PROFILE & PROFILE DISCUSSIONS/COMMENTS/NOTIFICATIONS ****************************************/
-  #Panel {
-    margin-top: 80px;
-    padding-top: 0
-  }
-  #Panel .BoxFilter {
-    margin: 0
-  }
-  .About {
-    margin-left: 1.5ex
-  }
-  .ProfileOptions {
-    z-index: 999;
-    top: 3ex
-  }
-  #Content .Profile h2 {
-    display: none
-  }
-  body.Profile.EditMode #Content form {
-    background: none;
-    margin-top: 80px;
-    padding-left: 3ex
-  }
-  .EditMode .ProfileOptions {
-    z-index: 999;
-    margin-top: 8px
-  }
-  #Content .About.P {
-    margin: 80px -2ex 0 0;
-    position: relative;
-    z-index: 99;
-    padding: 1.5ex 1.5ex 2ex;
-    background: white;
-    line-height: 1.1;
-  }
-  #Content .About.P dt,
-  #Content .About.P dd {
-    white-space: nowrap
-  }
-  #Content .About.P dd {
-    font-weight: bold;
-    opacity: 0.5
-  }
-  #Content .About.P > * {
-    opacity: 0.8;
-    transition: 1s opacity
-  }
-  #Content .About.P:hover * {
-    opacity: 1.0
-  }
-  .Discussions {
-    font-size: 11pt
-  }
-  .DataList .Item,
-  .NarrowList .Item {
-    padding: 0.5ex 2ex 0.5ex 3ex;
-    margin-right: -2ex
-  }
-  .Item:first-child {
-    padding-top: 1ex
-  }
-  .Item:nth-child(even) {
-    background: rgba(0, 20, 40, 0.03)
-  }
-  .DataList .Title {
-    width: 50%;
-    display: inline-block;
-    line-height: 1.2
-  }
-  .Meta {
-    width: calc(50% - 24px);
-    display: inline-block;
-    vertical-align: top
-  }
-  .MItem {
-    display: inline-block;
-    white-space: normal;
-    vertical-align: top;
-    line-height: 1.1;
-    font-size: 8pt;
-    color: #aaa;
-  }
-  .MItem span {
-    color: black
-  }
-  .MItem.ViewCount,
-  .MItem.DiscussionScore {
-    width: 3ex
-  }
-  .MItem.CommentCount {
-    width: 8ex
-  }
-  .MItem.LastCommentBy {
-    width: 16ex
-  }
-  .MItem.LastCommentDate {
-    width: 13ex;
-    color: gray
-  }
-  .MItem.Category {
-    width: 20ex
-  }
-  .rating-image {
-    position: absolute;
-    left: 2px;
-    top: 10px
-  }
-  .SearchResults .ItemContent {
-    padding-bottom: 0
-  }
-  .SearchResults .Message {
-    width: 70%;
-    display: inline-block;
-    margin-top: 0
-  }
-  .SearchResults .Meta {
-    width: 29%;
-    display: inline-block;
-    vertical-align: top;
-    padding-top: 0
-  }
-  .SearchResults .MItem {
-    white-space: normal;
-    display: inline-block;
-    line-height: 1.1;
-    vertical-align: top
-  }
-  .SearchResults .MItem:nth-child(1) {
-    width: calc(100% - 19ex)
-  }
-  .SearchResults .MItem:nth-child(2) {
-    display: none
-  }
-  .SearchResults .MItem:nth-child(3) {
-    width: 15ex
-  }
-  .Activities .ItemContent {
-    margin-left: calc(50px - 2ex)
-  }
-  .DataList .Activity {
-    padding-left: 2ex;
-    padding-right: 1ex
-  }
-  .Activity .Title {
-    width: calc(100% - (20ex * 10) / 11);
-    font-size: 11pt
-  }
-  .Activity .Title a {
-    font-size: 11pt
-  }
-  .Activity .Excerpt {
-    width: calc(100% - 21.5ex);
-    font-size: 10pt;
-    display: inline-block
-  }
-  .Activity .Meta {
-    width: 20ex;
-    font-size: 10pt;
-    text-align: right
-  }
-  .Activity .Meta .DateCreated {
-    font-size: 10pt
-  }
-}
-@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?forum/categories/?") {
-  /* FORUM CATEGORIES *******************************************************************/
-  .CategoryList {
-    padding: 4ex 0 0 0;
-    margin-right: -2ex
-  }
-  .DataList .Item,
-  .NarrowList .Item {
-    padding-left: 3ex
-  }
-  .Category {
-    padding: 1em 0
-  }
-  .TitleWrap {
-    display: inline-block;
-    width: 20%;
-    vertical-align: top;
-    margin-top: -0.3ex;
-  }
-  .CategoryDescription {
-    display: inline-block;
-    width: 20%;
-    vertical-align: top;
-    line-height: 1.2;
-    font-size: 10pt;
-  }
-  .Meta {
-    display: inline-block;
-    width: calc(60% - 32px);
-    line-height: 1.2;
-    vertical-align: top;
-  }
-  .MItem {
-    vertical-align: top;
-    display: inline-block;
-    white-space: normal
-  }
-  .DiscussionCount {
-    width: 12ex
-  }
-  .CommentCount {
-    width: 12ex
-  }
-  .LastDiscussionTitle {
-    width: calc(100% - 55ex)
-  }
-  .LastCommentDate {
-    width: 15ex
-  }
-}
-@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?forum/uploads/.+") {
-  /* FORUM ATTACHMENTS *******************************************************************/
-  html,
-  body {
-    background: #eee
-  }
-}
-@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?forum/post/discussion.+") {
-  #Content h1.H {
-    padding-left: calc(2rem + 96px)
-  }
-  #Content h1.H + span {
-    /* about script */
-    margin: 80px -1rem 1rem;
-    padding-left: calc(2rem + 96px);
-    line-height: 3em;
-    background: white;
-    display: block;
-  }
-  .FormWrapper {
-    margin-left: calc(1rem + 96px);
-    padding: 0
-  }
-  #Content h1.H + .FormWrapper {
-    margin-top: calc(96px + 0.5rem)
-  }
-}
-@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?forum/activity.*") {
-  /* FORUM ACTIVITY *******************************************************************/
-  .FormWrapper {
-    padding-top: 2.2em
-  }
-  .DataList .Item {
-    padding: 0.3em 0
-  }
-  .Item:nth-child(even) {
-    background: rgba(0, 20, 40, 0.03)
-  }
-  .ItemContent {
-    display: flex
-  }
-  .Title {
-    width: 50%
-  }
-  .Excerpt {
-    width: 30%;
-    margin: 0!important
-  }
-  .Meta {
-    width: 20%
-  }
-  .DateCreated {
-    width: 10em;
-    display: inline-block
-  }
-}
 @-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?scripts(/search|\\?q=).*") {
   /* SCRIPT SEARCH *******************************************************************/
   #script-list-sort {
@@ -2528,5 +1580,132 @@
   /* SCRIPT UPDATE *******************************************************************/
   .previewable .tabs {
     margin-right: 0;
+  }
+}
+@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?scripts/\\d+[^/]*/reports/\\d+.*") {
+  /* REPORT *******************************************************************/
+  .width-constraint {
+    padding: 2rem;
+  }
+  .text-content > :nth-child(-n + 2) {
+    font-size: 1.25rem !important;
+    font-weight: bold !important;
+  }
+  .text-content > :nth-child(2) {
+    color: darkgreen;
+  }
+  .text-content > p,
+  blockquote {
+    text-align: center;
+  }
+  blockquote {
+    border: 1px groove;
+    padding: 1em;
+    background: #1232;
+    margin: 0 auto;
+    min-width: 20em;
+    max-width: 100%;
+  }
+  form {
+    width: calc(50% - 2rem);
+    display: inline-block;
+    vertical-align: top;
+  }
+  textarea {
+    height: 4em !important;
+  }
+}
+@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?scripts/reported\\b.*") {
+  /* REPORTED *******************************************************************/
+  .script-list {
+    padding-top: 1em;
+  }
+  .script-list::before {
+    content: none;
+  }
+  .inline-script-stats + ul {
+    flex: 0 0 20%;
+  }
+}
+@-moz-document regexp("https://(greasy|sleazy)fork\\.org/([^/]+/)?reports\\b.*") {
+  /* REPORTS *******************************************************************/
+  .width-constraint {
+    padding: 0;
+  }
+  #main-header {
+    padding-left: 2ex;
+    padding-right: 2ex;
+  }
+  .report-list-item {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 1em 1rem !important;
+    margin: 0 !important;
+    border: none !important;
+  }
+  .report-list-item > * {
+    margin: 0;
+    padding: 0 1rem;
+    flex: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .report-list-item .report-diff {
+    order: 9;
+    flex: 1;
+    width: 0;
+  }
+  .report-list-item > table {
+    white-space: nowrap;
+  }
+  .report-list-item:nth-child(even) {
+    background-color: rgba(0,20,40,.1);
+  }
+  h4 a:nth-of-type(2) {
+    white-space: nowrap;
+  }
+  h4 {
+    font-weight: normal;
+  }
+  h4 a {
+    font-weight: bold;
+  }
+  form[action*="/dismiss"] {
+    order: 2;
+  }
+  form[action*="/uphold"],
+  form[action*="/dismiss"] {
+    min-width: 10em;
+    max-width: 10em; 
+  }
+  form[action*="/dismiss"] input {
+    white-space: normal;
+    padding: .5em;
+  }
+  .report-list-item > :nth-child(1) {
+    min-width: 15%;
+    max-width: 15%;
+  }
+  .report-list-item > blockquote,
+  .report-list-item > :nth-child(3) {
+    min-width: 15%;
+    flex-grow: 1;
+  }
+  .report-list-item > p {
+    min-width: 10%;
+    max-width: 10%;
+    font-size: small;
+  }
+  .report-resolution-options {
+    min-width: 10%;
+    max-width: 10%;
+    line-height: 1;
+  }
+  .report-resolution-options label {
+    display: inline !important;
+  }
+  .report-resolution-options input[type=checkbox] {
+    margin: 3px 0 0 -18px;
+    position: absolute;
   }
 }
