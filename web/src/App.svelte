@@ -4,7 +4,7 @@
 	import Pagination from "./Pagionation.svelte";
 	import StyleModal from "./StyleModal.svelte";
 
-	const dataPrefix = "https://raw.githubusercontent.com/33kk/uso-archive/flomaster/data/";
+	const dataPrefix = "https://cdn.jsdelivr.net/gh/33kk/uso-archive/flomaster/data/";
 
 	let styles = [];
 	let filteredStyles = [];
