@@ -12,6 +12,7 @@
 
 	export let styleId = "";
 	export let dataPrefix = "";
+	export let fullDataPrefix = "";
 	export let isOpen = false;
 
 	let promise;
@@ -149,7 +150,7 @@
 	}
 
 	function getScreenshotUrl(screenshot) {
-		return (screenshot.archived ? `${dataPrefix}screenshots/` : `https://userstyles.org/${screenshot.name.includes("-") ? "auto_" : ""}style_screenshots/`) + screenshot.name;
+		return (screenshot.archived ? dataPrefix : fullDataPrefix ) + "screenshots/" + screenshot.name;
 	}
 
 	function doRetry() {

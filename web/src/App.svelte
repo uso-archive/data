@@ -5,6 +5,7 @@
 	import StyleModal from "./StyleModal.svelte";
 
 	const dataPrefix = "https://cdn.jsdelivr.net/gh/33kk/uso-archive/data/";
+	const fullDataPrefix = "https://cdn.jsdelivr.net/gh/33kk/uso-archive@full/data/";
 
 	let styles = [];
 	let filteredStyles = [];
@@ -337,7 +338,7 @@
 		<Row>
 			{#each paginatedStyles as style (style.i)}
 				<Col xl="3" md="4" sm="6" xs="12" class="mb-4">
-					<StyleCard on:view={onView} styleData={style} {dataPrefix} />
+					<StyleCard on:view={onView} styleData={style} {dataPrefix} {fullDataPrefix} />
 				</Col>
 			{/each}
 		</Row>
@@ -350,5 +351,5 @@
 		Error while downloading data {e}
 	{/await}
 
-	<StyleModal {dataPrefix} on:onPushState={onModalPushState} styleId={modalStyleId} bind:isOpen={modalIsOpen} />
+	<StyleModal {dataPrefix} {fullDataPrefix} on:onPushState={onModalPushState} styleId={modalStyleId} bind:isOpen={modalIsOpen} />
 </Container>

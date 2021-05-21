@@ -6,6 +6,7 @@
 
 	export let styleData;
 	export let dataPrefix;
+	export let fullDataPrefix;
 
 	function capitalizeFirstLetter(string) {
 		if (!string) return "";
@@ -22,7 +23,7 @@
 	}
 
 	function getScreenshotUrl(archived, name) {
-		return (archived ? `${dataPrefix}screenshots/` : `https://userstyles.org/${name.includes("-") ? "auto_" : ""}style_screenshots/`) + name;
+		return (archived ? dataPrefix : fullDataPrefix ) + "screenshots/" + name;
 	}
 </script>
 
