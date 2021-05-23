@@ -3,7 +3,7 @@
 @namespace      USO Archive
 @author         Damian Sowiński
 @description    `Lite version of WhatsApp blur theme.<br>Full configurable version is here: <a href="https://github.com/DamianSowinski/whatsapp">WhatsApp blur</a>`
-@version        20210522.11.52
+@version        20210522.19.51
 @license        CC-BY-NC-ND-4.0
 @preprocessor   uso
 @advanced dropdown bgr-image "Background image" {
@@ -35,8 +35,7 @@ darkOff "On" <<<EOT :root, .dark {
 }
 @advanced dropdown separate-contacts "Separate contacts" {
 	off "Off*" <<<EOT  EOT;
-on "On" <<<EOT /* separate contacts *\/
-#app > div > div {
+on "On" <<<EOT #app > div > div {
     opacity: 1;
     animation: none !important;
     width: 100vw;
@@ -95,9 +94,9 @@ on "On" <<<EOT /* separate contacts *\/
     height: 100vh;
     content: '';
     background: var(--bgr-color) var(--bgr-image) !important;
-    transform: translate(0, calc(0 - var(--height-offset-contacts)));
+    transform: var(--height-offset-contact-negative);
     background-size: cover !important;
-    filter: blur(16px);
+    filter: var(--chat-blur-intensity);
 }
 
 #side:after {
@@ -137,7 +136,7 @@ on "On" <<<EOT /* separate contacts *\/
     transform: translate(calc(-50% - 50px), -50%);
     background: var(--bgr-color) var(--bgr-image) !important;
     background-size: cover !important;
-    filter: blur(16px);
+    filter: var(--chat-blur-intensity);
 }
 
 @media only screen and (max-width: 2080px) {
@@ -203,6 +202,14 @@ on "On" <<<EOT :root, .dark {
 } EOT;
 
 }
+@advanced text height-offset-chat "Height offset - chat ( 0 - 128 )" "32"
+@advanced text height-offset-cnt "Height offset - contacts ( 0 - 128, require Separate contacts ON)" "0"
+@advanced text width-chat "Width - chat ( 480 - 2280 )" "1000"
+@advanced text width-contacts "Width - contacts ( 240 - 500 )" "360"
+@advanced text corner-smooth-chat "Corner smooth - chat ( 0 - 48 )" "16"
+@advanced text corner-smooth-cnt "Corner smooth - contacts ( 0 - 48, require Separate contacts ON)" "0"
+@advanced text chat-blur-intensity "Blur intensity - chat ( 0 - 64 )" "16"
+@advanced text cnt-blur-intensity "Blur intensity - contacts ( 0 - 64, require Separate contacts ON)" "16"
 @advanced color chat-selected-mark "Selected contact - mark" #65BFFF
 @advanced color outgoing-bgr "Message bgr - you" #0E3D55
 @advanced color incoming-bgr "Message bgr - guest" #262D31
@@ -224,18 +231,17 @@ Doc         : https://github.com/DamianSowinski/whatsapp/wiki
 @-moz-document domain("web.whatsapp.com") {
     :root, .dark {
         --bgr-image: url("/*[[bgr-image]]*/");
-        --dark-style: 0;
-        --separate-contacts: 0;
-        --reduce-contacts: 0;
-        --hide-contacts-separate-lines: 0;
-        --height-offset-chat: 32px;
-        --height-offset-contacts: 0;
-        --width-chat: 1000px;
-        --width-contacts: 360px;
-        --corner-smooth-chat: 16px;
-        --corner-smooth-contacts: 0;
-        --chat-blur-intensity: 16px;
-        --contacts-blur-intensity: 16px;
+        --height-offset-chat: /*[[height-offset-chat]]*/px;
+
+        
+        --height-offset-contacts: /*[[height-offset-cnt]]*/px;
+        --height-offset-contact-negative: translate(0, -/*[[height-offset-cnt]]*/px);
+        --width-chat: /*[[width-chat]]*/px;
+        --width-contacts: /*[[width-contacts]]*/px;
+        --corner-smooth-chat: /*[[corner-smooth-chat]]*/px;
+        --corner-smooth-contacts: /*[[corner-smooth-cnt]]*/px;
+        --chat-blur-intensity: blur(/*[[chat-blur-intensity]]*/px);
+        --contacts-blur-intensity: blur(/*[[cnt-blur-intensity]]*/px);
         --chat-color: rgba(0, 0, 0, 0.2);
         --contacts-color: rgba(0, 0, 0, 0.2);
         --chat-header-color: rgba(0, 0, 0, 0.2);
@@ -470,7 +476,7 @@ Doc         : https://github.com/DamianSowinski/whatsapp/wiki
         animation: ease-in-out show 0.5s 0s forwards;
         top: 0;
         bottom: 0;
-        height: calc(100vh - (var(--height-offset-chat) / 5));
+        height: calc(100vh - var(--height-offset-chat) * 2);
         border-radius: var(--corner-smooth-chat);
         width: calc(var(--width-contacts) + var(--width-chat));
         max-width: calc(var(--width-contacts) + var(--width-chat));
@@ -486,9 +492,9 @@ Doc         : https://github.com/DamianSowinski/whatsapp/wiki
         height: 100vh;
         content: '';
         transform: translate(-50%, -50%);
-        background: url('https://raw.githubusercontent.com/DamianSowinski/whatsapp/master/images/default.jpg');
+        background: var(--bgr-color) var(--bgr-image);
         background-size: cover;
-        filter: blur(16px);
+        filter: var(--chat-blur-intensity);
     }
     #app > div > div > div:nth-child(3) {
         box-sizing: border-box;
@@ -656,9 +662,4 @@ Doc         : https://github.com/DamianSowinski/whatsapp/wiki
 
     /* Separate contacts */
     /*[[separate-contacts]]*/
-
-
 }
-
-
-
