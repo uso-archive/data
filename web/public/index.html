@@ -10,8 +10,46 @@
 		<link rel="stylesheet" href="./build/bundle.css" />
 		<link rel="stylesheet" href="./build/extra.css" />
 
-		<script defer src="./build/bundle.js"></script>
+		<!--<script defer src="./build/bundle.js"></script>-->
 	</head>
+	
+	<body>
+		<script>
+			const base = "https://uso-archive.github.io";
 
-	<body></body>
+			const sortMap = {
+				"total-installs": "totalInstalls",
+				"rating": "rating",
+				"updated": "updated",
+				"newest": "created"
+			};
+
+			function getDest(q) {
+				if (q.get("style"))
+					return `${base}/style/${q.get("style")}`;
+
+				let nq = new URLSearchParams();
+				let s = q.get("search") || "";
+
+				if (q.get("sort"))
+					nq.set("sort", sortMap[q.get("sort")]);
+				
+				if (q.get("page"))
+					nq.set("page", q.get("page"));
+
+				if (q.get("category"))
+					s = `#${q.get("category")} ${s}`;
+				
+				if (q.get("author"))
+					s = `@${q.get("author")} ${s}`;
+				
+				if (s)
+					nq.set("search", s);
+				
+				return `${base}/browse/styles?` + nq.toString();
+			}
+
+			window.location = getDest(new URLSearchParams(window.location.search));
+		</script>
+	</body>
 </html>
