@@ -3,7 +3,7 @@
 @namespace      USO Archive
 @author         MouShu
 @description    `哔哩哔哩美化脚本⏩<b>因为B站主页更新，请大家将自定义选项里的分区屏蔽中的block改成flex（如果仍未block的话），否则页面会很奇怪！想要屏蔽的话依旧可以写none</b>⏩背景图片三个覆盖模式：cover：图片完全覆盖背景，图片和背景长宽比不能差太大；contain：尽量拉伸图片使得图片能完全看见，不会完全覆盖背景；XX%：百分比缩放图片。========主要功能：✅改变了网页版B站的风格。✅本样式可以高度地自定义，打造属于你自己的风格。✅屏蔽了大部分可见广告，小部分的广告换成了插画。✅屏蔽了直播间的大部分无关信息，清爽的观看体验。✅全屏观看优化，不再因为碰一下鼠标就显示控制栏影响观感。✅大部分内容半透明<strike>（方便看老婆）</strike>。✅去掉了页面底端、APP下载等无关内容，可以自定义。✅主页分区屏蔽，在样式自定义里面设置。========食用须知：🅿本插件随缘更新，如果你遇到了问题，可以留言告诉我。🅿<b>直播间去污代码在代码2，直播间去污代码在代码2。</b>🅿仍然有部分页面没做完，或因网站更新而失效。（本人学生，此前没学过CSS）========🌐灵感及部分代码来源：<a href="https://userstyles.org/styles/169531/g36" target="_blank">百度美化G36</a>🌐我的另一个作品，<a href="https://userstyles.org/styles/172368/theme" target="_blank">百度去广告</a>（兼容性其他样式）🌐<a href="https://afdian.net/@capital" target="_blank">爱发电</a>（我还没有陷入财务危机，请不必担心）🌐邮件地址961857877@qq.com，欢迎指出问题和尬聊`
-@version        20210430.15.50
+@version        20210624.15.7
 @license        CC-BY-NC-SA-4.0
 @preprocessor   uso
 @advanced dropdown uurl "背景图片" {
@@ -337,6 +337,8 @@ form.searchform:hover:after{
 .chat-item.danmaku-item .title-label,
 /*舰长头衔*/
 .chat-item .guard-icon,
+/*榜首大哥*/
+.rank-icon,
 /*房管标志*
 .chat-item.danmaku-item .admin-icon,
 /*头衔*/
@@ -353,6 +355,8 @@ form.searchform:hover:after{
 .v-middle.hour-rank,
 /*每周榜*/
 .v-middle.week-star-rank,
+/*热门榜*/
+.hot-rank-text,
 /*礼物图标*/
 /*排行榜图标*/
 .svg-icon.gift,
@@ -385,7 +389,7 @@ form.searchform:hover:after{
 }
 }
 
-@-moz-document regexp("(https?:)?//www.bilibili.com/(bangumi|blackroom|read|audio|cheese)/(play/|ban/|[ac][vum]|activity)\\S*"), regexp("(https?:)?//www.bilibili.com/(video|blackboard)/.+"), regexp("(https?:)?//(space|t|h|live|manga).bilibili.com.+") {
+@-moz-document regexp("(https?:)?//www.bilibili.com/(bangumi|blackroom|read|audio|cheese|medialist)/(play/|ban/|[ac][vum]|activity)\\S*"), regexp("(https?:)?//www.bilibili.com/(video|blackboard)/.+"), regexp("(https?:)?//(space|t|h|live|manga).bilibili.com.+") {
 /*
 评论区通用
 */
@@ -428,6 +432,9 @@ form.searchform:hover:after{
     background: var(--boxback, rgba(255, 255, 255, 0.35));
     box-shadow: 0 0 5px 2px rgba(0, 0, 0, .1);
 }
+.bb-comment .comment-list .list-item .reply-box .reply-item .reply-con, .comment-bilibili-fold .comment-list .list-item .reply-box .reply-item .reply-con{
+    width: calc(100% - 79px);
+}
 .comment-list .list-item .con {
     /*修正楼层分割线的位置*/
     margin-top: -5px;
@@ -456,7 +463,7 @@ form.searchform:hover:after{
 }
 }
 
-@-moz-document regexp("(https?:)?//www.bilibili.com/(video|bangumi|blackboard|audio)/(play/|[acbB][vVu]|activity)\\S*") {
+@-moz-document regexp("(https?:)?//www.bilibili.com/(video|bangumi|blackboard|audio|medialist)/(play/|[acbB][vVu]|activity)\\S*") {
 /*播放器的样式改变*/
 .bui-bar-wrap {
     /*进度条底色*/
@@ -1531,7 +1538,7 @@ https://s2.ax1x.com/2019/11/22/M7cC6g.jpg <--这个来源于微博上薯妈的�
 }
 }
 
-@-moz-document regexp("(https?:)?//www.bilibili.com/video/\\S*") {
+@-moz-document regexp("(https?:)?//www.bilibili.com/(video|medialist)/\\S*") {
 /****************
  * 视频播放页面 *
  ****************/
@@ -1634,6 +1641,7 @@ https://s2.ax1x.com/2019/11/22/M7cC6g.jpg <--这个来源于微博上薯妈的�
 .player-auxiliary-area .player-auxiliary-filter,
 .danmaku-wrap .player-auxiliary-area .player-auxiliary-danmaku-wrap,
 .danmaku-wrap .player-auxiliary-area .player-auxiliary-danmaku-btn-footer,
+.player-auxiliary .bui-button.bui-button-disabled,
 .player-auxiliary-area .player-auxiliary-danmaku .player-auxiliary-danmaku-function,
 .player-auxiliary-area .player-auxiliary-danmaku .player-auxiliary-danmaku-function [class*=player-auxiliary-danmaku-btn-],/*上面是弹幕列表半透明*/
 .player-auxiliary-block-list-wrap .player-auxiliary-block-list .player-auxiliary-block-line/*发出了RO635的声音*/
@@ -2817,11 +2825,18 @@ https://s2.ax1x.com/2019/11/22/M7cC6g.jpg <--这个来源于微博上薯妈的�
 #page-dynamic .col-1 .feed-card > .content > div {
     animation: entryl 0.75s var(--v1);
 }
-.card[data-v-2dbadba2] {
+.card[data-did] {
     /* 动态卡片 */
     background-color: transparent !important;
 }
 /* 投稿页 */
+.col-full{
+    transition: all .4s;
+    background: var(--boxbackt, rgba(255, 255, 255, 0.2)) !important;
+}
+.col-full:hover {
+    background: var(--boxback, rgba(255, 255, 255, 0.5)) !important;
+}
 /*左侧选项卡*/
 .contribution-sidenav .contribution-item:hover {
     padding-left: 35px;
@@ -3157,6 +3172,16 @@ https://s2.ax1x.com/2019/11/22/M7cC6g.jpg <--这个来源于微博上薯妈的�
 /*
 主播动态下面的评论区
 */
+/* 主播动态 */
+.content > .card, 
+.content > .feed-title{
+    transition: all 0.3s;
+    background-color: var(--boxback, rgba(255, 255, 255, 0.4));
+}
+.content > .card:hover{
+    background-color: var(--boxbacks, rgba(255, 255, 255, 0.85));
+}
+/* 评论区 */
 .comment-area,
 .comm-main {
     background: none !important;
@@ -3240,7 +3265,7 @@ https://s2.ax1x.com/2019/11/22/M7cC6g.jpg <--这个来源于微博上薯妈的�
 /*视频块*/
 .user-panel,
 /*个人块的白块*/
-.card[data-v-73fb1623],
+.card[data-did],
 /*动态详细的白块*/
 .publish-panel/*发动态块的白块*/
 {
