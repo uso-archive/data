@@ -1,0 +1,43 @@
+name: auto update
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  auto-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install libvips
+        run: sudo apt-get install -y libvips libvips-dev
+
+      - name: Install uso-archive binary
+        uses: baptiste0928/cargo-install@v2
+        with:
+          crate: uso-archive
+          git: https://code.pepega.club/uso-archive/updater.git
+          branch: main
+
+      - name: Update
+        run: |
+          uso-archive fetch-ids --sorting updated --until-time "$(cat ./data/last-update.txt)" /tmp/ids.json
+          date -uIs > ./data/last-update.txt
+          uso-archive download /tmp/ids.json ./data
+          uso-archive index ./data ./data/search-index.json
+
+      - name: Commmit & Push
+        run: |
+          git config user.name 'uso-archive[bot]'
+          git config user.email '137587018+uso-archive[bot]@users.noreply.github.com'
+          uso-archive git-commit /tmp/ids.json ./data --path data
+          git add ./data/last-update.txt ./data/search-index.json
+          git commit -m "[*] auto update"
+          git push
