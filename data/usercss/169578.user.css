@@ -1,0 +1,278 @@
+/* ==UserStyle==
+@name         Bilibili直播界面调整
+@namespace    USO Archive
+@author       Felix Eden
+@description  调整Bilibili直播界面，去除一些烦人的东西。  特性：  1. 去除各种信息，给你一个清爽的界面；  2. 覆盖主播直播间主题；  3. 屏蔽抽奖后的提示框，帮助你快速领完上舰礼物；  4. 自由保留/去除礼物界面；  5. 设置弹幕字体大小和透明度。
+@version      20211030.14.10
+@license      CC0-1.0
+@preprocessor uso
+@advanced dropdown gift-vm-mode "是否保存礼物栏" {
+    gift-vm-show "保存*" <<<EOT @-moz-document regexp("^(http|https)://live.bilibili.com/.*$") {
+/* 不屏蔽礼物栏 *\/
+.gift-item.buy,
+.gift-item.buy:hover {
+    background: transparent !important;
+}
+.gift-list .live-skin-coloration-area:hover:not(:disabled) {
+    background-color: transparent !important;
+}
+/*----------------*\/
+} EOT;
+    gift-vm-hide "删除" <<<EOT @-moz-document regexp("^(http|https)://live.bilibili.com/.*$") {
+/* 屏蔽礼物栏 *\/
+#gift-control-vm {
+    display: none !important;
+}
+/*----------------*\/
+} EOT;
+    gift-vm-hide-round "删除并添加圆角" <<<EOT @-moz-document regexp("^(http|https)://live.bilibili.com/.*$") {
+/* 屏蔽礼物栏 *\/
+#gift-control-vm {
+    display: none !important;
+}
+.player-section {
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+}
+/*----------------*\/
+} EOT;
+
+}
+@advanced dropdown damuku-font-size "弹幕字体大小" {
+    damuku-font-15px "16px*" <<<EOT 16px EOT;
+    damuku-font-12px "12px" <<<EOT 12px EOT;
+    damuku-font-14px "14px" <<<EOT 14px EOT;
+    damuku-font-18px "18px" <<<EOT 18px EOT;
+    damuku-font-20px "20px" <<<EOT 20px EOT;
+
+}
+@advanced dropdown damuku-opacity "弹幕字体透明度" {
+    damuku-opacity-0_6 "0.6*" <<<EOT 0.6 EOT;
+    damuku-opacity-0_3 "0.3" <<<EOT 0.3 EOT;
+    damuku-opacity-0_2 "0.2" <<<EOT 0.2 EOT;
+    damuku-opacity-0_4 "0.4" <<<EOT 0.4 EOT;
+    damuku-opacity-0_5 "0.5" <<<EOT 0.5 EOT;
+    damuku-opacity-0_7 "0.7" <<<EOT 0.7 EOT;
+    damuku-opacity-0_8 "0.8" <<<EOT 0.8 EOT;
+    damuku-opacity-0_9 "0.9" <<<EOT 0.9 EOT;
+    damuku-opacity-1_0 "1.0" <<<EOT 1.0 EOT;
+
+}
+==/UserStyle== */
+@-moz-document regexp("^(http|https)://live.bilibili.com/.*$") {
+/* 常时左侧弹幕框调整 */
+/* 去除边框 */
+#aside-area-vm {
+    border: none;
+}
+/* 去除舰队等 */
+#pk-vm, #rank-list-ctnr-box, .left-action {
+    display: none;
+}
+/* 原舰长等排行去除后的占位，美化显示 */
+#rank-list-vm {
+    height: 14px;
+    border-radius: 12px 12px 0 0;
+    background-color: #f8f8f8;
+}
+/* 调整左侧弹幕框高度 */
+.chat-history-panel {
+    height: calc(100% - 159px) !important;
+}
+#chat-history-list {
+    height: calc(100% - 30px) !important;
+}
+/* 去除弹幕的各种不必要信息 */
+.announcement-wrapper,
+.bubble-list,
+.admin-icon,
+.chat-history-list .gift-item,
+.welcome-msg,
+.welcome-guard,
+.guard-icon,
+.vip-icon,
+.user-level-icon,
+.system-msg,
+#penury-gift-msg,
+#welcome-area-bottom-vm,
+.fans-medal-item-ctnr,
+.title-label{
+    display: none;
+}
+/* 覆盖聊天框特殊弹幕的样式 */
+.chat-history-panel .chat-history-list .chat-item {
+    padding: 4px 5px !important;
+    margin: 0 !important;
+}
+.chat-history-panel .chat-history-list .chat-item:before {
+    background-color: transparent !important;
+    border-image: none !important;
+}
+.chat-history-panel .chat-history-list .chat-item:after {
+    background-image: none !important;
+}
+/*----------------*/
+}
+
+@-moz-document regexp("^(http|https)://live.bilibili.com/.*$") {
+/* 网页全屏隐藏弹幕框并调整播放器 */
+/* 布局调整 */
+.player-full-win .player-section {
+    width: 100% !important;
+}
+.player-full-win .aside-area-toggle-btn {
+    display: none;
+}
+/* 隐藏弹幕框其它组件 */
+.player-full-win #rank-list-vm, 
+.player-full-win .chat-history-panel, 
+.player-full-win .control-panel-icon-row, 
+.player-full-win .bl-button{
+    display: none;
+}
+/* 抽奖卡片位置调整 */
+.player-full-win #chat-draw-area-vm {
+    bottom: 70px;
+    right: 300px;
+}
+.player-full-win .chat-draw-area-cntr {
+    background: white;
+    border-radius: 8px;
+    opacity: 0.6;
+}
+/* 弹幕发送框布局调整 */
+.player-full-win #chat-control-panel-vm {
+    height: 60px;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: transparent;
+}
+.player-full-win #chat-control-panel-vm .control-panel-ctnr {
+    padding: 0;
+}
+/* 浮动动画 */
+.player-full-win #chat-control-panel-vm .chat-input-ctnr {
+    transform: translateY(-60px);
+    margin: 0;
+    transition: transform 0.3s;
+}
+.player-full-win #chat-control-panel-vm:hover .chat-input-ctnr {
+    transform: translateZ(0);
+}
+/* 输入框调整 */
+.player-full-win #chat-control-panel-vm .chat-input {
+    border-radius: 0;
+    height: 40px;
+    padding: 10px;
+    color: #d3dadf;
+    border: none;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 40%, transparent);
+}
+.player-full-win #chat-control-panel-vm .chat-input::-webkit-input-placeholder {
+    color: #d3dadf;
+}
+.player-full-win #chat-control-panel-vm .input-limit-hint {
+    top: 10px;
+    right: 10px;
+}
+/*----------------*/
+}
+
+@-moz-document regexp("^(http|https)://live.bilibili.com/.*$") {
+/* 动态卡片添加圆角 */
+.card {
+    border-radius: 12px;
+}
+/*----------------*/
+
+/* 去除头像边框，header背景等 */
+.face-avatar-box, 
+#gift-control-vm {
+    background-image: none !important;
+}
+/*----------------*/
+
+/* 播放器去除部分信息 */
+.hour-rank,
+.m-guard-ent,
+.week-star-rank,
+.corner-mark,
+.gift-week-star-info,
+.gift-lucky-info, 
+.bilibili-live-player-video-logo,
+.chaos-pk-banner {
+    display: none !important;
+}
+/*----------------*/
+
+/* 其他部分调整 */
+.link-popup-ctnr, 
+#my-dear-haruna-vm,
+#sidebar-vm,
+.wish-part,
+.activity-pushing-out {
+    display: none;
+}
+/*----------------*/
+}
+
+@-moz-document regexp("^(http|https)://live.bilibili.com/.*$") {
+/* 默认主题覆盖 */
+#head-info-vm {
+    background-image: none !important;
+}
+.live-skin-coloration-area .live-skin-main-text {
+    color: #333 !important;
+}
+.live-skin-coloration-area .area-link.live-skin-normal-a-text,
+.action-text.v-middle,
+.live-skin-coloration-area .room-owner-username.live-skin-normal-a-text,
+.label.live-skin-normal-a-text,
+.right-action-ctnr .icon-font {
+    color: #999 !important;
+}
+.attention-btn-ctnr .left-part {
+    background-color: #23ade5 !important;
+}
+.attention-btn-ctnr .right-part {
+    border-color: #e9eaec !important;
+    color: #999 !important;
+    background-color: #FFF !important;
+}
+.seeds-wrap .item.btn,
+.live-skin-coloration-area .live-skin-highlight-text {
+    color: #23ade5 !important;
+}
+.live-skin-coloration-area:hover:not(:disabled) {
+}
+.live-skin-coloration-area .live-skin-highlight-bg,
+.live-skin-coloration-area .live-skin-highlight-button-bg.bl-button--primary:not(:disabled) {
+    background-color: #23ade5 !important;
+}
+.live-skin-coloration-area .live-skin-highlight-border {
+    border-color: #23ade5 !important;
+}
+#chat-control-panel-vm .live-skin-coloration-area {
+    background-color: transparent !important;
+}
+.gift-item.buy.hover {
+    background-color: #f4f4f4 !important;
+}
+.gift-item.buy {
+    background-color: #ffffff !important;
+}
+/*----------------*/
+}
+
+/*[[gift-vm-mode]]*/
+
+@-moz-document regexp("^(http|https)://live.bilibili.com/.*$") {
+/* 弹幕字体设置 */
+.bilibili-danmaku {
+    font-size: /*[[damuku-font-size]]*/ !important;
+    opacity: /*[[damuku-opacity]]*/ !important;
+}
+/*----------------*/
+}

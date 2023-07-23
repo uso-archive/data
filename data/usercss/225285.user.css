@@ -1,0 +1,326 @@
+/* ==UserStyle==
+@name         Betterfex
+@namespace    USO Archive
+@author       whitespace
+@description  a custom style for bergfex.at, bergfex.com (and others) specifically designed for wide screens.    - remove adds  - center page  - increase width
+@version      20220109.14.17
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+/**
+ * BETTERFEX - a custom style for BERGFEX
+ * 
+ * - increase map width to 100%
+ * - center page
+ * - increase page content width
+ *
+ * @author https://github.com/whytspace
+ * @version 1.0
+ */
+
+@-moz-document regexp("https?://.*\\.bergfex\\.[^.]*/.*")
+{
+  html {
+    /* prevent page width cahngees when interacting with menu or search */
+    scrollbar-gutter: stable;
+  }
+  .site {
+    /* allow creating ::pseudo elements for background colors, without expanding page size */
+    overflow-x: hidden;
+  }
+
+  #siteMap {
+    width: 100%;
+  }
+
+  aside#nav-side {
+    /* margin-left: 0 !important;  /* original style also has !important */
+    margin-right: 0;
+  }
+
+  main {
+    max-width: 100%;
+    display: flex;
+  }
+
+  #nav-side {
+    flex: 0 0 auto;
+  }
+
+  .content {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* allow content to scale with available width */
+  .section-left {
+    width: calc(
+      100% - 292px - 24px
+    ); /* 100% - .section-right width - margin-right */
+  }
+  .section-left.section-left-smaller,
+  .section-right.section-right-larger {
+    max-width: none;
+    width: 50%;
+    margin-right: 0;
+    padding-right: 1rem;
+  }
+  .section-right.section-right-larger {
+    padding-left: 1rem;
+  }
+
+  .content-fullwidth {
+    margin: auto;
+    padding-left: 0;
+  }
+
+  @media (max-width: 834px) {
+    .section-left {
+      width: 100%;
+    }
+  }
+
+  /* center elements */
+  #dropdown,
+  footer {
+    left: 0;
+    right: 0;
+  }
+
+  /* background: expand to full page size */
+  #dropdown,
+  nav.breadcrumb,
+  #nav-main.nav-default,
+  footer {
+    overflow: visible;
+    background: none;
+  }
+
+  #dropdown::before,
+  nav.breadcrumb::before,
+  #nav-main.nav-default::before,
+  footer::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -100%;
+    right: -100%;
+    z-index: -1;
+  }
+
+  #nav-main.nav-default::before {
+    background-image: url(https://vcdn.bergfex.at/images/site/header_background.png);
+    background-size: 100% 100%;
+    background-color: #1d5599;
+  }
+
+  footer::before {
+    background-color: #f2f2f2;
+  }
+
+  nav.breadcrumb {
+    position: relative;
+    z-index: 1;
+  }
+  nav.breadcrumb::before {
+    background-color: #eff1f3;
+  }
+  #dropdown::before {
+    background-color: white;
+    z-index: auto;
+  }
+
+  /* background image (extracted from original #sidebar::after) */
+  #sidebar {
+    display: none;
+  }
+  .site::before,
+  .site::after {
+    content: "";
+    display: block;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: auto;
+    z-index: 3;
+    opacity: 0.3;
+    background-image: url(https://vcdn.bergfex.at/images/site/sidebar_background_winter.jpg);
+    background-size: cover;
+    background-position: left 50%;
+    background-color: #001bac;
+    pointer-events: none;
+  }
+  .site::after {
+    left: auto;
+    right: 0;
+    background-position: right 50%;
+  }
+
+  /* menu */
+  @media (min-width: 835px) {
+    #nav-main {
+      display: flex;
+      align-items: center;
+    }
+    #nav-main > * {
+      flex: 0 0 auto;
+    }
+    #nav-main .logo-bergfex {
+      display: inline-flex;
+      position: relative;
+      left: 0 !important;
+      bottom: 0;
+      top: 0;
+    }
+    .nav-main-container {
+      margin-left: 0 !important;
+    }
+
+    .nav-main-trigger-side {
+      position: relative;
+    }
+
+    #nav-main.nav-default .nav-main-container {
+      width: auto;
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      flex: 1 1 auto;
+    }
+
+    #nav-main.nav-default .nav-search {
+      position: relative;
+      order: 1;
+      flex: 0 1 auto;
+      bottom: 0;
+    }
+
+    #nav-main.nav-default .nav-search input {
+      width: 100%;
+      min-width: 8em;
+    }
+
+    #nav-main.nav-default .nav-main-container .nav-list {
+      margin-left: auto;
+      margin-right: auto;
+      flex: 0 0 auto;
+    }
+
+    /* search (.show-nav-search) */
+    #page-container::after {
+      display: none !important;
+    }
+    #page-container::before {
+      left: 0;
+      width: 100% !important;
+    }
+    .show-nav-search #nav-main.nav-default .nav-main-container .nav-list {
+      display: none;
+    }
+  }
+
+  /* dropdown menu (.#nav-main.dropdown) */
+  #nav-main.dropdown::before {
+    background-color: white;
+    background-image: none;
+  }
+  #dropdown::before {
+    border-top: 2px solid #eff1f3;
+  }
+
+  /* map */
+  .leaflet-map {
+    z-index: 4; /* overlay sidebar image */
+  }
+
+  /* respionsive images */
+  .block img {
+    width: 100%;
+    height: auto;
+  }
+
+  /* limit page width (min-width: 1040px) */
+  #dropdown,
+  #page-container,
+  #nav-main,
+  footer {
+    margin: auto;
+    width: 1040px;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .site::before,
+  .site::after {
+    width: 0%; /* width * 0.5 */
+  }
+
+  #page-container.full-width {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  @media screen and (min-width: 1160px) {
+    #dropdown,
+    #page-container,
+    #nav-main,
+    footer {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      width: 90%;
+    }
+    .site::before,
+    .site::after {
+      width: 5%;
+    }
+  }
+  @media screen and (min-width: 1260px) {
+    #dropdown,
+    #page-container,
+    #nav-main,
+    footer {
+      width: 86%;
+    }
+    .site::before,
+    .site::after {
+      width: 7%;
+    }
+  }
+  @media screen and (min-width: 1400px) {
+    #dropdown,
+    #page-container,
+    #nav-main,
+    footer {
+      width: 80%;
+    }
+    .site::before,
+    .site::after {
+      width: 10%;
+    }
+  }
+
+  @media screen and (min-width: 2000px) {
+    #dropdown,
+    #page-container,
+    #nav-main,
+    footer {
+      width: 1560px;
+    }
+    .site::before,
+    .site::after {
+      width: calc((100% - 1560px) * 0.5);
+    }
+  }
+}
+
+/* summer */
+@-moz-document regexp("https?://.*\\.bergfex\\.[^.]*/sommer/.*")
+{
+  .site::before,
+  .site::after {
+    background-image: url(https://vcdn.bergfex.at/images/site/sidebar_background_sommer.jpg);
+    bottom: -6%;
+  }
+}

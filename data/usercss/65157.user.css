@@ -1,0 +1,663 @@
+/* ==UserStyle==
+@name         CompactGINZAPlayer　CSS for ニコニコ動画:GINZA
+@namespace    USO Archive
+@author       gwin
+@description  【このスタイルシートでできること】  ニコニコ動画：GINZAの動画再生画面を、大画面再生時：横幅1280・中画面再生時：横幅1024のウインドウを基準に必要な情報・ボタンが極力一画面の中におさまるように変更し、スクロールが必要になるケースを減らします。  ・マイリスト追加等のボタンを常に表示(テレビちゃんボタン非表示)  ・再生プレーヤーの下に再生数・投稿者名・投稿者コメント等の動画情報を表示  ・広告非表示  ・ニュースマーキーを再生モードアイコンの右に移動(→縦のスペース確保)  ・ニュースマーキー非表示モードが選択可能(導入時オプション選択)  ・検索結果表示欄を拡大し、ウィンドウの横幅に応じて11列3行/ページまで表示できるように変更    【最新バージョン：ver.7.9 更新日2016/03/19】
+@version      20160318.23.47
+@license      CC0-1.0
+@preprocessor uso
+@advanced dropdown newsMarquee "ニュースマーキー" {
+    ___niconico___ "表示(niconico標準)*" <<<EOT  EOT;
+    ___ "非表示" <<<EOT #textMarquee{
+    display:none !important;
+}
+body.full_with_browser #nicoplayerContainer{
+    margin-bottom:0px !important;
+    } EOT;
+
+}
+==/UserStyle== */
+@namespace url(http://www.w3.org/1999/xhtml);
+/*
+ver.7.9　動画再生終了後のスクロール防止。フルスクリーンモードでの背景変更ボタンの非表示。
+ver.7.8　コメント欄広告スペース部分修正
+ｖer.7.7 ニコニコ側でのシークバー・コメント入力バー非表示機能の廃止に対応するための修正
+ver.7.6 ニコニコ側での検索結果表示欄の設定変更に対応するための修正
+ver.7.5　「もっと動画を見る」メニューの”＞”マークが正常に表示されない不具合を修正
+ver.7.4　ニコニコ側での仕様変更に対応
+　　　　　　検索バー幅の設定、コメント欄下マージンの設定(twitter,facebookリンクが追加されたため) 
+　　　　　　検索結果表示欄の最大表示列数を11列にまで拡大し、1940のブラウザ幅があれば3行表示が可能になるよう変更　
+ver.7.3　幅1024のウィンドウで中画面再生時横スクロールバーが出ないように修正
+ver.7.2　幅1280のウィンドウで大画面再生時横スクロールバーが出ないように修正
+ver.7.1　投稿者コメント・プレイリストのmargin&paddingをつめて、なるべく「動画をもっと見る」ボタンが上に表示されるように変更
+ver.7.0　GINZAバージョンに対応
+　　　　　　コメント欄幅拡大＆左寄せモードを削除(ニコニコ公式側で左パネルがなくなりコメント欄の幅も広がったため)
+ver.5.9　もっと動画を見る→検索結果欄のユーザー広告表示エリアを非表示
+ver.5.8　上部ヘッダーが1024モードでも1行表示できるスペース確保のため「ポイント購入」を非表示に
+ver.5.7　コメント表示欄のマウスオーバー時に表示される←|カーソルを無効化
+　　　　　(「コメント欄幅拡大＆再生プレーヤー左寄せ&左パネル(ニコメンド)非表示」モード選択時のみ)
+ver.5.6.1　テレビちゃんボタンの中身の高さ(非オンマウス時)の高さを変更(←ボタン名の上端が少し見えていたため)
+ver.5.6　ニコニコ側で再生プレーヤーレイアウトの方法が変更になったので
+　　　　　「コメント欄幅拡大＆再生プレーヤー左寄せ&左パネル(ニコメンド)非表示」選択時(CSSインストール時に選択)の
+　　　　　レイアウト方法を変更
+ver.5.5　ニコニコ側でプレーヤー外コメント入力欄の高さが変更になったので、プレーヤーエリアの高さ設定値を変更
+ver.5.4　表示項目が増えたヘッダーを１行で表示するためにヘッダー＆検索バーの横幅変更
+ver.5.3　動画情報エリアの内容のレイアウトを変更
+　　　　　ニュースマーキーの幅を再生プレーヤーのサイズに応じてなるべく広くなるように変更
+ver.5.2　動画情報エリアの横幅をブラウザサイズに応じて変化するようにして拡大
+　　　　　動画タイトル左の▼クリック時にも動画情報エリアの内容が非表示にならないように修正
+　　　　　コメント欄拡大＆再生プレーヤー左詰めモードを選択可能に
+ver.5.1　ニュースマーキー表示/非表示選択機能を追加
+ver.5.0　ニコニコ側の仕様変更(12/20)に対応
+    　　　コメント欄拡大モードの廃止(ニコニコデフォルトのコメント欄の幅が広がったためメリットが小さくなったため)
+　　　    「もっと動画を見る」ボタンが画面内に入りやすくするため、動画情報表示欄の高さを縮めた
+　　　    もっと動画を見るパネルの検索結果表示欄を拡大し、1280のブラウザ幅があれば1ページあたり8列4行で表示できるように変更
+ver.4.1.1　もっと動画を見るエリアのページ移動リンクとマイリストコメントが被らないようにレイアウトを修正(ver.4.1での修正)が
+　　　　　　正常に機能していなかった部分を修正
+ver.4.1　コメント欄広告表示枠の消去
+　　　　　テレビちゃん関連ボタンおよび動画タイトル表示エリアのレイアウト方法の変更
+　　　　　ニュースマーキーの文字サイズ縮小およびレイアウト変更、再生モードボタンのレイアウト変更
+　　　　　もっと動画を見るエリアのページ移動リンクとマイリストコメントが被らないようにレイアウトを修正
+ver.4.0　レイアウトを大幅に変更
+　　　　　　ニコニコ標準と同様の中央寄せレイアウト
+　　　　　　動画情報欄を再生プレーヤーの下に表示
+　　　　　　ニュースマーキーを再生モードアイコンの右に移動
+　　　　　　1024モードの廃止(幅1024でも画面外に見切れないようにレイアウト)
+ver.3.1　ブラウザ外にある部分もスクロースした時に表示されるよう修正
+　　　　検索結果欄をブラウザ幅全体に拡大＆ページ移動リンクを上部に表示
+　　　　「ブログサイトに貼り付け」欄が検索結果欄に隠されてクリックできない不具合を修正
+　　　　言語：英語モードで表示した際に投稿者情報欄がツイッター&フェイスブック欄で隠れてしまう不具合を修正
+ver.3.0　ニコニコ側の仕様変更[ZeroWatch→QWatch]に対応
+ver.2.1　ニコニコ側の仕様変更によりマイリストに追加ボタン等が表示されなくなっていた不具合を修正。
+ver.2.0.1　ver.2.0修正によるブラウザフルスクリーンモードでのタグ表示の不具合を修正。
+ver.2.0　ニコニコ側の仕様変更(7/30)に対応→タグの表示域の幅変更。淡色モード時のタグ編集ボタンエリアの背景色変更。
+ver.1.9　プレイリストマウスオーバー時にサムネを拡大する機能の無効化を選択可能に。
+ver.1.8  検索バーをヘッダー部分に表示し、動画タイトルの横幅を広げた。
+         淡色バージョン時のフルスクリーンモードでの「再生リスト隠す/表示」ボタンの文字色修正。
+ver.1.7.1 動画情報欄の文字色を調整。投稿者情報欄・チャンネル情報欄の位置修正
+          「もっと動画を見る」ボタンが押しにくい問題の修正。下の広告が消去されてない問題の修正。
+ver.1.7　ニコニコ側の仕様変更(6/18)に対応してレイアウトを変更。
+　　　　暗くする機能を無効にする部分を削除(設定で選択可能になったため)
+ver.1.6　ニコニコ側の仕様変更に対応。淡色表示時の色設定微調整。
+　　　　　最初からマイリスト追加ボタン等を表示(テレビちゃんボタンは非表示)。
+ver.1.5 「常にコントローラーをプレーヤー下に表示」する設定で使用する機能を追加。
+ver.1.4.3 動画タイトル上に表示されるチャンネル名を非表示。
+                コメント表示欄拡大時：設定ボタン・ピンを左寄せ＆コメントスクロールバーが幅1280のウインドウで隠れないようコメント枠を縮小。
+ver.1.4.2 音楽ダウンロードボタンが表示されない不具合、テレビちゃんボタントグルで表示されるボタン群の重ね合わせの不具合を修正。
+ver.1.4.1 センタリング要素が必要以上に右にいかないように制限。
+ver.1.4 ウインドウの横幅が1100以下になると上画面に表示する要素を減らし
+                ユーザーが再生プレーヤーを中画面にすれば横幅1024のウインドウで見切れないモードに切り替える機能を追加。
+ver.1.3 コメント表示欄の全体の幅及びコメント列の幅を広げる(選択式) CompactZEROtest7 
+ver.1.2 タイトルとタグの間に投稿者コメントの短縮を表示・配色及びレイアウトを微調整・横幅1280で固定。 CompactZEROtest6
+ver.1.1 background-colorの設定抜けを修正 CompactZEROtest5
+ver.1.0 投稿者コメント、タグ完全解決。動画レビュー/市場分離 CompactZEROtest4
+*/
+
+/* z-index
+    100:プレイリスト
+    101:ニュースマーキー
+    600:検索結果欄(default)
+    702:テレビちゃんボタンの中身
+    1001:動画情報欄
+    9999:ヘッダー(default)
+    10000:検索ボタン
+*/
+
+@-moz-document url-prefix("http://www.nicovideo.jp/watch/") {
+/*テレビちゃんボタンのトグルで表示されるボタンと下画面から移動させる動画情報欄との重ね合わせz-indexを機能させるため
+#content のz-indexをautoに */
+/*スクロールした時に画面外も表示されるようにする */
+body:not([class*="full_with_browser"]) #content{
+    z-index:auto !important; 
+    overflow:visible !important;
+    }
+body:not([class*="full_with_browser"]) #playlist{
+    overflow:hidden !important;
+    }
+
+/*壁紙変更ボタン位置&コメント表示欄幅&全体の最小サイズの設定変更
+　→大画面再生時：横幅1280サイズのウィンドウで横スクロールバーが表示されないようにするため
+　→中画面再生時：横幅1024サイズのウィンドウで横スクロールバーが表示されないようにするため */
+body.size_normal{
+    min-width:1246px !important;
+}
+body{
+    min-width:990px !important;
+}
+#playerAlignmentArea.size_medium {
+  width: 982px !important;
+}
+#playerAlignmentArea.size_medium #playerTabWrapper {
+  width: 310px !important;
+}
+#wallPalette {
+  width: 990px !important;
+}
+body:not([class*="full_with_browser"]) #playerContainerWrapper #playerContainerSlideArea .playerContainer #playerAlignmentArea #chipWallList{
+    right:0px !important;
+    top:0px !important;
+    z-index:6 !important;
+}
+
+
+/*チャンネル名表示枠を非表示←投稿者情報に表示されるので不要 縦のスペース節約のため非表示*/
+    #videoHeader #videoHeaderDetail .ch_breadcrumb{
+    display:none !important;
+    }
+
+/*動画ヘッダーエリア全体の横幅設定 */
+body:not([class*="full_with_browser"]) #content #videoHeader{
+    max-width:1234px !important;
+    min-width:960px !important;
+    width:auto !important;
+    }
+
+/*動画タイトルエリアの横幅設定および高さ設定 */
+body:not([class*="full_with_browser"]) #content #videoHeader #videoHeaderDetail{
+    width:auto !important;
+    margin-right:430px !important; /*テレビちゃん関連ボタン類を表示するスペース確保*/
+    }
+body:not([class*="full_with_browser"]) #content #videoHeader #videoHeaderDetail .videoDetailExpand h2{
+    max-width:none !important;
+}
+body:not([class*="full_with_browser"]) #content #videoHeader #videoHeaderDetail .videoDetailExpand h2 .videoHeaderTitle{
+    font-size:18px !important;
+}
+body:not([class*="full_with_browser"]) #content #videoHeader #videoHeaderDetail .videoDetailExpand{
+    height:auto !important;
+    }
+    
+/*投稿者コメント(短縮表示)のmargin&paddingをつめる */    
+body:not([class*="full_with_browser"]) #videoHeader .toggleDetailExpand,
+body:not([class*="full_with_browser"]) #videoHeader .shortVideoInfo p.shortDescription,
+body:not([class*="full_with_browser"]) #videoHeader .shortVideoInfo span.readMore{
+    font-size: 13px !important;
+    line-height: 1.0 !important;
+    margin-bottom:4px !important;
+        }
+body:not([class*="full_with_browser"]) #videoHeader .shortVideoInfo{
+    margin-bottom:4px !important;
+        }
+
+/*動画再生終了後に上スクロールするのを防ぐ設定 */
+body:not([class*="full_with_browser"]) #videoHeader #videoHeaderDetail {
+    margin-top:2px !important;
+    }
+    
+/*テレビちゃんボタンの中身を常に表示する */    
+body:not([class*="full_with_browser"]) #videoHeader {
+    z-index:auto !important; 
+    }
+body:not([class*="full_with_browser"]) #videoHeader .videoMenuToggle{
+    display:none !important;
+    }
+body:not([class*="full_with_browser"]) #videoHeader #videoMenuWrapper{
+    width:auto !important;
+    position:absolute !important;
+    right:00px !important;
+    top:00px !important;
+    height:auto !important;
+    margin-bottom:-12px !important;
+    }
+body:not([class*="full_with_browser"]) #videoHeader #videoMenuWrapper #videoMenuTopList{
+    position:relative !important;
+    width:100% !important;
+    margin:0px !important;
+    padding:0px !important;
+    z-index:702 !important; 
+
+    }
+body:not([class*="full_with_browser"]) #videoMenuTopList li{
+    display:block !important;
+    float:left !important;
+    height:38px !important;
+    width:auto !important;
+    max-width:50px !important;
+    padding:0 2px !important;
+    overflow:hidden !important;
+    }
+body:not([class*="full_with_browser"]) #videoMenuTopList li:hover{
+    height:auto !important;
+    background:#EEEEEE !important; 
+    border: 1px solid #333333 !important;
+    }
+body:not([class*="full_with_browser"]) #videoHeader.noAward .menuAward {
+    display: none !important;
+    }
+body:not([class*="full_with_browser"]) #videoHeader #videoMenuTopList .videoMenuListNicoru{
+    width:50px !important; 
+    }
+body:not([class*="full_with_browser"]) #videoHeader #videoMenuTopList .videoMenuListNicoru .nicorub-balloon{
+    margin-top:-2px !important;
+    margin-left:-7px !important;
+    width:50px !important;
+    }
+body:not([class*="full_with_browser"]) #videoHeader #videoMenuTopList li.videoMenuList .awardButtonBaloon{
+    top:-0px !important;
+    left:-0px !important;
+    width:50px !important;
+    }
+    /*動画再生終了後のスクロール防止*/
+#videoHeader.menuOpened .tvChanMenuHeightController {
+    margin-top: 0px !important;
+    }
+/*検索バーをヘッダーの中に表示する*/
+  /*横幅1024のブラウザサイズでヘッダーを１行でを表示するための設定　ヘッダー＆検索バーの横幅設定*/
+body:not([class*="full_with_browser"]) #siteHeader div#siteHeaderInner{
+    padding-right: 172px !important;
+    width:auto !important;
+    min-width: 818px !important;
+    max-width:1000px !important;
+    }
+body:not([class*="full_with_browser"]) #videoHeader #videoHeaderMenu{
+    width: 92px !important;/*df:122px*/
+}
+body:not([class*="full_with_browser"]) #videoHeader #videoHeaderMenu .searchContainer .searchText{
+    width: 170px !important;/*df:327px*/
+}
+body:not([class*="full_with_browser"]) #videoHeader #videoHeaderMenu .searchContainer .searchText input{
+    width: 100px !important;/*df:257px 両サイドのボタンの幅100pxを　.searchTextの幅から引いた幅*/
+}
+
+
+body:not([class*="full_with_browser"]) #videoHeader #videoHeaderMenu {
+    margin-top:5px !important;
+    z-index:10000 !important;  /*ヘッダーのz-indexは9999 */
+    /*ヘッダーが追従モードの場合 */
+    right:0% !important;
+    top:-15px !important;
+    position:fixed !important;    
+    }
+    /* ヘッダーが固定モードの場合*/
+body:not([class*="full_with_browser"]).nofix #videoHeader #videoHeaderMenu{
+    position:absolute !important;
+    top:-53px !important;
+    right:0px !important;
+    }
+
+body:not([class*="full_with_browser"]) #videoHeader #videoHeaderMenu .searchContainer{
+    position:relative !important;
+    left:0px !important;
+    top:0px !important;
+    display:block !important;
+    margin-left:-80px !important; 
+    }
+    /*一般アカウントの場合に表示される「プレミアム登録」「ポイント購入」をスペース確保のため非表示にする */
+body:not([class*="full_with_browser"]) #siteHeaderNotification a#siteHeaderNotificationPremium,
+body:not([class*="full_with_browser"]) #siteHeaderNotification a.siteHeaderPoint {
+    display:none !important;
+    }		
+body:not([class*="full_with_browser"]) #videoHeaderMenu .searchContainer form .searchText input{
+    font-size:14px !important;
+    line-height:15px !important;
+}
+
+/*動画タグの整形 */
+body:not([class*="full_with_browser"]) #content #videoHeader #videoTagContainer,
+#content #videoHeader #videoTagContainer{
+    width:auto !important;
+    height:auto !important;
+    padding-right:0px !important;
+    }
+body:not([class*="full_with_browser"]) #videoTagContainer .tagInner{
+    height:auto !important;
+    min-height:48px !important;
+    }
+body:not([class*="full_with_browser"]) #videoTagContainer .tagInner #videoHeaderTagList .toggleTagEdit{
+    height:38px !important;
+}
+body:not([class*="full_with_browser"]) #videoTagContainer .tagInner #videoHeaderTagList .moreTagsExist,
+body:not([class*="full_with_browser"]) #videoTagContainer .tagInner #videoTagContainerPin{
+    display:none !important;
+}
+
+/*プレイリストの上に動画情報を表示する設定 */
+    /*表示するスペースを確保 */    
+body:not([class*="full_with_browser"]):not([class*="size_small"])  #content #playerContainerWrapper,
+body:not([class*="full_with_browser"]).setting_panel.size_small  #content #playerContainerWrapper{
+    margin:0px !important;
+    padding-top:5px !important;
+    padding-bottom:75px !important;
+    }
+    /*動画情報の整形および位置設定 */
+body:not([class*="full_with_browser"]) #videoInfo .videoMainInfoContainer{
+    display:block !important;
+    }
+body:not([class*="full_with_browser"]) #videoInfo{
+    position:absolute !important;
+    top:-268px !important; /*動画情報の縦位置の設定 */
+    z-index:1001 !important;
+    background-color:#efefef !important;
+    min-width:970px!important;
+    max-width:1228px !important;
+    width:99% !important; /*横位置の設定　センタリング */
+    left:-25% !important;
+    right:-25% !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    padding:2px !important;
+    height:70px !important;
+    overflow:auto !important; 
+    border:thin solid #000000 !important;
+    }
+body:not([class*="full_with_browser"]) #videoInfo div#videoInfoHead,
+body:not([class*="full_with_browser"]) #videoInfo div#videoShareLinks,
+body:not([class*="full_with_browser"]) #videoInfo div.parentVideoInfo,
+body:not([class*="full_with_browser"]) #videoInfo div#userProfile,
+body:not([class*="full_with_browser"]) #videoInfo div.ch_prof,
+body:not([class*="full_with_browser"]) #videoInfo div#bottomVideoDetailInformation{
+    width:50% !important;
+    max-width:435px !important;
+    float:left !important;
+    padding:0 !important; 
+    margin:2px 0px !important; 
+    }
+body:not([class*="full_with_browser"]) #videoInfo div#userProfile,
+body:not([class*="full_with_browser"]) #videoInfo div.ch_prof{
+    max-width:300px !important;
+    }
+body:not([class*="full_with_browser"]) #videoInfo div#userProfile .profile{
+    max-width:240px !important;
+    }
+body:not([class*="full_with_browser"]) #videoInfo div#videoComment,
+body:not([class*="full_with_browser"]) #videoInfo div.translation{
+    width:auto !important;
+    clear: both !important;
+}
+        /*動画タイトルは重複になるので削除 */
+body:not([class*="full_with_browser"]) #videoInfo div#videoInfoHead .videoInformation h3#videoTitle{
+    display:none !important;    
+    }
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead .videoInformation #videoStats li{
+	padding:0px 3px !important;
+}
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead .videoInformation #videoStats li span{
+	padding:0px !important;
+}
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead .videoPostedAt,
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead .viewCount,
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead .commentCount,
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead .mylistCount{
+	font-size:16px !important;
+	color:#000000 !important;
+	}
+body:not([class*="full_with_browser"]) #videoInfo div.ch_prof *{
+	font-size:13px !important;
+	line-height:13px !important;
+	}
+        /*動画ステータス欄でサムネの右側に情報を表示する&投稿日時の左側に大百科アイコンを表示する設定 */
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead{
+    min-height:60px !important;
+    }
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead .videoThumb{
+    position:absolute !important;
+    top:0px !important;
+    left:0px !important;
+    }
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead > p,
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead .videoEditMenu,
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead .videoInformation{
+    width:auto !important;
+    padding:0 !important; 
+    margin:0px 2px 0px 80px !important;
+    float:left !important;
+    }
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead .videoInformation p.dicIcon{
+    width:auto !important;
+    margin-left:0px !important;
+    position:absolute !important;
+    top:5px !important;
+    left:90px !important;
+    }   
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead .infoHeadOuter > p{
+    margin:0px 2px 0px 110px !important;
+    }
+body:not([class*="full_with_browser"]) #videoInfo div.parentVideoInfo > *{
+    margin:0px 0px 2px 0px !important;
+    }
+body:not([class*="full_with_browser"]) #videoInfo #videoInfoHead .videoInformation *{
+    margin:0px !important;
+    }
+
+
+/*ニュースマーキーを再生モードアイコンの右側に移動 */
+body:not([class*="full_with_browser"]) #content #playerContainerWrapper #textMarquee{
+    position:absolute !important;
+    bottom:-111px !important;
+    right:0px !important;                         /*コメント欄右端にニュースマーキーの右端を合わせる */
+    margin:0px 0px 0px 350px !important; /*左側に再生モードボタンおよび再生リストの内容を表示するためのスペース(350px)を確保*/
+    padding:0px !important;
+    z-index:101 !important;
+    height:32px !important;
+    }
+/*
+body:not([class*="full_with_browser"]) #content #playerAlignmentArea.size_normal #textMarquee{
+    width:748px !important;
+    }
+body:not([class*="full_with_browser"]) #content #playerAlignmentArea.size_medium #textMarquee{
+    width:522px !important;
+    }
+*/
+body:not([class*="full_with_browser"]) #content #playerContainerWrapper #textMarquee .prevButton,
+body:not([class*="full_with_browser"]) #content #playerContainerWrapper #textMarquee .nextButton{
+    top:-8px !important;
+    }
+body:not([class*="full_with_browser"]) #content #playerContainerWrapper #textMarquee .textMarqueeOuter{
+    top:2px !important;
+    bottom:10px !important;
+    }
+
+
+/* ニュースマーキー移動後のスペース消去→再生プレーヤーとコメント欄の高さ設定 (-41px height) シークバー高さ47px,コメント入力バー高さ30px*/
+  /*大画面 */
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_normal #playerContainer.text_marquee,
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_normal #playerContainer #playerTabWrapper{
+    height: 510px !important;
+}
+
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_normal #playerContainer.controll_panel.text_marquee,
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_normal #playerContainer.controll_panel #playerTabWrapper{
+    height: 557px !important;
+}
+
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_normal #playerContainer.oldTypeCommentInput.text_marquee,
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_normal #playerContainer.oldTypeCommentInput #playerTabWrapper{
+    height: 510px !important;
+}
+
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_normal #playerContainer.controll_panel.oldTypeCommentInput.text_marquee,
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_normal #playerContainer.controll_panel.oldTypeCommentInput #playerTabWrapper{
+    height: 557px !important;
+}
+
+  /*中画面 */
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_medium #playerContainer.text_marquee,
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_medium #playerContainer #playerTabWrapper{
+    height: 414px !important;
+}
+
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_medium #playerContainer.controll_panel.text_marquee,
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_medium #playerContainer.controll_panel #playerTabWrapper{
+    height: 461px !important;
+}
+
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_medium #playerContainer.oldTypeCommentInput.text_marquee,
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_medium #playerContainer.oldTypeCommentInput #playerTabWrapper{
+    height: 414px !important;
+}
+
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_medium #playerContainer.controll_panel.oldTypeCommentInput.text_marquee,
+body:not([class*="full_with_browser"]) #playerAlignmentArea.size_medium #playerContainer.controll_panel.oldTypeCommentInput #playerTabWrapper{
+    height: 461px !important;
+}
+
+
+    
+/*プレイリストがブラウザ内に収まるようmargin&paddingをつめる */    
+
+body:not([class*="full_with_browser"]) #content div#videoHeader{
+    padding-bottom:2px !important;
+    }
+body:not([class*="full_with_browser"]) #content div#videoHeader #videoTagContainer{
+    margin-top:2px !important;
+    }
+
+/*プレイリストのmargin&paddingをつめる */
+body:not([class*="full_with_browser"]) #playlist #playlistContainer #playlistContainerInner .playlistItemList .playlistItem .itemLink{
+    padding:4px 0px !important;
+}
+body:not([class*="full_with_browser"]) #playlist #playlistContainer #playlistContainerInner .playlistItemList .playlistItem .itemLink .videoTitle{
+    margin:4px auto 0 auto !important;
+}
+body:not([class*="full_with_browser"]) #playlist #playlistContainer,
+body:not([class*="full_with_browser"]) #playlist #playlistContainer .prevArrow,
+body:not([class*="full_with_browser"]) #playlist #playlistContainer .nextArrow,
+body:not([class*="full_with_browser"]) #playlist #playlistContainer #playlistContainerInner,
+body:not([class*="full_with_browser"]) #playlist #playlistContainer #playlistContainerInner .playlistItemList .playlistItem{
+    height:114px !important;
+}
+body:not([class*="full_with_browser"]).size_small.no_setting_panel.videoExplorer.playlist #playlist{
+    height:149px !important;
+}
+/*プレイリストから動画サムネイルをドラッグして削除する際の設定：「もっと動画を見る」時→削除エリアの分だけプレイリストの高さを＋ */
+body:not([class*="full_with_browser"]).size_small.no_setting_panel.videoExplorer.playlist #playlist.dragging{
+    height:183px !important;
+}
+/*プレイリストから動画サムネイルをドラッグして削除する際の設定：通常時→動画情報蘭が重ならないように、margin-topにネガティブを設定する */
+body:not([class*="full_with_browser"]):not([class*="videoExplorer"]) #playlist.dragging{
+    margin-top:-37px !important;
+}
+        
+/* 広告を削除 */
+.playerTabAds,
+.nicoSpotAds,
+#ichibaPanelAd,
+#playerBottomAd,
+#pageFooterAds,
+.videoStartAdsOuter,
+#selectionFooterAds,
+#leftPanelAd,
+.uadTagRelatedContainer{
+    display:none !important;
+    }
+
+/*広告スペースの分だけコメント欄の高さを広げる */
+body:not([class*="full_with_browser"]) #playerTabContainer .player-tab-content{
+    bottom:28px !important;
+}
+    
+
+/*検索結果欄を横いっぱいに広げる */
+
+body.size_small.no_setting_panel.videoExplorer #playlist{
+    left:200px !important;
+    z-index:1000 !important;
+}
+body.size_small.no_setting_panel.videoExplorer #playerContainerWrapper,
+body.size_small.no_setting_panel.videoExplorer #playerContainerSlideArea,
+body.size_small.no_setting_panel.videoExplorer #nicoplayerContainer,
+body.size_small.no_setting_panel.videoExplorer #external_nicoplayer,
+body.size_small.no_setting_panel.videoExplorer #playerContainerWrapper #playerAlignmentArea,
+body.size_small.no_setting_panel.videoExplorer #playerContainer,
+body.size_small.no_setting_panel.videoExplorer #playerNicoplayer{
+    width:200px !important;
+    height:135px !important;
+    padding:2px 0px !important;
+}
+
+body.size_small.no_setting_panel.videoExplorer #videoExplorerBackContainer{
+    top:143px !important;
+}    
+
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerMenu,
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerMenu .videoExplorerMenuInner,
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerMenu .videoExplorerMenuInner .item,
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerMenu .videoExplorerMenuInner .item *{
+    width:200px !important;
+}
+
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerMenu .videoExplorerMenuInner .item .arrow{
+    width:9px !important;
+}
+
+body.size_small.no_setting_panel.videoExplorer .videoExplorerBody .videoExplorerContentWrapper{
+    margin-left:200px !important;
+}
+
+.videoExplorerBody .videoExplorerContent .contentItemList .item .thumbnailContainer .noImage,
+.videoExplorerBody .videoExplorerContent .contentItemList .item .thumbnailContainer .thumbnail,
+.videoExplorerBody .videoExplorerContent .suggestVideo .item .thumbnailContainer .noImage,
+.videoExplorerBody .videoExplorerContent .suggestVideo .item .thumbnailContainer .thumbnail {
+  width: 160px !important;
+}
+
+.videoExplorerBody .videoExplorerContent .contentItemList .item .thumbnailContainer,
+.videoExplorerBody .videoExplorerContent .suggestVideo .item .thumbnailContainer,
+.videoExplorerBody .videoExplorerContent.column4 .contentItemList .item,
+.videoExplorerBody .videoExplorerContent.column4 .contentItemList .folder .column4 .container {
+  width: 148px !important;
+}
+
+
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContentWrapper .videoExplorerContent,
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContentWrapper .videoExplorerContent .contentItemList{
+    max-width:1694px !important; /*11列が最大表示になるよう横幅の最大値を設定 */
+    width:auto !important;
+    }
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContent .searchContent .uadTagRelated{
+    display:none !important;    
+    }
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContent .contentItemList.column4 .item,    
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContent .contentItemList.column4 .item.item4n,
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContent .contentItemList.column4 .item.item4n-3{
+    float:left !important;
+    clear:none !important;
+    margin:3px !important;
+    height:185px !important;
+}
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContent .contentItemList.column4 .item .column4 > *{
+    float:none !important;
+    clear:left !important;
+        
+    }
+
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContentWrapper .videoExplorerContent{
+    padding:4px !important;
+}
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContentWrapper .videoExplorerContent .mylistVideoContent .header{
+    margin-bottom:4px !important;
+}
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContentWrapper .videoExplorerContent .mylistVideoContent .mylistDetail .mylistDescriptionContainer{
+    margin:4px 0px !important;
+}
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContentWrapper .videoExplorerContent .mylistVideoContent .mylistDetail .mylistDescriptionContainer .mylistDescription{
+    padding:4px !important;
+}
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContentWrapper .videoExplorerContent .contentItemList{
+    margin:5px 0px !important;
+    }
+
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContentWrapper .videoExplorerContent .searchContent .searchBox{
+    padding:4px !important;
+    margin:0px !important;
+}
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContentWrapper .videoExplorerContent .searchContent .header{
+    margin-bottom:4px !important;
+    padding:0px !important;
+    
+}
+body:not([class*="full_with_browser"]) #bottomContentTabContainer.videoExplorer #videoExplorer .videoExplorerBody .videoExplorerContentWrapper .videoExplorerContent .searchContent .tagRelatedNicopedia{
+    margin-top:0px !important;
+    margin-bottom:4px !important;
+}
+/*userstyles.orgでの選択設定挿入部分*/
+
+/*[newsMarquee]ニュースマーキー表示/非表示設定 */
+/*[[newsMarquee]]*/
+/*終端：[newsMarquee]ニュースマーキー表示/非表示設定 */
+
+/*終端：userstyles.orgでの選択設定挿入部分*/
+
+
+/*css終わり */
+}

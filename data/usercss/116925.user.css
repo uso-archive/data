@@ -1,0 +1,98 @@
+/* ==UserStyle==
+@name         Firefox: Combined favicon and close button
+@namespace    USO Archive
+@author       okdana
+@description  Merges the tab close button into the favicon/throbber.
+@version      20170313.22.01
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+/* Move the favicon, throbber, and label to the right so that the close button appears on the left */
+.tabbrowser-tab .tab-icon-image,
+.tabbrowser-tab .tab-throbber {
+	-moz-box-ordinal-group: 2 !important;
+}
+.tabbrowser-tab .tab-label,
+.tabbrowser-tab .tab-label-container {
+	-moz-box-ordinal-group: 3 !important;
+}
+.tabbrowser-tab .tab-counter {
+	-moz-box-ordinal-group: 4 !important;
+}
+.tabbrowser-tab .tab-icon-sound {
+	-moz-box-ordinal-group: 5 !important;
+
+	/*
+		This should be 6px to match .tab-icon-image,
+		but the sound icon has 2px empty space on its left side, so...
+	*/
+	margin-inline-start:    4px !important;
+}
+
+/* Hide the close button initially */
+.tabbrowser-tab .tab-close-button {
+	display: none !important;
+	margin:  1px 6px 0px 0px !important;
+}
+
+/* Show the close button and hide the throbber/favicon on tab hover */
+.tabbrowser-tab:hover .tab-close-button {
+	display: block !important;
+}
+.tabbrowser-tab:hover .tab-icon-image,
+.tabbrowser-tab:hover .tab-throbber {
+	display: none !important;
+}
+
+/* Fix the close button images in FF 51+ */
+:root[devtoolstheme="light"] .tabbrowser-tab:hover .tab-close-button,
+:root:-moz-lwtheme-darktext  .tabbrowser-tab:hover .tab-close-button {
+	-moz-image-region: rect(0px, 16px, 16px, 0px) !important;
+}
+:root[devtoolstheme="light"] .tabbrowser-tab:hover .tab-close-button:hover,
+:root:-moz-lwtheme-darktext  .tabbrowser-tab:hover .tab-close-button:hover {
+	-moz-image-region: rect(0px, 32px, 16px, 16px) !important;
+}
+:root[devtoolstheme="light"] .tabbrowser-tab:hover .tab-close-button:hover:active
+:root:-moz-lwtheme-darktext  .tabbrowser-tab:hover .tab-close-button:hover:active {
+	-moz-image-region: rect(0px, 48px, 16px, 32px) !important;
+}
+/* Fix the close button images in FF 51+ (HiDPI) */
+@media (min-resolution: 2dppx) {
+	:root[devtoolstheme="light"] .tabbrowser-tab:hover .tab-close-button,
+	:root:-moz-lwtheme-darktext  .tabbrowser-tab:hover .tab-close-button {
+		-moz-image-region: rect(0px, 32px, 32px, 0px) !important;
+	}
+	:root[devtoolstheme="light"] .tabbrowser-tab:hover .tab-close-button:hover,
+	:root:-moz-lwtheme-darktext  .tabbrowser-tab:hover .tab-close-button:hover {
+		-moz-image-region: rect(0px, 64px, 32px, 32px) !important;
+	}
+	:root[devtoolstheme="light"] .tabbrowser-tab:hover .tab-close-button:hover:active,
+	:root:-moz-lwtheme-darktext  .tabbrowser-tab:hover .tab-close-button:hover:active {
+		-moz-image-region: rect(0px, 96px, 32px, 64px) !important;
+	}
+}
+
+/* Always show a favicon, unless there's a throbber or close button */
+/* (sometimes the New Tab tab shows as progress="true", not sure why) */
+.tabbrowser-tab:not([busy="true"]):not([progress="true"]):not(:hover) .tab-icon-image,
+.tabbrowser-tab:not([busy="true"]):not([progress="true"]):not(:hover) .tab-icon-image:not([src]):not([pinned]):not([crashed]),
+.tabbrowser-tab[label="New Tab"]:not([busy="true"]):not(:hover) .tab-icon-image {
+	display: block !important;
+}
+
+/* Pinned tabs should not behave like regular tabs, let them stay normal */
+.tabbrowser-tab[pinned]:hover .tab-close-button {
+	display: none !important;
+}
+.tabbrowser-tab[pinned]:hover .tab-icon-image {
+	display: block !important;
+}
+
+/* Add extra space to the right of the tab to keep the text centred */
+.tabbrowser-tab:not([pinned]):not([group^="{"]):not([soundplaying="true"]) .tab-text {
+	margin-right: 20px !important; /* 16px icon width + 4px icon margin */
+}
+/* eof */

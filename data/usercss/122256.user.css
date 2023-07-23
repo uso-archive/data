@@ -1,0 +1,795 @@
+/* ==UserStyle==
+@name         Userstyles editor
+@namespace    USO Archive
+@author       hideheader
+@description  Rearranges the Userstyles editor. Now it works on the 'upload failed' pages too, after a fashion, and works better than it did on narrow (600-900px) viewports.    Basically, the editor page needs more structure than it has in order to do this right.
+@version      20151224.04.54
+@license      CC-BY-NC-SA-4.0
+@preprocessor uso
+==/UserStyle== */
+@-moz-document regexp("https?://userstyles.org/styles/(create|update)") {
+/*
+  'upload error' pages 
+*/
+  /*remove the 'house rules' from error pages*/
+  #main-article > UL {display: none}
+  
+}
+
+@-moz-document regexp("https?://userstyles.org/styles/(new|create|update|\\d+/edit)") {
+::-moz-placeholder {color: blueviolet !important;}
+::-webkit-input-placeholder {color: blueviolet !important;}
+  /*
+    Header
+  */
+  #main-header A {
+    position: relative;
+    opacity: 0;
+    z-index: 1;
+    background-color: #FFEC8B;
+    padding-right: .5em;
+  }
+  #main-header A:hover {
+    opacity: 1;
+  }
+  #-main-header A:not(:hover)::after {
+    -font-size: x-large;
+    content: "Editing -";
+    visibility: visible;
+    position: absolute;
+    right: 0;
+  }
+
+  #main-article {position: relative}
+
+@media (max-width: 900px) {
+
+  /*
+    House rules
+  */
+    /* move 'em to the top, before the header */
+  BODY {padding-top: 170px}
+  .errorExplanation {
+    position: absolute;
+    left: 0; top: calc(-51px - 8px - 170px - 28px); margin-top: 0;
+    width: 100%; height: 200px;
+    max-height: 170px;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+  #main-article > UL {
+    position: absolute;
+    left: 0; top: -256px;/*calc(-51px - 170px - 30px - 8px)*/; background-color: rgba(0, 255,255,.3);
+    padding-left: 20px; /*from 40px*/
+    -height: 200px; -width: calc(100% - 40px + 20px); height: 170px;
+    overflow-y: auto;
+    margin-top: 0;
+    -top: calc(100% - 178px);
+  }
+
+} @media (min-width: 901px) {
+
+  /*
+    House rules
+  */
+    /* move 'em to the left column, after the menu */
+  .errorExplanation,
+  #main-article > UL {
+    position: absolute;
+    left: -185px; top: 118px;
+    width: 170px;
+    padding: 5px 5px 5px calc(5px + 1em)/**/;
+    box-sizing: border-box;
+    background-color: #D1EEEE;
+    border-radius: 5px;
+    margin-top: 0;
+  }
+    /* instead of a bullet, use whitespace... */
+  .errorExplanation > UL LI,
+  #main-article > UL LI {
+    display: block;
+    list-style-type: none;
+    text-indent: -1em;
+    margin-bottom: 1em;
+  }
+    /* ...and a big first letter */
+  .errorExplanation > UL LI::first-letter,
+  #main-article > UL LI::first-letter {
+    font-size: medium;
+  }
+  #left-sidebar .ad {display: none}
+  /* NB: Saving the ad just isn't possible.
+  .ad and nav are siblings, children of #left-sidebar. If #left-sidebar
+  is sticky, any other positioned element is either above them both or
+  below them both - it can't be both above .ad and below nav in z-index
+  order. As a result, if margin-top or padding-top are used to create a
+  gap above .ad for the guidelines, the guidelines either scroll over 
+  nav and obscure it, or the guidelines links can't be clicked because
+  they're covered by #left-sidebar.
+  
+  In Firefox (Chrome too?) if .ad is position:relative with top: large
+  enough that .ad is (almost) off-screen when #left-sidebar becomes
+  fixed, .ad is positioned as if top: were relative to the bottom of the
+  page, opening a huge gap above it.
+  */
+
+  /*
+    Error message
+  */
+  .errorExplanation {
+    background-color: #F88;
+    padding: 5px;
+  }
+  .errorExplanation > UL {padding-left: 5px}
+  .errorExplanation > UL LI {text-indent: 0}
+
+    /* ...or else a big first line */
+  .errorExplanation > UL LI:first-line {
+    font-variant: small-caps;
+    text-shadow: 1px 1px #444;
+    font-size: 1.1em;
+  }
+}
+
+
+  /*
+    'Save' button
+  */
+  INPUT[name="commit"] {
+    position: fixed;
+    top: calc(8px + (41px - 25px) / 2); left: calc(50% - 975px / 2 + 5px);
+      /* with add'l screenshot changes, add'l screenshot table is 975px wide instead of 729px wide */
+    position: absolute;
+    left: -180px; top: calc(-10px - 41px + (41px - 25px) / 2);
+    z-index: 2; /* else logo+link is on top */
+  }
+@media (max-width: 900px) {/*New/Editing/Save above Name in narrow viewports*/
+  INPUT[name="commit"] {
+    left: 13em; top: calc(-10px - 41px - 25px);
+  }
+}
+
+
+/* DIV.form-controls - ten of 'em
+    (1) name, (2) description, (3) additional info, (4) css, (5) example url,
+    (6) style settings, (7)  primary screenshot, (8) additional screenshots,
+    (9) pledgie, (10) license
+    
+   ...OH NO! The upload error message is added as an 11th DIV, before the
+   ten .form-control DIVs. If this is to work on /styles/create, we'll have
+   to number them last to first with :nth-last-of-type().
+*/
+
+  /*
+    (1) Name
+  */
+  #style_short_description {
+    font: bold 2em "Trebuchet MS";
+    position: absolute;
+    top: calc(-47px - 2px); /*left: calc(.6em - 2px);*/right: 2px;
+    background: transparent;
+    border-radius: 5px;
+    width: calc(100% - 5px);
+  }
+  #style_short_description:not(:focus):not(:hover):not(:invalid) {
+    border-color:transparent;
+    -background: transparent;
+  }
+  
+  #main-header H1 {color: transparent}
+
+  .form-controls:nth-last-of-type(10) {height: 0; margin: 0;}
+  label[for="short-description"] { /*or, as a menu entry in the left column*/
+    position: absolute;
+    top: -51px; right: 4px;
+  }
+  FORM[action$=create]::before,
+  FORM[action$=update]::before {
+    position: absolute;
+    top: calc(-51px + 5px); right: calc(100% + 1ch);
+    white-space: nowrap;
+    font: bold 2em "Trebuchet MS";
+  }
+  FORM[action$=create]::before {content: "New style"}
+  FORM[action$=update]::before {content: "Editing"}
+
+@media (max-width: 900px) {
+
+  #main-header H1 {
+    padding-top: calc(1em + 2px);
+  }
+  #main-header A {
+    top: calc(-31px - 3px); left: 0;
+  }
+  FORM[action$=create]::before,
+  FORM[action$=update]::before {
+    top: calc(-51px - 2px - 1em); right: auto; left: .5em;
+  }
+
+}/*@media*/
+
+
+  /*
+    (2) Description
+  */
+  .form-controls:nth-last-of-type(9) {
+    position: absolute;
+    width: calc(100% - 370px);
+    left: 370px;
+  }
+  #style_long_description {
+    -width: calc(100% - 370px) !important;
+    width: 100% !important;
+    -height: auto !important;
+    max-height: calc(416px - 1.3em);
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    resize: vertical;
+  }
+  .form-controls:nth-last-of-type(9) .linking-note {display: none}
+  .form-controls:nth-last-of-type(9) label:first-child:hover + .linking-note,
+  .form-controls:nth-last-of-type(9) .linking-note:hover  {
+    display: block;
+    position: absolute;
+    left: 0; top: 1.7em; /* 1.3 * 1.3 */
+    padding: .5em;
+    background-color: #D1EEEE;
+    -margin-left: 370px;
+  }
+
+
+  /*
+    (3) Notes (here, Additional Info)
+  */
+  .form-controls:nth-last-of-type(8) {
+    -width: calc(100% - 360px);
+    margin-top: calc(416px + 26px);
+  }
+  #style_additional_info {
+    height: 20em !important; /*if it's a pita for authors, it'll be a pita for users*/
+    width: 100% !important;
+    box-sizing: border-box;
+    overflow-x: hidden; -overflow-y: auto;
+    resize: none;
+  }
+
+
+  /*
+    (4) CSS
+  */
+   .CodeMirror,
+  .form-controls:nth-last-of-type(7) TEXTAREA {
+    width: 100%;
+    resize: vertical;
+  }
+
+
+  /*
+    (5) Example URL
+  */
+  #example-url {width: 100%; box-sizing: border-box;}
+
+
+  /*
+    (6) Style Settings
+  */
+  #-edit-style-settings {counter-reset: setting}
+  #-edit-style-settings > LI {counter-increment: setting}  
+  #-edit-style-settings > LI::before {
+    content: counter(setting) ". ";
+  }
+  #edit-style-settings {
+  }
+  #edit-style-settings LI:not(:last-child) {
+    -list-style-type: decimal;
+    margin: 1em 0;
+  }
+  #edit-style-settings > LI:not(:last-child) {
+    list-style-type: decimal;
+    -margin: 1em 0;
+  }
+  #-edit-style-settings .edit-style-options LI:not(:last-child) {
+    list-style-type: lower-alpha;
+  }
+  #edit-style-settings LI:last-child {margin-left: -2ch;}
+
+  #edit-style-settings textarea {width: 100%; resize: vertical;}
+  #edit-style-settings textarea:not(:focus) {max-height: 2.6em;}
+    /* edit boxes collapse when not editing */
+
+  /* up/down/remove buttons */
+  .edit-setting-buttons [style*="hidden"],
+  .edit-option-buttons [style*="hidden"] {/*buttons should be DISABLED, not hidden*/
+    visibility: visible !important;
+    color: #ADA9A5;
+    pointer-events: none;
+  }
+  .edit-text-setting:not(:hover) .edit-setting-buttons,
+  .edit-color-setting:not(:hover) .edit-setting-buttons,
+  .edit-setting:not(:hover) .edit-setting-buttons,
+  .edit-option:not(:hover) .edit-option-buttons {
+    opacity: 0;
+  }
+  .edit-option,
+  .edit-setting-buttons,
+  .edit-option-buttons {
+    transition: opacity .5s step-end;
+  }
+  .edit-text-setting:hover .edit-setting-buttons,
+  .edit-color-setting:hover .edit-setting-buttons,
+  .edit-option:hover,
+  .edit-setting:hover .edit-setting-buttons,
+  .edit-option:hover .edit-option-buttons {
+    transition-duration: 0s;
+  }
+
+    /*highlight up/down/remove target*/
+  .edit-setting-buttons::before,
+  .edit-option-buttons::before {
+    content: none;
+    position: absolute; display: block;
+    top: -5px; bottom: -5px;
+    left: -10px; right: -10px;
+    border: 2px solid orange;
+    -background: rgba(90, 90, 90, .4);
+    z-index: -1;
+  }
+  .edit-setting-buttons::before {border-color: cyan}
+
+  /* default option */
+  .edit-option {
+    margin-left: -6em;
+    transition-property: color;
+  }
+    /*position the input text to the left of the input */
+  .edit-option {direction: rtl}
+  .edit-option > * {direction: ltr}
+  .edit-option:not(:hover) {
+    color: transparent; /*not opacity:0, or the whole option disappears*/
+  }
+
+  .edit-option INPUT[placeholder="Label"] {
+    position: absolute; left: 0;
+  }
+    
+  .edit-setting-buttons:hover::before,
+  .edit-option-buttons:hover::before {
+    content: "";
+  }
+  .edit-setting-buttons INPUT,
+  .edit-option-buttons INPUT {
+    position: relative;
+    z-index: 1;
+  }
+   #edit-style-settings > LI,
+  .edit-style-options > LI {position: relative}
+
+  #edit-style-settings INPUT.color {width: calc(7ch + 4px);} /**/
+    
+    /*dropdown setting*/
+  UL#edit-style-settings .edit-dropdown-setting INPUT[placeholder="Label"] {
+    width: 377px;
+    -outline: 2px solid orange;
+  }
+  UL#edit-style-settings .edit-dropdown-setting .edit-option INPUT[placeholder="Label"] {
+    width: 356px;
+    -outline: 2px solid green;
+  }
+
+    /*image setting*/
+  UL#edit-style-settings .edit-image-setting .edit-setting INPUT[placeholder="Label"] {width: 377px}
+  UL#edit-style-settings .edit-image-setting .edit-style-options INPUT[placeholder="Label"] {
+    width: 295px;
+    -outline: 2px solid purple;
+  } /*what will fit in an OPTION to the right of the screenshots*/
+  .edit-image-setting .edit-option-value-url:not(:focus):not(:hover) {
+    border-color: transparent;
+    color: #777;
+  }
+
+    /*text setting*/
+  UL#edit-style-settings .edit-text-setting INPUT[placeholder="Label"] {width: 332px}
+  UL#edit-style-settings .edit-text-setting INPUT[id^="option-default"] {width: 10.5em /*138px*/}
+
+    /*color setting*/
+  UL#edit-style-settings .edit-color-setting INPUT[placeholder="Label"] {width: 332px}
+  UL#edit-style-settings .edit-color-setting INPUT[id^="option-default"] {width: 7.5em /*113px*/}
+
+   /* make color, text layout consistent with other style settings */
+  .edit-text-setting, .edit-color-setting {
+    background-color: #ddd;
+  }
+  .edit-text-setting::after,
+  .edit-color-setting::after {/*second row*/
+    content: "";
+    display: block;
+    width: 100%; height: 2em;
+    background-color: #fff;
+  }
+  .edit-text-setting LABEL,
+  .edit-color-setting LABEL {
+    position: absolute;
+    top: calc(3em - 1.3em / 2); left: 40px;
+  }
+  .edit-text-setting INPUT[id^="option-default"],
+  .edit-color-setting INPUT[id^="option-default"] {
+    position: absolute;
+    top: 2em; left: calc(40px + 4em) /*53px*/;
+  }
+
+  /* line up install keys vertically*/
+  INPUT[placeholder="Install Key"] {
+    position: absolute; right: 120px;
+    font-family: monospace;
+  }
+  INPUT[placeholder="Install Key"]:not(:focus):not(:invalid) {
+    background-color: transparent;
+    border-color: transparent;
+    color: #444;
+  }
+  .edit-style-options INPUT[placeholder="Install Key"]:not(:focus):not(:invalid) {
+    color: #aaa;
+  }
+
+
+  /*
+    (7) Primary Screenshot
+  */
+  .form-controls:nth-last-of-type(4) { /*primary screenshot*/
+    position: relative;
+    width: 362px; /* 350px, 5px, 1px */
+    position: absolute;
+    top: 0;
+  }
+    /* note */
+  .form-controls:nth-last-of-type(4) .linking-note {display: none}
+  .form-controls:nth-last-of-type(4) label:first-child:hover + .linking-note,
+  .form-controls:nth-last-of-type(4) .linking-note:hover  {
+    display: block;
+    position: absolute;
+    left: 0; top: 1.7em; /* 1.3 * 1.3 */
+    padding: .5em;
+    background-color: #D1EEEE;
+  }
+
+    /* make Primary Screenshot resemble the style page screenshot */
+  .form-controls:nth-last-of-type(4) > DIV {
+    position: absolute;
+    width: 100%; height: calc(265px + 12px + 3px + 59px);
+    top: 82px; left: 0px;
+    margin-left: 0 !important;
+  }
+  .form-controls:nth-last-of-type(4) > DIV {
+    -padding-top: 35px;
+    -text-align: center;
+    height: 112px; width: 362px; box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    height: calc(265px + 12px);
+  }
+  .form-controls:nth-last-of-type(4) > DIV A[rel] {
+    display: block;
+    /*max-*/height: 265px; -box-sizing: content-box;
+    overflow: hidden;
+    padding: 5px; -border: 1px solid #ddd; -border-radius: 5px;
+    -margin-top: -35px;
+  }
+
+    /* make a container for 'no screenshots' */
+  .form-controls:nth-last-of-type(4)::after {
+    content: "(No screenshots)";
+    display: block; position: absolute;
+    width: 362px; height: 112px; box-sizing: border-box;
+    top: 82px;
+    padding-top: calc(5px + 35px);
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+    /* show it by default when no other screenshot container is displayed */
+  .form-controls:nth-last-of-type(4) DIV {
+    display: none;
+    z-index: 1;
+  }
+  .form-controls:nth-last-of-type(4) INPUT:checked + DIV,
+  .form-controls:nth-last-of-type(4) INPUT:checked + BR + DIV {
+    display: block;
+  }
+
+@supports (-webkit-clip-path: inset(0 0 0 0)) {
+  INPUT[type=file] {
+    -webkit-clip-path: polygon(6.5em 0, 600px 0, 600px 2em, 6.5em 2em);
+  }
+}
+@supports not (-webkit-clip-path: inset(0 0 0 0)) {
+  INPUT[type=file] {
+    clip-path: url('data:image/svg+xml,\
+<svg height="0" width="0"\
+     xmlns="http://www.w3.org/2000/svg">\
+    <defs>\
+        <clipPath id="clipFileInput">\
+            <rect x="5.5em" y="0" width="600px" height="2em"/>\
+        </clipPath>\
+    </defs>\
+</svg>#clipFileInput');
+  }
+}
+  .form-controls:nth-last-of-type(4) > DIV:last-of-type::before { /*screenshot icon*/
+    content: "";
+    display: block; position: absolute;
+    width: 2em; height: 2em;
+    left: 0; bottom: calc(-2em - 5px);
+    background: url(https://forum.userstyles.org/uploads/FileUpload/b6/82d5334775eb6ae40616f2f7c2f365.png) 0 0/contain no-repeat #fff;
+      /* CC BY-ND http://www.iconsdb.com/caribbean-blue-icons/screenshot-icon.html */
+    z-index: 1;
+  }
+    /* place upload controls at the bottom edge of the screenshot */
+
+    /* 'remove' checkbox is above the bottom edge */
+		@supports (-moz-animation: none) {
+  .form-controls:nth-last-of-type(4) > DIV:last-of-type BR {display: block}
+  .form-controls:nth-last-of-type(4) > DIV:last-of-type BR:first-of-type {margin-top: -1.3em}
+		} @supports (-webkit-animation: none) {
+  input[name="remove_after_screenshot"] {
+    position: absolute;
+    bottom: 0;
+  }
+  input[name="remove_after_screenshot"]::after {
+    content: "Remove";
+    margin-left: 1.5em;
+  }
+		}
+
+    /* file input is below the bottom edge */
+  .form-controls:nth-last-of-type(4) > DIV:last-of-type BR:last-of-type {margin-top: calc(-2px + 5px)}
+
+  .form-controls:nth-last-of-type(4) > DIV:last-of-type INPUT[type=file] { /*screenshot file*/
+    max-width: calc(100% + (5.5em * 1.125) - 2em - 2px);
+    -max-width: calc(100% + (5.5em * 1.1) - 2px);
+    overflow: hidden;
+    position: absolute;
+    left: calc((-5.5em * 1.125) + 2em + 1px);
+    -left: calc((-5.5em * 1.1) + 1px);
+      /* 14.67px INPUT font vs 13px DIV font */
+    bottom: calc(-1.8em - 5px);
+  }
+
+
+  /*
+    (7-8) all screenshots
+  */
+    /* limit screenshot to 350 x 263px (4:3) */
+  A[rel*="lightbox[screenshot]"] IMG,
+  IMG[alt*="additional"] {
+    max-width: 350px;
+    -clip-path: url('data:image/svg+xml,<svg height="0" width="0"\
+     xmlns="http://www.w3.org/2000/svg">\
+    <defs>\
+        <clipPath id="svgPathh">\
+            <rect x="0" y="0" width="350px" height="200px"/>\
+        </clipPath>\
+    </defs>\
+</svg>#svgPathh');
+  }
+
+    /* checkerboard background */
+  INPUT[type="file"],
+  .form-controls:nth-last-of-type(4)::after,
+  .form-controls:nth-last-of-type(4) > DIV,
+  .form-controls:nth-last-of-type(3) TD:nth-child(4) {
+    background-color: #eee;
+    background-image: linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd), 
+                      linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd);
+    background-size: 10px 10px;
+    background-position:0 0, 5px 5px;
+  }
+
+
+  /*
+    (8) Additional Screenshots
+  */
+  .form-controls:nth-last-of-type(3) { /*additional screenshots*/
+    -margin-top: 357px;
+  }
+
+  .form-controls:nth-last-of-type(3) TD:nth-child(4) {/*image*/
+    width: 350px;
+    height: 265px; /*this needs a max-height box to clip the image vertically*/
+    -background-color: bisque;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    -position: absolute;
+  }
+  .form-controls:nth-last-of-type(3) TABLE {counter-reset: screenshot}
+  .form-controls:nth-last-of-type(3) THEAD {display: none}
+  .form-controls:nth-last-of-type(3) TR {
+    counter-increment: screenshot;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 2em;
+    margin: 1em;
+    width: 362px;
+    -overflow: hidden;
+    -outline: thin solid lime;
+    -padding-bottom: calc(1.8em + 5px); /*for upload control*/
+    margin-bottom: calc(2em + 5px + 1em);
+  }
+  .form-controls:nth-last-of-type(3) TD {
+    display: block;
+  }
+
+  .form-controls:nth-last-of-type(3) TD:nth-child(1) { /*description*/
+    position: relative;
+  }
+  .form-controls:nth-last-of-type(3) TD:nth-child(1)::before {
+    content: counter(screenshot) ". ";
+  }
+  .form-controls:nth-last-of-type(3) TD:nth-child(1)::after {
+    content: "Description";
+    display: inline;
+    -font-weight: bold;
+    position: absolute; left: 2em; top: .2em;
+    z-index: -1;
+  }
+  .form-controls:nth-last-of-type(3) TD:nth-child(1) INPUT {width: calc(100% - 2em)}
+  .form-controls:nth-last-of-type(3) TD:nth-child(1) INPUT:not(:focus) {
+    background-color: rgba(255, 255, 255, .8);
+  }
+
+  .form-controls:nth-last-of-type(3) TD:nth-child(2) { /*upload*/
+    -background-color: lime;
+    -clip-path: url('data:image/svg+xml,\
+<svg width="0" height="0"\
+     xmlns="http://www.w3.org/2000/svg">\
+  <defs>\
+    <clipPath id="stencil" >\
+      <rect x="0" y="0" width="10.5em" height="1.3em"/>\
+    </clipPath>\
+  </defs>\
+</svg>#stencil');
+  }
+  .form-controls:nth-last-of-type(3) TD:nth-child(2) INPUT {position: relative}
+  .form-controls:nth-last-of-type(3) TD:nth-child(2)::before {
+    content: "";
+    display: block;
+    width: 2em; height: 2em;;
+    background: url(https://forum.userstyles.org/uploads/FileUpload/b6/82d5334775eb6ae40616f2f7c2f365.png) 0 0/contain no-repeat #fff;
+      /* CC BY-ND http://www.iconsdb.com/caribbean-blue-icons/screenshot-icon.html */
+    position: absolute;
+    left: 0;
+    z-index: 1;
+    bottom: calc(-1.8em - 5px);
+    bottom: calc(-2em - 5px);
+  }
+  .form-controls:nth-last-of-type(3) TD:nth-child(2) INPUT {
+    max-width: calc(100% + 4.5em);
+    overflow: hidden;
+    position: relative; left: -4.5em;
+    position: absolute; bottom: 0;
+    bottom: calc(-1.8em - 5px);
+    left: calc((-5.5em * 1.125) + 2em + 1px);
+  }
+  /*-- AGENT_SHEET */
+  -input[type=file] > label {color: aquamarine;}
+  -input[type=file] > button {display:none !important; width: 0 !important;}
+
+  .form-controls:nth-last-of-type(3) TD:nth-child(3) { /*remove*/
+    -text-align: left !important;
+    -display: inline;
+    position: absolute; 
+    left: 0; bottom: 0;
+  }
+  .form-controls:nth-last-of-type(3) TD:nth-child(3)::after {
+    content: "Remove";
+  }
+
+
+  /*
+    (10) License
+  */
+  .form-controls:nth-last-of-type(1) { /*license*/
+    position: relative;
+  }
+@media (max-width: 0) { /* using font-size & clip */
+  .form-controls:nth-last-of-type(1):not(:hover) {
+    font-size: 0;
+    margin-bottom: calc(265px + 26px);
+  }
+  .form-controls:nth-last-of-type(1) LABEL,
+  .form-controls:nth-last-of-type(1) A:last-of-type::before {
+    font-size: small;
+  }
+    /* pause a moment before closing it */
+  .form-controls:nth-last-of-type(1) {transition: font-size 1s step-end}
+  .form-controls:nth-last-of-type(1):hover {transition-duration: 0s}
+
+    /* all this just to transition the INPUTs in Firefox */
+  .form-controls:nth-last-of-type(1) INPUT {
+    position: absolute;
+    clip: rect(0, 1em, 1em, 0);
+  }
+  .form-controls:nth-last-of-type(1):not(:hover) INPUT {clip: rect(0, 0, 0, 0)}
+  .form-controls:nth-last-of-type(1) INPUT {
+    transition: inherit;
+    transition-property: clip;
+  }
+  .form-controls:nth-last-of-type(1) {margin-left: 1.5em;}
+  .form-controls:nth-last-of-type(1) *:not(A) {
+    margin-left: -1.5em;
+  }
+  .form-controls:nth-last-of-type(1):not(:hover) LABEL {margin-left: 0}
+  .form-controls:nth-last-of-type(1) LABEL {
+    transition: inherit;
+    transition-property: margin-left;
+  }
+  .form-controls:nth-last-of-type(1):hover {
+    clip: rect(0, 13em, 1.3em, 0);
+  }
+}/*@media*/
+
+@supports (-webkit-clip-path: inset(0 0 0 0)) {
+  .form-controls:nth-last-of-type(1):hover {
+    -webkit-clip-path: inset(0 0 0 0);
+  }
+  .form-controls:nth-last-of-type(1):not(:hover) {
+    -webkit-clip-path: polygon(0 0, 10.5em 0, 10.5em, 1.3em, 0 1.3em);
+  }
+}
+@supports (clip-path: url())
+  AND (NOT (-webkit-clip-path: inset(0 0 0 0))) { /*grr - Chrome says 'yes', but doesn't support it*/
+
+  .form-controls:nth-last-of-type(1):hover {
+    clip-path: url('data:image/svg+xml,\
+<svg width="0" height="0"\
+     xmlns="http://www.w3.org/2000/svg">\
+  <defs>\
+    <clipPath id="stencil" clipPathUnits="objectBoundingBox" >\
+      <rect x="0" y="0" width="1000px" height="1000px"/>\
+    </clipPath>\
+  </defs>\
+</svg>#stencil');
+  }
+  .form-controls:nth-last-of-type(1):not(:hover) {
+    clip-path: url('data:image/svg+xml,\
+<svg width="0" height="0"\
+     xmlns="http://www.w3.org/2000/svg">\
+  <defs>\
+    <clipPath id="stencil" >\
+      <rect x="0" y="0" width="10.5em" height="1.3em"/>\
+    </clipPath>\
+  </defs>\
+</svg>#stencil');
+  }
+
+}
+@supports (-webkit-clip-path: polygon(0 0)) {
+  .form-controls:nth-last-of-type(1) {
+    -webkit-clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transition: -webkit-clip-path 1s step-end;
+    transition: clip-path 1s step-end;
+    transition-property: -webkit-clip-path;
+  }
+  .form-controls:nth-last-of-type(1):not(:hover) {
+    -webkit-clip-path: polygon(0px 0px, 13em 0px, 13em 1.3em, 0 1.3em);
+  }
+  .form-controls:nth-last-of-type(1):hover {transition-duration: 0s}
+}
+
+  #license-ccbyncnd + A::before {
+    position: absolute;
+    top: 0; left: 5em;
+    outline: thin solid wheat;
+  }
+  #license-none:checked ~ A:last-of-type::before {content: "Use my default"}
+  #license-cc0:checked ~ A:last-of-type::before {content: "Public Domain"}
+  #license-ccby:checked ~ A:last-of-type::before {content: "CC BY"}
+  #license-ccbysa:checked ~ A:last-of-type::before {content: "CC BY-SA"}
+  #license-ccbynd:checked ~ A:last-of-type::before {content: "CC BY-ND"}
+  #license-ccbync:checked ~ A:last-of-type::before {content: "CC BY-NC"}
+  #license-ccbyncsa:checked ~ A:last-of-type::before {content: "CC BY-NC-SA"}
+  #license-ccbyncnd:checked ~ A:last-of-type::before {content: "CC BY-NC-ND"}
+  /*#license-arr:checked ~ A:last-of-type::before {content: "No Redistribution"}*/
+
+}/*@document*/

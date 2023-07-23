@@ -1,0 +1,139 @@
+/* ==UserStyle==
+@name         minesweeperonline.com backseat overlay
+@namespace    USO Archive
+@author       iwsfg
+@description  Labels lines and columns with numbers and letters to allow for better communication.
+@version      20201112.05.27
+@license      CC0-1.0
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("minesweeperonline.com") {
+#game {
+    display: flex;
+    flex-flow: row wrap;
+    height: auto !important;
+    align-items: stretch;
+    justify-content: stretch;
+    align-content: stretch;
+    justify-items: stretch;
+    counter-reset: row;
+    box-sizing: content-box;
+    margin: 10px 0;
+    padding-bottom: 20px;
+    box-shadow: inset 0 -20px 0 0 white;
+    position: relative;
+}
+
+#game-container [class^="border"] {
+    background: #bdbdbd !important;
+    background: #d4d4d4 !important; /* use slightly brighter background for borders */
+    box-sizing: border-box;
+    border: 0 solid;
+    height: auto;
+    min-height: 10px;
+    flex-grow: 0;
+    border-color: #eee #7b7b7b #7b7b7b rgb(255,255,255,.5);
+
+    font-weight: 900;
+    font-family: Tahoma;
+    color: black;
+    letter-spacing: -1px;
+}
+
+#game-container.z150 [class^="border"] { 
+    min-height: 15px;
+    min-width: 15px;
+}
+#game-container.z200 [class^="border"] { 
+    min-height: 20px; 
+    min-width: 20px !important;
+}
+
+#game-container .bordertl { border-width: 2px 0 0 2px; }
+#game-container .bordertr { border-width: 2px 2px 0 0; }
+#game-container .borderbl { border-width: 0 0 2px 2px; }
+#game-container .borderbr { border-width: 0 2px 2px 0; }
+#game-container .bordertb {counter-increment: col;border-width: 2px 0;}
+#game-container .borderjointl { border-left-width: 2px; }
+#game-container .borderjointr { border-right-width: 2px; }
+#game-container .borderlr, 
+#game-container .borderlrlong { border-width: 0 2px; }
+
+/* make left borders wider to fit the letter */
+#game-container .bordertl:first-child,
+#game-container .bordertr + [class^="border"],
+#game-container .borderjointr + [class^="border"],
+#game-container [class^="borderlr"] + [class^="border"] {
+    flex-grow: 1;
+    width: 22px;
+    margin-left: -12px;
+    line-height: 1 !important;
+    counter-reset: col;
+}
+
+#game-container.z200 .bordertl:first-child,
+#game-container.z200 .bordertr + [class^="border"],
+#game-container.z200 .borderjointr + [class^="border"],
+#game-container.z200 [class^="borderlr"] + [class^="border"] {
+    width: 32px;
+}
+
+/* styles for horizontal and vertical borders with text */
+#game-container .borderjointl ~ .bordertb,
+#game-container .borderjointr + .borderlr,
+#game-container [class^="borderlr"] + .borderlr {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    line-height: 1.4 !important;
+    vertical-align: middle;
+    font-size: 10px !important;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 0 #ffffff;
+}
+
+#game-container:not(.z100) .borderjointl ~ .bordertb,
+#game-container:not(.z100) .borderjointr + .borderlr,
+#game-container:not(.z100) [class^="borderlr"] + .borderlr {
+    font-size: 12px !important;
+}
+
+/* should be more careful with rows so we don't strech lines vertically */
+#game-container .borderjointr + .borderlr,
+#game-container [class^="borderlr"] + .borderlr {
+    counter-increment: row;
+    counter-reset: col;
+    line-height: 1 !important;
+}
+
+/* label cols */
+#game-container .borderjointl ~ .bordertb:before {
+    content: counter(col);
+}
+
+/* label rows with letters */
+#game-container .borderjointr + .borderlr:before,
+#game-container [class^="borderlr"] + .borderlr:before {
+    content: counter(row, upper-alpha);
+}
+
+/* update counters with each new row */
+#game-container .borderjointr + .borderlr,
+#game-container [class^="borderlr"] + .borderlr {
+    counter-increment: row;
+    counter-reset: col;
+}
+
+/* Display current cursor position */
+#game-container .borderlr + .square { counter-reset: col; }
+#game-container .square { counter-increment: col; }
+#game-container .square:hover:after {
+    content: "Cursor position: " counter(row, upper-alpha) " " counter(col);
+    position: absolute;
+    left: 10px;
+    bottom: 0;
+    font: 12px/1 Tahoma, sans-serif;
+}
+}

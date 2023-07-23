@@ -1,0 +1,103 @@
+/* ==UserStyle==
+@name         YouTube Big Theater/Cinema Mode [requires Iridium]
+@namespace    USO Archive
+@author       Sergey Rozhenko
+@description  Makes theater mode occupy whole window. Supports hiding or shrinking of scrollbar. Requires Iridium addon/userscript. <a href="https://userstyles.org/styles/172319/youtube-big-theater-cinema-mode">Here's the version that doesn't require it.</a> Only for the material (aka new) design of YouTube.
+@version      20190701.17.05
+@license      NONE
+@preprocessor uso
+@advanced dropdown scrollbar "Scrollbar" {
+    scrollbar_none "Hidden*" <<<EOT /* no scrollbar *\/
+html.video_active {
+	-ms-overflow-style: none;
+	overflow-y: -moz-scrollbars-none;
+	scrollbar-width: none;
+}
+html.video_active::-webkit-scrollbar {
+	display: none;
+}
+ EOT;
+    scrollbar_thin "Thin" <<<EOT /* thin scrollbar *\/
+html.video_active {
+	scrollbar-width: thin;
+}
+html.video_active::-webkit-scrollbar-track {
+	background-color: black;
+}
+html.video_active::-webkit-scrollbar {
+	width: 4px;
+	background-color: black;
+}
+html.video_active::-webkit-scrollbar-thumb {
+	background-color: /*[[scrollbar_color]]*\/;
+}
+html.video_active ytd-watch-flexy > #columns, html.video_active ytd-masthead:not([dark]) {
+	box-shadow: inset -1px 0 0 0 black;
+}
+ EOT;
+    scrollbar_std "Standard" <<<EOT  EOT;
+
+}
+@advanced color scrollbar_color "Thin scrollbar thumb color" #666666
+==/UserStyle== */
+@-moz-document domain("youtube.com") {
+/* main conversion */ 
+html.video_active #page-manager {
+	margin-top: unset !important;
+}
+html.video_active ytd-watch-flexy:not([theater]) {
+	margin-top: var(--ytd-masthead-height, 56px) !important;
+}
+
+html.video_active ytd-watch-flexy[theater] #player-theater-container {
+	max-height: unset !important;
+	width: 100% !important;
+	height: 100vh !important;
+}
+
+/* masthead */
+html.video_active ytd-masthead[dark]:not(:hover) {
+	margin-top: calc(-1*var(--ytd-masthead-height, 56px));
+	transition: margin-top .2s .2s ease-out;
+}
+html.video_active ytd-masthead[dark]:hover {
+	transition: margin-top .2s ease-out;
+}
+html.video_active ytd-masthead[dark]::before {
+	content: "";
+	position: absolute;
+	bottom: -14px;
+	height: 14px;
+	left: 0;
+	width: 100%;
+	z-index: 2050;
+	transition: margin-bottom 0s .21s;
+}
+html.video_active ytd-masthead[dark]:hover::before {
+	margin-bottom: 14px;
+	transition: margin-bottom 0s .1s;
+}
+html.video_active #masthead-container::after {
+	content: unset !important;
+}
+html.video_active ytd-masthead::after {
+	bottom: -5px;
+	box-shadow: inset 0px 4px 8px -3px rgba(17, 17, 17, .06);
+	content: "";
+	height: 5px;
+	left: 0px;
+	opacity: 1;
+	pointer-events: none;
+	position: absolute;
+	right: 0px;
+	width: 100%;
+	z-index: 2050;
+}
+
+/* YT bug - hint area always there */
+paper-toast.yt-notification-action-renderer[allow-click-through] {
+	pointer-events: none !important;
+}
+
+/*[[scrollbar]]*/
+}

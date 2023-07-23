@@ -1,0 +1,206 @@
+/* ==UserStyle==
+@name         コメントスクロール化(Scroll Comments) 要userScript
+@namespace    USO Archive
+@author       Eni (たむ)
+@description  ●機能  ・コメントが全て自動で展開されます  ・Youtubeのコメ欄をスクロールできるようなります(スマホアプリのような感じ)    ●動作環境  ・画面幅の大きいディスプレイでのみ動作します    ●バグ  ・デフォルトではシーク位置がおかしくなります。仕様です。  ・私がセットで作成しているuserScriptで回避できます。使用は自己責任でお願いします。　https://eniwder.github.io/userScripts/youtubeCommentsFIx.user.js    ●その他  ・コメントを追加で読み込むためには、コメント欄を最後までスクロール後、ページ全体をスクロールするか、右の動画リストのサムネをマウスオーバーする必要があります    ●features  ・Auto expand comment  ・Can scroll comment    ●Operating environment  ・This work only screen what has wide resolution    ●Bug  ・The seek position is slightly off   fix scripts -> https://eniwder.github.io/userScripts/youtubeCommentsFIx.user.js    ●note  ・To loading additional comments, scroll comments to the end and mouse over on right video list
+@version      20200625.02.41
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+/* 
+userScriptが無いとバグります need userScript
+・シークがずれる seeking progress shift
+・縦長の動画が中央に表示されない video dont't show center when video is portrait
+*/
+@-moz-document url-prefix("https://www.youtube.com/watch"){
+@media screen and (min-width: 1200px) {
+  
+  
+/* 続きを読むを展開 */
+ytd-expander[should-use-number-of-lines][collapsed] > #content.ytd-expander {
+  display: block;
+}
+.more-button {
+  display: none;
+}
+
+/* ページ全体を100%サイズにする、気に入らなかったらごめんなさい */
+ytd-app,
+#content,
+#secondary {
+  height: calc(100% - 56px);
+}
+#columns,
+ytd-page-manager,
+#primary,
+#primary-inner {
+  height: 100%;
+}
+#comments {
+  height: calc(100% - 560px);
+}
+html,
+body,
+#columns {
+  overflow: hidden;
+}
+
+
+/* コメ欄スクロール可 */
+#comments,
+#secondary {
+  overflow-y: scroll;
+}
+
+
+/* 動画幅調整 */
+#primary,
+#primary video,
+#primary-inner,
+#player-container-outer,
+#player-container-inner,
+.ytp-player-content,
+#player {
+  max-width: 722px !important;
+}
+#primary video {
+  height: 408px !important;
+}
+#player-container-inner {
+  padding-top: 406px !important;
+}
+
+
+/* プレビュー位置調整 */
+.ytp-preview {
+  top: inherit !important;
+  bottom: 0px !important;
+  margin-bottom: 50px !important;
+}
+
+
+/* その他微調整 */
+.title {
+  font-size: 15px !important;
+  line-height: 1 !important;
+}
+#top-row.ytd-video-secondary-info-renderer {
+  padding-top: 8px;
+  margin-bottom: 4px;
+}
+#date {
+  font-size: 10px !important;
+}
+ytd-video-primary-info-renderer {
+  margin-top: -10px;
+}
+.html5-main-video {
+  width: auto !important;
+}
+
+
+/* 概要欄アイコン化 */
+ytd-video-secondary-info-renderer > #container {
+  height: 60px;
+  width: 48px;
+  overflow: hidden;
+  margin-left: -70px;
+  margin-bottom: -80px;
+  transition: all 0.2s;
+}
+ytd-video-secondary-info-renderer {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+ytd-video-secondary-info-renderer #upload-info {
+  margin-left: 58px;
+}
+ytd-video-secondary-info-renderer #upload-info,
+ytd-video-secondary-info-renderer ytd-expander {
+  opacity: 0;
+  transition: margin 0.5s, opacity 1s;
+}
+ytd-video-secondary-info-renderer ytd-expander {
+  position: fixed;
+  visibility:hidden;
+}
+
+  
+/* 概要欄アイコン展開 */
+ytd-video-secondary-info-renderer > #container:hover {
+  height: 300px !important;
+  width: 792px !important;
+  margin-bottom: 16px;
+  background-color: #222;
+  padding-bottom: 16px !important;
+  opacity: 1;
+  animation: add-scrollbar 0.2s ease 0s 1 normal forwards running;
+}
+ytd-video-secondary-info-renderer > #container:hover ytd-expander {
+  margin-left: 110px;
+  visibility:visible;
+}
+ytd-video-secondary-info-renderer > #container:hover yt-img-shadow {
+  position: inherit;
+}
+ytd-video-secondary-info-renderer > #container:hover #upload-info {
+  margin-left: 0;
+}
+ytd-video-secondary-info-renderer > #container:hover #upload-info,
+ytd-video-secondary-info-renderer > #container:hover ytd-expander {
+  opacity: 1;
+}
+ytd-video-secondary-info-renderer > #container:hover ytd-expander {
+  position: inherit;
+}
+
+/* エンドスクロール調整 */
+#movie_player .ytp-suggestion-set {
+  width: 192px !important;
+  height: 108px !important;
+}
+#movie_player .ytp-suggestion-set:nth-child(2) {
+  top: 120px !important;
+}
+#movie_player .ytp-suggestion-set:nth-child(3) {
+  top: 240px !important;
+}
+#movie_player .ytp-suggestion-set:nth-child(4) {
+  left: 204px !important;
+  top: 0px !important;
+}
+#movie_player .ytp-suggestion-set:nth-child(5) {
+  left: 204px !important;
+  top: 120px !important;
+}
+#movie_player .ytp-suggestion-set:nth-child(6) {
+  left: 204px !important;
+  top: 240px !important;
+}
+#movie_player .ytp-suggestion-set:nth-child(7) {
+  left: 408px !important;
+  top: 0px !important;
+}
+#movie_player .ytp-suggestion-set:nth-child(8) {
+  left: 408px !important;
+  top: 120px !important;
+}
+#movie_player .ytp-suggestion-set:nth-child(9) {
+  left: 408px !important;
+  top: 240px !important;
+}
+#movie_player .ytp-endscreen-content {
+  margin-left: -300px !important;
+  margin-top: -170px !important;
+}
+
+  
+}
+
+/* こうしないと変化が汚い */
+@keyframes add-scrollbar {
+  100% {
+  overflow-y: scroll;
+  }
+}
+}

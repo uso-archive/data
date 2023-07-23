@@ -1,0 +1,164 @@
+/* ==UserStyle==
+@name         GitHub Usability improved
+@namespace    USO Archive
+@author       KABA
+@description  Visualize that there is no whitespace in code block.  If necessary, uncomment out Code block for Full-width space.    コード上で全角スペースを視認・可視化したい場合は `for Full-width space` のコメントアウトを解除してください。  ※ userstyles.org でエラーになるためコメントアウトしています。
+@version      20230127.08.16
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("github.com") {
+/*
+    TOC
+
+    - Code
+
+    - Variables
+    - Project
+    - Repository Content
+    - Markdown / AsciiDoc
+
+    - UI
+*/
+
+/* - Code */
+/* for Full-width space */
+/*
+    OPTIMIZE: If necessary, uncomment out for Code block
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+body,
+.markdown-body,
+.blob-code-inner { font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, 'Noto Sans JP', monospace }
+*/
+
+
+/* - Variables */
+:root {
+    --project-column-width-sm: calc(100% / 3 - 10px);
+    --project-column-width-md: calc(100% / 4 - 12px);
+    --color-border: #e1e4e8;
+
+    --header-height: 60px;
+}
+
+/* - Project */
+[data-card-type='["note"]'] p:last-child { margin-bottom: 0 }
+[data-card-type='["note"]'] small.color-fg-muted {
+    position: absolute;
+    z-index: 1;
+    margin-top: 10px;
+    box-shadow: 0 1px 1px rgba(27,31,35,.1);
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    padding: 6px 10px;
+    background: #fff;
+    transition: .2s;
+}
+[data-card-type='["note"]']:not(:hover) small.color-fg-muted {
+    opacity: 0;
+    pointer-events: none;
+}
+[data-card-type='["note"]'] small.color-fg-muted::before,
+[data-card-type='["note"]'] small.color-fg-muted::after {
+    position: absolute;
+    content: "";
+}
+[data-card-type='["note"]'] small.color-fg-muted::before {
+    top: -16px;
+    left: 9px;
+    border: 8px solid transparent;
+    border-bottom-color: rgba(27,31,35,.15);
+}
+[data-card-type='["note"]'] small.color-fg-muted::after {
+    top: -14px;
+    left: 10px;
+    border: 7px solid transparent;
+    border-bottom-color: #fff;
+}
+/* -- Column Width */
+.new-project-column {
+    padding: 40px;
+    width: auto;
+}
+@media (min-width: 544px) and (max-width:1280px) {
+    .project-column { min-width: var(--project-column-width-sm) }
+}
+@media (min-width: 1012px) and (max-width:1280px) {
+    .project-column { min-width: var(--project-column-width-md) }
+}
+
+/* - Repository Content */
+/* -- Image */
+/* .repository-content img { max-width: 100% } -- will break Project user icon */
+/* -- Show Code Start */
+.blob-code,
+.repository-content .blob-code { box-shadow: 5px 0 #00000005 inset }
+.cm-s-github-light .CodeMirror-linenumber { box-shadow: -5px 0 #00000005 inset }
+
+/* - Markdown / AsciiDoc */
+/* Adjust anchor position of heading with ID in PR
+.markdown-body :where(h1, h2, h3, h4, h5, h6)[id^="user-content-"] {
+  scroll-margin-top: var(--header-height);
+}
+*/
+.markdown-body table blockquote:last-child,
+.markdown-body table details:last-child,
+.markdown-body table dl:last-child,
+.markdown-body table ol:last-child,
+.markdown-body table p:last-child,
+.markdown-body table pre:last-child,
+.markdown-body table table:last-child,
+.markdown-body table ul:last-child { margin-bottom: 0 }
+/* .markdown-body li > p { margin-top: 0; margin-bottom: 0 } -- NOTE: Inner `code` and `pre` stuck on */
+.markdown-body li > p { margin-top: .5em; margin-bottom: .5em }
+
+.markdown-body ul details { margin-top: .25em }
+.markdown-body ul details:not(:last-child) { margin-bottom: .25em; }
+
+.markdown-body hr { height: 2px } /* Fix height */
+
+/* NOTE: `:not(.js-apply-single-suggestion)` for Commit suggestion button */
+.markdown-body details:not(.js-apply-single-suggestion) {
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    padding: .5em 1em;
+}
+/* NOTE: `:not(.btn)` for Commit suggestion button */
+.markdown-body details summary:not(.btn),
+.markdown-body details summary:not(.btn):focus {
+    margin: -.5em -1em;
+    box-shadow: 0 0 0 1px #d1d5da;
+    border-radius: 3px;
+    padding: .5em 1em;
+    background: #f6f8fa;
+    color: #586069;
+}
+.markdown-body details summary:not(.btn):hover,
+.markdown-body details summary:not(.btn):focus { color: #0366d6 }
+.markdown-body details[open] > summary:not(.btn) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.markdown-body details summary:not(.btn) + *,
+.reorderable-task-lists * > /* NOTE: `* >` for Clear error */
+    .markdown-body details summary:not(.btn) + * { margin-top: 1.5rem } /* Prevent to invade summary */
+.markdown-body details summary:not(.btn) + a,
+.reorderable-task-lists * > /* NOTE: `* >` for Clear error */
+    .markdown-body details summary:not(.btn) + a { display: inline-block }
+.task-list-item-checkbox { margin-bottom: .275em /* Finer tuning */ }
+/* NOTE: `:not(.SelectMenu-header)` for Commit suggestion button */
+.markdown-body :not(div):not(.SelectMenu-header)
+    > :not(.task-list-item-checkbox):last-child { margin-bottom: 0 }
+
+.previewable-comment-form textarea {
+  max-height: calc(80vh - var(--header-height)) !important;
+}
+
+/* - UI */
+.social-reaction-summary-item:disabled {
+    background: var(--color-scale-gray-0);
+    cursor: not-allowed;
+}
+.social-reaction-summary-item:disabled * { cursor: not-allowed } /* HACK: without this, Chrome cursor becomes default */
+}

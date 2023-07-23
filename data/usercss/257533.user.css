@@ -1,0 +1,91 @@
+/* ==UserStyle==
+@name         WaniKani Lesson/review Explanation Width
+@namespace    USO Archive
+@author       Ynda Jas
+@description  This style limits the width of meaning/reading explanations and context sentences on lessons and reviews to 600px (or more precisely 37.5rem), making them a little easier to read.    You can customise the max width using the "Customize" button on Stylish/userstyles.org    ---    Why?    By default, the info panel on lessons and reviews spans almost the full width of your window. For windows larger than around 800px, this results in a sub-optimal reading experience, particularly for meaning and reading explanations. You can read more about optimal text element widths <a href="https://www.freshconsulting.com/insights/blog/uiux-principle-46-text-box-width-should-help-users-read">here</a>. This is also <a href="https://www.w3.org/WAI/WCAG21/quickref/?showtechniques=148#visual-presentation">an accessibility issue</a>.
+@version      20230221.23.34
+@license      CC-BY-NC-SA-4.0
+@preprocessor uso
+@advanced text maxwidth "Max width of explanation (rem)" "37.5"
+==/UserStyle== */
+@-moz-document url("https://www.wanikani.com/lesson/session"), url("https://www.wanikani.com/review/session") {
+  #lessons, #reviews {
+    --panel-padding-x: 20px;
+    --panel-margin: 10px;
+    --left-column-width: 15rem;
+  }
+
+  /* explanations: easier reading width */
+  #lessons #supplement-rad,
+  #lessons #supplement-kan .col2,
+  #lessons #supplement-kan .pure-u-1, /* rare: kanji explanations with no left column */
+  #lessons #supplement-voc .col2,
+  #lessons #supplement-voc #supplement-voc-context-sentences-slide,
+  #reviews #item-info-col2 {
+    max-width: /*[[maxwidth]]*/rem;
+  }
+
+  #lessons #information {
+    --lesson-quiz-explanation-padding-left: 8px;
+
+    max-width: calc(/*[[maxwidth]]*/rem + var(--lesson-quiz-explanation-padding-left));
+  }
+
+  @media (min-width: 768px) {
+    #lessons #information {
+      --lesson-quiz-explanation-padding-left: 32px;
+    }
+  }
+
+  /* left column: minimum visible/clean wrap width */
+  #lessons #supplement-info .col1,
+  #lessons #supplement-voc-collocations-container .word-types--with-collocations,
+  #reviews #item-info-col1 {
+    min-width: var(--left-column-width);
+  }
+
+  /* right column: width */
+  @media (min-width: 768px) {
+    #lessons #supplement-kan .col2,
+    #lessons #supplement-voc .col2,
+    #reviews #item-info-col2 {
+      width: calc(100% - var(--left-column-width));
+    }
+  }
+
+
+  /* lessons pre-quiz panel: centre; fit content */
+  #lessons #supplement-info {
+    align-self: center;
+  }
+
+  /* lessons pre-quiz vocab > reading > left column: allow outer panel to fit content */
+  #lessons #supplement-voc-reading .col1 li {
+    display: list-item;
+  }
+
+  /* lessons quiz panel: spacing and width */
+  #lessons #information {
+    margin: var(--panel-margin) auto;
+    width: calc(100% - (var(--panel-padding-x) * 2) - (var(--panel-margin) * 2));
+  }
+
+  /* reviews panel: spacing and width */
+  #reviews #information {
+    --column-gap: 20px;
+
+    margin: calc(var(--panel-margin) / 2) auto;
+    width: calc(var(--left-column-width) + var(--column-gap) + /*[[maxwidth]]*/rem);
+    max-width: calc(100% - (var(--panel-margin) * 2) - (var(--panel-padding-x) * 2));
+  }
+
+  /* reviews left column: give responsibility for column gap */
+  #reviews #item-info-col1 {
+    margin-right: var(--column-gap);
+  }
+
+  /* reviews right column: remove responsibility for column gap */
+  #reviews #item-info-col2 {
+    padding: 0;
+  }
+}

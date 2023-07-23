@@ -1,0 +1,81 @@
+/* ==UserStyle==
+@name         Hide header - AOL TV Listings
+@namespace    USO Archive
+@author       hideheader
+@description  Autohide the headers and footer. Nothing is removed from the page, only hidden at one of the edges of the screen. (Out of sight!)
+@version      20120714.10.44
+@license      NONE
+@preprocessor uso
+@advanced dropdown headerPosition "Header position" {
+    Top_of_the_screen__a "Top of the screen (always in sight and available)*" <<<EOT fixed EOT;
+    Top_of_the_page__scr "Top of the page (scrolls with the page out of view)" <<<EOT absolute EOT;
+
+}
+@advanced dropdown footerPosition "Footer position" {
+    Bottom_of_the_page__ "Bottom of the page (scrolls with the page out of view)*" <<<EOT absolute EOT;
+    Bottom_of_the_screen "Bottom of the screen (always in sight and available))" <<<EOT fixed EOT;
+
+}
+@advanced dropdown opacity "Footer transparency when minimized" {
+    Translucent_-_I_want "Translucent - I want to see it, and see through it too*" <<<EOT 0.2 EOT;
+    Opaque_-_I_want_to_s "Opaque - I want to see the placeholder, not what lies beneath" <<<EOT 1 EOT;
+    Invisible_-_I_don_t_ "Invisible - I don't need to see it to know that it's there" <<<EOT 0 EOT;
+
+}
+==/UserStyle== */
+@namespace url(http://www.w3.org/1999/xhtml);
+
+@-moz-document domain("tvlistings.aol.com") {
+
+ #below-listings-ad,
+ #header > .ad-wide {display: none} /* top banner ad */
+
+ #header, #footer, #guideHeader {z-index: 1000001}
+  /* else listings header (#grid-flexible-header) is on top */
+ #_header:hover, #footer:hover, #guideHeader:hover {z-index: 1000002}
+  /* expanded element is on top of collapsed elements */
+
+ /* - - - - - auto-hide header - - - - - */
+ #header {
+  position: /*[[headerPosition]]*/ !important; top: 0; left: 0;
+ }
+ #header:not( :hover ) {
+/*  clip: rect(0px 9999px 3mm 0px); overflow-y: hidden !important;
+  border-top: 3mm solid gray !important; opacity: /*[[opacity]]*/;*/
+  clip: rect(0, 16px, 16px, 0);
+  background: url("http://www.huffingtonpost.com/favicon.ico") left top no-repeat !important;
+}
+#header:not( :hover ) > * {visibility: hidden}
+
+
+ /* - - - - - auto-hide sub-header at left edge of screen - - - - - */
+ #main-content {position: static !important}
+ BODY {position: relative}
+  /* sub-header absolute position is relative to BODY */
+
+ #guideHeader {
+  position: /*[[headerPosition]]*/; left: 0; top: 16px/*0*/;
+ }
+ #guideHeader:not( :hover ) {
+/*  clip: rect(0px,3mm,9999px,0px);
+  border-left: 3mm solid red !important; opacity: /*[[opacity]]*/;*/
+  clip: rect(0, 16px, 16px, 0);
+  background: url("http://www.huffingtonpost.com/favicon.ico") left top no-repeat !important;
+ }
+
+
+ /* - - - - - auto-hide footer - - - - - */
+  BODY { position: relative }
+  /* position #footer relative to BODY */
+ #footer {
+  position: /*[[footerPosition]]*/ !important; bottom: 0px;
+  height: auto !important;
+  border-top: thin solid black !important;
+ }
+ #footer:not( :hover ) {
+  max-height: 0mm; overflow-y: hidden;
+  border-bottom: 3mm solid gray !important; opacity: /*[[opacity]]*/;
+ }
+ .footer_search {display: none}
+  /* duplicates search in the header, and pushes footer above screen bottom */
+}

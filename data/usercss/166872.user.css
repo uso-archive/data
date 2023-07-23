@@ -1,0 +1,547 @@
+/* ==UserStyle==
+@name         ニコ生コメント一覧付き全画面シアター
+@namespace    USO Archive
+@author       knoa
+@description  <a href="https://greasyfork.org/ja/scripts/382231-niconico-tsuu"><strong>NicoNico Tsuu</strong></a> に統合しました。  今後の更新は、NicoNico Tsuu でおこないます。
+@version      20200727.13.54
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@namespace url(http://www.w3.org/1999/xhtml);
+
+@-moz-document regexp("^https?:\/\/live2\.nicovideo\.jp\/watch\/.*") {
+ /**** 変数 ****/
+  :root{
+    /*左右比率*/
+    --screen-width: 75vw;
+    --comment-width: 25vw;
+    /*一覧コメント*/
+    --font-size: calc(4px + 1.2vmin);
+    --line-height: 1.5;
+    --negative-height: calc(var(--font-size) * -1.5);/*userstyles.orgがvar同士の計算に対応していないので*/
+    --nicoad-icon: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48dGl0bGU+bmljb2FkLWljb248L3RpdGxlPjxwYXRoIGQ9Ik05NC4yOTIsNjguNDA2YTUuNjYzLDUuNjYzLDAsMCwwLDIuNTgtMS40MjljMy4xODctMy4xODcsMS44MzQtMTAuMjYxLTIuODg0LTE4Ljg3OWwtNS44MzQsMS4wNTNjMi4xMzQsNC40OCwyLjYyNyw3Ljk1NCwxLDkuNTc4LTMuNzc5LDMuNzgyLTE3LjU2Mi0zLjg4MS0zMC43ODUtMTcuMXMtMjAuODc5LTI3LTE3LjEtMzAuNzgzYzEuNjI0LTEuNjI0LDUuMS0xLjEzMSw5LjU3OSwxLjAwNUw1MS45LDYuMDE0QzQzLjI4NiwxLjMsMzYuMjEyLS4wNTksMzMuMDIyLDMuMTMyYTUuNjgzLDUuNjgzLDAsMCwwLTEuNDI5LDIuNTc5TDMxLjU4Nyw1LjcsMTMuOTM2LDcxLjU2MiwxLjYxMyw3NC44NjhhMi4xMzcsMi4xMzcsMCwwLDAtLjk2NS41MzZjLTIuMiwyLjIwOSwxLjM3NCw5LjM1NSw3Ljk4MywxNS45NjZzMTMuNzU4LDEwLjE4NSwxNS45NjIsNy45NzhhMi4xMjUsMi4xMjUsMCwwLDAsLjUzNi0uOTY3bDMuMy0xMi4zMjRMOTQuMyw2OC40MTZaIiBmaWxsPSIjNDA0MDQwIi8+PHJlY3QgeD0iNjAuMTIiIHk9IjIwLjY5IiB3aWR0aD0iMzEuNjAzIiBoZWlnaHQ9IjYuNzczIiByeD0iMy4wNTEiIHJ5PSIzLjA1MSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNS4yMTMgNjAuNzM3KSByb3RhdGUoLTQ1KSIgZmlsbD0iIzQwNDA0MCIvPjxyZWN0IHg9IjQ3LjM4MyIgeT0iMTAuNDMzIiB3aWR0aD0iMjguMjE3IiBoZWlnaHQ9IjYuNzczIiByeD0iMy4wNTEiIHJ5PSIzLjA1MSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzIuMjI4IDY5LjYzOSkgcm90YXRlKC03NSkiIGZpbGw9IiM0MDQwNDAiLz48cmVjdCB4PSI3Mi4wNzIiIHk9IjM1LjEyMiIgd2lkdGg9IjI4LjIxNyIgaGVpZ2h0PSI2Ljc3MyIgcng9IjMuMDUxIiByeT0iMy4wNTEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC03LjAzIDIzLjYxNykgcm90YXRlKC0xNSkiIGZpbGw9IiM0MDQwNDAiLz48L3N2Zz4=");
+    /*スクロールコメント*/
+    --opacity: .75;
+  }
+ /**** display:none ****/
+  [class*="page-header-area"]/*サイトロゴ+検索+広告*/,
+  [class*="billboard-ad"]/*バナー広告*/,
+  [class*="billboard-banner"]/*バナー広告*/,
+  [class*="operator-area"]/*empty*/,
+  [class*="player-foot-area"]/*empty*/,
+  dummy{
+    display: none !important;
+  }
+ /**** 全画面レイアウト(htmlからすべて指定しないと100%にできない) ****/
+  ::-webkit-scrollbar{
+    display: none;
+  }
+  body{
+    scrollbar-width: none;
+  }
+  html,
+  body,
+  #root,
+  [class*="_watch-page_"],
+  [class*="_player-area_"],
+  [class*="_player-body-area_"],
+  [class*="_player-section_"],
+  [class*="_leo-player_"],
+  [class*="_player-display_"],
+  [class*="_player-display-screen_"],
+  [class*="_player-status_"],
+  dummy{
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  @media screen and (max-width: 640px){
+    #page-top,
+    #siteHeader{
+      display: none !important;
+    }
+  }
+  [class*="_player-area_"]{
+    display: flex;
+    flex-direction: column;
+  }
+  [class*="_player-area_"] [class*="_player-head-area_"] [class*="_nicoad-bar_"]/*ニコニ広告*/{
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+  @media screen and (max-width: 960px){
+    [class*="_player-area_"] [class*="_player-head-area_"] [class*="_nicoad-bar_"]/*ニコニ広告*/{
+      display: none !important;
+    }
+  }
+  [class*="_player-area_"]{
+    height: calc(100% - 36px) !important;/*36pxはヘッダの固定値*/
+  }
+  @media screen and (max-width: 640px){
+    [class*="_player-area_"]{
+      height: calc(100%) !important;
+    }
+  }
+  [class*="_player-area_"][data-browser-fullscreen]{
+    height: 100% !important;
+  }
+  [class*="_watch-page_"],
+  [class*="_player-body-area_"],
+  [class*="_player-section_"],
+  [class*="_player-display-screen_"],
+  dummy{
+    width: 100% !important;
+    max-width: none !important;
+    min-width: auto !important;
+    max-height: none !important;
+    min-height: auto !important;
+  }
+  [class*="_player-body-area_"]{
+    overflow: hidden;/*ニコニ広告ヘッダ付きなど画面の縦幅が狭いときにも高さ100%に収めるため*/
+  }
+  [data-browser-fullscreen] [class*="_player-display_"]/*メイン*/,
+  [data-browser-fullscreen] [class*="_player-display_"]/*メイン*/ > *{
+    width: 100%;
+  }
+  [class*="_player-display_"]/*メイン*/{
+    width: var(--screen-width);
+    min-width: var(--screen-width) !important;
+  }
+  [class*="_player-display_"]/*メイン*/ > *{
+    width: 100%;
+    min-width: 100% !important;
+  }
+  [class*="_player-setting-view_"]/*詳細設定*/,
+  [class*="_rich-view-status_"]/*ギフト*/,
+  [class*="_player-status_"]/*一覧コメント*/{
+    width: var(--comment-width);
+    min-width: var(--comment-width) !important;
+  }
+  [class*="_player-setting-view_"]/*詳細設定*/ > *,
+  [class*="_rich-view-status_"]/*ギフト*/ > *,
+  [class*="_player-status_"]/*一覧コメント*/ > *{
+    width: 100%;
+    
+  }
+  body{
+    overflow-x: hidden;
+  }
+ /**** 運営コメント ****/
+  [class*="_player-display-header_"]{
+    position: relative !important;/*運営コメントを映像に重ねない*/
+    height: 8vmin;/*運営コメントをより大きく*/
+    min-height: 8vmin;
+  }
+  [data-browser-fullscreen] [class*="_player-display-header_"]{
+    position: absolute !important;/*フルスクリーン時は公式仕様どおり映像に重ねる*/
+  }
+  [class*="_player-display-header_"] [class*="_announcement-renderer_"]{
+    padding: .5vmin 0 .5vmin;/*運営コメントをより大きく*/
+    box-sizing: border-box;
+  }
+  [data-browser-fullscreen] [class*="_player-display-header_"] [class*="_announcement-renderer_"]{
+    padding: .5vmin 0 3.5vmin;/*運営コメントをより大きく*/
+    box-sizing: content-box;
+    background: linear-gradient(
+      rgba(0,0,0,.500)  4vmin,
+      rgba(0,0,0,.481)  5vmin,
+      rgba(0,0,0,.427)  6vmin,
+      rgba(0,0,0,.346)  7vmin,
+      rgba(0,0,0,.154)  9vmin,
+      rgba(0,0,0,.073) 10vmin,
+      rgba(0,0,0,.019) 11vmin,
+      transparent
+    ) !important;/*背景にサインカーブの影*/
+    text-shadow:
+      rgba(0,0,0,.50)  1px  1px 2px,
+      rgba(0,0,0,.50) -1px  1px 2px,
+      rgba(0,0,0,.50)  1px -1px 2px,
+      rgba(0,0,0,.50) -1px -1px 2px,
+      rgba(0,0,0,.75)  0    1px 1px
+    ;/*公式の指定より影を濃くして目立たせる*/
+  }
+  [class*="_player-display-header_"] [class*="_announcement-renderer_"] [class*="_fitting-area_"]{
+    line-height: 1.25 !important;/*2行にわたる運営コメントをより大きく(リンク下線の余裕はどうしても必要)*/
+    font-size: calc(4vmin/1.25);/*運営コメントをより大きく*/
+    overflow: visible;/*ピッタリすぎてリンク下線の分だけはみ出てカットされるのを防ぐ*/
+    white-space: nowrap;/*美しくない強制改行をできるだけ防ぐ*/
+  }
+  html:not([data-browser-fullscreen]) [class*="_player-display-header_"] [class*="_announcement-renderer_"][data-fresh="false"],
+  [data-browser-fullscreen] [class*="_player-display_"]:hover [class*="_player-display-header_"] [class*="_announcement-renderer_"][data-fresh="false"]{
+    opacity: .75 !important;/*固定運営コメントが15秒で消えてしまうバグを回避*/
+    pointer-events: auto !important;
+  }
+ /**** スクロールコメント ****/
+  [class*="_comment-layer_"][data-extra-layout="showOperatorComment"]{
+    top: 50% !important;/*(通常画面での)運営コメント表示中の公式のレイアウト調整は不要なので上書きする*/
+    transform: translate(-50%, -50%) !important;
+  }
+  /*公式未対応につきTsuuで対応*/
+  [data-browser-fullscreen] [class*="_player-display_"][data-monitor-mode="manipulating"] [class*="_comment-layer_"][data-extra-layout="showOperatorComment"],
+  [data-browser-fullscreen] [class*="_player-display-header_"][data-fresh="true"] + [class*="_player-display-screen_"] [class*="_comment-layer_"][data-extra-layout="showOperatorComment"],
+  [data-browser-fullscreen] [class*="_player-display_"]:hover [class*="_comment-layer_"][data-extra-layout="showOperatorComment"]{
+    top: 50% !important;
+    transform: translate(-50%, calc(-50% + 8vmin)) !important;/*フルスクリーン時は逆に運営コメント表示中のレイアウト調整が欠けているので補う*/
+    transition: opacity 125ms, transform 500ms 0ms;
+  }
+  [class*="_player-display-screen_"] [class*="_comment-layer_"],
+  [class*="_player-display-screen_"] [class*="_telop-layer_"]{
+    opacity: var(--opacity);/*通常時の透明度*/
+    transition: opacity 125ms, transform 1000ms 1000ms;
+  }
+ /**** プレイヤフッタ ****/
+  [class*="_player-display-footer_"]::before{
+    opacity: 0;/*::before要素で影を表現するのはやめる*/
+  }
+  [class*="_broadcast-participation-area_"]{
+    background: black;/*背景を黒く*/
+  }
+  [data-browser-fullscreen] [class*="_player-display-footer_"]{
+    background: linear-gradient(-180deg,
+      transparent,
+      rgba(0,0,0,.019) 12px,
+      rgba(0,0,0,.073) 24px,
+      rgba(0,0,0,.154) 36px,
+      rgba(0,0,0,.346) 60px,
+      rgba(0,0,0,.427) 72px,
+      rgba(0,0,0,.481) 84px,
+      rgba(0,0,0,.500) 96px
+    ) !important;/*背景にサインカーブの影*/
+    padding-top: 24px;/*グラデーションの余裕(要素の高さは公式生放送で36+40pxなので計100px)*/
+  }
+  [data-browser-fullscreen] [class*="_controller-display-button_"][data-toggle-state="false"]{
+    transform: translateY(-24px);/*グラデーションの余裕でズレた分*/
+  }
+  [class*="_player-controller_"] button[aria-label]::before/*ボタンツールチップ*/,
+  [class*="_player-controller_"] [class*="_volume-size-control_"]::before,
+  [class*="_player-controller_"] [class*="_seek-information_"],
+  [class*="_player-controller_"] [class*="_setting-panel_"]/*設定パネル*/{
+    background: rgba(0,0,0,.75);/*半透明化*/
+  }
+  [data-browser-fullscreen] [class*="_player-controller_"] button > *|svg,
+  [data-browser-fullscreen] [class*="_player-controller_"] [class*="_slider-track_"]/*音量*/,
+  [data-browser-fullscreen] [class*="_player-controller_"] [class*="_program-statistics_"]/*番組統計情報*/,
+  [data-browser-fullscreen] [class*="_player-controller_"] span[class*="_elapsed-time_"]/*経過時間*/,
+  #comment-opacity-selector > li,
+  dummy{
+    filter:
+      drop-shadow(0 0 2px rgba(0,0,0,1.00))
+      drop-shadow(0 0 8px rgba(0,0,0,0.75))
+    ;/*少しだけ見やすく*/
+  }
+  [data-browser-fullscreen] [class*="_player-controller_"] [class*="_slider_"]/*時刻音量スライダ*/{
+    box-shadow: none;/*へんな影が追加される公式のミス(?)を回避*/
+  }
+  [data-browser-fullscreen] [class*="_program-statistics_"]/*番組統計情報*/{
+    display: block !important;
+    color: white;
+    margin-left: 1em;
+  }
+  [data-browser-fullscreen] [class*="_program-statistics_"] ul{
+    height: 100%;
+  }
+  [data-browser-fullscreen] [class*="_program-statistics_"] li > *|*{
+    position: absolute;
+    transform: translate(0,-50%);
+    top: 50%;
+    margin: 0 4px;
+  }
+  [class*="_time-status-area_"] span[class*="_elapsed-time_"] > span:first-child/*現在時刻*/,
+  [class*="_time-status-area_"] [class*="_time-text-box_"]/*時刻指定*/{
+    font-size: 16px;/*少し大きく(公式12px)*/
+    line-height: 24px;
+  }
+  [data-browser-fullscreen] [class*="_time-status-area_"] span[class*="_elapsed-time_"] > span:first-child/*現在時刻*/,
+  [data-browser-fullscreen] [class*="_time-status-area_"] [class*="_time-text-box_"]/*時刻指定*/{
+    font-size: 18px;/*少し大きく(公式12px)*/
+  }
+  [class*="_time-status-area_"] span[class*="_elapsed-time_"] > span:nth-child(2)/*時刻の区切り*/{
+    margin: 0 .5em;/*少し間隔を広げて見やすく*/
+  }
+ /**** ニコニコ市場 ****/
+  [class*="_ichiba-counter_"]{
+    position: absolute;
+    bottom: 40px;
+    pointer-events: none;
+    filter:
+      drop-shadow(0 0 2px rgba(0,0,0,0.25))
+      drop-shadow(0 0 8px rgba(0,0,0,0.25))
+    ;/*少しだけ見やすく*/
+  }
+  [class*="_ichiba-counter-section_"],
+  [class*="_broadcast-participation-area-disabled-message-area_"]{
+    opacity: 0;/*ふだんは邪魔なので*/
+    pointer-events: none;
+  }
+  [class*="_broadcast-participation-area_"]:hover [class*="_ichiba-counter_"][data-frozen="false"] [class*="_ichiba-counter-section_"]{
+    animation: NiconicoTsu-fade 2500ms 1 forwards;
+  }
+  @keyframes NiconicoTsu-fade{
+      0%/*   0ms*/{opacity: 0; pointer-events: none;}
+     10%/* 250ms*/{opacity: 0; pointer-events: auto;}
+     20%/* 500ms*/{opacity: 1; pointer-events: auto;}
+     60%/*1500ms*/{opacity: 1; pointer-events: auto;}
+    100%/*2500ms*/{opacity: 0; pointer-events: none;}
+  }
+  [class*="_broadcast-participation-area_"] [class*="_ichiba-counter_"][data-frozen="false"] [class*="_ichiba-counter-section_"]:hover{
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  [class*="_ichiba-counter-section_"] [class*="_queue-item-area_"] [class*="_item-placeholder_"]/*空欄アイテム枠*/,
+  [class*="_ichiba-counter-section_"] [class*="_queue-item-area_"] button/*アイテム枠*/{
+    background: rgba(0,0,0,.5);
+    border-radius: 4px;
+  }
+ /**** コメントフォーム ****/
+  [class*="_comment-post-panel_"]{
+    padding: 0 !important;/*paddingとmarginの入れ替え*/
+  }
+  [class*="_comment-post-form_"]{
+    margin: 0 8px 8px !important;/*paddingとmarginの入れ替え*/
+  }
+  [data-browser-fullscreen] [class*="_comment-post-panel_"]{
+    max-width: 60em !important;/*ピクセル値ではなく可変に*/
+  }
+  [data-browser-fullscreen] [class*="_comment-post-form_"]{
+    filter:
+      drop-shadow(0 0 2px rgba(0,0,0,0.25))
+      drop-shadow(0 0 8px rgba(0,0,0,0.25))
+    ;/*少しだけ見やすく*/
+  }
+  [class*="_comment-post-form_"][aria-disabled="true"]/*タイムシフトでコメントができない状態*/{
+    display: none;/*白く目立つ上に特に意味はないので*/
+  }
+  [class*="_comment-post-form_"] button[type="submit"]{
+    transition: none !important;/*フルスクリーン時にtransitionかかるのを回避*/
+  }
+  input[name="command"]:not(:focus) + input[name="comment"]:not(:focus) + button[type="submit"]:not(:focus){
+    color: #808080;/*コメント欄にフォーカスしていないならボタンは暗く*/
+    background: #404040;
+  }
+ /**** ステータス/一覧コメント 共通 ****/
+  [class*="_promotion-balloon_"]/*福引きの案内*/{
+    display: none;
+  }
+  [class*="_player-status_"] *|svg > *|*{
+    fill: #c0c0c0 !important;/*黒背景にしたぶんsvgの色も対応させる*/
+  }
+  [class*="_player-status_"] *|svg > *|*[fill="none"]{
+    fill: none !important;/*黒背景にしたぶんsvgの色も対応させる*/
+  }
+  [class*="_player-status_"] [class*="_close-button_"]{
+    background: black;/*黒背景にしたぶん広告閉じるボタンの色も対応させる*/
+  }
+  [class*="_tab-area_"]{
+    background: black;
+  }
+  [class*="_ng-setting-controller_"]::after{
+    display: none;
+  }
+  [class*="_player-status_"],
+  [class*="_tab-list_"] button/*コメント/おすすめ生放送*/{
+    color: white;
+    background: black;
+    border: none;
+  }
+  [class*="_tab-list_"] button[aria-selected="true"]::after{
+    height: 4px;
+    background: white;
+  }
+  [class*="_tab-list_"] button:not([aria-selected="true"]){
+    color: gray;
+  }
+ /**** ステータス ****/
+  [class*="_program-panel_"] [aria-label="部屋情報"] *,
+  [class*="_program-panel_"] [class*="_comment-data-grid_"] header *{
+    color: white;
+    background: black;
+    height: auto;
+  }
+  [class*="_program-panel_"]{
+    width: 100%;
+    height: calc(var(--font-size) * 4);
+    display: block;
+  }
+  [class*="_program-panel_"] > *{
+    padding: 0 0 0 1em;
+  }
+  [class*="_program-panel_"] *{
+    font-size: var(--font-size) !important;
+    line-height: 1.25 !important;
+  }
+  [class*="_program-panel_"] [class*="_header-area_"]{
+    overflow: hidden;
+    justify-content: flex-start;
+  }
+  [class*="_program-panel_"] [class*="_header-area_"] [aria-label="部屋情報"]{
+    height: auto;
+    white-space: nowrap;
+  }
+  [class*="_program-panel_"] [class*="_header-area_"] [aria-label="部屋情報"] + aside/*ギフトPR*/{
+    margin: 0 .5em 0 .5em;
+    height: auto;
+    color: #c0c0c0;
+  }
+  [class*="_program-panel_"] [class*="_header-area_"] [aria-label="部屋情報"] + aside *{
+    font-size: 87.5% !important;
+  }
+  [class*="_program-panel_"] [class*="_program-statistics_"] [data-value]{
+    color: white;
+  }
+  [class*="_program-panel_"] [class*="_program-statistics_"] *|svg,
+  [class*="_ng-panel-controller_"] [class*="_ng-button_"] *|svg{
+    width: var(--font-size) !important;
+    height: var(--font-size) !important;
+  }
+ /**** 一覧コメント ****/
+  [class*="_comment-panel_"] [class*="_body_"]{
+    -webkit-mask-image: linear-gradient(rgba(0,0,0,.5), black 1em);
+    mask-image: linear-gradient(rgba(0,0,0,.5), black 1em);/*ヘッダとの境界をわかりやすくする影*/
+  }
+  [class*="_comment-panel_"] header{
+    display: none;/*意味のある要素ではないので*/
+  }
+  [class*="_comment-panel_"] [class*="_header-table_"],
+  [class*="_comment-panel_"] [class*="_table_"]{
+    width: 100% !important;
+  }
+  [class*="_comment-panel_"] [class*="_table-row_"]:first-child{
+    margin-bottom: calc(var(--negative-height) - .4em);/*Chromeで崩れやすいのでtopにしたり上下で分けたり...*/
+    opacity: 0;
+    pointer-events: none;
+  }
+  [class*="_comment-panel_"] [class*="_table-row_"]{
+    transition: margin 100ms;/*短くしないとスムーズに動かない*/
+    padding: 0;
+    height: unset;
+  }
+  [class*="_comment-panel_"] [class*="_table-row_"]:hover,
+  [class*="_comment-panel_"] [class*="_table-row_"][aria-selected="true"]{
+    background: #404040;
+  }
+  [class*="_comment-panel_"] [class*="_table-row_"] [class*="_table-cell_"]/*セル内スクロール対応*/{
+    width: auto !important;
+    overflow: visible !important;
+    transition: transform 1000ms;
+    flex: 1;
+  }
+  [class*="_comment-panel_"] [class*="_table-row_"]:hover [class*="_table-cell_"]{
+    transform: translateX(calc(var(--comment-width) - 100%));/*セル内スクロール*/
+  }
+  [class*="_comment-panel_"] [class*="_table-row_"][data-comment-type="nicoad"] *|*::before/*広告アイコンを黄色に*/{
+    -webkit-mask-image: var(--nicoad-icon);
+    mask-image: var(--nicoad-icon);
+    background: rgba(255,244,0,.75) !important;
+    width: var(--font-size) !important;
+    height: var(--font-size) !important;
+    margin: 0 1em .2em 0;/*公式アイコンの重心調整*/
+  }
+  [class*="_comment-panel_"] [class*="_table-row_"][data-comment-type="nicoad"] */*広告文字を黄色に*/{
+    color: rgba(255,244,0,.75) !important;
+  }
+  [class*="_comment-panel_"] [class*="_table-row_"][data-comment-type="trialWatch"] */*チャンネル無課金*/,
+  [class*="_comment-panel_"] [class*="_table-row_"][data-comment-type="programExtend"] */*枠延長*/,
+  [class*="_comment-panel_"] [class*="_table-row_"][data-comment-type="ranking"] */*ランキング入り通知*/,
+  [class*="_comment-panel_"] [class*="_table-row_"][data-comment-type="cruise"] */*クルーズのお知らせ*/,
+  [class*="_comment-panel_"] [class*="_table-row_"][data-comment-type="quote"] */*クルーズさんのコメント*/,
+  [class*="_comment-panel_"] [class*="_table-row_"][data-comment-type="spi"] */*ニコニコ新市場*/,
+  dummy{
+    color: #a0a0a0 !important;/*黒背景に合わせて少し明るく*/
+  }
+  [class*="_comment-panel_"] [class*="_header-cell_"],
+  [class*="_comment-panel_"] [class*="_table-cell_"]{
+    font-size: var(--font-size);
+    line-height: var(--line-height);
+    padding: .2em 0 .2em 1em;
+  }
+  [class*="_comment-panel_"] [class*="_table-cell_"] > span{
+    font-size: var(--font-size);
+    width: auto !important;/*セル内スクロール対応*/
+    overflow: visible !important;
+  }
+  [class*="_comment-panel_"] [class*="_table-cell_"] [class*="_comment-number_"]/*一部放送で表示されるコメント通し番号*/{
+    display: none;
+  }
+  [class*="_comment-panel_"] [class*="_tooltip_"]{
+    display: none;
+    font-size: var(--font-size);
+    color: white;
+    background: rgba(32,32,32,.875);
+    border-color: #404040;
+  }
+ /**** NGパネル ****/
+  [class*="_ng-panel-controller_"] [class*="_ng-button_"][aria-expanded="false"]{
+    width: var(--font-size) !important;
+    height: var(--font-size) !important;
+    /*少しだけ見やすく*/
+    background: rgba(0,0,0,.75);
+    border-radius: var(--font-size);
+    padding: calc(var(--font-size) * .5);
+    box-sizing: content-box;
+    filter: drop-shadow(0 0 4px rgba(0,0,0,1.0));
+  }
+  [class*="_ng-panel_"] [class*="_ng-item-type-select-box_"],
+  [class*="_ng-panel_"] [class*="_ng-register-button_"]{
+    margin: 8px 0 0 8px;
+  }
+  [class*="_ng-panel_"] [class*="_ng-register-button_"]{
+    flex: 1;
+  }
+ /**** おすすめ生放送 ****/
+  [class*="_program-card-list_"] li{
+    border-color: #333;
+  }
+  [class*="_program-title_"]{
+    color: white;
+  }
+  [class*="_program-card_"]:hover{
+    color: white;
+    background: #333;
+    border: none;
+  }
+ /**** その他 ****/
+  [class*="_promote-menu_"]/*チケット購入者限定で放送中*/{
+    background: rgba(255,255,255,.75);
+    opacity: .25;
+    transition: opacity 250ms;
+  }
+  [class*="_promote-menu_"]:hover{
+    opacity: 1;
+  }
+  [class*="_banner-panel_"]{
+    border: none;/*黒背景に合わせて広告の白ボーダーをなくす*/
+    background: black;
+  }
+  [class*="_broadcast-participation-area_"]{
+    border: none;/*タイムシフト時のコメント投稿欄の削除に合わせて(このままでは生放送中は不格好になるのでプレイヤ全体に下線を付与してある)*/
+  }
+  [class*="_player-area_"]{
+    border-bottom: 1px solid #e5e5e5;/*コメント欄の下ボーダーをここで表現して区切りとする*/
+  }
+  [class*="_comment-post-form_"] [class*="_submit-button_"]{
+    height: 100% !important;/*ボーダー1pxぶん調整*/
+  }
+  [class*="_snack-bar-area_"]{
+    display: none;/*[タイムシフト視聴ではゲームやアンケートなどの操作はできません。]が邪魔*/
+  }
+  [class*="_program-information-area_"]{
+    z-index: -1;/*後続のbox-shadowがプレイヤにかぶってくるので*/
+  }
+  [class*="_player-status_"] a,
+  [class*="_program-statistics_"] button{
+    color: inherit;
+    background: transparent;
+  }
+ /**** 放送開始前 ****/
+  [class*="_watch-rejected-information-overlay-area_"]{
+    height: 100%;
+  }
+  [class*="_watch-rejected-information-overlay-area_"] [class*="_player-display-screen_"]{
+    position: absolute;
+    top: 0;
+  }
+  [class*="_watch-rejected-information-overlay-area_"] [class*="_player-display-screen_"] + [class*="_player-controller_"]{
+    display: none;
+  }
+}

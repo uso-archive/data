@@ -1,0 +1,229 @@
+/* ==UserStyle==
+@name         kome/nama【右置きmode】
+@namespace    USO Archive
+@author       このはG.E.
+@description  おーぷん(Open2ch)の機能を使いやすくするcssです。<a href="https://userstyles.org/styles/179083/kome-nama-mode">上置きmode</a>もあります。  ・kome/namaの位置を右に移動、スレと被らない位置へ  ・画像を表示してもnamaが消えない、スクロールについてくる  ・画像真ん中を右クリックで保存可能  ・1000表示
+@version      20200113.01.45
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("open2ch.net") {
+/* 右置きmode　上書きするにはだいたいdiv要素を指定すればよい */
+/* 変数 */
+:root {
+	/* komeの横幅 nama=320px */
+	--kome-width: 320px;
+	/* 画像表示時の上の余白 */
+	--image-margin-top: 30px;
+}
+
+
+/* 横スクロールバー非表示 */
+body.valus {
+	overflow-x: hidden;
+}
+
+/* 左上人数 */
+body.valus .lbox {
+	top: -5px;
+	z-index: 22;
+}
+
+/* nama (z-index: 最高21？変化する 閉じると1?) */
+body.valus #nama_box {
+	right: 0px !important;
+	background-color: rgba(239,239,239,1);
+}
+
+/* kome (z-index:20) */
+body.valus #komediv {
+	width: var(--kome-width) !important;
+	margin: 2px;
+	padding: 2px;
+}
+
+/* komeヘッダー非表示 */
+body.valus #kheader {
+	display: none;
+}
+
+/* komeログ */
+body.valus #klog_view {
+	width: calc(var(--kome-width) - 6px) !important;
+	opacity: 0.9 !important;
+	resize: vertical;
+}
+
+/* 使い方・ヘッドライン */
+body.valus #kmain > div:first-child[align="right"] {
+	float: right;
+}
+/* kome人数の後に改行(入力文字数位置の変更で必要) */
+body.valus #kmain #ninzu + font:after {
+	content: '';
+	display: block;
+}
+
+/* kome入力文字数の位置を変更 */
+body.valus #kmain .noselect,
+body.valus #kmain #komeLength
+{
+	display: inline;
+}
+body.valus #kmain .noselect + .noselect {
+	margin-left: 4px;
+}
+
+/* kome書き込み欄 */
+body.valus #kome {
+	width: calc(100% - 58px);
+}
+
+/* kome入力欄のサイズ調整 */
+body.valus #komeform #textTable td {
+	padding: 0px;
+}
+body.valus #komeform #kome + div {
+	height: 20px;
+}
+body.valus #komeform #kome + div > span { /* 画像うｐ */
+	float: left;
+	margin-top: 0px !important;
+}
+body.valus #komeform #ksubmitButton { /* 送 */
+	float: left;
+	font-size: 70%;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+/* スレがnama&komeとかぶらないように */
+body.valus .thread {
+	width: calc(100% - var(--kome-width));
+	border-right: solid 1px gray;
+}
+
+/* レスポップアップをnama&komeより上に */
+body.valus .mado {
+	z-index: 23;
+}
+
+/* 画像表示でnamaを消さない */
+body.valus #swf embed {
+	visibility: visible !important;
+}
+
+/* 画像関係はスレ以外でも使われるので、.valusをはずしたものも用意 */
+/* 画像表示時の暗転 */
+body #lightboxOverlay.lightboxOverlay {
+	position: fixed;
+	top: 0px !important;
+	width: calc(100% - 8px) !important; /* スレ以外 */
+	height: calc(100vh) !important;
+	opacity: 0.2 !important;
+	z-index: 0;
+}
+body.valus #lightboxOverlay.lightboxOverlay { /* スレ内 (komeを考慮) */
+	width: calc(100% - var(--kome-width) - 8px) !important;
+}
+
+/* 画像コンテナ */
+/* 一番外、フッターもある */
+body #lightbox.lightbox {
+	position: fixed;
+	top: var(--image-margin-top) !important;
+	width: calc(100% - 8px) !important;
+	z-index: 1; /* 多分namaが上 */
+}
+body.valus #lightbox.lightbox {
+	width: calc(100% - var(--kome-width) - 8px) !important;
+}
+
+/* 2番目、外枠のため */
+body .lightbox .lb-outerContainer {
+	display: table;
+	width: auto !important;
+	height: auto !important;
+	min-width: 50px;
+	min-height: 50px;
+}
+
+/* 読み込み中の表示 */
+body .lb-outerContainer.animating .lb-loader {
+	display: table-cell;
+	vertical-align: middle;
+	position: unset;
+	top: unset;
+	left: unset;
+	width: 60px !important;
+	height: 60px !important;
+}
+
+/* 画像: 前へと次への間に画像をクリックできる隙間をつくる
+   画像サイズを自動的にスレの表示部に合わせる */
+body .lightbox .lb-image {
+	max-height: calc(100vh - var(--image-margin-top) - 60px);
+	max-width: calc(100vw - 34px);
+	width: auto !important;
+	height: auto !important;
+	z-index: 30;
+}
+body.valus .lightbox .lb-image {
+	max-width: calc(100vw - var(--kome-width) - 34px);
+}
+
+/* ボタンのコンテナ、この要素だけ邪魔なので隠す */
+body div.lb-nav {
+	visibility: hidden;
+}
+
+body div.lb-nav > a.lb-prev,
+body div.lb-nav > a.lb-next
+{
+	width: 33%;
+	visibility: visible;
+	z-index: 31;
+}
+
+/* 画像footer */
+body .lb-dataContainer {
+	max-width: 100%;
+	opacity: 0.8;
+	background-color: black;
+}
+
+/* なんかからっぽな画像 */
+body .thread img[src="//image.open2ch.net/image/blank.gif"] {
+	width: 120px;
+	height: 20px;
+	background-color: blue;
+	opacity: 0.5;
+}
+
+
+/* 書き込み欄 */
+body.valus #MESSAGE {
+	width: 100%;
+}
+
+/* コピーライト */
+body.valus div.copyrights {
+	width: unset;
+	max-width: 550px;
+}
+
+/* 1000表示 */
+body.valus dt[res="1000"]:after {
+	content: '1000なのです。';
+	display: block;
+	position: fixed;
+	left: 100px;
+	top: 0px;
+	padding: 5px 15px;
+	background-color: #fcc;
+	z-index: 30;
+	color: red;
+	font-weight: bold;
+}
+
+}

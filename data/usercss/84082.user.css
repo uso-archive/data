@@ -1,0 +1,266 @@
+/* ==UserStyle==
+@name         Twitch Chat Badge Changer
+@namespace    USO Archive
+@author       Hitakashi
+@description  This script allows you to change the color, Oh wait, AND the image of the Broadcaster, Moderator, and Turbo badges in chat, It also allows you to hide those pesky badges if you hate them. There are a few cosmetic changes that I feel makes twitch look a little...better?, You can enable/disable all these changes to your liking. NOW with chat ignore!, Go to the bottom of the script when you edit it and add the ignored names (More info in addt'l info)     Examples: http://www.imgur.com/a/Ptgrh
+@version      20130503.22.17
+@license      CC-BY-SA-4.0
+@preprocessor uso
+@advanced color broadcolor "Broadcaster Badge Color" #1F1F1F
+@advanced color moderatorcolor "Moderator Badge Color" #009900
+@advanced color turbocolor "Turbo Badge Color" #6441A5
+@advanced dropdown hidingbadges "Are you going to be hiding badges?" {
+    No "No*" <<<EOT /*IF THIS IS HERE, THAT MEAN BADGES 
+ARE NOT FULLY HIDDEN, WILL SHOW A SPACE*\/ EOT;
+    Yes "Yes" <<<EOT .small{
+        display:none!important;
+    } EOT;
+
+}
+@advanced dropdown hidebadge "Hide Broadcaster badge?" {
+    No "No*" <<<EOT     /*Not hiding badge*\/ EOT;
+    Yes "Yes" <<<EOT display:none!important; EOT;
+
+}
+@advanced dropdown moderatorhide "Hide Moderator badge?" {
+    No "No*" <<<EOT     /*Not hiding badge*\/ EOT;
+    Yes "Yes" <<<EOT display:none!important; EOT;
+
+}
+@advanced dropdown turbohide "Hide Turbo badge?" {
+    No "No*" <<<EOT     /*Not hiding badge*\/ EOT;
+    Yes "Yes" <<<EOT display:none!important; EOT;
+
+}
+@advanced dropdown subscriberhide "Hide Subscriber badge?" {
+    No "No*" <<<EOT /*Doing nothing to subscriber badge*\/ EOT;
+    Yes "Yes" <<<EOT .subscriber a {
+        display:none!important;
+        } EOT;
+
+}
+@advanced dropdown headerusername "Change username color (Header and sidebar)" {
+    No "No*" <<<EOT /*Default Gray on username dropdown*\/ EOT;
+    Yes "Yes" <<<EOT #user_display_name {
+        color:/*[[headercolor]]*\/!important;
+    }
+Span[class="username"] {
+color:/*[[headercolor]]*\/!important;
+} EOT;
+
+}
+@advanced color headercolor "Change color on above setting? (Above MUST be yes)" #6441A5
+@advanced dropdown destructoidb "Destructoid (only account) badge" {
+    No "No*" <<<EOT /*No broadcaster changes*\/ EOT;
+    Yes "Yes" <<<EOT @-moz-document domain("twitch.tv"), domain("twitchtv.com") {
+[class*="destructoid"] .mod {
+background-image:url(http://bulk2.destructoid.com/ele2/images/destructoid/favicon.ico)!important;
+}
+[class*="destructoid"] .broadcaster {
+background-image:url(http://bulk2.destructoid.com/ele2/images/destructoid/favicon.ico)!important;
+}
+} EOT;
+
+}
+@advanced dropdown mysticbadge "Mystic Badge #Kappa" {
+    No "No*" <<<EOT /*Nothing with Mystic, Aw*\/ EOT;
+    Yes "Yes" <<<EOT @-moz-document domain("twitch.tv"), domain("twitchtv.com") {
+[class*="mysticseeker"] .mod {
+background-image:url(http://i.imgur.com/VtFroQP.png)!important;
+}
+[class*="mysticseeker"] .broadcaster {
+background-image:url(http://i.imgur.com/VtFroQP.png)!important;
+}
+} EOT;
+
+}
+@advanced dropdown pokebadge "Pokedude97 Badge" {
+    No "No*" <<<EOT /*Nothing with poke, Aw*\/ EOT;
+    Yes "Yes" <<<EOT @-moz-document domain("twitch.tv"), domain("twitchtv.com") {
+[class*="pokedude97"] .mod {
+background-image:url(http://img852.imageshack.us/img852/6050/pokeball7kw1.gif)!important;
+background-color:transparent!important;
+}
+[class*="pokedude97"] .broadcaster {
+background-image:url(http://img852.imageshack.us/img852/6050/pokeball7kw1.gif)!important;
+background-color:transparent!important;
+}
+} EOT;
+
+}
+@advanced dropdown broadcasterimage "Broadcaster Badge Image" {
+    Default_Broadcaster_ "Default Broadcaster Camera*" <<<EOT http://www.twitch.tv/images/xarth/g/g18_camera-FFFFFF80.png EOT;
+
+	broadcasterimage-custom-dropdown "Custom" <<<EOT /*[[broadcasterimage-custom]]*\/ EOT;
+}
+@advanced text broadcasterimage-custom "Broadcaster Badge Image (Custom)" "https://example.com/image.png"
+@advanced dropdown moderatorimage "Moderator Badge Image" {
+    Default_Moderator_Sw "Default Moderator Sword*" <<<EOT http://www.twitch.tv/images/xarth/g/g18_sword-FFFFFF80.png EOT;
+    Old_Moderator_Bolt "Old Moderator Bolt" <<<EOT http://www.twitch.tv/images/xarth/g/g18_bolt-FFFFFF80.png EOT;
+
+	moderatorimage-custom-dropdown "Custom" <<<EOT /*[[moderatorimage-custom]]*\/ EOT;
+}
+@advanced text moderatorimage-custom "Moderator Badge Image (Custom)" "https://example.com/image.png"
+@advanced dropdown turboimage "Turbo Badge Image" {
+    Default_Turbo_Batter "Default Turbo Battery*" <<<EOT http://www.twitch.tv/images/xarth/g/g18_turbo-FFFFFF80.png EOT;
+
+	turboimage-custom-dropdown "Custom" <<<EOT /*[[turboimage-custom]]*\/ EOT;
+}
+@advanced text turboimage-custom "Turbo Badge Image (Custom)" "https://example.com/image.png"
+@advanced dropdown broadcastertrans "Broadcaster Transparency" {
+    No "No*" <<<EOT /*No Transparency*\/ EOT;
+    Yes "Yes" <<<EOT background: transparent!important; EOT;
+
+}
+@advanced dropdown modtrans "Moderator Transparency" {
+    no "no*" <<<EOT /*No Transparency*\/ EOT;
+    Yes "Yes" <<<EOT background: transparent!important; EOT;
+
+}
+@advanced dropdown turbotrans "Turbo Transparency" {
+    No "No*" <<<EOT /*No Transparency*\/ EOT;
+    Yes "Yes" <<<EOT background: transparent!important; EOT;
+
+}
+@advanced dropdown colorchanges "Block Colors" {
+    No "No*" <<<EOT /*No blocking colors*\/ EOT;
+    Yes "Yes" <<<EOT @-moz-document domain("twitch.tv") {
+#chat_line_list > .line > p > [style*=blue] {
+color:#c4c4ff!important;
+}
+
+#chat_line_list > .line > p > [style*="color:#0000FF"] {
+color:#c4c4ff!important;
+}
+
+#chat_line_list > .line > p > [style*=darkblue] {
+color:#c4c4ff!important;
+}
+
+#chat_line_list > .line > p > [style*="color:#00008B"] {
+color:#c4c4ff!important;
+}
+#chat_line_list > .line > p > [style*="color:#001F85"] {
+color:#c4c4ff!important;
+}
+#chat_line_list > .line > p > [style*="color:#000000"] {
+color:#04c4ff!important;
+}
+#chat_line_list > .line > p > [style*="color:#191971"] {
+color:#5F9F9F!important;
+}
+#chat_line_list > .line > p > [style*="color:black"] {
+color:#5F9F9F!important;
+}
+/*.chat_color_swatch:nth-child(5) {
+background-color:#c4c4ff!important;
+}*\/
+} EOT;
+
+}
+==/UserStyle== */
+@namespace url(http://www.w3.org/1999/xhtml);
+
+@-moz-document domain("twitch.tv"), domain("twitchtv.com") {
+/* START Global twitch page changes */
+
+    /* Change color on username dropdown */
+    /*[[headerusername]]*/
+
+/* END Global twitch page changes */
+
+/* START chat/badge changes */    
+    /* Hides Go Turbo Button */
+    /*[[goturbo]]*/
+
+    /* This is used to hide the spaces 
+        with hiding badges, but hides time stamps
+        GG twitch */
+    /*[[hidingbadges]]*/
+
+    /* Badge Colors */
+
+        Span[class*="tag broadcaster"] {
+            background-color:/*[[broadcolor]]*/!important;
+        /*[[hidebadge]]*/
+        /*[[broadcastertrans]]*/
+            background-image:url("/*[[broadcasterimage]]*/")!important;
+        }
+
+        Span[class*="tag mod"] {
+            background-color:/*[[moderatorcolor]]*/!important;
+        /*[[moderatorhide]]*/
+        /*[[modtrans]]*/
+            background-image:url("/*[[moderatorimage]]*/")!important;
+        }
+
+        .turbo a {
+            background-color:/*[[turbocolor]]*/!important;
+        /*[[turbohide]]*/
+        /*[[turbotrans]]*/
+            background-image:url("/*[[turboimage]]*/")!important;
+        }
+
+        /*[[subscriberhide]]*/
+
+    A[class="mod_button ban"] {
+        margin-right:2px!important;
+    }
+    A[class="mod_button unban"] {
+        margin-right:2px!important;
+    }
+    Span[class*="tag"] { 
+       vertical-align:middle!important;
+    }
+/* END chat/badge changes */
+}
+
+/*[[destructoidb]]*/
+/*[[mysticbadge]]*/
+/*[[pokebadge]]*/
+
+@-moz-document domain("twitch.tv") {
+A[class="mod_button ban"] {
+background-position:center center!important;
+background-image:url('http://i.imgur.com/vdsH3JR.png') !important;
+}
+
+A[class="mod_button unban"] {
+background-position:center center!important;
+background-image:url('http://i.imgur.com/uODYTa8.png') !important;
+}
+
+A[class="mod_button timeout"] {
+background-position:center center!important;
+background-image:url('http://i.imgur.com/kIKD8h3.png') !important;
+}
+
+IMG[src*="g18_clock-00000080"] {visibility:hidden!important;}
+IMG[src*="g18_clock-00000020"] {visibility:hidden!important;}
+IMG[src*="g18_unban-00000080"] {visibility:hidden!important;}
+IMG[src*="g18_ban-00000080"] {visibility:hidden!important;}
+
+#chat_menu_ban img{
+visibility:visible!important;
+}
+#chat_menu unban img {
+visibility:visible!important;
+}
+#chat_menu timeout img {
+visibility:visible!important;
+}
+}
+
+@-moz-document domain("twitch.tv"), domain("twitchtv.com") {
+[class*="username_in_lower_case"] {
+display:none!important;
+}
+[class*="username_in_lower_case"] {
+display:none!important;
+}
+[class*="username_in_lower_case"] {
+display:none!important;
+}
+}
+
+/*[[colorchanges]]*/

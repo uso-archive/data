@@ -1,0 +1,93 @@
+/* ==UserStyle==
+@name         Thimbleweed Park™ Forums fixes
+@namespace    USO Archive
+@author       Nor Treblig
+@description  Fixes for <a href="https://forums.thimbleweedpark.com/">Thimbleweed Park™ Forums</a> like header height, timeline width and miscellaneous optical fixes.<br/>  Allows selecting a custom header background image.<br/>  <br/>  Note: See "Customize Settings" for options.
+@version      20190606.12.37
+@license      CC0-1.0
+@preprocessor uso
+@advanced dropdown HeaderPosition "Show fixed header" {
+    Fixed "yes*" <<<EOT  EOT;
+    Absolute "no" <<<EOT /* disable static header *\/
+.d-header { position: absolute !important; } EOT;
+
+}
+@advanced dropdown HeaderPadding "Compact header" {
+    Default "no*" <<<EOT  EOT;
+    Compact "yes" <<<EOT /* remove unnecessary padding from header *\/
+header.d-header { padding-top: 0px; padding-bottom: 0px; }
+header #site-text-logo { margin-top: 0px; }
+#main-outlet { padding-top: 82px !important; }
+/* fix logo height *\/
+.d-header #site-logo { max-height: 1.75em; } EOT;
+
+}
+@advanced dropdown CropAvatars "Crop avatar pictures" {
+    Crop "yes*" <<<EOT  EOT;
+    NoCrop "no" <<<EOT /* don't crop avatar pictures *\/
+img.avatar { border-radius: inherit; } EOT;
+
+}
+@advanced dropdown HeaderBackgroundUrl "Header background" {
+    Default "Default*" <<<EOT https://aws1.discourse-cdn.com/standard14/uploads/thimbleweedpark/original/2X/9/9aebc48bdcff23ba6cfe6cb55fb958ab319a4c1e.png EOT;
+    VistaWithDoor "Improved vista" <<<EOT https://aws1.discourse-cdn.com/standard14/uploads/thimbleweedpark/original/2X/7/7b227a2cf468df15d5f6856c433701effa8921c1.png EOT;
+    Books "Books" <<<EOT https://aws1.discourse-cdn.com/standard14/uploads/thimbleweedpark/original/2X/b/b4ac86e972f7770d5019d3a21e57d7cf74a84491.gif EOT;
+    Cemetery "Cemetery (1920px wide)" <<<EOT https://aws1.discourse-cdn.com/standard14/uploads/thimbleweedpark/original/2X/a/a9a2b5a8434a5ace0e9e07d765b041d01518bccb.png EOT;
+    CemeteryFull "Cemetery (full width of 2358px)" <<<EOT https://aws1.discourse-cdn.com/standard14/uploads/thimbleweedpark/original/2X/7/772e7d9e0bc5268081352f06c030858907118ea7.png EOT;
+    MMFloor1A "Maniac Mansion - 1st Floor A" <<<EOT https://aws1.discourse-cdn.com/standard14/uploads/thimbleweedpark/original/2X/c/c3694c143d2ee2579ec1367f11d477b711e4ad47.png EOT;
+    MMFloor1B "Maniac Mansion - 1st Floor B" <<<EOT https://aws1.discourse-cdn.com/standard14/uploads/thimbleweedpark/original/2X/e/e84f3914134ecd6cee02e23abca8af994f2f2ad5.png EOT;
+    MMFloor2A "Maniac Mansion - 2nd Floor A" <<<EOT https://aws1.discourse-cdn.com/standard14/uploads/thimbleweedpark/original/2X/1/128d9c373abdee391a2579840e40b1e304c63c31.png EOT;
+    MMFloor2B "Maniac Mansion - 2nd Floor B" <<<EOT https://aws1.discourse-cdn.com/standard14/uploads/thimbleweedpark/original/2X/c/c076ce37c6f45ae2faeceff1a49bc74d9b47239c.png EOT;
+
+	HeaderBackgroundUrl-custom-dropdown "Custom" <<<EOT /*[[HeaderBackgroundUrl-custom]]*\/ EOT;
+}
+@advanced text HeaderBackgroundUrl-custom "Header background (Custom)" "https://example.com/image.png"
+==/UserStyle== */
+@-moz-document domain("forums.thimbleweedpark.com") {
+/* disable static header */
+/*[[HeaderPosition]]*/
+
+/* change header background */
+header.d-header
+{
+    background-image: url(/*[[HeaderBackgroundUrl]]*/);
+    background-position: left center;
+    background-repeat: repeat-x;
+}
+
+/*[[HeaderPadding]]*/
+
+/* override text colours in header using TWP style */
+.d-header .title a, .d-header .title a:visited, .d-header .extra-info-wrapper .topic-link { color: #feca2f; }
+/* ensure title stays readable on every background */
+header.d-header .title, header.d-header .fa, header.d-header .topic-link { text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; }
+
+/* don't make timeline wider as it looks */
+.topic-timeline { width: 90px !important; }
+
+/*[[CropAvatars]]*/
+
+/* draw custom emojis pixelated */
+.emoji-custom
+{
+    image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+    image-rendering: -moz-crisp-edges;          /* Firefox                        */
+    image-rendering: -o-crisp-edges;            /* Opera                          */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated;                 /* Chrome */
+    image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+}
+
+/* fix spelling mistake in footer thanks to PiecesOfKate :-) */
+.ember-view > center > span.category-description
+{
+    display: none;
+}
+.ember-view > center:after
+{
+    color: #CCCCEE;
+    content: 'Official Thimbleweed Park Forums powered by Discourse.';
+}
+
+}

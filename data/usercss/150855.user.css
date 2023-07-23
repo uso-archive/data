@@ -1,0 +1,461 @@
+/* ==UserStyle==
+@name         Toodledo Lightskin
+@namespace    USO Archive
+@author       genez
+@description  A lightweight skin for Toodledo to make it more usable.    Best used with the NEW Toodledo UI.
+@version      20180115.16.55
+@license      CC-BY-NC-SA-4.0
+@preprocessor uso
+@advanced text primary_font "Primary Font" "Segoe UI"
+@advanced text task_title_font "Task Title Font" "Crete Round"
+@advanced color pri3_color "Top Priority Color" #A61414
+@advanced color pri2_color "High Priority Color" #000000
+@advanced color pri1_color "Medium Priority Color" #000000
+@advanced color pri0_color "Low Priority Color" #808080
+@advanced color pri-1_color "Negative Priority Color" #D3D3D3
+@advanced color task_input_bg_color "Task Input Background Color" #F8F8BB
+@advanced dropdown grid_density "Grid Density" {
+    1 "Medium (Default)*" <<<EOT 1 EOT;
+    2 "Comfortable" <<<EOT 2 EOT;
+    0 "Compact (Native)" <<<EOT 0 EOT;
+
+}
+==/UserStyle== */
+/*
+ *
+ * Features
+ *
+ * Global Font Changes
+ * Task Row Padding
+ * Distinct Task Title Font
+ * Task Row Styling
+ * Priority Task Styling
+ * Task Note Styling
+ * Row Divider Styling
+ * Text Hover Transitions
+ * Sidebar Styling
+ * Ribbon Highlights
+ *
+ *
+ * Licenses:
+ * Open Font License: http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL_web
+ * - for Crete Round, Bitter font(s)
+ */
+@-moz-document domain('toodledo.com') {
+
+
+/* -----------------------------------------------------------------------------
+ * First we load fonts we need
+ */
+
+/* Crete-Round: latin-ext */
+@font-face {
+  font-family: 'Crete Round';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Crete Round'), local('CreteRound-Regular'), url(https://fonts.gstatic.com/s/creteround/v6/ZCcPJiCGOzh84o2siPk48SYE0-AqJ3nfInTTiDXDjU4.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* Crete Round: latin */
+@font-face {
+  font-family: 'Crete Round';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Crete Round'), local('CreteRound-Regular'), url(https://fonts.gstatic.com/s/creteround/v6/ZCcPJiCGOzh84o2siPk48Y4P5ICox8Kq3LLUNMylGO4.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* Bitter: latin-ext */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Bitter Regular'), local('Bitter-Regular'), url(https://fonts.gstatic.com/s/bitter/v12/Qt2dUzVlMd1bCOcZXl06LPesZW2xOQ-xsNqO47m55DA.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* Bitter: latin */
+@font-face {
+  font-family: 'Bitter';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Bitter Regular'), local('Bitter-Regular'), url(https://fonts.gstatic.com/s/bitter/v12/zfs6I-5mjWQ3nxqccMoL2A.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+
+/* -----------------------------------------------------------------------------
+ * Global Font Changes
+ *
+ */
+
+
+body
+, input
+, textarea { /*Overwrite user agent stylesheet*/
+
+    /* Segoe UI looks nicer than Arial */
+    font-family: "/*[[primary_font]]*/", "Segoe UI", Arial, "Helvetica Neue", Helvetica, sans-serif, Georgia, Times, "Times New Roman", serif;
+}
+
+
+/* -----------------------------------------------------------------------------
+ * Task Row Padding (for readability)
+ */
+
+.taskRow.Grid .taskCell
+, #tasks div.cols.row           /* old UI */
+{
+    padding-left:   calc( .2em );
+    padding-top:    calc( .2em );
+    padding-bottom: .1em;
+
+    /* Cascading Overrides */
+    padding-left:   calc( .2em * /*[[grid_density]]*/ );
+    padding-top:    calc( .2em * /*[[grid_density]]*/ );
+}
+
+
+/* -----------------------------------------------------------------------------
+ * Distinct Task Title Font
+ */
+
+.tc_title
+, #tray input.newTitle
+, .tc_title input.cellText
+, .taskTitle                    /* mobile */
+, .taskTitle input
+, .task                         /* old UI */
+{
+    font-family: "/*[[task_title_font]]*/","Crete Round","Bitter","Segoe UI", Arial, "Helvetica Neue", Helvetica, sans-serif, Georgia, Times, "Times New Roman", serif;
+    /*
+     * Other Serif Fonts:
+     *
+     * Calibri
+     * Cambria
+     * Constantia;
+     * Georgia
+     */
+
+    /* Google Fonts
+     * Roboto Slab (serif): http://fonts.googleapis.com/css?family=Roboto+Slab
+     *
+     */
+}
+
+/* make task titles bigger */
+.tc_title
+, #tray input.newTitle
+, .taskTitle                    /* mobile */
+, .task                         /* old UI */
+{
+    font-size: 1.1em !important; /* important needed to override tray newTitle font size */
+}
+
+.taskRow .tc_title.editable input.cellText
+/* you'd think :active will do the job, but NOPE */
+{
+    /* Fix input element width (previously fixed at 83%) */
+    width: calc( 100% - 5px ) !important;
+
+    /* Distinct background color makes it clearer when we're in input mode
+     * (vs. keyboard command mode)
+     * Doubles as a focus highlighter--COOL!
+     */
+
+    background-color: #F8F8BB;
+    background-color: /*[[task_input_bg_color]]*/;
+}
+
+/* border color doesn't like .editable for some reason
+ * FIXME
+ */
+.taskRow .tc_title input.cellText
+{
+    border-color: #E49E26 !important;
+    border-radius: 3px !important;
+}
+
+
+/* -----------------------------------------------------------------------------
+ * Task Row Color
+ */
+
+.taskCell.editable:not(.tc_title)
+, #tasks                        /* old UI */
+{
+    color: slategray;   /* Dim all filled columns (except title, see below) */
+}
+
+/* Dimmer grey for No Tags, No Due Date, No Repeat, etc */
+.taskRow.Grid .taskCell.noval
+{
+   color: #D3D3D3;
+}
+
+/* dim completed tasks */
+.taskCell.completed
+, .taskRow.Mobile.completed .taskTitle
+, .rowcomp .task                  /* old UI */
+{
+    color: silver !important;
+    font-style: italic;
+    /* https://en.wikipedia.org/wiki/Shades_of_gray#Chart_of_computer_web_color_grays */
+}
+
+/* -----------------------------------------------------------------------------
+ * Task Priority Styling
+ */
+
+
+/* override native style so we can re-style only non-completed tasks*/
+.style_pri .pri3 .tc_title
+, .style_pri .pri2 .tc_title
+, .style_pri .pri1 .tc_title
+, .style_pri .pri0 .tc_title
+, .style_pri .pri-1 .tc_title {
+    color:       initial;
+    font-weight: initial;
+    text-shadow: initial;
+}
+
+/* top pri */
+.style_pri .pri3:not(.completed) .tc_title
+, .style_pri .pri3:not(.completed) .tc_title.editable input.cellText   /* style input text too! */
+, .task.pri3                                /* old UI */
+{
+    color: #a61414 !important;
+    color: /*[[pri3_color]]*/ !important;
+    font-weight: bold;
+    text-shadow: #ddd 1px 1px 1px;
+}
+
+/* high pri */
+.style_pri .pri2:not(.completed) .tc_title
+, .style_pri .pri2:not(.completed) .tc_title.editable input.cellText   /* style input text too! */
+, .task.pri2                                /* old UI */
+{
+    color: black !important;
+    color: /*[[pri2_color]]*/ !important;
+    /* Altnernative colors:
+    color: #563c10;
+     */
+    font-weight: bold;
+    text-shadow: none !important;
+}
+
+/* medium pri */
+.style_pri .pri1:not(.completed) .tc_title {
+    color: black !important;
+    color: /*[[pri1_color]]*/ !important;
+}
+
+
+/* low pri */
+.style_pri .pri0:not(.completed) .tc_title
+, .task.pri0                                /* old UI */
+/* NOTE: old UI tagged both Low and Negative Priority tasks as pri0 */
+{
+    color: gray !important;
+    color: /*[[pri0_color]]*/ !important;
+    text-shadow: none;
+}
+
+/* negative pri */
+.style_pri .pri-1:not(completed) .tc_title {
+    color: lightgray !important;
+    color: /*[[pri-1_color]]*/ !important;
+}
+
+
+/* -----------------------------------------------------------------------------
+ * Task Note Styling
+ */
+
+
+/* clearer boundaries on task notes */
+.taskRow .taskNote
+, textarea.editNote
+{
+    border-left: 1px solid grey !important;
+    border-bottom: 1px solid grey !important;
+
+    /* TODO find a better looking font:
+    font-family: "Consolas";
+    */
+}
+
+
+/* -----------------------------------------------------------------------------
+ * Row Divider Styling
+ */
+
+.taskRowDivider
+, .sep                                          /* old UI */
+{
+    padding-top:    calc( .4em );
+    padding-top:    calc( .4em * /*[[grid_density]]*/ );
+    padding-bottom: calc( .2em );
+    padding-bottom: calc( .2em * /*[[grid_density]]*/ );
+}
+
+.taskRowDivider:not(.closed)
+, .sep:not(.closed)                             /* old UI */
+{
+    background-color: white;
+    /* border-bottom: 1px solid #1b75bc; */
+    border-image: linear-gradient(to right, #1b75bc 0%, lightgrey 360px, lightgrey 100%);
+    /* wider:
+    border-image: linear-gradient(to right, #1b75bc 0%, #1b75bc 180px, lightgrey 360px, lightgrey 100%);
+    */
+    /* TODO
+     * other browser specific implementations (webkit, mozilla)
+     * See: https://css-tricks.com/examples/GradientBorder/
+     *
+     *    background-image: -webkit-gradient(linear, 0 0, 100% 0, from(#000), to(transparent));
+          background-image: -webkit-linear-gradient(left, #000, transparent);
+          background-image: -moz-linear-gradient(left, #000, transparent);
+          background-image: -o-linear-gradient(left, #000, transparent);
+     */
+    border-image-slice: 1;
+}
+
+.taskRowDivider:hover
+/* , .taskRowDivider a:hover */
+, .sep a:hover                            /* old UI */
+{
+  color:#333;
+  background-color: whitesmoke;
+}
+
+
+.taskRowDivider a
+, .sep a                                /* old UI */
+{
+    color: #1b75bc;  /* blue instead of gray */
+    font-size: 1.1em;
+    font-weight: normal;
+}
+
+
+.taskRowDivider.closed
+, .sep.closed                           /* old UI */
+, .sep.closed a:hover
+{
+  background-color: #e8e8e8;
+}
+
+.taskRowDivider.closed
+, .sep.closed                           /* old UI */
+{
+  border-bottom-color: #aaa;
+  border-bottom-style:dashed;
+}
+
+.taskRowDivider.closed a
+, .sep.closed a                         /* old UI */
+{
+  color: #666;
+}
+
+/* -----------------------------------------------------------------------------
+ * Text Hover Transitions
+ */
+.taskRowDivider:hover
+/* , .taskCell:hover */ /* possibly overkill for task items */
+, .sep a:hover                          /* old UI */
+{
+  text-shadow: 1px 1px .5em rgba(0,0,0,.25);
+  transition-property: text-shadow;
+  transition-duration: .1s;
+  transition-timing-function: ease;
+}
+
+
+/* -----------------------------------------------------------------------------
+ * Sidebar Styling
+ */
+
+#sidebar .sb_card_header {
+    background: rgba(100,100,100,0.25);
+}
+
+/* these should really be .ems, not % */
+
+#sidebar .sb-card.shortest .badge.four {
+    width: 18% !important;
+}
+
+#sidebar .sb-card.shortest .badge.three {
+    width: 14%;
+}
+
+#sidebar .sb-card.shortest .badge.two {
+    width: 10% !important;
+}
+
+
+/* Distinguish it from main panel */
+#sidebar .sb-card {
+    box-shadow: none;
+    background-color: inherit;
+    /* border-color: #cfdcea; */
+    /* border-color: transparent; */
+
+    /* signify sidebar cards are clickable with a colored tab */
+    /* border-left: #AEC3DD .5em solid; */
+    /* border-left: white .5em solid; */
+}
+
+#sidebar .sb-card.tabon
+{
+    /* border-left: white .5em solid; */     /* white to match selection color */
+    /* border-bottom: 1px solid white; */  /* override default gray */
+}
+
+#sidebar .tabon
+, #sidebar .tab
+{
+    /* width: calc( 100% - 0.5em ); */   /* subtract width used by new left border */
+}
+
+#sidebar .sb-card a {
+    color: #173C60;
+    margin: 0 0 0 .5em !important;     /* a bit more margin than default */
+}
+
+/* Make selected tab more prominent */
+#sidebar .tabon
+{
+    box-shadow: 1px 1px 6px #7a8b9e;    /* slate grey better than grey? */
+    /* box-shadow: 1px 1px 6px #888888; */
+    background-color: white;
+    z-index: 1; /* so it stays on top of the rest of the sidebar */
+}
+
+/* Cleaner look without dark blue tab marker */
+#sidebar .tabon a
+{
+    border-right-color: transparent !important;
+}
+
+/* Shorten the transition duration so the app doesn't seem so sluggish */
+#sidebar .tab {
+    transition: all .1s ease-out;
+}
+
+
+/* -----------------------------------------------------------------------------
+ * Ribbon Highlights
+ */
+
+#ribbon .active {
+    background-color: #B57A15 !important;
+}
+
+/* match the breadcrumb color to ribbon selection color */
+#bread_view {
+    border-left: .5em solid #B57A15
+}
+
+
+
+}

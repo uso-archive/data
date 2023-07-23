@@ -1,0 +1,457 @@
+/* ==UserStyle==
+@name         poe trade slim
+@namespace    USO Archive
+@author       asdf89234
+@description  space saver for official path of exile trade site. somewhat mimics poe.trade style.
+@version      20200621.21.08
+@license      CC-BY-SA-4.0
+@preprocessor uso
+@advanced dropdown default-font "Font Options" {
+    sansserif "Sans-Serif*" <<<EOT /*===============default-font start=================*\/
+/* Override poe font in mod descriptions *\/
+.results:not(.compact) .itemBoxContent .itemName {
+    font-family: "Times New Roman", Times New Roman, Times-Roman, Times, serif;
+    font-size: 12pt;
+}
+.results:not(.compact) .row .middle .itemPopupAdditional, .results:not(.compact) .itemBoxContent .content, .results:not(.compact) .divinationCard .itemBoxContent .explicitModsWrapper {
+    font-family:"Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+}
+/*===============default-font end=================*\/ EOT;
+    default "Default PoE Font" <<<EOT  EOT;
+
+}
+@advanced dropdown item-order "Section Order" {
+    pricefirst "Picture/Price/Desc*" <<<EOT /*===============item-order start=================*\/
+.results:not(.compact) .row .middle {
+    flex: 1 1 auto;
+    order: 3;
+}
+.results:not(.compact) .row .right {
+    flex: 0 0 25%;
+    overflow:hidden;
+}
+/*===============item-order end=================*\/ EOT;
+    defaultorder "Picture/Desc/Price" <<<EOT /*===============item-order start=================*\/
+.results:not(.compact) .row .middle {
+    flex: 1 1 auto;
+}
+.results:not(.compact) .row .right {
+    flex: 0 0 25%;
+    overflow:hidden;
+}
+/*===============item-order end=================*\/ EOT;
+    nopic "Price/Desc/Picture" <<<EOT /*===============item-order start=================*\/
+.results:not(.compact) .row .middle {
+    flex: 1 1 auto;
+    order: -1;
+}
+.results:not(.compact) .row .right {
+    flex: 0 0 25%;
+    overflow:hidden;
+    order:-2;
+}
+/*===============item-order end=================*\/ EOT;
+
+}
+==/UserStyle== */
+@-moz-document regexp(".*pathofexile.com/trade.*") {
+/* === Global Changes === */
+
+/* Hide separators */
+ .separator, .secDescrText, .itemNote, .vaalHeader {
+    display:none;
+}
+/* Resize cols, more space for item text */
+ .results:not(.compact) .resultset .row {
+    display:flex;
+}
+/* Let rates grow in bulk exchange */
+ .results:not(.compact) .row.exchange .left {
+    flex: 1 0 10%;
+    overflow:hidden;
+}
+/* can use order: <num> to rearrange these 2 cols how you like */
+ .results:not(.compact) .row .left {
+    flex: 0 0 10%;
+    overflow:hidden;
+}
+
+/* Top-align item descriptions. */
+.results:not(.compact) .row .middle {
+	align-self: stretch;
+}
+/* Show Additional info (dps). */
+.results:not(.compact) .row .middle {
+    display: flex;
+    flex-direction: column;
+}
+.results:not(.compact) .row .middle .itemPopupContainer {
+    flex: 1 1 auto;
+}
+
+.results:not(.compact) .row .middle .itemPopupAdditional {
+    flex: 0 1 auto;
+    margin-top: 0px;
+}
+/* Shrink header */
+.logo {
+    height:6em;
+}
+.logo a {
+    max-width:10em;
+}
+/*[[item-order]]*/
+
+ .results:not(.compact) .row:not(.row-total) {
+    padding:.25em 0 .25em 0;
+}
+/* remove margin for live search results */
+ .results:not(.compact) .resultset {
+    margin-bottom: 0;
+}
+/* === Left === */
+
+/* "Verified" overlap image to save space, display only on hover. */
+ .results:not(.compact) .newItemContainer .iconContainer:hover .verifiedStatus {
+    display: initial;
+}
+.results:not(.compact) .newItemContainer .iconContainer .verifiedStatus {
+    display: none;
+}
+.results:not(.compact) .left .iconContainer .verifiedStatus {
+    position:absolute;
+    bottom:0;
+    padding:1px 1em;
+    background: #000c;
+}
+.results:not(.compact) .left .iconContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+/* Buttons on Top */
+ .results:not(.compact) .refresh, .results:not(.compact) .copy, .results:not(.compact) .searchBy {
+    z-index: 100;
+}
+/* === Middle === */
+
+/* Shrink item name and decoration */
+.results:not(.compact) .itemBoxContent .itemHeader {
+    display: flex;
+}
+ .results:not(.compact) .itemBoxContent .itemHeader .l:after, .results:not(.compact) .itemBoxContent .itemHeader .r:after {
+    position: static;
+    background-size: 1.2em 1.2em;
+    height: 1em;
+    width: 1.2em;
+}
+.results:not(.compact) .itemBoxContent .itemHeader .itemName, .results:not(.compact) .itemPopupContainer .itemBoxContent .itemName .lc {
+    padding: 0;
+}
+.results:not(.compact) .itemBoxContent .itemHeader .itemName:first-of-type {
+    padding-right: .3em;
+}
+.results:not(.compact) .itemPopupContainer .itemBoxContent .itemHeader {
+    background: none;
+    text-align: left;
+    font-size: 1.2em;
+    padding-left: .25em;
+    padding-top: .1em;
+    height: auto;
+}
+/* Use grid layout to have multiple (2) columns */
+ .results:not(.compact) .itemBoxContent .content {
+    display: grid;
+    grid-template-columns: 2fr 1.3fr;
+    grid-auto-flow: column;
+    padding-top:.1em;
+    padding-bottom:.3em;
+}
+/* mods in col 1, other stats in col 2 */
+ .results:not(.compact) .itemBoxContent .content > div {
+    grid-column-start: 2;
+}
+.results:not(.compact) .itemBoxContent .content [class*=Mod] {
+    grid-column-start: 1;
+}
+/* Color resists and life, including for crafted mods */
+
+/* life mod */
+ .explicitMod > .s[data-field="stat.explicit.stat_3299347043"], .craftedMod > .s[data-field="stat.crafted.stat_3299347043"] {
+    color:#D14E4E;
+}
+/* fire res */
+ .explicitMod > .s[data-field="stat.explicit.stat_3372524247"], .craftedMod > .s[data-field="stat.crafted.stat_3372524247"] {
+    color:#B97123;
+}
+/* cold res */
+ .explicitMod > .s[data-field="stat.explicit.stat_4220027924"], .craftedMod > .s[data-field="stat.crafted.stat_4220027924"] {
+    color:#3F6DB3;
+}
+/* light res */
+ .explicitMod > .s[data-field="stat.explicit.stat_1671376347"], .craftedMod > .s[data-field="stat.crafted.stat_1671376347"] {
+    color:#ADAA47;
+}
+/* color implicits for visibility */
+ .itemBoxContent .content .implicitMod {
+    color:#b4b4ff;
+}
+/* highlight "Corrupted" text */
+ .unmet {
+    background:#ff000040;
+}
+/* hide incubator bar */
+ .row .incubated {
+    padding: 0px 6.08519px;
+}
+ .row .incubated *:not(:first-child) {
+    display:none;
+}
+/* highlight enchants and crafted mods */
+ .enchantMod, .craftedMod {
+    background:#6b6bd730;
+}
+/* left align text */
+ .results:not(.compact) .itemBoxContent .content {
+    text-align:left;
+}
+/* Make mod ranges more visible (solid background) */
+ .results:not(.compact) [class*=Mod] {
+    position:relative;
+}
+.results:not(.compact) [class*=Mod] .l > .d {
+    right:0;
+    z-index:100;
+    position:relative;
+    white-space:nowrap;
+	font-size:10pt;
+}
+.results:not(.compact) [class*=Mod]:hover .l {
+    font-size:0%;
+}
+
+.results:not(.compact) [class*=Mod]:hover .lc.l > .d,
+.results:not(.compact) [class*=Mod]:hover .lc.s,
+.results:not(.compact) [class*=Mod]:hover .lc.r > .d {
+    background: #1d1d1d;
+}
+
+/* Right align properties as much as possible */
+ .results:not(.compact) .displayProperty > .lc, .results:not(.compact) .requirements > .lc {
+    display:flex;
+    justify-content: space-between;
+    color: #A38D6D;
+}
+.results:not(.compact) .displayProperty > .lc:not([data-field="ilvl"]):not([data-field="talisman_tier"]) {
+    color:transparent;
+}
+.results:not(.compact) .displayProperty > .lc:not([data-field="ilvl"]):not([data-field="talisman_tier"]) > *:first-child {
+    flex:1;
+    color: #A38D6D;
+}
+.results:not(.compact) .displayProperty > .lc[data-field="ilvl"] > *:first-child, .results:not(.compact) .displayProperty > .lc[data-field="talisman_tier"] > *:first-child, .results:not(.compact) .requirements > .lc > *:first-child {
+    flex: 1;
+    text-align:right;
+}
+.results:not(.compact) .displayProperty > .lc[data-field]:not([data-field="ilvl"]):not([data-field="talisman_tier"]) > span:first-child:after {
+    content:":";
+}
+.results:not(.compact) .requirements > .lc > *:not(:first-child):before {
+    content:"\00a0";
+}
+/* Align mod tiers */
+ .results:not(.compact) .itemBoxContent .content [class*=Mod] {
+    display:flex;
+    justify-content: space-between;
+}
+.results:not(.compact) .itemBoxContent .content [class*=Mod] .l {
+    position:absolute;
+	flex: 0 0 auto;
+    order: 3;
+	text-align:right;
+    right:0;
+}
+/* hide prefix/suffix names */
+ .results:not(.compact) [class*=Mod]:hover .r {
+    position: absolute;
+    flex: 1 1 auto;
+    overflow: visible;
+    text-align: left;
+    order: 2;
+    left: 100%;
+	padding: 0;
+}
+ .results:not(.compact) [class*=Mod]:hover .r > .d {
+    white-space:nowrap;
+}
+.results:not(.compact) .itemBoxContent .content [class*=Mod] .s {
+    flex: 0 0 auto;
+    order:1;
+	width: 100%;
+}
+/* Hide xp bar number */
+ .results:not(.compact) .experienceBar + span {
+    display:none;
+}
+/* align gem xp bar */
+ .results:not(.compact) .newItemPopup .experienceBar {
+    margin-left: 0;
+}
+/*[[default-font]]*/
+
+/* === Right === */
+
+/* Remove padding in price section*/
+ .results:not(.compact) .row .details .price > span {
+    padding:0;
+}
+.results:not(.compact) .row .details .info {
+    padding: 0 0 .2em 0;
+}
+.results:not(.compact) .row .details .btns {
+    padding:0;
+    margin-top:-.5em;
+}
+.results:not(.compact) .row .details .btns > span {
+    margin-top:.5em;
+    width:auto;
+}
+/* shrink ignore button*/
+ .results .row .details .btns .ignore-btn {
+    color:transparent;
+    background: url(https://web.poecdn.com/image/UI/button/close-normal.png);
+    background-repeat: no-repeat;
+    background-size: 1.3em 1.3em;
+    width:1.5em;
+    background-position: center;
+    border:none;
+}
+/* Asking/Exact text condensed to 1 letter on same line */
+ .results:not(.compact) .row .details .price br {
+    display:none;
+}
+.results:not(.compact) .price-label {
+    color: #e9cf9f;
+}
+.results:not(.compact) .row .details .price br + span {
+    font-size:1.5em;
+}
+.results:not(.compact) .price .price-label {
+    font-size:0;
+}
+.results:not(.compact) .price span:first-letter {
+    font-size:initial;
+}
+.results:not(.compact) .price .price-label:after {
+    content:":";
+    font-size:16pt;
+    margin-right:.3em;
+}
+/* If "No Price Set" display that instead of first letter only */
+ .results:not(.compact) .price .price-label:only-child {
+    display:block
+}
+.results:not(.compact) .price .price-label:only-child:after {
+    content:"o Price Set";
+    font-size:12pt;
+}
+/* === Div Card === */
+
+/* hide decoration */
+ .results:not(.compact) .divinationCard .itemBoxContent, .results:not(.compact) .divinationCard {
+    background:none;
+    height:100%;
+}
+.results:not(.compact) .divinationCard .cardFace, .results:not(.compact) .divinationCard .flavourTextWrapper, .results:not(.compact) .divinationCard .stackSize {
+    display:none;
+}
+.results:not(.compact) .divinationCard .itemName {
+    color:#e9cf9f;
+}
+/* position remaining text */
+ .results:not(.compact) .divinationCard, .results:not(.compact) .divinationCard .itemBoxContent .explicitModsWrapper .explicitModsContainer {
+    display:contents;
+}
+.results:not(.compact) .divinationCard .itemBoxContent .explicitModsWrapper {
+    position:relative;
+    text-align:left;
+    padding-top:.3em;
+    margin-left:0;
+	display:inline;
+}
+/* Add background to match other items */
+.results:not(.compact) .divinationCard {
+    background:#000000CC;
+    display:inline-block;
+	max-width:none;
+}
+/* POE Trade Enhancer CSS Below Here */
+.results:not(.compact) .row .details .gs-wrapper {
+    flex: 0 1 auto;
+}
+/* An exception: this also affects compact views. */
+.results :not(.exchange) .row .details .price,
+.results .exchange .row .details.left .price {
+    display: flex;
+}
+.results .exchange .row .details.left .price {
+    display: flex;
+    flex-flow: column wrap;
+    max-height: 4em;
+    align-content: flex-end;
+}
+.results:not(.compact) .row .details .gs-wrapper .chaosEquiv,
+.results:not(.compact) .row .details .gs-wrapper .gs-style {
+    padding: 0 1px 0 2px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+.results:not(.compact) .row .details .gs-wrapper:nth-child(2) span,
+.results .exchange .row .details.left .price .gs-wrapper:nth-child(3) span {
+    margin-left: 3px;
+}
+.results:not(.compact) .row .details .gs-wrapper .chaosEquiv .currency b,
+.results:not(.compact) .row .details .gs-style b {
+    display: none;
+}
+.results:not(.compact) .row .details .gs-wrapper .gs-more {
+    word-spacing: 2em;
+    max-width: 1.4em;
+    text-overflow: clip;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.results:not(.compact) .row .details .price .s {
+    flex: 1 1 auto;
+}
+
+.results:not(.compact) .row .details .currency-image span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    max-width: calc(100% - 8.5em);
+    display: inline-block;
+    vertical-align: middle;
+}
+.results:not(.compact) .row .details .btns {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+.results:not(.compact) .row .details .btns .pull-right,
+.results:not(.compact) .row .details .ignore-btno {
+    flex: 0 1 auto;
+    align-self: flex-end;
+}
+.results:not(.compact) .row .details .btns .pull-left {
+    flex: 0 1 auto;
+    align-self: flex-start;
+}
+.results:not(.compact) .row .details .btns .clear {
+    display: none;
+}
+}

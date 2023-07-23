@@ -1,0 +1,226 @@
+/* ==UserStyle==
+@name         MDN: Compat table: first and compact
+@namespace    USO Archive
+@author       myf
+@description  Moves compatibility and specs tables to the top and makes them compact in articles at developer.mozilla.org.
+@version      20200730.08.31
+@license      CC0-1.0
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("developer.mozilla.org") {
+/*
+
+https://userstyles.org/styles/177139/edit
+
+
+MDN: Compat table: first and compact
+
+
+general structure of the article is:
+
+article#wikiArticle
+ div
+ p
+ (...h2,p,h3,pre...)
+ h2#Specifications
+ table.standard-table
+ h2#Browser_compatibility // ← "Browser compatibility"
+ div.hidden // invisible "send PR" message
+ div // sadly, .bc-data is now wrapped in this :(
+  div.bc-data // ← ← ← ← ← this is it!
+ // there seems to be no div after this point, only H2 and UL
+ // so #Browser_compatibility ~ div seems to be viable selector
+ h2.See_also // leave on the bootm. 
+ ul
+
+*/
+/*
+ pull BC table to the top
+*/
+article#wikiArticle {
+	display: flex;
+	flex-direction: column;
+}
+
+#Browser_compatibility,
+#Browser_compatibility ~ * {
+	order: -2;
+}
+
+/*
+ return "see also" block back to the end 
+*/
+#Browser_compatibility ~ #See_also,
+#Browser_compatibility ~ #See_also ~ * {
+	order: 1
+}
+
+/*
+ but pull Specs below compat
+*/
+#Specifications,
+#Specifications + table.standard-table {
+	order: -1;
+}
+
+/*
+ remake Specs table into condensed condensed and reversed "list"
+*/
+.standard-table tbody { display: flex;
+	flex-direction: column-reverse;
+}
+.standard-table th,
+.standard-table td br { display: none !important;
+}
+.standard-table td {
+	background-color: transparent !important;
+}
+.standard-table td,
+.standard-table td * {
+	display: inline !important;
+	padding: 0;
+	border: none !important;
+	box-shadow: none !important;
+}
+.standard-table td:nth-child(1) small {
+	padding-left: 1ch;
+}
+.standard-table td:nth-child(2) {
+	float: left;
+	clear: left;
+	padding-right: 0.5ch;
+	background-color: #fff;
+	white-space: nowrap;
+	width: 3em;
+}
+.standard-table td:nth-child(2) [class^="spec-"] {
+	width: 2em;
+	background-color: #eeeeee !important;
+	font-size: 0;
+	position: relative;
+	z-index: 1;
+}
+.standard-table td:nth-child(2) [class^="spec-"]:hover {
+	font-size: 1rem;
+	box-shadow: 0 0 1ch #fff;
+	padding-right: 1ch;
+}
+.standard-table td:nth-child(2) [class^="spec-"]::before {
+	margin: 0;
+	padding: 0;
+	padding-right: 1ch;
+	font-size: 1rem;
+}
+
+
+/*
+ "Browser compatibility" heading: compact, in table
+*/
+#Browser_compatibility {
+	margin-top: 0;
+	border-top: none;
+	padding-top: 0;
+	/* margin-bottom: -1rem; */
+	opacity: 0.6;
+	font-size: 1rem;
+	position: relative;
+	z-index: 1;
+	padding-left: 0.3rem;
+}
+
+/*
+ <NUKAGE>
+*/
+.bc-legend,
+#Specifications,
+#Browser_compatibility {
+	display: none;
+}
+/*
+ </NUKAGE>
+*/
+/* compact table headers - icons only */
+.bc-table .bc-browsers th {
+	height: 2rem;
+	overflow: hidden;
+}
+
+/* overflowing headers on hover*/
+.bc-table .bc-browsers th:hover {
+	overflow: visible;
+}
+.bc-browsers th .bc-head-txt-label {
+	background-color: #e9eef1;
+	width: auto;
+	height: auto;
+	bottom: 1em;
+	position: absolute;
+	margin: 0;
+	transform-origin: center left;
+}
+.bc-browsers th:not(:hover) .bc-head-txt-label {
+	color: transparent;
+}
+
+/* compact cells */
+.text-content .bc-table td,
+.text-content .bc-table th {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+/* history dropdown toggle smaller */
+.bc-history-link.only-icon {
+	border-top: none;
+	text-align: right
+}
+.ic-history {
+	border-right: 0.35rem solid transparent
+}
+.bc-has-history.active .bc-history-link {
+	max-width: 2em
+}
+
+/* compact table legend */
+.bc-legend {
+	margin-top: 0;
+	margin-bottom: 1rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px dotted;
+}
+.bc-legend dl {
+	display: flex;
+	max-width: none;
+	margin-bottom: 0;
+}
+.bc-legend dd {
+	margin: 0;
+	padding: 0 5px;
+}
+.bc-legend .bc-supports {
+	margin: 0;
+	min-width: 1em;
+	min-height: 1em;
+}
+.bc-legend .bc-level {
+	display: none
+}
+
+
+
+/* some more compacting things*/
+.text-content article[id="wikiArticle"] > h2 {
+	position: relative;
+	margin-top: 1rem;
+	padding-top: 1rem;
+	border-top: 3px solid #3d7e9a;
+}
+
+.text-content dd:last-child {
+	margin-bottom: 0;
+}
+
+/*
+END of MDN: Compat table: first and compact
+*/
+}

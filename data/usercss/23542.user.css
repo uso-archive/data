@@ -1,0 +1,83 @@
+/* ==UserStyle==
+@name         HBO Forum Enhancer
+@namespace    USO Archive
+@author       Arithmomaniac
+@description  This script cleans up extra space in the Halo.Bungie.Org forums by  - Hiding extra elements at the top of the page  - Widening the text body (optional)  - Forcing images to fit (optional)    While it is NO LONGER a prerequisite, It plays nice with the HBO Forum Enhancer Greasemonkey script ( http://userscripts.org/scripts/show/62016 ).
+@version      20110509.08.40
+@license      NONE
+@preprocessor uso
+@advanced dropdown imgwidth "Maximum image width" {
+    off "off" <<<EOT /*image shrinking is off*\/ EOT;
+    auto-width__requires "auto-width (requires Greasemonkey script)" <<<EOT /*use HBO Forum Enhancer to auto-shrink large images*\/
+ EOT;
+    post_width "post width" <<<EOT #glob_wrapbbs img {
+	max-width:			100% 	!important;
+} EOT;
+    1000_px "1000 px" <<<EOT #glob_wrapbbs img {
+	max-width:			1000px 	!important;
+} EOT;
+
+}
+@advanced dropdown pagewidth "Post width" {
+    510px__default_ "510px (default)" <<<EOT 510px EOT;
+    750px__recommended_ "750px (recommended)" <<<EOT 750px EOT;
+    1000px "1000px" <<<EOT 1000px EOT;
+    full_screen_width "full screen width" <<<EOT none EOT;
+
+}
+@advanced dropdown hidechallengebox "Hide challenge box" {
+    Yes "Yes" <<<EOT /* This section removes the challenges box.*\/
+body > table tr:first-child > td:first-child + td + td{
+	display : 	none 	!important;
+}
+
+body > table{
+	width : 500px !important;
+}
+/* end challenges box removal *\/
+
+/* end challenges box removal *\/ EOT;
+    No "No" <<<EOT /*challenge box is shown*\/ EOT;
+
+}
+==/UserStyle== */
+/*
+HBO Forum Enhancer Greasemonkey Script
+copyright 2009+, Arithmomaniac (http://scr.im/2041)
+licensed MPL 1.1+ / GPL 2.0+ / LGPL 2.1+ / CC BY-SA 3.0+ US
+*/
+
+@namespace url(http://www.w3.org/1999/xhtml);
+
+@-moz-document domain("carnage.bungie.org") {
+
+/*widens page; keeps it fit to window*/
+div.msg_headln, div.msg_delete, div.msg_gbnavbar, div#prof_poster, div.msg_userln, div#ind_topinf, div#glob_footerbbs, div.msg_link, div#prof_text, div.msg_text{
+	width:				100% 	!important;
+	max-width:			/*[[pagewidth]]*/ 	!important;
+}
+
+/*[[imgwidth]]*/
+
+#glob_wrapbbs img:active {
+	max-width: 			none 	!important;
+}
+
+/*kills unnecessary elements at top/side of page*/
+body > table tr:first-child + tr + tr + tr + tr + tr,
+body > table tr:first-child + tr + tr + tr + tr + tr + tr,
+body > table tr:first-child + tr + tr + tr + tr + tr + tr + tr + tr + tr + tr + tr,
+body > table tr:first-child + tr + tr + tr + tr + tr + tr + tr + tr + tr + tr + tr + tr,
+#forumnews{
+	display : 	none 	!important;
+}
+
+/*hides pre-postbox messages*/
+#misc_msgform form > hr + table, /*gbook*/ 
+#msg_form form > hr + table{ /*single msg*/ 
+	display: none !important
+}
+
+/*[[hidechallengebox]]*/
+
+}

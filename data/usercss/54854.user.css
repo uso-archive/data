@@ -1,0 +1,329 @@
+/* ==UserStyle==
+@name         autohide the menu & sidebar [CBS News]
+@namespace    USO Archive
+@author       hideheader
+@description  (1) Collapse the header and footer into thin horizontal strips at the top and bottom of the page; they expand and reappear when the mouse hovers over them.  (2) Move the sidebar on the right of the page to the left and collapse it into a thin vertical strip at the left edge of the article; the sidebar expands and reappears when the mouse hovers over it.  (3) Move the article "filmstrip" from the top of the page to the bottom.  (4) Remove the social networking links at the top of the page (those below the article remain)
+@version      20160113.15.13
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("www.cbsnews.com") {
+
+#contentAux,
+FOOTER#rbFooter,
+#cbsFooterWrap {
+  z-index: 11; /* else "Play VIDEO" link (.meta) is on top */
+  }
+HEADER#rbHeader,
+#cbsHeaderWrap,
+#contentAux:hover {
+  z-index: 12; /* else sidebar is on top */
+  }
+
+/* - - - - auto-hide header - - - - */
+
+HEADER#rbHeader,
+#cbsHeaderWrap {
+ position: fixed !important; top: 0; left: 0;
+/*-- clip: rect(0, 50mm, 3mm, 16px);--*/
+  background: white;
+  clip: rect(0, 2mm, 20mm, 0);
+  border-left: 2.2mm solid red !important;
+/*-- z-index: 12;--*/
+  /* else story "filmstrip" (#storyStrip {z-index:0}) is on top */
+  transition: clip .3s .8s linear;
+/*--  transition-property: clip, background;--*/
+  transition-property: clip, border-left-width;
+  transition-timing-function: linear, step-end;
+}
+HEADER#rbHeader:hover,
+#cbsHeaderWrap:hover {
+ clip: auto;
+ clip: rect(0, 1920px, 500px, 0);
+  border-left-width: 0 !important;
+/*--  background: white;--*/
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+}
+
+
+/* - - - - auto-hide footer - - - - */
+
+body {position: relative}
+
+FOOTER#rbFooter,
+#cbsFooterWrap {
+ position: absolute; bottom: 0px;
+  background-color: white !important;
+ height: /*--3mm--*/20mm !important; overflow: hidden;
+  clip: rect(0, 2mm, 1080px, 0);
+  border-left: 2.2mm solid red !important;
+  transition: height .3s .8s linear;
+  transition-property: clip, border-left-width, height;
+  transition-timing-function: linear, step-end;
+  }
+FOOTER#rbFooter:hover,
+#cbsFooterWrap:hover {
+  height: /*--251px--*/421px !important;
+  clip: rect(0, 1039px, 1080px, 0);
+  border-left-width: 0 !important;
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+}
+
+#cbsFooter {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  }
+#cbsFooterWrap {margin-bottom:/*-- -3mm--*/-15px !important}
+FOOTER#rbFooter {margin-bottom: -17px !important}
+ /* else a gap below the footer - dunno why */
+
+#cbsSMPB {display: none !important}
+ /* "Connect with CBS News" bar that floats at bottom of screen */
+
+
+/* - - - - move article "filmstrip" below article - - - - */
+
+#contentMain {position: relative}
+#storyStrip {
+ position: absolute !important; bottom: 0px;
+}
+/*--#contentBody, #contentAux {margin-bottom: 20mm !important}--*/
+
+
+#rb_wrap {position: relative}
+#dashboard {
+  position: absolute; bottom: 0;
+  z-index: 1 !important; /* 400000? really? */
+  }
+#dashboard ~ :last-child {
+  padding-bottom: 204px !important;
+  }
+
+/* - - - - auto-hide sidebar - - - - */
+
+#contentAux {
+  position: fixed !important; left: 0; top: 0;
+  height: 100%; overflow-y: auto; resize: horizontal;
+  margin: 0 !important;
+  background-color: white;
+/*--  z-index: 11; /*else "Play VIDEO" link (.meta) is on top */
+/*--  clip: rect(0, 3mm, 1080px, 0);
+  border-left: 3mm dotted lightblue !important;--*/
+  clip: rect(0, 2mm, 1080px, 0);
+  border-left: 2.2mm solid lightblue !important;
+  transition: clip .3s .8s linear;
+  transition-property: clip, border-left-width, z-index;
+  transition-timing-function: linear, step-end, step-end;
+ padding: 0 1.5em 0 .5em !important;
+}
+#contentAux:hover {
+  clip: rect(0, 500px, 1080px, 0);
+  border-left-width: 0 !important;
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start, step-start;
+}
+
+#contentAux .carouselSlide[style*='display: block']
+ {visibility: hidden !important}
+#contentAux:hover .carouselSlide[style*='display: block']
+ {visibility: visible !important}
+ /* hide slideshow photo when the sidebar is collapsed (site sets both display: and visibility: for the slides) */
+
+
+/** no adverts **/
+#leaderboard,
+.advertisement,
+#videoAd,
+[id^="cbsiAd"],
+IFRAME[src*="bwp.cbsnews.com"],
+
+/* - - - - no social - - - - */
+.mostShared .countNumber,
+.mostShared .countIncrement,
+.mostPopular .countNumber,
+.mostPopular .countIncrement,
+#inlineSocialBarTopPlaceholder + .shareBar,
+#inlineSocialBarBottomPlaceholder + .shareBar,
+#socialToolBarTop,
+ /* don't Tweet it until you read it */
+.bnFBLink, .bnTWLink,
+
+/* - - - - no comment - - - - */
+.commentBubble,
+.twoColContentRight .twoColContentLink + A,
+.commentTeaser,
+#postComments,
+#postCommentsToggle,
+
+/* - - - - no syndicated "content" - - - - */
+#nrelate_related_placeholder,
+[class*="nrelate"],
+
+.\. {display: none !important}
+
+}
+
+@-moz-document url-prefix("http://www.cbsnews.com/news/"),
+url-prefix("http://www.cbsnews.com/us/") {
+/* new layout everywhere? maybe... */
+.container > .row > .row > .col-12 > .row > .col-4,
+.site-footer {z-index: 4}
+.container > .row > .row > .col-12 > .row > .col-4:hover,
+.site-header {z-index: 5}
+  /* else .meta-label is on top */
+
+.site-header,
+.container > .row > .row > .col-12 > .row > .col-4,
+.site-footer {
+  position: fixed !important; left: 0; top: 0;
+  background-color: white;
+  clip: rect(0, 2mm, 1080px, 0);
+  border-left: 2.2mm solid red;
+  transition: .3s .8s;
+  transition-property: border-left-width, clip, z-index, height;
+  transition-timing-function: step-end, linear;
+}
+.site-header:hover,
+.container > .row > .row > .col-12 > .row > .col-4:hover,
+.site-footer:hover {
+  clip: rect(0, 1024px, 1080px, 0);
+  border-left-width: 0;
+  transition-timing-function: step-start, linear;
+  transition-delay: 0s;
+}
+
+
+/** autohide the sidebar **/
+.container > .row > .row > .col-12 > .row > .col-4 {
+  border-left-color: blue;
+  padding: 0 10px;
+  margin-left: 0 !important;
+  width: 338px !important;
+  height: 100%; overflow-y: auto;
+}
+.container > .row > .row > .col-12 > .row > .col-4:hover {
+  clip: rect(0, 338px, 1080px, 0);
+}
+
+
+/*.article*/#article .title {font-size: 300% !important; font-weight: normal !important;}
+
+/** autohide the footer **/
+.site-footer {
+  top: auto; bottom: 0;
+  height: 15mm;
+}
+.site-footer:hover {
+  height: 221px;
+}
+
+
+/** no ads **/
+[class^="ad-"],
+
+/** no social **/
+.social,
+#author + .links,
+
+/** no comment **/
+#comments,
+.callout-figure,
+.media-figure > .number,
+.meta-label.social-count,
+.meta-label.view-count,
+
+.\. {display:none!important}
+
+}
+
+
+@-moz-document url-prefix("http://www.cbsnews.com/videos/") {
+/* new layout everywhere? maybe... */
+#col-video-nav,
+.site-footer-video {z-index: 251}
+#col-video-nav:hover,
+.site-header {z-index: 252}
+  /* else .h2-container is on top */
+
+.site-header,
+#col-video-nav,
+.site-footer-video {
+  position: fixed !important; left: 0; top: 0;
+  background-color: white;
+  clip: rect(0, 2mm, 1080px, 0);
+  border-left: 2.2mm solid red;
+  transition: .3s .8s;
+  transition-property: border-left-width, clip, z-index, height;
+  transition-timing-function: step-end, linear;
+}
+.site-header:hover,
+#col-video-nav:hover,
+.site-footer-video:hover {
+  clip: rect(0, 1024px, 1080px, 0);
+  border-left-width: 0;
+  transition-timing-function: step-start, linear;
+  transition-delay: 0s;
+}
+
+
+/** autohide the sidebar **/
+#col-video-nav {
+  border-left-color: blue;
+  width: 338px !important;
+}
+#col-video-nav:hover {
+  clip: rect(0, 338px, 1080px, 0);
+}
+
+#col-video-list {
+  display: flex;
+  flex-direction: column;
+}
+#col-video-list > .searchBoxWrap,
+#col-video-list > .category-tabs {flex: none}
+#col-video-list > .playlist-container {
+  flex: auto;
+  height: auto !important;
+}
+#col-video-list > .playlist-container > .playlist {
+  overflow: hidden !important;
+}
+
+#col-video-nav,
+#container-video-list,
+#col-video-list {height: 100%}
+
+#col-single-video {float: none !important;}
+
+
+/** autohide the footer **/
+.site-footer-video {
+  top: auto; bottom: 0;
+  height: 15mm;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0 !important;
+  background-color: white !important;
+  padding-left: 10px;
+}
+.site-footer-video:hover {
+  height: 226px;
+}
+
+
+/** no ads **/
+[class^="ad-"],
+
+/** no social **/
+.social,
+
+/** no comment **/
+#comments,
+
+.\. {display:none!important}
+
+.single-video H1 {font-size: 300% !important; font-weight: normal !important;}
+
+}

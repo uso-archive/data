@@ -1,0 +1,241 @@
+/* ==UserStyle==
+@name         （已失效）Bili 浅色宽屏模式/选集分P完整名称/裁剪左右黑边/隐藏登录弹窗
+@namespace    USO Archive
+@author       C55uyes
+@description  （已失效）bilibili 亮瞎眼/日间/浅色模式加强版  1. 浅色视频背景，包括宽屏模式。  2. 选集/分P/分集名称完整显示（选集列表中当前分P以及鼠标悬停时）。  3. 左右两侧有黑边的视频画面，可以裁剪或者反色遮罩，只能同时选其中一种。可自定义裁剪宽高比。  4. 登录弹窗默认只在悬停时显示。  - 不支持：bwp-video标签（HEVC播放策略）、番剧（/bangumi/play）、合集列表（collection）。  + bilibili 如果界面改版，本样式很可能会失效不适用不兼容。  + 如果使用stylus，复制下方的源码然后手动导入，或从uso.kkx安装，体验更佳。  + 本样式未经测试，出现bug很正常。
+@version      20220126.19.28
+@license      NONE
+@preprocessor uso
+@advanced dropdown hack "(安装来源/Which Site)" {
+    ignore1 "userstyles.org*" <<<EOT /* EOT;
+    ignore2 "userstyles.world" <<<EOT  EOT;
+
+}
+@advanced dropdown bl_mask "两侧黑边-遮罩模式/side-mask-mode" {
+    mask_on "开启/Yes (default)*" <<<EOT /**\/ EOT;
+    mask_off "关闭/No" <<<EOT /* EOT;
+
+}
+@advanced dropdown bl_crop "两侧黑边-裁剪模式/side-crop-mode" {
+    crop1 "关闭/No (default)*" <<<EOT /* EOT;
+    crop2 "开启/Yes" <<<EOT /**\/ EOT;
+
+}
+@advanced dropdown eg_ar "(宽高比参考样例/AR)" {
+    sar_11 "1*" <<<EOT 1/* EOT;
+    sar_43 "4/3" <<<EOT 4/3/* EOT;
+    sar_96 "9/16" <<<EOT 9/16/* EOT;
+    sar_34 "3/4" <<<EOT 3/4/* EOT;
+    sar_69 "16/9" <<<EOT 16/9/* EOT;
+
+}
+@advanced text bl_sar "自定义裁剪宽高比/MAR" "1"
+@advanced text bl_dar "自定义视频宽高比/OAR" "16/9"
+@advanced text bl_dt "宽高比误差修正/delta" "0.5%"
+==/UserStyle== */
+/* ==UserStyle==
+@name           Bili Light Plus Plus
+@namespace      github.com/openstyles/stylish
+@version        1.3.8-dev
+@description    -dev-Beta-stylish
+@author         C55uyes
+@license        CC-BY-NC-SA
+
+@advanced dropdown hack "(安装来源/Which Site)" {
+    ignore1 "userstyles.org (default)*" <<<EOT /* EOT;
+ignore2 "userstyles.world" <<<EOT  EOT;
+
+}
+
+@advanced dropdown bl_normal_bg "浅色版视频背景？/video light background?" {
+	bg_on "Yes (default)*" <<<EOT  EOT;
+bg_off "No" <<<EOT /* EOT;
+
+}
+
+@advanced dropdown bl_mask "两侧黑边-遮罩模式/side-mask-mode" {
+    mask_off "关闭/No (default)*" <<<EOT /* EOT;
+mask_on "开启/Yes" <<<EOT /**\/ EOT;
+
+}
+@advanced dropdown bl_crop "两侧黑边-裁剪模式/side-crop-mode" {
+    crop_off "关闭/No (default)*" <<<EOT /* EOT;
+crop_on "开启/Yes" <<<EOT /**\/ EOT;
+
+}
+
+@advanced dropdown bl_sar "裁剪宽高比/MAR" {
+    sar_11 "1*" <<<EOT 1/* EOT;
+sar_69 "16/9" <<<EOT   16/9/* EOT;
+sar_43 "4/3" <<<EOT    4/3/* EOT;
+sar_96 "9/16" <<<EOT   9/16/*  EOT;
+sar_34 "3/4" <<<EOT    3/4/* EOT;
+sar_00 "自定义/custom" <<<EOT /*[[bl_sar_inp]]*\//* EOT;
+}
+@advanced dropdown bl_dar "视频宽高比/OAR" {
+    dar_69 "16/9*" <<<EOT 16/9/* EOT;
+dar_43 "4/3" <<<EOT       4/3/* EOT;
+dar_11 "1" <<<EOT         1/* EOT;
+dar_96 "9/16" <<<EOT      9/16/*  EOT;
+dar_34 "3/4" <<<EOT       3/4/* EOT;
+dar_00 "自定义/custom" <<<EOT /*[[bl_dar_inp]]*\//* EOT;
+}
+
+@var text bl_sar_inp "自定义裁剪宽高比/MAR" 1/9
+@var text bl_dar_inp "自定义视频宽高比/OAR" 1/9
+@var text bl_dt "宽高比误差修正/delta" 0.5%
+
+==/UserStyle== */
+
+
+@-moz-document domain("bilibili.com") {
+    /* version 1.0.1 */
+    /*[hide-popover]*/
+    /*TODO
+    - opacity 1s
+    */
+    div[id^=van-popover][role=tooltip]
+    ,div.login-tip
+    {
+        transition: 1s;
+    }
+    div[id^=van-popover][role=tooltip]:not(:hover)
+    ,div.login-tip:not(:hover)
+    ,div.bili-header ul.right-entry>li.right-entry-item:first-of-type
+    >li.v-popover-wrap:not(:hover)>div.v-popover
+    {
+        filter:opacity(0);
+    }
+}
+
+@-moz-document url-prefix("https://www.bilibili.com/video/"){
+    /* version 1.0.2 */
+    /*[expand-part-name]*/
+        /*div#multi_page>div.cur-list>ul>li:is(:hover, .on)/**/
+        /*,div#multi_page>div.cur-list>ul>li.on
+        >a>div.clickitem>div.link-content>span.part*/
+    div#multi_page>div.cur-list>ul>li:hover
+    >a>div.clickitem>div.link-content>span.part
+    ,div#multi_page>div.cur-list>ul>li.on
+    >a>div.clickitem>div.link-content>span.part
+    {
+        _overflow:scroll;
+        white-space:pre-line;
+        line-height:1.7;
+    }
+        /*div#multi_page>div.cur-list>ul>li:is(:hover, .on)/**/
+        /*,div#multi_page>div.cur-list>ul>li.on*/
+    div#multi_page>div.cur-list>ul>li:hover
+    ,div#multi_page>div.cur-list>ul>li.on
+    {
+       height:auto;
+    }
+}
+
+@-moz-document url-prefix("https://www.bilibili.com/video/") {
+    /* version 1.3.8+ */
+    /*TODO
+    + @text dt
+    - @bl_bg
+    + fix :is()
+    */
+    
+    /*[light-theater]*/
+    /*ASSERT {
+        --bg3:var(--Ga1);
+        --bg1:var(--Wh0);
+        --Wh0:#FFFFFF;
+        --Ga1:#F1F2F3;
+    }*/
+    .bilibili-player-video
+    {
+        background:var(--bg3);/**/
+    }
+    #bilibiliPlayer>div.bilibili-player-area
+    >div.bilibili-player-video-wrap
+    {
+        /*[[bl_normal_bg]]*/background:var(--bg1);/**/
+    }
+    
+    
+    /*[crop-side-borders]*/
+    /*test/beta*/
+    .bilibili-player-video
+    {
+        isolation:isolate;
+        --sar:/*[[bl_sar]]*/;
+        --dt: /*[[bl_dt]]*/;
+        --dar:/*[[bl_dar]]*/;
+    }
+    /*{
+        --sar:(/*[[bl_sar]]*\/);
+        --dt:(/*[[bl_dt]]*\/);
+        --dar:(/*[[bl_dar]]*\/);
+        --sar:1;
+        --dt:.5%;
+        --dar:16/9;
+    }*/
+    
+    
+    /*[if-bl-mask]*//*[[bl_mask]]*/
+    .bilibili-player-video-wrap:hover .bilibili-player-video::after
+    ,.bilibili-player-video-wrap:hover .bilibili-player-video::before
+    {
+        width:0;
+        transition: width 1s;
+    }
+    .bilibili-player-video::before
+    ,.bilibili-player-video::after
+    {
+        height:100%;
+        width: calc((100%*(1 - (var(--sar))/(var(--dar))))/2 - var(--dt));
+        transition: width 1s;
+        background:var(--bg3);
+        position:absolute;
+        content:"";
+        z-index:1;
+        mix-blend-mode:difference;
+        _mix-blend-mode:color-dodge;
+    }
+    .bilibili-player-video::after
+    {
+        right:0;
+    }
+    :fullscreen .bilibili-player-video::after
+    ,:fullscreen .bilibili-player-video::before
+    {
+        height: calc((100vw/(var(--dar)))*(var(--sar)));
+        margin-top: calc((100vh - ((100vw/(var(--dar)))*(var(--sar))))/2);
+    }
+    /*#bilibiliPlayer.mode-fullscreen .bilibili-player-video::before/**/
+    /*[end-of-bl-mask]*/
+    
+    
+    /*[if-bl-crop]*//*[[bl_crop]]*/
+    #bilibiliPlayer .bilibili-player-video-wrap:hover .bilibili-player-video > video 
+    ,#bilibiliPlayer .bilibili-player-video-wrap:hover .bilibili-player-video > bwp-video 
+    {
+        transition: width 1s;
+        width:100%;
+        _width:auto;
+        _margin:0;
+        _object-fit:contain;
+    }
+    #bilibiliPlayer .bilibili-player-video > video
+    ,#bilibiliPlayer .bilibili-player-video > bwp-video 
+    {
+        width: calc((100%/(var(--dar)))*(var(--sar)) + var(--dt)*2);
+        object-fit: cover;
+        margin: 0 auto;
+        transition: width 1s;
+    }
+    #bilibiliPlayer:fullscreen .bilibili-player-video > video 
+    ,#bilibiliPlayer:fullscreen .bilibili-player-video > bwp-video 
+    {
+        width: min(calc(100vh*(var(--sar)) + var(--dt)*2),100%);
+    }
+    /*,#bilibiliPlayer .bilibili-player-video-wrap:hover .bilibili-player-video > :is(bwp-video, video)/**/
+    /*,#bilibiliPlayer .bilibili-player-video-wrap:hover .bilibili-player-video > :-webkit-any(bwp-video, video)/**/
+    /*,#bilibiliPlayer .bilibili-player-video-wrap:hover .bilibili-player-video > :matches(bwp-video, video)/**/
+    /*[end-of-bl-crop]*/
+}

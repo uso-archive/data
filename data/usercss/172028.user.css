@@ -1,0 +1,81 @@
+/* ==UserStyle==
+@name         Netflix 再生中の邪魔なものを隠す
+@namespace    USO Archive
+@author       kozue01
+@description  変更点  ・エンドロールに入ると出てくる画面を再生が終わるまで隠します  ・一時停止のときに出てくる文章を隠します  ・スキップボタンを隠します  ・ロード中の画像を隠します  ・マウスカーソルを画面から外すと操作パネルをすぐに隠します    以下は「Customize Settings」から変更可能です。デフォルトではオフになっています  ・見終わると出てくる画面から画像や文章等を隠す    注意事項  ・自動再生は切っておかないとエンドロールの途中で移動してしまいます  ・エンドロールに入ったら一度画面をクリックしないと操作パネルが出てきません    以下のURLから始まるページで動作します  https://www.netflix.com/watch/
+@version      20190523.15.19
+@license      NONE
+@preprocessor uso
+@advanced dropdown PostPlay "見終わると出てくる画面から画像や文章等を隠す？" {
+    PostPlay0 "隠さない*" <<<EOT  EOT;
+    PostPlay1 "隠す" <<<EOT /* 映画 *\/
+,.OriginalsPostPlay-background
+,.PromotedVideo-message
+,.PromotedVideo-synopsis
+,.PromotedVideo-actions > a:not(:nth-child(3))
+,.ptrack-content
+/* ドラマ *\/
+,.WatchNext-background
+,.WatchNext-still
+,.WatchNext-episode-synopsis EOT;
+
+}
+==/UserStyle== */
+@-moz-document url-prefix("https://www.netflix.com/watch/") {
+/* 非表示 */
+dummy + dummy
+/*再生中*/
+,.evidence-overlay
+,.advisory-container
+/*[[PostPlay]]*/
+,dummy + dummy{
+    visibility: hidden !important; }
+
+.player-loading-background-image,
+.PlayerControlsNeo__gradient-top,
+.PlayerControlsNeo__gradient-bottom,
+.PlayerControlsNeo__layout--dimmed,
+.EpisodicTeaser-background,
+.PlayView {
+    background: none !important; }
+
+.nfp .skip-credits .nf-icon-button {
+    width: 100% !important;
+    right: 0 !important; }
+
+/* アニメーション無効 */
+.nfp .nf-flat-button-text,
+.nfp .skip-credits .nf-icon-button,
+.PlayerControlsNeo__bottom-controls,
+.PlayerControlsNeo__bottom-controls--faded,
+.PlayerControlsNeo__core-controls {
+    transform: none !important;
+    transition: none !important;
+    transition-delay: 0s !important; }
+
+.PlayerControlsNeo__bottom-controls {
+    background-color: rgba(0,0,0,0.1) !important; }
+
+/* hover */
+.skip-credits,
+.PlayerControlsNeo__bottom-controls,
+.nfp-control-row.top-left-controls {
+    visibility: hidden !important; }
+
+.nfp:hover .skip-credits,
+.nfp:hover .PlayerControlsNeo__bottom-controls,
+.nfp:hover .nfp-control-row.top-left-controls {
+    visibility: visible !important; }
+
+/* エンドロール中 */
+.ptrack-container.fill-container {
+    z-index: 1 !important; }
+
+.NFPlayer:not(.ended) {
+    height: 100% !important;
+    width: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+    border: none !important;
+    z-index: 100 !important; }
+}

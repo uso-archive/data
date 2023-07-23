@@ -1,0 +1,120 @@
+/* ==UserStyle==
+@name         autohide the menu & sidebar [ZDNet]
+@namespace    USO Archive
+@author       hideheader
+@description  Hides the <i>ZDNet</i> header, footer, and sidebar. (But not permanently - hover at the left edge of the screen to restore them.)
+@version      20141021.20.47
+@license      NONE
+@preprocessor uso
+@advanced dropdown footerPosition "Footer position: bottom of the screen, or bottom of the page?" {
+    Bottom_of_the_page_- "Bottom of the page - when has the footer ever been useful?*" <<<EOT absolute EOT;
+    Bottom_of_the_screen "Bottom of the screen - don't make me scroll to find it!" <<<EOT fixed EOT;
+
+}
+==/UserStyle== */
+@-moz-document domain("www.zdnet.com"), domain("downloads.zdnet.com") {
+
+ /*#header, #footer, #content > DIV:last-of-type {z-index: 3}
+ #header:hover, #footer:hover, #content > DIV:last-of-type:hover {z-index: 4}*/
+  /* else prev/next buttons in slideshow are on top */
+ HEADER[role="banner"], FOOTER[role="contentinfo"], #content > #secondary {z-index: 4}
+ HEADER[role="banner"]:hover, FOOTER[role="contentinfo"]:hover, #content > #secondary {z-index: 5}
+  /* else annoying login toolbar is on top */
+FOOTER[role="contentinfo"], #content > #secondary {z-index: 4}
+HEADER[role="banner"], #content > #secondary:hover {z-index: 5}
+
+HEADER[role="banner"],
+FOOTER[role="contentinfo"],
+#content > #secondary {
+  position: fixed !important; top: 0; left: 0;
+  background-color: rgb(21, 41, 62)/* !important*/;
+  clip: rect(0, 2mm, 9999px, 0);
+  border-left: 2.2mm solid red !important;
+  transition: .3s .8s;
+  transition-property: clip, border-left-width;
+  transition-timing-function: linear, step-end;
+  }
+HEADER[role="banner"]:hover,
+FOOTER[role="contentinfo"]:hover,
+#content > #secondary:hover {
+  border-left-width: 0 !important;
+  transition-delay: 0s;
+  transition-timing-function: linear, step-start;
+  }
+
+
+/** auto-hide header **/
+HEADER[role="banner"] {
+  clip: rect(0, 2mm, 20mm, 0);
+  }
+HEADER[role="banner"]:hover {
+  clip: rect(0, 980px, 150px, 0);
+  }
+
+
+/** auto-hide footer **/
+BODY {position: relative}
+FOOTER[role="contentinfo"] {
+  position: /*[[footerPosition]]*/ !important; top: auto; bottom: 0;
+  height: 20mm;
+  overflow: hidden;
+  border-left-color: gray !important;
+  transition-property: clip, border-left-width, height;
+ }
+FOOTER[role="contentinfo"]:hover {
+  height: 334px;
+  clip: rect(0, 980px, 9999px, 0);
+  }
+
+
+/** auto-hide sidebar **/
+#content > #secondary {
+  height: 100%; overflow-y: scroll;
+  padding-right: 18px !important; 
+  margin-left: 0 !important;
+  background-color: white;
+  border-left-color: blue !important;
+  }
+#content > #secondary:hover {
+  clip: rect(0, 318px, 9999px, 0);
+  }
+
+
+/** no ads **/
+#cnet-brand, /* internal ad/branding banner ("A CNET Professional Brand") */
+#leaderTop, #leaderBottom,
+[id*="_ad_"],
+[class*="adcontainer"],
+.bidwar,
+#marquee,
+#vendor-text-link,
+
+/** no comment **/
+#comments,
+
+/** no social **/
+/*.social,*/
+[class^="fb-"],
+FOOTER.authorBio,
+.sharebar-outer-horizontal,
+IFRAME[src*="twitter.com"],
+.followOptions,
+
+/** no syndicated "content" **/
+#nrelate_related_placeholder,
+
+ /* - - - - - no nonsense - - - - - */
+.byline .thumb,
+ #catfish, /*annoying floating login bar */
+.bcx_overlay, /*[id^="campaign"],*/ /*Bounce Exchange modal adverts*/
+.breakingNews, /* really internal advert, not news */
+.QSIPopOver, /*survey - no, thank you*/
+.\. {display: none !important}
+}
+
+
+/*@-moz-document url("http://www.zdnet.com/") {
+ #header, #footer, #content > DIV:last-of-type {z-index: 3}
+ #header:hover, #footer:hover, #content > DIV:last-of-type:hover {z-index: 4}
+  /* else picture caption (.caption) is on top *//*
+}*/

@@ -1,0 +1,98 @@
+/* ==UserStyle==
+@name         Launchpad MONOist
+@namespace    USO Archive
+@author       Artoria2e5
+@description  Use monospace for lp bug comments and translations.
+@version      20160624.06.40
+@license      CC-BY-4.0
+@preprocessor uso
+@advanced color spacebg "Lead/Trail Space bg" #D3D3D3
+@advanced dropdown kill_lf_lbl "Kill LF Labels" {
+    kill_lf_lbl_t "Yes*" <<<EOT *[id^=msgset_] img[src="/@@/translation-newline"] {
+    display: none;               /* linebreak icon is lonely *\/
+}
+
+div[id^=msgset] > br:before,
+label[id^=msgset] > br:before {
+    color: salmon;               /* let's try a pink dollar *\/
+    content: '$';
+    font-weight: normal;         /* 300 looks better? *\/
+}
+
+div[id^=msgset_][id*="_singular"]:after,
+div[id^=msgset_][id*="_plural"]:after,
+div[id^=msgset_][id*="_translation"]:not(.no-translation):after,
+div[id^=msgset_][id*="_suggestion"]:not(.no-translation):after {
+    color: salmon;               /* also one for end-of-text *\/
+    content: '¶';
+    font-weight: normal;
+} EOT;
+    kill_lf_lbl_f "No" <<<EOT  EOT;
+
+}
+==/UserStyle== */
+@-moz-document domain("translations.launchpad.net"){
+div[id^=msgset_][id*="_singular"],       /* original */
+div[id^=msgset_][id*="_plural"],
+div[id^=msgset_][id*="_translation"]:not(.no-translation),    /* translated */
+div[id^=msgset_][id*="_suggestion"]:not(.no-translation), /* suggestion */
+label[id^=msgset_][id*="_suggestion"]:not(.no-translation), /* suggestion */
+textarea[id^=msgset],                    /* input */
+input[id^=msgset] {
+    font-family: monospace;      /* console-ish monospace */
+    white-space: pre-wrap !important; /* console-ish as-is whitespaces */
+}
+
+div[id^=msgset] > br,
+label[id^=msgset] > br {
+    content: '';                 /* kill the extra linebreaks */
+}
+
+/* is firefox */
+@supports (-moz-appearance:meterbar) {
+    div[id^=msgset] > br, 
+    label[id^=msgset] > br {
+        display: none;
+    }
+}
+
+.translation samp,
+label[id^=msgset] > samp,
+#messages_to_translate tr td img[src="/@@/translation-space"] {
+    background: /*[[spacebg]]*/; /* now kill the circle (def = lightgrey) */
+    padding: 0;                  /* and its extra space */
+}
+
+#messages_to_translate tr td img[src="/@@/translation-space"] {
+    /* smallest gif doesn't save us from being a bloatware and too much for the CSS */
+    content: url('data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+    width: 0.5em;
+    height: 1em;
+}
+
+/*[[kill_lf_lbl]]*/
+}
+
+@-moz-document domain("bugs.launchpad.net"){
+textarea[id='field.comment']{ font-family: monospace; }
+}
+
+/* I failed to deal with the translating listing.
+@-moz-document regexp("https?://translations.aaaaaaaaaaaaaaaaaaaaa") {
+/* https?://translations.launchpad.net/.*DELETEME/\\+filter(\\?.*)? 
+td.englishstring div:first-line,        /* listing - naive attempt to work around extra \n in <div>\nblah... 
+td.usedtranslation div:first-line,
+td.hiddentranslation div:first-line {
+    line-height: 0px;            /* there will be 6px left because of the spacing of the following lines; better though 
+}
+
+/* pseudo code, do it yourself in jq or so 
+table.listing tr:not(:or(:has(td.usedtranslation),:has(td.hiddentranslation))) td:nth-child(1) {
+    display: none;               /* kill the empty cell for alignment 
+    white-space: nowrap;
+} 
+
+table.listing tr:nth-child(2n) td:nth-child(2) {
+    text-align: right;           /* line up 
+}
+} */

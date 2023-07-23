@@ -1,0 +1,413 @@
+/* ==UserStyle==
+@name         Golem.de - Mehrspaltig, Flexibel, Reduziert
+@namespace    USO Archive
+@author       alexander255
+@description  Einfachere Version von golem.de mit Betonung auf den Inhalt.
+@version      20150402.21.53
+@license      CC-BY-SA-4.0
+@preprocessor uso
+@advanced dropdown comment_layout "Breite der Kommentar-Spalte:" {
+    40_ "40%*" <<<EOT #comments { width: 35% !important; }
+.g2, .giv { width: 55% !important; } EOT;
+    20_ "20%" <<<EOT #comments { width: 15% !important; }
+.g2, .giv { width: 75% !important; } EOT;
+    30_ "30%" <<<EOT #comments { width: 25% !important; }
+.g2, .giv { width: 65% !important; } EOT;
+    50_ "50%" <<<EOT #comments { width: 45% !important; }
+.g2, .giv { width: 45% !important; } EOT;
+    60_ "60%" <<<EOT #comments { width: 55% !important; }
+.g2, .giv { width: 35% !important; } EOT;
+    70_ "70%" <<<EOT #comments { width: 65% !important; }
+.g2, .giv { width: 25% !important; } EOT;
+    80_ "80%" <<<EOT #comments { width: 75% !important; }
+.g2, .giv { width: 15% !important; } EOT;
+
+}
+@advanced dropdown column_count "Anzahl der Textspalten:" {
+    3 "3*" <<<EOT 3 EOT;
+    2 "2" <<<EOT 2 EOT;
+    4 "4" <<<EOT 4 EOT;
+    5 "5" <<<EOT 5 EOT;
+    6 "6" <<<EOT 6 EOT;
+
+}
+@advanced dropdown share_display "Teilen-Knöpfe zeigen?" {
+    Ja "Ja*" <<<EOT  EOT;
+    Nein "Nein" <<<EOT display: none !important; EOT;
+
+}
+@advanced dropdown follow_display "\"Folgen Sie Uns\"-Knöpfe zeigen?" {
+    Ja "Ja*" <<<EOT  EOT;
+    Nein "Nein" <<<EOT display: none !important; EOT;
+
+}
+@advanced dropdown home_display "\"HOME\" und \"TICKER\" Verweise zeigen?" {
+    Ja "Ja*" <<<EOT  EOT;
+    Nein "Nein" <<<EOT display: none !important; EOT;
+
+}
+@advanced dropdown top_topics "\"Top Themen\"-Leiste zeigen?" {
+    Ja "Ja*" <<<EOT #header {height:  84px !important;} EOT;
+    Nein "Nein" <<<EOT #header-nav-2 {display: none !important;} EOT;
+
+}
+@advanced dropdown ads_display "Unaufdringliche Werbung zeigen?" {
+    Ja "Ja*" <<<EOT  EOT;
+    Nein "Nein" <<<EOT display: none !important; EOT;
+
+}
+==/UserStyle== */
+@namespace url(http://www.w3.org/1999/xhtml);
+
+@-moz-document domain("golem.de") {
+
+/* Artikel-Darstellung */
+article {
+    text-align:      justify;
+    hyphens:         auto;
+    -moz-hyphens:    auto;
+    -webkit-hyphens: auto;
+}
+
+/* Fix image gallery issues */
+article div.formatted > div.golem-gallery2:not(.golem-gallery2-fullscreenmode) .golem-gallery2-footer-title {
+    position: static !important;
+    padding-left:  30px !important;
+    padding-right: 30px !important;
+}
+/* Add space below image description */
+article div.formatted > div.golem-gallery2:not(.golem-gallery2-fullscreenmode) .golem-gallery2-footer-title:after {
+    display:   block;
+    font-size: 0.5em;
+    color:     white;
+    content:   ".";
+}
+
+/* Fix "Golem Pur" header */
+#screen > iframe:first-child {
+    width: 100% !important;
+    margin: -0.5em 0 0 0 !important;
+}
+
+/* Make forum title links larger */
+#thread-list .g3 {
+    width: 100% !important;
+}
+
+/**
+ * Put article image next to heading
+ */
+/* Limit horizontal image size */
+#screen > div.g.g2:first-of-type {
+    float: right !important;
+    width: 35%   !important;
+}
+/* Reduce margin below article image text */
+#screen > div.g.g2:first-of-type > figure {
+    margin-bottom: 5px !important;
+}
+
+/* Prevent heading for moving below the image */
+#screen > .g.g4 {
+    float: none !important;
+}
+
+/**
+ * Break article into multiple columns
+ */
+/* "HTML5-Video für Golem" script fixes */
+article div.formatted > div[id*="gvideo_"] div[id*="tfrHtml5Related"] {
+    /* Prevent "Related video" content from covering the other content */
+    overflow: scroll !important;
+}
+
+/* Set column count and adjust active content acordingly */
+/* @placeholder column_count "Anzahl der Textspalten:" select */
+/* @option "2" "2" */
+/* @option "3" "3" */
+/* @option "4" "4" */
+/* @option "5" "5" */
+/* @option "6" "6" */
+article div.formatted {
+    -webkit-column-count: /*[[column_count]]*/ !important;
+    -moz-column-count:    /*[[column_count]]*/ !important;
+    column-count:         /*[[column_count]]*/ !important;
+
+    -webkit-column-gap: 1%;
+    -moz-column-gap:    1%;
+    column-gap:         1%;
+
+    /* Make sure columns appear below the article image instead of becomming 30% smaller */
+    clear: both !important;
+
+    /* Fix margin-top of content container (due to "display: block-inline" hack) */
+    margin-top: 0 !important;
+    
+    /*XXX: Break longer multi-column layout into several sections */
+    /*height: calc(61.00vw / /*[[column_count]]*/);*/
+    /*overflow: fragments;*/
+}
+
+/* Optimize column breaks */
+article div.formatted > h3 {
+    /* Move subheadings to the start of the next column */
+    -webkit-column-break-before: always !important;
+    -webkit-break-before: column !important;
+    -moz-break-before:    column !important;
+    break-before:         column !important;
+}
+article div.formatted > * {
+    /* Avoid breaking up elements across several columns (except for the actual content) */
+    -webkit-column-break-inside: avoid !important;
+    -webkit-break-inside: avoid-column !important;
+    -moz-break-inside:    avoid-column !important;
+    break-inside:         avoid-column !important;
+    
+    /* WORKAROUND: "break-inside: avoid-column" for FireFox */
+    display: inline-block !important;
+    margin-top: 0 !important;
+}
+article div.formatted > p {
+    /* Make content "breakupable" */
+    -webkit-column-break-inside: auto !important;
+    -webkit-break-inside: auto !important;
+    -moz-break-inside:    auto !important;
+    break-inside:         auto !important;
+
+    display: block !important;
+}
+
+/* Shink image and video elements to fit into the layout */
+article div.formatted > figure[id*="gvideo_"],
+article div.formatted > div > div > embed,
+article div.formatted > * > iframe {
+    width: calc(87.68vw / /*[[column_count]]*/) !important;
+    height: calc(61.00vw / /*[[column_count]]*/) !important;
+}
+article div.formatted > div.golem-gallery2:not(.golem-gallery2-fullscreenmode) {
+    width: calc(87.68vw / /*[[column_count]]*/) !important;
+}
+article div.formatted > div.golem-gallery2:not(.golem-gallery2-fullscreenmode) > ul.golem-gallery2-list img,
+articel div.formatted > * #ytplayer {
+    height: calc(61.00vw / /*[[column_count]]*/)       !important;
+    width:  calc(87.68vw / /*[[column_count]]*/ - 2vw) !important;
+    
+    /*WORKAROUND: Buggy behaviour when highlighting video */
+    padding-bottom: 0.2em;
+}
+
+
+/* Hide static video image (doesn't align correctly) */
+article div.formatted > div > div {
+    background: none !important;
+}
+/*article div.formatted > div {
+    -moz-column-span:    all;
+    -webkit-column-span: all;
+    column-span:         all;
+}*/
+
+/* Design-Änderungen */
+#grandwrapper {
+    width: 95% !important;
+    box-shadow: 0 -10px 30px #BBBBBB;
+}
+body {
+    background: #FFFFFF !important;
+}
+
+#hn2-top,
+#header-nav-2 > ul > li > a {
+    color: #DEE !important;
+}
+
+/* Resize main article */
+#screen {
+    width:   100%       !important;
+    padding: 0.5em 0 0 0 !important;
+}
+
+/* Make main article bigger */
+.g4, .g2 {
+    width: 95% !important;
+}
+
+
+/**
+ * Move comments and trackbacks next to each other
+ */
+/* Fix comments and trackbacks */
+#comments,
+#trackbacks {
+    clear: both !important;
+    
+    /* Align trackbacks with info/comment section
+       (breaks with too much scaling) */
+    margin-left: 0.7% !important;
+
+    /* Hack: Escaping from main article container */
+    position: absolute !important; 
+}
+
+.article #comments,
+.giv {
+    /* Hack: Prevent overlaping due to the above hack */
+    margin-top: -2em !important;
+}
+
+/* Fit "related videos" section inside parent container (defined below: .giv) */
+.givwrapper,
+.givh {
+    width: 95% !important;
+}
+
+/***
+#trackbacks {
+    /* Set new width /
+    width: 91% !important;
+    
+    margin: 0 !important;
+}
+***/
+#trackbacks {
+    display: none !important;
+}
+
+/* Fix info section */
+.g2 {
+    clear:  both   !important;
+    margin: 0 2.5% !important;
+}
+
+/* Float comments, trackbacks and infos */
+/* Selection: Info section position: right */
+.g2, .giv { float: right !important; }
+/* Selection: Info section position: left */
+#comments { right: 5% !important; margin-top: -0.1em !important; }
+.g2, .giv { float: left !important; }
+
+/* Resize comments, trackbacks and infos */
+/*[[comment_layout]]*/
+/* @select "Breite der Kommentar-Spalte:" */
+/* @option "20%" "#comments { width: 15% !important; } .g2, .giv { width: 75% !important; }" */
+/* @option "30%" "#comments { width: 25% !important; } .g2, .giv { width: 65% !important; }" */
+/* @option "40%" "#comments { width: 35% !important; } .g2, .giv { width: 55% !important; }" default */
+/* @option "50%" "#comments { width: 45% !important; } .g2, .giv { width: 45% !important; }" */
+/* @option "60%" "#comments { width: 55% !important; } .g2, .giv { width: 35% !important; }" */
+/* @option "70%" "#comments { width: 65% !important; } .g2, .giv { width: 25% !important; }" */
+/* @option "80%" "#comments { width: 75% !important; } .g2, .giv { width: 15% !important; }" */
+
+
+/**
+ * Hide elements
+ */
+/* Hide share buttons */
+.g2 > aside > ol > li.text1:nth-child(4),
+.social-bottom,
+#shareButton_article {
+    /*[[share_display]]*/
+    /* @question "Teilen-Knöpfe zeigen?" */
+    /* @option "Ja"   ""                         default */
+    /* @option "Nein" "display: none !important"         */
+}
+
+/* Hide "Follow us" buttons */
+#followrss,
+#newsletter {
+    /*[[follow_display]]*/
+    /* @question "\"Folgen Sie Uns\"-Knöpfe zeigen?" */
+    /* @option "Ja"   ""                         default */
+    /* @option "Nein" "display: none !important"         */
+}
+
+/* Hide discrete ads */
+*.supplementary[id*="-clip"],
+#iqadtile4,
+#iqadtile8,
+.iqadlinetop {
+    /*[[ads_display]]*/
+    /* @question "Unaufdringliche Werbung zeigen?" */
+    /* @option "Ja"   ""                         default */
+    /* @option "Nein" "display: none !important"         */
+}
+
+/* Hide job market */
+#job-market {
+    display: none !important;
+}
+
+/* Hide contact link */
+#contact {
+    display: none !important;
+}
+
+/* Hide footer */
+#footer {
+    display: none !important;
+}
+
+/* Hide top navigation bar */
+#header-nav-1 {
+    /*[[home_display]]*/
+    /* @question "\"HOME\" und \"TICKER\" zeigen?" */
+    /* @option "Ja"   ""                         default */
+    /* @option "Nein" "display: none !important"         */
+}
+
+/* Secondary navigation bar */
+/*[[top_topics]]*/
+/* @select "\"Top Themen\" zeigen?" */
+/* @option "Ja"   "#header       {height:  84px !important;}" */
+/* @option "Nein" "#header-nav-2 {display: none !important;}" */
+
+#header-nav-1 {
+    left: 0.5em !important;
+    top:  20px  !important;
+}
+#header-nav-2 {
+    border:     none        !important;
+    width:      100%        !important;
+    text-align: right       !important;
+    position:   static      !important;
+    margin:     5px 0 0 1em !important;
+}
+
+#header {
+    width:  100%  !important;
+    margin: auto  !important;
+    border: 0     !important;
+}
+#header .dh1 {
+    position: relative !important;
+    left:   0    !important;
+    margin: auto !important;
+}
+    
+/**
+ * Overview page fixes
+ */
+/* Make horizontal separators in footer section use the entire page width */
+body.index #screen > .g.g2 {
+    width: 95% !important;
+}
+/* Fix "recent videos" box and make it use all the available space */
+body.index #index-vica2 {
+    height:      7em  !important;
+    width:       102% !important;
+    padding-top: 1em  !important;
+}
+body.index #index-vica2 > .giv {
+    width: 100% !important;
+}
+body.index #index-vica2 > .giv > .givc,
+body.index #index-vica2 > .giv > .givc > .givwrapper,
+body.index #index-vica2 > .giv > .givc > .givh {
+    width: 99% !important;
+}
+
+/* verstecken */
+#recently, .promos, .activity, #plista_widget_belowArticlev2, #bannerTopWrapper, .golemContentToHide img[height="1"], hr, #iqadtile1gol, #iqadtile2gol, #iqadtile3gol, #iqadtile4gol, #iqadtile5gol, #iqadtile6gol, #iqadtile7gol, #iqadtile8gol, #iqadtile9gol, #iqadtile10gol, #iqadtile11gol, #iqadtile12gol, #afcbecof2, nbb-clip, div.g.g4 > article > div[style="margin:15px 0; min-height:103px;"] {
+    display: none !important;
+}
+
+}
