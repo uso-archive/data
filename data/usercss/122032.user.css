@@ -2,10 +2,120 @@
 @name         YouTube Real Cinema Mode
 @namespace    USO Archive
 @author       HorsyNox
-@description  Don't like these small videos on YouTube pages? Me too. So one day I decided to change that and created this userstyle.  <br><strong>This style expands video to fill all free space inside browser window. Like a fullscreen YouTube but not fullscreen. You'll like it!</strong>  <br>Scroll YouTube page down to see comments and other stuff.  Move cursor to top and the top bar with search will appear.
-@version      20230727.18.25
+@description  Don't like these small videos on YouTube pages? Me too. So one day I decided to change that and created this userstyle.  <br><strong>This style expands video to fill all free space inside the browser window. Like a fullscreen YouTube but not fullscreen. You'll like it!</strong>  <br>Scroll YouTube page down to see comments and other stuff.  Move the cursor up and the top bar with the search will appear.  <br>It also shows a floating miniplayer in the corner when you read comments. You can disable this in options if you don't like it.
+@version      20151218.17.01
 @license      CC0-1.0
 @preprocessor uso
+@advanced dropdown miniplayer "Miniplayer in comments" {
+    show "Show*" <<<EOT #player-container {
+  animation: miniPlayer-player-container linear 0s;
+  animation-timeline: scroll(root);
+  animation-range-start: 100vh;
+  animation-range-end: 100vh;
+  animation-fill-mode: both;
+}
+
+@keyframes miniPlayer-player-container {
+  100% {
+    z-index: 1001;
+  }
+}
+
+.html5-video-container {
+  animation: miniPlayer-html5-video-container linear 0s;
+  animation-timeline: scroll(root);
+  animation-range-start: 100vh;
+  animation-range-end: 100vh;
+  animation-fill-mode: both;
+}
+
+@keyframes miniPlayer-html5-video-container {
+  100% {
+    position: fixed;
+    width: 29vw;
+    aspect-ratio: 16/9;
+    right: 20px;
+    bottom: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #000;
+    box-shadow: 0 0 10px 3px #0f0f0f;
+  }
+}
+
+.playing-mode .html5-video-container::before {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMTAwJSIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMzYgMzYiIHdpZHRoPSIxMDAlIj48cGF0aCBkPSJNIDEyLDI2IDE2LDI2IDE2LDEwIDEyLDEwIHogTSAyMSwyNiAyNSwyNiAyNSwxMCAyMSwxMCB6IiBzdHlsZT0ic3Ryb2tlOiAjMDAwOyBzdHJva2Utb3BhY2l0eTogLjE1OyBzdHJva2Utd2lkdGg6IDJweDsgZmlsbDogI2ZmZjsiPjwvcGF0aD48L3N2Zz4=);
+}
+
+.paused-mode .html5-video-container::before {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMTAwJSIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMzYgMzYiIHdpZHRoPSIxMDAlIj48cGF0aCBkPSJNIDEyLDI2IDI1LDE4IDEyLDEwIHoiIHN0eWxlPSJzdHJva2U6ICMwMDA7c3Ryb2tlLW9wYWNpdHk6IC4xNTtzdHJva2Utd2lkdGg6IDJweDtmaWxsOiAjZmZmOyI+PC9wYXRoPjwvc3ZnPg==);
+}
+
+.ended-mode .html5-video-container {
+  animation: miniPlayer-html5-video-container--ended linear 0s;
+  animation-timeline: scroll(root);
+  animation-range-start: 100vh;
+  animation-range-end: 100vh;
+  animation-fill-mode: both;
+}
+
+@keyframes miniPlayer-html5-video-container--ended {
+  100% {
+    display: none;
+  }
+}
+
+.html5-video-container::before {
+  content: '';
+  display: block;
+  animation: miniPlayer-html5-video-container--before linear 0s;
+  animation-timeline: scroll(root);
+  animation-range-start: 100vh;
+  animation-range-end: 100vh;
+  animation-fill-mode: both;
+  opacity: 0;
+  transition: opacity .12s ease-in-out, background-image .2s ease-in-out;
+}
+.html5-video-container:hover::before {
+  opacity: 1;
+}
+
+@keyframes miniPlayer-html5-video-container--before {
+  100% {
+    content: '';
+    position: fixed;
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 72px;
+    background-color: rgba(0, 0, 0, .5);
+  }
+}
+
+.html5-main-video {
+  animation: miniPlayer-html5-main-video linear 0s;
+  animation-timeline: scroll(root);
+  animation-range-start: 100vh;
+  animation-range-end: 100vh;
+  animation-fill-mode: both;
+}
+
+@keyframes miniPlayer-html5-main-video {
+  100% {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    object-fit: contain;
+    pointer-events: none;
+  }
+} EOT;
+    hide "Hide" <<<EOT  EOT;
+
+}
 @advanced dropdown scrollbar "Scrollbar" {
     hide "Hide*" <<<EOT @supports (scrollbar-width: none) {
   body {
@@ -17,80 +127,56 @@
     display: none;
   }
 } EOT;
+    auto "Auto" <<<EOT @supports (scrollbar-width: none) {
+  body {
+    scrollbar-width: none;
+  }
+}
+
+@supports not (scrollbar-width: none) {
+  @supports (animation-timeline: scroll(root)) {
+
+#masthead-container.ytd-app, body>ytd-app { 
+  width: 100vw;
+}
+
+/*[theater]:not([hidden])*\/
+body:has(ytd-watch-flexy) {
+  animation: scrollbar linear 1s, topMenu linear 1s;
+  animation-timeline: scroll(root);
+  animation-range-start: 100vh, 0vh;
+  animation-range-end: 100vh, 1vh;
+  animation-fill-mode: both;
+  overflow-x: hidden;
+}
+
+body::-webkit-scrollbar {
+  display: var(--displayScroll);
+}
+
+@keyframes scrollbar {
+  from {
+    --displayScroll: none;
+  }
+  to {
+    --displayScroll: initial;
+  }
+}
+
+@keyframes topMenu {
+    from {
+      --topMenuPosition: -56px;
+    }
+    to {
+      --topMenuPosition: 0;
+    }
+}
+
+  }
+}
+ EOT;
     show "Show" <<<EOT  EOT;
 
 }
 ==/UserStyle== */
-@-moz-document domain(youtube.com) {
-
-ytd-app:not([guide-persistent-and-visible]) ytd-page-manager {
-  margin-top: 0!important;
-}
-
-ytd-app:not([guide-persistent-and-visible]) #player-theater-container:empty~#columns #primary,
-ytd-app:not([guide-persistent-and-visible]) #player-theater-container:empty~#columns #secondary{
-    padding-top: 56px;
-}
-
-ytd-app:not([guide-persistent-and-visible]) ytd-masthead,
-ytd-app:not([guide-persistent-and-visible]) #masthead-container.ytd-app::after {
-  transform: translateY(-56px);
-  transition: transform .1s .5s ease-out;
-}
-ytd-app:not([guide-persistent-and-visible]) #masthead-container:hover ytd-masthead,
-ytd-app:not([guide-persistent-and-visible]) #masthead-container:hover.ytd-app::after {
-  transform: translateY(0px);
-}
-
-ytd-app:not([guide-persistent-and-visible]) [theater] #player.ytd-watch {
-  height: 100vh!important;
-  max-height: 100vh!important;
-}
-
-ytd-watch-flexy[theater] #player-theater-container.ytd-watch-flexy, 
-ytd-watch-flexy[fullscreen] #player-theater-container.ytd-watch-flexy,
-ytd-app:not([guide-persistent-and-visible]) [theater] #player video {
-  width: 100%!important;
-  height: 100vh!important;
-  max-height: 100vh!important;
-  max-width: 100%!important;
-  left: 0!important;
-}
-
-ytd-app:not([guide-persistent-and-visible]) .ytp-chrome-top.ytp-share-button-visible,
-ytd-app:not([guide-persistent-and-visible]) #iv-drawer .iv-drawer-header,
-ytd-app:not([guide-persistent-and-visible]) #iv-drawer .iv-drawer-content {
-  margin-top: 30px;
-}
-
-ytd-app:not([guide-persistent-and-visible]) [theater] .ytp-chrome-top.ytp-share-button-visible,
-ytd-app:not([guide-persistent-and-visible]) [theater] #iv-drawer .iv-drawer-header,
-ytd-app:not([guide-persistent-and-visible]) [theater] #iv-drawer .iv-drawer-content,
-ytd-app:not([guide-persistent-and-visible]) [theater] .ytp-multicam-menu-header,
-ytd-app:not([guide-persistent-and-visible]) [theater] .ytp-multicam-menu-items,
-ytd-app:not([guide-persistent-and-visible]) [theater] .ytp-playlist-menu-header,
-ytd-app:not([guide-persistent-and-visible]) [theater] .ytp-playlist-menu-items,
-ytd-app:not([guide-persistent-and-visible]) [theater] .ytp-share-panel-close {
-  margin-top: 56px;
-}
-
-ytd-app:not([guide-persistent-and-visible]) .ytp-tooltip.ytp-tooltip-opaque.ytp-bottom {
-  right: 60px!important;
-  top: 35px!important;
-}
-
-ytd-app:not([guide-persistent-and-visible]) [theater] .ytp-tooltip.ytp-tooltip-opaque.ytp-bottom {
-  right: 60px!important;
-  top: 60px!important;
-}
-
-    /* Quickfix June 29 */
-    /* TODO: Review the code and make it properly */
-    ytd-watch-flexy[theater] #player-wide-container.ytd-watch-flexy, ytd-watch-flexy[fullscreen] #player-wide-container.ytd-watch-flexy {
-        height: 100vh;
-        max-height: 100vh;
-    }
-
-/*[[scrollbar]]*/
-
-}
+{"result":"@-moz-document domain(youtube.com) {\r\n\r\nytd-app:not([guide-persistent-and-visible]) ytd-page-manager {\r\n  margin-top: 0!important;\r\n}\r\n\r\nytd-app:not([guide-persistent-and-visible]) #player-theater-container:empty~#columns #primary,\r\nytd-app:not([guide-persistent-and-visible]) #player-theater-container:empty~#columns #secondary{\r\n  padding-top: 56px;\r\n}\r\nytd-masthead[is-watch-page]:not([theater]):not([fullscreen]) #background.ytd-masthead {\r\n  opacity: 1!important;\r\n}\r\nytd-app:not([guide-persistent-and-visible]) ytd-masthead,\r\nytd-app:not([guide-persistent-and-visible]) #masthead-container.ytd-app::after {\r\n  transform: translateY(var(--topMenuPosition, -56px));\r\n  transition: transform .1s .5s ease-out;\r\n}\r\nytd-app:not([guide-persistent-and-visible]) #masthead-container:hover ytd-masthead,\r\nytd-app:not([guide-persistent-and-visible]) #masthead-container:hover.ytd-app::after {\r\n  transform: translateY(0px);\r\n}\r\n\r\nytd-app:not([guide-persistent-and-visible]) [theater] #player.ytd-watch {\r\n  height: 100vh!important;\r\n  max-height: 100vh!important;\r\n}\r\n\r\nytd-watch-flexy[theater] #player-theater-container.ytd-watch-flexy, \r\nytd-watch-flexy[fullscreen] #player-theater-container.ytd-watch-flexy,\r\nytd-app:not([guide-persistent-and-visible]) [theater] #player video {\r\n  width: 100%!important;\r\n  height: 100vh!important;\r\n  max-height: 100vh!important;\r\n  max-width: 100%!important;\r\n  left: 0!important;\r\n}\r\n\r\nytd-app:not([guide-persistent-and-visible]) .ytp-chrome-top.ytp-share-button-visible,\r\nytd-app:not([guide-persistent-and-visible]) #iv-drawer .iv-drawer-header,\r\nytd-app:not([guide-persistent-and-visible]) #iv-drawer .iv-drawer-content {\r\n  margin-top: 30px;\r\n}\r\n\r\nytd-app:not([guide-persistent-and-visible]) [theater] .ytp-chrome-top.ytp-share-button-visible,\r\nytd-app:not([guide-persistent-and-visible]) [theater] #iv-drawer .iv-drawer-header,\r\nytd-app:not([guide-persistent-and-visible]) [theater] #iv-drawer .iv-drawer-content,\r\nytd-app:not([guide-persistent-and-visible]) [theater] .ytp-multicam-menu-header,\r\nytd-app:not([guide-persistent-and-visible]) [theater] .ytp-multicam-menu-items,\r\nytd-app:not([guide-persistent-and-visible]) [theater] .ytp-playlist-menu-header,\r\nytd-app:not([guide-persistent-and-visible]) [theater] .ytp-playlist-menu-items,\r\nytd-app:not([guide-persistent-and-visible]) [theater] .ytp-share-panel-close {\r\n  margin-top: 56px;\r\n}\r\n\r\nytd-app:not([guide-persistent-and-visible]) .ytp-tooltip.ytp-tooltip-opaque.ytp-bottom {\r\n  right: 60px!important;\r\n  top: 35px!important;\r\n}\r\n\r\nytd-app:not([guide-persistent-and-visible]) [theater] .ytp-tooltip.ytp-tooltip-opaque.ytp-bottom {\r\n  right: 60px!important;\r\n  top: 60px!important;\r\n}\r\n  \r\n\r\n\r\n/* Quickfix June 29 */\r\n/* TODO: Review the code and make it properly */\r\nytd-watch-flexy[theater] #player-full-bleed-container.ytd-watch-flexy, \r\nytd-watch-flexy[fullscreen] #player-full-bleed-container.ytd-watch-flexy {\r\n\theight: 100vh;\r\n  max-height: 100vh;\r\n}\r\n  \r\n/* Fix August 22 */\r\nytd-watch-flexy[full-bleed-player] #full-bleed-container.ytd-watch-flexy {\r\n  height: 100vh;\r\n\tmax-height: 100vh;\r\n}\r\n\r\n\r\n/* Auto show menu on scroll */\r\n@supports (animation-timeline: scroll(root)) {\r\n  body {\r\n    animation: topMenu linear 1s;\r\n    animation-timeline: scroll(root);\r\n    animation-range-start: 0vh;\r\n    animation-range-end: 1vh;\r\n    animation-fill-mode: both;\r\n  }\r\n\r\n  @keyframes topMenu {\r\n    from {\r\n      --topMenuPosition: -56px;\r\n    }\r\n    to {\r\n      --topMenuPosition: 0;\r\n    }\r\n  }\r\n}\r\n\r\n\r\n\r\n/*[[miniplayer]]*/\r\n/*[[scrollbar]]*/\r\n\r\n}"}
