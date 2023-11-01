@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       HorsyNox
 @description  Don't like these small videos on YouTube pages? Me too. So one day I decided to change that and created this userstyle.  <br><strong>This style expands video to fill all free space inside the browser window. Like a fullscreen YouTube but not fullscreen. You'll like it!</strong>  <br>Scroll YouTube page down to see comments and other stuff.  Move the cursor up and the top bar with the search will appear.  <br>It also shows a floating miniplayer in the corner when you read comments. You can disable this in options if you don't like it.
-@version      20231028.12.09
+@version      20231031.16.59
 @license      CC0-1.0
 @preprocessor uso
 @advanced dropdown miniplayer "Miniplayer in comments" {
@@ -126,7 +126,8 @@ ytd-app:not([guide-persistent-and-visible])
 }
 @advanced dropdown scrollbar "Scrollbar" {
     auto "Auto*" <<<EOT @supports (scrollbar-width: none) {
-  body {
+  body,
+  body.no-scroll ytd-app[scrolling] {
     scrollbar-width: none;
   }
 }
@@ -140,7 +141,7 @@ ytd-app:not([guide-persistent-and-visible])
 
 /*body:has(ytd-watch-flexy[theater]:not([hidden]))*\/
 /*body:has(ytd-watch-flexy[role="main"])*\/
-body:has(ytd-watch-flexy) {
+body:not(.no-scroll):has(ytd-watch-flexy) {
   animation: scrollbar linear 1s, topMenu linear 1s;
   animation-timeline: scroll(root);
   animation-range-start: 100vh, 0vh;
@@ -149,8 +150,12 @@ body:has(ytd-watch-flexy) {
   overflow-x: hidden;
 }
 
-body::-webkit-scrollbar {
+body:not(.no-scroll)::-webkit-scrollbar {
   display: var(--displayScroll);
+}
+
+body.no-scroll ytd-app[scrolling]::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes scrollbar {
