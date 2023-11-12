@@ -2,7 +2,7 @@ name: auto update
 
 on:
   schedule:
-    - cron: "0 */12 * * *"
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 permissions:
@@ -25,23 +25,26 @@ jobs:
           git: https://code.pepega.club/uso-archive/updater.git
           branch: main
 
+      - name: Fetch updated IDs
+        run: |
+          date -uIs >./data/last-update.txt
+          uso-archive fetch-ids --sorting updated --until-time "$(cat ./data/last-update.txt)" /tmp/ids.json
+
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Update
+      - name: Download & Index
         run: |
-          uso-archive fetch-ids --sorting updated --until-time "$(cat ./data/last-update.txt)" /tmp/ids.json
-          date -uIs > ./data/last-update.txt
           uso-archive download /tmp/ids.json ./data
-          uso-archive index ./data ./data/search-index.json
+          uso-archive index ./data ./data/search-index.json >/tmp/index.log || cat /tmp/index.log
 
       - name: Commmit & Push
         run: |
           git config user.name 'uso-archive[bot]'
           git config user.email '137587018+uso-archive[bot]@users.noreply.github.com'
-          git add data
+          git add ./data
           uso-archive git-commit-msg ./data /tmp/ids.json | git commit -F -
-          git rev-parse HEAD > ./data/last-commit.txt
-          git add data
+          git rev-parse HEAD >./data/last-commit.txt
+          git add ./data
           git commit -m "[*] update last-commit"
           git push
