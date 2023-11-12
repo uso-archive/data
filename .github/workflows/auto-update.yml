@@ -27,7 +27,7 @@ jobs:
 
       - name: Fetch updated IDs
         run: |
-          date -uIs >./data/last-update.txt
+          date -uIs >/tmp/last-update.txt
           uso-archive fetch-ids --sorting updated --until-time "$(cat ./data/last-update.txt)" /tmp/ids.json
 
       - name: Checkout
@@ -35,6 +35,7 @@ jobs:
 
       - name: Download & Index
         run: |
+          cp /tmp/last-update.txt ./data/last-update.txt
           uso-archive download /tmp/ids.json ./data
           uso-archive index ./data ./data/search-index.json >/tmp/index.log || cat /tmp/index.log
 
