@@ -19,28 +19,31 @@ jobs:
           sudo apt-get install -y libvips libvips-dev
 
       - name: Install uso-archive binary
-        uses: baptiste0928/cargo-install@v2
-        with:
-          crate: uso-archive
-          git: https://code.pepega.club/uso-archive/updater.git
-          branch: main
+        run: |
+          set -xe
+          curl -o ~/.local/bin/uso-archive 'https://code.pepega.club/uso-archive/updater-release/releases/download/latest/uso-archive'
+          chmod +x ~/.local/bin/uso-archive
+          uso-archive
 
       - name: Fetch updated IDs
         run: |
+          set -xe
           date -uIs >/tmp/last-update.txt
-          uso-archive fetch-ids --sorting updated --until-time "$(cat /tmp/last-update.txt)" /tmp/ids.json
+          uso-archive fetch-ids --next-build-id "$(uso-archive next-build-id)" --sorting updated --until-time "$(cat /tmp/last-update.txt)" /tmp/ids.json
 
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Download & Index
         run: |
+          set -xe
           cp /tmp/last-update.txt ./data/last-update.txt
           uso-archive download /tmp/ids.json ./data
           uso-archive index ./data ./data/search-index.json >/tmp/index.log || cat /tmp/index.log
 
       - name: Commmit & Push
         run: |
+          set -xe
           git config user.name 'uso-archive[bot]'
           git config user.email '137587018+uso-archive[bot]@users.noreply.github.com'
           git add ./data
