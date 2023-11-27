@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       HorsyNox
 @description  Don't like these small videos on YouTube pages? Me too. So one day I decided to change that and created this userstyle.  <br><strong>This style expands video to fill all free space inside the browser window. Like a fullscreen YouTube but not fullscreen. You'll like it!</strong>  <br>Scroll YouTube page down to see comments and other stuff.  Move the cursor up and the top bar with the search will appear.  <br>It also shows a floating miniplayer in the corner when you read comments. You can disable this in options if you don't like it.
-@version      20231031.16.59
+@version      20231126.23.37
 @license      CC0-1.0
 @preprocessor uso
 @advanced dropdown miniplayer "Miniplayer in comments" {
@@ -193,8 +193,7 @@ body.no-scroll ytd-app[scrolling]::-webkit-scrollbar {
 
 }
 ==/UserStyle== */
-@-moz-document domain(youtube.com) {
-
+@-moz-document domain("www.youtube.com") {
 ytd-app:not([guide-persistent-and-visible]) ytd-page-manager {
   margin-top: 0!important;
 }
@@ -297,7 +296,172 @@ ytd-watch-flexy[full-bleed-player] #full-bleed-container.ytd-watch-flexy {
 
 
 
-/*[[miniplayer]]*/
-/*[[scrollbar]]*/
+ytd-app:not([guide-persistent-and-visible]) 
+#player-container {
+  animation: miniPlayer-player-container linear 0s;
+  animation-timeline: scroll(root);
+  animation-range-start: 100vh;
+  animation-range-end: 100vh;
+  animation-fill-mode: both;
+}
+
+@keyframes miniPlayer-player-container {
+  100% {
+    z-index: 1001;
+  }
+}
+
+ytd-app:not([guide-persistent-and-visible]) 
+.html5-video-container {
+  animation: miniPlayer-html5-video-container linear 0s;
+  animation-timeline: scroll(root);
+  animation-range-start: 100vh;
+  animation-range-end: 100vh;
+  animation-fill-mode: both;
+}
+
+@keyframes miniPlayer-html5-video-container {
+  100% {
+    position: fixed;
+    width: 29vw;
+    aspect-ratio: 16/9;
+    right: 20px;
+    bottom: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #000;
+    box-shadow: 0 0 10px 3px #0f0f0f;
+  }
+}
+
+ytd-app:not([guide-persistent-and-visible]) 
+.playing-mode .html5-video-container::before {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMTAwJSIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMzYgMzYiIHdpZHRoPSIxMDAlIj48cGF0aCBkPSJNIDEyLDI2IDE2LDI2IDE2LDEwIDEyLDEwIHogTSAyMSwyNiAyNSwyNiAyNSwxMCAyMSwxMCB6IiBzdHlsZT0ic3Ryb2tlOiAjMDAwOyBzdHJva2Utb3BhY2l0eTogLjE1OyBzdHJva2Utd2lkdGg6IDJweDsgZmlsbDogI2ZmZjsiPjwvcGF0aD48L3N2Zz4=);
+}
+
+ytd-app:not([guide-persistent-and-visible]) 
+.paused-mode .html5-video-container::before {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMTAwJSIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMzYgMzYiIHdpZHRoPSIxMDAlIj48cGF0aCBkPSJNIDEyLDI2IDI1LDE4IDEyLDEwIHoiIHN0eWxlPSJzdHJva2U6ICMwMDA7c3Ryb2tlLW9wYWNpdHk6IC4xNTtzdHJva2Utd2lkdGg6IDJweDtmaWxsOiAjZmZmOyI+PC9wYXRoPjwvc3ZnPg==);
+}
+
+ytd-app:not([guide-persistent-and-visible]) 
+.ended-mode .html5-video-container {
+  animation: miniPlayer-html5-video-container--ended linear 0s;
+  animation-timeline: scroll(root);
+  animation-range-start: 100vh;
+  animation-range-end: 100vh;
+  animation-fill-mode: both;
+}
+
+@keyframes miniPlayer-html5-video-container--ended {
+  100% {
+    display: none;
+  }
+}
+
+ytd-app:not([guide-persistent-and-visible]) 
+.html5-video-container::before {
+  content: '';
+  display: block;
+  animation: miniPlayer-html5-video-container--before linear 0s;
+  animation-timeline: scroll(root);
+  animation-range-start: 100vh;
+  animation-range-end: 100vh;
+  animation-fill-mode: both;
+  opacity: 0;
+  transition: opacity .12s ease-in-out, background-image .2s ease-in-out;
+}
+ytd-app:not([guide-persistent-and-visible]) 
+.html5-video-container:hover::before {
+  opacity: 1;
+}
+
+@keyframes miniPlayer-html5-video-container--before {
+  100% {
+    content: '';
+    position: fixed;
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 72px;
+    background-color: rgba(0, 0, 0, .5);
+  }
+}
+
+ytd-app:not([guide-persistent-and-visible]) 
+.html5-main-video {
+  animation: miniPlayer-html5-main-video linear 0s;
+  animation-timeline: scroll(root);
+  animation-range-start: 100vh;
+  animation-range-end: 100vh;
+  animation-fill-mode: both;
+}
+
+@keyframes miniPlayer-html5-main-video {
+  100% {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    object-fit: contain;
+    pointer-events: none;
+  }
+}
+@supports (scrollbar-width: none) {
+  body,
+  body.no-scroll ytd-app[scrolling] {
+    scrollbar-width: none;
+  }
+}
+
+@supports not (scrollbar-width: none) {
+  @supports (animation-timeline: scroll(root)) {
+
+#masthead-container.ytd-app, body>ytd-app { 
+  width: 100vw;
+}
+
+/*body:has(ytd-watch-flexy[theater]:not([hidden]))*/
+/*body:has(ytd-watch-flexy[role="main"])*/
+body:not(.no-scroll):has(ytd-watch-flexy) {
+  animation: scrollbar linear 1s, topMenu linear 1s;
+  animation-timeline: scroll(root);
+  animation-range-start: 100vh, 0vh;
+  animation-range-end: 100vh, 1vh;
+  animation-fill-mode: both;
+  overflow-x: hidden;
+}
+
+body:not(.no-scroll)::-webkit-scrollbar {
+  display: var(--displayScroll);
+}
+
+body.no-scroll ytd-app[scrolling]::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes scrollbar {
+  from {
+    --displayScroll: none;
+  }
+  to {
+    --displayScroll: initial;
+  }
+}
+
+@keyframes topMenu {
+    from {
+      --topMenuPosition: -56px;
+    }
+    to {
+      --topMenuPosition: 0;
+    }
+}
+
+  }
+}
 
 }
