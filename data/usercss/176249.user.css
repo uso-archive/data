@@ -3,13 +3,12 @@
 @namespace    USO Archive
 @author       Evan Tseng
 @description  欄數依寬度增減，再加一些小調整    要找一頁健全的來截圖好難啊
-@version      20230727.18.24
+@version      20240111.05.02
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
-@-moz-document domain("htmanga2.top"), domain("ssmh01.top"), domain("hentaicomic.org"), regexp("^https?:\\/\\/(?:www\\.)?wnacg.*\\.(?:com|net|org)\\/.*$")
-{
-	body>div[align="center"][style="margin:20px;"],
+@-moz-document domain("htmanga2.top"), domain("ssmh01.top"), domain("hentaicomic.org"), regexp("^https?:\/\/(?:www\.)?wnacg.*\.(?:com|net|org)\/.*$") {
+body>div[align="center"][style="margin:20px;"],
 	iframe,
 	#tuzaoblock,
 	#bread>a,
@@ -21,6 +20,8 @@
 	.grid .sel_on .pic_ctl,
 	.grid_2 .cw,
 	#img_load~div,
+	.title_sort>script+div,
+	.dlh>script+div,
 	img[src="/themes/weitu/images/bg/shoucang.jpg"] {
 		display: none !important;
 	}
@@ -93,7 +94,9 @@
 	}
 	
 	.header.cc {
+		position: relative;
 		display: flex;
+		z-index: 20000;
 	}
 	
 	.header .logo,
@@ -167,9 +170,7 @@
 		background: none;
 		border: none;
 	}
-	#img_list {
-		
-	}
+	
 	#img_list img {
 		width: auto !important;
 		max-width: 100%;
@@ -305,9 +306,20 @@
 	}
 	
 	.grid .pic_box {
+		position: static;
 		margin: 0;
 		overflow: hidden;
 		border-radius: 1mm;
+	}
+	
+	.grid .pic_box[class*="cate-"]::before {
+		position: absolute;
+		right: unset;
+		top: unset;
+		margin: 22em 2mm -2em;
+		background: rgba(30, 0, 80, .3);
+		text-shadow: 0 0 1mm #000,
+			0 0 1mm #000;
 	}
 	
 	.grid li:hover .pic_box {
@@ -381,11 +393,8 @@
 	.drop_dwon {
 		left: 0;
 		right: 0;
-		display: block !important;
 		border-radius: 0 0 2mm 2mm;
-		overflow: hidden;
 		box-shadow: 0 0 5px #888;
-		max-height: 0;
 		transition: .5s;
 	}
 	
@@ -401,7 +410,7 @@
 	#header {
 		width: 100%;
 		padding: 0;
-		z-index: 2;
+		z-index: 1000;
 		box-shadow: 0 0 0 1px #ccc, 0 0 2mm #000;
 		opacity: .2;
 		backdrop-filter: blur(2mm);
@@ -528,23 +537,19 @@
 	
 	.adbox {
 		position: relative;
-		width: 50vw;
-		min-width: 400px;
-		max-width: 600px;
+		width: 70vw;
+		min-width: 300pt;
+		max-width: 500pt;
 		height: auto;
 		padding: 6mm;
 		margin: 30vh auto 10mm;
-		background: rgba(240, 240, 240, .7);
-		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .7),
-			0 2mm 6mm rgba(0, 0, 0, .7);
-		border-radius: 3mm;
+		background: rgba(255, 252, 248, .7);
+		box-shadow: inset 0 0 0 1px #eee,
+			0 2mm 12mm rgba(0, 0, 0, .7);
+		border-radius: 5mm;
 		z-index: 2;
-		backdrop-filter: blur(3mm) saturate(.6);
-		-webkit-backdrop-filter: blur(3mm) saturate(.6);
-	}
-	
-	.backstretch {
-		z-index: 1 !important;
+		backdrop-filter: contrast(.5) blur(5mm);
+		-webkit-backdrop-filter: contrast(.5) blur(5mm);
 	}
 	
 	.btn {
@@ -559,18 +564,17 @@
 	}
 	
 	.btn:hover {
-		background: linear-gradient(180deg, #7c7 0%, #6b6 100%) !important;
+		background: linear-gradient(0deg, #6b6 0%, #7c7 100%) !important;
 		box-shadow: 0 0 1mm #aaa;
 	}
 	
 	.btn:active {
-		background: linear-gradient(180deg, #5a5 0, #494 100%) !important;
+		background: linear-gradient(0deg, #494 0, #5a5 100%) !important;
 		box-shadow: inset 0 0 1mm #777;
 	}
 	
 	.download_panel,
 	.download_btn {
-		text-align: center;
 		width: auto;
 		height: auto;
 		padding: 0;
@@ -580,26 +584,22 @@
 	}
 	
 	.download_filename {
-		font-size: 14pt;
+		font-size: 1.2rem;
 		white-space: normal;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-		text-overflow: ellipsis;
 		padding: 0;
 	}
 	
+	.download_btn {
+		display: flex;
+	}
+	
 	.down_btn {
-		display: inline-block !important;
+		flex: 1 1 auto;
 		float: none;
-		width: calc(50% - 3mm);
-		height: auto;
-		line-height: 1.4;
-		font-size: 14pt;
-		padding: 1.5em 0;
+		font-size: 1.2rem;
+		line-height: 24mm;
 		margin: 10mm 1mm 1mm;
-		border-radius: 3mm;
+		border-radius: 2mm;
 		background: rgba(20, 80, 120, .7);
 		transition: .2s;
 	}
@@ -607,11 +607,13 @@
 	.down_btn:hover {
 		color: #ff2;
 		background: rgba(20, 80, 120, .8) !important;
-		box-shadow: 0 1px 4px rgba(0, 0, 0, .8), inset 0 0 0 1px #ccc;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, .8),
+			inset 0 0 0 1px #ccc;
 	}
 	
 	.down_btn:active {
-		box-shadow: inset 0 1px 4px rgba(0, 0, 0, .8), 0 0 0 1px #eee;
+		box-shadow: inset 0 1px 4px rgba(0, 0, 0, .8),
+			0 0 0 1px #eee;
 	}
 	
 	.demo-error,
