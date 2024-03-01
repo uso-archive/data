@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Evan Tseng
 @description  动漫屋dm5, 动漫之家dmzj, 漫画柜manhuagui, 拷贝漫画copymanga  (动漫之家的頁面系統雜亂不一，這邊主要只有弄 manhua.dmzj.com 這個網域)    調整字型大小、色彩、圖片尺寸，隱藏上下工具列  捲頁模式下，視窗拉寬可變成雙頁顯示  雙頁模式中，移動滑鼠的進出可切換排序，方便觀看跨頁大圖    動漫之家的部份停止更新  從幾個月前開始，我在 dmzj 就已經無法觀看任何日本漫畫了，應該是 IP 被擋吧.
-@version      20240125.16.54
+@version      20240229.14.28
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -326,11 +326,15 @@
 		margin-right: 5mm
 	}
 	
+	.header>.container {
+		display: flex;
+		position: relative;
+		max-width: 1200pt
+	}
+	
 	.header-title,
-	.header-bar,
 	.header-search input {
 		flex: 1 0 auto;
-		float: none;
 	}
 	
 	.header-search {
@@ -342,14 +346,15 @@
 		flex: 0 0 auto
 	}
 	
+	.header-bar {
+		flex: 0 1 16em;
+		display: inline-flex;
+		margin: calc(17px - .2em) 0 0 !important
+	}
+	
 	.header_login {
 		flex: 0 0 auto;
 		margin: 0 0 0 4mm
-	}
-	
-	.header-bar {
-		display: inline-flex;
-		margin: calc(17px - .2em) 0 0 !important
 	}
 	
 	.header-bar li {
@@ -750,8 +755,13 @@
 	}
 	
 	.header-title {
+		display: flex;
 		width: clamp(17em, 25%, 24em);
-		display: flex
+	}
+	
+	.header-title::after {
+		flex: 6 6 auto;
+		content: "";
 	}
 	
 	.header-title li {
@@ -781,7 +791,7 @@
 		display: block;
 		width: 100%;
 		margin: 0;
-		line-height: 2em;
+		line-height: 2.4em;
 		transition: .2s
 	}
 	
@@ -1774,12 +1784,6 @@
 			inset 0 1pt 3pt #888
 	}
 	
-	.header>.container {
-		display: flex;
-		position: relative;
-		max-width: 1200pt
-	}
-	
 	.cat-filter {
 		max-height: 85px;
 		background: #dcdee4;
@@ -2134,14 +2138,19 @@
 		margin: -7pt 3pt 0 0;
 		border-radius: 2mm;
 		background: transparent radial-gradient(circle at 50% 50%,
-				rgba(240, 0, 50, .5) 1.4em,
-				rgba(50, 0, 120, .7) 1.5em,
+				rgba(240, 80, 110, 75%) 1.4em,
+				#830 1.5em,
 				transparent 1.6em) !important;
 		text-shadow: 0 0 2pt #000,
 			0 0 3pt #000,
 			0 0 3pt #000;
 		transform: rotate(5deg);
-		animation: 1.6s infinite pulse_new
+		animation: pulse_new 1.6s infinite
+	}
+	
+	.mh-cover .read-section {
+		text-shadow: 0 0 2pt #000,
+			0 0 2pt #000;
 	}
 	
 	.mh-item-tip .btn {
@@ -4567,7 +4576,6 @@
 
 @-moz-document domain("manhuagui.com"), domain("mhgui.com"), domain("wuqimh.com") {
 /*	漫畫櫃	*/
-	
 	.footer,
 	.gg_728,
 	.gg_950,
@@ -4623,7 +4631,9 @@
 	.crumb,
 	.crumb em,
 	.content_r .text,
-	.book-intro {
+	.book-intro,
+	.pager a,
+	.pager span {
 		font: var(--font1)
 	}
 	
@@ -4645,9 +4655,7 @@
 	.nav-sub-cont .filter label,
 	.nav-sub-cont .filter ul,
 	.filter-nav .filter label,
-	.filter-nav .filter ul,
-	.pager a,
-	.pager span {
+	.filter-nav .filter ul {
 		font: var(--font2)
 	}
 	
@@ -5280,7 +5288,7 @@
 	}
 	
 	.w998 {
-		margin: 2mm auto;
+		margin: 2mm auto 0;
 		box-shadow: none
 	}
 	
@@ -5297,9 +5305,11 @@
 		-webkit-backdrop-filter: blur(5mm)
 	}
 	
-	.nav-sub-cont a:hover {
+	.nav-sub-cont a:hover,
+	.filter-nav a:hover {
 		color: #a30;
-		background: #fff
+		background: #fff;
+		border-radius: 4pt;
 	}
 	
 	.reminder-cont {
@@ -5462,17 +5472,47 @@
 		width: calc(100% - 160px)
 	}
 	
+	#contList {
+		padding-bottom: 13mm;
+	}
+	
+	.pager-cont {
+		position: fixed;
+		left: 0;
+		bottom: 0;
+		width: 100%;
+		background: rgba(225, 225, 225, .2);
+		z-index: 31;
+		backdrop-filter: blur(1mm);
+		-webkit-backdrop-filter: blur(1mm);
+		transition: .5s;
+	}
+	
+	.pager-cont:hover {
+		background: rgba(80, 80, 90, .5);
+		backdrop-filter: blur(3mm);
+		-webkit-backdrop-filter: blur(3mm)
+	}
+	
 	.pager a,
 	.pager span {
 		min-width: 1em;
 		height: auto;
 		line-height: 1.6;
 		padding: 0 .3em;
-		border-radius: 4pt
+		border: none;
+		border-radius: 4pt;
 	}
 	
 	.pager a {
-		background: #aaa
+		background: rgba(255, 255, 255, .4);
+	}
+	
+	.pager a:hover {
+		background: rgba(255, 220, 200, .8);
+		box-shadow: inset 1px 1px 2px #ccc,
+			inset -1px -1px 2px #666,
+			0 1px 1mm #555;
 	}
 	
 	/* ============================================= */
@@ -5801,7 +5841,7 @@
 		top: -1.2em;
 		right: -1em;
 		z-index: 2;
-		animation: pulse_2 1s infinite
+		animation: pulse_new 1s infinite
 	}
 	
 	.chapter-list li a em::before {
@@ -6485,7 +6525,7 @@
 	
 	.rank-cont li h6 {
 		display: flex;
-		width: calc(100% - 4em)
+		width: calc(100% - 50pt)
 	}
 	
 	.rank-cont li h6:hover {
@@ -6494,14 +6534,14 @@
 	
 	.rank-cont li h6 a,
 	.rank-cont li h6 span {
-		flex: 1 1 1em;
+		flex: 3 1 1em;
 		overflow: hidden;
 		text-overflow: ellipsis
 	}
 	
 	.rank-cont li h6 span {
-		display: flex;
-		flex: 0 1 auto
+		flex: 2 0 1em;
+		text-align: right;
 	}
 	
 	.rank-cont li h6 span a {
@@ -6734,12 +6774,13 @@
 	.dy_r p .new::before {
 		display: inline-block;
 		content: "新";
+		line-height: 1;
 		color: #fff;
-		background: #d00;
-		padding: 0 .2em;
-		border-radius: .3em;
-		text-shadow: 0 0 2px #600;
-		animation: pulse_2 1s infinite
+		background: #c00;
+		padding: .2em;
+		border-radius: 4pt;
+		text-shadow: 0 0 2px #500;
+		animation: pulse_new 1s infinite
 	}
 	
 	.dy_check,
@@ -6972,7 +7013,7 @@
 	
 	}
 	
-	@keyframes pulse_2 {
+	@keyframes pulse_new {
 		25% {
 			transform: translate(-1px, 0) rotate(-5deg)
 		}
@@ -8621,7 +8662,6 @@
 		object-fit: cover;
 		object-position: 50% 10%
 	}
-	
 	.correlationItem-img,
 	.correlationItem-txt p {
 		width: 100%;

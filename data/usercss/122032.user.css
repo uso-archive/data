@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       HorsyNox
 @description  Don't like these small videos on YouTube pages? Me too. So one day I decided to change that and created this userstyle.  <br><strong>This style expands video to fill all free space inside the browser window. Like a fullscreen YouTube but not fullscreen. You'll like it!</strong>  <br>Scroll YouTube page down to see comments and other stuff.  Move the cursor up and the top bar with the search will appear.  <br>It also shows a floating miniplayer in the corner when you read comments. You can disable this in options if you don't like it.
-@version      20231126.23.37
+@version      20240229.23.01
 @license      CC0-1.0
 @preprocessor uso
 @advanced dropdown miniplayer "Miniplayer in comments" {
@@ -125,69 +125,76 @@ ytd-app:not([guide-persistent-and-visible])
 
 }
 @advanced dropdown scrollbar "Scrollbar" {
-    auto "Auto*" <<<EOT @supports (scrollbar-width: none) {
-  body,
+    auto "Auto*" <<<EOT /* Use this @supports instead when the parser is fixed:
+@supports not selector(::-webkit-scrollbar) {
+ *\/
+
+@supports (scrollbar-width: none) {
+  html,
   body.no-scroll ytd-app[scrolling] {
     scrollbar-width: none;
   }
 }
 
-@supports not (scrollbar-width: none) {
+/* Use this @supports instead when the parser is fixed:
+@supports selector(::-webkit-scrollbar) { 
+*\/
+
+/*@supports not (scrollbar-width: none) {*\/
   @supports (animation-timeline: scroll(root)) {
 
-#masthead-container.ytd-app, body>ytd-app { 
-  width: 100vw;
-}
+    #masthead-container.ytd-app, body>ytd-app { 
+      width: 100vw;
+    }
 
-/*body:has(ytd-watch-flexy[theater]:not([hidden]))*\/
-/*body:has(ytd-watch-flexy[role="main"])*\/
-body:not(.no-scroll):has(ytd-watch-flexy) {
-  animation: scrollbar linear 1s, topMenu linear 1s;
-  animation-timeline: scroll(root);
-  animation-range-start: 100vh, 0vh;
-  animation-range-end: 100vh, 1vh;
-  animation-fill-mode: both;
-  overflow-x: hidden;
-}
+    /*body:has(ytd-watch-flexy[theater]:not([hidden]))*\/
+    /*body:has(ytd-watch-flexy[role="main"])*\/
+    html:has(ytd-watch-flexy),
+    body:not(.no-scroll):has(ytd-watch-flexy) {
+      animation: scrollbar linear 1s, topMenu linear 1s;
+      animation-timeline: scroll(root);
+      animation-range-start: 100vh, 0vh;
+      animation-range-end: 100vh, 1vh;
+      animation-fill-mode: both;
+      overflow-x: hidden;
+    }
 
-body:not(.no-scroll)::-webkit-scrollbar {
-  display: var(--displayScroll);
-}
+    body:not(.no-scroll)::-webkit-scrollbar {
+      display: var(--displayScroll);
+    }
 
-body.no-scroll ytd-app[scrolling]::-webkit-scrollbar {
+    body.no-scroll ytd-app[scrolling]::-webkit-scrollbar {
+      display: none;
+    }
+
+    @keyframes scrollbar {
+      from {
+        --displayScroll: none;
+        scrollbar-width: none;
+      }
+      to {
+        --displayScroll: initial;
+        scrollbar-width: thin;
+      }
+    }
+
+    @keyframes topMenu {
+      from {
+        --topMenuPosition: -56px;
+      }
+      to {
+        --topMenuPosition: 0;
+      }
+    }
+
+  }
+/*} ** @supports not (scrollbar-width: none)*\/ EOT;
+    hide "Hide" <<<EOT html {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
   display: none;
-}
-
-@keyframes scrollbar {
-  from {
-    --displayScroll: none;
-  }
-  to {
-    --displayScroll: initial;
-  }
-}
-
-@keyframes topMenu {
-    from {
-      --topMenuPosition: -56px;
-    }
-    to {
-      --topMenuPosition: 0;
-    }
-}
-
-  }
-}
- EOT;
-    hide "Hide" <<<EOT @supports (scrollbar-width: none) {
-  body {
-    scrollbar-width: none;
-  }
-}
-@supports not (scrollbar-width: none) {
-  body::-webkit-scrollbar {
-    display: none;
-  }
 } EOT;
     show "Show" <<<EOT  EOT;
 
@@ -410,58 +417,68 @@ ytd-app:not([guide-persistent-and-visible])
     pointer-events: none;
   }
 }
+/* Use this @supports instead when the parser is fixed:
+@supports not selector(::-webkit-scrollbar) {
+ */
+
 @supports (scrollbar-width: none) {
-  body,
+  html,
   body.no-scroll ytd-app[scrolling] {
     scrollbar-width: none;
   }
 }
 
-@supports not (scrollbar-width: none) {
+/* Use this @supports instead when the parser is fixed:
+@supports selector(::-webkit-scrollbar) { 
+*/
+
+/*@supports not (scrollbar-width: none) {*/
   @supports (animation-timeline: scroll(root)) {
 
-#masthead-container.ytd-app, body>ytd-app { 
-  width: 100vw;
-}
-
-/*body:has(ytd-watch-flexy[theater]:not([hidden]))*/
-/*body:has(ytd-watch-flexy[role="main"])*/
-body:not(.no-scroll):has(ytd-watch-flexy) {
-  animation: scrollbar linear 1s, topMenu linear 1s;
-  animation-timeline: scroll(root);
-  animation-range-start: 100vh, 0vh;
-  animation-range-end: 100vh, 1vh;
-  animation-fill-mode: both;
-  overflow-x: hidden;
-}
-
-body:not(.no-scroll)::-webkit-scrollbar {
-  display: var(--displayScroll);
-}
-
-body.no-scroll ytd-app[scrolling]::-webkit-scrollbar {
-  display: none;
-}
-
-@keyframes scrollbar {
-  from {
-    --displayScroll: none;
-  }
-  to {
-    --displayScroll: initial;
-  }
-}
-
-@keyframes topMenu {
-    from {
-      --topMenuPosition: -56px;
+    #masthead-container.ytd-app, body>ytd-app { 
+      width: 100vw;
     }
-    to {
-      --topMenuPosition: 0;
+
+    /*body:has(ytd-watch-flexy[theater]:not([hidden]))*/
+    /*body:has(ytd-watch-flexy[role="main"])*/
+    html:has(ytd-watch-flexy),
+    body:not(.no-scroll):has(ytd-watch-flexy) {
+      animation: scrollbar linear 1s, topMenu linear 1s;
+      animation-timeline: scroll(root);
+      animation-range-start: 100vh, 0vh;
+      animation-range-end: 100vh, 1vh;
+      animation-fill-mode: both;
+      overflow-x: hidden;
     }
-}
+
+    body:not(.no-scroll)::-webkit-scrollbar {
+      display: var(--displayScroll);
+    }
+
+    body.no-scroll ytd-app[scrolling]::-webkit-scrollbar {
+      display: none;
+    }
+
+    @keyframes scrollbar {
+      from {
+        --displayScroll: none;
+        scrollbar-width: none;
+      }
+      to {
+        --displayScroll: initial;
+        scrollbar-width: thin;
+      }
+    }
+
+    @keyframes topMenu {
+      from {
+        --topMenuPosition: -56px;
+      }
+      to {
+        --topMenuPosition: 0;
+      }
+    }
 
   }
-}
-
+/*} ** @supports not (scrollbar-width: none)*/
 }
