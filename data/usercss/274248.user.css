@@ -3,12 +3,200 @@
 @namespace    USO Archive
 @author       Валерий Щучкин
 @description  Yandex SERP
-@version      20250723.16.06
+@version      20250724.06.54
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
-@-moz-document domain("yandex.ru"), url-prefix("http://yandex.ru/search") {
-.content__left {width: 720px;}
-.main {background: #fff;}
-.serp-item_card {box-shadow: none;}
+@-moz-document domain("yandex.ru"), url-prefix("https://yandex.ru/search") {
+/* =====================================================================
+   MEDIA: до 1251px — плитки продуктов и ширина serp-item, поповер = 400px
+   ===================================================================== */
+@media (max-width: 1251px) {
+  /* Карточки внутри ProductTile — 4 в ряд (25%)  */
+  .ProductsCustomAmountInRow.ProductsModeRoot .ProductTile-Products .EProductSnippet2_withBorder.ProductTile-Item[class],
+  .serp-item_full-width .ProductsCustomAmountInRow.ProductsModeRoot .ProductTile-Products .EProductSnippet2_withBorder.ProductTile-Item[class],
+  .ProductsModeRoot .EProductSnippet2_withBorder.EProductSnippet2.ProductTile-Item[class] {
+    width: calc(25% - 20px);
+    margin: 0 0 8px 8px;
+  }
+
+  /* Ширина serp-item в левой колонке */
+  .content__left li.serp-item.serp-item_full-width {
+    width: 720px;
+    max-width: 720px;
+    box-sizing: border-box;
+  }
+
+  /* Поповер при узком экране */
+  .content__right_cols_10 .Popover {
+    max-width: 400px;
+  }
+}
+
+/* =====================================================================
+   MEDIA: от 1252px — плитки 5 в ряд (25% - 8px), serp-item шире
+   ===================================================================== */
+@media (min-width: 1252px) {
+  .content__left li.serp-item.serp-item_full-width {
+    width: 980px;
+    max-width: 980px;
+    box-sizing: border-box;
+  }
+
+  .ProductsCustomAmountInRow.ProductsModeRoot .ProductTile-Products .EProductSnippet2_withBorder.ProductTile-Item[class],
+  .serp-item_full-width .ProductsCustomAmountInRow.ProductsModeRoot .ProductTile-Products .EProductSnippet2_withBorder.ProductTile-Item[class],
+  .ProductsModeRoot .EProductSnippet2_withBorder.EProductSnippet2.ProductTile-Item[class] {
+    width: calc(25% - 8px);
+  }
+}
+
+/* =====================================================================
+   MEDIA: до 1224px — другой лимит для Popover (480px)
+   (да, перекрывает предыдущее правило про 400px, по специфичности/порядку)
+   ===================================================================== */
+@media (max-width: 1224px) {
+  .content__right_cols_10 .Popover {
+    max-width: 480px;
+  }
+}
+
+/* =====================================================================
+   MODAL / PRODUCT CARD
+   ===================================================================== */
+.Modal-Cell {
+  display: block;
+  text-align: right;
+}
+
+.Modal.Modal_theme_popup {
+  z-index: 10006;
+  background: none;
+}
+
+.ProductCardModal {
+  --local-product-modal-button-size: 32px;
+  --local-product-modal-button-offset: -5px;
+  box-shadow: -1px 0 var(--depot-color-stroke);
+  width: 480px;
+  max-width: 480px;
+  height: 100%;
+  max-height: auto; /* да, auto — оставлено как было */
+  border-radius: 0;
+}
+
+[class].ProductCardModal-CloseButton {
+  right: 10px;
+  top: 10px;
+}
+
+.EProductCard-Item_type_ecom-header {
+  width: calc(100% - 32px);
+}
+
+[class].ProductCardModal-Content {
+  border-radius: 0;
+}
+
+/* =====================================================================
+   Глобальные мелочи / сглаживание / скрытие теней и т.п.
+   ===================================================================== */
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* .OrganicText {display:none} */
+
+.serp-item_card {
+  box-shadow: none;
+}
+
+.EProductSnippet2_withBorder .EProductSnippet2-Overlay {
+  border: 1px solid var(--depot-color-fill-05);
+}
+
+.EProductSnippet2:hover {
+  border-radius: 16px;
+  border-color: var(--depot-color-bg-primary);
+  box-shadow: var(--depot-shadow-card-var);
+  transform: scale(1.02);
+  transition: .15s ease-in-out;
+  z-index: 1; /* На всякий случай — чтоб поверх был */
+}
+
+/* Z-index правок для хедера/правой колонки */
+.HeaderDesktop {
+  z-index: 9998;
+}
+
+.content__right {
+  z-index: 9999;
+}
+
+.content__right.content__right_cols_6.content__right_wide {
+  z-index: 999;
+}
+
+/* =====================================================================
+   POPUP / WIZARD WRAPPERS — фиксированная панель справа
+   ===================================================================== */
+.Popover,
+.FuturisSearchWrapper,
+.FuturisProductsComplexChoice-WizardWrapper {
+  overflow-y: scroll;
+  position: fixed;
+  inset: 0 0 0 auto; /* top:0; right:0; bottom:0; left:auto */
+  width: 100%;
+  max-width: 480px;
+  background: #fff;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -1px 0 var(--depot-color-stroke);
+}
+
+/* Кнопка закрытия поповера */
+[class].Popover-CloseButton {
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+}
+
+/* Внутренние отступы карточки и визарда */
+.EProductCardViewer,
+.FuturisProductsComplexChoice-WizardWrapper {
+  padding: 20px 16px;
+}
+
+.FuturisProductsComplexChoice-WizardWrapper {
+  padding: 20px 16px; /* дублируется сознательно, оставлено как было */
+  max-width: 488px;
+}
+
+/* =====================================================================
+   Контентные блоки, типографика
+   ===================================================================== */
+.PreviewSingle_size_m {
+  height: 240px;
+}
+
+.FuturisMarkdown-Paragraph {
+  font: var(--depot-font-size-text-s-paragraph) var(--depot-font-text);
+}
+
+.FuturisProductsComplexChoice-CollapserLabelWrapper {
+  font: 700 var(--depot-font-size-text-s-paragraph) var(--depot-font-text);
+}
+
+.FuturisProductsComplexChoice-CollapserSegment .Collapser-Description {
+  color: var(--depot-color-text-tertiary);
+}
+
+/* Убираем внутренние отступы у карточки */
+.EProductSnippet2_withBorder {
+  padding: 0;
+}
+
+.EProductSnippet2_withBorder .EProductSnippet2-Content {
+  padding: 6px 12px 8px;
+}
 }
