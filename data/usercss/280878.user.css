@@ -1,0 +1,200 @@
+/* ==UserStyle==
+@name         Liquid YouTube
+@namespace    USO Archive
+@author       Rex Fuentes
+@description  It's a VisionOS and Liquid Glass inspired theme.
+@version      20250815.21.26
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("youtube.com") {
+/* ---------- Variables ---------- */
+  :root{
+    --glass-bg: rgba(255,255,255,0.64);
+    --glass-dark: rgba(20,20,22,0.72);
+    --glass-border: rgba(255,255,255,0.12);
+    --shadow-soft: 0 8px 30px rgba(0,0,0,0.10);
+    --shadow-hover: 0 12px 48px rgba(0,0,0,0.14);
+    --blur-amount: 10px; /* reducido */
+    --primary-accent: linear-gradient(135deg,#667eea 0%, #764ba2 100%);
+    --glow-color: rgba(102,126,234,0.28);
+    --anim-ease: cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Preferencia modo oscuro (YouTube usa html[dark] en muchos casos) */
+  html[dark], ytd-app[dark] {
+    --glass-bg: rgba(28,28,30,0.64);
+    --glass-dark: rgba(12,12,14,0.72);
+    --glass-border: rgba(255,255,255,0.06);
+  }
+
+  /* ---------- Transiciones: limitar a elementos interactivos ---------- */
+  a, button, input, textarea, ytd-toggle-button-renderer, ytd-button-renderer,
+  ytd-compact-video-renderer, ytd-video-renderer, ytd-grid-video-renderer {
+    transition: transform 260ms var(--anim-ease), box-shadow 260ms var(--anim-ease),
+                background-color 220ms var(--anim-ease), opacity 220ms var(--anim-ease);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Fondo opcional (comentar si prefieres respetar fondo de YouTube) ---------- */
+  /* body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%);
+    background-attachment: fixed;
+    background-size: 400% 400%;
+    animation: gradientShift 25s linear infinite;
+  } */
+
+  /* ---------- Masthead (pegado y sutil) ---------- */
+  ytd-masthead, #masthead-container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--blur-amount)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--blur-amount)) saturate(140%);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-soft);
+    position: sticky;
+    top: 0;
+    z-index: 2020;
+  }
+
+  /* ---------- Búsqueda: menos brillante ---------- */
+  #search-form, #search-container {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(6px);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    padding: 2px 6px;
+  }
+
+  #search-input input { background: transparent; border: none; padding: 10px 12px; color: inherit; }
+
+  /* ---------- Botones del header: añadir contención para ripple ---------- */
+  ytd-button-renderer, button, #avatar-btn {
+    position: relative; /* para que ::after quede contenido */
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(6px);
+    border-radius: 16px;
+    padding: 6px 12px;
+    border: 1px solid var(--glass-border);
+  }
+
+  /* Hover sutil */
+  ytd-button-renderer:hover, button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    background: rgba(255,255,255,0.26);
+  }
+
+  /* ---------- Ripple pequeño y no intrusivo ---------- */
+  ytd-button-renderer::after, button::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    width: 48px;
+    height: 48px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%) scale(0);
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  ytd-button-renderer:active::after, button:active::after {
+    animation: rippleSmall 420ms var(--anim-ease) forwards;
+  }
+
+  @keyframes rippleSmall {
+    0% { transform: translate(-50%,-50%) scale(0); opacity: 0.6; }
+    60% { transform: translate(-50%,-50%) scale(1); opacity: 0.18; }
+    100% { transform: translate(-50%,-50%) scale(1.6); opacity: 0; }
+  }
+
+  /* ---------- Cards / Thumbnails: menos opaco, bordes más finos ---------- */
+  ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(calc(var(--blur-amount) - 4px));
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    margin: 8px;
+  }
+
+  ytd-rich-item-renderer:hover, ytd-video-renderer:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 18px 36px rgba(0,0,0,0.12);
+  }
+
+  /* Thumbnail overlay (oscurecer sutil para legibilidad del texto) */
+  ytd-thumbnail::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.28) 100%);
+    z-index: 1;
+    border-radius: 12px;
+    pointer-events: none;
+  }
+
+  /* ---------- Player: bordes y controles limpios ---------- */
+  #movie_player, .html5-video-player {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.28);
+    background: #000;
+  }
+
+  .ytp-chrome-bottom {
+    background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.7));
+    backdrop-filter: blur(8px);
+  }
+
+  .ytp-progress-bar-container { height: 5px; border-radius: 4px; background: rgba(255,255,255,0.06); }
+  .ytp-play-progress { background: linear-gradient(90deg,#667eea,#764ba2); box-shadow: 0 0 6px var(--glow-color); }
+
+  /* mejor apariencia del scrubber sin desproporcionar la interfaz */
+  .ytp-scrubber-container { width: auto; height: 12px; border-radius: 999px; }
+  .ytp-scrubber-button { width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.28); }
+
+  /* ---------- Panel de info y comentarios: legible y sobrio ---------- */
+  #primary-inner, ytd-watch-metadata, ytd-comments, #comments {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,0.03);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+
+  h1.ytd-watch-metadata, #video-title {
+    font-weight: 700;
+    font-size: 20px;
+    color: inherit; /* permite adaptar al modo */
+  }
+
+  /* ---------- Scrollbars discretas ---------- */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { border-radius: 8px; background: linear-gradient(135deg,#667eea,#764ba2); opacity: 0.9; border: 2px solid rgba(0,0,0,0); }
+
+  /* ---------- Tooltips, menus y modales: menos intrusivos ---------- */
+  paper-tooltip, tp-yt-paper-tooltip, paper-menu, ytd-menu-popup-renderer, paper-dialog, ytd-dialog {
+    background: var(--glass-dark);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+  }
+
+  /* ---------- Accesibilidad: focus claro pero no exagerado ---------- */
+  *:focus { outline: 2px solid rgba(102,126,234,0.8); outline-offset: 2px; }
+
+  /* ---------- Limpieza: evitar reglas globales peligrosas ---------- */
+  /* Quitar reglas que causan problemas:
+     - no usar *:hover { z-index: 1 }
+     - no usar transition en *
+  */
+
+  /* ---------- Optimizaciones pequeñas ---------- */
+  ytd-thumbnail img { will-change: transform; }
+  ytd-rich-item-renderer:hover, ytd-video-renderer:hover { will-change: transform, box-shadow; }
+}
