@@ -1,0 +1,239 @@
+/* ==UserStyle==
+@name         NeonTube
+@namespace    USO Archive
+@author       Divesh Deswal
+@description  Neon style for youtube
+@version      20251013.15.32
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("youtube.com") {
+/* =========================
+     Theme Variables
+  ========================= */
+  :root {
+    --primary-color: #ff3ec0;
+    --secondary-color: #00fff7;
+    --accent-color: #fffc00;
+    --bg-color: #0d0d1a;
+    --bg-image-url: url('https://i.imgur.com/6XfZB7D.png');
+    --overlay-image-url: url('https://i.imgur.com/0H5GQwA.png');
+    --glow-intensity: 0.6;
+    --animation-enabled: 1;
+    --reduced-motion: 0;
+  }
+
+  :root.light-theme {
+    --primary-color: #ff007f;
+    --secondary-color: #00d4ff;
+    --accent-color: #ffd400;
+    --bg-color: #f0f0f5;
+  }
+
+  :root.reduced-motion {
+    --animation-enabled: 0;
+  }
+
+  :root.disable-bg {
+    --bg-image-url: none;
+    --overlay-image-url: none;
+  }
+
+  /* =========================
+     Base Styles
+  ========================= */
+  ytd-app, body, html {
+    background: var(--bg-color) var(--bg-image-url) center/cover no-repeat;
+    color: var(--secondary-color);
+    font-family: 'Orbitron', sans-serif;
+  }
+
+  /* =========================
+     Animated Background Overlay
+  ========================= */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: var(--overlay-image-url) center/cover no-repeat;
+    opacity: 0.15;
+    z-index: -1;
+    pointer-events: none;
+    animation: floatOverlay 60s linear infinite;
+  }
+
+  @keyframes floatOverlay {
+    0% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(10px) translateX(-10px); }
+    100% { transform: translateY(0) translateX(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::before { animation: none; }
+  }
+
+  /* =========================
+     Logo & Masthead
+  ========================= */
+  ytd-masthead #logo-icon-container {
+    filter: drop-shadow(0 0 10px var(--primary-color));
+    animation: logoGlow 3s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+  }
+
+  @keyframes logoGlow {
+    0% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0.8; transform: scale(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ytd-masthead #logo-icon-container { animation: none; }
+  }
+
+  /* =========================
+     Search Bar
+  ========================= */
+  ytd-masthead #search, ytd-masthead #search-input {
+    border-radius: 25px;
+    border: 2px solid var(--accent-color);
+    background-color: rgba(0,0,0,0.3);
+    color: var(--secondary-color);
+    transition: box-shadow 0.3s ease;
+  }
+
+  ytd-masthead #search-input:focus {
+    box-shadow: 0 0 15px var(--accent-color);
+    outline: none;
+  }
+
+  /* =========================
+     Player Styling
+  ========================= */
+  .html5-video-player {
+    box-shadow: 0 0 20px var(--primary-color);
+    border-radius: 5px;
+  }
+
+  .ytp-scrubber-button {
+    background-color: var(--secondary-color);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--secondary-color);
+  }
+
+  .ytp-hd-badge {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: #000;
+    text-shadow: 0 0 5px #fff;
+  }
+
+  /* =========================
+     Thumbnails
+  ========================= */
+  ytd-rich-grid-media:hover {
+    transform: scale(1.03);
+    transition: transform 0.25s ease;
+  }
+
+  ytd-rich-grid-media::after {
+    content: 'Watched / Watch Again?';
+    position: absolute;
+    bottom: 5px; left: 5px;
+    font-size: 12px;
+    color: var(--accent-color);
+    text-shadow: 0 0 5px #000;
+    opacity: 0;
+  }
+
+  ytd-rich-grid-media[ytd-thumbnail-progress="100%"]::after {
+    opacity: 1;
+  }
+
+  /* =========================
+     Sidebar / Guide
+  ========================= */
+  ytd-guide, ytd-guide-entry-renderer, ytd-mini-guide-entry-renderer {
+    background-color: rgba(13, 13, 26, 0.8);
+    border-left: 2px solid var(--primary-color);
+    backdrop-filter: blur(6px);
+  }
+
+  ytd-guide-entry-renderer[selected] {
+    box-shadow: 0 0 10px var(--primary-color);
+  }
+
+  /* =========================
+     Dropdowns & Tooltips
+  ========================= */
+  ytd-popup-container, ytd-menu-popup-renderer, tp-yt-paper-tooltip {
+    background-color: rgba(0, 0, 0, 0.65);
+    border: 1px solid var(--accent-color);
+    backdrop-filter: blur(4px);
+    color: var(--secondary-color);
+  }
+
+  /* =========================
+     Like / Engagement Bars
+  ========================= */
+  #like-button-renderer, ytd-toggle-button-renderer {
+    position: relative;
+  }
+
+  #like-button-renderer::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    box-shadow: 0 0 10px var(--primary-color);
+    border-radius: 2px;
+  }
+
+  /* =========================
+     Live Indicators
+  ========================= */
+  .yt-live-badge, ytd-badge-supported-renderer[iconType="LIVE"] {
+    border-radius: 50%;
+    box-shadow: 0 0 8px 2px #ff3ec0, 0 0 12px 4px #00fff7, 0 0 16px 6px #fffc00;
+    animation: livePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes livePulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .yt-live-badge { animation: none; }
+  }
+
+  /* =========================
+     Scrollbar
+  ========================= */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(13,13,26,0.5);
+  }
+
+  /* =========================
+     Comments & Chat
+  ========================= */
+  ytd-comment-renderer, ytd-live-chat-text-message-renderer {
+    background: rgba(0,0,0,0.3);
+    border-left: 2px solid var(--primary-color);
+    padding: 6px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    color: var(--secondary-color);
+  }
+}
