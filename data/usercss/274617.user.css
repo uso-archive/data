@@ -1,14 +1,15 @@
 /* ==UserStyle==
 @name         Turkhackteam 2014
 @namespace    USO Archive
-@author       Gauloran
+@author       drose
 @description  oldschool THT theme.
-@version      20240815.00.21
+@version      20251121.08.26
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
 @-moz-document domain("www.turkhackteam.org") {
-.p-pageWrapper {
+/* --- GENEL SAYFA YAPISI --- */
+    .p-pageWrapper {
         position: relative;
         display: flex;
         flex-direction: column;
@@ -344,4 +345,403 @@
     color: #bfbfbf;
     background: #0A0A0A;
 }
+
+/* --- Reaction Bar Düzenlemesi --- */
+
+/* 1. Barın genel çerçevesi ve rengi */
+.message .reactionsBar {
+    background: #0D0D0D !important; /* Mesaj içi user alanı ile uyumlu */
+    border: 1px solid #232323 !important;
+    border-left: 3px solid red !important; /* Senin kırmızı aksan rengin */
+    margin-top: 10px;
+    padding: 10px;
+    display: flex; /* Hizalama için */
+    align-items: center;
+}
+
+/* 2. Soldaki emoji ikonlarını (Thumb up vb.) tamamen gizle */
+.reactionsBar .reactionSummary {
+    display: none !important;
+}
+
+/* 3. İsimlerin olduğu link yapısını düzenle */
+.reactionsBar .reactionsBar-link {
+    color: #bfbfbf !important; /* Gri metin rengi */
+    font-size: 13px;
+    text-decoration: none;
+}
+
+/* 4. "Bu üyeler mesaja teşekkür etti:" yazısını ekle */
+.reactionsBar .reactionsBar-link::before {
+    content: "Bu üyeler mesaja teşekkür etti: ";
+    color: gray !important; /* Başlık kırmızı */
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+/* 5. İsimlerin vurgusunu artırmak istersen (Opsiyonel) */
+.reactionsBar .reactionsBar-link bdi {
+    color: #ffffff !important; /* İsimler beyaz olsun */
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   YENİ POSTBIT (ÜYE VİTRİNİ) TASARIMI - TURKHACKTEAM TARZI
+   ========================================================================== */
+
+/* 1. ANA KONTEYNER DÜZENLEMESİ */
+/* Kullanıcı bölümünün dış çerçevesini hedef resimdeki gibi yapalım */
+.block--messages article.message .message-cell.message-cell--user {
+    background: #050505 !important; /* Daha koyu, neredeyse siyah arka plan */
+    border: 1px solid #3a3a3a !important; /* Koyu gri çerçeve */
+    border-radius: 4px !important;
+    padding: 0 !important; /* İç boşlukları sıfırla, elemanlar yönetecek */
+    overflow: hidden; /* Köşelerin taşmasını engelle */
+    /* Eski sağ kenarlığı kaldıralım */
+    border-right: none !important; 
+}
+/* Mobilde veya dar ekranda kenar boşluğunu ayarlayalım */
+@media (min-width: 751px) {
+    .block--messages article.message .message-cell.message-cell--user {
+       margin: 0 12px 0 0 !important;
+    }
+}
+
+
+/* 2. FLEXBOX İLE YENİDEN SIRALAMA (EN ÖNEMLİ KISIM) */
+/* Tüm parçaları kapsayan alanı esnek kutu yapıyoruz */
+.message-cell--user .message-user {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Yanlara tam otursun */
+}
+
+/* --- Parçaların Sıralamasını ve Stilini Belirleyelim --- */
+
+/* SIRA 1: KULLANICI ADI BANNERI (En Üstte) */
+.message-userDetails .message-name {
+    order: 1; /* Sıralamada 1. */
+    margin: 0 !important;
+    padding: 8px 0 !important;
+    /* Hedef resimdeki gibi üstü bombeli, koyu degrade arka plan */
+    background: linear-gradient(to bottom, #2a2a2a, #0a0a0a) !important;
+    border: none !important;
+    border-bottom: 1px solid #000 !important;
+    border-radius: 3px 3px 0 0 !important; /* Sadece üst köşeler yuvarlak */
+}
+/* İsim rengini beyaz ve kalın yapalım */
+.message-name a.username {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 15px;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* SIRA 2: RÜTBE GIF'İ (İsmin Hemen Altında) */
+.message-userDetails .userBanner.message-userBanner {
+    order: 2; /* Sıralamada 2. */
+    margin: 0 !important;
+    padding: 10px 5px !important;
+    background: #111111; /* Gif'in arkasına koyu fon */
+    border-top: 1px solid #333; /* Hafif bir parlama çizgisi */
+    border-bottom: 1px solid #000;
+    text-align: center;
+    display: block !important; /* Xenforo bazen gizler, zorla gösterelim */
+  	padding-bottom: 2px !important; /* Alt iç boşluğu azalttık */
+    margin-bottom: 0 !important;    /* Alt dış boşluğu sıfırladık */
+    border-bottom: none !important; /* Aradaki çizgiyi kaldırdık */
+}
+/* Rütbe gifinin boyut ayarı - BÜYÜTÜLDÜ */
+.message-userBanner img {
+    max-height: 150px !important; /* Yükseklik sınırını artırdık, gerekirse daha da artırabilirsin */
+    width: auto !important; /* En boy oranını koru */
+    max-width: 100% !important; /* Kutunun dışına taşmasını engelle */
+    height: auto !important;
+}
+/* Rütbe gifinin yanındaki gereksiz spanları gizle */
+.userBanner-before, .userBanner-after { display: none !important; }
+
+
+/* SIRA 3: AVATAR ALANI (Rütbenin Altında) */
+.message-avatar {
+    order: 3; /* Sıralamada 3. */
+    margin: 0 !important;
+    padding: 15px 0 !important;
+    background: #080808; /* Avatarın arkası hafif aydınlık */
+    text-align: center;
+}
+/* Avatar çerçevesini hedefteki gibi yapalım */
+.message-avatar-wrapper {
+    border: 2px solid #444 !important; /* Koyu gri, daha ince çerçeve */
+    border-radius: 2px !important; /* Keskin köşeler */
+    padding: 3px !important; /* Çerçeve ile resim arası boşluk */
+    background: #000 !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5); /* Hafif gölge */
+    margin-bottom: 0 !important;
+    display: inline-block;
+  	order: 4 !important;
+}
+/* Avatar resminin boyutu */
+.avatar.avatar--m {
+    width: 150px !important;
+    height: 160px !important;
+    border-radius: 0 !important; /* Resim kare olsun */
+}
+
+
+/* SIRA 4: KULLANICI ÜNVANI (Title - Avatarın Altında) */
+.message-userDetails .message-userTitle {
+   	order: 5 !important;
+    margin: 0 !important;
+    padding: 6px 0 !important;
+    /* İsim bannerına benzer ama daha ince bir banner */
+    background: linear-gradient(to bottom, #222, #050505) !important;
+    border-top: 1px solid #3a3a3a;
+    border-bottom: 1px solid #000;
+    color: #ccc !important; /* Hafif gri yazı */
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    border-radius: 0 !important;
+}
+
+
+/* 2. Rozetlerin (Alttaki Kutu) Üstünü Sıfırla */
+.message-userDetails .featuredBadges {
+    margin-top: 0 !important;       /* Üst dış boşluğu sıfırladık */
+    padding-top: 0 !important;      /* Üst iç boşluğu sıfırladık */
+    border-top: none !important;    /* Üst çizgiyi kaldırdık */
+    background: #111111 !important; /* Rütbe arka planıyla aynı renk yaptık, bütünleşsin */
+    padding-bottom: 8px !important; /* Avatarla arasına hafif mesafe bıraktık */
+    
+    /* Garanti olsun diye sıralamayı netleştirelim */
+    order: 3 !important; 
+}
+.featuredBadge { margin: 2px !important; }
+
+
+/* 3. İSTATİSTİK ALANI DÜZENLEMESİ (Kırmızı Başlıklı Bölüm) */
+
+/* İstatistiklerin ana kapsayıcısı */
+.message-userExtras {
+    order: 6; /* En altta yer alacak */
+    margin: 10px 5px 5px 5px !important; /* Kenarlardan biraz boşluk */
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+/* "Kırmızı Başlık" ekleme hilesi (::before ile sanal element) */
+.message-userExtras::before {
+    content: "Üye Bilgileri"; /* Veya "Genel Bilgiler" */
+    display: block;
+    background: linear-gradient(to bottom, #cc0000, #990000); /* Kırmızı degrade */
+    color: #fff;
+    text-align: center;
+    font-weight: bold;
+    padding: 6px;
+    border-radius: 3px 3px 0 0; /* Sadece üst köşeler yuvarlak */
+    border: 1px solid #770000;
+    font-size: 13px;
+}
+
+/* İstatistik satırlarının (dl) tasarımı */
+.message-userExtras dl.pairs.pairs--justified {
+    background: #111 !important; /* Çok koyu gri arka plan */
+    border: 1px solid #2a2a2a !important;
+    border-top: none !important; /* Üst çizgiyi kaldır ki birbirine yapışsın */
+    margin-bottom: 0 !important;
+    border-radius: 0 !important;
+    padding: 8px 10px !important;
+    display: flex !important;
+    justify-content: space-between; /* İkon ve yazıyı iki uca yasla */
+    align-items: center;
+}
+
+/* En alttaki istatistik satırının alt köşelerini yuvarlayalım */
+.message-userExtras dl:last-child {
+    border-bottom-left-radius: 3px !important;
+    border-bottom-right-radius: 3px !important;
+}
+
+/* İkonların rengini kırmızı yapalım ki temaya uysun */
+.message-userExtras dl dt i {
+    color: #cc0000 !important;
+    font-size: 14px;
+}
+
+/* Değerlerin (sayıların) rengi */
+.message-userExtras dl dd {
+    color: #e0e0e0 !important; /* Açık gri/beyaz */
+    font-weight: 600;
+}
+
+/* Kredi gibi özel alanların link rengi */
+.message-userExtras .fauxBlockLink-blockLink {
+    color: #e0e0e0 !important;
+}
+
+/* --- Rozet (Badge) İkonlarını Büyütme --- */
+
+/* Mesaj içi profildeki rozetlerin boyutunu artır */
+.featuredBadges--message .badgeIcon {
+    max-width: 38px !important; /* 22px'ten 38px'e çıkardık, oldukça netleşecektir */
+    width: auto !important;     /* En boy oranını bozma */
+    height: auto !important;
+    max-height: 38px !important; /* Dikeyde de çok uzamasını engelle */
+}
+
+/* Rozetler arası boşluğu biraz açalım ki sıkışık durmasın */
+.featuredBadges--message .featuredBadge {
+    margin: 3px !important; /* Rozetler arası hafif boşluk */
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* --- OFFLINE / ONLINE SİSTEMİ (SADECE FORUM KONULARI İÇİN) --- */
+
+/* 1. ADIM: OFFLINE YAZISI */
+/* "article.message--post" seçicisi sayesinde SADECE konularda çalışır.
+   Ziyaretçi mesajlarına (message--simple) asla bulaşmaz. */
+article.message--post .message-avatar-wrapper::after {
+    content: "Offline";
+    position: absolute;
+    bottom: -8px;
+    right: -5px;
+    background: #cc0000; /* Kırmızı */
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 3px;
+    z-index: 1; 
+    box-shadow: 0 0 3px rgba(0,0,0,0.8);
+    border: 1px solid #550000;
+    pointer-events: none;
+}
+
+/* 2. ADIM: YEŞİL ONLINE KUTUSU */
+/* Yine sadece article.message--post içindekileri hedefliyoruz */
+article.message--post .message-avatar-wrapper .message-avatar-online {
+    position: absolute !important;
+    right: -5px !important;
+    bottom: -8px !important;
+    left: auto !important; 
+    top: auto !important;
+    transform: none !important; 
+    margin: 0 !important;
+
+    /* GÖRÜNÜM AYARLARI */
+    min-width: 55px !important; /* Kırmızıyı kapatmak için genişlik */
+    height: auto !important;
+    border-radius: 3px !important;
+    padding: 2px 4px !important;
+    background: #009900 !important; /* Yeşil Renk */
+    border: 1px solid #004400 !important;
+    
+    /* İÇERİK HİZALAMA */
+    display: flex !important;
+    align-items: center;
+    justify-content: center; 
+    
+    /* KATMAN */
+    z-index: 100 !important; 
+    opacity: 1 !important;
+}
+
+/* 3. ADIM: İKON TEMİZLİĞİ */
+article.message--post .message-avatar-wrapper .message-avatar-online svg,
+article.message--post .message-avatar-wrapper .message-avatar-online i,
+article.message--post .message-avatar-wrapper .message-avatar-online::before {
+    display: none !important; 
+}
+
+/* 4. ADIM: "ONLINE" YAZISI */
+article.message--post .message-avatar-wrapper .message-avatar-online::after {
+    content: "Online" !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    display: block !important;
+    white-space: nowrap !important;
+    font-family: sans-serif !important;
+}
+
+/* ==========================================================================
+   BEĞEN BUTONUNU -> TEŞEKKÜR BUTONUNA ÇEVİRME (GÜÇLENDİRİLMİŞ KOD)
+   ========================================================================== */
+
+/* 1. BUTONUN KENDİSİ (Kırmızı Kutu Tasarımı) */
+.actionBar-action.actionBar-action--reaction {
+    background: linear-gradient(to bottom, #cc0000, #990000) !important; /* Kırmızı Degrade */
+    border: 1px solid #770000 !important;
+    padding: 0 15px !important; /* Yatayda boşluk */
+    border-radius: 3px !important;
+    margin-right: 5px !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    opacity: 1 !important;
+    
+    /* İçerik Hizalama - Flexbox ile tam ortalama */
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    height: 28px !important; /* Yükseklik sabitlendi */
+    min-width: 100px; /* Butonun çok küçülmesini engelle */
+    position: relative; /* İçine koyacağımız yazı buna göre hizalanacak */
+}
+
+/* Hover (Üzerine gelince) */
+.actionBar-action.actionBar-action--reaction:hover {
+    background: linear-gradient(to bottom, #ff0000, #cc0000) !important;
+    text-decoration: none !important;
+}
+
+/* 2. ESKİ İÇERİKLERİ TAMAMEN GİZLE */
+/* Beğen yazısını ve ikonunu görünmez yapıyoruz ama yer kaplamasınlar */
+.actionBar-action.actionBar-action--reaction .reaction-text,
+.actionBar-action.actionBar-action--reaction .reaction-image,
+.actionBar-action.actionBar-action--reaction i,
+.actionBar-action.actionBar-action--reaction svg {
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 0 !important;
+    position: absolute; /* Akıştan çıkar */
+}
+
+/* 3. YENİ YAZIYI EKLE (Teşekkür Et) */
+/* Butonun kendisine (::after) yazı ekliyoruz, böylece iç elementlere bağımlı kalmıyoruz */
+.actionBar-action.actionBar-action--reaction::after {
+    content: "Teşekkür Et"; /* Yazımız */
+    
+    /* Görünürlük Ayarları */
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+    
+    /* Font Ayarları */
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: bold !important;
+    line-height: 28px !important; /* Buton yüksekliğiyle aynı olsun ki dikey ortalansın */
+    white-space: nowrap;
+}
+
+/* 4. "TEŞEKKÜR ETTİN" DURUMU (Butona basıldıysa) */
+.actionBar-action.actionBar-action--reaction.has-reaction {
+    background: #222222 !important; /* Aktif renk (Koyu Gri/Siyah) */
+    border-color: #444 !important;
+}
+
+/* Basıldıysa yazıyı değiştir */
+.actionBar-action.actionBar-action--reaction.has-reaction::after {
+    content: "Teşekkürü Geri Al" !important;
+   	color: #ffffff !important;
+}
+
+
+/* 4. TEMİZLİK */
+/* Orijinal temadan kalan ve yapıyı bozan bazı ok işaretlerini gizle */
+.message-userArrow { display: none !important; }
 }
