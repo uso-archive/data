@@ -3,16 +3,66 @@
 @namespace    USO Archive
 @author       bin shu (feifeiadmim)
 @description  好看的字体
-@version      20251220.07.22
+@version      20251221.19.58
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
-* {
-    font-weight:400!important;
-}
-* {
-    font-family:"苹方-简 细体", "苹方-简 细体" !important;
-}
-* {
+/* ===================================================
+   Stylish 终极修正版 - 针对 Google/Gemini 图标修复
+   =================================================== */
+
+/* 1.全局文字设置（满足你的要求：苹方 + 阴影） 
+   我们使用 :not() 排除掉常见的图标标签 i 和 span class="...symbol..."
+*/
+*:not(i):not([class*="icon"]):not([class*="symbol"]):not([class*="material"]) {
+    font-family: "PingFang SC", "苹方-简 细体", "苹方-简", "Microsoft YaHei UI", sans-serif !important;
+    /* 强制细体 300，如果太细看不清，请改为 400 */
+    font-weight: 400 !important;
     text-shadow: #999999 0.1px 0.1px 1px !important;
+}
+
+/* 2. 【核心修复】强制还原 Google 图标字体
+   针对你截图中出现的 thumb_up, refresh 等乱码，
+   这里强制把字体改回 Google 自己的图标字体，并锁定样式。
+*/
+[class*="material-symbols"],    /* 匹配 material-symbols-outlined */
+[class*="google-symbols"],      /* 匹配 Gemini 专用的 google-symbols */
+[class*="material-icons"],      /* 匹配旧版图标 */
+[class*="icon"],                /* 匹配通用图标 */
+[class*="Icon"], 
+[class*="svg"],
+i, em, 
+/* 专门修复 Gemini 里的按钮图标 */
+button span[class*="symbol"] 
+{
+    /* 关键！这里列出了 Google 所有的图标字体名，优先级设为最高 */
+    font-family: 'Google Symbols', 'Material Symbols Outlined', 'Material Symbols Rounded', 'Material Icons', 'Material Icons Extended' !important;
+    
+    /* 必须取消阴影，否则图标会糊 */
+    text-shadow: none !important;
+    
+    /* 还原字体粗细和样式，防止被苹方覆盖 */
+    font-weight: normal !important;
+    font-style: normal !important;
+    
+    /* 强制不换行，防止单词把布局撑开 */
+    white-space: nowrap !important;
+    word-wrap: normal !important;
+    direction: ltr !important;
+    letter-spacing: normal !important;
+    line-height: 1 !important;
+    text-transform: none !important;
+}
+
+/* 3. 输入框特别优化
+   输入框里如果有阴影，打字时光标会看不清，这里单独去掉阴影 */
+input, textarea, select, [contenteditable="true"] {
+    text-shadow: none !important;
+    font-family: "苹方-简 细体", "苹方-简 细体",  sans-serif !important;
+}
+
+/* 4. 图片和 SVG 矢量图修复 */
+img, svg {
+    text-shadow: none !important;
+    font-family: sans-serif !important; /* SVG 内部字体不强求苹方，防止错位 */
 }
