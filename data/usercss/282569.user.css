@@ -1,0 +1,1543 @@
+/* ==UserStyle==
+@name         Google Neumorphic Redesign
+@namespace    USO Archive
+@author       Prismaris
+@description  A complete redesign of the Google Search page featuring a Soft UI (Neumorphism) aesthetic.     PLS NOTE: Light and dark modes are applied automatically based on your browser's light/dark mode settings.   For example in Chrome, go to chrome://settings/appearance and under "Mode", you have Light, Dark, and Device (auto). Set it to whichever and the style will also match it.
+@version      20260102.03.58
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document url-prefix("https://www.google.com") {
+/* Font stack (no external import; USO-compatible) */
+    :root {
+        --neu-font: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    :root {
+        --neu-bg: #EDF1F4;
+        --neu-text: #5f6368;
+        --neu-shadow-light: #ffffff;
+        --neu-shadow-dark: #c9ccd1;
+
+        --neu-search-scale: 0.95;
+        --neu-search-scale-active: 0.9;
+        --neu-search-gap: 12px;
+        --neu-search-height-results: 80px;
+        --neu-anim-ease: cubic-bezier(0.16, 0.8, 0.32, 1);
+        --neu-search-anim-delay: 0.1s;
+        --neu-dropdown-anim-delay: 0.2s;
+        --neu-buttons-anim-delay: 0.35s;
+        --neu-header-anim-delay: 0.5s;
+        --neu-gmail-anim-delay: 0.55s;
+        --neu-images-anim-delay: 0.63s;
+        --neu-apps-anim-delay: 0.7s;
+        --neu-settings-anim-delay: 0.78s;
+        --neu-profile-anim-delay: 0.86s;
+        --neu-footer-anim-delay: 0.65s;
+
+        /* General Shadows */
+        --neu-flat: 5px 5px 10px var(--neu-shadow-dark), -5px -5px 10px var(--neu-shadow-light);
+        --neu-flat-hover: 8px 8px 16px var(--neu-shadow-dark), -8px -8px 16px var(--neu-shadow-light);
+        --neu-pressed: inset 4px 4px 8px var(--neu-shadow-dark), inset -4px -4px 8px var(--neu-shadow-light);
+
+        /* Specific Search Bar Shadows (More Diffused) */
+        --neu-search-flat: 10px 10px 16px var(--neu-shadow-dark), -10px -10px 16px var(--neu-shadow-light);
+        --neu-search-hover: 14px 14px 24px var(--neu-shadow-dark), -14px -14px 24px var(--neu-shadow-light);
+        --neu-search-flat-compact: 8px 8px 14px var(--neu-shadow-dark), -8px -8px 14px var(--neu-shadow-light);
+        --neu-search-hover-compact: 12px 12px 20px var(--neu-shadow-dark), -12px -12px 20px var(--neu-shadow-light);
+        --neu-search-pressed-compact: inset 6px 6px 14px 2px var(--neu-shadow-dark),
+            inset -6px -6px 14px 2px var(--neu-shadow-light);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --neu-bg: #1e1f22;
+            --neu-text: #cfd3d8;
+            --neu-shadow-light: #2a2c31;
+            --neu-shadow-dark: #0f1013;
+        }
+    }
+
+    @keyframes neu-fade-in {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes neu-fade-pop {
+        from {
+            opacity: 0;
+            transform: translateY(8px) scale(0.96);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* Global Resets */
+    body,
+    html,
+    .L3eUgb {
+        background-color: var(--neu-bg) !important;
+        font-family: var(--neu-font) !important;
+        color: var(--neu-text) !important;
+        height: 100vh !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Hide standard elements to clean up (Includes specific Logo container .LS8OJ and Language links) */
+    .lnXdpd,
+    #logo,
+    .k1zIA,
+    .logo>img,
+    .LS8OJ,
+    #LS8OJ,
+    .vcVZ7d,
+    #gws-output-pages-elements-homepage_additional_languages__als,
+    .FPdoLc.lJ9FBc {
+        display: none !important;
+    }
+
+    /* Footer & Header blends */
+    .KxwPGc,
+    .sfbg {
+        background: var(--neu-bg) !important;
+        border: none !important;
+    }
+
+    /* ===========================
+       Centering Container (.A8SBwf)
+       =========================== */
+    .A8SBwf {
+        position: fixed !important;
+        top: 37% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 100% !important;
+        max-width: 580px !important;
+        margin: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        z-index: 1100 !important;
+    }
+
+    /* ===========================
+       Search Results Layout (Top Left)
+       =========================== */
+    .A8SBwf[data-hp="false"] {
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+        width: calc(100% - 32px) !important;
+        max-width: 720px !important;
+        align-items: flex-start !important;
+        margin: 12px 16px 0 -30px !important;
+    }
+
+    .A8SBwf[data-hp="false"] .logo.Ib7Efc {
+        display: none !important;
+    }
+
+    .A8SBwf[data-hp="false"] .RNNXgb .FgNLaf {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 36px !important;
+        height: 36px !important;
+        margin-left: 12px !important;
+        background: url('https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg') no-repeat center center !important;
+        background-size: contain !important;
+        flex: 0 0 auto !important;
+    }
+
+    .A8SBwf[data-hp="false"] .RNNXgb .FgNLaf img {
+        display: none !important;
+    }
+
+    .A8SBwf[data-hp="false"] .RNNXgb .iblpc .hvhmMe .z1asCe {
+        display: none !important;
+    }
+
+    .A8SBwf[data-hp="false"] .RNNXgb {
+        height: var(--neu-search-height-results) !important;
+        min-height: var(--neu-search-height-results) !important;
+        position: relative !important;
+        z-index: 1200 !important;
+        transition: box-shadow 0.5s ease, transform 0.5s ease, background-color 0.3s ease !important;
+    }
+
+    .A8SBwf[data-hp="false"] .gLFyf {
+        line-height: var(--neu-search-height-results) !important;
+    }
+
+    .A8SBwf[data-hp="false"] .UUbT9 {
+        top: calc(var(--neu-search-height-results) + 5px + var(--neu-search-gap)) !important;
+        z-index: 1200 !important;
+    }
+
+    .A8SBwf[data-hp="false"].emcav .UUbT9 {
+        transform: translateY(0) scale(var(--neu-search-scale)) !important;
+    }
+
+    .LoygGf,
+    .LoygGf .Xx7Mif,
+    #searchform {
+        height: 120px !important;
+        min-height: 120px !important;
+        position: relative !important;
+        z-index: 1100 !important;
+    }
+
+    /* ===========================
+       Results Tabs Bar (Neumorphic)
+       =========================== */
+    .GG4mbd.P3mIxe {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        width: calc(100% - 32px) !important;
+        max-width: 720px !important;
+        margin-left: -30px !important;
+        margin-right: 16px !important;
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    .GG4mbd.P3mIxe .HTOhZ {
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        border-radius: 999px !important;
+        border: none !important;
+        outline: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        max-width: 100% !important;
+        padding: 0 6px 0 0 !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+    }
+
+    .GG4mbd.P3mIxe .HTOhZ::before {
+        content: "" !important;
+        width: 12px !important;
+        flex: 0 0 12px !important;
+    }
+
+    .GG4mbd.P3mIxe .EDblX,
+    .GG4mbd.P3mIxe .rQTE8b,
+    .GG4mbd.P3mIxe .beZ0tf {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
+    .GG4mbd.P3mIxe .EDblX {
+        padding: 0 !important;
+    }
+
+    .GG4mbd.P3mIxe [role="listitem"]:first-child {
+        margin-left: 20px !important;
+    }
+
+    .GG4mbd.P3mIxe .rQTE8b,
+    .GG4mbd.P3mIxe .beZ0tf {
+        padding-right: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .GG4mbd.P3mIxe .C6AK7c,
+    .GG4mbd.P3mIxe .C6AK7c:visited {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
+    .GG4mbd.P3mIxe .mXwfNd {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 999px !important;
+        box-shadow: none !important;
+        outline: none !important;
+        padding: 0 10px !important;
+    }
+
+    .GG4mbd.P3mIxe [role="listitem"]:first-child .mXwfNd {
+        padding-left: 22px !important;
+    }
+
+    .GG4mbd.P3mIxe .mXwfNd::after {
+        display: none !important;
+    }
+
+    .GG4mbd.P3mIxe .mXwfNd[aria-current="page"],
+    .GG4mbd.P3mIxe .mXwfNd[selected] {
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-pressed) !important;
+    }
+
+    .GG4mbd.P3mIxe [role="listitem"]:first-child .mXwfNd[aria-current="page"],
+    .GG4mbd.P3mIxe [role="listitem"]:first-child .mXwfNd[selected] {
+        margin-left: 0 !important;
+    }
+
+    .GG4mbd.P3mIxe .C6AK7c:active .mXwfNd,
+    .GG4mbd.P3mIxe [role="button"]:active .mXwfNd {
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-pressed) !important;
+    }
+
+    .GG4mbd.P3mIxe [role="listitem"]:first-child .C6AK7c:active .mXwfNd,
+    .GG4mbd.P3mIxe [role="listitem"]:first-child [role="button"]:active .mXwfNd {
+        margin-left: 0 !important;
+    }
+
+    /* Hide divider line between tabs and results */
+    .Fgyi2e.wZQcA.caNvfd,
+    .Fgyi2e.wZQcA.caNvfd .zLSRge.w2jn8d.OMqmfd {
+        display: none !important;
+    }
+
+    /* ===========================
+       Search Header Buttons (Sign In / Settings / Apps)
+       =========================== */
+    .Q3DXx.Efnghe {
+        width: calc(100% - 32px) !important;
+        max-width: 720px !important;
+        margin-left: -30px !important;
+        margin-right: 16px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 16px !important;
+        flex-wrap: nowrap !important;
+        padding-right: 12px !important;
+        box-sizing: border-box !important;
+    }
+
+    .Q3DXx.Efnghe .c58wS,
+    .Q3DXx.Efnghe .uZkjhb {
+        display: flex !important;
+        align-items: center !important;
+        margin: 0 !important;
+    }
+
+    #gb {
+        position: static !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
+        width: auto !important;
+        height: auto !important;
+        background: transparent !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 16px !important;
+        padding: 0 !important;
+        min-width: 0 !important;
+        z-index: auto !important;
+    }
+
+    #gbwa,
+    #gbwa > div,
+    #gb .gb_z {
+        display: flex !important;
+        align-items: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    #gbwa > div > a {
+        width: 40px !important;
+        height: 40px !important;
+        background-size: 18px !important;
+    }
+
+    .Q3DXx.Efnghe .fLciMb {
+        height: 40px !important;
+        width: 40px !important;
+        padding: 0 !important;
+        border-radius: 999px !important;
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        cursor: pointer !important;
+    }
+
+    .Q3DXx.Efnghe .fLciMb:hover {
+        box-shadow: var(--neu-flat-hover) !important;
+        transform: translateY(-1px) !important;
+    }
+
+    .Q3DXx.Efnghe .fLciMb:active {
+        box-shadow: var(--neu-pressed) !important;
+        transform: translateY(0) !important;
+    }
+
+    .Q3DXx.Efnghe .fLciMb .z1asCe svg {
+        display: none !important;
+    }
+
+    .Q3DXx.Efnghe .fLciMb .z1asCe {
+        display: block !important;
+        width: 18px !important;
+        height: 18px !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 18px !important;
+    }
+
+    .Q3DXx.Efnghe .fLciMb .ZOyvub {
+        display: none !important;
+    }
+
+    #gb .gb_z a.gb_A {
+        height: 40px !important;
+        padding: 0 18px !important;
+        border-radius: 999px !important;
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-decoration: none !important;
+        text-align: center !important;
+    }
+
+    #gb .gb_z a.gb_A:hover {
+        box-shadow: var(--neu-flat-hover) !important;
+        transform: translateY(-1px) !important;
+    }
+
+    #gb .gb_z a.gb_A:active {
+        box-shadow: var(--neu-pressed) !important;
+        transform: translateY(0) !important;
+    }
+
+    #gb .gb_z a.gb_A .gb_U {
+        color: var(--neu-text) !important;
+        font-family: 'Product Sans', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
+        white-space: nowrap !important;
+    }
+
+    /* ===========================
+       The Search Bar (.RNNXgb)
+       =========================== */
+    .RNNXgb {
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-search-flat) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        border-radius: 50px !important;
+        /* Half of 100px height */
+        padding: 0 15px !important;
+        margin: 0 !important;
+        /* No margin needed when centered */
+        height: 100px !important;
+        /* Even thicker bar */
+        min-height: 100px !important;
+        width: 100% !important;
+        transition: box-shadow 0.3s ease, transform 0.3s ease, background-color 0.3s ease !important;
+        display: flex !important;
+        align-items: center !important;
+        transform: scale(var(--neu-search-scale)) !important;
+        transform-origin: center !important;
+        animation: neu-fade-in 0.65s var(--neu-anim-ease) var(--neu-search-anim-delay) both !important;
+    }
+
+    .RNNXgb:hover,
+    .RNNXgb:focus-within {
+        box-shadow: var(--neu-search-hover) !important;
+        transform: translateY(-2px) scale(var(--neu-search-scale)) !important;
+        background-color: var(--neu-bg) !important;
+    }
+
+    /* Newer homepage search bar variant (data-hp="true") */
+    .A8SBwf[data-hp="true"] .RNNXgb {
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-search-flat-compact) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        position: relative !important;
+        overflow: visible !important;
+    }
+
+    .A8SBwf[data-hp="true"] .RNNXgb::before {
+        content: "" !important;
+        position: absolute !important;
+        inset: -2px !important;
+        border-radius: inherit !important;
+        box-shadow: var(--neu-search-pressed-compact) !important;
+        opacity: var(--neu-search-pressed-compact-opacity, 0) !important;
+        pointer-events: none !important;
+        transition: opacity 0.2s ease !important;
+    }
+
+    .A8SBwf[data-hp="true"] .RNNXgb:hover,
+    .A8SBwf[data-hp="true"] .RNNXgb:focus-within {
+        box-shadow: var(--neu-search-hover-compact) !important;
+        background-color: var(--neu-bg) !important;
+    }
+
+    .A8SBwf[data-hp="true"] .RNNXgb:active,
+    .A8SBwf[data-hp="true"].emcav .RNNXgb,
+    .A8SBwf[data-hp="true"].BgPPrc .RNNXgb {
+        box-shadow: none !important;
+        background-color: var(--neu-bg) !important;
+        border-color: transparent !important;
+        --neu-search-pressed-compact-opacity: 1 !important;
+    }
+
+
+    /* Concave state: when clicked or when the search dropdown is active */
+    .RNNXgb:active,
+    .A8SBwf.emcav .RNNXgb {
+        box-shadow: inset 6px 6px 12px var(--neu-shadow-dark), inset -6px -6px 12px var(--neu-shadow-light) !important;
+        transform: translateY(0) scale(var(--neu-search-scale-active)) !important;
+        background-color: var(--neu-bg) !important;
+    }
+
+    .A8SBwf[data-hp="false"].emcav .RNNXgb {
+        box-shadow: var(--neu-search-flat) !important;
+        transform: translateY(0) scale(var(--neu-search-scale)) !important;
+    }
+
+    /* ===========================
+       1. Left Icon Replacement (Aggressive Targeting)
+       DOM: .RNNXgb > .SDkEP > .iblpc > .hvhmMe > span.z1asCe > svg
+       =========================== */
+
+    /* Reset containers to allow larger icon */
+    .RNNXgb .SDkEP,
+    .RNNXgb .iblpc,
+    .RNNXgb .hvhmMe {
+        height: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: auto !important;
+    }
+
+    .RNNXgb .iblpc {
+        padding-left: 15px !important;
+        padding-right: 20px !important;
+    }
+
+    /* Hide the original SVG */
+    .RNNXgb .iblpc .hvhmMe .z1asCe svg {
+        display: none !important;
+    }
+
+    /* Style the span to be the G Logo */
+    .RNNXgb .iblpc .hvhmMe .z1asCe {
+        display: block !important;
+        width: 36px !important;
+        height: 36px !important;
+        background: url('https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg') no-repeat center center !important;
+        background-size: contain !important;
+        opacity: 1 !important;
+        margin-top: 0 !important;
+        line-height: 36px !important;
+    }
+
+    /* ===========================
+       2. Input Text Area & Placeholder 
+       =========================== */
+    .RNNXgb .a4bIc {
+        display: flex !important;
+        align-items: center !important;
+        /* Flexbox centering */
+        height: 100% !important;
+        position: relative !important;
+        flex: 1 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Inject Placeholder text */
+    .RNNXgb .a4bIc::before {
+        content: "Search Google or drop an image";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--neu-text) !important;
+        font-family: 'Product Sans', sans-serif !important;
+        font-size: 14px !important;
+        /* Smaller text */
+        font-weight: 700 !important;
+        pointer-events: none !important;
+        opacity: 0.7 !important;
+        z-index: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    /* Hide fake placeholder when container has focus (user clicking to type) */
+    .RNNXgb:focus-within .a4bIc::before {
+        display: none !important;
+    }
+
+    /* Hide fake placeholder on results pages (input already populated) */
+    .A8SBwf[data-hp="false"] .a4bIc::before {
+        display: none !important;
+    }
+
+    /* The actual input */
+    .RNNXgb .gLFyf {
+        margin: 0 !important;
+        padding: 0 !important;
+        color: var(--neu-text) !important;
+        font-family: var(--neu-font) !important;
+        font-size: 14px !important;
+        /* Smaller text */
+        font-weight: 500 !important;
+        height: 100% !important;
+        line-height: 100px !important;
+        /* Force line-height to match container height for centering */
+        z-index: 1 !important;
+        background: transparent !important;
+        align-self: center !important;
+        /* Flex item alignment */
+        vertical-align: middle !important;
+        overflow: hidden !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+
+    .RNNXgb .gLFyf::-webkit-scrollbar {
+        width: 0 !important;
+        height: 0 !important;
+        display: none !important;
+    }
+
+    /* ===========================
+       3. Right Icons (Mic & Lens) 
+       =========================== */
+    .RNNXgb .dRYYxd {
+        height: 100% !important;
+        align-items: center !important;
+        padding-right: 5px !important;
+        display: flex !important;
+    }
+
+    /* Mic Icon Container */
+    .RNNXgb .XDyW0e,
+    .RNNXgb [jsname="F7uqIe"] {
+        width: 54px !important;
+        height: 54px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* Hide original Mic SVG */
+    .RNNXgb .XDyW0e svg,
+    .RNNXgb [jsname="F7uqIe"] svg {
+        display: none !important;
+    }
+
+    /* Replace with Colorful Mic */
+    .RNNXgb .XDyW0e::after,
+    .RNNXgb [jsname="F7uqIe"]::after {
+        content: '' !important;
+        display: block !important;
+        width: 28px !important;
+        height: 28px !important;
+        background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e8/Google_mic.svg') !important;
+        background-size: contain !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+    }
+
+    /* Lens Icon Container */
+    .RNNXgb .nDcEnd,
+    .RNNXgb [jsname="R5mgy"] {
+        width: 54px !important;
+        height: 54px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* Hide original Lens SVG */
+    .RNNXgb .nDcEnd svg,
+    .RNNXgb [jsname="R5mgy"] svg {
+        display: none !important;
+    }
+
+    /* Replace with Colorful Lens */
+    .RNNXgb .nDcEnd::after,
+    .RNNXgb [jsname="R5mgy"]::after {
+        content: '' !important;
+        display: block !important;
+        width: 28px !important;
+        height: 28px !important;
+        background-image: url('https://upload.wikimedia.org/wikipedia/commons/d/d6/Google_Lens_Icon.svg') !important;
+        background-size: contain !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+    }
+
+    /* Clear 'X' Button */
+    .RNNXgb .vOY7J {
+        height: 100% !important;
+        align-items: center !important;
+    }
+
+    /* ===========================
+       Buttons below search bar
+       =========================== */
+    center input.gNO89b,
+    center input.gF3C2e {
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        border-radius: 50px !important;
+        border: 1px solid transparent !important;
+        color: var(--neu-text) !important;
+        font-family: var(--neu-font) !important;
+        font-weight: 500 !important;
+        padding: 0 24px !important;
+        height: 46px !important;
+        margin: 20px 8px !important;
+        transition: all 0.2s ease !important;
+        animation: neu-fade-in 0.65s var(--neu-anim-ease) var(--neu-buttons-anim-delay) both !important;
+    }
+
+    center input.gNO89b:hover,
+    center input.gF3C2e:hover {
+        box-shadow: var(--neu-flat-hover) !important;
+        transform: translateY(-2px) !important;
+        color: #333 !important;
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    }
+
+    center input.gNO89b:active {
+        box-shadow: var(--neu-pressed) !important;
+        transform: translateY(0) !important;
+    }
+
+    /* ===========================
+       Suggestion Dropdown Makeover
+       =========================== */
+
+    /* 1. Dropdown Wrapper Alignment */
+    .UUbT9 {
+        position: absolute !important;
+        top: calc(105px + var(--neu-search-gap)) !important;
+        /* Position below the 100px search bar */
+        left: 0 !important;
+        width: 100% !important;
+        z-index: 998 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transform: translateY(-6px) scale(var(--neu-search-scale)) !important;
+        transform-origin: top center !important;
+        transition: opacity 0.25s ease, transform 0.25s ease !important;
+        animation: neu-fade-in 0.65s var(--neu-anim-ease) var(--neu-dropdown-anim-delay) both !important;
+    }
+
+    .A8SBwf.emcav .UUbT9 {
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: translateY(0) scale(var(--neu-search-scale-active)) !important;
+    }
+
+    /* 2. Main Dropdown Container (Concave) */
+    .aajZCb,
+    .gssb_c {
+        background-color: var(--neu-bg) !important;
+        /* Concave shadow to match search bar active state */
+        box-shadow: inset 6px 6px 12px var(--neu-shadow-dark),
+            inset -6px -6px 12px var(--neu-shadow-light) !important;
+        border-radius: 32px !important;
+        border: none !important;
+        overflow: hidden !important;
+        padding: 12px !important;
+        margin: 0 !important;
+    }
+
+    .A8SBwf[data-hp="false"].emcav .aajZCb,
+    .A8SBwf[data-hp="false"].emcav .gssb_c {
+        box-shadow: var(--neu-search-flat) !important;
+    }
+
+    /* 3. Suggestion Items */
+    .sbct {
+        background: transparent !important;
+        padding: 4px 0 !important;
+        transition: all 0.2s ease !important;
+        border-radius: 16px !important;
+        margin: 2px 0 !important;
+    }
+
+    /* Hover State for Suggestions */
+    .sbhl {
+        background: rgba(255, 255, 255, 0.4) !important;
+        box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.02) !important;
+    }
+
+    /* Suggestion Text */
+    .wM6W7d span,
+    .ClJ9Yb span {
+        color: var(--neu-text) !important;
+        font-family: var(--neu-font) !important;
+        font-size: 14px !important;
+    }
+
+    /* 4. Icons inside Dropdown */
+    .sbic {
+        opacity: 0.7 !important;
+        filter: grayscale(1) !important;
+        /* Clean look */
+    }
+
+    /* 5. Bottom Buttons (Google Search / I'm Feeling Lucky) */
+    .lJ9FBc {
+        background: transparent !important;
+        border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+        margin-top: 12px !important;
+        padding-top: 12px !important;
+        height: auto !important;
+    }
+
+    .lJ9FBc center {
+        display: flex !important;
+        justify-content: center !important;
+        gap: 12px !important;
+    }
+
+    .lJ9FBc input[type="submit"],
+    .RNmpXc {
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        border-radius: 50px !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: var(--neu-text) !important;
+        font-family: var(--neu-font) !important;
+        font-weight: 500 !important;
+        padding: 0 20px !important;
+        height: 40px !important;
+        margin: 0 !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+    }
+
+    .lJ9FBc input[type="submit"]:hover,
+    .RNmpXc:hover {
+        box-shadow: var(--neu-flat-hover) !important;
+        transform: translateY(-1px) !important;
+    }
+
+    .lJ9FBc input[type="submit"]:active,
+    .RNmpXc:active {
+        box-shadow: var(--neu-pressed) !important;
+        transform: translateY(0) !important;
+    }
+
+    /* 6. Footer Links (Report Predictions) */
+    .WzNHm {
+        color: var(--neu-text) !important;
+        opacity: 0.5 !important;
+        font-size: 12px !important;
+        margin-top: 8px !important;
+        text-align: right !important;
+        padding-right: 20px !important;
+    }
+
+    /* Remove default separators */
+    .xtSCL {
+        display: none !important;
+    }
+
+    /* ===========================
+       Header Redesign (Top Right)
+       =========================== */
+
+    /* 1. Position and Layout of Header Container */
+    #gb {
+        position: fixed !important;
+        top: 80px !important;
+        right: 80px !important;
+        left: auto !important;
+        width: auto !important;
+        height: auto !important;
+        background: transparent !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 32px !important;
+        /* Space between the main groups */
+        padding: 0 !important;
+        min-width: 0 !important;
+        z-index: 1000 !important;
+    }
+
+    /* Hide background elements usually present in header */
+    .gb_Dd,
+    .gb_vd {
+        background: transparent !important;
+    }
+
+    /* Reset flex items and ensure vertical alignment */
+    #gb .gb_M,
+    #gb .gb_J,
+    #gb .gb_z,
+    #gb #gbwa {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        height: auto !important;
+        padding: 0 !important;
+        position: static !important;
+        float: none !important;
+        margin: 0 !important;
+    }
+
+    /* Special handling for the container that holds Gmail and Images */
+    #gb .gb_M {
+        display: flex !important;
+        gap: 32px !important;
+        /* Ensure gap between Gmail and Images matches the global gap */
+    }
+
+    /* Ensure wrappers for Gmail/Images don't add extra space or block flow */
+    #gb .gb_M .gb_0 {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+    }
+
+    /* 2. Gmail Button (Convert Link to Icon Button) */
+    #gb .gb_M .gb_0 a[href*="mail"] {
+        display: block !important;
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 50% !important;
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        font-size: 0 !important;
+        /* Hide text */
+        /* Envelope Icon */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z'%3E%3C/path%3E%3Cpolyline points='22,6 12,13 2,6'%3E%3C/polyline%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 20px !important;
+        transition: all 0.2s ease !important;
+        opacity: 1 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    #gb .gb_M .gb_0 a[href*="mail"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: var(--neu-flat-hover) !important;
+    }
+
+    #gb .gb_M .gb_0 a[href*="mail"]:active {
+        transform: translateY(0) !important;
+        box-shadow: var(--neu-pressed) !important;
+    }
+
+    /* 3. Images Button (Styled like Gmail but with image icon) */
+    #gb .gb_M .gb_0 a[href*="imghp"] {
+        display: block !important;
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 50% !important;
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        font-size: 0 !important;
+        /* Hide text */
+        /* Image Icon (Mountain/Sun) */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpolyline points='21 15 16 10 5 21'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 20px !important;
+        transition: all 0.2s ease !important;
+        opacity: 1 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    #gb .gb_M .gb_0 a[href*="imghp"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: var(--neu-flat-hover) !important;
+    }
+
+    #gb .gb_M .gb_0 a[href*="imghp"]:active {
+        transform: translateY(0) !important;
+        box-shadow: var(--neu-pressed) !important;
+    }
+
+    /* 3. Sign In Button (Homepage) */
+    #gb .gb_z a.gb_A {
+        height: 40px !important;
+        padding: 0 18px !important;
+        border-radius: 999px !important;
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-decoration: none !important;
+        text-align: center !important;
+    }
+
+    #gb .gb_z a.gb_A:hover {
+        box-shadow: var(--neu-flat-hover) !important;
+        transform: translateY(-1px) !important;
+    }
+
+    #gb .gb_z a.gb_A:active {
+        box-shadow: var(--neu-pressed) !important;
+        transform: translateY(0) !important;
+    }
+
+    #gb .gb_z a.gb_A .gb_U {
+        color: var(--neu-text) !important;
+        font-family: 'Product Sans', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
+        white-space: nowrap !important;
+    }
+
+    /* 4. Google Apps Button */
+    #gbwa {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    #gbwa>div {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    #gbwa>div>a {
+        display: block !important;
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 50% !important;
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        /* Grid Icon */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%235f6368'%3E%3Cpath d='M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 20px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        opacity: 1 !important;
+        transition: all 0.2s ease !important;
+    }
+
+    /* Hide original SVG inside Apps button */
+    #gbwa>div>a>svg {
+        display: none !important;
+    }
+
+    #gbwa>div>a:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: var(--neu-flat-hover) !important;
+    }
+
+    #gbwa>div>a:active {
+        transform: translateY(0) !important;
+        box-shadow: var(--neu-pressed) !important;
+    }
+
+    /* 5. Profile Button */
+    .gb_z,
+    .gb_0a {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .gb_0a {
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 50% !important;
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        padding: 4px !important;
+        /* Rim size */
+        box-sizing: border-box !important;
+        transition: all 0.2s ease !important;
+    }
+
+    /* The image itself */
+    .gb_0a img.gb_Q {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 50% !important;
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .gb_0a:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: var(--neu-flat-hover) !important;
+    }
+
+    .gb_0a:active {
+        transform: translateY(0) !important;
+        box-shadow: var(--neu-pressed) !important;
+    }
+
+    /* Hide potential ring overlays or extra SVGs in profile button */
+    .gb_0a svg,
+    .gb_0a .gb_P,
+    .gb_0a .gb_R {
+        display: none !important;
+    }
+
+    /* ===========================
+       Footer Redesign
+       =========================== */
+
+    /* 1. Reset Footer Container */
+    .c93Gbe,
+    .uU7dJb,
+    .KxwPGc {
+        background: transparent !important;
+        border: none !important;
+    }
+
+    /* Position the footer container */
+    .c93Gbe {
+        position: fixed !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        left: 0 !important;
+        pointer-events: none !important;
+        /* Let clicks pass through empty areas */
+        height: 100px !important;
+        z-index: 100 !important;
+    }
+
+    /* 2. Location (Left) */
+    /* Original: <div class="uU7dJb">Canada</div> */
+    .uU7dJb {
+        position: fixed !important;
+        bottom: 80px !important;
+        /* Moved up to match side margin */
+        left: 80px !important;
+        /* Moved closer in */
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        pointer-events: auto !important;
+        font-family: var(--neu-font) !important;
+        font-weight: 700 !important;
+        color: var(--neu-text) !important;
+        font-size: 16px !important;
+        border: none !important;
+        cursor: default !important;
+    }
+
+    /* Location Icon Button (Pseudo-element) */
+    .uU7dJb::before {
+        content: '' !important;
+        display: block !important;
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 50% !important;
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        margin-right: 16px !important;
+        /* Target Icon */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='12' r='6'/%3E%3Ccircle cx='12' cy='12' r='2'/%3E%3Cline x1='12' y1='2' x2='12' y2='4'/%3E%3Cline x1='12' y1='20' x2='12' y2='22'/%3E%3Cline x1='2' y1='12' x2='4' y2='12'/%3E%3Cline x1='20' y1='12' x2='22' y2='12'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 20px !important;
+        transition: all 0.2s ease !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        cursor: pointer !important;
+    }
+
+    .uU7dJb:hover::before {
+        transform: translateY(-2px) !important;
+        box-shadow: var(--neu-flat-hover) !important;
+    }
+
+    /* Recessed click effect for Location */
+    .uU7dJb:active::before {
+        transform: translateY(0) !important;
+        box-shadow: var(--neu-pressed) !important;
+    }
+
+    /* 3. Hide Unwanted Links */
+    /* Hide Advertising, Business, Privacy, Terms */
+    a.pHiOh[href*="ads"],
+    a.pHiOh[href*="services"],
+    a.pHiOh[href*="policies.google.com"] {
+        display: none !important;
+    }
+
+    /* 4. Info Button (Right) */
+    /* Targeting "How Search works" link */
+    a.pHiOh[href*="howsearchworks"] {
+        position: fixed !important;
+        bottom: 80px !important;
+        /* Moved up to match side margin */
+        right: 144px !important;
+        /* Left of settings (80px + 48px + 16px gap) */
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 0 !important;
+        /* Hide text */
+        border-radius: 50% !important;
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        pointer-events: auto !important;
+        /* Info Icon */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='16' x2='12' y2='12'/%3E%3Cline x1='12' y1='8' x2='12.01' y2='8'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 20px !important;
+        transition: all 0.2s ease !important;
+        display: block !important;
+        padding: 0 !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    a.pHiOh[href*="howsearchworks"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: var(--neu-flat-hover) !important;
+    }
+
+    /* Recessed click effect for Info */
+    a.pHiOh[href*="howsearchworks"]:active {
+        transform: translateY(0) !important;
+        box-shadow: var(--neu-pressed) !important;
+    }
+
+    #gbwa>div>a {
+        animation: neu-fade-in 0.65s var(--neu-anim-ease) var(--neu-apps-anim-delay) both !important;
+    }
+
+    .CcNe6e {
+        animation: neu-fade-in 0.65s var(--neu-anim-ease) var(--neu-settings-anim-delay) both !important;
+    }
+
+    .gb_0a {
+        animation: neu-fade-in 0.65s var(--neu-anim-ease) var(--neu-profile-anim-delay) both !important;
+    }
+
+    .uU7dJb,
+    a.pHiOh[href*="howsearchworks"] {
+        animation: neu-fade-in 0.65s var(--neu-anim-ease) var(--neu-header-anim-delay) both !important;
+    }
+
+    #gb .gb_M .gb_0 {
+        animation: neu-fade-pop 0.8s var(--neu-anim-ease) both !important;
+    }
+
+    #gb .gb_M .gb_0:nth-child(1) {
+        animation-delay: var(--neu-gmail-anim-delay) !important;
+    }
+
+    #gb .gb_M .gb_0:nth-child(2) {
+        animation-delay: var(--neu-images-anim-delay) !important;
+    }
+
+    #gb .gb_M .gb_0 a.gb_Z[data-pid="23"],
+    #gb .gb_M .gb_0 a.gb_Z[data-pid="2"] {
+        animation: neu-fade-pop 0.8s var(--neu-anim-ease) both !important;
+    }
+
+    #gbwa,
+    #gbwa .gb_B {
+        animation: neu-fade-pop 0.8s var(--neu-anim-ease) var(--neu-apps-anim-delay) both !important;
+    }
+
+    /* 5. Settings Button (Right) */
+    /* Target the Settings trigger container */
+    .CcNe6e {
+        position: fixed !important;
+        bottom: 80px !important;
+        /* Moved up to match side margin */
+        right: 80px !important;
+        /* Moved closer in */
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 50% !important;
+        background-color: var(--neu-bg) !important;
+        box-shadow: var(--neu-flat) !important;
+        pointer-events: auto !important;
+        transition: all 0.2s ease !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 101 !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        cursor: pointer !important;
+    }
+
+    /* Hide text inside settings button */
+    .CcNe6e .ayzqOc {
+        font-size: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: transparent !important;
+        display: block !important;
+        /* Settings Icon */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 20px !important;
+        pointer-events: auto !important;
+        cursor: pointer !important;
+    }
+
+    .CcNe6e:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: var(--neu-flat-hover) !important;
+    }
+
+    /* Recessed click effect for Settings */
+    .CcNe6e:active {
+        transform: translateY(0) !important;
+        box-shadow: var(--neu-pressed) !important;
+    }
+
+    /* ===========================
+       Settings Menu Makeover
+       =========================== */
+    g-popup {
+        overflow: visible !important;
+    }
+
+    /* The actual popup container */
+    div[jsname="V68bde"].UjBGL {
+        position: fixed !important;
+        /* Re-positioning since button is fixed */
+        bottom: 135px !important;
+        right: 80px !important;
+        left: auto !important;
+        top: auto !important;
+        background-color: var(--neu-bg) !important;
+        box-shadow: 10px 10px 20px var(--neu-shadow-dark), -10px -10px 20px var(--neu-shadow-light) !important;
+        border-radius: 24px !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        padding: 12px !important;
+        min-width: 220px !important;
+        animation: neu-fade-pop 0.3s var(--neu-anim-ease) both !important;
+    }
+
+    /* Hide original styling */
+    .cF4V5c {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    /* Individual Menu Items */
+    g-menu-item {
+        background: transparent !important;
+        padding: 4px 0 !important;
+        transition: all 0.2s ease !important;
+        border-radius: 12px !important;
+        margin: 2px 0 !important;
+    }
+
+    g-menu-item:hover,
+    g-menu-item:focus-within {
+        background: rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.03) !important;
+    }
+
+    /* Menu Text Links */
+    g-menu-item a,
+    g-menu-item .YpcDnf,
+    g-menu-item .y0fQ9c {
+        color: var(--neu-text) !important;
+        font-family: var(--neu-font) !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        padding: 8px 16px !important;
+        display: block !important;
+        text-decoration: none !important;
+    }
+
+    /* Dark theme toggle row */
+    .tFYjZe {
+        padding: 0 !important;
+    }
+
+    /* ===========================
+       Google app drawer shell (Neumorphic)
+       =========================== */
+    div[aria-hidden][style*="overflow: hidden"][style*="position: absolute"] {
+        border-radius: 36px !important;
+        background: linear-gradient(180deg, #f2f6fb 0%, #e7edf4 50%, #e0e4ef 100%) !important;
+        box-shadow: 0 30px 60px rgba(20, 40, 70, 0.25), inset 12px 12px 24px rgba(255, 255, 255, 0.95), inset -12px -12px 24px rgba(157, 168, 193, 0.45) !important;
+        border: 1px solid rgba(255, 255, 255, 0.75) !important;
+        transform: scale(0.9) translateY(-8px) !important;
+        transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease !important;
+        opacity: 0 !important;
+    }
+
+    div[aria-hidden="false"][style*="overflow: hidden"][style*="position: absolute"] {
+        transform: scale(1) translateY(0) !important;
+        opacity: 1 !important;
+        box-shadow: 0 38px 70px rgba(20, 40, 70, 0.35), inset 14px 14px 30px rgba(255, 255, 255, 0.98), inset -12px -12px 30px rgba(157, 168, 193, 0.5) !important;
+        animation: neu-drawer-pop 0.45s ease forwards !important;
+    }
+
+    @keyframes neu-drawer-pop {
+        from {
+            opacity: 0;
+            transform: scale(0.95) translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    /* ===========================
+       Mobile Layout
+       =========================== */
+    @media (max-width: 768px) {
+        :root {
+            --neu-search-height: 72px;
+            --neu-search-height-filled: 56px;
+            --neu-search-gap: 10px;
+        }
+
+        .A8SBwf {
+            top: 32% !important;
+            width: calc(100% - 32px) !important;
+            max-width: none !important;
+        }
+
+        .RNNXgb {
+            border-radius: 32px !important;
+            padding: 0 10px !important;
+        }
+
+        .RNNXgb .iblpc {
+            padding-left: 10px !important;
+            padding-right: 12px !important;
+        }
+
+        .RNNXgb .iblpc .hvhmMe .z1asCe {
+            width: 28px !important;
+            height: 28px !important;
+            line-height: 28px !important;
+        }
+
+        .RNNXgb .gLFyf {
+            font-size: 13px !important;
+        }
+
+        .RNNXgb .dRYYxd {
+            padding-right: 0 !important;
+        }
+
+        .RNNXgb .XDyW0e,
+        .RNNXgb [jsname="F7uqIe"],
+        .RNNXgb .nDcEnd,
+        .RNNXgb [jsname="R5mgy"] {
+            width: 40px !important;
+            height: 40px !important;
+        }
+
+        .RNNXgb .XDyW0e::after,
+        .RNNXgb [jsname="F7uqIe"]::after,
+        .RNNXgb .nDcEnd::after,
+        .RNNXgb [jsname="R5mgy"]::after {
+            width: 22px !important;
+            height: 22px !important;
+        }
+
+        #gb {
+            top: 16px !important;
+            right: 16px !important;
+            gap: 16px !important;
+        }
+
+        #gb .gb_M {
+            gap: 16px !important;
+        }
+
+        #gb .gb_M .gb_0 a[href*="mail"],
+        #gb .gb_M .gb_0 a[href*="imghp"],
+        #gbwa>div>a,
+        .gb_0a {
+            width: 40px !important;
+            height: 40px !important;
+        }
+
+        .gb_0a {
+            padding: 3px !important;
+        }
+
+        .c93Gbe {
+            height: 72px !important;
+        }
+
+        .uU7dJb {
+            bottom: 24px !important;
+            left: 16px !important;
+            font-size: 14px !important;
+        }
+
+        .uU7dJb::before {
+            width: 40px !important;
+            height: 40px !important;
+            margin-right: 10px !important;
+        }
+
+        a.pHiOh[href*="howsearchworks"] {
+            bottom: 24px !important;
+            right: 72px !important;
+            width: 40px !important;
+            height: 40px !important;
+        }
+
+        .CcNe6e {
+            bottom: 24px !important;
+            right: 16px !important;
+            width: 40px !important;
+            height: 40px !important;
+        }
+    }
+}
