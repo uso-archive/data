@@ -1,94 +1,214 @@
 /* ==UserStyle==
-@name         Zenith OLED
+@name         Gamer Edition
 @namespace    USO Archive
 @author       Trishan
-@description  Deep black theme with neon pink accents.
-@version      20260215.05.41
+@description  Deep black theme with neon accents and icons.
+@version      20260217.08.36
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
 @-moz-document domain("youtube.com") {
-/* --- 1. Global Backgrounds --- */
-    html, [dark], ytd-app, #master-container {
-        background-color: #000000 !important;
-        --yt-spec-base-background: #000000 !important;
-        --yt-spec-brand-background-primary: #000000 !important;
-        --yt-spec-menu-background: #0a0a0a !important;
-        --yt-spec-raised-background: #0a0a0a !important;
-        --yt-spec-text-primary: #ffffff !important;
+/* ==========================================================================
+       1. THE CORE ENGINE & BACKGROUND FIX (Modified for Visibility)
+       ========================================================================== */
+    :root {
+        --neon-primary: #00ffcc;    /* Cyber Cyan */
+        --neon-danger: #ff003c;     /* Critical Red */
+        --glass-panel: rgba(0, 0, 0, 0.7);
+        
+        /* YOUR IMAGE - Hardcoded */
+        --bg-wall: url("https://images.unsplash.com/photo-1501408459713-977c880160ab?q=80&w=1201&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
     }
 
-    /* --- 2. Header & Search --- */
-    #masthead-container, ytd-masthead {
-        background: rgba(0, 0, 0, 0.95) !important;
+    /* FORCE TRANSPARENCY ON ALL LAYERS - STOPS THE BLACK VOID */
+    html, body, ytd-app, #masthead, #columns, #page-manager, #secondary, ytd-watch-flexy, #content, ytd-mini-guide-renderer, ytd-guide-renderer, #background, ytd-browse {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    /* THE WALLPAPER LAYER - Fixed & Unmovable */
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-image: var(--bg-wall);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        z-index: -1; /* Sits behind everything */
+        opacity: 0.8 !important;
+        pointer-events: none;
+    }
+
+    /* Header Glass Effect */
+    #masthead-container, #masthead {
+        background: rgba(0, 0, 0, 0.6) !important;
         backdrop-filter: blur(10px);
-        border-bottom: 1px solid #222;
+        border-bottom: 1px solid rgba(0, 255, 204, 0.2);
     }
 
-    #search-form #container {
-        background-color: #111 !important;
-        border: 1px solid #333 !important;
-        border-radius: 12px !important;
-        box-shadow: inset 0 1px 4px rgba(0,0,0,0.5);
+    /* ==========================================================================
+       2. THE "BLADE" SEARCH BAR (Aggressive Sci-Fi Shape)
+       ========================================================================== */
+    ytd-searchbox {
+        margin-left: 40px !important;
+        flex: 1;
+        overflow: visible !important;
     }
 
-    /* --- 3. Video Cards & Interactions --- */
-    ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer {
-        transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* The Input Box */
+    #container.ytd-searchbox {
+        background: rgba(0, 0, 0, 0.9) !important;
+        border: 2px solid var(--neon-primary) !important;
+        border-right: none !important;
+        border-radius: 0 !important;
+        box-shadow: -5px 5px 0px rgba(0, 255, 204, 0.1);
+        
+        /* CHAMFERED CUT CORNERS */
+        clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%, 0 15px) !important;
+        
+        height: 40px !important;
+        padding-left: 15px !important;
     }
 
-    ytd-rich-item-renderer:hover, ytd-video-renderer:hover {
-        transform: scale(1.02);
-        z-index: 10;
+    input#search {
+        color: var(--neon-primary) !important;
+        font-family: 'Roboto', sans-serif !important;
+        font-weight: bold !important;
+        text-shadow: 0 0 5px var(--neon-primary);
+    }
+    
+    input#search::placeholder { color: rgba(0, 255, 204, 0.4) !important; }
+
+    /* The Search Button */
+    #search-icon-legacy {
+        background: var(--neon-danger) !important;
+        border: 2px solid var(--neon-danger) !important;
+        border-radius: 0 !important;
+        height: 44px !important;
+        width: 65px !important;
+        margin-top: -2px !important;
+        
+        /* OPPOSITE CHAMFER CUT */
+        clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%) !important;
+        
+        transition: 0.2s ease !important;
     }
 
-    ytd-thumbnail, #thumbnail {
-        border-radius: 12px !important;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    #search-icon-legacy:hover {
+        background: white !important;
+        box-shadow: 0 0 25px var(--neon-danger);
+    }
+    
+    #search-icon-legacy yt-icon { fill: black !important; }
+
+    /* ==========================================================================
+       3. VIDEO PLAYER & SNAKE LOADER
+       ========================================================================== */
+    /* Glass Player Container */
+    #player-theater-container, #player-container, #player-container-outer {
+        background: rgba(0,0,0,0.8) !important;
+        box-shadow: 0 0 80px rgba(0,0,0,0.8);
+        border: 1px solid var(--neon-primary);
     }
 
-    /* --- 4. The Neon Pink Accents --- */
-    .ytp-play-progress {
-        background: #ff0055 !important;
-        box-shadow: 0 0 12px #ff0055, 0 0 20px #ff0055;
+    /* The Snake Animation */
+    .ytp-spinner-container {
+        animation: snake-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
+    }
+    .ytp-spinner-rotator {
+        border: 4px solid rgba(255, 255, 255, 0.1) !important;
+        border-top: 4px solid var(--neon-primary) !important;
+        border-right: 4px solid var(--neon-danger) !important; /* Two-tone snake */
+        border-radius: 50% !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: none !important;
+        filter: drop-shadow(0 0 10px var(--neon-primary));
+    }
+    /* Hide Default Elements */
+    .ytp-spinner-left, .ytp-spinner-right, .ytp-spinner-dot { display: none !important; }
+    
+    @keyframes snake-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* ==========================================================================
+       4. BUTTONS & ICONS (Sci-Fi Chamfer)
+       ========================================================================== */
+    ytd-menu-renderer ytd-button-renderer button, 
+    #top-level-buttons-computed button,
+    button.yt-icon-button {
+        border-radius: 0 !important;
+        /* 45 DEGREE CUTS */
+        clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px) !important;
+        
+        background: rgba(20, 20, 20, 0.9) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        transition: all 0.2s ease !important;
     }
 
-    .ytp-scrubber-button {
-        background: #fff !important;
-        box-shadow: 0 0 15px #ff0055;
-        transform: scale(1.2);
+    ytd-menu-renderer ytd-button-renderer button:hover, 
+    #top-level-buttons-computed button:hover {
+        background: var(--neon-primary) !important;
+        border-color: var(--neon-primary) !important;
+        box-shadow: 0 0 15px var(--neon-primary);
+        transform: translateY(-2px);
+    }
+    
+    yt-icon, .yt-icon-shape {
+        color: white !important;
+        filter: drop-shadow(0 0 2px var(--neon-primary));
+    }
+    
+    button:hover yt-icon {
+        color: black !important;
+        fill: black !important;
     }
 
-    .ytp-swatch-background-color {
-        background-color: #ff0055 !important;
+    /* ==========================================================================
+       5. SUBSCRIBE BUTTON ("THE DETONATOR")
+       ========================================================================== */
+    #subscribe-button button, .yt-spec-button-shape-next--filled {
+        background: linear-gradient(135deg, #ff0000, #ff0055) !important;
+        font-weight: 900 !important;
+        letter-spacing: 2px !important;
+        border: none !important;
+        /* Aggressive Shape */
+        clip-path: polygon(15% 0, 100% 0, 100% 70%, 85% 100%, 0 100%, 0 30%) !important;
+        padding: 12px 30px !important;
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
     }
 
-    /* --- 5. Sidebar & Guide --- */
-    #guide-content, ytd-mini-guide-renderer {
-        background: #000000 !important;
-        border-right: 1px solid #222;
+    #subscribe-button button:hover {
+        background: white !important;
+        color: black !important;
+        box-shadow: 0 0 40px white;
     }
 
-    ytd-guide-entry-renderer:hover {
-        background-color: #1a1a1a !important;
-        border-radius: 10px;
+    /* ==========================================================================
+       6. THUMBNAILS (Holographic Tiles)
+       ========================================================================== */
+    ytd-thumbnail { overflow: visible !important; }
+
+    ytd-thumbnail a#thumbnail {
+        border-radius: 0 !important;
+        border: 2px solid transparent;
+        clip-path: polygon(0 0, 90% 0, 100% 20%, 100% 100%, 10% 100%, 0 80%) !important;
+    }
+    
+    ytd-thumbnail:hover a#thumbnail {
+        transform: scale(1.05);
+        border-color: var(--neon-primary);
+        box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+        z-index: 100;
     }
 
-    /* --- 6. Scrollbars (Chrome/Edge/Webkit) --- */
-    ::-webkit-scrollbar {
-        width: 10px;
-        background: #000;
-    }
-    ::-webkit-scrollbar-track {
-        background: #000;
-    }
-    ::-webkit-scrollbar-thumb {
-        background: #333;
-        border-radius: 5px;
-        border: 2px solid #000;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background: #ff0055;
+    /* Text Brightness */
+    #video-title {
+        color: #fff !important;
+        text-shadow: 0 2px 4px rgba(0,0,0,1);
     }
 }
