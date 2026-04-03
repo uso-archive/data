@@ -1,0 +1,200 @@
+/* ==UserStyle==
+@name         Gemini Gradient Ether Theme
+@namespace    USO Archive
+@author       Chrome Remote Desktop
+@description  A dark, fluid liquid theme with an aurora flare and translucent windows.
+@version      20260402.15.15
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("gemini.google.com") {
+/* ====================================================
+       1. STRICT DARK MODE TARGETING & VARIABLES
+       ==================================================== */
+       
+    body.dark-theme, 
+    html[data-theme="dark"] body {
+        /* Restored the perfect glass translucency */
+        --gemini-glass-bg: rgba(20, 15, 35, 0.4) !important; 
+        --gemini-glass-border: rgba(255, 255, 255, 0.08) !important;
+        --gemini-glass-text: #ffffff !important; 
+        --gemini-glass-text-muted: #c4b8d6 !important;
+        --gemini-input-bg: rgba(25, 20, 45, 0.4) !important;
+        --gemini-chip-bg: rgba(30, 20, 50, 0.4) !important;
+        --gemini-chip-hover: rgba(60, 40, 90, 0.6) !important;
+        --gemini-message-bg: rgba(30, 20, 50, 0.4) !important;
+        
+        /* Deep dark blue/purple base canvas color */
+        background-color: #080612 !important; 
+        color: var(--gemini-glass-text) !important;
+    }
+
+    /* ====================================================
+       2. SAFE TRANSPARENCY (Fixes "Doubling Over")
+       ==================================================== */
+    body.dark-theme app-root, html[data-theme="dark"] body app-root,
+    body.dark-theme main, html[data-theme="dark"] body main,
+    body.dark-theme mat-sidenav-container, html[data-theme="dark"] body mat-sidenav-container,
+    body.dark-theme mat-sidenav-content, html[data-theme="dark"] body mat-sidenav-content,
+    body.dark-theme .page-container, html[data-theme="dark"] body .page-container,
+    body.dark-theme .main-container, html[data-theme="dark"] body .main-container,
+    body.dark-theme app-chat-window, html[data-theme="dark"] body app-chat-window,
+    body.dark-theme chat-window, html[data-theme="dark"] body chat-window {
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Kill the specific horizontal fade/gradient bars */
+    body.dark-theme [class*="gradient"], html[data-theme="dark"] body [class*="gradient"],
+    body.dark-theme [class*="background"], html[data-theme="dark"] body [class*="background"],
+    body.dark-theme [class*="shadow"], html[data-theme="dark"] body [class*="shadow"],
+    body.dark-theme [class*="hero"], html[data-theme="dark"] body [class*="hero"],
+    body.dark-theme [class*="bottom-"], html[data-theme="dark"] body [class*="bottom-"],
+    body.dark-theme [class*="fade"], html[data-theme="dark"] body [class*="fade"] {
+        background-image: none !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+    
+    /* Ensure pseudo-elements on structural containers don't render black bars */
+    body.dark-theme [class*="hero"]::before, html[data-theme="dark"] body [class*="hero"]::before,
+    body.dark-theme [class*="hero"]::after, html[data-theme="dark"] body [class*="hero"]::after,
+    body.dark-theme [class*="bottom-"]::before, html[data-theme="dark"] body [class*="bottom-"]::before {
+        background-image: none !important;
+        background-color: transparent !important;
+    }
+
+    /* ====================================================
+       3. ANIMATED FLARE BACKGROUND (Lumi Style)
+       ==================================================== */
+       
+    /* Flare 1: Sweeping Bright Purple/White Beam */
+    body.dark-theme::before, html[data-theme="dark"] body::before {
+        content: "";
+        position: fixed;
+        top: 0%; left: -20%; width: 140vw; height: 60vh;
+        /* Elliptical gradient creates the wide flare look */
+        background: radial-gradient(ellipse at center, rgba(160, 100, 255, 0.7) 0%, rgba(90, 40, 220, 0.3) 40%, transparent 70%);
+        filter: blur(100px);
+        opacity: 0.95;
+        transform-origin: center center;
+        animation: flareSweep 20s infinite alternate ease-in-out;
+        z-index: 0 !important; 
+        pointer-events: none;
+    }
+
+    /* Flare 2: Deep Blue Ambient Glow at the bottom right */
+    body.dark-theme::after, html[data-theme="dark"] body::after {
+        content: "";
+        position: fixed;
+        bottom: -15%; right: -15%; width: 100vw; height: 80vh;
+        background: radial-gradient(circle at center, rgba(40, 100, 255, 0.4) 0%, transparent 60%);
+        filter: blur(120px);
+        opacity: 0.8;
+        animation: ambientPulse 25s infinite alternate ease-in-out;
+        z-index: 0 !important;
+        pointer-events: none;
+    }
+
+    /* Flare Animation Keyframes */
+    @keyframes flareSweep {
+        0% { transform: rotate(-15deg) translate(-5vw, -5vh) scale(1); }
+        50% { transform: rotate(-10deg) translate(5vw, 5vh) scale(1.1); }
+        100% { transform: rotate(-22deg) translate(-5vw, 10vh) scale(0.95); }
+    }
+
+    @keyframes ambientPulse {
+        0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+        100% { transform: translate(-10vw, -10vh) scale(1.2); opacity: 0.8; }
+    }
+
+    /* ====================================================
+       4. UI COMPONENTS & TRANSLUCENT GLASS WINDOWS
+       ==================================================== */
+       
+    /* Ensure App content sits above the blobs */
+    body.dark-theme app-root, html[data-theme="dark"] body app-root {
+        position: relative !important;
+        z-index: 10 !important; 
+    }
+
+    /* TRANSLUCENT WINDOWS: Sidebar and Canvas/Code Editor */
+    body.dark-theme mat-sidenav, html[data-theme="dark"] body mat-sidenav,
+    body.dark-theme app-navigation-drawer, html[data-theme="dark"] body app-navigation-drawer,
+    body.dark-theme .mat-drawer, html[data-theme="dark"] body .mat-drawer,
+    body.dark-theme [class*="sidebar"], html[data-theme="dark"] body [class*="sidebar"],
+    body.dark-theme app-artifacts, html[data-theme="dark"] body app-artifacts,
+    body.dark-theme [class*="artifact"], html[data-theme="dark"] body [class*="artifact"],
+    body.dark-theme [class*="workspace"], html[data-theme="dark"] body [class*="workspace"] {
+        background: var(--gemini-glass-bg) !important;
+        backdrop-filter: blur(24px) !important;
+        -webkit-backdrop-filter: blur(24px) !important;
+        border: 1px solid var(--gemini-glass-border) !important;
+        border-radius: 12px !important;
+    }
+    
+    /* Input Box */
+    body.dark-theme chat-input, html[data-theme="dark"] body chat-input,
+    body.dark-theme .input-area-container, html[data-theme="dark"] body .input-area-container,
+    body.dark-theme [class*="input-area"], html[data-theme="dark"] body [class*="input-area"],
+    body.dark-theme .chat-input-wrapper, html[data-theme="dark"] body .chat-input-wrapper {
+        background: var(--gemini-input-bg) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-radius: 28px !important;
+        border: 1px solid rgba(177, 158, 239, 0.3) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    /* Force inner containers of the input and editor to be transparent so glass shows through */
+    body.dark-theme chat-input > div, html[data-theme="dark"] body chat-input > div,
+    body.dark-theme .input-area-container > div, html[data-theme="dark"] body .input-area-container > div,
+    body.dark-theme [class*="input-area"] > div, html[data-theme="dark"] body [class*="input-area"] > div,
+    body.dark-theme .ql-container, html[data-theme="dark"] body .ql-container,
+    body.dark-theme .ql-editor, html[data-theme="dark"] body .ql-editor {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    /* Chat Bubbles */
+    body.dark-theme [class*="user-message"], html[data-theme="dark"] body [class*="user-message"] {
+        background: var(--gemini-message-bg) !important;
+        border: 1px solid var(--gemini-glass-border) !important;
+        backdrop-filter: blur(16px) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* Header/Top Bar */
+    body.dark-theme header, html[data-theme="dark"] body header,
+    body.dark-theme [class*="top-bar"], html[data-theme="dark"] body [class*="top-bar"] {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    /* ====================================================
+       5. AGGRESSIVE TEXT COLOR FIXES
+       Guarantees you can actually read the chat and code
+       ==================================================== */
+    body.dark-theme p, html[data-theme="dark"] body p,
+    body.dark-theme h1, html[data-theme="dark"] body h1,
+    body.dark-theme h2, html[data-theme="dark"] body h2,
+    body.dark-theme h3, html[data-theme="dark"] body h3,
+    body.dark-theme span, html[data-theme="dark"] body span,
+    body.dark-theme div.markdown, html[data-theme="dark"] body div.markdown,
+    body.dark-theme .markdown *, html[data-theme="dark"] body .markdown *,
+    body.dark-theme .message-content *, html[data-theme="dark"] body .message-content *,
+    body.dark-theme .ql-editor *, html[data-theme="dark"] body .ql-editor *,
+    body.dark-theme mat-sidenav *, html[data-theme="dark"] body mat-sidenav *,
+    body.dark-theme button *, html[data-theme="dark"] body button * {
+        color: var(--gemini-glass-text) !important;
+    }
+    
+    body.dark-theme .mat-mdc-tooltip, html[data-theme="dark"] body .mat-mdc-tooltip,
+    body.dark-theme [class*="subtitle"], html[data-theme="dark"] body [class*="subtitle"],
+    body.dark-theme [class*="timestamp"], html[data-theme="dark"] body [class*="timestamp"] {
+         color: var(--gemini-glass-text-muted) !important;
+    }
+}
