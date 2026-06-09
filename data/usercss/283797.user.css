@@ -1,0 +1,555 @@
+/* ==UserStyle==
+@name         ClaudeGlass
+@namespace    USO Archive
+@author       Jijin Jayakumar
+@description  Cluade glass theme
+@version      20260608.19.21
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("claude.ai") {
+/*
+  Claude 2026 — Apple Glass
+  Paste into userstyles.org editor.
+  Set "Applies To" → URLs on the domain → claude.ai
+*/
+
+/* ── TOKENS ──────────────────────────────────────────────── */
+:root,
+html[data-theme="claude"] {
+  --accent:          #007AFF;
+  --accent-faint:    color-mix(in srgb, #007AFF 10%, transparent);
+  --accent-medium:   color-mix(in srgb, #007AFF 18%, transparent);
+  --accent-glow:     color-mix(in srgb, #007AFF 30%, transparent);
+  --text-100: #1D1D1F;
+  --text-200: #3A3A3C;
+  --text-300: #6E6E73;
+  --text-500: #AEAEB2;
+  --accent-brand:       var(--accent);
+  --accent-brand-faint: var(--accent-faint);
+  --always-black:       #1D1D1F;
+  --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  --font-user-message:    -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  --font-claude-response: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  --font-sans-serif:      -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  --font-serif:           -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+}
+
+/* ── WALLPAPER ───────────────────────────────────────────── */
+body {
+  font-family:            var(--font-ui) !important;
+  -webkit-font-smoothing: antialiased !important;
+  letter-spacing:         -0.008em;
+  background:
+    radial-gradient(ellipse 80% 65% at  8% 12%, #C8DEFF, transparent 58%),
+    radial-gradient(ellipse 65% 75% at 88%  8%, #DEC8FF, transparent 54%),
+    radial-gradient(ellipse 75% 55% at 52% 92%, #C8FFE0, transparent 58%),
+    radial-gradient(ellipse 55% 65% at 92% 72%, #FFE0C8, transparent 52%),
+    linear-gradient(145deg, #C8DEFF 0%, #DEC8FF 30%, #C8FFE0 60%, #FFE0C8 100%) !important;
+  background-attachment: fixed !important;
+}
+
+/* ── STRIP SOLID FILLS from intermediate containers ──────── */
+body > #root,
+body > #root > div,
+body > #root > div > div,
+body > #root > div > div > div,
+#main-content,
+#main-content > div,
+#main-content > div > div,
+#main-content > div > div > div,
+[data-testid="chat-stale-nav-frame"],
+[data-testid="chat-stale-nav-frame"] > div,
+[data-testid="chat-stale-nav-inert"],
+[data-testid="chat-stale-nav-inert"] > div,
+.grid.w-full,
+.flex.min-h-0.min-w-0.w-full,
+.flex.h-full.flex-col.overflow-hidden,
+.flex.flex-1.h-full.w-full.overflow-hidden,
+.relative.w-full.min-h-full.flex.flex-col,
+.mx-auto.flex.w-full.flex-1.flex-col,
+.flex-1.flex.flex-col.px-4 {
+  background:       transparent !important;
+  background-color: transparent !important;
+}
+
+[data-autoscroll-container="true"] {
+  background:              rgba(255,255,255,0.12) !important;
+  backdrop-filter:         blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+/* ── SIDEBAR GLASS ───────────────────────────────────────── */
+nav[aria-label="Sidebar"] {
+  background:              rgba(255,255,255,0.62) !important;
+  backdrop-filter:         blur(28px) saturate(2.0) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(2.0) !important;
+  border-right: 0.5px solid rgba(255,255,255,0.55) !important;
+  box-shadow:   1px 0 0 rgba(0,0,0,0.06) !important;
+}
+
+nav a[aria-label="New chat"] {
+  background:    rgba(255,255,255,0.55) !important;
+  border:        0.5px solid rgba(255,255,255,0.85) !important;
+  box-shadow:    0 1px 4px rgba(0,0,0,0.06),
+                 inset 0 1px 0 rgba(255,255,255,0.95) !important;
+  border-radius: 9px !important;
+  font-size:     12.5px !important;
+  font-weight:   500 !important;
+}
+
+nav a[aria-current="page"] {
+  background:    var(--accent-faint) !important;
+  color:         var(--accent) !important;
+  border-radius: 8px !important;
+  font-weight:   500 !important;
+}
+
+h2 span[role="button"] span.truncate {
+  font-size:      10px !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  font-weight:    600 !important;
+  color:          var(--text-500) !important;
+}
+
+/* ─────────────────────────────────────────────────────────
+   HEADERS — three structures across claude.ai pages:
+
+   A) Chat page:
+      header.sticky.z-header[data-testid="page-header"]
+      The header element IS the sticky glass panel.
+
+   B) Chats / Projects / Artifacts pages:
+      div.sticky.z-header.bg-bg-100        ← outer sticky wrapper
+        ├── header[data-testid="page-header"] ← inner (make transparent)
+        └── div                              ← search bar (make transparent)
+
+   C) Incognito page:
+      div.fixed.z-header   ← dark overlay mask  (NOT touched — fixed, not sticky)
+      div.fixed.z-header   ← incognito bar      (NOT touched — fixed, not sticky)
+
+   KEY FIX: use div.sticky.z-header (not div.z-header) so fixed
+   incognito overlays are never caught by the glass rule.
+
+   KEY FIX 2: remove :not(.z-header *) — complex descendant
+   selectors inside :not() are not valid in userstyles parsers.
+   Instead rely on specificity: div.sticky.z-header header
+   (0,2,1) beats header[data-testid] (0,1,1) so inner header
+   correctly becomes transparent.
+───────────────────────────────────────────────────────── */
+
+/* A & B) Any header[data-testid="page-header"] gets glass by default */
+header[data-testid="page-header"] {
+  background:              rgba(255,255,255,0.55) !important;
+  backdrop-filter:         blur(28px) saturate(1.9) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.9) !important;
+  border-bottom: 0.5px solid rgba(255,255,255,0.5) !important;
+  box-shadow:    0 1px 0 rgba(0,0,0,0.06) !important;
+}
+
+/* B) Outer sticky wrapper on Chats/Projects pages — glass */
+div.sticky.z-header {
+  background:              rgba(255,255,255,0.55) !important;
+  backdrop-filter:         blur(28px) saturate(1.9) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.9) !important;
+  border-bottom: 0.5px solid rgba(255,255,255,0.5) !important;
+  box-shadow:    0 1px 0 rgba(0,0,0,0.06) !important;
+}
+
+/* B) Inner header inside sticky wrapper — transparent (higher specificity wins) */
+div.sticky.z-header header {
+  background:              transparent !important;
+  backdrop-filter:         none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow:              none !important;
+  border:                  none !important;
+}
+
+/* B) Sub-container (search bar area) inside sticky wrapper — transparent */
+div.sticky.z-header > div {
+  background:              transparent !important;
+  backdrop-filter:         none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Kill gradient fade line inside Chats header */
+div.sticky.z-header .bg-gradient-to-b {
+  display: none !important;
+}
+
+/* Page headings */
+header[data-testid="page-header"] h1,
+div.sticky.z-header h1,
+header button[aria-label*="rename"] span {
+  font-weight:    600 !important;
+  letter-spacing: -0.015em !important;
+  color:          var(--text-100) !important;
+}
+
+/* Share button */
+header button[data-testid="wiggle-controls-actions-share"] {
+  background:    rgba(255,255,255,0.72) !important;
+  border:        0.5px solid rgba(0,0,0,0.10) !important;
+  box-shadow:    0 1px 4px rgba(0,0,0,0.06),
+                 inset 0 1px 0 rgba(255,255,255,0.95) !important;
+  border-radius: 8px !important;
+  font-size:     11.5px !important;
+  font-weight:   500 !important;
+  color:         var(--text-200) !important;
+}
+
+/* Search input (Chats page) */
+[data-cds="TextInput"],
+div[data-cds="TextInput"] {
+  background:    rgba(255,255,255,0.72) !important;
+  border:        0.5px solid rgba(255,255,255,0.7) !important;
+  box-shadow:    0 1px 4px rgba(0,0,0,0.04),
+                 inset 0 1px 0 rgba(255,255,255,0.9),
+                 0 0 0 0.5px rgba(0,0,0,0.07) !important;
+  border-radius: 12px !important;
+}
+
+div[data-cds="TextInput"]:focus-within {
+  border-color: color-mix(in srgb, #007AFF 40%, transparent) !important;
+  box-shadow:   0 0 0 3px var(--accent-faint),
+                inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+
+div[data-cds="TextInput"] input {
+  background:  transparent !important;
+  color:       var(--text-100) !important;
+  font-family: var(--font-ui) !important;
+}
+
+/* ── MESSAGES ────────────────────────────────────────────── */
+[data-user-message-bubble="true"] {
+  background:     var(--accent) !important;
+  color:          #ffffff !important;
+  border-radius:  18px 18px 4px 18px !important;
+  box-shadow:     0 4px 16px var(--accent-glow) !important;
+  font-size:      13.5px !important;
+  line-height:    1.55 !important;
+  letter-spacing: -0.01em !important;
+  padding:        10px 15px !important;
+}
+
+.font-claude-response,
+.font-claude-response p,
+.font-claude-response li {
+  font-family:    var(--font-ui) !important;
+  font-size:      14px !important;
+  line-height:    1.72 !important;
+  color:          var(--text-100) !important;
+  letter-spacing: -0.008em !important;
+}
+
+.font-claude-response h1,
+.font-claude-response h2,
+.font-claude-response h3,
+.font-claude-response h4 {
+  font-weight:    600 !important;
+  letter-spacing: -0.02em !important;
+  color:          var(--text-100) !important;
+}
+
+.font-claude-response code {
+  background:    var(--accent-faint) !important;
+  color:         var(--accent) !important;
+  border:        0.5px solid var(--accent-medium) !important;
+  border-radius: 5px !important;
+  font-family:   "SF Mono", Menlo, Consolas, monospace !important;
+  font-size:     12px !important;
+  padding:       1px 5px !important;
+}
+
+[role="group"][aria-label*="code"],
+.font-claude-response pre {
+  background:    rgba(0,0,0,0.04) !important;
+  border:        0.5px solid rgba(0,0,0,0.09) !important;
+  border-radius: 12px !important;
+  box-shadow:    none !important;
+}
+
+pre code {
+  font-family: "SF Mono", Menlo, Consolas, monospace !important;
+  font-size:   12.5px !important;
+  line-height: 1.72 !important;
+  color:       var(--text-200) !important;
+  background:  transparent !important;
+  border:      none !important;
+}
+
+/* ── INPUT AREA — transparent container, glass on pill only ─ */
+[data-chat-input-container="true"] {
+  background:              transparent !important;
+  backdrop-filter:         none !important;
+  -webkit-backdrop-filter: none !important;
+  border-top:              none !important;
+  box-shadow:              none !important;
+}
+
+fieldset {
+  background: transparent !important;
+  border:     none !important;
+}
+
+/* Rounded pill (chat page + incognito new chat page) */
+.flex.flex-col.bg-bg-000 {
+  background:              rgba(255,255,255,0.85) !important;
+  backdrop-filter:         blur(24px) saturate(1.8) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.8) !important;
+  border:        0.5px solid rgba(255,255,255,0.9) !important;
+  box-shadow:    0 4px 24px rgba(0,0,0,0.08),
+                 inset 0 1px 0 rgba(255,255,255,1),
+                 0 0 0 0.5px rgba(0,0,0,0.07) !important;
+  border-radius: 20px !important;
+}
+
+.flex.flex-col.bg-bg-000:focus-within {
+  border-color: color-mix(in srgb, #007AFF 40%, transparent) !important;
+  box-shadow:   0 4px 24px rgba(0,0,0,0.08),
+                inset 0 1px 0 rgba(255,255,255,1),
+                0 0 0 3px var(--accent-faint) !important;
+}
+
+.ProseMirror,
+[data-testid="chat-input"] {
+  font-family:    var(--font-ui) !important;
+  font-size:      14px !important;
+  letter-spacing: -0.008em !important;
+  color:          var(--text-100) !important;
+  caret-color:    var(--accent) !important;
+}
+
+.ProseMirror p.is-empty::before {
+  color:      var(--text-500) !important;
+  font-style: normal !important;
+}
+
+button[data-testid="model-selector-dropdown"] {
+  font-family:   var(--font-ui) !important;
+  font-size:     12px !important;
+  font-weight:   500 !important;
+  color:         var(--text-300) !important;
+  background:    rgba(255,255,255,0.6) !important;
+  border:        0.5px solid rgba(0,0,0,0.08) !important;
+  border-radius: 20px !important;
+}
+
+[data-disclaimer="true"] {
+  font-size:               11px !important;
+  color:                   var(--text-500) !important;
+  background:              transparent !important;
+  backdrop-filter:         none !important;
+  -webkit-backdrop-filter: none !important;
+  border:                  none !important;
+}
+
+/* ── USER AVATAR ─────────────────────────────────────────── */
+button[data-testid="user-menu-button"] .rounded-full {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, #007AFF 60%, #ffffff),
+    #007AFF) !important;
+  border:      none !important;
+  color:       #fff !important;
+  box-shadow:  0 2px 8px var(--accent-glow) !important;
+  font-weight: 600 !important;
+}
+
+/* ── SCROLLBAR ───────────────────────────────────────────── */
+* { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.14) transparent; }
+*::-webkit-scrollbar { width: 4px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.14); border-radius: 4px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.22); }
+
+/* ── SELECTION & FOCUS ───────────────────────────────────── */
+::selection {
+  background: var(--accent-medium) !important;
+  color:      var(--text-100) !important;
+}
+
+button:focus-visible, a:focus-visible {
+  outline:        2px solid var(--accent) !important;
+  outline-offset: 2px !important;
+  border-radius:  4px !important;
+}
+
+/* ── TRANSITIONS ─────────────────────────────────────────── */
+nav a, button, input {
+  transition: all 120ms cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+/* ── SETTINGS DIALOG GLASS ───────────────────────────────── */
+/*
+  Structure:
+    [data-base-ui-backdrop]              ← backdrop overlay
+    [role="dialog"][data-cds="Dialog"]   ← floating card
+      ├── nav[aria-label="Settings"]     ← left nav (bg-surface-1)
+      └── .flex.min-h-0.flex-1.flex-col ← right content (bg-surface-2)
+*/
+
+/* Backdrop behind the dialog */
+[data-base-ui-backdrop],
+[data-popup-backdrop],
+[data-cds="Backdrop"] {
+  background:              rgba(0,0,0,0.12) !important;
+  backdrop-filter:         blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
+/* Main dialog card — frosted glass floating panel */
+[role="dialog"][data-cds="Dialog"] {
+  background:              rgba(255,255,255,0.78) !important;
+  backdrop-filter:         blur(40px) saturate(2.0) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(2.0) !important;
+  border:     0.5px solid rgba(255,255,255,0.70) !important;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.14),
+              0  8px  30px rgba(0,0,0,0.06),
+              inset 0 1px 0 rgba(255,255,255,0.95) !important;
+}
+
+/* Left settings nav */
+[role="dialog"][data-cds="Dialog"] nav[aria-label="Settings"] {
+  background:  rgba(255,255,255,0.45) !important;
+  border-right: 0.5px solid rgba(0,0,0,0.07) !important;
+}
+
+/* Right content panel — fully transparent, dialog card handles glass */
+[role="dialog"][data-cds="Dialog"] .flex.min-h-0.min-w-0.flex-1.flex-col {
+  background: transparent !important;
+}
+
+/* Gradient scroll-fade inside settings — hide it */
+[role="dialog"][data-cds="Dialog"] .bg-gradient-to-b {
+  display: none !important;
+}
+
+/* Section dividers — lighter */
+[role="dialog"][data-cds="Dialog"] .divide-y > * {
+  border-color: rgba(0,0,0,0.06) !important;
+}
+
+/* Section headings */
+[role="dialog"][data-cds="Dialog"] h3 {
+  font-weight:    600 !important;
+  letter-spacing: -0.01em !important;
+  color:          var(--text-100) !important;
+}
+
+/* ── Settings nav items ───────────────────────────────────── */
+
+/* Active nav item */
+[role="dialog"][data-cds="Dialog"] nav button[aria-current="page"] {
+  background:  var(--accent-faint) !important;
+  color:       var(--accent) !important;
+  font-weight: 500 !important;
+}
+
+/* Inactive nav items */
+[role="dialog"][data-cds="Dialog"] nav button:not([aria-current="page"]) {
+  color: var(--text-300) !important;
+}
+
+[role="dialog"][data-cds="Dialog"] nav button:not([aria-current="page"]):hover {
+  background: rgba(0,0,0,0.04) !important;
+  color:      var(--text-100) !important;
+}
+
+/* ── Settings search input ───────────────────────────────── */
+[role="dialog"][data-cds="Dialog"] .bg-fill-field {
+  background:    rgba(255,255,255,0.65) !important;
+  box-shadow:    0 0 0 0.5px rgba(0,0,0,0.10) !important;
+  border-radius: 8px !important;
+}
+
+[role="dialog"][data-cds="Dialog"] .bg-fill-field:focus-within {
+  background:    rgba(255,255,255,0.90) !important;
+  box-shadow:    0 0 0 2px var(--accent-faint),
+                 0 0 0 0.5px rgba(0,0,0,0.10) !important;
+}
+
+/* ── Settings form controls ──────────────────────────────── */
+
+/* Text inputs */
+[role="dialog"][data-cds="Dialog"] input.cds-input[data-cds="TextInput"],
+[role="dialog"][data-cds="Dialog"] input.cds-input:not([type="radio"]):not([type="checkbox"]):not([aria-hidden]) {
+  background:    rgba(255,255,255,0.65) !important;
+  box-shadow:    0 0 0 0.5px rgba(0,0,0,0.10) !important;
+  border-radius: 8px !important;
+  font-family:   var(--font-ui) !important;
+  color:         var(--text-100) !important;
+}
+
+[role="dialog"][data-cds="Dialog"] input.cds-input:focus-visible {
+  background:    rgba(255,255,255,0.95) !important;
+  box-shadow:    0 0 0 3px var(--accent-faint),
+                 0 0 0 0.5px rgba(0,0,0,0.10) !important;
+}
+
+/* Textarea (Instructions for Claude) */
+[role="dialog"][data-cds="Dialog"] textarea.cds-input {
+  background:    rgba(255,255,255,0.65) !important;
+  box-shadow:    0 0 0 0.5px rgba(0,0,0,0.10) !important;
+  border-radius: 8px !important;
+  font-family:   var(--font-ui) !important;
+  font-size:     13.5px !important;
+  line-height:   1.65 !important;
+  color:         var(--text-100) !important;
+}
+
+[role="dialog"][data-cds="Dialog"] textarea.cds-input:focus-visible {
+  background:    rgba(255,255,255,0.92) !important;
+  box-shadow:    0 0 0 3px var(--accent-faint),
+                 0 0 0 0.5px rgba(0,0,0,0.10) !important;
+}
+
+/* ── Segmented control (Appearance: System / Light / Dark) ── */
+[role="dialog"][data-cds="Dialog"] [data-cds="SegmentedControl"] {
+  background: rgba(0,0,0,0.05) !important;
+}
+
+/* Active segment thumb */
+[role="dialog"][data-cds="Dialog"] [data-cds="SegmentedControl"] > div[aria-hidden] {
+  background: rgba(255,255,255,0.90) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.10) !important;
+}
+
+/* ── Toggle switches ─────────────────────────────────────── */
+[role="dialog"][data-cds="Dialog"] [role="switch"][data-checked] {
+  background: var(--accent) !important;
+}
+
+[role="dialog"][data-cds="Dialog"] [role="switch"][data-unchecked] {
+  background: rgba(0,0,0,0.12) !important;
+}
+
+/* ── Dropdown / select triggers ──────────────────────────── */
+[role="dialog"][data-cds="Dialog"] .group\/cbx {
+  background:    rgba(255,255,255,0.55) !important;
+  border-radius: 8px !important;
+  border:        0.5px solid rgba(0,0,0,0.08) !important;
+}
+
+[role="dialog"][data-cds="Dialog"] .group\/cbx:hover {
+  background: rgba(255,255,255,0.80) !important;
+}
+
+/* Close button in dialog */
+[role="dialog"][data-cds="Dialog"] button[aria-label="Close"] {
+  color: var(--text-300) !important;
+}
+
+[role="dialog"][data-cds="Dialog"] button[aria-label="Close"]:hover {
+  background: rgba(0,0,0,0.06) !important;
+  color:      var(--text-100) !important;
+}
+
+/* Section labels (footnote text) */
+[role="dialog"][data-cds="Dialog"] .text-footnote,
+[role="dialog"][data-cds="Dialog"] .text-muted,
+[role="dialog"][data-cds="Dialog"] .text-secondary {
+  color: var(--text-300) !important;
+}
+}
