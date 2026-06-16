@@ -2,47 +2,115 @@
 @name         老派极客时间阅读体验
 @namespace    USO Archive
 @author       飞扬
-@description  一点点改进的极客时间阅读体验。
-@version      20251204.09.45
+@description  调整极客时间课程页的正文、标题、列表、引用和大纲目录排版，偏向中文长文阅读体验。
+@version      20260615.11.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
 @-moz-document domain("time.geekbang.org") {
 /* 目录 */
-  [class^="Syllabus_syllabusListWrapper"] {
-    font-family: 方正黑体简体, 苹方-简, 微软雅黑, "Noto Sans CJK SC", sans-serif;
-    max-height: unset;
-    overflow-y: unset;
+  [class*="Syllabus_syllabusListWrapper"] {
+    font-family: "方正黑体简体", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+    max-height: none;
+    overflow-y: visible;
   }
-  [class^="Syllabus_syllabusItem"] {
-    margin-bottom: 12px
+
+  [class*="Syllabus_syllabusItem"] {
+    display: block;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    -webkit-line-clamp: initial;
+    -webkit-box-orient: initial;
+    margin-bottom: 12px;
   }
 
   /* 课程标题 */
-  [class^="Index_articleTitle"] {
-    font-family: 方正大雅宋简体, 方正黑体简体, 苹方-简, 微软雅黑, "Noto Sans CJK SC", sans-serif;
+  [class*="Index_articleTitle"] {
+    font-family: "方正大雅宋简体", "方正黑体简体", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
   }
 
   /* 分级标题 */
   [data-slate-type="heading"] {
-    font-family: 方正黑体简体, 苹方-简, 微软雅黑, "Noto Sans CJK SC", sans-serif;
-    margin-top: calc(1.5em)
+    font-family: "方正黑体简体", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+    margin-top: 1.5em;
   }
 
   /* 正文 */
   [data-slate-type="paragraph"] {
-    font-family:  "STIX Two Text", Cambria, 方正新书宋简体, 宋体-简, 华文宋体, 新宋体, "Noto Serif CJK SC", serif;
+    font-family: "STIX Two Text", Cambria, "方正新书宋简体", "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif;
     margin-bottom: calc(1em - 2px);
   }
 
-  /* 列表 */
-  div[data-slate-type="list-line"],
-  div[data-slate-type="quote-line"] {
-    font-family: Charter, Georgia, 方正楷体简体, 华文楷体, 楷体, "Noto Serif CJK SC", serif;
-    font-size: calc(1em - 2px);
-    margin-bottom: 0;
+  /* 行内代码 */
+  [data-slate-type="code"] {
+    font-family: "SF Mono", SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Cascadia Code", "JetBrains Mono", Consolas, "Liberation Mono", monospace;
+    font-size: 0.9em;
+    padding: 0.08em 0.22em;
+    border-radius: 3px;
+    background: #f3f3f1;
   }
-  div[data-code-line-number]::before {
-    font-family: Georgia, serif;
+
+  /* 列表 */
+  div[data-slate-type="list-line"] {
+    font-family: Charter, Georgia, "方正楷体简体", "Kaiti SC", "KaiTi", "STKaiti", "Noto Serif CJK SC", serif;
+    font-size: 0.94em;
+    margin-bottom: 0;
+    font-style: normal;
+  }
+
+  /* 引用*/
+  div[data-slate-type="quote-line"] {
+    box-sizing: border-box;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  
+    padding: 0.22em 1em 0.22em 1.25em !important;
+    border-left: 4px solid #e1e4e8 !important;
+    background: #fafaf8 !important;
+  
+    font-family: Charter, Georgia, "方正楷体简体", "Kaiti SC", "KaiTi", "STKaiti", "Noto Serif CJK SC", serif;
+    font-size: 0.94em;
+    line-height: 1.75;
+    color: #858d96;
+    font-style: normal;
+    text-indent: 0;
+  }
+
+  div[data-slate-type="quote-line"] span {
+    color: inherit;
+  }
+
+  /* 清掉站点原本可能加在内部元素上的缩进/竖线，避免双重缩进 */
+  div[data-slate-type="quote-line"] > div {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    border-left: 0 !important;
+  }
+
+  div[data-slate-type="quote-line"]::before,
+  div[data-slate-type="quote-line"] > div::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  /* 连续引用块的上下留白 */
+  [data-slate-type="paragraph"] + div[data-slate-type="quote-line"],
+  [data-slate-type="heading"] + div[data-slate-type="quote-line"],
+  div[data-slate-type="list-line"] + div[data-slate-type="quote-line"] {
+    margin-top: 1.15em !important;
+  }
+
+  div[data-slate-type="quote-line"] + [data-slate-type="paragraph"],
+  div[data-slate-type="quote-line"] + [data-slate-type="heading"],
+  div[data-slate-type="quote-line"] + div[data-slate-type="list-line"] {
+    margin-top: 1.15em !important;
+  }
+
+  /* 有序列表编号 */
+  div[data-slate-type="list-line"] > div[data-code-line-number]::before {
+    font-family: Georgia, "Times New Roman", serif;
   }
 }
