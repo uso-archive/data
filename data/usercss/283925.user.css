@@ -1,0 +1,297 @@
+/* ==UserStyle==
+@name         niconico Dark 2026
+@namespace    USO Archive
+@author       Reza Rahemtola
+@description  A polished dark look across the whole site: the home page, video pages and their comment lists, the rankings, search results and user profiles.
+@version      20260623.21.03
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("nicovideo.jp") {
+/* ============================================================
+     niconico Dark
+     The 2024 relaunch is built on a design-token system (Panda CSS):
+     surfaces, text, borders and inputs all resolve from --colors-*
+     custom properties. Re-pointing those tokens flips the modern
+     pages (video, ranking, search, comment list) to dark in one pass.
+     The home page and profiles still use the legacy DOM, so those
+     classes are handled directly below.
+     ============================================================ */
+
+  :root {
+    color-scheme: dark !important;
+
+    /* ---- Base page + elevated surfaces ---- */
+    --colors-layer-background: #14181d !important;
+    --colors-layer-surface-high-em: #1c2128 !important;
+    --colors-layer-surface-high-em-white: #1c2128 !important;
+    --colors-layer-surface-high-em-black: #1c2128 !important;
+    --colors-layer-surface-medium-em: #1a1f26 !important;
+    --colors-layer-surface-medium-em-white: #1a1f26 !important;
+    --colors-layer-surface-medium-em-black: #1a1f26 !important;
+    --colors-layer-surface-low-em: #262c33 !important;
+    --colors-layer-surface-low-em-black: #262c33 !important;
+    --colors-layer-surface-lower-em: #2d333b !important;
+    --colors-layer-surface-overlay: #000000cc !important;
+    --colors-layer-surface-overlay-black: #000000cc !important;
+    --colors-layer-content-overlay: #14181dcc !important;
+
+    /* ---- Text on surfaces ---- */
+    --colors-text-on-layer-high-em: #e6edf3 !important;
+    --colors-text-on-layer-high-em-white: #e6edf3 !important;
+    --colors-text-on-layer-high-em-black: #e6edf3 !important;
+    --colors-text-on-layer-medium-em: #c4cdd6 !important;
+    --colors-text-on-layer-medium-em-inv: #14181dcc !important;
+    --colors-text-on-layer-low-em: #8b949e !important;
+    --colors-text-on-layer-lower-em: #6e7681 !important;
+    --colors-text-on-layer-visited: #a9b4c0 !important;
+
+    /* ---- Borders (soften the bright default lines) ---- */
+    --colors-border-base: #262c33 !important;
+    --colors-border-high-em: #2d333b !important;
+    --colors-action-ui-border: #3a424c !important;
+
+    /* ---- Form inputs (search box, fields) ---- */
+    --colors-input-form-background: #0d1117 !important;
+    --colors-input-form-input-text: #e6edf3 !important;
+    --colors-input-form-placeholder: #8b949e !important;
+
+    /* ---- Icons ---- */
+    --colors-icon-base: #c4cdd6 !important;
+    --colors-icon-primary: #e6edf3 !important;
+    --colors-icon-base-white: #c4cdd6 !important;
+    --colors-icon-primary-white: #e6edf3 !important;
+    --colors-icon-video-description: #8b949e !important;
+    --colors-icon-header-search-base: #8b949e !important;
+    --colors-icon-watch-controller-base: #ccd3da !important;
+
+    /* ---- Tabs / on-base actions ---- */
+    --colors-tab-text-on-base: #c4cdd6 !important;
+    --colors-tab-object-on-base: #c4cdd6 !important;
+    --colors-tab-text-on-base-active: #e6edf3 !important;
+    --colors-tab-object-on-base-active: #e6edf3 !important;
+    --colors-tab-text-on-base-hover: #e6edf3 !important;
+    --colors-tab-object-on-base-hover: #e6edf3 !important;
+    --colors-action-text-on-base: #e6edf3 !important;
+
+    /* ---- Monotone scale (light end maps to dark surfaces;
+            the dark end #252525 / #000 already reads as dark and is
+            kept for the header bar and the video stage) ---- */
+    --colors-monotone--l100: #e6edf3 !important;
+    --colors-monotone--l95: #1c2128 !important;
+    --colors-monotone--l90: #262c33 !important;
+    --colors-monotone--l80: #2d333b !important;
+    --colors-monotone--l70: #8b949e !important;
+
+    /* ---- Tooltips / snackbars ---- */
+    --colors-tooltip-background: #2d333b !important;
+    --colors-tooltip-text-on-background: #e6edf3 !important;
+    --colors-snackbar-base: #2d333b !important;
+    --colors-snackbar-text-on-base: #e6edf3 !important;
+
+    /* ---- Loading skeleton shimmer ---- */
+    --colors-layer-skeleton: linear-gradient(to right, #0000, #ffffff0d, #0000) !important;
+
+    /* ---- niconico accent — keep the brand azure, lift it slightly
+            so links/CTAs stay vivid and readable on near-black ---- */
+    --colors-action-primary-azure: #2f86e6 !important;
+    --colors-action-primary-azure-hover: #4799eb !important;
+    --colors-text-on-layer-accent-azure: #5fb0e6 !important;
+    --colors-action-text-on-tertiary-azure: #5fb0e6 !important;
+    --colors-action-text-on-tertiary-azure-inv: #5fb0e6 !important;
+    --colors-icon-primary-azure: #5fb0e6 !important;
+    --colors-layer-surface-accent-azure: #1f4a78 !important;
+  }
+
+  /* ============================================================
+     Modern (token) pages — a few literal surfaces that bypass
+     the token and a couple of util classes Panda emits inline.
+     ============================================================ */
+  /* Empty / placeholder ad frames sit on white — neutralise the slot
+     so it reads as a blank dark panel instead of a bright box. */
+  .Ads, [class*="Ads"], [class^="Ads"],
+  iframe[id*="google_ads"], ins.adsbygoogle {
+    background-color: #161b21 !important;
+  }
+
+  /* ============================================================
+     Common top header bar (shared chrome) + campaign strip
+     ============================================================ */
+  .CommonHeader, [class*="CommonHeader"] { background-color: #0d1117 !important; }
+  header [class*="common-header-"] { color: #e6edf3; }
+
+  /* ============================================================
+     LEGACY DOM — home (video_top) + profiles (UserPage)
+     Stable structural / semantic classes only.
+     ============================================================ */
+
+  /* Base layout shells */
+  .BaseLayout, .BaseUniLayout,
+  body.BaseLayout, body.BaseUniLayout {
+    background-color: #14181d !important;
+    color: #c4cdd6 !important;
+  }
+  .BaseLayout-container, .BaseLayout-contents, .BaseLayout-main,
+  .BaseLayout-header, .BaseLayout-sidebar, .BaseLayout-block,
+  .BaseLayout-billboard, .BaseUniLayout-container, .BaseUniLayout-contents,
+  .BaseUniLayout-main, .BaseUniLayout-block {
+    background-color: transparent !important;
+  }
+
+  /* Soften every light border across the legacy DOM */
+  .BaseLayout *, .BaseUniLayout * { border-color: #262c33 !important; }
+
+  /* Site / category header strip on the home page */
+  .GlobalHeader, .HeaderContainer, .SiteHeader, #siteHeaderNotification,
+  .VideoTopHeaderContainer {
+    background-color: #0d1117 !important;
+  }
+  .VideoTopGenreListContainer, .GenreListContainer,
+  [class*="GenreListContainer"] {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+  }
+  .VideoTopGenreListContainer-item, [class*="GenreListContainer-item"] {
+    background-color: transparent !important;
+    color: #c4cdd6 !important;
+  }
+  .VideoTopGenreListContainer-item.is-current,
+  [class*="GenreListContainer-item"].is-current {
+    background-color: #262c33 !important;
+    color: #e6edf3 !important;
+  }
+  .VideoTopGenreListContainer-item:hover,
+  [class*="GenreListContainer-item"]:hover { background-color: #1f262e !important; }
+
+  /* Left navigation / system menu + side drawer rail */
+  .SystemMenuContainer, .SideMenuContainer, .GlobalNavigation,
+  [class*="SystemMenu"], [class*="SideMenu"], [class*="LeftMenu"] {
+    background-color: transparent !important;
+  }
+  .SystemMenuContainer a, .SideMenuContainer a,
+  [class*="SystemMenu"] a, [class*="SideMenu"] a { color: #c4cdd6 !important; }
+  .SystemMenuContainer a:hover, .SideMenuContainer a:hover { color: #e6edf3 !important; }
+
+  /* The left web/video-menu drawer panel (white rail on the home page).
+     Its inner surfaces carry hashed class names, so the whole subtree is
+     repainted dark. */
+  .NC-VideoMenuDrawerPlaceHolder, .NC-WebDrawer, .NC-VideoMenu,
+  [class*="VideoMenuDrawer"], [class*="WebDrawer"], [class*="VideoMenu"],
+  .NC-VideoMenuDrawerPlaceHolder *, .NC-WebDrawer *, [class*="VideoMenuDrawer"] * {
+    background-color: #1c2128 !important;
+  }
+  .NC-VideoMenuDrawerPlaceHolder *, .NC-WebDrawer *, [class*="VideoMenuDrawer"] * {
+    border-color: #262c33 !important;
+  }
+  .NC-VideoMenuDrawerPlaceHolder a, .NC-WebDrawer a, [class*="VideoMenu"] a {
+    color: #c4cdd6 !important; background-color: transparent !important;
+  }
+  .NC-VideoMenuDrawerPlaceHolder a:hover, .NC-WebDrawer a:hover { color: #e6edf3 !important; }
+  /* Active / hovered drawer rows */
+  .NC-VideoMenuDrawerPlaceHolder [class*="active"],
+  .NC-WebDrawer [class*="active"] { background-color: #262c33 !important; }
+
+  /* ---- Home content sections (video_top) ----
+     Each section is a stable *Container; the cards inside are React
+     nodes with hashed class names, so the section subtree is reset to
+     dark surfaces and the elevated cards are repainted on top. */
+  .RecommendAreaContainer, .RecommendVideoContainer, .ForYouRankingContainer,
+  .NewArrivalVideosContainer, .NicoadVideosContainer, .OnTvAnimeVideosContainer,
+  .TagPushVideosContainer, .HotTagsContainer, .NewsNotificationContainer,
+  .NicoNewsContainer, .ViewHistoriesContainer, .FollowingVideosContainer,
+  .BunsContainer, .LivePlayerContainer, .VideoIntroductionAreaContainer,
+  .FooterContainer,
+  .RecommendAreaContainer *, .ForYouRankingContainer *, .NewArrivalVideosContainer *,
+  .NicoadVideosContainer *, .OnTvAnimeVideosContainer *, .TagPushVideosContainer *,
+  .HotTagsContainer *, .NewsNotificationContainer *, .NicoNewsContainer *,
+  .ViewHistoriesContainer *,
+  .FollowingVideosContainer *, .VideoIntroductionAreaContainer *, .FooterContainer * {
+    background-color: transparent !important;
+  }
+  /* The actual elevated cards in those sections */
+  .NC-NegativeFeedbackedVideoCard, [class*="VideoCard"], [class*="MediaObject"],
+  .NewsNotificationList-item, .TagWithVideoItem, .ForYouRankingContainer-videoItem,
+  .NewArrivalVideosContainer-list > *, .NicoadVideosContainer-list > *,
+  .NicoNewsContainer-photoNews {
+    background-color: #1c2128 !important;
+  }
+  /* NicoNews featured "photo news" thumbnail well (light grey by default) */
+  .NicoNewsContainer-photoNewsThumbnail { background-color: #262c33 !important; }
+  /* Empty thumbnail wells / skeletons */
+  .NC-VideoCardSkeleton-barContainer, [class*="Skeleton"] { background-color: #262c33 !important; }
+
+  /* ---- Profile / user page components ---- */
+  .UserPage-header, .UserPage-content, .UserDetailsHeader, .UserDetailsContainer,
+  .UserDetailsCard, [class*="UserDetails"], .UserIcon, .MainMenuContainer,
+  .MainMenuContainer-menu, .NC-Tabs, .TimelineItem, .TimelineItem-content,
+  .CrossSearch-form, .CrossSearch-rowSelector, .CrossSearch-rowService,
+  .SearchBox-option, .Dropdown-menu, .Dropdown-content,
+  [class*="UserPage-"], [class*="Timeline"] {
+    background-color: #1c2128 !important;
+  }
+  .UserDetailsHeader, .MainMenuContainer { background-color: transparent !important; }
+
+  /* Generic legacy card / panel fallbacks */
+  .RankingMatrixVideoMediaObject, .VideoMediaObject, .NiconicoVideoCard,
+  [class*="-card"], .Card, .Panel, .Box {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* Headings + body text in legacy regions */
+  .BaseLayout h1, .BaseLayout h2, .BaseLayout h3,
+  .BaseUniLayout h1, .BaseUniLayout h2, .BaseUniLayout h3,
+  .UserDetailsHeader-nickname, .UserDetailsName,
+  .TimelineItem-senderName, .TimelineItem-contentTitle,
+  [class*="-title"], [class*="-name"], [class*="Title"], [class*="Heading"] {
+    color: #e6edf3 !important;
+  }
+  .BaseLayout p, .BaseUniLayout p, .TimelineItem-activityMessage,
+  .CrossSearch-rowService, .Dropdown-button, .MainMenuItem,
+  [class*="-description"], [class*="Description"], [class*="-label"], [class*="Label"] {
+    color: #c4cdd6 !important;
+  }
+
+  /* Secondary / meta text (timestamps, dates, count labels) */
+  .RankingMatrixVideoMediaObject-metaRow, [class*="-metaRow"],
+  .TimelineItem-activityCreatedAt, .UserDetailsHeader-accountID,
+  .UserDetailsHeader-accountRegisteredVersion,
+  .UserDetailsHeader-accountType, [class*="accountType"],
+  [class*="-registeredAt"], [class*="-postedAt"], time,
+  [class*="-count"], [class*="Meta"] { color: #8b949e !important; }
+
+  /* Active nav tab + internal accent links */
+  .MainMenuItem.NC-Tab_active, .NC-Tab_active { color: #e6edf3 !important; }
+  .SubMenuLink-link, .SubMenuLink-link_internal, .SubMenuLink-label,
+  .UserDetailsStatusItem-linkLabel, a[class*="SubMenuLink"] {
+    background-color: transparent !important; color: #5fb0e6 !important;
+  }
+
+  /* Search box (legacy header) */
+  .SearchInput, .CrossSearch input, .SearchField input,
+  input[type="text"], input[type="search"], input[type="email"],
+  input[type="password"], textarea, select {
+    background-color: #0d1117 !important;
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+  }
+  ::placeholder { color: #8b949e !important; opacity: 1 !important; }
+  .SearchInput::placeholder, .CrossSearch input::placeholder { color: #8b949e !important; }
+
+  /* Links */
+  .BaseLayout a, .BaseUniLayout a { color: #c4cdd6; }
+  .BaseLayout a:hover, .BaseUniLayout a:hover { color: #e6edf3; }
+
+  /* Misc light greys used as separators / rails in legacy DOM */
+  hr, .Divider, [class*="Divider"], [class*="Separator"] {
+    border-color: #2d333b !important; background-color: #2d333b !important;
+  }
+
+  /* Keep media untinted; just give empty thumb wells a dark fill */
+  .Thumbnail-image, .NC-Thumbnail-image, .UserIcon-image,
+  [class*="Thumbnail-image"] { background-color: #262c33 !important; }
+  img, video, canvas { background-color: transparent !important; }
+
+  /* Selection */
+  ::selection { background-color: #2f6fb8 !important; color: #ffffff !important; }
+}

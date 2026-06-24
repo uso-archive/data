@@ -1,0 +1,255 @@
+/* ==UserStyle==
+@name         Avito Dark 2026
+@namespace    USO Archive
+@author       Reza Rahemtola
+@description  A clean, modern dark theme for Avito that's easy on the eyes, perfect for late-night browsing.
+@version      20260623.21.00
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("avito.ru") {
+:root {
+    color-scheme: dark;
+
+    --av-bg: #14181d;          /* base canvas */
+    --av-surface: #1c2128;     /* elevated cards */
+    --av-surface-2: #1a1f26;   /* secondary surface */
+    --av-header: #0d1117;      /* header / footer */
+    --av-border: #2a313a;      /* subtle borders */
+    --av-text: #e6edf3;        /* primary text */
+    --av-text-soft: #c4cdd6;   /* body text */
+    --av-text-muted: #8b949e;  /* muted / placeholder */
+    --av-accent: #4aa8ff;      /* refined Avito blue */
+    --av-accent-hover: #7cc4ff;
+  }
+
+  /* ---- Base canvas ---- */
+  html {
+    background-color: var(--av-bg) !important;
+  }
+  body {
+    background-color: var(--av-bg) !important;
+    color: var(--av-text-soft) !important;
+  }
+
+  /* ---- Borders ---- */
+  /* Soften every light border to a subtle dark one (colour only — this never
+     adds a border, so it is safe to apply universally). */
+  *, *::before, *::after {
+    border-color: var(--av-border) !important;
+  }
+
+  /* Avito's class names are hashed and unstable, and white/light-grey fills are
+     painted on hundreds of nested block wrappers. The robust lever is to make
+     structural block elements transparent so the dark canvas shows through,
+     then deliberately re-paint the real surfaces (header, cards, inputs,
+     coloured badges) in the rules below. Inline elements that carry brand
+     colours (badges, buttons) are re-painted afterwards and keep their fill. */
+  div, section, article, main, aside, ul, ol, li, dl, dd, dt,
+  table, tbody, thead, tr, td, th, figure, fieldset, span {
+    background-color: transparent !important;
+  }
+
+  /* Header bar */
+  [data-marker="header/navbar"],
+  header {
+    background-color: var(--av-header) !important;
+    border-color: var(--av-border) !important;
+  }
+
+  /* Top notification banner ("how to keep using Avito on iOS", etc.) */
+  [data-marker^="top-notification"],
+  [data-marker^="top-banner"] {
+    background-color: var(--av-surface-2) !important;
+    border-color: var(--av-border) !important;
+  }
+
+  /* ---- Inline-styled badges & pills ---- */
+  /* These carry their fill via an inline `background` (so the neutraliser above
+     would otherwise flatten the DIVs). Re-paint them, refining each saturated
+     brand colour to a tone that sits well on the dark canvas while staying
+     instantly recognisable. */
+
+  /* Light-blue info pills ("trusted seller", "documents verified", …) — the
+     biggest light surface on search. Move to a muted blue-tinted dark chip. */
+  [style*="rgb(204, 236, 255)"], [style*="#ccecff"],
+  [style*="rgb(207, 237, 255)"], [style*="#cfedff"] {
+    background-color: #1d2c3a !important;
+    color: #9fd0f5 !important;
+  }
+
+  /* Sale / discount (red) */
+  [style*="rgb(255, 64, 83)"], [style*="#ff4053"] {
+    background-color: #c8323f !important; color: #fff !important;
+  }
+  /* Below-market / delivery discount (green) */
+  [style*="rgb(2, 209, 92)"], [style*="#02d15c"] {
+    background-color: #198049 !important; color: #fff !important;
+  }
+  /* Avito Guarantee / promo (purple) */
+  [style*="rgb(150, 94, 235)"], [style*="#965eeb"] {
+    background-color: #7d5bc4 !important; color: #fff !important;
+  }
+  /* Installment / other brand-blue inline pills */
+  [style*="rgb(0, 170, 255)"], [style*="#00aaff"] {
+    background-color: var(--av-accent) !important; color: #0b1620 !important;
+  }
+
+  /* ---- Buttons ---- */
+  /* Avito reuses one hashed Button class for both primary (blue) and secondary
+     (light-grey) buttons, so the class can't tell them apart. Give every button
+     an elevated dark surface by default, then promote only the real primary
+     CTAs to brand blue by their stable data-marker. */
+  button, [role="button"],
+  a[class*="styles-module-root"], label[class*="styles-module-root"],
+  [class*="multiselect-outline-input"], [class*="style-module-wrapper"],
+  [data-marker$="-button"], [data-marker$="/link"],
+  [data-marker="icebreakers"], [data-marker="icebreakers"] > * {
+    background-color: var(--av-surface) !important;
+    border-color: var(--av-border) !important;
+  }
+  /* Primary brand-blue CTAs */
+  [data-marker="search-form/submit-button"],
+  [data-marker="top-rubricator/all-categories"],
+  [data-marker="top-rubricator/all-categories-icon"],
+  [data-marker="item-phone-button/header"],
+  [data-marker$="/phone-button"],
+  button[type="submit"] {
+    background-color: var(--av-accent) !important;
+    color: #0b1620 !important;
+  }
+  [data-marker="search-form/submit-button"]:hover,
+  [data-marker="top-rubricator/all-categories"]:hover {
+    background-color: var(--av-accent-hover) !important;
+  }
+
+  /* ---- Text ---- */
+  /* The site hardcodes near-black text colours; force them light. */
+  body, p, span, li, td, th, div, label, dd, dt, time, small, b, strong, em,
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--av-text-soft) !important;
+  }
+  h1, h2, h3, h4, h5, h6,
+  [class*="title"], [data-marker*="title"] {
+    color: var(--av-text) !important;
+  }
+
+  /* ---- Links / accent ---- */
+  a {
+    color: var(--av-accent) !important;
+  }
+  a:hover {
+    color: var(--av-accent-hover) !important;
+  }
+  /* Titles that are links should stay light, not blue */
+  a[class*="title"], a[data-marker*="title"],
+  [data-marker="item-title"] a, h3 a {
+    color: var(--av-text) !important;
+  }
+  [data-marker="item-title"] a:hover, h3 a:hover {
+    color: var(--av-accent-hover) !important;
+  }
+
+  /* ---- Text on coloured surfaces (must come after the broad text rule) ---- */
+  /* Keep labels readable on the re-painted chips, pills and primary buttons. */
+  [style*="rgb(255, 64, 83)"], [style*="rgb(255, 64, 83)"] *,
+  [style*="rgb(2, 209, 92)"], [style*="rgb(2, 209, 92)"] *,
+  [style*="rgb(150, 94, 235)"], [style*="rgb(150, 94, 235)"] *,
+  [style*="rgb(0, 170, 255)"], [style*="rgb(0, 170, 255)"] * {
+    color: #fff !important;
+  }
+  [style*="rgb(204, 236, 255)"], [style*="rgb(204, 236, 255)"] *,
+  [style*="rgb(207, 237, 255)"], [style*="rgb(207, 237, 255)"] * {
+    color: #9fd0f5 !important;
+  }
+  /* Dark text only on the brand-blue CTAs */
+  [data-marker="search-form/submit-button"],
+  [data-marker="search-form/submit-button"] *,
+  [data-marker="top-rubricator/all-categories"],
+  [data-marker="top-rubricator/all-categories"] *,
+  [data-marker="item-phone-button/header"],
+  [data-marker="item-phone-button/header"] *,
+  [data-marker$="/phone-button"],
+  [data-marker$="/phone-button"] * {
+    color: #0b1620 !important;
+  }
+
+  /* ---- Inputs, selects, filter fields ---- */
+  [data-marker="search-form/suggest/input"],
+  [data-marker="search-form"] input,
+  input, textarea, select,
+  [data-marker$="/multiselect-outline-input"],
+  [data-marker$="-from"], [data-marker$="-to"],
+  [class*="multiselect"], [class*="-input"], [class*="Input"] {
+    background-color: var(--av-surface) !important;
+    color: var(--av-text) !important;
+    border-color: var(--av-border) !important;
+  }
+  /* The search field sits in a white wrapper — darken that too. */
+  [data-marker="search-form/suggest"] {
+    background-color: var(--av-surface) !important;
+  }
+  ::placeholder { color: var(--av-text-muted) !important; opacity: 1; }
+
+  /* ---- Floating surfaces (dropdowns, popovers, menus) ---- */
+  /* These are DIV-based, so the neutraliser above wiped their backgrounds and
+     page content bled through (search autocomplete, sort menu, region picker,
+     "Ещё" nav menu). Re-establish an opaque elevated surface on every floating
+     panel via stable data-marker / class-prefix selectors. */
+  [data-marker="suggest/list/dropdown"],
+  [class*="suggest-dropdownItems"],
+  [class*="styles-module-dropdown"],
+  [class*="styles-module-dropdownScrollWr"],
+  [class*="styles-module-popup"],
+  [class*="styles-module-popover"],
+  [class*="styles-module-tooltip"],
+  [class*="popup-popup"],
+  [class*="popover-content"],
+  [data-marker="overlay"] [role="listbox"],
+  [role="listbox"], [role="menu"], [role="tooltip"], [role="dialog"] {
+    background-color: var(--av-surface) !important;
+    border-color: var(--av-border) !important;
+  }
+  /* Header nav fly-out menus ("Ещё", "Для бизнеса", "Каталоги") — hashed-class
+     absolutely-positioned panels nested in the nav. Stable hook: the
+     nav-container-HEADER wrapper. */
+  [class*="nav-container-HEADER"] li > div > div {
+    background-color: var(--av-surface) !important;
+    border-color: var(--av-border) !important;
+  }
+  /* Suggestion / menu rows stay readable on the panel. */
+  [data-marker="suggest/list/custom-option"],
+  [data-marker="suggest/list/custom-option"] * {
+    color: var(--av-text-soft) !important;
+  }
+  [data-marker="suggest/list/custom-option"]:hover {
+    background-color: var(--av-surface-2) !important;
+  }
+
+  /* ---- Buttons ---- */
+  [data-marker="search-form/submit-button"],
+  button[type="submit"] {
+    background-color: var(--av-accent) !important;
+    color: #0b1620 !important;
+  }
+  [data-marker="search-form/submit-button"]:hover {
+    background-color: var(--av-accent-hover) !important;
+  }
+
+  /* ---- Price (semantic, kept prominent and light) ---- */
+  [data-marker="item-price"],
+  [data-marker="item-price-value"],
+  [data-marker="item-view/item-price"],
+  [itemprop="price"] {
+    color: var(--av-text) !important;
+  }
+
+  /* ---- Footer ---- */
+  footer, [data-marker*="footer"] {
+    background-color: var(--av-header) !important;
+    border-color: var(--av-border) !important;
+  }
+  footer a, [data-marker*="footer"] a {
+    color: var(--av-text-soft) !important;
+  }
+}

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for OLX that turns the bright marketplace into an easy-on-the-eyes dark interface, perfect for late-night browsing.
-@version      20260622.10.08
+@version      20260623.21.03
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -96,12 +96,20 @@
   header[class*="app-header"] a,
   header.app-header button { color: #e6edf3 !important; }
 
-  /* The "post new ad" CTA reads as a white pill by default */
+  /* The "post new ad" CTA reads as a white pill by default. Its inner
+     <span> carries its own near-black -webkit-text-fill-color, so set
+     BOTH on the wrapper and the span or the label stays invisible. */
   [data-testid="post-new-ad-button"],
   [data-cy="post-new-ad-button"] {
     background-color: #1fcabf !important;
     color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
     border-color: #1fcabf !important;
+  }
+  [data-testid="post-new-ad-button"] span,
+  [data-cy="post-new-ad-button"] span {
+    color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
   }
 
   /* Notification + account dropdowns */
@@ -116,34 +124,65 @@
 
   /* ============================================================
      Main page wrappers — flatten literal light backgrounds.
-     Anchored on stable ids/testids so we never touch images.
-     #mainContent / #footerContent / #searchmain-container are the
-     page-shell wrappers that ship a literal #F2F4F5 / #FFFFFF.
-     ============================================================ */
+
+     OLX's content lives inside emotion (css-<hash>) shells whose
+     class names change every deploy, so we never target those
+     hashes. Instead we anchor on the STABLE page-shell ids
+     (#hydrate-root / #mainContent / #footerContent /
+     #searchmain-container) and neutralise EVERY descendant
+     div/section/article/ul to transparent — that wipes the literal
+     #F2F4F5 / #FFFFFF content bands regardless of how deep the
+     hashed wrapper sits. The real cards then re-establish their own
+     opaque dark surface below (data-testid anchored). The <img>
+     element itself is left alone (its pixels aren't a CSS bg). */
   #hydrate-root,
   #mainContent,
   #footerContent,
   #searchmain-container,
-  #searchmain-container > div,
-  #searchmain-container > div > div,
   [data-testid="home-page"],
   [data-testid="listing-grid"],
   [data-testid="listing"],
   main, .listing-grid {
     background-color: #14181d !important;
   }
-  /* The page-shell light wrappers (#F2F4F5 full-width frames) directly
-     under #mainContent carry no stable hook — flatten them to the base. */
-  #mainContent > div,
-  #mainContent > div > div {
+  /* Blanket light-shell neutraliser: anything structural under the
+     stable page containers loses its hardcoded light background and
+     shows the dark base. Cards re-opaque themselves afterwards. */
+  #mainContent div, #mainContent section, #mainContent article, #mainContent ul,
+  #footerContent div, #footerContent section,
+  #searchmain-container div, #searchmain-container section, #searchmain-container article {
     background-color: transparent !important;
   }
-  /* Generic emotion wrappers inside the page shell: make them inherit
-     the dark base instead of their hardcoded white/grey. */
-  [data-testid="home-page"] > div,
+  [data-testid="home-page"] div,
   [data-testid="home-page"] section,
   [data-testid="listing-grid"] > div {
     background-color: transparent !important;
+  }
+
+  /* ============================================================
+     Floating surfaces — RE-OPAQUE over the neutraliser.
+
+     The blanket `#mainContent div/section/article/ul {transparent}`
+     rule above (specificity id+type, 0,1,1) also blanks the
+     background off every interactive floating panel that lives
+     inside #mainContent — the global search autocomplete, the
+     filter flyouts (sort / category / price-range / multiselect)
+     and any role=menu/listbox popover. Left alone they render fully
+     SEE-THROUGH, so the listing grid + breadcrumbs scroll right
+     through the open menu and it's unreadable. Re-establish a solid
+     opaque dark surface on each, anchored on the STABLE flyout/menu
+     testids + roles and scoped under #mainContent so the rule
+     out-specifies the neutraliser (0,2,0 > 0,1,1). */
+  #mainContent [data-testid="flyout-content"],
+  #mainContent [data-testid="category-dropdown-list"],
+  #mainContent [data-testid="search-autosuggession"],
+  #mainContent [data-testid="search-autosuggession"] [role="listbox"],
+  #mainContent [role="menu"],
+  #mainContent [role="listbox"],
+  #mainContent [class*="multi-select-body"] {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
   }
 
   /* ============================================================
@@ -188,49 +227,106 @@
     background-color: transparent !important;
     color: #c4cdd6 !important;
   }
-  [data-testid^="cat-promo-"] {
+  /* Category tile LABEL is a <p> inside a[data-testid="cat-N"] carrying
+     its own near-black -webkit-text-fill-color — set both so it reads. */
+  [data-testid="home-categories-menu"] p,
+  [data-testid^="cat-"] p, [data-cy^="cat-"] p,
+  [data-testid^="cat-"] span, [data-cy^="cat-"] span {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  [data-testid="home-page"] [data-testid^="cat-promo-"] {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
 
+  /* Homepage content headings/text (e.g. the "OLX dla biznesu"
+     business-promo band) ship near-black #14181d that vanishes once
+     the band is flattened to dark. Remap content text under the
+     home-page container, forcing -webkit-text-fill-color too. */
+  [data-testid="home-page"] h1,
+  [data-testid="home-page"] h2,
+  [data-testid="home-page"] h3,
+  [data-testid="home-page"] h4 {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  [data-testid="home-page"] p {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+
   /* ============================================================
      Listing / ad cards
+     The blanket neutraliser above (#mainContent div) out-specifies a
+     bare [data-testid="l-card"], so the card re-opaque rules are
+     anchored under the stable page container ids to win the cascade.
      ============================================================ */
-  [data-testid="l-card"],
-  [data-cy="l-card"] {
+  #mainContent [data-testid="l-card"],
+  #searchmain-container [data-testid="l-card"],
+  #mainContent [data-cy="l-card"] {
     background-color: #1c2128 !important;
     border: 1px solid #2d333b !important;
     border-radius: 8px !important;
   }
-  /* Inner emotion wrappers of a card -> transparent so the card bg shows */
-  [data-testid="l-card"] > div,
-  [data-cy="l-card"] > div,
-  [data-testid="l-card"] [class*="css-"]:not(img) {
-    background-color: transparent !important;
-  }
   /* Image placeholder block inside cards (grey #ECEEEF) — the photo
      wrapper is a plain div under the card link, so target the link's
      image holder generically while leaving the <img> itself alone. */
-  [data-testid="l-card"] a > div,
-  [data-testid="l-card"] [data-testid="image-container"],
-  [data-testid="l-card"] figure,
-  [data-testid="l-card"] [class*="image"] {
+  #mainContent [data-testid="l-card"] a > div,
+  #searchmain-container [data-testid="l-card"] a > div,
+  #mainContent [data-testid="l-card"] figure {
     background-color: #21262d !important;
   }
+  /* Card title is an <h4> inside [data-testid="ad-card-title"] with its
+     own near-black -webkit-text-fill-color — set both on title + child. */
   [data-testid="ad-card-title"],
-  [data-cy="ad-card-title"] { color: #e6edf3 !important; }
+  [data-cy="ad-card-title"],
   [data-testid="ad-card-title"] a,
-  [data-cy="ad-card-title"] a { color: #e6edf3 !important; }
-  [data-testid="ad-price"] { color: #ffffff !important; font-weight: 700 !important; }
-  [data-testid="location-date"] { color: #8b949e !important; }
+  [data-cy="ad-card-title"] a,
+  [data-testid="ad-card-title"] h4,
+  [data-testid="ad-card-title"] h3 {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  [data-testid="ad-price"] {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 700 !important;
+  }
+  [data-testid="location-date"] {
+    color: #8b949e !important;
+    -webkit-text-fill-color: #8b949e !important;
+  }
+  /* Search results count line ("Znaleźliśmy ponad 1000 ogłoszeń") */
+  #mainContent [data-testid="listing-count-msg"],
+  #mainContent [data-testid="listing-count-msg"] *,
+  #mainContent [data-testid="total-count"],
+  #mainContent [data-testid="total-count"] * {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  /* Promoted "z Pakietem Ochronnym" price badge text */
+  [data-testid="btr-label-wrapper"],
+  [data-testid="btr-label-wrapper"] *,
+  [data-testid="btr-label-text"] {
+    color: #6fe3da !important;
+    -webkit-text-fill-color: #6fe3da !important;
+  }
 
   /* Delivery / promoted / negotiable badges */
   [data-testid="card-delivery-badge"],
-  [data-testid="btr-label-wrapper"] {
+  [data-testid="btr-label-wrapper"],
+  [data-testid="free-delivery-tag"] {
     background-color: #103c3b !important;
     border-color: #1fcabf !important;
   }
-  [data-testid="btr-label-text"] { color: #6fe3da !important; }
+  /* free-delivery-tag ships a light mint (#C8F8F6) fill + dark teal
+     text — flip the fill to the dark accent-subtle and lift the text. */
+  [data-testid="free-delivery-tag"],
+  [data-testid="free-delivery-tag"] * {
+    color: #6fe3da !important;
+    -webkit-text-fill-color: #6fe3da !important;
+  }
 
   /* Favourite (heart) toggle */
   [data-testid="adAddToFavorites"] { color: #c4cdd6 !important; }
@@ -239,13 +335,14 @@
      Top promo / info banner strip (was pale yellow #FFF6D9)
      ============================================================ */
   #banner, #banner > div,
-  [data-testid="top-banner-wrapper"],
-  [data-testid="cta-banner-click"] {
+  #mainContent [data-testid="top-banner-wrapper"],
+  #mainContent [data-testid="cta-banner-click"] {
     background-color: #1c2128 !important;
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
   }
-  [data-testid="banner-btn"], [data-testid="bep-button"] {
+  #mainContent [data-testid="banner-btn"],
+  #mainContent [data-testid="bep-button"] {
     background-color: #21262d !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
@@ -254,11 +351,17 @@
   /* ============================================================
      Search-results page: filters sidebar, sort dropdowns, pills
      ============================================================ */
-  [data-testid="listing-filters"],
-  [data-testid="filters-container"],
-  [data-testid="qsearch-container"],
-  [class*="filter"] [role="button"],
-  [data-testid="chips-container"] > * {
+  /* The current OLX frontend nests the whole search/category page
+     (filters + listing grid) under #mainContent — the old
+     #searchmain-container id no longer exists, so these are anchored
+     on #mainContent (and the stable filter/listing testids) which is
+     where they actually live now. */
+  #mainContent [data-testid="listing-filters"],
+  #mainContent [data-testid="filters-container"],
+  #mainContent [data-testid="qsearch-container"],
+  #mainContent [data-testid="listing-filters-form"],
+  #mainContent [class*="filter"] [role="button"],
+  #mainContent [data-testid="chips-container"] > * {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
     color: #e6edf3 !important;
@@ -271,78 +374,191 @@
   [data-testid="pagination-forward"],
   [data-testid="pagination-back"] { color: #e6edf3 !important; }
 
+  /* Search-results heading (h1[data-testid="heading"], "Sprzedaż
+     elektroniki") + filter/sort labels + filter values all carry the
+     near-black #02282c / dim #406367 content colour. Remap them under
+     the listing-filters form / sorting wrapper and force
+     -webkit-text-fill-color so the override wins. */
+  #mainContent [data-testid="heading"],
+  #mainContent [data-testid="listing-filters-form"] h1,
+  #mainContent [data-testid="listing-filters-form"] h2,
+  #mainContent [data-testid="listing-filters-form"] h3 {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  #mainContent [data-testid="listing-filters-form"] p,
+  #mainContent [data-testid="listing-filters-form"] label,
+  #mainContent [data-testid="listing-filters"] p,
+  #mainContent [data-testid="listing-filters"] span,
+  #mainContent [data-testid^="category-filter"] p,
+  #mainContent [data-testid^="category-filter"] span,
+  #mainContent [data-testid="filter-clear-all"],
+  #mainContent [data-testid="filter-clear-all"] span,
+  #mainContent [data-testid="sorting-wrapper"],
+  #mainContent [data-testid="sorting-wrapper"] span {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  /* Filter segmented-control values (Wszystkie / Firmowe / Prywatne)
+     are <span> inside <button> in a filter <header> — flip to legible. */
+  #mainContent [data-testid="listing-filters"] button span,
+  #mainContent [data-testid="listing-filters-form"] button span {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  /* "Zapisz" save-search CTA: accent fill, dark legible label */
+  #mainContent [data-testid="save-search-button"],
+  #mainContent [data-testid="save-search-form-submit"],
+  #mainContent [data-testid="l-save-search-banner-button"] {
+    background-color: #1fcabf !important;
+    border-color: #1fcabf !important;
+  }
+  #mainContent [data-testid="save-search-button"],
+  #mainContent [data-testid="save-search-button"] span,
+  #mainContent [data-testid="save-search-form-submit"],
+  #mainContent [data-testid="save-search-form-submit"] span,
+  #mainContent [data-testid="l-save-search-banner-button"],
+  #mainContent [data-testid="l-save-search-banner-button"] span {
+    color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
+  }
+
+  /* Footer SEO sub-category link list (Fotografia / Komputery / … )
+     at the bottom of search/category pages ships dim #406367 link text
+     via its own -webkit-text-fill-color — lift it to a legible muted
+     grey. These links live in <ul><li><a> blocks under #mainContent. */
+  #mainContent ul li a,
+  #mainContent ul li a span {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+  #mainContent ul li a:hover,
+  #mainContent ul li a:hover span {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+
   /* ============================================================
      Individual offer / item page
+
+     The offer content column is a stack of hashed emotion shells
+     under #mainContent → div[data-testid="main"]; the blanket
+     neutraliser above already flattens those literal light bands.
+     Here we (a) RE-ESTABLISH opaque dark on the real floating cards
+     (out-specifying the neutraliser via #mainContent), and (b) remap
+     the near-black content text. OLX drives rendered text through
+     -webkit-text-fill-color, so a `color`-only override silently
+     fails — every text rule sets BOTH color and -webkit-text-fill.
      ============================================================ */
-  /* Content + sidebar columns -> transparent so the base shows through */
-  [data-testid="main"],
-  [data-testid="main"] > div,
-  [data-testid="aside"],
-  [data-testid="aside"] > div,
-  [data-testid="ad_description"],
-  [data-testid="ad-parameters-container"],
-  [data-testid="ad-promotion-actions"] {
-    background-color: transparent !important;
-    color: #c4cdd6 !important;
-  }
   /* Distinct cards within the offer page -> elevated surface */
-  [data-testid="ad-action-box"],
-  [data-testid="seller_card"],
-  [data-testid="map-aside-section"],
-  [data-testid="legal-information-accordion"],
-  [data-testid="user-profile-link"],
-  [data-testid="qa-skeleton-item"],
-  [data-testid="ad-card-loader"] {
+  #mainContent [data-testid="ad-action-box"],
+  #mainContent [data-testid="seller_card"],
+  #mainContent [data-testid="map-aside-section"],
+  #mainContent [data-testid="legal-information-accordion"],
+  #mainContent [data-testid="user-profile-link"],
+  #mainContent [data-testid="qa-skeleton-item"],
+  #mainContent [data-testid="ad-card-loader"],
+  #mainContent [data-testid="ad-login-dialog"] {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
-  }
-  /* Inner emotion wrappers of those cards -> transparent so no white blocks */
-  [data-testid="ad-action-box"] > div,
-  [data-testid="seller_card"] > div,
-  [data-testid="user-profile-link"] > div,
-  [data-testid="map-aside-section"] > div {
-    background-color: transparent !important;
   }
   /* In-content seller-contact card (white box under main > section) */
-  [data-testid="main"] > section > div {
+  #mainContent [data-testid="main"] > section > div {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
-  /* Title + price */
-  [data-cy="ad_title"], [data-testid="offer_title"],
-  [data-testid="ad-price-container"],
-  [data-testid="prices-wrapper"],
-  [data-testid="ad-price-container"] h3 {
+
+  /* ---- Offer content text (was near-black #02282c on dark) ----
+     The offer TITLE is an un-testid'd <h4>, and headings/labels/
+     parameter rows/desc all inherit the same near-black; remap the
+     whole content column's text and force -webkit-text-fill-color
+     so the override actually wins. Brand-coloured controls (accent
+     CTAs, the red "Zgłoś" report button) keep their own colour via
+     the more specific rules that follow. */
+  #mainContent [data-testid="main"] h1,
+  #mainContent [data-testid="main"] h2,
+  #mainContent [data-testid="main"] h3,
+  #mainContent [data-testid="main"] h4,
+  #mainContent [data-cy="ad_title"], #mainContent [data-testid="offer_title"] {
     color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
   }
-  [data-testid="prices-wrapper"] h3,
-  [data-testid="price-label"], [data-testid="ad-price-value"] {
-    color: #ffffff !important;
-  }
-  /* Description + parameter text */
-  [data-testid="ad_description"], [data-testid="ad_description"] *,
-  [data-testid="ad-parameters-container"] p,
-  [data-testid="ad-parameters-container"] li,
-  [data-testid="trader-title"], [data-testid="user-profile-user-name"],
-  [data-testid="ad-posted-at"] {
+  #mainContent [data-testid="main"] p,
+  #mainContent [data-testid="main"] li,
+  #mainContent [data-testid="ad_description"],
+  #mainContent [data-testid="ad_description"] *,
+  #mainContent [data-testid="ad-parameters-container"] p,
+  #mainContent [data-testid="ad-parameters-container"] li,
+  #mainContent [data-testid="ad-parameters-container"] span,
+  #mainContent [data-testid="trader-title"],
+  #mainContent [data-testid="ad-posted-at"] {
     color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
   }
-  /* Contact / chat / phone buttons */
-  [data-testid="ad-contact-message-button"],
-  [data-testid="ad-contact-phone"],
-  [data-testid="show-phone"],
-  [data-testid="phones-container"] button,
-  button[data-testid*="contact"] {
+  /* Seller-card metadata (member-since / last-online, was #406367) */
+  #mainContent [data-testid="user-profile-user-name"],
+  #mainContent [data-testid="member-since"],
+  #mainContent [data-testid="user-profile-link"] p,
+  #mainContent [data-testid="user-profile-link"] span,
+  #mainContent [data-testid="ad-footer-bar-section"] span {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+  /* Login prompt + its sign-in/register CTA (was #02282c dark-on-dark) */
+  #mainContent [data-testid="prompt-message"] {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  /* Price */
+  #mainContent [data-testid="ad-price-container"],
+  #mainContent [data-testid="prices-wrapper"] {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  #mainContent [data-testid="prices-wrapper"] h3,
+  #mainContent [data-testid="price-label"],
+  #mainContent [data-testid="ad-price-value"] {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+  /* Promote / refresh action links (Promuj / Odśwież, were #02282c) */
+  #mainContent [data-testid="ad-promotion-actions"] a,
+  #mainContent [data-testid="ad-promotion-actions"] span,
+  #mainContent [data-testid="to-back"],
+  #mainContent [data-testid="to-back"] span {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  /* Keep the brand-red "Zgłoś" report button readable as itself */
+  #mainContent [data-testid="ad-report-button"],
+  #mainContent [data-testid="ad-report-button"] span {
+    color: #f0795f !important;
+    -webkit-text-fill-color: #f0795f !important;
+  }
+  /* Contact / chat / phone buttons + the login-dialog CTA -> accent
+     fill with dark legible text (set BOTH color + text-fill). */
+  #mainContent [data-testid="ad-contact-message-button"],
+  #mainContent [data-testid="ad-contact-phone"],
+  #mainContent [data-testid="show-phone"],
+  #mainContent [data-testid="phones-container"] button,
+  #mainContent [data-testid="login-button"],
+  #mainContent button[data-testid*="contact"] {
     background-color: #1fcabf !important;
     color: #07232a !important;
     border-color: #1fcabf !important;
   }
+  #mainContent [data-testid="login-button"] span,
+  #mainContent [data-testid="ad-contact-message-button"] span,
+  #mainContent [data-testid="phones-container"] button span {
+    color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
+  }
 
-  /* Image gallery surrounds */
-  [data-testid="image-galery-container"],
-  [data-testid="ad-photo"],
-  [data-testid="gallery"],
-  [data-testid="swiper-list"] {
+  /* Image gallery surrounds (out-specify the blanket neutraliser) */
+  #mainContent [data-testid="image-galery-container"],
+  #mainContent [data-testid="ad-photo"],
+  #mainContent [data-testid="gallery"],
+  #mainContent [data-testid="swiper-list"] {
     background-color: #0d1117 !important;
   }
 
