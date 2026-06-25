@@ -1,0 +1,638 @@
+/* ==UserStyle==
+@name         Wunderground Dark 2026
+@namespace    USO Archive
+@author       Reza Rahemtola
+@description  A clean dark theme for Weather Underground. Darkens forecasts, hourly and 10-day pages and data tables while keeping radar, maps and weather icons intact.
+@version      20260624.20.44
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("wunderground.com") {
+/*
+   * Weather Underground is an Angular Material SPA with colors hardcoded
+   * per-element (no CSS custom properties to remap). We retheme by overriding
+   * stable Material / semantic selectors: app-root, .region-content-top,
+   * .data-module, .current-container, .list-container, mat-sidenav-*,
+   * .global-header/.topbar, the mat tables, etc. There are no hashed class
+   * names to chase.
+   *
+   * HANDS OFF the weather data itself: radar/satellite maps, the wundermap,
+   * canvas/leaflet tiles, temperature scales, condition icons (sun/cloud/rain),
+   * alert banners and precip/UV color codes are left intact -- we only theme
+   * the surrounding chrome, surfaces, text and borders.
+   */
+  :root {
+    color-scheme: dark;
+
+    --wu-base: #14181d;          /* page base                     */
+    --wu-surface: #1c2128;       /* cards / modules               */
+    --wu-surface-2: #161d27;     /* alt elevated / zebra          */
+    --wu-chrome: #0d1117;        /* header / footer / sidenav     */
+    --wu-border: #262c33;        /* subtle border                 */
+    --wu-border-2: #2d333b;      /* component border              */
+    --wu-text: #e6edf3;          /* primary text                  */
+    --wu-text-2: #c4cdd6;        /* body text                     */
+    --wu-text-muted: #8b949e;    /* metadata / muted              */
+    --wu-link: #5fb0e6;          /* refined WU blue for dark      */
+    --wu-link-hover: #9bd4ff;
+  }
+
+  /* ---- base ------------------------------------------------------------- */
+  html,
+  body,
+  body.enable-sda,
+  app-root,
+  mat-sidenav-container,
+  .mat-drawer-container,
+  .mat-sidenav-container,
+  .mat-drawer-content,
+  .mat-sidenav-content {
+    background-color: var(--wu-base) !important;
+    color: var(--wu-text-2) !important;
+  }
+
+  /* Soften every light border to a subtle dark one. Specific brighter ones
+     (e.g. the #4c4c4c table grid) are re-handled below. */
+  * {
+    border-color: var(--wu-border) !important;
+  }
+
+  /* ---- header / chrome -------------------------------------------------- */
+  .topbar,
+  .global-header,
+  wu-header .topbar,
+  wu-header .global-header,
+  mat-toolbar,
+  .mat-toolbar {
+    background-color: var(--wu-chrome) !important;
+    color: var(--wu-text) !important;
+  }
+
+  /* side navigation drawer */
+  mat-sidenav,
+  .mat-drawer,
+  .mat-sidenav,
+  .sidenav-main-menu {
+    background-color: var(--wu-chrome) !important;
+    color: var(--wu-text-2) !important;
+  }
+
+  /* ---- content regions & cards ----------------------------------------- */
+  .region-content-top,
+  .region-content-bottom,
+  .region-content,
+  .has-content,
+  section.inner-content,
+  .inner-content,
+  mat-sidenav-content > div {
+    background-color: var(--wu-base) !important;
+  }
+
+  /* Foundation grid scaffolding anywhere in the content area carries its own
+     white / light-grey bg. Blanket it transparent so it inherits the dark base
+     or the surface of an enclosing card; images/maps/charts excluded below. */
+  mat-sidenav-content .row,
+  mat-sidenav-content .columns,
+  lib-city-current-conditions,
+  .city-conditions,
+  .conditions-circle-wrap,
+  .conditions-circle,
+  .condition-data,
+  .conditions-extra {
+    background-color: transparent !important;
+  }
+
+  /* Module / card surfaces. WU wraps each module in a lib-* web component and
+     a .data-module; the small dashboard tiles use lib-*-tile wrappers. */
+  .data-module,
+  .current-container,
+  .list-container,
+  .module,
+  .city-almanac,
+  .city-astronomy,
+  .additional-conditions,
+  .video-promo,
+  .removeIfEmpty,
+  .weather-map,
+  .city-map,
+  .city-map-wrapper,
+  lib-precip-tile,
+  lib-pollen-tile,
+  lib-air-quality-tile,
+  lib-uv-tile,
+  lib-city-today-forecast,
+  lib-additional-conditions,
+  lib-almanac,
+  .tile-title,
+  mat-card,
+  .mat-mdc-card,
+  .mat-card,
+  .panel,
+  .card {
+    background-color: var(--wu-surface) !important;
+    color: var(--wu-text-2) !important;
+  }
+
+  /* The Foundation grid scaffolding (.row / .columns / .small-* / .medium-*)
+     carries its own white / light-grey backgrounds inside these regions. Make
+     the scaffolding transparent so it inherits the dark surface, while images,
+     maps and charts (handled at the bottom) are never touched. */
+  .region-content-top .row,
+  .region-content-top .columns,
+  .region-content-bottom .row,
+  .region-content-bottom .columns,
+  .current-container *:not(img):not(svg):not(canvas):not(picture),
+  .list-container *:not(img):not(svg):not(canvas):not(picture),
+  .data-module *:not(img):not(svg):not(canvas):not(picture):not(.module-header),
+  .city-forecast .row,
+  .city-forecast .columns,
+  .inner-content > .row,
+  .forecast-tile,
+  .day-content {
+    background-color: transparent !important;
+  }
+
+  /* Map tabs bar (.ui-tabs.header-tabs #f7f7f7) above the city map. */
+  .ui-tabs,
+  .header-tabs,
+  .wundermap_links {
+    background-color: var(--wu-surface-2) !important;
+  }
+
+  /* The little dashboard tiles label bar (.tile-title #e7e7e7) -> elevated. */
+  .tile-title {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text) !important;
+  }
+  /* Module header strip (#e7e7e7 with #4c4c4c text). */
+  .module-header,
+  .data-module .module-header {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text) !important;
+  }
+  /* re-establish opaque surfaces on the table header / zebra inside modules */
+  .data-module thead th,
+  .data-module .mat-mdc-header-cell {
+    background-color: var(--wu-chrome) !important;
+  }
+
+  /* ---- text ------------------------------------------------------------- */
+  h1, h2, h3, h4, h5, h6,
+  .module-title,
+  .city-header,
+  .current-temp,
+  b, strong {
+    color: var(--wu-text) !important;
+  }
+
+  p, span, li, td, th, dt, dd, label, figcaption, small,
+  .data-module *,
+  .current-container * {
+    color: inherit;
+  }
+
+  /* WU hardcodes its standard body text as rgba(0,0,0,.87) and #1e2023 on most
+     grid/content blocks -- lift these to light. Inline-styled greys too. */
+  .region-content-top,
+  .region-content-top .row,
+  .region-content-top .columns,
+  .city-conditions,
+  .conditions-extra,
+  .city-header,
+  .data-module .content,
+  [style*="color: rgb(76, 76, 76)"],
+  [style*="color:#4c4c4c"],
+  [style*="color: rgb(102, 102, 102)"] {
+    color: var(--wu-text-2) !important;
+  }
+
+  /* Muted greys WU uses for secondary labels (#696969, #4c4c4c on captions). */
+  .duration,
+  .columns .duration,
+  .mat-mdc-tooltip-trigger,
+  .phases-name,
+  .module-footer,
+  .attribution,
+  .branding,
+  .last-updated,
+  .split,
+  .separator {
+    color: var(--wu-text-muted) !important;
+  }
+
+  /* Dark class-driven text WU renders in #4c4c4c / #1e2023 (not inline-styled,
+     so the [style*=] catch above misses them): day labels, the daily summary
+     paragraph, astronomy labels. Lift to readable body text. */
+  .day,
+  .weather-quickie,
+  .astro-data,
+  .obs-date,
+  .obs-text,
+  .calendar-day,
+  .timestamp {
+    color: var(--wu-text-2) !important;
+  }
+  /* Astronomy sunrise/sunset accent (#cc5500 / #e59900) -> readable amber. */
+  .astro-data[style*="204"],
+  .sun-data,
+  .moon-data {
+    color: #ffb454 !important;
+  }
+
+  /* WU's data values use a hardcoded near-black (#1e2023) as the NEUTRAL color,
+     reserving saturated hues (red highs, orange current temp, blue precip, grey
+     lows) for the SEMANTIC temperature/precip scale. We lift only the neutral
+     default to light text and KEEP the saturated scale colors below, so the
+     temperature scale stays meaningful. WU's own selectors used verbatim. */
+  .data-module .content .data-point,
+  .data-module .content .wx-value,
+  .data-module .content .wu-value,
+  .temp .secondary-temp .wu-label,
+  .wind-dir .wx-value,
+  #stationselector_table .table-row .temp,
+  .location-data,
+  .wu-value,
+  .wu-suffix,
+  .wu-degree,
+  .wx-value,
+  .data-point {
+    color: var(--wu-text) !important;
+  }
+
+  /* Brighten the dark teal-blue link/precip accent (#006f9e) for dark. */
+  .data-module .content a .data-point,
+  .data-module .content a .wx-value,
+  .data-module .content a .wu-value {
+    color: var(--wu-link) !important;
+  }
+
+  /* Header city-conditions readout ("61° Cloudy" by the city name) uses a
+     more specific #4c4c4c rule than the generic .wu-value lift -- match it. */
+  .city-info,
+  .city-info .wu-value,
+  .city-info .wu-suffix,
+  .city-info .wu-degree,
+  .city-info .wu-label,
+  .city-info span,
+  .city-conds,
+  .city-conds .wu-value,
+  .city-conds span {
+    color: var(--wu-text) !important;
+  }
+
+  /* Re-assert the SEMANTIC scale colors (these read fine on dark) so the
+     blanket lift above doesn't flatten them: orange current temp, grey lows. */
+  .current-temp,
+  .conditions-circle .current-temp,
+  .feels-like .temp {
+    color: #ff9d4d !important;          /* WU orange, nudged lighter for dark */
+  }
+  .temp .secondary-temp {
+    color: var(--wu-text-muted) !important;  /* low/secondary temp grey */
+  }
+  /* 10-day / calendar temperature scale: keep the warm reds/oranges (readable
+     on dark) but lift the cold blue end (#0053ae is too dark on dark). */
+  .temp-lo,
+  .temp-low,
+  .wu-value.temp-lo {
+    color: #4d9fe6 !important;          /* cold blue, lightened for dark */
+  }
+  .temp-hi,
+  .temp-high {
+    color: #ff6b6b !important;          /* warm red, lightened for dark */
+  }
+  /* Other saturated high-temp scale values are kept as authored. */
+
+  /* Muted / secondary labels (greys #696969 etc.). */
+  .subheading,
+  .split,
+  .date,
+  .phase-name,
+  .phases-date,
+  .small-4,
+  .wind-north,
+  .show-for-medium,
+  .module-title-small,
+  .timestamp {
+    color: var(--wu-text-muted) !important;
+  }
+
+  /* Mapbox attribution overlay (white text on white pill) on the mini-map. */
+  .__wxmap_MapboxAttribution,
+  [class*="MapboxAttribution"] {
+    color: var(--wu-text-muted) !important;
+    background-color: rgba(13, 17, 23, 0.6) !important;
+  }
+
+  /* ---- links / accent --------------------------------------------------- */
+  a,
+  a:visited {
+    color: var(--wu-link) !important;
+  }
+  a:hover,
+  a:focus {
+    color: var(--wu-link-hover) !important;
+  }
+
+  /* WU blue accents used as text (#006f9e / #19aadb) -> dark-friendly blue */
+  .ui-tabs a,
+  .header-tabs a,
+  .wundermap_links a {
+    color: var(--wu-link) !important;
+  }
+  .ui-tabs a.selected,
+  .header-tabs a.selected,
+  .ui-tabs li.selected,
+  .header-tabs li.selected,
+  a.selected,
+  a.selected span,
+  .ui-tabs-nav .ui-state-active,
+  .ui-tabs-nav .ui-state-active a,
+  .wundermap_module_tabs .ui-state-active a,
+  li.ui-state-active a {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text) !important;
+    border-color: var(--wu-border-2) !important;
+  }
+
+  /* ---- data tables (hourly / 10-day / history) -------------------------- */
+  table,
+  .mat-mdc-table,
+  .mat-table,
+  .mdc-data-table__table,
+  tbody,
+  tfoot,
+  .mdc-data-table__content,
+  .summary-table,
+  .observation-table {
+    background-color: var(--wu-surface) !important;
+    color: var(--wu-text-2) !important;
+    border-color: var(--wu-border) !important;
+  }
+  /* history "summary" table sets a #f9f9f9 bg on the bare thead element */
+  thead {
+    background-color: var(--wu-chrome) !important;
+  }
+  thead th,
+  .mat-mdc-header-cell,
+  .mat-header-cell,
+  th {
+    background-color: var(--wu-chrome) !important;
+    color: var(--wu-text) !important;
+    border-color: var(--wu-border) !important;
+  }
+  tbody tr,
+  .mat-mdc-row,
+  .mat-row {
+    background-color: var(--wu-surface) !important;
+  }
+  /* zebra: WU alternates white / #f7f7f7 */
+  tbody tr:nth-child(even),
+  .mat-mdc-row:nth-child(even),
+  .mat-row:nth-child(even) {
+    background-color: var(--wu-surface-2) !important;
+  }
+  td,
+  .mat-mdc-cell,
+  .mat-cell {
+    color: var(--wu-text-2) !important;
+    border-color: var(--wu-border) !important;
+  }
+  tbody tr:hover,
+  .mat-mdc-row:hover {
+    background-color: #232a33 !important;
+  }
+
+  /* ---- forms / search --------------------------------------------------- */
+  input,
+  textarea,
+  select,
+  .wu-search,
+  .mat-mdc-input-element,
+  .mat-input-element {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text) !important;
+    border-color: var(--wu-border-2) !important;
+  }
+  input::placeholder,
+  textarea::placeholder,
+  .wu-search::placeholder {
+    color: var(--wu-text-muted) !important;
+    opacity: 1 !important;
+  }
+
+  /* search autocomplete dropdown / mat menus / panels must be opaque */
+  .mat-mdc-autocomplete-panel,
+  .mat-autocomplete-panel,
+  .mat-mdc-menu-panel,
+  .mat-menu-panel,
+  .mat-mdc-select-panel,
+  .mat-select-panel,
+  .cdk-overlay-pane,
+  .mat-mdc-dialog-surface,
+  .mat-dialog-container,
+  .typeahead,
+  .results,
+  .autocomplete,
+  .mat-mdc-option,
+  .mat-option {
+    background-color: var(--wu-surface) !important;
+    color: var(--wu-text-2) !important;
+  }
+  .mat-mdc-option:hover,
+  .mat-option:hover,
+  .mat-mdc-option.mdc-list-item--selected,
+  .mat-option.mat-active {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text) !important;
+  }
+
+  /* ---- buttons ---------------------------------------------------------- */
+  button,
+  .mat-mdc-button,
+  .mat-button,
+  .mdc-button {
+    color: var(--wu-text) !important;
+  }
+  .mat-mdc-raised-button,
+  .mat-raised-button,
+  .mdc-button--raised,
+  .btn {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text) !important;
+    border-color: var(--wu-border-2) !important;
+  }
+
+  /* WU's brand CTA buttons use a bright cyan (#19aadb) that gives weak contrast
+     with white text on dark. Refine the brand cyan to a deeper blue of the same
+     family so the white label reads clearly while staying recognizably WU. */
+  .button,
+  a.button,
+  button.button,
+  .submit-button .button,
+  .subnav .button,
+  a.mat-mdc-menu-trigger.button,
+  .button.split,
+  .weather-chart-options .button {
+    background-color: #1f7fb8 !important;
+    color: #ffffff !important;
+    border-color: #1f7fb8 !important;
+  }
+  .button:hover,
+  a.button:hover {
+    background-color: #2a93cf !important;
+    color: #ffffff !important;
+  }
+
+  /* ---- footer ----------------------------------------------------------- */
+  footer,
+  .footer,
+  .global-footer {
+    background-color: var(--wu-chrome) !important;
+    color: var(--wu-text-2) !important;
+  }
+  footer a,
+  .footer a {
+    color: var(--wu-text-2) !important;
+  }
+  footer a:hover {
+    color: var(--wu-link-hover) !important;
+  }
+
+  /* ---- keep weather imagery / data viz untouched ------------------------ */
+  /* radar, satellite, wundermap, leaflet tiles, charts, condition icons,
+     temperature swatches and alert banners must render their real pixels --
+     do not paint backgrounds onto these. */
+  img,
+  svg,
+  canvas,
+  video,
+  picture,
+  .leaflet-container,
+  .leaflet-tile,
+  .wundermap,
+  #map,
+  .map-container,
+  .radar,
+  .satellite,
+  [class*="chart"],
+  [class*="graph"],
+  highcharts-chart,
+  .highcharts-container {
+    background-color: transparent !important;
+  }
+  /* never let the blanket border rule outline map/chart tiles */
+  .leaflet-container *,
+  .highcharts-container * {
+    border-color: transparent !important;
+  }
+
+  /* ====================================================================== */
+  /* SVG data-viz surfaces a plain DOM-background audit can't see.          */
+  /* These are WU's own custom SVG charts (NOT raster radar/maps, NOT       */
+  /* canvas, NOT Highcharts) -- so their CHROME is safe to theme while the  */
+  /* colored data SERIES are preserved. Raster radar/satellite imagery is   */
+  /* never touched (it lives in <img>/leaflet tiles, handled above).        */
+  /* ====================================================================== */
+
+  /* ---- (1) current-conditions temperature circle ------------------------ */
+  /* .conditions-circle is a border-radius:50% div whose RING is an inline
+     red/orange linear-gradient and whose INTERIOR is a white ::before disc.
+     Darken the disc to an elevated surface; tone the ring to a refined red;
+     keep the temp text light + the orange current-temp accent. */
+  .conditions-circle::before {
+    background: var(--wu-surface) !important;
+  }
+  .conditions-circle {
+    background: linear-gradient(to bottom, #c0444c, #b83a3a) !important;
+  }
+  .conditions-circle .condition-data,
+  .conditions-circle .hi-lo,
+  .conditions-circle .hi,
+  .conditions-circle .lo,
+  .conditions-circle .separator,
+  .conditions-circle .feels-like,
+  .conditions-circle .feels-like-label {
+    color: var(--wu-text) !important;
+  }
+  .conditions-circle .hi-lo .hi {
+    color: #ff6b6b !important;          /* warm high */
+  }
+  .conditions-circle .hi-lo .lo {
+    color: #4d9fe6 !important;          /* cold low  */
+  }
+  /* the big current temperature stays the WU orange accent (semantic). */
+  .conditions-circle .temp,
+  .conditions-circle .wu-value,
+  .conditions-circle .current-temp {
+    color: #ff9d4d !important;
+  }
+  /* the small "Gusts" dial ring -> subtle dark border. */
+  .dial {
+    border-color: var(--wu-border-2) !important;
+  }
+
+  /* ---- (2) 10-day multi-panel SVG charts -------------------------------- */
+  /* The white plot stripes are <rect class="bc-bar"> day-column bands filled
+     #f7f7f7; gridlines/border are #e7e7e7; axis labels + the pressure line
+     are near-black (#1e2023) -> invisible on dark. Darken the bands, mute
+     the grid, and lift the near-black axis text / data line to light. The
+     SATURATED series (temp red, feels-like magenta, dew-point green, cloud
+     grey, precip/wind blue, humidity) are left as authored. */
+  svg.chart .bc-bar.bar-on,
+  svg.chart rect.bc-bar {
+    fill: var(--wu-surface-2) !important;
+  }
+  svg.chart .tick-line,
+  svg.chart line.tick-line,
+  svg.chart rect.border {
+    stroke: var(--wu-border) !important;
+  }
+  /* axis tick labels (#1e2023) -> readable muted light. */
+  svg.chart text,
+  svg.chart .tick-label {
+    fill: var(--wu-text-muted) !important;
+  }
+  /* remap ONLY the near-black data line (Pressure, #1e2023) so it stays
+     visible; the colored series keep their hues. */
+  svg.chart path[stroke="#1e2023"],
+  svg.chart path[stroke="rgb(30, 32, 35)"],
+  svg.chart .pressure path,
+  svg.chart path.pressure {
+    stroke: var(--wu-text-2) !important;
+  }
+
+  /* ---- (3) dashboard tiles (Precip / Pollen / Air Quality / UV) --------- */
+  /* Each lib-*-tile body is a div#*BarChart wrapping an inline-styled white
+     <svg> whose bars are <rect fill="#e7e7e7">. Darken the body + svg bg and
+     the bars; the colored value text + top accent rules are kept by the
+     rules above (value colors are semantic). */
+  lib-precip-tile a,
+  lib-pollen-tile a,
+  lib-air-quality-tile a,
+  lib-uv-tile a,
+  lib-precip-tile [id$="BarChart"],
+  lib-pollen-tile [id$="BarChart"],
+  lib-air-quality-tile [id$="BarChart"],
+  lib-uv-tile [id$="BarChart"],
+  #precipBarChart,
+  #pollenBarChart,
+  #airQualityBarChart,
+  #uvBarChart,
+  #aqiBarChart {
+    background-color: var(--wu-surface) !important;
+  }
+  lib-precip-tile svg,
+  lib-pollen-tile svg,
+  lib-air-quality-tile svg,
+  lib-uv-tile svg {
+    background-color: var(--wu-surface) !important;
+  }
+  /* the light-grey mini bars -> a soft elevated tone that reads on dark. */
+  lib-precip-tile svg rect,
+  lib-pollen-tile svg rect,
+  lib-air-quality-tile svg rect,
+  lib-uv-tile svg rect {
+    fill: #3a424d !important;
+  }
+}
