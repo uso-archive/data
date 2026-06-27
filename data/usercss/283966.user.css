@@ -1,0 +1,482 @@
+/* ==UserStyle==
+@name         Pikabu Dark 2026
+@namespace    USO Archive
+@author       Reza Rahemtola
+@description  A clean, modern dark theme for Pikabu.
+@version      20260626.21.29
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("pikabu.ru") {
+/* Pikabu ships a fully tokenised design system (~900 CSS custom properties).
+     The cleanest, most stable retheme is to flip the light palette tokens to a
+     dark equivalent at :root, then add a thin structural safety net for the few
+     surfaces that use literal colours or inherit a transparent background from
+     the body. Brand green and semantic colours (vote up/down, badges, awards)
+     are preserved — only their tone is refined to sit well on the dark canvas. */
+
+  :root {
+    color-scheme: dark !important;
+
+    /* ---- Local palette ---- */
+    --pk-bg: #14181d;            /* base canvas */
+    --pk-surface: #1c2128;       /* elevated cards (stories, comments) */
+    --pk-surface-2: #1a1f26;     /* secondary surface (inputs, chips) */
+    --pk-header: #0d1117;        /* header / footer */
+    --pk-border: #2a313a;        /* subtle borders */
+    --pk-border-soft: #232931;   /* very subtle dividers */
+    --pk-text: #e6edf3;          /* primary text */
+    --pk-text-soft: #c4cdd6;     /* body text */
+    --pk-text-muted: #8b949e;    /* muted / hints / placeholder */
+    --pk-green: #8fd35c;          /* refined Pikabu green (brand) */
+    --pk-green-hover: #a4e072;
+    --pk-green-deep: #6fae44;
+
+    /* ---- Flip the "bright"/"blackjack"/"black" greyscale ramps ----
+       Pikabu's neutral ramps run light→dark; we re-map the light end of each to
+       dark surfaces and the dark end to light text, so every component built on
+       these tokens themes itself. */
+    --color-bright-900: var(--pk-surface);
+    --color-bright-800: var(--pk-surface);
+    --color-linear-bright-900: var(--pk-surface);
+    --color--header__bg: var(--pk-header);
+    --footer-bg: var(--pk-header);
+
+    --color-blackjack-100: var(--pk-surface);   /* was #fcfdff */
+    --color-blackjack-99: var(--pk-bg);          /* was #f7f8fc */
+    --color-blackjack-97: var(--pk-surface-2);   /* was #f2f3f7 */
+    --color-blackjack-90: var(--pk-border);      /* was #dfe1e5 */
+    --color-blackjack-75: #6b7480;
+    --color-blackjack-70: var(--pk-text-muted);  /* was #aaacb2 */
+    --color-blackjack-60: var(--pk-text-muted);  /* was #909299 */
+    --color-blackjack-50primary: #9aa3ad;        /* was #757880 */
+    --color-blackjack-30: var(--pk-text-soft);   /* was #45474d */
+    --color-blackjack-18: var(--pk-text);        /* was #292a2e */
+    --color-blackjack-15: var(--pk-text);        /* was #222326 */
+    --color-blackjack-10: var(--pk-text);        /* was #1f2021 */
+
+    --color-black-100: var(--pk-surface);        /* was #f9f9fb */
+    --color-black-200: var(--pk-surface);        /* was #f9f9fb */
+    --color-black-300: var(--pk-bg);             /* was #f7f8fc */
+    --color-black-400: var(--pk-border);         /* was #e9e9e9 */
+    --color-black-420: var(--pk-border);
+    --color-black-430: var(--pk-border);         /* was #ebedf2 */
+    --color-black-440: var(--pk-border);
+    --color-black-500: #4a525c;                  /* was #d8dadd */
+    --color-black-600: #7d8893;                  /* was #b0b3bb */
+    --color-black-700: #aab3bd;                  /* was #70737b */
+    --color-black-800: var(--pk-text-soft);      /* was #444850 */
+    --color-black-900: var(--pk-text);           /* was #212121 */
+    --color-black-920: var(--pk-text);
+    --color-black-940: var(--pk-text);           /* body text was #1b1e24 */
+
+    /* ---- Background / surface design tokens ---- */
+    --s-colorBg-clear: var(--pk-surface);
+    --s-colorBg-tonned: var(--pk-bg);
+    --s-colorBg-stroke: var(--pk-border);
+    --s-colorBg-special: #2a2718;
+    --s-colorBg-popup: rgba(0, 0, 0, 0.64);
+
+    --s-text-paragraph-primary: var(--pk-text);
+    --s-text-subheading-primary: var(--pk-text);
+    --s-text-label-primary: var(--pk-text-soft);
+    --s-text-label-tertiary: var(--pk-text-muted);
+    --user-name-text: var(--pk-text);
+
+    /* ---- Inputs / textareas / comboboxes / selects ---- */
+    --c-input-bgDefault: var(--pk-surface-2);
+    --c-input-bgDisabled: var(--pk-bg);
+    --c-input-strokeDefault: var(--pk-border);
+    --c-input-textDefault: var(--pk-text-muted);
+    --c-textarea-bgDefault: var(--pk-surface-2);
+    --c-textarea-bgDisabled: var(--pk-bg);
+    --c-textarea-strokeDefault: var(--pk-border);
+    --c-textarea-textFilled: var(--pk-text);
+    --c-combobox-bgDefault: var(--pk-surface-2);
+    --c-combobox-bgDisabled: var(--pk-bg);
+    --c-combobox-content-bg: var(--pk-bg);
+    --c-combobox-strokeDefault: var(--pk-border);
+    --c-combobox-content-stroke: var(--pk-border);
+    --c-combobox-contentDefault: var(--pk-text-muted);
+    --c-select-main-bgDefault: var(--pk-surface-2);
+    --c-select-main-bgDisabled: var(--pk-bg);
+    --c-select-main-strokeDefault: var(--pk-border);
+    --c-select-list-bg: var(--pk-surface);
+    --c-select-list-item-text: var(--pk-text);
+    --c-selectBtn-bgDefault: var(--pk-surface-2);
+    --c-selectBtn-bgHover: var(--pk-surface);
+    --c-selectBtn-stroke: var(--pk-border);
+
+    /* ---- Tags / chips / quotes / tooltips / menus ---- */
+    --c-tag-bgDefault: var(--pk-surface-2);
+    --c-tag-bgHover: var(--pk-surface);
+    --c-tag-bgContrastDefault: var(--pk-surface-2);
+    --c-tag-bgContrastHover: var(--pk-surface);
+    --c-tag-stroke: var(--pk-border);
+    --c-tag-strokeContrast: var(--pk-border);
+    --c-quote-bg: var(--pk-surface-2);
+    --c-tooltip-bg: var(--pk-surface);
+    --c-tooltip-text: var(--pk-text);
+    --c-menu-item-text: var(--pk-text);
+    --c-counter-bgTertiary: var(--pk-surface-2);
+
+    /* ---- Secondary buttons (neutral greys) ---- */
+    --c-btn-secondary-bgDefault: var(--pk-surface-2);
+    --c-btn-secondary-bgHover: var(--pk-border);
+    --c-btn-secondary-bgClick: var(--pk-border);
+    --c-btn-secondary-textIcon: var(--pk-text-soft);
+    --c-btnIcon-tertiary-bgDefault: var(--pk-surface-2);
+    --c-btnIcon-tertiary-bgHover: var(--pk-surface);
+    --c-btnIcon-tertiary-stroke: var(--pk-border);
+    --c-btnSocialIcon-bgDefault: var(--pk-surface-2);
+    --c-btnSocialIcon-bgHover: var(--pk-surface);
+    --c-btnSocialIcon-bgClick: var(--pk-border);
+    --c-social-bgWhite: var(--pk-surface);
+
+    /* ---- Pagination ---- */
+    --c-pagination-defaultBg: var(--pk-surface-2);
+    --c-pagination-hoverBg: var(--pk-surface);
+    --c-pagination-clickBg: var(--pk-border);
+    --c-pagination-content: var(--pk-text-soft);
+
+    /* ---- Alerts / captcha / collapse ---- */
+    --c-alert-baseBg: var(--pk-surface-2);
+    --c-alert-baseStroke: var(--pk-border);
+    --c-captcha-block-bg: var(--pk-surface-2);
+    --c-captcha-block-stroke: var(--pk-border);
+    --collapse-stroke: var(--pk-border);
+    --c-bottomSheet-line: var(--pk-border);
+
+    /* ---- Refine the brand green (keep hue family, lift for dark) ---- */
+    --color-pikabu-80primary: var(--pk-green);
+    --color-pikabu-75: var(--pk-green);
+    --color-pikabu-60: var(--pk-green-deep);
+    --color-primary-800: var(--pk-green);
+    --color-primary-700: var(--pk-green);
+    --color-primary-600: var(--pk-green);
+    --color-primary-900: var(--pk-green-deep);
+    --c-btn-primary-bgDefault: var(--pk-green);
+    --c-btn-primary-bgHover: var(--pk-green-hover);
+    --c-btn-primary-bgClick: var(--pk-green-deep);
+    --c-btn-primaryText-textIcon: var(--pk-green);
+    --c-navigation-horizontal-textActiveDefault: var(--pk-green);
+    --c-counter-bgPrimary: var(--pk-green);
+    --c-counter-textPrimary: var(--pk-green);
+    --c-breadcrumbs-default: var(--pk-green);
+    --s-colorTextSpecial-accent: var(--pk-green);
+
+    /* ---- Rating: keep green up / red down, lift the tone for dark ---- */
+    --rating-plus-active: var(--pk-green);
+    --rating-plus-hover: var(--pk-green);
+    --rating-plus-default: var(--pk-text-muted);
+    --rating-plus-click: var(--pk-green-deep);
+    --rating-minus-active: #ef6a5d;
+    --rating-minus-hover: #ef6a5d;
+    --rating-minus-default: var(--pk-text-muted);
+    --rating-minus-click: #d9483b;
+    --rating-progressMinus: #ef6a5d;
+    --rating-icon: var(--pk-text-muted);
+    --rating-text: var(--pk-text-muted);
+    --rating-stroke: var(--pk-border);
+    --rating-progressBg: var(--pk-border);
+    --reaction-default: var(--pk-surface-2);
+    --reaction-hover: var(--pk-surface);
+
+    /* ---- Subtle shadows: soften so they don't glow on dark ---- */
+    --shadow-low: 0 1px 12px rgba(0, 0, 0, 0.4);
+    --s-shadow-mainStroke: rgba(255, 255, 255, 0.06);
+    --s-shadow-extraStroke: rgba(255, 255, 255, 0.06);
+  }
+
+  /* ===== Base canvas ===== */
+  html { background-color: var(--pk-bg) !important; }
+  body {
+    background-color: var(--pk-bg) !important;
+    color: var(--pk-text-soft) !important;
+  }
+
+  /* ===== Borders ===== (colour only — never adds a border, safe everywhere) */
+  * { border-color: var(--pk-border) !important; }
+
+  /* ===== Header ===== */
+  .header,
+  .header__inner,
+  .header_with-ads,
+  .app-header {
+    background-color: var(--pk-header) !important;
+    border-color: var(--pk-border) !important;
+  }
+  .header a,
+  .header__nav a,
+  .menu__link,
+  .header-menu a { color: var(--pk-text-soft) !important; }
+  .header a:hover,
+  .menu__link:hover { color: var(--pk-text) !important; }
+  .header-dropdown,
+  .header-menu__dropdown,
+  .menu-popup,
+  .dropdown__content { background-color: var(--pk-surface) !important; }
+
+  /* ===== Main columns / feed wrappers (transparent over base) ===== */
+  .app,
+  .layout,
+  .layout__content,
+  .main,
+  .wrapper,
+  .page,
+  .page__inner,
+  .stories-feed,
+  .stories-feed__container,
+  .feed,
+  .sidebar,
+  .sidebar_right,
+  .sidebar_left { background-color: transparent !important; }
+
+  /* ===== Story / post cards ===== */
+  .story,
+  .story__main,
+  .story-block,
+  .page-story,
+  .page-story__main { background-color: var(--pk-surface) !important; }
+  .story__title,
+  .story__title-link,
+  .story-title,
+  .page-story__title { color: var(--pk-text) !important; }
+  .story__content-inner,
+  .story__text,
+  .story-block__content,
+  .b-story-block__text { color: var(--pk-text-soft) !important; }
+  .story__title-link:hover { color: var(--pk-green-hover) !important; }
+
+  /* Rating block on the story card */
+  .story__rating-block { background-color: var(--pk-surface-2) !important; }
+  .story__rating-count { color: var(--pk-text-soft) !important; }
+
+  /* ===== Tags ===== */
+  .tags__tag,
+  .story__tags a,
+  a.tag {
+    background-color: var(--pk-surface-2) !important;
+    color: var(--pk-text-soft) !important;
+    border-color: var(--pk-border) !important;
+  }
+  .tags__tag:hover,
+  .story__tags a:hover { background-color: var(--pk-surface) !important; color: var(--pk-text) !important; }
+
+  /* ===== Comments tree ===== */
+  .comments,
+  .page-story__comments { background-color: var(--pk-surface) !important; }
+  .comment,
+  .comment__content,
+  .comment__body { background-color: transparent !important; color: var(--pk-text-soft) !important; }
+  .comment__user,
+  .comment .user__nick { color: var(--pk-text) !important; }
+  .comment-toolbar,
+  .comments__sorting,
+  .comment__children { background-color: transparent !important; }
+  /* the thin nesting guide-lines between nested comments */
+  .comment__branch,
+  .comment__indent,
+  .comment-thread__line { border-color: var(--pk-border) !important; background-color: var(--pk-border) !important; }
+
+  /* ===== Author / user blocks, avatars (do NOT tint the avatar image) ===== */
+  .user__nick,
+  .story__user-link,
+  a.user { color: var(--pk-text) !important; }
+  .avatar img,
+  .user__avatar img,
+  img.avatar { background-color: transparent !important; }
+
+  /* ===== Search ===== */
+  input[type="text"],
+  input[type="search"],
+  input[name="q"],
+  .search-input,
+  .input__field,
+  textarea {
+    background-color: var(--pk-surface-2) !important;
+    color: var(--pk-text) !important;
+    border-color: var(--pk-border) !important;
+  }
+  input::placeholder,
+  textarea::placeholder { color: var(--pk-text-muted) !important; }
+  .search-results,
+  .search__results,
+  .search-suggest { background-color: var(--pk-surface) !important; }
+
+  /* ===== Login form — third-party provider buttons ===== */
+  /* The provider buttons (VK / Yandex ID) keep their brand background but hardcode
+     a near-black #1c2128 label that survives the theme; on the black Yandex button
+     it is near-invisible. Lift every provider label to a readable light tone. */
+  .auth__provider-text,
+  [class*="auth__provider"] .auth__provider-text { color: var(--pk-text) !important; }
+
+  /* ===== Filter / sort / tab / segmented controls =====
+     These interactive controls hardcode a near-black label colour (#292a2e /
+     #37393d) for their UNSELECTED state, which is invisible on the dark canvas.
+     Make every unselected label clearly readable (body-text tone), and keep the
+     SELECTED/active state visually distinct (brand green or white-on-green) so
+     the affordance is preserved. */
+
+  /* Home feed sort tabs (Горячее / Лучшее / Свежее / Подписки) */
+  .header-menu__item,
+  .header-menu__item a,
+  .header-menu a { color: var(--pk-text-soft) !important; }
+  .header-menu__item:hover,
+  .header-menu__item:hover a { color: var(--pk-text) !important; }
+  /* current/selected feed sort stays brand green + bolder */
+  .header-menu__item_current,
+  .header-menu__item_current a,
+  .header-menu__item_active,
+  .header-menu__item_active a { color: var(--pk-green) !important; font-weight: 600 !important; }
+
+  /* Search result tabs (Посты / Пользователи / Теги / Сообщества) */
+  [class*="TabItem__tab"],
+  [class*="TabItem__tab"] span { color: var(--pk-text-soft) !important; }
+  [class*="TabItem__tab"]:hover { color: var(--pk-text) !important; }
+  /* The pill background is painted by the tab's ::before pseudo, which hardcodes
+     a near-white #fcfdff for unselected tabs (and brand green for the active one).
+     Remap the unselected pill to a dark elevated surface so the light label reads,
+     and refresh the active pill with the dark-tuned brand green. */
+  [class*="TabItem__tab"]::before {
+    background-color: var(--pk-surface-2) !important;
+    border-color: var(--pk-border) !important;
+  }
+  [class*="TabItem__tab"]:hover::before { background-color: var(--pk-surface) !important; }
+  /* active tab: white label on the brand-green pill */
+  [class*="TabItem__tab_active"],
+  [class*="TabItem__tab_active"] span,
+  [class*="TabItem__tab--active"] { color: #ffffff !important; font-weight: 600 !important; }
+  [class*="TabItem__tab_active"]::before,
+  [class*="TabItem__tab--active"]::before {
+    background-color: var(--pk-green-deep) !important;
+    border-color: var(--pk-green-deep) !important;
+  }
+
+  /* Search period / type segmented buttons (Сегодня / Неделя / Текстовые …) */
+  [class*="SelectBtn__button"],
+  [class*="SelectBtn__button"] span {
+    background-color: var(--pk-surface-2) !important;
+    color: var(--pk-text-soft) !important;
+    border-color: var(--pk-border) !important;
+  }
+  [class*="SelectBtn__button"]:hover { background-color: var(--pk-surface) !important; color: var(--pk-text) !important; }
+  /* active segmented button keeps the brand green pill with white label */
+  [class*="SelectBtn__button_active"],
+  [class*="SelectBtn__button_active"] span {
+    background-color: var(--pk-green-deep) !important;
+    color: #ffffff !important;
+    border-color: var(--pk-green-deep) !important;
+  }
+
+  /* Comment-sort + generic sorting controls (Лучшие / Новые / Старые …) */
+  [class*="comments__sort"],
+  [class*="comments__sort"] a,
+  [class*="comments__sort"] span,
+  [class*="sorting__item"],
+  .comments__sorting a,
+  .comments__sorting span { color: var(--pk-text-soft) !important; }
+  [class*="sorting__item_active"],
+  [class*="comments__sort"] .active,
+  .comments__sorting .active { color: var(--pk-green) !important; font-weight: 600 !important; }
+
+  /* ===== Sidebar widgets / community blocks ===== */
+  .sidebar-block,
+  .sidebar-game,
+  .community-card,
+  .community,
+  .b-community,
+  .widget,
+  .block { background-color: var(--pk-surface) !important; }
+  .sidebar-block__title,
+  .widget__title,
+  .community-card__title { color: var(--pk-text) !important; }
+
+  /* Some sidebar / topic widgets hardcode a dark-grey #292a2e text and a white
+     surface as literal values (not tokens), so they survive the :root flip and
+     end up dark-on-dark. Restore readable text + dark surfaces explicitly. */
+  .sidebar-game__title-text,
+  .sidebar-game__name,
+  .page-topic-links__name,
+  .page-topic-links__title { color: var(--pk-text) !important; }
+  .sidebar-game__title-subtext,
+  .sidebar-game__genres { color: var(--pk-text-muted) !important; }
+
+  /* The in-feed "Pikabu Игры" carousel variant hardcodes the same near-black
+     #292a2e on the widget title + each game name — invisible on the dark card.
+     Lift the title/name to readable light text; keep the genre subtitle muted. */
+  .feed-games-carousel__title-text,
+  .feed-games-carousel__name { color: var(--pk-text) !important; }
+  .feed-games-carousel__genres,
+  .feed-games-carousel__subtext { color: var(--pk-text-muted) !important; }
+  .page-topic-links,
+  .page-topic-links__link {
+    background-color: var(--pk-surface) !important;
+    color: var(--pk-text-soft) !important;
+  }
+  .page-topic-links__link:hover { background-color: var(--pk-surface-2) !important; color: var(--pk-text) !important; }
+
+  /* Shop / gamification user badges keep their warm accent text but get a dark,
+     low-saturation surface instead of the light cream original. */
+  .story__user-badge.pkb-badge-shop,
+  .pkb-badge-shop,
+  .gamification-btn { background-color: var(--pk-surface-2) !important; }
+
+  /* ===== Generic light surfaces caught by literal colours ===== */
+  [style*="background: #fff"],
+  [style*="background-color: #fff"],
+  [style*="background:#fff"],
+  [style*="background-color:#fff"] { background-color: var(--pk-surface) !important; }
+
+  /* ===== Footer ===== */
+  .footer,
+  .page-footer,
+  .b-footer {
+    background-color: var(--pk-header) !important;
+    color: var(--pk-text-muted) !important;
+  }
+  .footer a,
+  .footer a span,
+  .page-footer a,
+  [class*="footer"] a,
+  [class*="footer__link"],
+  [class*="footer-link"] { color: var(--pk-text-soft) !important; }
+
+  /* ===== Code / quotes inside posts ===== */
+  pre, code, .b-story-block__code {
+    background-color: var(--pk-surface-2) !important;
+    color: #a5d6ff !important;
+    border-color: var(--pk-border) !important;
+  }
+  blockquote, .b-quote, .comment__quote {
+    background-color: var(--pk-surface-2) !important;
+    border-color: var(--pk-border) !important;
+    color: var(--pk-text-soft) !important;
+  }
+
+  /* ===== Generic muted / hint text ===== */
+  .hint, .text-muted, .date, time, .comment__time, .story__date {
+    color: var(--pk-text-muted) !important;
+  }
+
+  /* Several metadata bits (comment counts, result counts, slider captions) use a
+     literal mid-grey (#757880 / #45474d) rather than a token, which lands below
+     the WCAG floor on dark. Lift them to the readable muted tone. */
+  .story__comments-link-count,
+  [class*="comments-link-count"],
+  [class*="results-stories__count"],
+  [class*="results-search__count"],
+  [class*="Slider__info"] { color: var(--pk-text-muted) !important; }
+
+  /* Video / embedded-player poster placeholders show a light loading panel
+     before the media paints — darken it so it matches the surrounding card. */
+  [class*="player-block__preview"],
+  [class*="video-file-player__player"],
+  [class*="player-block__poster"] { background-color: #0d1117 !important; }
+
+  /* Search-term highlight marker keeps its yellow background, so its text must
+     stay dark to remain readable (the global light text would vanish on it). */
+  .pkb-marker,
+  mark,
+  [class*="pkb-marker"] { color: #1b1e24 !important; }
+}

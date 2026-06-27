@@ -1,0 +1,640 @@
+/* ==UserStyle==
+@name         Weather.com Dark 2026
+@namespace    USO Archive
+@author       Reza Rahemtola
+@description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
+@version      20260626.16.54
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("weather.com") {
+/*
+   * weather.com (The Weather Channel / IBM) is a hashed CSS-module React SPA:
+   * the styled class names (styles--cards--Yo-aJ, ...) ROTATE on every deploy,
+   * which is exactly what rotted the previous comprehensive theme. So this theme
+   * is built ENTIRELY on STABLE hooks: the design-system CSS custom properties
+   * (--background / --card / --popover / --border / ... shadcn-style tokens),
+   * the Tailwind utility classes the app ships (bg-white, bg-gray-100, bg-card,
+   * text-gray-900, border-gray-200, ...) and the rich data-testid attributes
+   * (header-main, sidebar-navigation, header-search, current-conditions,
+   * daily-forecast, SemiCircleGauge, DonutChart, ...). None of these are hashed.
+   *
+   * HANDS OFF the weather data itself: radar/satellite maps (DynamicMap, the
+   * Mapbox tiles), condition icons, the temperature color scale, AQI / UV /
+   * pollen / allergy color codes and severe-weather alert banners are left
+   * intact -- we only retheme the surrounding chrome, surfaces, text, borders
+   * and the white chrome of the SVG charts/gauges, never the colored data.
+   */
+
+  :root {
+    color-scheme: dark;
+
+    --wx-base: #14181d;          /* page base                     */
+    --wx-surface: #1c2128;       /* cards / modules               */
+    --wx-surface-2: #161d27;     /* alt elevated / wells / zebra  */
+    --wx-chrome: #0d1117;        /* header / footer / sidebar     */
+    --wx-border: #262c33;        /* subtle border                 */
+    --wx-border-2: #2d333b;      /* component border              */
+    --wx-text: #e6edf3;          /* primary text                  */
+    --wx-text-2: #c4cdd6;        /* body text                     */
+    --wx-text-muted: #8b949e;    /* metadata / muted              */
+    --wx-link: #5fb0e6;          /* refined weather.com blue      */
+    --wx-link-hover: #9bd4ff;
+
+    /* ---- design-system tokens (shadcn / Tailwind v4) -------------------- */
+    /* Remapping these themes most cards, popovers, inputs and text at once,
+       durably, because the app references them as bg-card / bg-background /
+       text-foreground / border-border etc. rather than hardcoded colors. */
+    --background: #14181d !important;
+    --foreground: #e6edf3 !important;
+    --card: #1c2128 !important;
+    --card-foreground: #e6edf3 !important;
+    --popover: #1c2128 !important;
+    --popover-foreground: #e6edf3 !important;
+    --primary: #5fb0e6 !important;
+    --primary-foreground: #0d1117 !important;
+    --secondary: #1c2128 !important;
+    --secondary-foreground: #e6edf3 !important;
+    --muted: #161d27 !important;
+    --muted-foreground: #8b949e !important;
+    --accent: #1c2128 !important;
+    --accent-foreground: #e6edf3 !important;
+    --border: #262c33 !important;
+    --input: #2d333b !important;
+    --ring: #5fb0e6 !important;
+    --text-secondary: #8b949e !important;
+  }
+
+  /* ---- base ------------------------------------------------------------- */
+  html,
+  body,
+  #app,
+  #appWrapper,
+  main,
+  [data-testid="page-wrapper"] {
+    background-color: var(--wx-base) !important;
+    color: var(--wx-text-2) !important;
+  }
+
+  /* Soften every light border to a subtle dark one (specific ones re-handled
+     below). Maps / charts are excluded at the bottom. */
+  * {
+    border-color: var(--wx-border) !important;
+  }
+
+  /* ---- header / sidebar chrome ----------------------------------------- */
+  [data-testid="header-main"],
+  [data-component="header-main"],
+  header,
+  [data-testid="subnavigation"] {
+    background-color: var(--wx-chrome) !important;
+    color: var(--wx-text) !important;
+  }
+
+  /* left sidebar navigation rail */
+  [data-testid="sidebar-navigation"],
+  [data-component="sidebar-navigation"],
+  nav[data-testid="sidebar-navigation"] {
+    background-color: var(--wx-chrome) !important;
+    color: var(--wx-text-2) !important;
+  }
+  /* sidebar links + their hover/active fills (ship bg-gray-100 / f2f2f2) */
+  [data-testid="sidebar-navigation"] a,
+  [data-testid="sidebar-navigation"] button {
+    background-color: transparent !important;
+    color: var(--wx-text-2) !important;
+  }
+  [data-testid="sidebar-navigation"] a:hover,
+  [data-testid="sidebar-navigation"] button:hover,
+  [data-testid="sidebar-navigation"] a[aria-current],
+  [data-testid="sidebar-navigation"] [aria-current="page"],
+  [data-testid="sidebar-navigation"] a.bg-gray-100 {
+    background-color: var(--wx-surface) !important;
+    color: var(--wx-text) !important;
+  }
+  /* the location-pill popover anchor (rounded-4xl bg-white wrapper) */
+  [data-slot="popover-anchor"],
+  .rounded-4xl.bg-white {
+    background-color: var(--wx-surface) !important;
+  }
+
+  /* the radar / interactive-map pages use a LEGACY collapsed sidebar (a
+     different component from the data-testid rail above): the nav itself is
+     ~636px tall but its WRAPPER stretches the full viewport height and ships a
+     white background, so a bright strip shows BELOW the nav items. The region
+     wrapper classes (.region-sidebarNavigation / .regionSidebarNavigation) are
+     stable layout hooks; the SidebarNavigation--* module names are stable
+     prefixes (only the trailing build-hash rotates). Darken them to the
+     chrome so the whole rail reads dark top-to-bottom. */
+  .region-sidebarNavigation,
+  .regionSidebarNavigation,
+  [class*="SidebarNavigation--sidebarWrapper"],
+  [class*="SidebarNavigation--sidebar"] {
+    background-color: var(--wx-chrome) !important;
+  }
+
+  /* sub-nav pill row sits in a white rounded bar */
+  [data-testid="subnavigation"] a,
+  [data-testid="subnavigation"] button {
+    color: var(--wx-text-2) !important;
+  }
+  [data-testid="subnavigation"] a:hover,
+  [data-testid="subnavigation"] [aria-current="page"] {
+    color: var(--wx-text) !important;
+  }
+
+  /* ---- horizontal-scroll fade overlays (the white "more →" gradients) --- */
+  /* The forecast-type nav (Today / Hourly / 10 Day / ...) and the chart tab
+     strip (Overview / Temperature / Feels Like / Precipitation / Wind / Wind
+     Gust) are horizontally-scrollable rows that paint a left/right edge fade as
+     a `pointer-events-none absolute` overlay with a `from-white` Tailwind
+     gradient (`bg-gradient-to-r/-l from-white via-white`). It's a
+     BACKGROUND-IMAGE, not a background-color, so a bg-color audit is blind to
+     it -- and it renders as a bright white bar over the dark strip. Neutralise
+     the white ORIGIN of the gradient (the `from-white`/`via-white` stops resolve
+     `--color-white` / `--tw-gradient-*`) so every such fade blends into the page
+     base instead, regardless of direction. */
+  [class*="pointer-events-none"][class*="from-white"],
+  [class*="pointer-events-none"][class*="absolute"][class*="inset-y-0"] {
+    --color-white: var(--wx-base) !important;
+    --tw-gradient-from: var(--wx-base) !important;
+    --tw-gradient-via: var(--wx-base) !important;
+  }
+  /* the chart tab strip's fades are authored as literal
+     `linear-gradient(to right/left, #fff 36px, transparent)` (not from-white),
+     so also override the whole image to the page base. */
+  [class*="pointer-events-none"][class*="absolute"][class*="inset-y-0"][class*="left-0"] {
+    background-image: linear-gradient(to right, var(--wx-base) 36px, rgba(20, 24, 29, 0) 100%) !important;
+  }
+  [class*="pointer-events-none"][class*="absolute"][class*="inset-y-0"][class*="right-0"] {
+    background-image: linear-gradient(to left, var(--wx-base) 36px, rgba(20, 24, 29, 0) 100%) !important;
+  }
+
+  /* ---- Tailwind surface utilities (stable, non-hashed) ----------------- */
+  /* These ship literally as bg-white / bg-gray-100 / bg-gray-50 on content
+     wells, cards and tiles. Excluded: maps / svg / canvas (handled below). */
+  .bg-white,
+  .bg-card,
+  .bg-popover,
+  [data-slot="card"],
+  [data-slot="popover"] {
+    background-color: var(--wx-surface) !important;
+    color: var(--wx-text-2) !important;
+  }
+  .bg-gray-100,
+  .bg-gray-50,
+  .bg-neutral-100,
+  .bg-slate-100,
+  .bg-muted,
+  .bg-secondary,
+  .bg-accent {
+    background-color: var(--wx-surface-2) !important;
+  }
+  /* translucent white veils used as gradient/scrim fills over photos */
+  .bg-white\/75,
+  .bg-white\/80,
+  .bg-white\/90 {
+    background-color: rgba(28, 33, 40, 0.85) !important;
+  }
+  /* dark utility surfaces the app already uses (location pill, etc.) keep a
+     consistent dark tone matching the chrome */
+  .bg-gray-900,
+  .bg-black {
+    background-color: var(--wx-chrome) !important;
+  }
+
+  /* ---- cards / modules / wells ----------------------------------------- */
+  [data-slot="card"],
+  [data-slot="card-header"],
+  [data-slot="card-content"],
+  [data-testid="current-conditions"],
+  [data-testid="current-widgets"],
+  [data-testid="daily-forecast"],
+  [data-testid="next-48-hours"],
+  [data-testid="HealthAndActivitiesModule"],
+  [data-testid="AirQualityIndex"],
+  [data-testid$="Module"],
+  [data-testid$="-container"] {
+    background-color: var(--wx-surface) !important;
+    color: var(--wx-text-2) !important;
+  }
+  [data-slot="card-header"] {
+    background-color: transparent !important;
+  }
+
+  /* ---- text ------------------------------------------------------------- */
+  h1, h2, h3, h4, h5, h6,
+  .text-gray-900,
+  .text-black,
+  .text-card-foreground,
+  .text-foreground,
+  b, strong {
+    color: var(--wx-text) !important;
+  }
+  p, li, dt, dd, label, figcaption, small,
+  .text-gray-700,
+  .text-gray-800,
+  .text-neutral-800 {
+    color: var(--wx-text-2) !important;
+  }
+  /* muted / secondary greys the app uses for metadata + captions */
+  .text-gray-400,
+  .text-gray-500,
+  .text-gray-600,
+  .text-neutral-500,
+  .text-text-secondary,
+  .text-muted-foreground,
+  [class*="text-[#6f7585]"],
+  [class*="text-[#8d8d8d]"] {
+    color: var(--wx-text-muted) !important;
+  }
+
+  /* weather.com colors most neutral text via near-black inline rgb -- lift
+     those so they don't go dark-on-dark, while saturated hues stay below. */
+  [style*="color: rgb(37, 36, 34)"],
+  [style*="color:#252422"],
+  [style*="color: rgb(55, 55, 53)"] {
+    color: var(--wx-text-2) !important;
+  }
+  [style*="color: rgb(103, 103, 103)"],
+  [style*="color: rgb(141, 141, 141)"] {
+    color: var(--wx-text-muted) !important;
+  }
+
+  /* ---- Air Quality page (All Pollutants list + AQI status heading) ------ */
+  /* The Air Quality page colors its key headings with a NEAR-BLACK Tailwind
+     arbitrary token `text-[#2b2b2b]` (NOT a saturated AQI-category hue here):
+     - the pollutant NAME labels in the "All Pollutants" list
+       ([data-testid="PollutantName"]) -- "O3 (Ozone)", "CO (Carbon Monoxide)",
+       "NO2 (Nitrogen Dioxide)", "PM10", "PM2.5", "SO2" ...
+     - the big AQI status heading next to the gauge
+       ([data-testid="AirQualityCategory"]) -- "Good" / "Moderate" / "Unhealthy".
+     Both render #2b2b2b -> dark-on-dark and vanish. Lift to primary light so
+     they read; these are neutral near-black tokens, not colored AQI codes, so
+     no semantic hue is lost (the colored gauge arc + status DOT keep theirs). */
+  [data-testid="PollutantName"],
+  [data-testid="AirQualityCategory"],
+  [class*="text-[#2b2b2b]"],
+  [class*="text-[#252422]"] {
+    color: var(--wx-text) !important;
+  }
+  /* the per-pollutant severity word ("Good"/"Moderate") ships text-[#6f7585]
+     (a muted grey, already remapped above) -- pin it via its stable testid too
+     so the row status stays a legible muted light regardless of class rotation. */
+  [data-testid="AirQualitySeverity"] {
+    color: var(--wx-text-muted) !important;
+  }
+  /* the Health & Activities donut value (Cold & Flu "98%", health indices) is a
+     [data-testid="DonutChartValue"] node whose color is a near-black #424a50 ->
+     dark-on-dark. (On the AQI page it sits inside [data-testid="DonutChart"] and
+     was already lifted; the Cold-&-Flu/health donut carries the testid directly,
+     so pin both the HTML color and the SVG <text> fill.) */
+  [data-testid="DonutChartValue"],
+  [data-testid="DonutChartValue"] text,
+  [data-testid="DonutChartValue"] tspan {
+    color: var(--wx-text) !important;
+    fill: var(--wx-text) !important;
+  }
+
+  /* ---- site-wide near-black text tokens (header, content strip, footer) -- */
+  /* These surfaces appear on EVERY page (Allergies / Cold-&-Flu siblings most
+     visibly), colored via hashed CSS-module classes that resolve to near-black
+     tokens (#252422 / #2b2b2b) -> dark-on-dark once the surface is darkened:
+     - the header language / unit display ("US" / "°F")
+     - the "More from weather.com" content-strip article titles
+     - the footer privacy links ("Cookie Settings", "Privacy Policy" ...).
+     Lift to a readable light; the content-strip thumbnails + colored data are
+     untouched (this only recolors the title/label text). */
+  [data-testid="languageSelectorStatus"],
+  [class*="LanguageSelector--unitDisplay"],
+  [class*="LanguageSelector--LanguageSelectorStatus"],
+  [data-testid="ContentMediaTitle"],
+  [class*="MediaObject--mediaCaptionCTA"] {
+    color: var(--wx-text) !important;
+  }
+  [class*="PrivacyLinks"],
+  [class*="PrivacyLinks"] a,
+  footer [class*="Footer--link"] {
+    color: var(--wx-text-2) !important;
+  }
+  [class*="PrivacyLinks"] a:hover,
+  footer [class*="Footer--link"]:hover {
+    color: var(--wx-link-hover) !important;
+  }
+
+  /* ---- temperature scale (semantic, NEUTRAL ends only) ------------------ */
+  /* weather.com renders the temperature readouts with NEUTRAL colors: the high
+     in a near-black (rgb(37,36,34)) and the low in a grey (rgb(103,103,103)) --
+     NOT a saturated hue scale. Both go dark-on-dark, so we lift them: the high
+     to a warm light tone (still reads as "high"), the low to a cool light tone.
+     Any genuinely colored value (alert reds, AQI/UV codes) is preserved. */
+  [data-testid="TemperatureValue"] {
+    color: var(--wx-text) !important;
+  }
+  /* the dimmer (low / secondary) temperature -> cool light */
+  [data-testid="daily-forecast"] [data-testid="TemperatureValue"][style*="103"],
+  [data-testid="daily-forecast"] span[style*="rgb(103, 103, 103)"] [data-testid="TemperatureValue"],
+  span[style*="rgb(103, 103, 103)"] > [data-testid="TemperatureValue"] {
+    color: #7fb4e6 !important;
+  }
+
+  /* ---- links / accent --------------------------------------------------- */
+  a,
+  a:visited,
+  .text-blue-500,
+  .text-blue-600,
+  .text-blue-700 {
+    color: var(--wx-link) !important;
+  }
+  a:hover,
+  a:focus {
+    color: var(--wx-link-hover) !important;
+  }
+
+  /* ---- data tables (hourly / 10-day details) ---------------------------- */
+  table,
+  thead,
+  tbody,
+  tfoot {
+    background-color: var(--wx-surface) !important;
+    color: var(--wx-text-2) !important;
+    border-color: var(--wx-border) !important;
+  }
+  thead th,
+  th {
+    background-color: var(--wx-chrome) !important;
+    color: var(--wx-text) !important;
+    border-color: var(--wx-border) !important;
+  }
+  tbody tr:nth-child(even) {
+    background-color: var(--wx-surface-2) !important;
+  }
+  td {
+    color: var(--wx-text-2) !important;
+    border-color: var(--wx-border) !important;
+  }
+  tbody tr:hover {
+    background-color: #232a33 !important;
+  }
+  /* accordion detail rows in the 10-day list */
+  [data-testid="daily-forecast"] details,
+  [data-testid="daily-forecast"] summary,
+  details[data-testid],
+  summary[data-testid] {
+    background-color: transparent !important;
+    color: var(--wx-text-2) !important;
+  }
+
+  /* ---- forms / location search ----------------------------------------- */
+  input,
+  textarea,
+  select {
+    background-color: var(--wx-surface-2) !important;
+    color: var(--wx-text) !important;
+    border-color: var(--wx-border-2) !important;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--wx-text-muted) !important;
+    opacity: 1 !important;
+  }
+
+  /* the location-search dialog + its results list must be opaque dark */
+  [data-testid="header-search"],
+  [data-testid="header-search"] [role="dialog"],
+  [data-testid="location-search"],
+  [role="listbox"],
+  [data-testid="header-search"] ul,
+  [data-testid="header-search"] li {
+    background-color: var(--wx-surface) !important;
+    color: var(--wx-text-2) !important;
+  }
+  /* the search field ships Tailwind's bg-white! utility, whose !important sits
+     in @layer utilities and therefore BEATS an unlayered !important override
+     (layered important wins). bg-white! resolves var(--color-white), so we
+     neutralise it by redefining --color-white ON the input itself -- variable
+     resolution is layer-agnostic, so the rule still "wins" but computes our
+     dark value. Pair with a legible muted placeholder (it ships text-gray-900). */
+  [data-testid="header-search"] input,
+  [data-testid="header-search"] input.bg-white,
+  input[class*="bg-white"] {
+    --color-white: #161d27 !important;
+    background-color: var(--wx-surface-2) !important;
+    color: var(--wx-text) !important;
+  }
+  [data-testid="header-search"] input::placeholder,
+  input[class*="bg-white"]::placeholder {
+    color: var(--wx-text-muted) !important;
+    opacity: 1 !important;
+  }
+  [data-testid="header-search"] li:hover,
+  [data-testid="header-search"] a:hover,
+  [role="option"]:hover,
+  [role="option"][aria-selected="true"] {
+    background-color: var(--wx-surface-2) !important;
+    color: var(--wx-text) !important;
+  }
+  [data-testid="header-search"] a,
+  [data-testid="header-search"] li,
+  [role="option"] {
+    color: var(--wx-text-2) !important;
+  }
+
+  /* ---- buttons ---------------------------------------------------------- */
+  button {
+    color: inherit;
+  }
+  /* the location pill / primary dark CTAs already read on dark; keep them
+     consistent with the chrome and ensure a visible hover */
+  [data-testid="location-picker-trigger"],
+  [data-testid="header-menu-button"] {
+    background-color: var(--wx-surface) !important;
+    color: var(--wx-text) !important;
+  }
+  [data-testid="location-picker-trigger"]:hover,
+  [data-testid="header-menu-button"]:hover {
+    background-color: var(--wx-surface-2) !important;
+  }
+
+  /* ---- settings / units menu (must be opaque) --------------------------- */
+  [data-settings-menu-trigger] + *,
+  [data-testid*="settings"] [role="menu"],
+  [role="menu"],
+  [data-radix-popper-content-wrapper] > * {
+    background-color: var(--wx-surface) !important;
+    color: var(--wx-text-2) !important;
+  }
+  [role="menuitem"]:hover {
+    background-color: var(--wx-surface-2) !important;
+    color: var(--wx-text) !important;
+  }
+
+  /* ---- footer ----------------------------------------------------------- */
+  footer,
+  [data-testid="footer"],
+  [data-component="footer"] {
+    background-color: var(--wx-chrome) !important;
+    color: var(--wx-text-2) !important;
+  }
+  footer a,
+  [data-testid="footer"] a {
+    color: var(--wx-text-2) !important;
+  }
+  footer a:hover {
+    color: var(--wx-link-hover) !important;
+  }
+
+  /* ---- Taboola "More from weather.com" recommendation strip ------------- */
+  /* The Taboola widget (trc_*) renders white cards with hardcoded near-black
+     titles; our surface darkening leaves the titles dark-on-dark. Darken its
+     surfaces and lift the title/branding text. (Its thumbnail imagery stays.) */
+  .trc_rbox,
+  .trc_rbox_outer,
+  .trc_rbox_div,
+  .trc_excludable,
+  .trc_spotlight_item,
+  .trc_related_container,
+  .trc_popover,
+  .trc_exclude_overlay {
+    background-color: var(--wx-surface) !important;
+    color: var(--wx-text-2) !important;
+  }
+  .video-title,
+  .trc_el .video-title,
+  .video-label,
+  .trc_el,
+  .syndicatedItem,
+  .trc_rbox .branding,
+  .trc_rbox_header_span {
+    color: var(--wx-text-2) !important;
+  }
+
+  /* ---- interactive radar map: floating control / insight panels --------- */
+  /* The radar map's two floating cards -- the location/alert "insight" card
+     (place name + severe-weather alert + "See all N alerts") and the bottom
+     timeline/layers control panel (time slider + Radar/Clouds/Temperatures/
+     All Layers + Hide menu) -- are the map's own UI, NOT the basemap. They ship
+     white via HASHED CSS-module classes that have no data-testid/role to hook,
+     so we target the STABLE module-name PREFIX (`ControlPanel--controlContainer`,
+     `ControlPanel--noticeContainer`, `InsightPanel--npContainer`, ...); only the
+     trailing build-hash (`--SueT4`) rotates, the prefix is stable. ROT RISK: if
+     IBM changes the CSS-modules localIdentName format these stop matching --
+     acceptable, since no stable hook exists and leaving them bright-white over
+     the dark map is worse. We darken the surfaces + lift their text, while the
+     blue links ("See all alerts"), the colored layer-thumbnail images and the
+     orange alert icon keep their own colors (links/imgs handled elsewhere; we
+     don't recolor a/button/img here). The basemap + colored radar overlay are
+     left untouched by the imagery rules just below. */
+  [class*="ControlPanel--controlContainer"],
+  [class*="ControlPanel--noticeContainer"],
+  [class*="InsightPanel--npContainer"],
+  [class*="InsightPanel--insight"],
+  [class*="LayerDetail--layerDetailContainer"],
+  section.card[class*="Wrapper--radarWrapper"] {
+    background-color: var(--wx-surface) !important;
+    color: var(--wx-text) !important;
+  }
+  [class*="InsightPanel--"]:not(a):not(button),
+  [class*="ControlPanel--controlContainer"] *:not(a):not(button):not(img):not(svg):not(canvas),
+  [class*="LayerDetail--"]:not(a):not(button) {
+    color: var(--wx-text) !important;
+  }
+
+  /* ====================================================================== */
+  /* Keep weather imagery / data viz untouched.                             */
+  /* radar/satellite (DynamicMap + Mapbox tiles), condition icons, photos   */
+  /* must render their real pixels -- never paint a background onto these.  */
+  /* ====================================================================== */
+  img,
+  picture,
+  video,
+  canvas,
+  [data-testid="DynamicMap"],
+  [data-testid="DynamicMap"] *,
+  .mapboxgl-map,
+  .mapboxgl-canvas,
+  [class*="mapbox"] {
+    background-color: transparent !important;
+  }
+  [data-testid="DynamicMap"] *,
+  .mapboxgl-map * {
+    border-color: transparent !important;
+  }
+
+  /* ====================================================================== */
+  /* SVG data-viz chrome a DOM-background audit can't see.                  */
+  /* These are weather.com's own SVG charts/gauges (NOT raster maps). Their */
+  /* white track / grid / plot chrome is darkened while the COLORED data    */
+  /* arcs / bars / series are preserved verbatim.                           */
+  /* ====================================================================== */
+
+  /* (1) the semicircle wind/pressure gauge: track arc is a light #E7ECF1
+     stroke. Darken the track; the colored value arc keeps its own stroke. */
+  [data-testid="SemiCircleGauge"] path[stroke="#E7ECF1"],
+  [data-testid="SemiCircleGauge"] path[stroke="#e7ecf1"] {
+    stroke: var(--wx-border-2) !important;
+  }
+
+  /* (2) donut chart (AQI / health): the light track ring is the first circle,
+     class stroke-[#E7ECF1] (Tailwind arbitrary stroke); the colored value arc
+     is a 2nd circle with an inline saturated stroke (preserved). Darken only
+     the track. */
+  [data-testid="DonutChart"] circle[stroke="#E7ECF1"],
+  [data-testid="DonutChart"] circle[class*="stroke-[#E7ECF1]"],
+  [data-testid="DonutChart"] circle[class*="stroke-[#e7ecf1]"],
+  .stroke-\[\#E7ECF1\],
+  .stroke-\[\#e7ecf1\] {
+    stroke: var(--wx-border-2) !important;
+  }
+  [data-testid="DonutChart"] circle[fill="#fff"],
+  [data-testid="DonutChart"] circle[fill="#ffffff"],
+  [data-testid="DonutChart"] circle[fill="white"] {
+    fill: var(--wx-surface) !important;
+  }
+  /* (2b) the gauge CENTER VALUE text (the AQI "26", UV index, pollutant
+     numbers, etc.) is an SVG <text> whose color comes from a Tailwind
+     `fill-text-*` utility that resolves to a NEAR-BLACK token -- so the number
+     goes dark-on-dark and vanishes on the dark gauge. (A DOM-bg audit can't see
+     SVG text fill.) Lift it to primary light. The colored arc keeps its own
+     stroke; only the value/label text is recolored. */
+  [data-testid="DonutChart"] text,
+  [data-testid="DonutChart"] tspan,
+  [data-testid="SemiCircleGauge"] text,
+  [data-testid="SemiCircleGauge"] tspan,
+  svg text[class*="fill-text-"],
+  svg tspan[class*="fill-text-"] {
+    fill: var(--wx-text) !important;
+  }
+
+  /* (3) bar/line chart plot backgrounds shipped as a white <rect> behind the
+     plot. Darken the chart's own white backdrop rects; colored data bars keep
+     their fill. Raster radar/satellite maps are <canvas>/Mapbox tiles (no
+     <svg><rect>), so this never touches map pixels. */
+  svg > rect[fill="white"],
+  svg > rect[fill="#fff"],
+  svg > rect[fill="#ffffff"],
+  svg rect[fill="#F2F2F2"],
+  svg rect[fill="#f2f2f2"],
+  svg rect[fill="#f3f4f6"],
+  svg rect[fill="#F3F4F6"],
+  svg rect[fill="#E7ECF1"],
+  svg rect[fill="#e7ecf1"] {
+    fill: var(--wx-surface-2) !important;
+  }
+  /* gauge tick marks / faint gridline strokes shipped as light #E7ECF1 */
+  [data-testid="SemiCircleGauge"] line[stroke="#E7ECF1"],
+  [data-testid="SemiCircleGauge"] line[stroke="#e7ecf1"],
+  svg path[stroke="#E7ECF1"],
+  svg path[stroke="#e7ecf1"] {
+    stroke: var(--wx-border-2) !important;
+  }
+  /* near-black chart axis text / gridlines -> readable muted light */
+  svg text[fill="#252422"],
+  svg text[fill="rgb(37, 36, 34)"],
+  svg line[stroke="#E7ECF1"],
+  svg line[stroke="#e7ecf1"],
+  svg line[stroke="#EFEFEF"] {
+    fill: var(--wx-text-muted) !important;
+    stroke: var(--wx-border) !important;
+  }
+}
