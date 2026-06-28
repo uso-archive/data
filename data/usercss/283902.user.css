@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260621.21.08
+@version      20260627.15.17
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -19,6 +19,12 @@
 
   /* Soften every default light border to a subtle dark line */
   * { border-color: #262c33 !important; }
+
+  /* Login / Sign-up hero: the page grid paints a bright yellow->white gradient that
+     washes the whole auth screen (and hides the light "Sign In" title). Clear the
+     decorative gradient so the dark base shows; PageGrid is a layout wrapper that
+     carries no other meaningful background image. */
+  [class*="PageGrid-desktop"] { background-image: none !important; }
 
   /* ====================================================================
      MODERN (React / styled-components) shell
@@ -38,7 +44,13 @@
   [class*="StickyNav-desktop__Right"] { background-color: transparent !important; }
   [class*="StickyNavSectionLink__StyledLink"],
   [class*="StickyNav-desktop__AuthTextButton"],
+  [class*="StickyNav-desktop__Auth"],
   [class*="StickyNav"] a { color: #e6edf3 !important; }
+  /* the "Sign Up" text button (login/signup pages) ships black text -> lift both
+     color and the webkit text-fill so it stays legible on the dark nav */
+  [class*="StickyNav-desktop__AuthCustomTextButton"],
+  [class*="StickyNav-desktop__AuthCustomTextButton"] * {
+    color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
   [class*="StickyNavSectionLink__StyledLink"]:hover,
   [class*="StickyNav"] a:hover { color: #ffffff !important; }
   /* GENIUS wordmark: the inline SVG fill is black on some pages (home/charts) ->
@@ -60,6 +72,13 @@
   [class*="StickyNavSearch"] [class*="Input"]::placeholder { color: #8b949e !important; }
   [class*="StickyNavSearch-desktop__Icon"] svg,
   [class*="StickyNavSearch"] svg { fill: #c4cdd6 !important; color: #c4cdd6 !important; }
+  /* nav search autocomplete dropdown: a white floating panel by default. Its
+     result rows render in a same-origin genius.com/search/embed iframe, so the
+     card/text rules below also apply inside it via @-moz-document. */
+  [class*="PageHeaderDropdownMenu"],
+  [class*="SearchDropdown"], [class*="search_dropdown"],
+  .search_results, .quick_search-results {
+    background-color: #1c2128 !important; border-color: #2d333b !important; color: #e6edf3 !important; }
   /* sign-up pill keeps the brand red */
   [class*="StickyNavSignUp__Button"] {
     background-color: #ed4337 !important; color: #ffffff !important; border-color: #ed4337 !important; }
@@ -98,9 +117,41 @@
   [class*="RecommendedSong"] [class*="Title"],
   [class*="RecommendedSong"] [class*="Artist"] { color: #c4cdd6 !important; }
 
+  /* lyrics-header label row "<Song> Lyrics" sits right after the ⓘ info icon
+     and is a non-link title the site paints near-black via -webkit-text-fill
+     (defaults to currentColor) -> lift BOTH color and the webkit text-fill so it
+     stays legible on the dark bar even if the site ships an !important fill */
+  [class*="LyricsHeader__TitleContainer"], [class*="LyricsHeader__GroupContainer"],
+  [class*="LyricsHeader__Title"], [class*="LyricsHeader__TitleContainer"] * {
+    color: #c4cdd6 !important; -webkit-text-fill-color: #c4cdd6 !important; }
+
   /* ---- Links: keep the Genius periwinkle, lifted for dark contrast ---- */
   a, a span { color: #9aa7f0 !important; }
   a:hover { color: #c2cbff !important; }
+
+  /* ====================================================================
+     Action / UI icons (inline SVG) — black on the light site, invisible on
+     dark. Lift the action-icon families to a legible light fill. The GENIUS
+     wordmark, yellow IQ badges and brand-colored surfaces are handled
+     elsewhere and are NOT in these families, so they stay intact.
+     ==================================================================== */
+  [class*="Button__Container"] svg, [class*="Button__Container"] svg path,
+  [class*="ShareButtons__Container"] svg, [class*="ShareButtons__Container"] svg path,
+  [class*="LyricsFooter"] svg, [class*="LyricsFooter"] svg path,
+  [class*="VotingActions__Button"] svg, [class*="VotingActions__Button"] svg path,
+  [class*="DropdownList__Icon"] svg, [class*="DropdownList__Icon"] svg path,
+  [class*="Dropdown__Toggle"] svg, [class*="Dropdown__Toggle"] svg path,
+  [class*="ContributorsCreditSong__Label"] svg, [class*="ContributorsCreditSong__Label"] svg path,
+  [class*="InfoTooltip__Container"] svg, [class*="InfoTooltip__Container"] svg path,
+  [class*="MetadataTooltip"] svg, [class*="MetadataTooltip"] svg path,
+  [class*="LyricsHeader__Container"] svg, [class*="LyricsHeader__Container"] svg path,
+  [class*="RoleIcon__Container"] svg, [class*="RoleIcon__Container"] svg path,
+  [class*="InlineSvg__Wrapper"] svg, [class*="InlineSvg__Wrapper"] svg path {
+    fill: #c4cdd6 !important; color: #c4cdd6 !important; }
+  /* brand share glyphs (Facebook/Twitter) keep their own brand color, just
+     ensure they're not pure-black-on-dark — lift to a light neutral too */
+  [class*="ShareButtons__Container"] [aria-label*="Facebook"] svg path,
+  [class*="ShareButtons__Container"] [aria-label*="Twitter"] svg path { fill: #c4cdd6 !important; }
 
   /* ====================================================================
      Lyrics body + annotations (referents)
@@ -156,6 +207,12 @@
   /* ---- Apple Music player strip / media ---- */
   [class*="AppleMusicPlayer"], [class*="MediaPlayersContainer__Container"],
   [class*="MusicVideo__Container"] { background-color: #1c2128 !important; }
+  /* The actual player UI renders in a same-origin genius.com/songs/<id>/apple_music_player
+     iframe, so domain("genius.com") matches inside it. Its container/player/popup paint
+     pure white by default -> dark; the divider is pure black -> soften to a dark line. */
+  .apple_music_player-container, .apple_music_player-player,
+  .apple_music_player-player-popup { background-color: #1c2128 !important; }
+  .apple_music_player-divider { background-color: #2d333b !important; }
 
   /* ---- Tags / chips ---- */
   [class*="SongTags__Tag"], [class*="SquareManySelects__Container"],
@@ -236,6 +293,11 @@
   .vertical_album_card-artist_name, .metadata_unit-label, .text_2, .small_text,
   .u-quarter_top_margin, .secondary_info { color: #c4cdd6 !important; }
   .mini_card_grid-title, .list_section .text_label { color: #e6edf3 !important; }
+  /* "More on Genius" recirculated article cards: titles ship near-black (#222) and
+     vanish on dark -> lift; the date/meta line to the muted secondary tone */
+  .recirculated_content-title { color: #e6edf3 !important; }
+  .recirculated_content-subtitle, .recirculated_content-date,
+  .recirculated_content-author { color: #c4cdd6 !important; }
 
   /* legacy profile header is already dark — keep it, just soften */
   .profile_header { background-color: #0d1117 !important; }
@@ -270,14 +332,32 @@
   /* legacy avatar / image placeholders */
   .user_avatar, .profile_header-avatar, .avatar { background-color: #1c2128 !important; }
 
+  /* legacy "STATS" panel (charts / profile contributor pane): white card with black
+     glyph icons + #666 labels -> dark card, light icons, legible labels */
+  .statistics_panel { background-color: #1c2128 !important; border-color: #2d333b !important; }
+  .statistics_panel svg, .statistics_panel svg path { fill: #c4cdd6 !important; }
+  .statistic_and_label-number { color: #e6edf3 !important; }
+  .statistic_and_label-subtext { color: #8b949e !important; }
+
   /* legacy dropdowns / menus */
   .dropdown_menu, .dropdown_menu-item, .menu {
     background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   .dropdown_menu-item:hover { background-color: #2d333b !important; }
+  /* legacy search autocomplete: the feed_dropdown panel paints #f7f7f7 behind the
+     result rows -> dark so the section-header bands stop flashing white */
+  .feed_dropdown, .feed_dropdown--medium_width {
+    background-color: #1c2128 !important; border-color: #2d333b !important; }
+  .feed_dropdown .section_header, .feed_dropdown-section_header,
+  .feed_dropdown .text_label { color: #8b949e !important; }
 
   /* legacy lyric annotation highlight */
   .referent, a.referent { background-color: #1c2128 !important; color: #e6edf3 !important; }
   .referent--yellow, .referent.referent--yellow { background-color: #21262d !important; box-shadow: inset 3px 0 0 #ed4337 !important; }
+  /* standalone annotation (artist profile contributions): the caret pointing to the
+     card is a rotated ::before square painted pure white -> match the card surface */
+  .standalone_annotation { background-color: #1c2128 !important; }
+  .standalone_annotation-referent_fragment--with_caret::before,
+  .standalone_annotation-referent_fragment::before { background-color: #1c2128 !important; }
 
   /* ====================================================================
      Forms / inputs (shared)

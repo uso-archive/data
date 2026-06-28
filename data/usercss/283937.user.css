@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Weather Underground. Darkens forecasts, hourly and 10-day pages and data tables while keeping radar, maps and weather icons intact.
-@version      20260624.20.44
+@version      20260627.16.54
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -634,5 +634,145 @@
   lib-air-quality-tile svg rect,
   lib-uv-tile svg rect {
     fill: #3a424d !important;
+  }
+
+  /* ====================================================================== */
+  /* Page-type fixes found in deep review (calendar, hourly, news,          */
+  /* wundermap, search dropdown, sponsored widget, global controls).        */
+  /* ====================================================================== */
+
+  /* ---- calendar grid ---------------------------------------------------- */
+  /* WU paints in-month day cells white (#fff) and other-month cells light
+     grey (#d7d7d7). The cell TEXT is already lifted to light by the rules
+     above, so on a white cell it reads light-on-white (invisible). Darken the
+     cells: in-month -> surface, out-of-month -> dimmer elevated. */
+  .calendar-day,
+  li.calendar-day {
+    background-color: var(--wu-surface-2) !important;
+  }
+  .calendar-day.current-month {
+    background-color: var(--wu-surface) !important;
+  }
+  /* weekday column headers (Sunday..Saturday) are #1e2023 -> readable. */
+  .calendar-weekday,
+  .calendar-weekday .desktop,
+  .calendar-weekday .mobile {
+    color: var(--wu-text-2) !important;
+  }
+  /* the day high-temp keeps WU's deep red (#d5202a), too dark on a dark cell;
+     lift to the same warm red the rest of the theme uses (low stays cyan). */
+  .calendar-day .temperature .hi,
+  .calendar-day span.hi {
+    color: #ff6b6b !important;
+  }
+
+  /* ---- hourly "next day" expander bar ----------------------------------- */
+  /* #nextForecasts is a full-width #f7f7f7 "NEXT DAY HOURLY FORECAST" button
+     bar with near-invisible text once the page is dark. */
+  #nextForecasts {
+    background-color: var(--wu-surface-2) !important;
+  }
+  #nextForecasts,
+  #nextForecasts * {
+    color: var(--wu-text-2) !important;
+  }
+
+  /* ---- news & blogs cards ----------------------------------------------- */
+  /* Alternating article rows (#f7f7f7) and the recent-infographics modules
+     (#fff) keep a light background, so the lifted light text vanishes on them.
+     Darken the card surfaces; the article images are untouched. */
+  .news-item,
+  .news-list .news-item,
+  lib-article-list .news-item,
+  lib-infographic-recent-list .basic-module,
+  lib-infographic-recent-list .stack,
+  .basic-module .content .stack,
+  .infographic-item,
+  .poster-item {
+    background-color: var(--wu-surface) !important;
+    color: var(--wu-text-2) !important;
+  }
+
+  /* ---- wundermap page --------------------------------------------------- */
+  /* #inner-wrap is a white page wrapper (flashes white while leaflet tiles
+     load); the top ad slot (#top-banner-ad-browser) is a light-grey band; the
+     layer-panel accordion bodies (.accordion-content) are white. Map tiles,
+     markers and overlays are untouched (img/canvas/leaflet handled above). */
+  #inner-wrap {
+    background-color: var(--wu-base) !important;
+  }
+  #top-banner-ad-browser {
+    background-color: var(--wu-chrome) !important;
+  }
+  wm-layer .accordion-content,
+  wxstn-layer .accordion-content,
+  .layers-container .accordion-content,
+  .accordion-content {
+    background-color: var(--wu-surface) !important;
+  }
+
+  /* ---- search autocomplete (jQuery UI, not Material) -------------------- */
+  /* The location search dropdown is a jQuery UI .ui-autocomplete / .ui-menu
+     with a white background -- not covered by the Material panel rules above.
+     Make the floating surface opaque dark; style hover + the group headers. */
+  .ui-autocomplete,
+  ul.ui-autocomplete,
+  .ui-autocomplete.ui-menu {
+    background-color: var(--wu-surface) !important;
+    border-color: var(--wu-border-2) !important;
+  }
+  .ui-autocomplete .ui-menu-item,
+  .ui-autocomplete .ui-menu-item-wrapper,
+  .ui-autocomplete li {
+    background-color: transparent !important;
+    color: var(--wu-text-2) !important;
+  }
+  .ui-autocomplete .ui-menu-item-wrapper.ui-state-active,
+  .ui-autocomplete .ui-state-focus,
+  .ui-autocomplete .ui-state-active,
+  .ui-autocomplete li:hover {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text) !important;
+  }
+  .ui-autocomplete .ui-autocomplete-category {
+    color: var(--wu-text-muted) !important;
+    background-color: var(--wu-chrome) !important;
+  }
+
+  /* ---- selected sub-nav tab indicator ----------------------------------- */
+  /* The active TODAY/HOURLY/... tab paints a 2px white ::after underline. */
+  .subnav a.selected::after,
+  .subnav-left a.selected::after,
+  .subnav-right a.selected::after {
+    background-color: var(--wu-link) !important;
+  }
+
+  /* ---- global header geolocate icon ------------------------------------- */
+  /* The "use my location" gps icon is WU blue (#006f9e) -> too dim on dark. */
+  .geolocate-wrap i.material-icons,
+  .geolocate-wrap .material-icons,
+  #wuSearch-contain .geolocate-wrap i {
+    color: var(--wu-link) !important;
+  }
+
+  /* ---- sponsored "You May Like" widget (Taboola) ------------------------ */
+  /* The recommendation widget renders its header, attribution and item titles
+     in near-black -- readable on its original white page, dark-on-dark once
+     the base is dark. Lift its text to readable light; ad thumbnails/creatives
+     are untouched (they are <img> / advertiser markup). */
+  div[id^="trc_"] .video-title,
+  div[id^="trc_"] .video-label,
+  .videoCube .video-title,
+  .videoCube .video-label,
+  .trc-main-label,
+  .trc_related_container .video-title {
+    color: var(--wu-text-2) !important;
+  }
+  .trc_rbox_header_span,
+  .trc_desktop_attribution_link span,
+  .trc_desktop_disclosure_link span,
+  .videoCube .branding,
+  .videoCube .video-label-source {
+    color: var(--wu-text-muted) !important;
   }
 }

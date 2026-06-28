@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260626.16.54
+@version      20260627.16.16
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -131,6 +131,96 @@
   [class*="SidebarNavigation--sidebarWrapper"],
   [class*="SidebarNavigation--sidebar"] {
     background-color: var(--wx-chrome) !important;
+  }
+  /* CRITICAL: the legacy layout ALSO ships a `SidebarNavigation--isOverlay`
+     variant of that wrapper -- a position:fixed, z-index:1000, FULL-VIEWPORT,
+     pointer-events:none layer that is normally TRANSPARENT (the closed
+     mobile-overlay backdrop). The broad rule above matched it and painted it
+     opaque chrome, so it covered the ENTIRE page with a dark sheet and blanked
+     every legacy-layout page (monthly, etc.). It is pointer-events:none, so the
+     page stayed clickable but rendered all-dark. Force the overlay variant back
+     to transparent; the real (docked) sidebar wrapper keeps its dark fill. */
+  [class*="SidebarNavigation--isOverlay"] {
+    background-color: transparent !important;
+  }
+
+  /* ---- legacy "Daybreak" layout surfaces (Monthly, and other not-yet-migrated
+     routes) ------------------------------------------------------------------
+     Some routes (notably the Monthly calendar) still ship the OLD Daybreak/Helios
+     React layout instead of the new data-testid/Tailwind SPA. Its cards are
+     `section.card.Card--card--<hash>` (white), the page header is `#regionHeader`
+     (white), day-grid dividers are `Calendar--line--<hash>` (#dedede) and the
+     day-part wells are `DaypartDetails--DetailsTable--<hash>` (#e8e8e8). The new
+     layout's tokens/utilities don't touch these, so the calendar card rendered
+     white with our lifted light text on top (light-on-light). Darken the legacy
+     module surfaces via their STABLE prefixes (only the trailing hash rotates);
+     the colored condition icons + the temperature numbers keep their own hues. */
+  [class*="Card--card"],
+  [class*="CalendarMonthPicker--"],
+  [class*="DailyForecast--"],
+  /* id-prefixed forms out-rank module CSS-in-JS rules injected after our sheet
+     (which otherwise win same-specificity ties -- seen on the radar map card,
+     the radar right rail and the footer). */
+  [id^="Wxu"] [class*="Card--card"],
+  aside[class*="region-sidebar"],
+  aside[class*="regionSidebar"],
+  [class*="Layers--overlayGroup"],
+  /* the 404 / not-found fallback (e.g. an alerts URL with no active alerts)
+     renders white promo teaser cards via WxuNotFound -> NotFound--pageLink. */
+  [class*="NotFound--pageLink"],
+  [class*="NotFound--notFound"] {
+    background-color: var(--wx-surface) !important;
+    color: var(--wx-text-2) !important;
+  }
+  #regionHeader,
+  [class*="region-header"],
+  [class*="regionHeader"] {
+    background-color: var(--wx-chrome) !important;
+  }
+  [class*="DaypartDetails--DetailsTable"],
+  [class*="DetailsTable--"] {
+    background-color: var(--wx-surface-2) !important;
+  }
+  [class*="Calendar--line"] {
+    background-color: var(--wx-border) !important;
+  }
+  /* the calendar day cells + day-part list rows draw a light #dedede grid border
+     (set by a module rule with !important, so the global `* { border-color }`
+     loses); darken the grid so it reads as a subtle dark lattice on the card.
+     Card-scoped to out-rank any later-injected module rule. */
+  [class*="Card--card"] [class*="CalendarDateCell"],
+  [class*="Card--card"] [class*="DetailsTable--listItem"],
+  [class*="CalendarDateCell--dayCell"] {
+    border-color: var(--wx-border) !important;
+  }
+  /* the legacy location search ships a light #f2f2f2 fill via a high-specificity
+     module rule that beats the generic `input` override -- pin it by id + module
+     prefix so the field reads dark. */
+  #headerSearch_LocationSearch_input,
+  input[id*="LocationSearch"],
+  [class*="SearchInput--SearchInput"] {
+    background-color: var(--wx-surface-2) !important;
+    color: var(--wx-text) !important;
+  }
+  /* the legacy footer is a `div.Footer--container` (not a <footer> tag, so the
+     footer rule below misses it) shipping white; and the ad placeholder frames
+     ship a light grey backdrop. Darken both so nothing flashes bright. The
+     footer's white fill comes from a CSS-in-JS rule injected AFTER our sheet (so
+     it wins same-specificity ties); use the id-prefixed descendant form to
+     out-rank it. */
+  [id^="WxuFooter"] [class*="Footer--container"],
+  [class*="Footer--container"] {
+    background-color: var(--wx-chrome) !important;
+  }
+  [class*="adBackground"],
+  [class*="combinedTopAds"] {
+    background-color: var(--wx-surface-2) !important;
+  }
+  /* the calendar day numbers ship a #6f7585 module color (CalendarDateCell--date)
+     -- fine on the original white grid but only ~3.4:1 on our dark card. Lift to
+     the muted token for a comfortable read; the high/low temps stay as-is. */
+  [class*="CalendarDateCell--date"] {
+    color: var(--wx-text-muted) !important;
   }
 
   /* sub-nav pill row sits in a white rounded bar */
@@ -337,6 +427,18 @@
   span[style*="rgb(103, 103, 103)"] > [data-testid="TemperatureValue"] {
     color: #7fb4e6 !important;
   }
+  /* the "Feels Like" widget paints a SOLID disc whose inline background-color is
+     the feels-like temperature color on weather.com's scale (a pale near-white
+     tint at mild temps, a saturated hue when hot) -- a div.rounded-full carrying
+     an inline `background-color: rgb(...)`. That semantic fill is preserved, but
+     our global TemperatureValue->light rule above then renders the centered value
+     light-on-light and it vanishes inside the disc. weather.com itself centers a
+     DARK value (text-gray-900) on this disc across the whole scale, so restore a
+     dark, readable value HERE only (the disc keeps its own data color). */
+  .rounded-full[style*="background-color"] [data-testid="TemperatureValue"] {
+    color: #14181d !important;
+    -webkit-text-fill-color: #14181d !important;
+  }
 
   /* ---- links / accent --------------------------------------------------- */
   a,
@@ -384,6 +486,19 @@
     background-color: transparent !important;
     color: var(--wx-text-2) !important;
   }
+  /* each 10-day row is a <button> that paints a light #f2f2f2 fill in two states
+     our static surface rules don't match: on :hover, and while EXPANDED
+     (aria-expanded="true", the open accordion day). The row text is already
+     lifted light, so the bright fill renders light-on-light and the day/temps
+     wash out. Darken both states to an elevated dark surface so the light text
+     stays legible (the colored temperature range bar is untouched). */
+  [data-testid="daily-forecast"] button:hover,
+  [data-testid="daily-forecast"] summary:hover,
+  [data-testid="daily-forecast"] li:hover,
+  [data-testid="daily-forecast"] button[aria-expanded="true"],
+  [data-testid="daily-forecast"] [aria-expanded="true"] {
+    background-color: var(--wx-surface-2) !important;
+  }
 
   /* ---- forms / location search ----------------------------------------- */
   input,
@@ -410,7 +525,7 @@
     color: var(--wx-text-2) !important;
   }
   /* the search field ships Tailwind's bg-white! utility, whose !important sits
-     in @layer utilities and therefore BEATS an unlayered !important override
+     inside Tailwind's utilities cascade layer and so BEATS an unlayered override
      (layered important wins). bg-white! resolves var(--color-white), so we
      neutralise it by redefining --color-white ON the input itself -- variable
      resolution is layer-agnostic, so the rule still "wins" but computes our

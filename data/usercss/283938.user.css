@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Neoseeker, easy-on-the-eyes walkthroughs, guides, cheats and FAQs, plus the home, game hubs, wikis, search and forums.
-@version      20260624.21.01
+@version      20260627.21.27
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -275,6 +275,8 @@
 
   .table-list tbody > tr > td,
   .table-list tbody > tr > th,
+  .table-list-wide-column tbody > tr > td,
+  .table-list-wide-column tbody > tr > th,
   td.row,
   td.forum,
   tr.row td,
@@ -286,7 +288,9 @@
   .table-striped tbody > tr:nth-child(even) > td,
   .table-striped tbody > tr:nth-child(even) > th,
   .table-list tbody > tr:nth-child(2n + 1) > td,
-  .table-list tbody > tr:nth-child(2n + 1) > th {
+  .table-list tbody > tr:nth-child(2n + 1) > th,
+  .table-list-wide-column tbody > tr:nth-child(2n + 1) > td,
+  .table-list-wide-column tbody > tr:nth-child(2n + 1) > th {
     background-color: var(--neo-elev2) !important;
   }
 
@@ -374,13 +378,22 @@
     color: #ffffff !important;
   }
 
-  /* prev/next pagination arrows: keep text light on dark */
+  /* prev/next pagination arrows: keep text light on dark. The forum
+     pagination ships its own .pagenav_nextprev a.next/.prev rule (greyish
+     #625e51 that reads dark-on-dark here), so match its specificity. */
   a.next,
   a.prev,
   a.next *,
   a.prev *,
   #nav_prev_next a,
-  #nav_prev_next a * {
+  #nav_prev_next a *,
+  .pagenav_nextprev a,
+  .pagenav_nextprev a.next,
+  .pagenav_nextprev a.prev,
+  .pagination .pagenav_nextprev a,
+  .pagenav_pages a,
+  .pagination-spaced a,
+  .pagination .pagenav_pages a {
     color: var(--neo-text-2) !important;
   }
 
@@ -581,12 +594,46 @@
     color: var(--neo-text-2) !important;
   }
 
-  blockquote,
-  .quote,
-  .bbcode_quote {
+  /* Forum thread posts ship a classic table layout the generic .post
+     selectors miss: tr.messagerow rows, the td.authorcol postbit column,
+     the td.msgcol body and the .section-vu content view all default to a
+     light lavender / white that left light text invisible on light bg. */
+  tr.messagerow,
+  tr.messagerow.norm,
+  tr.norm,
+  tr.thread_note,
+  td.msgcol,
+  div.section-vu,
+  div.cookiecrumb {
+    background-color: var(--neo-elev) !important;
+    border-color: var(--neo-border) !important;
+    color: var(--neo-text-2) !important;
+  }
+
+  tr.messagerow.alt,
+  td.authorcol {
     background-color: var(--neo-elev2) !important;
     border-color: var(--neo-border) !important;
     color: var(--neo-text-2) !important;
+  }
+
+  blockquote,
+  .quote,
+  .bbcode_quote,
+  div.qt {
+    background-color: var(--neo-elev2) !important;
+    border-color: var(--neo-border) !important;
+    color: var(--neo-text-2) !important;
+  }
+
+  /* Collapsed blog/activity posts (member profiles) end with a "read more"
+     scroll-fade gradient that fades to WHITE, washing the last lines out.
+     Remap the fade to the elevated surface so text stays readable. */
+  .collapsed-expand {
+    background-image: linear-gradient(
+      rgba(28, 33, 40, 0) 0%,
+      rgba(28, 33, 40, 1) 80%
+    ) !important;
   }
 
   .spoiler,
@@ -633,28 +680,28 @@
      children) so cells we darkened to elevated surfaces aren't touched.
      Skip transparent/none inline bgs (those sit on our dark elevated
      surface and must keep LIGHT text — forcing dark there = invisible). */
-  .mw-parser-output td[style*="background"],
-  .mw-parser-output th[style*="background"],
-  .mw-parser-output td[style*="background"] > a,
-  .mw-parser-output td[style*="background"] > b,
-  .mw-parser-output td[style*="background"] > span,
-  .mw-parser-output th[style*="background"] > a,
-  .mw-parser-output th[style*="background"] > b {
+  .mw-parser-output td[style*="background"]:not([style*="transparent"]):not([style*="background:none"]):not([style*="background-color:none"]):not([style*="#e3f6fb"]):not([style*="#cdf1c7"]),
+  .mw-parser-output th[style*="background"]:not([style*="transparent"]):not([style*="background:none"]):not([style*="background-color:none"]):not([style*="#e3f6fb"]):not([style*="#cdf1c7"]),
+  .mw-parser-output td[style*="background"]:not([style*="transparent"]) > a,
+  .mw-parser-output td[style*="background"]:not([style*="transparent"]) > b,
+  .mw-parser-output td[style*="background"]:not([style*="transparent"]) > span,
+  .mw-parser-output th[style*="background"]:not([style*="transparent"]) > a,
+  .mw-parser-output th[style*="background"]:not([style*="transparent"]) > b {
     color: #14181d !important;
   }
 
   /* Light PASTEL inline surfaces (move tables, section boxes, light
      decorative wrappers) are too bright on dark — darken to elevated and
      keep text light. These hexes are the recurring light pastels Neoseeker
-     wikis use; placed after the saturated-cell rule so they win on order. */
+     wikis use; saturated type-color cells above are left untouched. */
   .mw-parser-output td[style*="#e3f6fb"],
   .mw-parser-output th[style*="#e3f6fb"],
-  .mw-parser-output td[style*="#CDF1C7"],
-  .mw-parser-output th[style*="#CDF1C7"],
-  .mw-parser-output div[style*="#A181DB"],
-  .mw-parser-output div[style*="#98E2DF"],
-  .mw-parser-output div[style*="#B782C9"],
-  .mw-parser-output div[style*="#D2A7E0"] {
+  .mw-parser-output td[style*="#cdf1c7"],
+  .mw-parser-output th[style*="#cdf1c7"],
+  .mw-parser-output div[style*="#a181db"],
+  .mw-parser-output div[style*="#98e2df"],
+  .mw-parser-output div[style*="#b782c9"],
+  .mw-parser-output div[style*="#d2a7e0"] {
     background-color: var(--neo-elev) !important;
     background-image: none !important;
     color: var(--neo-text-2) !important;
@@ -662,12 +709,12 @@
 
   .mw-parser-output td[style*="#e3f6fb"],
   .mw-parser-output td[style*="#e3f6fb"] *,
-  .mw-parser-output td[style*="#CDF1C7"],
-  .mw-parser-output td[style*="#CDF1C7"] *,
-  .mw-parser-output div[style*="#A181DB"],
-  .mw-parser-output div[style*="#98E2DF"],
-  .mw-parser-output div[style*="#B782C9"],
-  .mw-parser-output div[style*="#D2A7E0"] {
+  .mw-parser-output td[style*="#cdf1c7"],
+  .mw-parser-output td[style*="#cdf1c7"] *,
+  .mw-parser-output div[style*="#a181db"],
+  .mw-parser-output div[style*="#98e2df"],
+  .mw-parser-output div[style*="#b782c9"],
+  .mw-parser-output div[style*="#d2a7e0"] {
     color: var(--neo-text-2) !important;
   }
 
@@ -681,6 +728,17 @@
   html body ul.gallery li.gallerybox div.thumb div.thumbinner {
     background-color: var(--neo-elev) !important;
     color: var(--neo-text-2) !important;
+  }
+
+  /* Bootstrap "polaroid" thumbnail frames (game-hub Media/screenshot
+     galleries) default to a white padded border around each thumb. */
+  .img-polaroid,
+  .thumbnail,
+  a.thumbnail,
+  .media-thumb {
+    background-color: var(--neo-elev) !important;
+    border-color: var(--neo-border) !important;
+    box-shadow: none !important;
   }
 
   /* ---- Footer ----------------------------------------------- */

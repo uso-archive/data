@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete, polished dark theme for Chefkoch. Homepage, recipe pages and search/category results all get a calm GitHub-dark treatment while Chefkoch's signature green brand accent stays intact. Easy on the eyes for late-night recipe browsing.
-@version      20260623.21.01
+@version      20260627.18.35
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -38,6 +38,12 @@
   .content, .recipe, .ds-page {
     background-color: #14181d !important;
   }
+  /* the CMS "stage" wave (magazine overview etc.) ships as a cream #F6F7F4
+     SVG background-image on body that paints over our dark bg and washes
+     out the light heading — drop the decorative image on dark */
+  body.ds-cms-bg-home, body[class*="ds-cms-bg"] {
+    background-image: none !important;
+  }
 
   /* Soften every default light border to a subtle dark line */
   * { border-color: #262c33 !important; }
@@ -49,6 +55,11 @@
     background-color: #0d1117 !important;
     color: #e6edf3 !important;
     border-bottom: 1px solid #262c33 !important;
+  }
+  /* backdrop pseudo behind the sticky header ships solid white and peeks
+     out as a sliver below the nav — recolor it to the header bg */
+  #w-header::before, .w-header::before, .w-header.w-scope::before {
+    background-color: #0d1117 !important;
   }
   .w-header__menu, .w-main-menu, .w-flyout, .w-mobile-menu, .w-mobile-menu-head {
     background-color: #0d1117 !important;
@@ -94,7 +105,10 @@
   .ds-text-caption, .ds-text-olive-medium, .ds-text-olive,
   .ds-text-secondary, .ds-text-muted, .ds-recipe-card__description,
   .ds-collection-card__info-value, .ds-collection-card__info-label,
-  .ds-collection-card__date, small.ds-text-caption {
+  .ds-collection-card__date, small.ds-text-caption,
+  /* comment / author meta timestamp ("vor 2 Stunden") ships as a dark
+     olive #595852 that fails contrast on the dark card -> muted grey */
+  .ds-author__caption, .ds-author__meta .ds-author__caption {
     color: #9aa5af !important;
   }
   /* monochrome glyph-font icons default to a dark olive — lift to muted grey */
@@ -314,16 +328,19 @@
   }
   .ds-btn--primary .ds-btn__label, .ds-btn--conversion .ds-btn__label,
   .ds-btn--primary .ds-btn__icon, .ds-btn--conversion .ds-btn__icon { color: #ffffff !important; }
-  /* tertiary / flat / monochrome / control / round buttons -> dark elevated */
-  .ds-btn--tertiary, .ds-btn--flat, .ds-btn--monochrome,
+  /* tertiary / secondary / flat / monochrome / control / round buttons
+     -> dark elevated (the white "Planen"/"Drucken"/"Folgen" pills are
+     .ds-btn--secondary and need the same dark fill) */
+  .ds-btn--tertiary, .ds-btn--secondary, .ds-btn--flat, .ds-btn--monochrome,
   .ds-btn--control, .ds-btn--round, .ds-btn--close {
     background-color: #21262d !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
   }
-  .ds-btn--tertiary:hover, .ds-btn--flat:hover, .ds-btn--monochrome:hover,
-  .ds-btn--control:hover, .ds-btn--round:hover { background-color: #2d333b !important; }
-  .ds-btn--tertiary .ds-btn__label, .ds-btn--flat .ds-btn__label,
+  .ds-btn--tertiary:hover, .ds-btn--secondary:hover, .ds-btn--flat:hover,
+  .ds-btn--monochrome:hover, .ds-btn--control:hover, .ds-btn--round:hover { background-color: #2d333b !important; }
+  .ds-btn--tertiary .ds-btn__label, .ds-btn--secondary .ds-btn__label,
+  .ds-btn--flat .ds-btn__label,
   .ds-btn--monochrome .ds-btn__label { color: #e6edf3 !important; }
   .ds-btn__icon, .ds-btn--round .ds-btn__icon { fill: #c4cdd6 !important; }
 
@@ -435,6 +452,112 @@
   }
   spark-ad, .ad-wrapper { color: #c4cdd6 !important; }
   ins.adsbygoogle, [id^="google_ads"], [id*="div-gpt-ad"] { background-color: #14181d !important; }
+
+  /* ====================================================================
+     Magazine editorial light panels (highlight teaser, collection gallery,
+     list-view recipe row) — these ship a cream/white surface (incl. a
+     full-size ::before) so our light heading/body text washes out on it.
+     Force the panel + its pseudo to the elevated dark surface.
+     ==================================================================== */
+  .ds-highlight-teaser__content, .ds-collection-gallery__body,
+  .ds-list-view-item, .ds-list-view-item--recipe {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  .ds-highlight-teaser__content::before, .ds-highlight-teaser__content::after,
+  .ds-collection-gallery__body::before, .ds-collection-gallery__body::after,
+  .ds-list-view-item::before, .ds-list-view-item--recipe::before {
+    background-color: #1c2128 !important;
+    background-image: none !important;
+  }
+  .ds-highlight-teaser__content .ds-highlight-teaser__headline,
+  .ds-collection-gallery__body .ds-collection-gallery__headline,
+  .ds-list-view-item__title { color: #e6edf3 !important; }
+  /* category eyebrow ("THEMENWELT", "NEUHEITEN") ships brand-dark #212018
+     which now sits dark-on-dark on the elevated panel -> muted grey */
+  .ds-text-category, .ds-highlight-teaser__content .ds-text-category,
+  .ds-collection-gallery__body .ds-text-category { color: #9aa5af !important; }
+  .ds-highlight-teaser__content p, .ds-collection-gallery__body p,
+  .ds-list-view-item span, .ds-list-view-item__meta { color: #c4cdd6 !important; }
+
+  /* pagination: the ACTIVE page number ships a dark brand-green #3b8047
+     that fails contrast on the base dark page -> lift to the light accent */
+  .ds-pagination__item--active, .ds-pagination__item--active a {
+    color: #6fd382 !important;
+  }
+
+  /* ====================================================================
+     Legacy COMMUNITY / forum frontend (chefkoch.de/forum/* — a separate
+     old template not built from the ds-* design system). Its surfaces
+     ship near-white (#page, the box "gradient" header strips, per-post
+     author columns) with light gradient images; our light text then
+     washes out. Repaint the legacy chrome to the dark palette.
+     ==================================================================== */
+  #page { background-color: #14181d !important; }
+  .content-box, .content-wrapper, .content.no-sidebar, #content-1,
+  #sidebar, #sidebar .box {
+    background-color: transparent !important;
+    border-color: #2d333b !important;
+  }
+  /* box header strips carry a light gradient IMAGE behind the (now light)
+     titles -> kill the image, give an elevated dark fill */
+  .content-box-gradient, .forum-group-gradient, .box-gradient {
+    background-color: #1c2128 !important;
+    background-image: none !important;
+    border-color: #2d333b !important;
+  }
+  .content-box-headline, .forum-group-title, .box-headline,
+  .content-box-headline a, .forum-group-title a { color: #e6edf3 !important; }
+  /* per-post author column (white box on the left of each message) +
+     the post date header strip + avatar frame. These also carry a LIGHT
+     CDN gradient background-IMAGE painted over the bg-color (a url(), so
+     the gradient-only audit misses it) — kill the image too. */
+  .forum-message-author, .forum-message-author--thread-poster,
+  .forum-message-header, .user-image {
+    background-color: #1c2128 !important;
+    background-image: none !important;
+    border-color: #2d333b !important;
+  }
+  .forum-message-author a { color: #4cae5e !important; }
+  .forum-message, .forum-message-text, .forum-message-wrapper {
+    background-color: transparent !important;
+    color: #c4cdd6 !important;
+  }
+  /* highlighted / sticky thread row (light-yellow) -> elevated dark */
+  tr.thread-highlighted, tr.rowclick.thread-highlighted {
+    background-color: #20222a !important;
+  }
+  tr.thread-highlighted td, tr.thread-highlighted a { color: #c4cdd6 !important; }
+  tr.thread-highlighted a.thread-title, tr.thread-highlighted .thread a { color: #4cae5e !important; }
+  /* bootstrap-style info alerts in the reply box (light blue) */
+  .alert, .alert-info {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+  /* forum tables / rows */
+  .search-result-table, .search-result-table td, .search-result-table th,
+  .forum-list, .forum-list td { background-color: transparent !important; }
+  /* legacy pagination: the current-page pill ships light-grey #efefef */
+  .pagination-item { color: #c4cdd6 !important; }
+  .pagination-item-current {
+    background-color: #2d333b !important;
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+  }
+  /* legacy forum tab strip: the bar ships light-grey #eee and the active
+     tab (.tab-nav-item.on) ships solid white with light-grey text */
+  ul.tab-nav, .tab-nav {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  .tab-nav-item { background-color: transparent !important; }
+  .tab-nav-item.on, li.tab-nav-item.on {
+    background-color: #14181d !important;
+    color: #e6edf3 !important;
+  }
+  .tab-nav-item a { color: #4cae5e !important; }
+  .tab-nav-item.on a { color: #e6edf3 !important; }
 
   /* ====================================================================
      Safety nets

@@ -1,0 +1,903 @@
+/* ==UserStyle==
+@name         Juejin (掘金) Dark
+@namespace    USO Archive
+@author       Reza Rahemtola
+@description  A clean dark theme for Juejin (掘金): comfortable reading of articles, the feed, pins and comments, with fully readable dark code blocks and syntax.
+@version      20260627.22.54
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("juejin.cn") {
+/* Juejin ships NO native dark mode. The UI is a server-rendered Vue SPA with
+     stable BEM-ish class names; most text is colored through a DESIGN-TOKEN gray
+     font scale (`--juejin-font-1` #252933 primary … `--juejin-font-2` #515767
+     secondary … `--juejin-font-3` #8a919f … `--juejin-font-4` #c2c8d1) plus some
+     hardcoded literals, on white #fff surfaces over a #f2f3f5 page, with a
+     github-light highlight.js code theme. This theme rebuilds the palette: a
+     GitHub-dark-ish surface stack, softened borders, a full dark syntax palette
+     for code, the brand blue refined for dark, and — critically — a full
+     dark→light REMAP of the gray font scale so every secondary/muted text reads. */
+
+  :root {
+    color-scheme: dark;
+  }
+
+  /* ---------- Gray font-scale remap (the #1 dark-on-dark fix) ----------
+     Juejin defines its font tokens on `body` (NOT :root), and colors nearly all
+     secondary/muted text through them. We MUST redefine the whole scale dark→light
+     at the same-or-deeper scope so it wins: primary text light, the muted ends
+     lifted to legible greys. This also fixes inline `color: var(--juejin-font-*)`
+     used by pin topic hashtags. Defined on :root, html AND body for full coverage. */
+  :root,
+  html,
+  body {
+    --juejin-font-1: #e6edf3 !important;   /* was #252933 — primary text */
+    --juejin-font-2: #c4cdd6 !important;   /* was #515767 — secondary text */
+    --juejin-font-3: #9aa6b0 !important;   /* was #8a919f — tertiary/muted */
+    --juejin-font-4: #8b949e !important;   /* was #c2c8d1 — faint/disabled */
+    --juejin-ai-text-desc: #9aa6b0 !important; /* was #9299a7 */
+    --juejin-font-danger: #ff5e5e !important;
+    --juejin-font-success: #3fb950 !important;
+    --juejin-font-warning: #ffa657 !important;
+    --juejin-font-white: #e6edf3 !important;
+    --juejin-font-brand1-normal: #5fb0e6 !important; /* topic/link accent */
+    --juejin-font-brand-normal: #5fb0e6 !important;
+    --juejin-brand-normal: #1e80ff !important;
+    --juejin-brand-1-normal: #5fb0e6 !important;
+  }
+
+  /* ---------- Base ---------- */
+  html,
+  body,
+  #juejin,
+  .view-container,
+  .main-container,
+  .container,
+  .global-layout {
+    background-color: #14181d !important;
+    color: #c4cdd6 !important;
+  }
+
+  body {
+    scrollbar-color: #3a424d #14181d;
+  }
+
+  /* Soften every default light border into a subtle dark line */
+  * {
+    border-color: #262c33 !important;
+  }
+
+  /* Row dividers in the article-page recommended lists ("为你推荐"/"相关推荐")
+     are drawn as a 1px `.content-wrapper::before` with a hardcoded light bg
+     (#e4e6eb) — NOT a border, so the `*` border rule above can't reach it and
+     it renders as a bright line on dark. Darken the pseudo to the border tone. */
+  .entry-list .content-wrapper::before,
+  .entry .content-wrapper::before,
+  .follow-block::after,
+  .follow-block::before {
+    background-color: #262c33 !important;
+  }
+
+  /* Wrappers that only carry a white bg → neutralize, so the surfaces below
+     (cards/header) define the real elevation. Keeps things from going flat. */
+  .view-container,
+  .main-container,
+  .main-content,
+  .container,
+  .global-layout,
+  .layout-content,
+  .view,
+  .index-view,
+  .article-view,
+  .pin-view,
+  .search-view,
+  .main-list,
+  .search-list,
+  .result-list {
+    background-color: transparent !important;
+  }
+
+  /* Search results sub-nav bar (filter tabs) → elevated dark surface */
+  .view-nav,
+  .search-nav,
+  .filter-nav {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+  }
+
+  /* ---------- Courses / 掘金小册 (booklet) section ----------
+     The 课程 area lives in its own `.course-*` / `.common-nav-header` /
+     `.section` namespace untouched by the generic card rules below, and ships
+     white surfaces (filter bar, content header, the whole right aside of promo
+     cards). Wrappers → transparent; the filter bar, content header and aside
+     panels → elevated dark. Their text already rides the remapped font scale. */
+  .courses-home-view,
+  .course-layout,
+  .course-content-wrap,
+  .course-content,
+  .books-view {
+    background-color: transparent !important;
+  }
+
+  .common-nav-header,
+  .course-header,
+  .books-filter-header,
+  .course-aside .section,
+  .course-aside .recommend-box,
+  .course-aside .announcement,
+  .course-aside .help {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+  }
+
+  /* ---------- Header / nav (opaque, sits above scrolling content) ---------- */
+  .main-header,
+  .main-header-box,
+  header.main-header {
+    background-color: #0d1117 !important;
+    border-bottom: 1px solid #262c33 !important;
+    box-shadow: none !important;
+  }
+
+  .main-header .nav-item,
+  .main-header a,
+  .nav-list a,
+  .nav-item-normal {
+    color: #c4cdd6 !important;
+  }
+
+  .main-header .nav-item:hover,
+  .main-header a:hover,
+  .nav-item.active,
+  .nav-item-active,
+  .nav-list a:hover {
+    color: #e6edf3 !important;
+  }
+
+  /* Global search box in the header */
+  .search-form,
+  .search-box,
+  .search-input-wrapper {
+    background-color: #1c2128 !important;
+    border: 1px solid #2d333b !important;
+  }
+
+  .search-input,
+  input.search-input {
+    background-color: transparent !important;
+    color: #e6edf3 !important;
+  }
+
+  /* ---------- Elevated surfaces (cards, panels, sidebar blocks) ---------- */
+  .entry-list-container,
+  .entry-list,
+  .entry,
+  .item,
+  .article-item,
+  .index-nav,
+  .nav-list-box,
+  .sidebar-block,
+  .signin-tip,
+  .hot-list-item,
+  .hot-list,
+  .list_box,
+  .hot_list,
+  .hot_item,
+  .hot-theme,
+  .global-component-box,
+  .recommended-area,
+  .author-block,
+  .author-info-block,
+  .side-info,
+  .popular-box,
+  .recommended-tags,
+  .tag-list-box,
+  .card,
+  .block,
+  .panel,
+  .pin-list,
+  .pin-item,
+  .pin,
+  .comment-list,
+  .comment-item,
+  .reply-list,
+  .dropdown-list,
+  .byte-popover,
+  .byte-select-dropdown,
+  .pop-list,
+  .more-menu,
+  .more-dropdown-list,
+  .user-popover,
+  .auth-modal,
+  .auth-form,
+  .modal-box,
+  .column-container,
+  .article-end,
+  .jj-comment-list-container,
+  .comment-box-common,
+  .article-catalog,
+  .catalog-block,
+  .recommended-list-title-wrapper,
+  .dock-nav,
+  .userbox,
+  .pin-editor,
+  .pin-editor-dialog,
+  .guide-link,
+  .link-box,
+  .activity-item,
+  .activity-item.shadow,
+  .badge-wall,
+  .jj-recommend-users-card,
+  .jj-recommend-users,
+  .bottom-login-guide,
+  .top-login-guide,
+  .team-info,
+  .more-list,
+  .typehead,
+  .new-topic-picker {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+    box-shadow: none !important;
+  }
+
+  /* User-profile content column (juejin.cn/user/<id>): the activity/post feed,
+     its tab bar and the badge-wall are NOT in the generic card list above and
+     ship a white bg with hardcoded dark text (#333 / #1d2129). Dark the surfaces
+     and force their text light so the font-scale title remap reads correctly. */
+  .list-header,
+  .list-header .header-content {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+  }
+
+  .list-header .nav-item .item-title,
+  .list-header .nav-item {
+    color: #8b949e !important;
+  }
+
+  .list-header .nav-item.active .item-title,
+  .list-header .nav-item.route-active .item-title,
+  .list-header .nav-item.router-link-exact-active .item-title {
+    color: #e6edf3 !important;
+  }
+
+  /* Post rows in the activity feed carry hardcoded literals (#171a1c title,
+     #333/#909090 links, #5c6066 excerpt). The bare <h3> title is caught by the
+     global heading rule; the rest are remapped here. */
+  .activity-item .post-item-title,
+  .activity-item .post-link,
+  .activity-item h3,
+  .activity-item .title,
+  .activity-item .content-title {
+    color: #e6edf3 !important;
+  }
+
+  .activity-item,
+  .activity-item .post-item,
+  .activity-item .post-item-content,
+  .activity-item .post-item-excerpt,
+  .activity-item .rich-content,
+  .activity-item .content,
+  .activity-item .abstract,
+  .activity-item p {
+    color: #c4cdd6 !important;
+  }
+
+  /* Badge-wall ("获得徽章 19") — count label readable on the dark surface */
+  .badge-wall .badge-count {
+    color: #c4cdd6 !important;
+  }
+
+  /* Profile-sidebar "team" card (juejin.cn/user/<id> → 掘金运营团队) names its
+     team with a hardcoded black, invisible once we dark the card. Force light. */
+  .team-info,
+  .team-info .content,
+  .team-info .name,
+  .team-info .title {
+    color: #e6edf3 !important;
+  }
+
+  /* Inset / nested light-grey areas (comment input wells, login guides,
+     pin masks) — slightly darker than the card they sit in */
+  .input-box,
+  .comment-login-guide,
+  .pin-editor .editor-body .content,
+  .editor-body .content,
+  .mask {
+    background-color: #14181d !important;
+  }
+
+  /* Feed/detail pin bodies are an INLINE `span.content` — giving them the inset
+     darker bg above made it hug each text line, painting stray highlight boxes on
+     the card. Pin text should sit flat on the card like comments do. */
+  .pin-view .content,
+  .pin-item .content,
+  .pin-list .content {
+    background-color: transparent !important;
+  }
+
+  /* Blank ad slots keep a white bg — dark them so they don't flash white */
+  .ad-container,
+  .ad-block,
+  .advert {
+    background-color: #14181d !important;
+  }
+
+  /* Light-blue active tints (selected nav items, login wrap, dock tabs) */
+  .nav-item-content.active-nav,
+  .item-login-wrap,
+  .title.active,
+  a.title.active,
+  .dock .dock-nav .item a.title.active,
+  .dock-nav .item a.title.active,
+  .dock-nav .title.active,
+  .dock-nav .active,
+  .active-nav {
+    background-color: #1a2433 !important;
+  }
+
+  /* Hover state for feed rows / list items */
+  .entry:hover,
+  .item:hover,
+  .article-item:hover,
+  .hot-list-item:hover,
+  .pin-item:hover,
+  .activity-item:hover {
+    background-color: #232a32 !important;
+  }
+
+  /* ---------- Typography ---------- */
+  h1, h2, h3, h4, h5, h6,
+  .title,
+  .title-text,
+  .article-title,
+  .entry .title,
+  .content-main .title {
+    color: #e6edf3 !important;
+  }
+
+  /* Hardcoded literal text colors that bypass the font-scale vars
+     (#252933 / #515767 / #4e5969). These classes carry the value directly, so
+     remap them explicitly — top nav labels, sidebar widget titles, descriptions,
+     author meta, dates, counts. */
+  .nav-item-text,
+  .nav-list .nav-item-text,
+  .menu .nav-item-text,
+  .descrip,
+  .desc,
+  .sub-title,
+  .subtitle,
+  .info-box .name,
+  .user-name,
+  .username,
+  .article-meta,
+  .article-meta *,
+  .meta,
+  .meta *,
+  .entry .meta-list,
+  .entry .meta-list *,
+  .footer-content,
+  .list-header .title,
+  .recommended-area .title,
+  .led-time,
+  .related-time,
+  .abstract,
+  .abstract-row,
+  .abstract-row *,
+  a.jj-link.abstract,
+  a.jj-link.abstract *,
+  .info-box,
+  .info-row,
+  .info-row * {
+    color: #c4cdd6 !important;
+  }
+
+  /* Search-result query-match highlight (<em>, hardcoded crimson #e8001c) →
+     a warm highlight that reads on dark while keeping the "match" emphasis */
+  em,
+  .jj-link em,
+  mark,
+  .highlight {
+    color: #ff9d8a !important;
+    background-color: transparent !important;
+    font-style: normal;
+  }
+
+  p,
+  span,
+  div,
+  li,
+  .abstract,
+  .description,
+  .summary {
+    color: inherit;
+  }
+
+  /* Pin (沸点) post bodies + content blocks + section titles carry a hardcoded
+     dark text color (#252933 / #515767) → force readable light text */
+  .pin-item .content,
+  .pin-list .content,
+  .pin .content,
+  span.content,
+  p.content,
+  .content-d-bot,
+  .block-title,
+  .list-title,
+  .section-title,
+  .item-title {
+    color: #c4cdd6 !important;
+  }
+
+  /* Bold text inside markdown / pins used the link-blue (#036aca) → readable */
+  .markdown-body strong,
+  .markdown-body b,
+  strong.dark-link {
+    color: #e6edf3 !important;
+  }
+
+  /* Pin feed secondary text (#515767) — tags, topic refs, "如何玩转沸点"
+     guide links, and any unclassed spans inside pin bodies → readable grey */
+  .pin-list span,
+  .pin-item span,
+  .pin span,
+  .pin-view .content span,
+  .guide-link,
+  .guide-link span,
+  .pin-content span,
+  .more-dropdown-list span,
+  .more-dropdown-list .nav-item,
+  .jj-link span,
+  .nav-item.link-item span,
+  .list_box.pin .hot_content,
+  .list_box.pin .hot_content span,
+  .list_box.pin .hot_content p,
+  .list_box.pin .hot_item .hot_content p span,
+  .list_box.pin .hot_list .hot_item .hot_content p,
+  .hot_item .content,
+  .hot_item .content span,
+  .hot_content,
+  .hot_content p,
+  .hot_content p span,
+  .hot_content span,
+  .list_box.pin .hot_list .hot_item span,
+  .list_box.pin span,
+  .list_box.pin p {
+    color: #c4cdd6 !important;
+  }
+
+  /* Topic / theme refs inside pins keep the brand-blue accent */
+  .pin-list .topic,
+  .pin-item .topic,
+  .pin a.theme,
+  .pin-content a {
+    color: #5fb0e6 !important;
+  }
+
+  /* Muted metadata: dates, view/like/comment counts, tags meta */
+  .meta-list,
+  .meta-list *,
+  .entry-footer,
+  .entry-footer *,
+  .date,
+  .time,
+  .view-num,
+  .like-num,
+  .comment-num,
+  .count,
+  .footer-info,
+  .sub-title,
+  .extra,
+  .gray,
+  .text-gray,
+  .author-name + .date,
+  .list-header .more {
+    color: #8b949e !important;
+  }
+
+  /* User profile (juejin.cn/user/…) stat blocks bypass the font-scale vars with
+     hardcoded dark literals (#31445b on follow counts, #000 on stat labels,
+     #1d2129 on the badge count) → force readable text. Counts read primary
+     light, the descriptive labels read secondary grey. */
+  .stat-block .item-count,
+  .follow-block .item-count,
+  .follow-item .item-count,
+  .user-view .item-count,
+  .badge-count,
+  .stat-item .count,
+  .block-body .count {
+    color: #e6edf3 !important;
+  }
+
+  .stat-item,
+  .stat-item .text,
+  .stat-item .desc,
+  .block-body .stat-item,
+  .badge-block .text,
+  .follow-item .item-title {
+    color: #c4cdd6 !important;
+  }
+
+  /* Links */
+  a {
+    color: #c4cdd6;
+  }
+
+  .markdown-body a,
+  a.link,
+  .title a:hover,
+  a.username,
+  a.author-name {
+    color: #5fb0e6 !important;
+  }
+
+  .markdown-body a:hover,
+  a.link:hover {
+    color: #9bd4ff !important;
+  }
+
+  /* ---------- Brand blue (refined for dark) ---------- */
+  .login-button,
+  .btn-login,
+  button.primary,
+  .byte-btn--primary,
+  .submit-btn,
+  .follow-button:not(.followed),
+  .creator-btn {
+    background-color: #1e80ff !important;
+    border-color: #1e80ff !important;
+    color: #ffffff !important;
+  }
+
+  .login-button:hover,
+  .byte-btn--primary:hover,
+  .follow-button:not(.followed):hover {
+    background-color: #3a91ff !important;
+    border-color: #3a91ff !important;
+  }
+
+  /* Ghost / outline buttons that used a light tinted bg */
+  .byte-btn--default,
+  .btn-default,
+  .follow-button.followed,
+  .ghost-btn {
+    background-color: #21262d !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* ---------- Article page ---------- */
+  .article-area,
+  .main-area,
+  .article,
+  .article-viewer,
+  #article-root {
+    background-color: transparent !important;
+    color: #c4cdd6 !important;
+  }
+
+  .markdown-body {
+    color: #c4cdd6 !important;
+  }
+
+  .markdown-body p,
+  .markdown-body li,
+  .markdown-body td,
+  .markdown-body blockquote {
+    color: #c4cdd6 !important;
+  }
+
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3,
+  .markdown-body h4,
+  .markdown-body h5,
+  .markdown-body h6 {
+    color: #e6edf3 !important;
+    border-bottom-color: #262c33 !important;
+  }
+
+  .markdown-body blockquote {
+    background-color: #1a1f26 !important;
+    border-left-color: #3a424d !important;
+    color: #9aa4ae !important;
+  }
+
+  .markdown-body table th,
+  .markdown-body table td {
+    border-color: #2d333b !important;
+  }
+
+  /* The white header bg sits on the thead/th element itself (not just the row),
+     and th text is never remapped → black-on-white header. Dark the whole header
+     surface and force its text light. */
+  .markdown-body table thead,
+  .markdown-body table thead tr,
+  .markdown-body table th,
+  .markdown-body table tr:nth-child(2n) {
+    background-color: #1a1f26 !important;
+  }
+
+  .markdown-body table th {
+    color: #e6edf3 !important;
+  }
+
+  .markdown-body hr {
+    background-color: #262c33 !important;
+    border-color: #262c33 !important;
+  }
+
+  .markdown-body img {
+    /* slightly dim very bright images so they don't glare */
+    filter: brightness(0.92);
+  }
+
+  /* Inline code */
+  .markdown-body code,
+  .markdown-body :not(pre) > code {
+    background-color: #21262d !important;
+    color: #e6a4a4 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* ---------- Code blocks + full dark syntax palette ---------- */
+  .markdown-body pre,
+  pre {
+    background-color: #1a1f26 !important;
+    border: 1px solid #262c33 !important;
+  }
+
+  .markdown-body pre code,
+  pre code.hljs,
+  .hljs,
+  .code-block-extension-codeLine {
+    background-color: transparent !important;
+    color: #e6edf3 !important;
+  }
+
+  /* code block header (language label + copy button + line-number gutter) */
+  .code-block-extension-header,
+  .code-block-extension-headerLeft,
+  .code-block-extension-lang {
+    color: #8b949e !important;
+    background-color: transparent !important;
+  }
+
+  .code-block-extension-codeLineNumbers,
+  .code-block-extension-lineNumbers,
+  .code-block-extension-lineNumber {
+    color: #5c6570 !important;
+    border-color: #262c33 !important;
+  }
+
+  .code-block-extension-copyCodeBtn {
+    color: #8b949e !important;
+  }
+
+  /* highlight.js tokens — GitHub-dark-ish, readable on #1a1f26 */
+  .hljs-comment,
+  .hljs-quote {
+    color: #8b949e !important;
+  }
+
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-subst,
+  .hljs-deletion {
+    color: #ff7b72 !important;
+  }
+
+  .hljs-string,
+  .hljs-doctag,
+  .hljs-regexp,
+  .hljs-addition {
+    color: #a5d6ff !important;
+  }
+
+  .hljs-number,
+  .hljs-literal,
+  .hljs-variable,
+  .hljs-template-variable,
+  .hljs-tag .hljs-attr {
+    color: #79c0ff !important;
+  }
+
+  .hljs-title,
+  .hljs-section,
+  .hljs-function .hljs-title,
+  .hljs-name {
+    color: #d2a8ff !important;
+  }
+
+  .hljs-built_in,
+  .hljs-builtin-name,
+  .hljs-type,
+  .hljs-class .hljs-title {
+    color: #79c0ff !important;
+  }
+
+  .hljs-attribute,
+  .hljs-attr,
+  .hljs-property {
+    color: #79c0ff !important;
+  }
+
+  .hljs-symbol,
+  .hljs-bullet,
+  .hljs-link,
+  .hljs-meta,
+  .hljs-selector-id,
+  .hljs-selector-class {
+    color: #ffa657 !important;
+  }
+
+  .hljs-punctuation,
+  .hljs-operator {
+    color: #c4cdd6 !important;
+  }
+
+  /* Bare .hljs-tag is the `<…>` bracket chrome of HTML/XML/JSX — defaults to navy
+     #000080, near-invisible on the code block. (The inner name/attr/string are
+     remapped above via descendant selectors; this only touches the brackets.) */
+  .hljs-tag {
+    color: #c4cdd6 !important;
+  }
+
+  .hljs-emphasis {
+    font-style: italic;
+  }
+
+  .hljs-strong {
+    font-weight: bold;
+  }
+
+  /* ---------- Comments ---------- */
+  .comment-list,
+  .comment-item,
+  .reply-item,
+  .comment-box,
+  .comment-editor {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+  }
+
+  .comment-item .name,
+  .reply-item .name,
+  .user-name {
+    color: #e6edf3 !important;
+  }
+
+  .comment-content,
+  .reply-content {
+    color: #c4cdd6 !important;
+  }
+
+  .comment-editor textarea,
+  textarea.comment-input {
+    background-color: #14181d !important;
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* "查看全部 N 条评论" expand bar ships a white (#f7f8fa) bg; its label already
+     rides the light font scale → just dark the bar so it reads as a tappable row. */
+  .fetch-more-comment {
+    background-color: #21262d !important;
+    border-color: #262c33 !important;
+  }
+
+  /* ---------- Forms / inputs ---------- */
+  input,
+  textarea,
+  select,
+  .byte-input,
+  .byte-input__input,
+  .byte-textarea__inner {
+    background-color: #14181d !important;
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder,
+  .byte-input__input::placeholder,
+  .search-input::placeholder {
+    color: #8b949e !important;
+    opacity: 1 !important;
+  }
+
+  /* ---------- Tags / chips ---------- */
+  .tag,
+  .tag-item,
+  .entry-tag,
+  .meta-list .tag,
+  .suggested-tag {
+    background-color: #21262d !important;
+    color: #9bd4ff !important;
+    border-color: #2d333b !important;
+  }
+
+  /* Hot / 热 rank markers — keep the warm accent, refined */
+  .hot-number,
+  .rank-number.top,
+  .rank-1,
+  .rank-2,
+  .rank-3,
+  .is-hot {
+    color: #ff7043 !important;
+  }
+
+  /* Like / collect (收藏) active accents preserved */
+  .like.active,
+  .liked,
+  .collect.active,
+  .action.active {
+    color: #ff5e5e !important;
+  }
+
+  /* ---------- Scrollbar ---------- */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #14181d;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #3a424d;
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4a525d;
+  }
+
+  /* ---------- Misc surfaces / overlays ---------- */
+  .byte-tooltip__content,
+  .byte-popconfirm,
+  .tooltip,
+  .popper,
+  .v-popper__inner {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* Skeleton / placeholder shimmer blocks. Juejin's loader is `.xitu-skeleton`
+     (white card) whose `.xitu-skeleton-line` bars shimmer via a LIGHT bg-image
+     gradient (bg-color transparent) — dark the card and remap the gradient so
+     loading states don't flash white. */
+  .skeleton,
+  .skeleton-item,
+  .loading-block,
+  .xitu-skeleton {
+    background-color: #1c2128 !important;
+  }
+
+  .xitu-skeleton-line {
+    background-image: linear-gradient(90deg, #21262d 25%, #2d333b 37%, #21262d 63%) !important;
+  }
+
+  /* Empty-state placeholder boxes */
+  .common-empty,
+  .empty-box,
+  .empty-block,
+  .no-data {
+    background-color: transparent !important;
+    color: #8b949e !important;
+  }
+
+  /* Footer */
+  .main-footer,
+  footer {
+    background-color: #0d1117 !important;
+    color: #8b949e !important;
+    border-top: 1px solid #262c33 !important;
+  }
+
+  .main-footer a,
+  footer a {
+    color: #8b949e !important;
+  }
+}

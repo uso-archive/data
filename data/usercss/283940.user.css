@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Stack Overflow and the whole Stack Exchange network: easy-on-the-eyes questions, answers, code blocks, comments and sidebar.
-@version      20260624.22.01
+@version      20260627.21.28
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -48,6 +48,19 @@
   body {
     background-color: #14181d !important;
     color: #c4cdd6 !important;
+  }
+
+  /* The smaller network sites (every *.stackexchange.com Q&A site
+     plus Super User / Server Fault / Ask Ubuntu / MathOverflow /
+     Stack Apps) tile a LIGHT "site-background-image.svg" texture
+     across the whole <body>. It paints over our dark bg-color and
+     washes the entire page near-white — invisible to a bg-COLOR
+     audit. Stack Overflow itself ships no body texture, so killing
+     it here is safe and fixes every per-site skin at once. */
+  html,
+  body,
+  body.unified-theme {
+    background-image: none !important;
   }
 
   body.unified-theme {
@@ -178,6 +191,33 @@
   .s-topbar .-logo,
   .s-topbar .-logo .-img {
     filter: none;
+  }
+
+  /* The centered Stack Overflow wordmark on the login / auth pages
+     is an SVG carrying .fc-black (pure #000) and renders nearly
+     invisible black-on-dark. The monochrome "new" logo is fine in
+     light — lift it. (Topbar icons already inherit a light color.) */
+  svg.iconLogoNew,
+  svg.iconLogoNewSm,
+  svg.iconGlyphNew,
+  .iconLogoNew.fc-black,
+  .fc-black.iconLogoNew {
+    color: #e6edf3 !important;
+    fill: #e6edf3 !important;
+  }
+
+  /* Per-site header logos on the non-SO network sites (Super User,
+     Server Fault, Ask Ubuntu, MathOverflow, *.stackexchange.com,
+     Stack Apps) are <img src="…/logo.svg"> dark wordmarks baked for
+     the white site — invisible black-on-dark. They're images we
+     can't recolor internally, so apply the standard dark-mode
+     luminance invert (hue-rotate keeps brand hues like SU's blue
+     bracket). SO uses an inline SVG (handled above), not this img. */
+  .site-header--link img,
+  a.site-header--link img,
+  #hlogo img,
+  .-logo img {
+    filter: invert(1) hue-rotate(180deg) !important;
   }
 
   /* Global search box in the top bar */
@@ -312,6 +352,13 @@
     background-color: transparent !important;
   }
 
+  /* The smaller network sites box #content in a light 1px border
+     (#e3e6e8) — a thin light frame around the whole content area.
+     SO has no such border; recolor to a subtle dark frame. */
+  #content {
+    border-color: #262c33 !important;
+  }
+
   /* Cards & elevated panels */
   .s-card,
   .js-post-summary,
@@ -436,6 +483,12 @@
     border-bottom: 1px solid #20262d !important;
   }
 
+  /* comment action rows carry a light #c4cdd6 border-bottom */
+  .comment-actions,
+  .js-comment-actions {
+    border-color: #20262d !important;
+  }
+
   .comment-copy { color: #b3bcc6 !important; }
 
   .comment .comment-user,
@@ -463,7 +516,9 @@
   .post-tag,
   .s-tag,
   a.post-tag,
-  a.s-tag {
+  a.s-tag,
+  .badge-tag,
+  a.badge-tag {
     background-color: #20303d !important;
     color: #8cc6f0 !important;
     border-color: #2b4253 !important;
@@ -471,7 +526,8 @@
 
   .post-tag:hover,
   .s-tag:hover,
-  a.post-tag:hover {
+  a.post-tag:hover,
+  a.badge-tag:hover {
     background-color: #2b4253 !important;
     color: #bfe0f7 !important;
   }
@@ -788,6 +844,7 @@
   .s-badge__bounty {
     background-color: #20303d !important;
     color: #8cc6f0 !important;
+    border-color: #2b4253 !important;
   }
 
   /* reputation / badge counts on user cards */
@@ -829,6 +886,15 @@
   .profile-header,
   .user-header {
     background-color: transparent !important;
+  }
+
+  /* Collectives / Communities cards: the collective NAME label
+     (.subcommunity-topic-avatar .fs-body2) keeps SE's near-black
+     #0c0d0e and renders dark-on-dark on the card. Lift it. */
+  .subcommunity-topic-avatar .fs-body2,
+  .subcommunity-topic-avatar .fs-body1,
+  a.s-link__inherit .subcommunity-topic-avatar div {
+    color: #e6edf3 !important;
   }
 
   /* ============================================================
@@ -918,6 +984,18 @@
     background-color: #222831 !important;
   }
 
+  /* Topbar help / inbox / achievements dropdowns: their list-item
+     rows carry an UNCLASSED border-bottom: 1px #f1f2f3 (white) that
+     renders as glaring white divider lines on dark. Recolor every
+     row divider inside these dialogs. */
+  .topbar-dialog .modal-content li,
+  .topbar-dialog .modal-content ul li,
+  #topbar-help-dialog .modal-content li,
+  .topbar-dialog .modal-content .header,
+  .siteSwitcher-dialog .modal-content li {
+    border-color: #262c33 !important;
+  }
+
   /* autocomplete / search suggestions dropdown */
   .js-search-dropdown,
   .acp-dropdown,
@@ -930,6 +1008,87 @@
   .acp-dropdown li:hover,
   .autocomplete li.selected {
     background-color: #222831 !important;
+  }
+
+  /* ============================================================
+     OneTrust cookie / consent banner + preference center
+     ------------------------------------------------------------
+     SE serves the OneTrust GDPR banner to EU/anonymous visitors:
+     a full white panel (#edf5fd) with near-black text + black
+     pill buttons — completely unthemed and glaring on dark.
+     OneTrust uses its own stable IDs/classes (not SE's Stacks
+     system), so it needs a dedicated block.
+     ============================================================ */
+  #onetrust-banner-sdk,
+  #onetrust-banner-sdk .ot-sdk-container,
+  #onetrust-button-group-parent,
+  #onetrust-pc-sdk,
+  #ot-pc-content,
+  #onetrust-pc-sdk .ot-pc-header,
+  #onetrust-pc-sdk .ot-pc-footer,
+  #onetrust-pc-sdk .ot-cat-item,
+  #onetrust-pc-sdk #ot-pc-lst,
+  #onetrust-pc-sdk .ot-accordion-layout {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  #onetrust-policy-title,
+  #ot-pc-title,
+  #onetrust-pc-sdk h2,
+  #onetrust-pc-sdk h3,
+  #onetrust-pc-sdk .ot-cat-header {
+    color: #e6edf3 !important;
+  }
+
+  #onetrust-policy-text,
+  #onetrust-banner-sdk #onetrust-policy-text span,
+  #onetrust-banner-sdk .ot-b-addl-desc,
+  #onetrust-banner-sdk .ot-dpd-desc,
+  #onetrust-banner-sdk .ot-dpd-title,
+  #onetrust-banner-sdk .ot-tcf2-vendor-count,
+  #onetrust-banner-sdk #option-details-1,
+  #onetrust-banner-sdk #option-details-1 li,
+  #onetrust-banner-sdk ul li,
+  #ot-pc-desc,
+  #onetrust-pc-sdk p,
+  #onetrust-pc-sdk li,
+  #onetrust-pc-sdk .ot-cat-item p,
+  #onetrust-pc-sdk label {
+    color: #c4cdd6 !important;
+  }
+
+  #onetrust-banner-sdk a,
+  #onetrust-banner-sdk .ot-link-btn,
+  #onetrust-pc-sdk a,
+  #onetrust-pc-sdk .ot-link-btn {
+    color: #5fb0e6 !important;
+  }
+
+  /* primary accept / reject / save buttons -> theme blue. SE ships
+     these with 3-ID + type specificity
+     (#onetrust-banner-sdk #onetrust-button-group button#id), so
+     mirror that exact pattern to win the cascade. */
+  #onetrust-banner-sdk #onetrust-button-group button#onetrust-accept-btn-handler,
+  #onetrust-banner-sdk #onetrust-button-group button#onetrust-reject-all-handler,
+  #onetrust-pc-sdk #accept-recommended-btn-handler,
+  #onetrust-pc-sdk .save-preference-btn-handler {
+    background-color: #2f6f9f !important;
+    color: #ffffff !important;
+    border-color: #3b82b8 !important;
+  }
+
+  /* secondary "Customize settings" link-button -> readable accent */
+  #onetrust-banner-sdk #onetrust-button-group button#onetrust-pc-btn-handler,
+  #onetrust-pc-sdk #ot-pc-refuse-all-handler {
+    background-color: transparent !important;
+    color: #5fb0e6 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* preference-center close glyph */
+  #onetrust-pc-sdk .ot-close-icon {
+    filter: invert(1) brightness(0.9);
   }
 
   /* ============================================================
@@ -1111,6 +1270,19 @@
   .everyonelovesstackoverflow,
   .js-report-ad {
     background-color: transparent !important;
+  }
+
+  /* "Report this ad" chrome pill on the sticky anchor ad renders a
+     light #f0f0f0 background with near-invisible light-grey text —
+     a glaring light pill on dark. Darken it + lift the label. */
+  .mobile-anchor-ad-report-button-container,
+  .js-report-ad-button-container {
+    background-color: #1c2128 !important;
+  }
+  .mobile-anchor-ad-report-button-container .js-report-ad,
+  .js-report-ad-button-container .js-report-ad,
+  .mobile-anchor-ad-report-button {
+    color: #9198a1 !important;
   }
 
   /* keep images untouched (no filter/recolor) */
