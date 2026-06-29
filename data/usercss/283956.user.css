@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260627.16.16
+@version      20260628.14.02
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -439,6 +439,16 @@
     color: #14181d !important;
     -webkit-text-fill-color: #14181d !important;
   }
+  /* the precipitation-chance percentages in the Today / 10-Day forecast lists ship
+     weather.com's precip blue as a Tailwind arbitrary token text-[#007ea8] -- a
+     SEMANTIC rain color that reads ~4.6:1 on the original white card but drops to
+     ~3.5:1 on our dark surface (a dark-on-dark fail for this 14px label). Lift to a
+     lighter precip blue that keeps the rain identity while passing AA; the colored
+     precip icons keep their own hues. */
+  [class*="text-[#007ea8]"],
+  [class*="text-[#007EA8]"] {
+    color: #45a8db !important;
+  }
 
   /* ---- links / accent --------------------------------------------------- */
   a,
@@ -653,6 +663,92 @@
   [class*="ControlPanel--controlContainer"] *:not(a):not(button):not(img):not(svg):not(canvas),
   [class*="LayerDetail--"]:not(a):not(button) {
     color: var(--wx-text) !important;
+  }
+
+  /* The radar map's CONTAINER card now ships its white fill via a higher-specificity
+     doubled-class Helios rule ([dir] .Wrapper--radarWrapper--<hash>.Wrapper--radarWrapper--<hash>
+     { background-color: var(--backgroundPage) !important }) that out-specifies the
+     section.card[class*="Wrapper--radarWrapper"] rule above -- so the radar legend
+     strip at the top of the map rendered bright white again. Redefine the Helios
+     surface tokens ON the wrapper itself: variable resolution is specificity-agnostic,
+     so their rule still wins the cascade but COMPUTES our dark value (the basemap
+     tiles are <img>/<canvas> and stay untouched). */
+  [class*="Wrapper--radarWrapper"] {
+    --backgroundPage: var(--wx-surface) !important;
+    --backgroundCard: var(--wx-surface) !important;
+  }
+  /* the radar timeline's tick labels (Now / 7a / 8a / ...) are <button> nodes
+     (TimeLine--tickLabelButton) that the ControlPanel :not(button) rule above
+     excludes; "Now" ships a near-black #2b2b2b that goes dark-on-dark. Lift the
+     ticks to a readable light and the current "Now" label to primary. */
+  [class*="TimeLine--tickLabelButton"] {
+    color: var(--wx-text-2) !important;
+  }
+  [class*="TimeLine--nowContainer"] [class*="TimeLine--tickLabelButton"] {
+    color: var(--wx-text) !important;
+  }
+
+  /* ---- Cold & Flu "Extended Flu Forecast" timeline control ---------------- */
+  /* Below the flu-risk choropleth map sits a timeline control that ships a #fafafa
+     fill (ExtendedFluForecast--controlContainer) -- a bright white strip on the dark
+     card. Darken it; its date ticks are HTML spans (FluRiskTimeLine--tickLabel) and
+     its play icon is a path[fill="#2B2B2B"], both of which go dark-on-dark once the
+     strip is darkened, so lift them. The flu-risk MAP above and the colored severity
+     dot are data and stay untouched. */
+  [class*="ExtendedFluForecast--controlContainer"],
+  [class*="ExtendedAllergyForecast--controlContainer"] {
+    background-color: var(--wx-surface) !important;
+    color: var(--wx-text-2) !important;
+  }
+  [class*="FluRiskTimeLine--tickLabel"] {
+    color: var(--wx-text-2) !important;
+  }
+  [class*="ExtendedFluForecast--controlContainer"] svg path[fill="#2B2B2B"],
+  [class*="ExtendedFluForecast--controlContainer"] svg path[fill="#2b2b2b"] {
+    fill: var(--wx-text-2) !important;
+  }
+
+  /* ---- 15-day allergy forecast SVG area chart ---------------------------- */
+  /* The allergy forecast is an SVG area chart whose plot area is filled white via a
+     path[fill="#FFFFFF"] plus a #ffffff -> light-purple area gradient -- neither of
+     which a DOM-background audit can see, so it renders a stark white block on the
+     dark card. Darken the fill and remap the gradient stops so the area blends into
+     the card; the blue forecast LINE (stroke #0062FF) and its dots are data and
+     stay verbatim. */
+  [data-testid="AllergyForecastChart"] path[fill="#FFFFFF"],
+  [data-testid="AllergyForecastChart"] path[fill="#ffffff"],
+  [class*="AllergyLineChart"] path[fill="#FFFFFF"],
+  [class*="AllergyLineChart"] path[fill="#ffffff"] {
+    fill: var(--wx-surface-2) !important;
+  }
+  [data-testid="AllergyForecastChart"] stop,
+  [class*="AllergyLineChart"] stop {
+    stop-color: var(--wx-surface-2) !important;
+    stop-opacity: 1 !important;
+  }
+
+  /* The "DeeperDive" AI-overview widget injected into news articles (#dd-widget)
+     ships its own light-theme chrome: a white footer input pill, a navy brand
+     logo, dark #2f3c4c title/summary copy, and a left-to-right white scroll-fade
+     shader behind the "Full Summary" button. All of it lands on our dark article
+     card -- the copy reads dark-on-dark and the pill + fade flash bright. Re-skin
+     the widget surfaces dark and lift its text; the blue send button keeps its
+     identity. Stable third-party class names (not hashed). */
+  #dd-widget .dd-widget-title-text,
+  #dd-widget .dd-widget-title-text span,
+  #dd-widget .dd-widget-article-summary-content-wrapper,
+  #dd-widget .dd-widget-article-summary-button {
+    color: var(--wx-text) !important;
+  }
+  #dd-widget .dd-widget-article-summary-button-shader {
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), var(--wx-surface)) !important;
+  }
+  #dd-widget .dd-widget-input-wrapper {
+    background-color: var(--wx-surface-2) !important;
+    border: 1px solid var(--wx-border) !important;
+  }
+  #dd-widget .dd-widget-branding-logo svg path {
+    fill: var(--wx-text) !important;
   }
 
   /* ====================================================================== */

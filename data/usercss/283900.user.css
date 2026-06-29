@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260627.14.15
+@version      20260628.14.00
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -151,8 +151,11 @@
   /* ---- Tabs ---- */
   .tabs__list, .Tabs, .mod-tabs, .ui-tabs-nav, .ContentList__Tabs {
     background-color: transparent !important; border-color: #2d333b !important; }
-  .tabs__list__item, .Tabs__Link, .ui-tabs-nav li a { color: #c4cdd6 !important; }
-  .tabs__list__item--active, .Tabs__Link--active, .ui-tabs-selected a {
+  .tabs__list__item, .Tabs__Link, .ui-tabs-nav li a,
+  .tabs__link, .tabs__list__item .Button--unstyled { color: #c4cdd6 !important; }
+  .tabs__list__item--active, .Tabs__Link--active, .ui-tabs-selected a,
+  .tabs__list__item--active .tabs__link,
+  .tabs__list__item--active .Button--unstyled {
     color: #e6edf3 !important; border-bottom-color: #c8102e !important; }
 
   /* ---- Promos / callouts / banners ---- */
@@ -257,7 +260,15 @@
 
   /* ---- Misc surfaces that default to white ---- */
   .bg-clr-white, .bg-white, [class*="bg-clr-white"] { background-color: #1c2128 !important; }
+  /* Schedule group header band (team page left rail) hardcodes a near-white
+     bg-clr-gray-10 (#f9f9fb) under our already-light title text → light-on-light. */
+  .Schedule__Group__Title { background-color: #1c2128 !important; }
   hr { border-color: #2d333b !important; }
+  /* Pseudo-element divider lines ESPN paints with a near-white #dcdddf bar
+     (footer column rule + news-feed item separators) — invisible to a bg-color
+     scan; remap to our divider grey. ---- */
+  .PageFooter__QuickLinks::after, .news-feed-item::before,
+  .mediaList__link::after { background-color: #2d333b !important; }
   ::selection { background-color: #2f6fb8 !important; color: #ffffff !important; }
 
   /* ---- Filter controls (season / round / view dropdowns, segmented ButtonGroup) ---- */
@@ -281,10 +292,15 @@
   .Pill { background-color: #21262d !important; border-color: #2d333b !important; color: #c4cdd6 !important; }
   .Pill--selected { background-color: #2d333b !important; color: #e6edf3 !important; }
   .MediaPlaceholder__Pill { background-color: rgba(13,17,23,0.78) !important; color: #ffffff !important; }
+  /* Search player-result tiles: team/league subtitle hardcodes #6c6d6f → dark-on-dark */
+  .LogoTile__Meta, .LogoTile__Meta--subtitle, .LogoTile__Meta--category { color: #9aa4ae !important; }
 
   /* ---- Taboola "sponsored content" wrapper (hyphenated class variant) ---- */
   .sponsored-headlines, .trc_rbox, .trc_rbox_div, [class*="taboola"] {
     background-color: #14181d !important; }
+  /* Taboola sponsored-widget CTA pill ("Learn more") hardcodes near-black text
+     → invisible on our dark surround; lighten just the label. ---- */
+  .video-cta-button, .video-cta-href { color: #c4cdd6 !important; }
 
   /* ---- Golf scoreEvent metadata (hardcodes #48494a via class) ---- */
   .scoreEvent__concludings { color: #9aa4ae !important; }
@@ -296,7 +312,8 @@
        Fully token-driven — remap surface tokens (white -> dark) and text tokens
        (dark -> light). Deploy-stable: targets the design-system theme wrappers, not
        the hashed component classes. ---- */
-  .theme-espnDS_v2, .theme-espnDS_v2Remaps, .next-gen-gamecast, .theme-nextGenGamecast {
+  .theme-espnDS_v2, .theme-espnDS_v2Remaps, .next-gen-gamecast, .theme-nextGenGamecast,
+  .theme-light {
     --layoutCard-background-color: #1c2128 !important;
     --bg-surface-raised: #1c2128 !important;
     --surface-background-color: #14181d !important;
@@ -335,6 +352,18 @@
     --color-combo-gray90-white: #e6edf3 !important;
     --color-combo-gray100-white: #e6edf3 !important;
     --color-combo-gray100-gray10: #e6edf3 !important;
+    /* black-on-light text combos (gamecast Gamestrip winner score numeral + box-score
+       team abbreviations paint pure black via --color-combo-black-white) → light */
+    --color-combo-black-white: #e6edf3 !important;
+    --color-combo-black-gray85ish: #e6edf3 !important;
+    --color-combo-black-gainsboro: #e6edf3 !important;
+    --color-combo-black-cultured: #e6edf3 !important;
+    /* white-in-light surface combos (gamecast line-score table body cells paint white
+       via --color-combo-white-gray90) → dark elevated surface */
+    --color-combo-white-gray90: #1c2128 !important;
+    --color-combo-white-gray100: #1c2128 !important;
+    --color-combo-white-graybunker: #1c2128 !important;
+    --color-combo-white-oreo: #1c2128 !important;
     --color-combo-oreo-white: #e6edf3 !important;
     --color-combo-oreo-gray85ish: #e6edf3 !important;
     --color-combo-themeDark-themeLight: #e6edf3 !important;
@@ -351,4 +380,21 @@
   .Gamestrip, .Gamestrip__Container, .Gamestrip__StickyContainer { background-color: #14181d !important; }
   .Gamestrip__Container > div { background-color: #14181d !important; }
   .Media__Caption, .Media__Caption--card { background-color: #1c2128 !important; }
+  /* Next-gen "light theme" cards that hardcode a white panel bg (gamecast recap /
+     GameStory card) — the token remap above darks token-driven surfaces, but these
+     paint white directly. Scope to the light-theme wrapper so feed cards elsewhere
+     are untouched. ---- */
+  .theme-light .contentItem__content, .theme-light .contentItem__contentWrapper,
+  .theme-light .GameStory, .GameStory .contentItem__content { background-color: #1c2128 !important; }
+  /* Prism segmented control (gamecast Matchups "Regular Season / Playoffs" toggle):
+     the track paints a light grey (#c7c7c9) and the ACTIVE segment a hardcoded white
+     pill (shared --color-neutral-0, not token-remappable) with light text → unreadable.
+     Dark the track + active pill via stable role/data-testid selectors. ---- */
+  [data-testid="prism-tab-list"] [role="tablist"] {
+    background-color: #14181d !important; border-color: #2d333b !important; }
+  [data-testid="prism-tab-list"] [role="tab"],
+  [data-testid="prism-ButtonBase"][role="tab"] { background-color: transparent !important; color: #9aa4ae !important; }
+  [data-testid="prism-tab-list"] [role="tab"][aria-selected="true"],
+  [data-testid="prism-ButtonBase"][role="tab"][aria-selected="true"] {
+    background-color: #2d333b !important; color: #e6edf3 !important; }
 }
