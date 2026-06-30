@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A cosy Catppuccin Mocha dark theme for BBC News, Sport and the homepage: easy on the eyes, with the BBC logo, photos and live colors kept intact.
-@version      20260627.23.41
+@version      20260629.17.02
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -92,6 +92,17 @@
      inheriting the light header colour keeps the brand shape, just
      visible. Do NOT recolour them to an accent. */
   header svg { color: var(--ctp-text) !important; }
+
+  /* Combined menu/search toggle (top-left) ships a solid white box in
+     both closed (hamburger+search glyphs) and open (X) states — a glaring
+     white square with a near-invisible light icon. Darken to a surface
+     tile so the icon reads. (36px wide → below the audit big() threshold.) */
+  [class*="HeaderMenuButtonStyled"] {
+    background-color: var(--ctp-surface0) !important;
+    color: var(--ctp-text) !important;
+    border-color: var(--ctp-surface1) !important;
+  }
+  [class*="HeaderMenuButtonStyled"] svg { color: var(--ctp-text) !important; }
 
   /* ---- Top navigation links / items ---- */
   [data-testid^="navigationPanel-navItem"],
@@ -282,6 +293,39 @@
     border-color: var(--ctp-surface1) !important;
   }
 
+  /* ---- Scores & Fixtures page (ssrcss) ----
+     A redesigned match-list view our older Sport rules didn't cover: the
+     whole content area ships #f8f8f8/#fff surfaces (page background, the
+     team-search combobox, the competition header band, and every fixture
+     row) — light-on-light, unreadable. Map them onto the Mocha surfaces.
+     The combobox/header use generic component suffixes, so scope them to
+     their stable parent wrapper. */
+  [class*="BackgroundWrapper"],
+  [class*="HeaderWrapper"], [class*="HeaderWrapper"] div {
+    background-color: transparent !important;
+  }
+  [class*="HeadToHeadWrapper"],
+  [class*="StyledHeadToHead"] {
+    background-color: var(--ctp-surface0) !important;
+    border-color: var(--ctp-surface1) !important;
+  }
+  [class*="ComboboxWrapper"], [class*="ComboboxWrapper"] div {
+    background-color: var(--ctp-surface0) !important;
+    color: var(--ctp-text) !important;
+  }
+  /* The date carousel's scroll-fade overlays paint a light #f8f8f8
+     gradient (100px wide → under the audit big() width filter, so the
+     lightBgImages scan misses them). Drop the gradient. */
+  [class*="Datepicker"] [class*="Fade"],
+  [class*="DatePicker"] [class*="Fade"] {
+    background-image: none !important;
+  }
+  /* "All times are UK…" disclaimer ships hardcoded near-black text — fine
+     on the old light bg, dark-on-dark once we darken the page. */
+  [class*="DisclaimerText"] {
+    color: var(--ctp-subtext0) !important;
+  }
+
   /* Image placeholders / loading tiles (light grey) */
   [class*="Placeholder"] {
     background-color: var(--ctp-surface0) !important;
@@ -347,11 +391,22 @@
     color: var(--ctp-yellow) !important;
     border-color: var(--ctp-yellow) !important;
   }
-  /* "More" sub-nav toggle ships raw brand yellow — soften + dark text */
+  /* "More" sub-nav toggle ships raw brand yellow. The label + hamburger
+     glyph are an <a>, so the generic [role="navigation"] a rule (0,1,1)
+     out-specifies a bare [class*="StyledToggle"] (0,1,0) and paints them
+     light → light-on-yellow, unreadable. Win with a descendant selector
+     (0,2,0) and force the icon dark too. */
   [class*="StyledToggle"] {
     background-color: var(--ctp-yellow) !important;
-    color: var(--ctp-crust) !important;
     border-color: var(--ctp-yellow) !important;
+  }
+  [class*="ToggleContainer"] [class*="StyledToggle"],
+  [class*="StyledToggle"], [class*="StyledToggle"] span {
+    color: var(--ctp-crust) !important;
+  }
+  [class*="StyledToggle"] svg, [class*="StyledToggle"] svg path {
+    color: var(--ctp-crust) !important;
+    fill: var(--ctp-crust) !important;
   }
 
   /* ============================================================

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for CSDN: comfortable dark articles, homepage and search, with fully dark code blocks and a readable syntax palette.
-@version      20260627.21.25
+@version      20260629.17.04
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -41,6 +41,12 @@
   body {
     background-color: var(--csdn-base) !important;
     color: var(--csdn-text-2) !important;
+  }
+  /* blog articles can carry an author-chosen "skin" that paints a light
+     full-page raster (e.g. skin-1024 bg.gif) as a body background-IMAGE —
+     drop it so the dark base shows through (bg-color audit misses url() bgs) */
+  body.nodata {
+    background-image: none !important;
   }
 
   /* Soften every light border into a subtle dark one */
@@ -237,6 +243,19 @@
     background-color: var(--csdn-elev2) !important;
   }
 
+  /* Article action-bar "觉得还不错？" nudge bubble: the .tool-active-list
+     speech bubble is drawn entirely by white ::before (body) + ::after
+     (arrow) pseudo-elements (audit-blind — pseudos, and the box is only
+     32px tall). Repaint both dark so its light label is legible. */
+  .tool-active-list::before,
+  .tool-active-list::after {
+    background-color: var(--csdn-elev2) !important;
+  }
+  .tool-active-list .text,
+  .tool-active-list .text * {
+    color: var(--csdn-text-2) !important;
+  }
+
   /* Side copyright/contact footer popover */
   .csdnside-copyright-footer-contact,
   .csdnside-copyright-footer-contact .work-time-btn,
@@ -290,6 +309,15 @@
   .text-gray,
   .gray {
     color: var(--csdn-muted) !important;
+  }
+  /* search-result download-size metadata ships a hardcoded dark grey
+     (#555666) via a higher-specificity site rule — lift to muted, and set
+     the fill too in case the site drives it through -webkit-text-fill-color */
+  body .so-items-bottom .btm-lt .download-size,
+  body .so-result .download-size,
+  body .download-size {
+    color: var(--csdn-muted) !important;
+    -webkit-text-fill-color: var(--csdn-muted) !important;
   }
 
   /* ---------- Links ---------- */
@@ -638,12 +666,52 @@
     background-image: none !important;
   }
 
+  /* ---------- AI search card (so.csdn.net right rail) ----------
+     The "开发者首选的 AI 搜索引擎" promo card wraps its dark textarea in a
+     .chat-input-main box painted white via a background-IMAGE gradient
+     (bg-color transparent, so audit-blind). Flatten it to a dark elevated
+     surface so only the textarea + brand-purple submit button read on it. */
+  body div.ai-search-card,
+  body .ai-search-card .chat-input-main {
+    background-color: var(--csdn-elev) !important;
+    background-image: none !important;
+    border-color: var(--csdn-border) !important;
+  }
+
   /* tiny white ::before slivers on article/profile asides — neutralize them */
   #aside-content::before,
   #aside-content::after,
   .aside-common-box-content.aside-box-fold::before,
   .aside-common-box-content.aside-box-fold::after {
     background-color: transparent !important;
+  }
+
+  /* ---------- Blog-article "skin" raster bars ----------
+     When an author applies a CSDN skin (skin-1024 etc.), the article aside
+     section headers (.aside-title — 最新评论/大家在看/最新文章/上下篇) and the
+     comment-form title (.title-box) render a light bg-nav.png / comment-title
+     raster as a background-IMAGE. The bg-color audit misses url() images, so
+     these ship as bright white bars. Drop the raster, keep the title text. */
+  h3.aside-title,
+  .aside-title,
+  .comment-box .title-box,
+  div.title-box {
+    background-image: none !important;
+    background-color: transparent !important;
+    color: var(--csdn-text) !important;
+  }
+
+  /* aside "最新评论" comment previews use solid-white ::before (the "..."
+     ellipsis indicator) + ::after (fade mask) pseudo-elements (bg-color
+     audit-blind) — they paint a bright "..." sliver bottom-right on dark.
+     Remap both to the page base so they blend invisibly. */
+  .aside-content .newcomment-list li p.comment::before,
+  .aside-content .newcomment-list li p.comment::after,
+  .newcomment-list li p.comment.ellipsis::before,
+  .newcomment-list li p.comment.ellipsis::after {
+    background-color: var(--csdn-base) !important;
+    background-image: none !important;
+    color: var(--csdn-muted) !important;
   }
 
   /* ---------- 问答 (ask.csdn.net) ----------
@@ -704,6 +772,30 @@
   .el-card__body > ul > li {
     background-color: transparent !important;
     color: var(--csdn-text-2) !important;
+  }
+
+  /* download.csdn.net "新版内容上线啦" onboarding modal: .right-content paints
+     a white raster panel (bg-IMAGE, audit-blind) and all the title/feature
+     text is real DOM that our theme lightens — light-on-white = unreadable.
+     Flatten the panel to a dark surface so the light copy + colored feature
+     icons read; brand the CTA. */
+  .dialog-tip,
+  .dialog-tip .right-content,
+  .dialog-tip .left-content {
+    background-image: none !important;
+    background-color: var(--csdn-elev) !important;
+  }
+  .dialog-tip .title {
+    color: var(--csdn-text) !important;
+  }
+  .dialog-tip .text,
+  .dialog-tip .btn {
+    color: var(--csdn-text-2) !important;
+  }
+  /* the left panel is a decorative cube-animation <video> with a baked-in
+     light background — hide it so the flattened dark left panel stays clean */
+  .dialog-tip .left-content video {
+    display: none !important;
   }
 
   /* ---------- Download-recommend feed (blog list / 404 / column pages) ----------
