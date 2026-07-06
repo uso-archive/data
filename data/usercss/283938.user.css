@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Neoseeker, easy-on-the-eyes walkthroughs, guides, cheats and FAQs, plus the home, game hubs, wikis, search and forums.
-@version      20260629.17.20
+@version      20260705.21.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -107,6 +107,14 @@
   .who_liked,
   .text-secondary {
     color: var(--neo-muted) !important;
+  }
+
+  /* News article tagline/subtitle (`#news_description.news_tagline`) is a
+     <div> the site colors a hardcoded dark purple #443344 — reads dark-on-
+     dark here (the generic p/span text rule doesn't reach a bare div). */
+  #news_description,
+  .news_tagline {
+    color: var(--neo-text-2) !important;
   }
 
   /* ---- Links / accent --------------------------------------- */
@@ -214,6 +222,7 @@
   .modal-header,
   .modal-footer,
   .forum-group,
+  .community-box,
   #right_content > div,
   #left_content > div,
   #sidebar,
@@ -225,6 +234,7 @@
 
   /* sub-headers / table-ish header strips */
   .section-header,
+  .section-footer,
   .heading,
   .nav-header,
   .panel-heading,
@@ -285,6 +295,8 @@
 
   .table-list tbody > tr > td,
   .table-list tbody > tr > th,
+  .table-list-bordered tbody > tr > td,
+  .table-list-bordered tbody > tr > th,
   .table-list-wide-column tbody > tr > td,
   .table-list-wide-column tbody > tr > th,
   td.row,
@@ -299,6 +311,8 @@
   .table-striped tbody > tr:nth-child(even) > th,
   .table-list tbody > tr:nth-child(2n + 1) > td,
   .table-list tbody > tr:nth-child(2n + 1) > th,
+  .table-list-bordered tbody > tr:nth-child(2n + 1) > td,
+  .table-list-bordered tbody > tr:nth-child(2n + 1) > th,
   .table-list-wide-column tbody > tr:nth-child(2n + 1) > td,
   .table-list-wide-column tbody > tr:nth-child(2n + 1) > th {
     background-color: var(--neo-elev2) !important;
@@ -307,6 +321,68 @@
   table tr:hover > td,
   .table-hover tbody > tr:hover > td {
     background-color: #2b333d !important;
+  }
+
+  /* Forum index / thread-list tables stripe their COLUMNS via
+     `<col class="norm|alt">` (light #eef0f9 / #c6d0e7) painted behind
+     transparent `<td>`s — so the light column bg bleeds through as washed
+     light-on-light rows the row/cell selectors never touch. Darken the
+     columns to the elevated surfaces so the forum/thread text reads. */
+  #forumlist col.norm,
+  #threadlist col.norm,
+  .table-list col.norm,
+  col.norm {
+    background-color: var(--neo-elev) !important;
+  }
+
+  #forumlist col.alt,
+  #threadlist col.alt,
+  .table-list col.alt,
+  col.alt {
+    background-color: var(--neo-elev2) !important;
+  }
+
+  /* Some forum rows ALSO carry their own `<td class="norm|alt">` (the
+     post-count / last-reply columns) whose light bg paints ON TOP of the
+     darkened <col>, masking the col fix. Darken those cells to match. */
+  #forumlist td.norm,
+  #threadlist td.norm,
+  .table-list td.norm {
+    background-color: var(--neo-elev) !important;
+  }
+
+  #forumlist td.alt,
+  #threadlist td.alt,
+  .table-list td.alt {
+    background-color: var(--neo-elev2) !important;
+  }
+
+  /* Forum thread type-tag pills: `news` / `announcement` ship a light
+     #d4def7 chip that reads light-on-light. Darken to an elevated chip and
+     keep the accent-blue label. (The purple `.tag-gaming` chip is fine.) */
+  a.label.tag-news,
+  a.label.tag-announcement,
+  .label.tag-news,
+  .label.tag-announcement {
+    background-color: var(--neo-elev2) !important;
+    color: var(--neo-link) !important;
+  }
+
+  /* Hardware-review spec tables (`table.mwt`) paint their label column a
+     light #dbe5f1 via a site class (no inline style) while the value column
+     is transparent — so the labels wash out light-on-light. Darken the
+     cells to elevated surfaces, keeping the label column a touch lighter so
+     the two-tone spec-table layout is preserved. */
+  table.mwt td,
+  table.mwt th {
+    background-color: var(--neo-elev) !important;
+    color: var(--neo-text-2) !important;
+  }
+
+  table.mwt td:first-child,
+  table.mwt th:first-child {
+    background-color: var(--neo-elev2) !important;
+    color: var(--neo-text) !important;
   }
 
   /* ---- Alerts / callouts (recolored, semantics kept) -------- */
@@ -373,10 +449,16 @@
   }
 
   /* guide TOC "you are here" item ships a bright yellow bg with blue
-     link text (fails on dark). Recolor to the accent blue + light text. */
+     link text (fails on dark). Recolor to the accent blue + light text.
+     The wiki-navigation guide sidebar highlights the current chapter on the
+     `<li class="active">` CONTAINER (not the anchor), and forces its label
+     dark via -webkit-text-fill-color — so target the container itself and
+     pin BOTH color and fill-color light, or the bright #ffd500 bar leaks. */
   .section-spaced-small.active,
   .toc-item.active,
-  li.active > a {
+  li.active > a,
+  #wiki-navigation li.active,
+  .section-list li.active {
     background-color: var(--neo-blue) !important;
     color: #ffffff !important;
   }
@@ -384,8 +466,15 @@
   .section-spaced-small.active a,
   .section-spaced-small.active a:link,
   .section-spaced-small.active a:visited,
-  .section-spaced-small.active * {
+  .section-spaced-small.active *,
+  #wiki-navigation li.active,
+  #wiki-navigation li.active a,
+  #wiki-navigation li.active a:link,
+  #wiki-navigation li.active a:visited,
+  #wiki-navigation li.active .bullet,
+  #wiki-navigation li.active * {
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
   }
 
   /* prev/next pagination arrows: keep text light on dark. The forum
@@ -636,6 +725,25 @@
     color: var(--neo-text-2) !important;
   }
 
+  /* Forum thread "post tags:" strip (div#post_tags.inner.borders) ships a
+     light #E0E3EB bar with a light #efefef tag pill — an uncovered light
+     strip on the dark thread. Darken the bar to the elevated surface and
+     give its tag pill a dark chip with readable link text. */
+  #post_tags,
+  #post_tags.inner {
+    background-color: var(--neo-elev) !important;
+    border-color: var(--neo-border) !important;
+    color: var(--neo-text-2) !important;
+  }
+
+  #post_tags .tag,
+  #post_tags .label,
+  #post_tags a.tag.label {
+    background-color: var(--neo-elev2) !important;
+    border-color: var(--neo-border) !important;
+    color: var(--neo-link) !important;
+  }
+
   /* Collapsed blog/activity posts (member profiles) end with a "read more"
      scroll-fade gradient that fades to WHITE, washing the last lines out.
      Remap the fade to the elevated surface so text stays readable. */
@@ -700,6 +808,36 @@
     color: #14181d !important;
   }
 
+  /* Inline-COLORED infobox wrappers — Pokemon "Type Matchups", the main
+     species infobox, evolution-chain boxes, move/level/breeding tables —
+     are <div>s with a hardcoded light inline `background-color` (pale
+     yellow #f8f7c9, peach #FDD4A3, lavender #C0C7FF, green #92E584, orange
+     #F7BB75, light-blue #89C0E8, etc.), not cells, so the td/th rule above
+     misses them. They keep that light bg, but text sitting DIRECTLY on the
+     box bg inherits our LIGHT body text → column headers ("Type", "Attack
+     Advantages"…), labels and data rows wash out light-on-light.
+       Fix: darken (a) the box's own direct text and (b) any TRANSPARENT
+     descendant cell (`td`/`th` with no inline bg of its own) plus its
+     inline text children. Cells that carry their OWN inline bg are left to
+     the saturated-cell td/th rule above — that deliberately darkens only
+     their DIRECT a/b/span children, which keeps LIGHT text on DARK brand
+     cells (e.g. the near-black #090909 game-version cells) readable rather
+     than painting them dark-on-dark. `<b>`/`<strong>` carry their own
+     !important light color, so they must be named explicitly. Scoped to
+     .mw-parser-output; EXCLUDE transparent/none bgs and the hexes we remap
+     to DARK elevated surfaces below (#a181db/#98e2df/#b782c9/#d2a7e0). */
+  .mw-parser-output div[style*="background"]:not([style*="transparent"]):not([style*="background:none"]):not([style*="background-color:none"]):not([style*="#a181db"]):not([style*="#98e2df"]):not([style*="#b782c9"]):not([style*="#d2a7e0"]),
+  .mw-parser-output div[style*="background"]:not([style*="transparent"]):not([style*="#a181db"]):not([style*="#98e2df"]):not([style*="#b782c9"]):not([style*="#d2a7e0"]) td:not([style*="background"]),
+  .mw-parser-output div[style*="background"]:not([style*="transparent"]):not([style*="#a181db"]):not([style*="#98e2df"]):not([style*="#b782c9"]):not([style*="#d2a7e0"]) td:not([style*="background"]) b,
+  .mw-parser-output div[style*="background"]:not([style*="transparent"]):not([style*="#a181db"]):not([style*="#98e2df"]):not([style*="#b782c9"]):not([style*="#d2a7e0"]) td:not([style*="background"]) strong,
+  .mw-parser-output div[style*="background"]:not([style*="transparent"]):not([style*="#a181db"]):not([style*="#98e2df"]):not([style*="#b782c9"]):not([style*="#d2a7e0"]) td:not([style*="background"]) a,
+  .mw-parser-output div[style*="background"]:not([style*="transparent"]):not([style*="#a181db"]):not([style*="#98e2df"]):not([style*="#b782c9"]):not([style*="#d2a7e0"]) td:not([style*="background"]) span,
+  .mw-parser-output div[style*="background"]:not([style*="transparent"]):not([style*="#a181db"]):not([style*="#98e2df"]):not([style*="#b782c9"]):not([style*="#d2a7e0"]) td:not([style*="background"]) small,
+  .mw-parser-output div[style*="background"]:not([style*="transparent"]):not([style*="#a181db"]):not([style*="#98e2df"]):not([style*="#b782c9"]):not([style*="#d2a7e0"]) caption,
+  .mw-parser-output td[style*="#f8f7c9"] * {
+    color: #14181d !important;
+  }
+
   /* Light PASTEL inline surfaces (move tables, section boxes, light
      decorative wrappers) are too bright on dark — darken to elevated and
      keep text light. These hexes are the recurring light pastels Neoseeker
@@ -749,6 +887,35 @@
     background-color: var(--neo-elev) !important;
     border-color: var(--neo-border) !important;
     box-shadow: none !important;
+  }
+
+  /* Guide/FAQ `.section-info` callout boxes (e.g. "BOSS FIGHT: …") ship an
+     inline LIGHT background (#d6d8d9 body + #8a8b8c header) with dark text.
+     We darken the box + header to elevated surfaces via the `.section*`
+     rules, but the MediaWiki `div[style*="background"]` dark-text rule above
+     (high specificity from its stacked `:not()`s) then repaints their text
+     #14181d → invisible dark-on-dark headers/labels. Re-light the text; the
+     `#wiki-content`/`#mw-content-text` ID prefix out-specifies that rule.
+     Only `color` is remapped (the site sets no `-webkit-text-fill-color`, so
+     fill follows currentColor) — this leaves link/image fill colors intact. */
+  #wiki-content .section-info,
+  #wiki-content .section-info > center,
+  #wiki-content .section-info > b,
+  #wiki-content .section-info > strong,
+  #mw-content-text .section-info,
+  #mw-content-text .section-info > center,
+  #mw-content-text .section-info > b,
+  #mw-content-text .section-info > strong {
+    color: var(--neo-text-2) !important;
+  }
+
+  #wiki-content .section-info .section-header,
+  #wiki-content .section-info .section-header center,
+  #wiki-content .section-info .section-header *,
+  #mw-content-text .section-info .section-header,
+  #mw-content-text .section-info .section-header center,
+  #mw-content-text .section-info .section-header * {
+    color: var(--neo-text) !important;
   }
 
   /* ---- Footer ----------------------------------------------- */

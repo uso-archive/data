@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A cosy Catppuccin Mocha dark theme for BBC News, Sport and the homepage: easy on the eyes, with the BBC logo, photos and live colors kept intact.
-@version      20260629.17.02
+@version      20260705.21.14
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -30,22 +30,15 @@
     --ctp-crust:    #11111b;
     --ctp-surface0: #313244;
     --ctp-surface1: #45475a;
-    --ctp-surface2: #585b70;
-    --ctp-overlay0: #6c7086;
     --ctp-overlay1: #7f849c;
     --ctp-overlay2: #9399b2;
     --ctp-subtext0: #a6adc8;
     --ctp-subtext1: #bac2de;
     --ctp-text:     #cdd6f4;
     --ctp-blue:     #89b4fa;
-    --ctp-lavender: #b4befe;
-    --ctp-sapphire: #74c7ec;
     --ctp-sky:      #89dceb;
     --ctp-mauve:    #cba6f7;
-    --ctp-pink:     #f5c2e7;
     --ctp-red:      #f38ba8;
-    --ctp-maroon:   #eba0ac;
-    --ctp-peach:    #fab387;
     --ctp-yellow:   #f9e2af;
     --ctp-green:    #a6e3a1;
     --ctp-teal:     #94e2d5;
@@ -130,8 +123,13 @@
 
   /* ---- Page section wrappers (keep transparent over base) ---- */
   main,
-  [data-testid$="-section-outer"],
-  [data-testid$="-section-inner"],
+  /* Sections use US-state codenames with an optional trailing index
+     (e.g. georgia-section-outer-4) — a $="…-section-outer" suffix match
+     misses the numbered variants and lets a special-report section
+     (e.g. the "AMERICA 250" band) ship its white bg. Match on *= so every
+     …-section-outer/-inner is caught regardless of the trailing number. */
+  [data-testid*="-section-outer"],
+  [data-testid*="-section-inner"],
   [data-testid^="ohio-section"],
   [data-testid^="nevada-section"],
   [data-testid^="illinois-section"],
@@ -309,7 +307,12 @@
     background-color: var(--ctp-surface0) !important;
     border-color: var(--ctp-surface1) !important;
   }
-  [class*="ComboboxWrapper"], [class*="ComboboxWrapper"] div {
+  [class*="ComboboxWrapper"], [class*="ComboboxWrapper"] div,
+  /* Team/competition search autocomplete: the open suggestion list ships a
+     solid-white <ul>/<li> (StyledUl/StyledLi) that only appears once you type,
+     so the closed-state audit misses it — it peeks out as a white strip beside
+     the dark menu panel. The div-only rule above skipped the list elements. */
+  [class*="ComboboxWrapper"] ul, [class*="ComboboxWrapper"] li {
     background-color: var(--ctp-surface0) !important;
     color: var(--ctp-text) !important;
   }
@@ -318,6 +321,16 @@
      lightBgImages scan misses them). Drop the gradient. */
   [class*="Datepicker"] [class*="Fade"],
   [class*="DatePicker"] [class*="Fade"] {
+    background-image: none !important;
+  }
+  /* Promo/Shorts carousel edge overlays ship a solid rgba(248,248,248,.75)
+     scroll-fade that washes the outermost card to light grey (bg-COLOR, not
+     a gradient → the lightBgImages scan misses it; it slips the lightSurfaces
+     size filter as a narrow strip). Re-tint to a translucent base so the
+     fade cue survives but reads dark. */
+  [class*="CarouselLeftOverlay"],
+  [class*="CarouselRightOverlay"] {
+    background-color: rgba(30, 30, 46, 0.75) !important;
     background-image: none !important;
   }
   /* "All times are UK…" disclaimer ships hardcoded near-black text — fine
@@ -357,9 +370,59 @@
   [class*="LiveLabel"] ~ * {
     color: var(--ctp-overlay2) !important;
   }
+
+  /* ---- Sport STORY frontend (ssrcss article + its rails) ----
+     The related-story promo cards ("More on this story", the right-hand
+     promo rail) ship a solid-white Promo card + white MediaContainer, and
+     the "Related topics" pills are white LinkItem/StyledLink chips. Our
+     Sport rules coloured the headline text light but never darkened these
+     surfaces → light-on-white, unreadable. `[class*="-Promo"]` targets the
+     exact Emotion component "Promo" (leading hyphen) without touching
+     "MatchPromo". Cards sit transparent on the base; chips become dark pills. */
+  [class*="-Promo"],
+  [class*="IndexPromo"],
+  [class*="MediaContainer"],
+  [class*="PromoContentWrapper"] {
+    background-color: transparent !important;
+  }
+  /* Sport-story byline "BBC Sport journalist at …" ships hardcoded #606060,
+     readable on the old white bg but dark-on-dark once darkened. */
+  [class*="ContributorDetails"],
+  [class*="ContributorDetails"] * {
+    color: var(--ctp-subtext0) !important;
+  }
+  /* Live "…viewing" count is hardcoded BBC-Sport teal #006666 (~1.6:1 on the
+     Mocha base, invisible). All other MetadataText already reads as subtext1,
+     so pin the whole class to the readable subtext for a consistent metadata. */
+  [class*="MetadataText"] { color: var(--ctp-subtext1) !important; }
+  [class*="LinkItem"] { background-color: transparent !important; }
+  [class*="LinkItem"] [class*="StyledLink"],
+  [class*="TagList"] [class*="StyledLink"],
+  [class*="Cluster"] [class*="StyledLink"] {
+    background-color: var(--ctp-surface0) !important;
+    color: var(--ctp-subtext1) !important;
+    border-color: var(--ctp-surface1) !important;
+  }
   [class*="PageTypeIndicator"] {
     background-color: var(--ctp-mantle) !important;
     color: var(--ctp-text) !important;
+  }
+  /* Match-coverage promo card embedded in a Sport story ("Mexico v England /
+     Watch on iPlayer / Listen: …") ships a solid-white EventInformationContainer.
+     Our generic p/li + heading rules had already lightened its text, so the card
+     rendered light-on-WHITE — unreadable. It carries no -Promo/-Card hook (its
+     class is EventInformationContainer), so the Sport-story surface rules missed
+     it. Darken the card and lift its hardcoded #606060 detail/coverage/links text
+     (dark-on-dark once the card is dark) to a readable muted Mocha. */
+  [class*="EventInformationContainer"] {
+    background-color: var(--ctp-surface0) !important;
+    border-color: var(--ctp-surface1) !important;
+  }
+  [class*="EventDetailsContainer"],
+  [class*="CoverageTextContainer"],
+  [class*="CallToActionContainer"],
+  [class*="AdditionalLinksContainer"] {
+    color: var(--ctp-subtext0) !important;
   }
 
   /* Sport masthead + primary nav bar ship a huge brand-yellow fill that
@@ -420,11 +483,37 @@
   [class*="AdSlot"],
   [class*="dotcom-ad"],
   .dotcom-ad,
-  [id^="dotcom-"] {
+  [id^="dotcom-"],
+  /* Sport (ssrcss) MPU / sticky ad slots ship a bare white container that
+     glares before the cross-origin ad iframe fills it. */
+  #sticky-mpu,
+  [id*="mpu-side-aside"],
+  [id="advert"] {
     background-color: var(--ctp-crust) !important;
     border-color: var(--ctp-surface0) !important;
     color: var(--ctp-overlay1) !important;
   }
+
+  /* Taboola sponsored-content feed (rendered INLINE below articles, not in
+     an iframe → themeable). Our page-darkening left its hardcoded near-black
+     card titles/descriptions (#141414) dark-on-dark and its branding line a
+     too-dim #545658, plus a light-grey rbox pseudo-panel (#e4e4e4, 161px).
+     Lift the text to readable Mocha and darken the panel. Targets Taboola's
+     stable global classes, scoped to the widget so nothing else is touched. */
+  [id*="taboola"] .video-title,
+  [id*="taboola"] .video-label,
+  .trc_rbox .video-title, .trc_rbox .video-label,
+  .tbl-feed-header, .tbl-feed-header * {
+    color: var(--ctp-text) !important;
+  }
+  [id*="taboola"] .video-description,
+  [id*="taboola"] .branding, [id*="taboola"] .branding *,
+  .trc_rbox .video-description,
+  .trc_rbox .branding, .trc_rbox .branding * {
+    color: var(--ctp-subtext0) !important;
+  }
+  #rbox-t2v::before, #rbox-t2v::after,
+  .trc_rbox_div::before, .trc_rbox_div::after { background-color: var(--ctp-mantle) !important; }
 
   /* ============================================================
      FORMS / INPUTS / BUTTONS
@@ -485,11 +574,29 @@
   [class*="LiveLabel"],
   [class*="Live-"],
   [data-testid="live-icon"],
-  [class*="PulseLabel"] {
+  [class*="PulseLabel"],
+  /* Dotcom card-heading "LIVE" badge ships hardcoded brand red #eb0000 —
+     ~3.3:1 on the Mocha base (a WCAG-AA fail for the small bold caps), and the
+     [class*="Live*"] hooks above don't catch it (its class is …ContentTypeLabel).
+     Lift it to the readable Mocha red so the live signal still reads. */
+  [class*="IndexCardHeading-styles__ContentTypeLabel"] {
     color: var(--ctp-red) !important;
   }
   [class*="Breaking"] [class*="Headline"],
   [class*="Breaking"] a { color: var(--ctp-red) !important; }
+
+  /* Sport (ssrcss) live pulse ships brand teal #006666 on the "LIVE" caps AND
+     its SVG pulse dot — ~2.3:1 dark-on-dark on the Mocha base, near-invisible.
+     Lift to the Mocha teal so it keeps the BBC-Sport live cue but reads. */
+  [class*="LivePulse"],
+  [class*="LivePulse"] * {
+    color: var(--ctp-teal) !important;
+  }
+  [class*="LivePulse"] svg,
+  [class*="LivePulse"] svg path,
+  [class*="LivePulse"] svg circle {
+    fill: var(--ctp-teal) !important;
+  }
   /* Sport result wins/losses + status accents */
   [class*="Win"], [class*="Winner"], [class*="Increase"] { color: var(--ctp-green) !important; }
   [class*="Loss"], [class*="Decrease"] { color: var(--ctp-red) !important; }

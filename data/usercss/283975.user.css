@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Juejin (掘金): comfortable reading of articles, the feed, pins and comments, with fully readable dark code blocks and syntax.
-@version      20260629.17.18
+@version      20260705.21.17
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -53,7 +53,8 @@
   .view-container,
   .main-container,
   .container,
-  .global-layout {
+  .global-layout,
+  .root-view-bg {
     background-color: #14181d !important;
     color: #c4cdd6 !important;
   }
@@ -166,6 +167,17 @@
   input.search-input {
     background-color: transparent !important;
     color: #e6edf3 !important;
+  }
+
+  /* Header search magnifier button (Juejin's class is the typo `seach-icon-…`).
+     Its `.active` state — set while the search box is focused — paints a hardcoded
+     light-blue #eaf2ff fill, a bright button on the dark bar. Remap to a subtle
+     brand-tinted dark so the blue magnifier icon still reads as a pressable. */
+  .seach-icon-container,
+  .seach-icon-container.active,
+  .search-icon-btn,
+  .search-btn {
+    background-color: #1a2433 !important;
   }
 
   /* ---------- Elevated surfaces (cards, panels, sidebar blocks) ---------- */
@@ -334,6 +346,21 @@
     background-color: #14181d !important;
   }
 
+  /* Feed article cover thumbnails are `img.lazy.thumb` carrying a hardcoded white
+     `background-color` placeholder that juejin shows behind the picture while it
+     lazy-loads (and keeps if the image is broken/absent). On the dark feed every
+     loading/failed cover glares as a bright white box (audit-blind — the scan
+     skips <img> tags). object-fit:cover fully covers the bg once loaded, so
+     darkening the placeholder is invisible for loaded covers and kills the flash. */
+  img.lazy,
+  img.thumb,
+  img.lazy.thumb,
+  .thumb-box img,
+  .cover img,
+  .thumb-container {
+    background-color: #1c2128 !important;
+  }
+
   /* Light-blue active tints (selected nav items, login wrap, dock tabs) */
   .nav-item-content.active-nav,
   .item-login-wrap,
@@ -484,6 +511,19 @@
     color: #5fb0e6 !important;
   }
 
+  /* Pin circle/club chips: the per-pin `.pin-club-box .club` badge ("发布在 X 圈子")
+     paints a hardcoded light-blue #eaf2ff bg, and the editor's `.new_topic`
+     ("请选择圈子") pill a white bg — both short (~24px) chips that slip under the
+     audit size filter and glare as pale pills on the dark cards. Remap to a subtle
+     brand-tinted dark; the blue icon + label already read on it. */
+  .pin-club-box .club,
+  .club,
+  .new_topic {
+    background-color: #1a2433 !important;
+    border-color: #24314a !important;
+    color: #5fb0e6 !important;
+  }
+
   /* Muted metadata: dates, view/like/comment counts, tags meta */
   .meta-list,
   .meta-list *,
@@ -553,10 +593,21 @@
   .byte-btn--primary,
   .submit-btn,
   .follow-button:not(.followed),
-  .creator-btn {
+  .creator-btn,
+  .add-group,
+  .add-group .add-btn,
+  .add-group .more {
     background-color: #1e80ff !important;
     border-color: #1e80ff !important;
     color: #ffffff !important;
+  }
+
+  /* The header "创作者中心" CTA (`.add-group` → `.add-btn` + caret `.more`) drove its
+     fill from a brand VAR we deliberately remap to a light accent-blue (#5fb0e6) for
+     text — so the button rendered a pale washed-out blue with near-white text
+     (~1.8:1). Forced to the proper deep brand blue above; the caret divider stays subtle. */
+  .add-group .more {
+    border-left-color: rgba(255, 255, 255, 0.25) !important;
   }
 
   .login-button:hover,
@@ -808,6 +859,39 @@
     border-color: #2d333b !important;
   }
 
+  /* Byte-design `<select>` control (the category-feed "全部" filter box top-right,
+     sort/type filters). The CLOSED control is `.byte-select__wrap` with a hardcoded
+     light-grey bg (#f2f3f5) + black label — a bright box on the dark feed (the open
+     `.byte-select-dropdown` panel was already darked). Dark the control + its value
+     text; the caret rides the muted scale. */
+  .byte-select,
+  .byte-select__wrap,
+  .byte-select__trigger,
+  .pc-sub-tags.byte-select {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .byte-select__value,
+  .byte-select__placeholder,
+  .byte-select .byte-select__value-text {
+    color: #c4cdd6 !important;
+  }
+
+  /* The SELECTED option in the open dropdown paints a hardcoded light-blue
+     (#eaf2ff) bg with brand-blue text → light-on-light, near-invisible. Remap the
+     active tint to a subtle brand-tinted dark so the selected row still reads. */
+  .byte-select-option--selected,
+  .byte-select-option--hover,
+  .byte-select-option:hover {
+    background-color: #1a2433 !important;
+  }
+
+  .byte-select-option--selected {
+    color: #5fb0e6 !important;
+  }
+
   input::placeholder,
   textarea::placeholder,
   .byte-input__input::placeholder,
@@ -816,12 +900,36 @@
     opacity: 1 !important;
   }
 
+  /* Byte-design checkboxes (course "只看VIP课程" filter, comment/agreement opt-ins)
+     render the box as a styled `<span.byte-checkbox__checkbox>` with a hardcoded
+     white bg — a 14px bright square on dark that also reads as if already checked.
+     Dark the unchecked box + border; the CHECKED state keeps the brand blue so the
+     white tick still reads. */
+  .byte-checkbox__checkbox {
+    background-color: #14181d !important;
+    border-color: #3a424d !important;
+  }
+
+  .byte-checkbox--checked .byte-checkbox__checkbox,
+  .byte-checkbox__checkbox--checked,
+  .byte-checkbox.is-checked .byte-checkbox__checkbox {
+    background-color: #1e80ff !important;
+    border-color: #1e80ff !important;
+  }
+
   /* ---------- Tags / chips ---------- */
+  /* Feed article footer tags are `.footer-tag` (a `jj-link.footer-tag` pill) with a
+     hardcoded light-grey #f2f3f5 bg — a short (~24px) pill that slips under the
+     audit size filter, so it ships as a bright box on the dark feed. Dark it to the
+     chip surface; its label already rides the muted grey. */
   .tag,
   .tag-item,
   .entry-tag,
   .meta-list .tag,
-  .suggested-tag {
+  .suggested-tag,
+  .footer-tag,
+  .jj-link.footer-tag,
+  .entry-footer-tags .footer-tag {
     background-color: #21262d !important;
     color: #9bd4ff !important;
     border-color: #2d333b !important;
@@ -873,6 +981,19 @@
     background-color: #21262d !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
+  }
+
+  /* Floating action dock (bottom-right): customer-service chat `.meiqia-btn`, the
+     "..." more button and the scroll-triggered back-to-top `.to-top-btn` are all
+     `.btn.btn-hover` circles with a hardcoded white bg. The to-top button only
+     mounts after scrolling (audit-blind at top-of-page), the others glare white on
+     the dark page. Dark to the elevated surface; their blue/grey glyphs still read. */
+  .btn.btn-hover,
+  .btn.btn-hover.meiqia-btn,
+  .btn.btn-hover.to-top-btn {
+    background-color: #1c2128 !important;
+    border: 1px solid #262c33 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
   }
 
   /* Skeleton / placeholder shimmer blocks. Juejin's loader is `.xitu-skeleton`

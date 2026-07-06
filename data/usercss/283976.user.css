@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260628.10.37
+@version      20260705.21.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -188,8 +188,14 @@
      `linear-gradient(transparent -> white)` on a hashed div at the foot of the
      scrollable unit sidebar) which the color-only neutralizer otherwise misses;
      Khan paints no decorative gradients in `#main-content` (mastery/progress use
-     solid tokens + SVG strokes), so this is safe. */
-  #main-content [class] { background-color: transparent; background-image: none; }
+     solid tokens + SVG strokes), so this is safe. The `:not(span)` carve-out is
+     essential: Khan's mastery legend keys (Mastered/Quiz/Unit test…) and the
+     unit-progress grid markers are Wonder Blocks icon `<span>`s rendered as a
+     `mask-image` SVG whose FILL is the span's own `background-color` (the slate
+     mastery tone, white, or `currentColor`). Flattening that to transparent
+     stripped every icon to an empty box; excluding `span` keeps the mastery /
+     progress colors intact (no large light-surface span exists to need it). */
+  #main-content [class]:not(span) { background-color: transparent; background-image: none; }
   /* Keep interactive promo cards/buttons reading as tappable cards */
   #main-content button[class],
   #main-content a[class][role],
@@ -209,12 +215,43 @@
      hashed class ever changes the icon simply stays empty as before, no breakage. */
   ._1yakn8cj span { background-color: #8b949e !important; }
 
+  /* Mastery "information" glyphs (the small "i" beside "… possible mastery
+     points" and each unit's "Unit mastery: NN%" indicator) are the same
+     `mask-image` icon pattern, hardcoded to a dark ink (rgba(33,36,44,.64))
+     built for the light page, so they read dark-on-dark here. Scoped to the
+     stable accessible name (not a hashed class) and lifted to a muted light so
+     the mastery affordance stays visible. */
+  #main-content span[role="img"][aria-label="Mastery information"] { background-color: #8b949e !important; }
+
   /* Logged-out donation widget (form/fieldset of amount + frequency options
      render on white) — neutralized via its stable form structure. The
      selected option keeps a clear highlighted state in the brand blue. */
   form fieldset, form fieldset ul, form fieldset li,
   form fieldset li label { background-color: #1c2128 !important; color: #c4cdd6 !important; }
   form fieldset li label:hover { background-color: #232a32 !important; }
+
+  /* OneTrust cookie-consent banner (logged-out, first visit) — Khan loads the
+     stock OneTrust CMP, whose container, body text and "Cookies Settings"
+     outline button hardcode white / near-black built for a light page, leaving
+     a glaring white modal (and a near-invisible light-grey "Use of cookies"
+     heading on white). Not token-driven, so it bypasses every remap above.
+     Dark the OneTrust surfaces via its stable #onetrust-* ids; the blue
+     Accept/Reject buttons keep the Khan-blue brand identity. */
+  #onetrust-consent-sdk #onetrust-banner-sdk,
+  #onetrust-consent-sdk #onetrust-pc-sdk,
+  #onetrust-consent-sdk .ot-sdk-container,
+  #onetrust-consent-sdk .ot-pc-footer { background-color: #1c2128 !important; }
+  #onetrust-consent-sdk #onetrust-policy-title,
+  #onetrust-consent-sdk #onetrust-policy-text,
+  #onetrust-consent-sdk .ot-b-addl-desc,
+  #onetrust-consent-sdk #onetrust-banner-sdk *:not(a):not(button) { color: #e6edf3 !important; }
+  #onetrust-consent-sdk #onetrust-banner-sdk a { color: #5fb0e6 !important; }
+  #onetrust-consent-sdk #onetrust-pc-btn-handler,
+  #onetrust-consent-sdk .ot-pc-refuse-all-handler {
+    background-color: #1c2128 !important;
+    color: #5fb0e6 !important;
+    border-color: #3a424c !important;
+  }
 
   /* ====================================================================
      Soften any remaining bright borders across the app

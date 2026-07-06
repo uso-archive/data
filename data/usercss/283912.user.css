@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for HeadHunter (hh.ru / hh.kz / hh.uz / hh.by / rabota.by). Job search, vacancies and companies in an easy-on-the-eyes dark UI.
-@version      20260629.17.09
+@version      20260705.21.17
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -110,18 +110,34 @@
   [class*="magritte-card"]:hover, [data-qa="vacancy-serp__vacancy"]:hover {
     background-color: #21262d !important; }
 
-  /* ---- Employer "chameleon" branded templates (tmpl-hh-*) ---- */
+  /* ---- Employer "chameleon" branded templates ---- */
+  /* Two naming conventions ship in the wild: the hyphen family (tmpl-hh-*) and an
+     UNDERSCORE family (tmpl_hh_*, e.g. the Газпромбанк page: tmpl_hh_wrapper /
+     _appeal / _become-part cards ship a light-blue #eaf9ff shell + pure-white
+     award cards). Both must be darkened — otherwise our forced light body text
+     reads light-on-light-blue (unreadable). Cover both spellings. */
   [class*="tmpl-hh-wrapper"], [class*="tmpl-hh-facts"], [class*="tmpl-hh-banner"],
   [class*="tmpl-hh-offers"], [class*="tmpl-hh-find"], [class*="tmpl-hh-reviews"],
-  [class*="tmpl-hh"], [class*="with-top-image"], [class*="employer-tabs-wrapper"] {
+  [class*="tmpl-hh"], [class*="tmpl_hh"],
+  [class*="with-top-image"], [class*="employer-tabs-wrapper"] {
     background-color: #1c2128 !important; border-color: #2d333b !important; }
-  [class*="tmpl-hh"] * { color: #c4cdd6 !important; }
-  [class*="tmpl-hh"] h1, [class*="tmpl-hh"] h2, [class*="tmpl-hh"] h3 { color: #e6edf3 !important; }
+  [class*="tmpl-hh"] *, [class*="tmpl_hh"] * { color: #c4cdd6 !important; }
+  [class*="tmpl-hh"] h1, [class*="tmpl-hh"] h2, [class*="tmpl-hh"] h3,
+  [class*="tmpl_hh"] h1, [class*="tmpl_hh"] h2, [class*="tmpl_hh"] h3 { color: #e6edf3 !important; }
   /* newer Magritte "constructor" employer pages: the "О компании" body widget
      ships a hardcoded WHITE panel — our light body text then reads light-on-light
      (unreadable). Dark the widget surface; its text already maps to light grey. */
   [class*="employer-constructor-widget"] {
     background-color: #1c2128 !important; border-color: #2d333b !important; }
+  /* SERP "branded snippet" promo cards ship the employer's OWN brand colour as an
+     INLINE background-color on the outer wrapper (e.g. a light-blue #deeaff). The
+     inner content is a dark magritte-card, but the wrapper's frame + the wide
+     right-hand illustration column then glare light — a bright panel on the dark
+     results list. It's audit-blind-ish (rotates per employer, inline non-white).
+     Dark the wrapper so the frame + illustration column read dark; the decorative
+     PNG (transparent) sits on dark like the rest of the card. */
+  [class*="branded-snippet--"] {
+    background-color: #1c2128 !important; }
 
   /* ---- Typography ---- */
   h1, h2, h3, h4, h5, h6, [class*="magritte-title"], [class*="magritte-text"][class*="primary"],
@@ -212,6 +228,23 @@
   [data-qa="advanced-filter"], [data-qa="serp__settings"],
   [data-qa="order-by-menu"], .supernova-filters {
     background-color: transparent !important; color: #c4cdd6 !important; }
+  /* the SERP "add filter" chips (+ Район / Метро / График / Опыт …) darken at
+     the button level, but their inner content span (magritte-content___) ships
+     a hardcoded WHITE fill on TOP → light-on-light, unreadable. It's audit-blind
+     (32px tall, under the surface-scan floor). Clear the inner fill so the dark
+     chip button shows through; the label already maps to light grey, and the
+     checked chip keeps its blue button surface. */
+  [class*="magritte-chip"] [class*="magritte-content___"],
+  [data-qa="chip"] [class*="magritte-content___"] {
+    background-color: transparent !important; }
+  /* On the SERP, once you scroll the filter-chip bar re-mounts as a FIXED
+     glass strip (CSS-module `sticky--<hash>`) with a hardcoded near-white
+     `color(srgb 1 1 1 / 0.68)` background + backdrop blur — a white band under
+     the dark chips. Absent at scroll 0 (evades top-of-page scans) and the
+     hashed class + srgb() make it audit-blind. Pin it to the page base so the
+     stuck bar matches the SERP behind it. */
+  div[class*="sticky--"] {
+    background-color: #14181d !important; }
 
   /* ---- Filter select / "trigger" controls (sidebar dropdowns: schedule,
      working hours, payout period, etc. — shipped white) ---- */
@@ -232,6 +265,19 @@
   [class*="magritte-modal"] [class*="magritte-modal-close"] svg,
   [class*="magritte-modal"] [class*="magritte-modal-close"] svg path {
     color: #c4cdd6 !important; fill: currentColor !important; }
+  /* the ccTLD "Выберите язык" language picker (hh.kz/uz/by) was redesigned onto the
+     Magritte "nav-bar-panes" component: its close button ships a light-glass
+     (rgba(255,255,255,.68)) rounded square with a BLACK X glyph — a bright control
+     on the dark modal, and the pane's own "-pane-background" backing layer is a
+     hardcoded white. Both are audit-blind-ish (the backing is occluded, the glass
+     square is a small control). Dark the glass + backing and lift the glyph. */
+  [class*="magritte-pane-background"] {
+    background-color: #1c2128 !important; }
+  [data-qa="select-modal-close"] [class*="magritte-view"] {
+    background-color: #21262d !important; }
+  [data-qa="select-modal-close"] svg,
+  [data-qa="select-modal-close"] svg path {
+    color: #c4cdd6 !important; fill: #c4cdd6 !important; }
 
   /* ---- Auth form: phone calling-code box + neutral "show more" social
      aggregator ship WHITE (the aggregator's hh label is light-grey → unreadable
@@ -272,6 +318,20 @@
   [data-qa="vacancy-view-employment-mode"] {
     color: #c4cdd6 !important; }
   [data-qa="vacancy-description"] * { color: inherit !important; }
+  /* Branded ("chameleon") vacancy descriptions inject the employer's OWN
+     stylesheet, which highlights section headers with a bright fill on inline
+     tags (e.g. a #58ffff cyan <strong> "ОБЯЗАННОСТИ:"). The fill comes from the
+     employer rule (not inline) so a white-surface scan misses it, and our forced
+     light body text then reads light-on-bright — effectively invisible. Neutralise
+     those inline highlight fills within branded user content so the bold header
+     reads as clean light text on the dark card (text is already forced light, so
+     no dark-on-dark). Colored highlight TEXT stays its hue. */
+  [class*="vacancy-branded-user-content"] strong,
+  [class*="vacancy-branded-user-content"] b,
+  [class*="vacancy-branded-user-content"] em,
+  [class*="vacancy-branded-user-content"] font,
+  [class*="vacancy-branded-user-content"] span {
+    background-color: transparent !important; }
   /* search-term highlight: keep the "matched word" meaning, dark amber */
   span.highlighted, mark, .bloko-text_highlighted {
     background-color: #4a3a12 !important; color: #f0d58a !important; }
@@ -326,6 +386,16 @@
      surface; its accent-blue glyph stays its brand colour and reads on top. */
   [class*="magritte-avatar_mode-icon"][class*="magritte-avatar_style-accent-secondary"] {
     background-color: #1f3550 !important; }
+  /* the "IT-аккредитация" employer chip (a ~24px disc next to the rating, and on
+     vacancy / search cards) ships a light disc with a BLACK currentColor "it"
+     glyph. It's audit-blind — the surface scan needs >120×40 so the small disc
+     slips past — and reads as a bright spot on dark. Dark the disc to the card
+     surface and lift its glyph (its fill is currentColor). */
+  [data-qa="accredited-it-employer-icon"] {
+    background-color: #21262d !important; }
+  [data-qa="accredited-it-employer-icon"] svg,
+  [data-qa="accredited-it-employer-icon"] svg path {
+    color: #b8c0c9 !important; fill: currentColor !important; }
 
   /* ---- Cookie / consent informer (kill the bright bar; click-dismiss in real use) ---- */
   [data-qa="cookies-policy-informer"], .cookies-policy-informer {

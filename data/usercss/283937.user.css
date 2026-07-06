@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Weather Underground. Darkens forecasts, hourly and 10-day pages and data tables while keeping radar, maps and weather icons intact.
-@version      20260629.17.21
+@version      20260705.21.22
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -232,6 +232,14 @@
   .timestamp {
     color: var(--wu-text-2) !important;
   }
+  /* Home/forecast hourly strip date row (.forecast .dates span) is WU's dim
+     #696969 grey -> ~2:1 dark-on-dark. Lift to the readable muted light. */
+  .forecast .dates span,
+  .forecast .dates .date,
+  .forecast .times span {
+    color: var(--wu-text-muted) !important;
+  }
+
   /* Astronomy sunrise/sunset accent (#cc5500 / #e59900) -> readable amber. */
   .astro-data[style*="204"],
   .sun-data,
@@ -698,9 +706,47 @@
   lib-infographic-recent-list .stack,
   .basic-module .content .stack,
   .infographic-item,
-  .poster-item {
+  .poster-item,
+  lib-cat-six-article,
+  lib-cat-six-article .cat-six-article,
+  .cat-six-article,
+  lib-cat-six-about-author,
+  lib-cat-six-about-author .cat-six-about-author,
+  .cat-six-about-author {
     background-color: var(--wu-surface) !important;
     color: var(--wu-text-2) !important;
+  }
+
+  /* The Category 6 blog "ALL SECTIONS" filter is a Material <mat-select> whose
+     trigger renders as a #f7f7f7 box with near-black value/arrow -- a glaring
+     white pill on the dark page. Darken the trigger and lift its value + arrow;
+     the open panel is already handled by the .mat-mdc-select-panel rule above. */
+  mat-select,
+  .mat-mdc-select,
+  .mat-mdc-select-trigger,
+  .cat-six-grid mat-select {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text) !important;
+  }
+  /* WU paints a light dropdown-arrow chip on the right of the <mat-select> via a
+     sprite background-IMAGE (sprite-common-vert.png) -- a white rounded button
+     that survives the bg-color darkening (audit-blind). Drop it; the Material
+     grey triangle arrow (.mat-mdc-select-arrow) still indicates the control. */
+  mat-select.mat-mdc-select,
+  .cat-six-dropdown mat-select {
+    background-image: none !important;
+  }
+  .mat-mdc-select-value,
+  .mat-select-value,
+  .mat-mdc-select-value-text,
+  .mat-mdc-select-min-line {
+    color: var(--wu-text) !important;
+  }
+  .mat-mdc-select-arrow,
+  .mat-select-arrow,
+  .mat-mdc-select-arrow svg {
+    color: var(--wu-text-muted) !important;
+    fill: var(--wu-text-muted) !important;
   }
 
   /* Article-detail "Recent Stories" rail: lib-recent-stories wraps a
@@ -874,5 +920,98 @@
   .history-tab-btn.active,
   li.tab-item.active a {
     background-color: var(--wu-surface-2) !important;
+  }
+
+  /* The station-history date picker uses native <select class="wu-select"> with
+     appearance:none and a sprite background-IMAGE (sprite-common-vert.png) that
+     paints a WHITE rounded dropdown-arrow chip on the right of every field --
+     audit-blind (the select's bg-color is already dark, the sprite survives) so
+     four glaring white chips ship on the dark dashboard. Drop the light sprite;
+     the dark field body + light value text remain. */
+  .wu-select {
+    background-image: none !important;
+  }
+  /* The "Previous"/"Next" history pager buttons (.custom-button) use a gradient
+     background-IMAGE: enabled = WU cyan (kept), but the DISABLED state (parent
+     .nav-button.disabled) paints a light-grey linear-gradient (#c1c1c1->#dbdbdb)
+     over its cyan bg-color -> a bright white-grey button on dark (audit reads the
+     cyan bg-color, misses the grey gradient). Darken the disabled pager to an
+     elevated surface; its chevron icon still indicates the control. */
+  .nav-button.disabled .custom-button {
+    background: var(--wu-surface-2) !important;
+  }
+
+  /* ---- PWS dashboard gauge discs (audit-blind) -------------------------- */
+  /* (a) PRESSURE dial: .pressure-dial paints the barometer face as a WHITE
+     raster background-IMAGE (url(), not a bg-color or gradient) with black
+     ticks/numbers + a black needle <img.pressure-marker> child. The bg audit
+     (color only) and the gradient/lightBgImages check both miss a url() image.
+     Invert the whole dial subtree: white face -> dark, black ticks/numbers and
+     the needle -> light, so the gauge reads on dark with no recolor needed. */
+  .pressure-dial {
+    filter: invert(1) !important;
+  }
+  /* (b) SOLAR RADIATION gauge: an inline <svg> whose outer disc is
+     <circle fill="#EDEDED"> (the audit's white-fill scan only recognizes
+     #fff/white literals, so a light hex like #EDEDED slips past) with an
+     orange <circle fill="#FF9A3B"> sun on top. Darken only the light track
+     disc; the orange intensity indicator is semantic and kept. */
+  lib-tile-solar-radiation circle[fill="#EDEDED"],
+  lib-tile-solar-radiation circle[fill="#ededed"],
+  .dashboard__module circle[fill="#EDEDED"],
+  .dashboard__module circle[fill="#ededed"] {
+    fill: var(--wu-surface-2) !important;
+    stroke: var(--wu-border-2) !important;   /* mute its #E7E7E7 track ring */
+  }
+  /* (c) UV INDEX gauge: an inline <svg> pyramid whose empty (unreached) level
+     segments are <polygon fill="#EDEDED"> -- the same light hex as the solar
+     disc, so it is audit-blind for the same reason and shipped as a glaring
+     white triangle on the dark tile. Darken ONLY the #EDEDED empty segments;
+     the reached-level segments carry their semantic green/yellow/orange/red
+     fills and are preserved. */
+  lib-tile-uv polygon[fill="#EDEDED"],
+  lib-tile-uv polygon[fill="#ededed"],
+  .dashboard__module polygon[fill="#EDEDED"],
+  .dashboard__module polygon[fill="#ededed"] {
+    fill: var(--wu-surface-2) !important;
+  }
+
+  /* ---- health / air-quality, pollen, UV, flu & feels-like page ---------- */
+  /* The /health page stacks several modules (#pollen_section, #uv_section,
+     .flu-activity, .feels-like / .wind-chill-heat, the AQ .monitors table)
+     that share their own class-driven near-black text no city-page rule
+     reaches. On dark they shipped invisible: the current-level
+     .status.label-xlarge values and .flu-activity .label (#1e2023) vanished
+     entirely, the Trees/Grass/Weed .tab-nav labels (#333) were near-invisible,
+     and the small metadata/legend/table-header labels (#696969) dropped to
+     ~2:1. Lift the big values to primary text, the tabs to body text, and all
+     the small labels/legends to the readable muted grey. */
+  .status.label-xlarge,
+  #pollen_section .status,
+  #uv_section .status,
+  .flu-activity .label {
+    color: var(--wu-text) !important;
+  }
+  .tab-nav a,
+  .tab-nav li a,
+  ul.tab-nav li a {
+    color: var(--wu-text-2) !important;
+  }
+  .tab-nav li.active a,
+  ul.tab-nav li.active a {
+    color: var(--wu-text) !important;
+  }
+  .label-small,
+  .label-tiny,
+  .label-line,
+  .pollen-levels .condition,
+  .aq-legend,
+  .aq-legend .columns,
+  .flu-legend .rating,
+  .feels-like-scale .label-tiny,
+  .feels-like-scale .label-tiny span,
+  .monitors .station-row .columns,
+  .monitors .station-row .label-unit {
+    color: var(--wu-text-muted) !important;
   }
 }

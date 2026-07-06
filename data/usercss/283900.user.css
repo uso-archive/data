@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260629.17.07
+@version      20260705.21.16
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -44,7 +44,7 @@
   .scoreEvent__athlete, .scoreEvent__score, .scoreEvent__position,
   .scoreEvent__description, .scoreEvent__competitors, .cscore_rank,
   .cscore_aggregate, .scoreCell__Score, .gameStrip__team-name { color: #e6edf3 !important; }
-  .cscore_date-time, .cscore_network, .cscore_info, .cscore_info-overview,
+  .cscore_date-time, .cscore_date, .cscore_network, .cscore_info, .cscore_info-overview,
   .cscore_notes, .cscore_status, .cscore_odds, .scoreEvent__status,
   .ScoreCell__Time, .Schedule__Time, .scoreEvent__event, .scoreEvent__title { color: #8b949e !important; }
   .media-duration, .video-length, .timestamp--overlay { color: #ffffff !important; }
@@ -132,6 +132,13 @@
     border-color: #2d333b !important; color: #c4cdd6 !important; }
   .Table__TR--sm, tr:nth-child(even), .Table__even { background-color: #181d23 !important; }
   .Table__TR:hover, tr:hover { background-color: #21262d !important; }
+  /* Box-score / line-score DATA cells hardcode a solid white bg (baseball gamecast
+     line score's PIT/WSH score rows) → light-grey numerals on white, unreadable.
+     Audit-blind: each cell is <40px tall so it slips the light-surface size filter.
+     Keep them transparent so the dark card + row striping show; the header row (TH)
+     keeps its own dark band. ---- */
+  .Table__TD, .Table2__td, td.playByPlay__linescore__score {
+    background-color: transparent !important; }
 
   /* ---- Forms / inputs / search ---- */
   input, textarea, select, .search-box, .Search__Input {
@@ -209,7 +216,9 @@
     color: #c4cdd6 !important; }
   .Stats__footerText, .Stats__footerEmph, .Stats__TotalRow, .glossary__item,
   .LegalFooter__Copyright, .LegalFooter__Link, .ContentMetadata,
-  .GameInfo__Meta, .Gamestrip__Time, .ScoreboardScoreCell__Note { color: #9aa4ae !important; }
+  .GameInfo__Meta, .Gamestrip__Time, .ScoreboardScoreCell__Note,
+  /* box-score footnote ("+/- denotes…") hardcodes #6c6d6f → ~2.9:1 on the card */
+  .TableDetails__Note { color: #9aa4ae !important; }
   /* Stat headers / sortable column links that color via class */
   .StatsTable__headerLink, .stats-cell, .Table__TH .AnchorLink,
   .Table__TH svg { color: #c4cdd6 !important; fill: #c4cdd6 !important; }
@@ -232,12 +241,23 @@
      contrast on dark; lift to our readable blue. */
   .BackToTop, .BackToTop a { color: #5fb0e6 !important; }
 
-  /* ---- "More Sports" mega-menu (white) — .submenu-wrapper / ul.split ---- */
+  /* ---- "More Sports" mega-menu + per-sport top-nav flyouts (white) —
+       .submenu-wrapper / ul.split, plus the bare inner <ul>/<li> the flyout panel
+       is actually painted on (the wrapper is dark but its direct-child <ul> ships
+       solid white; flyout is closed at load = audit-blind). ---- */
   .submenu-wrapper, ul.split, ul.split.three, .split.three, .submenu, .sub-nav-menu,
-  .Nav__Secondary__Submenu, .Nav__Submenu, .nav-submenu, .navbar-submenu {
+  .Nav__Secondary__Submenu, .Nav__Submenu, .nav-submenu, .navbar-submenu,
+  .submenu-wrapper ul, .submenu-wrapper li, .submenu-wrapper .sub {
     background-color: #1c2128 !important; border-color: #2d333b !important; }
-  .submenu-wrapper a, ul.split a, .submenu a, .Nav__Secondary__Submenu a { color: #e6edf3 !important; }
-  .submenu-wrapper a:hover, ul.split a:hover, .submenu a:hover { color: #9bd4ff !important; }
+  .submenu-wrapper a, ul.split a, .submenu a, .Nav__Secondary__Submenu a,
+  .submenu-wrapper a span { color: #e6edf3 !important; }
+  .submenu-wrapper a:hover, ul.split a:hover, .submenu a:hover,
+  .submenu-wrapper a:hover span { color: #9bd4ff !important; }
+  /* flyout caret: a CSS-border triangle pointing at the nav item — recolor its
+     bottom border (the fill) to the dark panel so it doesn't glare white. */
+  .submenu-wrapper::before, .submenu-wrapper::after,
+  .submenu-wrapper ul::before, .submenu-wrapper ul::after {
+    border-bottom-color: #1c2128 !important; border-top-color: #1c2128 !important; }
 
   /* ---- Video-playlist modules ("Top Videos" / "NBA Videos") — white tiles ---- */
   .mediaList, .mediaList__content, .mediaList__link, .video-playlist,
@@ -299,7 +319,18 @@
   /* ---- Header-scoreboard event cards (e.g. live golf "spotlight") that go white ---- */
   .HeaderEvent { background-color: #1c2128 !important; border-color: #2d333b !important; }
   .ScoreCell__NetworkItem { color: #9aa4ae !important; }
+  /* live/in-progress HeaderEvent spotlight (.HeaderEvent--in, e.g. a live golf major)
+     paints its event-name headline in ESPN live-red #dd0000 — ~3.1:1 on our darkened
+     #1c2128 chip (readable at ~5:1 on the site's original white). Lift to a brighter
+     red so it clears AA while staying a live-red accent. ---- */
+  .HeaderEvent--in .HeaderEvent__Headline {
+    color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
 
+  /* ---- Search results page: the React page wrapper (#themeProvider > breakpoint
+       div) + the search-input wrapper (.SearchBar) ship a solid WHITE panel behind
+       the search field + filter-pill row (content cards cover the rest, so a bg-color
+       scan of the cards passes while the header band glares white). Dark to base. ---- */
+  #themeProvider > div, .SearchBar { background-color: #14181d !important; }
   /* ---- Search results: filter pills + video duration badge ---- */
   .Pill { background-color: #21262d !important; border-color: #2d333b !important; color: #c4cdd6 !important; }
   .Pill--selected { background-color: #2d333b !important; color: #e6edf3 !important; }
@@ -349,6 +380,9 @@
     --color-combo-disableddark-graychateau: #9aa4ae !important;
     --betSixPack-teamRecord-color: #9aa4ae !important;
     --card-content-color: #c4cdd6 !important;
+    /* neutral-50 (#f9f9f9) is the lightest surface tint — drives the next-gen
+       gamecast Game-Odds panel + DraftKings odds cells white (bg-only, never text). */
+    --color-neutral-50: #1c2128 !important;
     --color-neutral-100: #21262d !important;
     --border-divider-weak: #2d333b !important;
     --color-combo-cultured-eerieblack: #1c2128 !important;
@@ -389,6 +423,9 @@
     --color-combo-themeDark-white: #e6edf3 !important;
     --color-combo-gray80-grayChateau: #9aa4ae !important;
     --color-combo-grayabbey-graychateau: #9aa4ae !important;
+    /* DraftKings odds-widget disclaimer note (.NIhmB "Odds and lines subject to
+       change") = --color-combo-gray60-gray40 (#6c6e6f) → ~3:1 dark-on-dark. */
+    --color-combo-gray60-gray40: #9aa4ae !important;
     --color-combo-cobaltblue-pictonblue: #5fb0e6 !important;
     --color-combo-blue80-blue30: #5fb0e6 !important;
     --byline-contributorLinkActive-color: #5fb0e6 !important;
@@ -422,4 +459,45 @@
     background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   .ShotChart__Court__Play__Tooltip::before, .ShotChart__Court__Play__Tooltip::after {
     background-color: #1c2128 !important; border-color: #1c2128 !important; }
+  /* Gamecast Game-Odds (DraftKings) odds cells: the value text hardcodes pure black
+     (--color-neutral-1000) — fine on the original white cell, dark-on-dark once the
+     cell surface is darked. Light the cell text via the stable testid. */
+  [data-testid="OddsCell"] {
+    background-color: #1c2128 !important; border-color: #2d333b !important; }
+  [data-testid="OddsCell"], [data-testid="OddsCell"] * {
+    color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
+  /* Soccer shot-card goal-mouth outcome badge ("Goal"/"Saved"/"Blocked"/"Off Target")
+     sits on a red/green chip; its label resolves through --color-combo-white-gray90,
+     which we dark as a SURFACE elsewhere → dark-on-color label. Force white in scope. */
+  .ShotCard__GoalMouth, .ShotCard__GoalMouth * {
+    color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+
+  /* ---- MLB baseball gamecast live-tracker widget (.Gamecast__Baseball): the
+     batter/pitcher header, pitch-zone surround, on-base strip and pitch-list rows
+     ship a solid WHITE panel (hardcoded, not token-driven) with grey text → a
+     glaring white block mid-gamecast. Dark the panels; the colored strike-zone
+     cells and batter illustration are separate children and stay intact. ---- */
+  .Gamecast__Baseball, .Gamecast__Baseball .StatusBar__Slide,
+  .Gamecast__Baseball .StatusBar__Module__BatterPitcher,
+  .Gamecast__Baseball .StatusBar__Module__PlayerIntro,
+  .OnBase__Wrapper, .PitchTracker__Pitch {
+    background-color: #1c2128 !important; border-color: #2d333b !important; }
+  .Gamecast__Baseball .headshot { background-color: #1c2128 !important; }
+  /* empty base-indicator square (.FieldView__Square--hidden) was white-on-white
+     and camouflaged; darking the widget exposes it → let the dark panel show. */
+  .FieldView__Square--hidden { background-color: transparent !important; }
+  /* the StatusBar carousel transition panes paint a full-size white ::before */
+  .StatusBar__TransitionPane::before, .StatusBar__TransitionPane::after {
+    background-color: #1c2128 !important; }
+  /* win-probability chart legend team names + gamecast weather temp hardcode
+     near-black text (dark-on-dark once their surface is darked). */
+  .CustomLegend__TeamName { color: #e6edf3 !important; }
+  .Weather__Temp, .Weather__Items, .Weather__HiLow { color: #c4cdd6 !important; }
+  /* light-grey divider in the top scoreboard-strip ScoreCells (#cecfcf ::after) */
+  .ScoreCell__CompetitorDetails::after { background-color: #2d333b !important; }
+  /* gamecast WIN/LOSS pitcher pair (.Athletes__Container) is split by a light-grey
+     #cecfcf ::after vertical divider → light hairline on the dark card; remap to the
+     theme divider grey. Audit sees it as a pseudo-white but it's a thin rule. ---- */
+  .Athletes__Container .Athlete::after, .Athletes__Container .Athlete::before {
+    background-color: #2d333b !important; }
 }

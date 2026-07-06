@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for OLX that turns the bright marketplace into an easy-on-the-eyes dark interface, perfect for late-night browsing.
-@version      20260627.18.34
+@version      20260705.21.19
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -84,6 +84,25 @@
   /* ---- Soften every default light border into a dark hairline ---- */
   * { border-color: #2d333b !important; }
 
+  /* Skip-navigation links ("Przejdź do głównej części / stopki") live at the
+     top of the #hydrate-root shell and slide into view on keyboard focus. The
+     link text carries the near-black #02282c -webkit-text-fill token, so it
+     renders dark-on-dark and is unreadable when focused; the wrapping first-div
+     container also ships a literal white background. Both skip hrefs are stable
+     and there is exactly one skip-nav ListContainer (scoped to that first div so
+     other ListContainers aren't touched): give the box an opaque dark surface
+     and lift the link text to legible light, forcing -webkit-text-fill-color. */
+  #hydrate-root > div:first-of-type,
+  #hydrate-root > div:first-of-type [data-nx-name="ListContainer"] {
+    background-color: #1c2128 !important;
+  }
+  #hydrate-root a[href="#mainContent"],
+  #hydrate-root a[href="#footerContent"] {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+
   /* ============================================================
      Header / global nav (OLX dark-teal bar -> deep neutral dark)
      ============================================================ */
@@ -157,6 +176,19 @@
   [data-testid="home-page"] section,
   [data-testid="listing-grid"] > div {
     background-color: transparent !important;
+  }
+  /* The homepage/search "content sheet" #searchmain-container carries an
+     INLINE `background:#F2F4F5 !important` (set so the page sits opaque over
+     a takeover/skin wallpaper ad). Inline !important can't be beaten by any
+     stylesheet rule, so the container itself stays light — and the blanket
+     neutraliser turns its children transparent, letting that light band show
+     through the entire category grid + promoted-listings area (headings and
+     tile labels go light-on-light). Its DIRECT children have no inline style,
+     so re-opaque them to the dark base here; anchored under #mainContent to
+     out-specify the neutraliser. The real search field / promo tiles / cards
+     re-establish their own elevated surface on top. */
+  #mainContent #searchmain-container > div {
+    background-color: #14181d !important;
   }
 
   /* ============================================================
@@ -285,11 +317,15 @@
     border: 1px solid #2d333b !important;
     border-radius: 8px !important;
   }
-  /* Image placeholder block inside cards (grey #ECEEEF) — the photo
-     wrapper is a plain div under the card link, so target the link's
-     image holder generically while leaving the <img> itself alone. */
-  #mainContent [data-testid="l-card"] a > div,
-  #searchmain-container [data-testid="l-card"] a > div,
+  /* Image placeholder block inside cards (grey #ECEEEF). OLX's card link now
+     holds TWO `a > div` children: the FIRST is the photo container (holds the
+     <img>), the SECOND is an absolutely-positioned overlay (favourite heart /
+     badges) laid ON TOP of the photo. Painting a bare `a > div` opaque #21262d
+     covered every loaded photo with the overlay. Scope the dark placeholder to
+     the FIRST child only — it shows through as a dark box on image-less cards
+     while the overlay stays transparent so loaded photos are visible. */
+  #mainContent [data-testid="l-card"] a > div:first-child,
+  #searchmain-container [data-testid="l-card"] a > div:first-child,
   #mainContent [data-testid="l-card"] figure {
     background-color: #21262d !important;
   }
@@ -344,8 +380,91 @@
     -webkit-text-fill-color: #6fe3da !important;
   }
 
+  /* "Wyróżnione" (Featured/highlighted-ad) badge sits over the dark card
+     thumbnail carrying its own near-black #02282c -webkit-text-fill token, so
+     it renders dark-on-dark and vanishes. It's the only card label using the
+     stable data-nx-name="Tag" component wrapper (delivery/promoted badges have
+     their own testids), so anchor there and lift it to the mint accent to keep
+     the "featured" highlight identity legible on the dark thumbnail. */
+  #mainContent [data-testid="l-card"] [data-nx-name="Tag"],
+  #mainContent [data-testid="l-card"] [data-nx-name="Tag"] *,
+  #searchmain-container [data-testid="l-card"] [data-nx-name="Tag"],
+  #searchmain-container [data-testid="l-card"] [data-nx-name="Tag"] * {
+    color: #6fe3da !important;
+    -webkit-text-fill-color: #6fe3da !important;
+  }
+
+  /* The homepage "recommended"/partner (Storia real-estate) l-card variant
+     adds a secondary parameter line — area / rooms, e.g. "352 m²" — inside an
+     un-testid'd <span> carrying the dim #406367 token, so it renders low
+     contrast on the dark card. Lift every card param <span> to a legible muted
+     grey. The price is a <p> and the title an <h4> (not spans), so they stay
+     untouched; the mint promoted/delivery badges and the white price are
+     re-asserted just below so this broader span rule can't grey them out. */
+  #mainContent [data-testid="l-card"] span,
+  #searchmain-container [data-testid="l-card"] span {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+  /* Re-assert semantic card colours the param-lift above would otherwise flatten */
+  #mainContent [data-testid="l-card"] [data-testid="ad-price"],
+  #mainContent [data-testid="l-card"] [data-testid="ad-price"] span,
+  #searchmain-container [data-testid="l-card"] [data-testid="ad-price"],
+  #searchmain-container [data-testid="l-card"] [data-testid="ad-price"] span {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+  #mainContent [data-testid="l-card"] [data-testid="btr-label-wrapper"] span,
+  #mainContent [data-testid="l-card"] [data-testid="btr-label-text"],
+  #mainContent [data-testid="l-card"] [data-testid="free-delivery-tag"] span,
+  #searchmain-container [data-testid="l-card"] [data-testid="btr-label-wrapper"] span,
+  #searchmain-container [data-testid="l-card"] [data-testid="free-delivery-tag"] span {
+    color: #6fe3da !important;
+    -webkit-text-fill-color: #6fe3da !important;
+  }
+
   /* Favourite (heart) toggle */
   [data-testid="adAddToFavorites"] { color: #c4cdd6 !important; }
+
+  /* Native "SPONSOROWANE" ads (OLX baxter native template) render inside the
+     listing grid as plain HTML carrying their own near-black #02282c
+     -webkit-text-fill token, so once the grid goes dark the ad title,
+     advertiser line and the "i" attribution popup all fall dark-on-dark.
+     Anchor on the stable #baxter-native-listing* id (the -olx-<tld>- segment
+     varies per country) and lift the text; brighten the headline; flatten the
+     small light info chip + the white attribution popup so it reads too. */
+  [id^="baxter-native-listing"],
+  [id^="baxter-native-listing"] * {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  [id^="baxter-native-listing"] [class*="title"] {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  [id^="baxter-native-listing"] [class*="_spnu"],
+  [id^="baxter-native-listing"] [class*="attribution"],
+  [id^="baxter-native-listing"] [class*="popup"],
+  [id^="baxter-native-listing"] [class*="tooltip"] {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* Offer pages also inject an in-page ING loan-calculator native ad
+     (#inter-box_ad-detail inside a qa-advert-slot) rendered as plain HTML.
+     Its legal disclaimer ("RRSO … ING Bank Śląski S.A.") and the "Zobacz
+     koszty kredytu" link carry a literal near-black colour, so once the box
+     flattens to the dark base they render dark-on-dark and vanish. Lift its
+     dark subtitle/footer text to a legible muted grey; the white headline,
+     the grey slider labels and the accent "Oblicz ratę" button keep their
+     own colour. Force -webkit-text-fill-color too (OLX drives text fill). */
+  #inter-box_ad-detail .inter-box_subtitle_middle,
+  #inter-box_ad-detail .inter-box_subtitle_bottom,
+  #inter-box_ad-detail .inter-box_subtitle_middle *,
+  #inter-box_ad-detail .inter-box_subtitle_bottom * {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
 
   /* ============================================================
      Top promo / info banner strip (was pale yellow #FFF6D9)
@@ -598,9 +717,27 @@
   [data-testid="core-layout"] {
     background-color: #14181d !important;
   }
+  /* login.olx.<tld> renders a full-bleed OLX-blue brand splash BEHIND the
+     sign-in card: a hashed wrapper with a literal `background:#3A77FF` plus
+     lighter concentric ::before / ::after rings. That bright full-viewport
+     blue fights the dark theme. The card (.login-box) re-opaques on top one
+     level deeper, so flatten just that decorative wrapper (core-layout's
+     3rd-level shell) and neutralise its ring pseudos to the dark base. Scoped
+     to the login-only core-layout testid, so no other page is affected. */
+  [data-testid="core-layout"] > div > div > div {
+    background-color: #14181d !important;
+  }
+  [data-testid="core-layout"] > div > div > div::before,
+  [data-testid="core-layout"] > div > div > div::after {
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+  }
   .login-box,
   [data-testid="login-form"],
-  [data-testid="registration-form"] {
+  [data-testid="registration-form"],
+  [data-testid="register-form"] {
     background-color: #1c2128 !important;
     border: 1px solid #2d333b !important;
     color: #e6edf3 !important;
@@ -617,7 +754,8 @@
   [data-testid="google-button"] { color: #e6edf3 !important; }
   /* Email + password fields */
   #username, #password,
-  [data-testid="login-form"] input {
+  [data-testid="login-form"] input,
+  [data-testid="register-form"] input {
     background-color: #21262d !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
@@ -637,10 +775,17 @@
     -webkit-text-fill-color: #c4cdd6 !important;
   }
   /* Email / password floating labels + the "lub" separator carry the
-     near-black token and vanish on dark — force both colour channels. */
+     near-black token and vanish on dark — force both colour channels.
+     The redesigned sign-up form's stable testid is "register-form" (not
+     "registration-form"), and its E-mail / Hasło floating labels + the
+     consent-checkbox label <span>s render dark-on-dark unless covered, so
+     anchor on BOTH testids and reach label spans too. */
   [data-testid="login-form"] label,
   [data-testid="login-form"] label span,
-  [data-testid="registration-form"] label {
+  [data-testid="registration-form"] label,
+  [data-testid="registration-form"] label span,
+  [data-testid="register-form"] label,
+  [data-testid="register-form"] label span {
     color: #9aa6b0 !important;
     -webkit-text-fill-color: #9aa6b0 !important;
   }

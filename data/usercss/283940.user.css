@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Stack Overflow and the whole Stack Exchange network: easy-on-the-eyes questions, answers, code blocks, comments and sidebar.
-@version      20260627.21.28
+@version      20260705.21.21
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -112,7 +112,10 @@
   .s-navigation--item, .disabled-link,
   .v-visible-sr, .post-menu .lsep,
   .s-post-summary--stats-item,
-  .s-prose .fc-light {
+  .s-empty-state, .s-empty-state p,
+  .s-empty-state .fs-body2,
+  .s-prose .fc-light,
+  .revision-comment, span.revision-comment {
     color: #9198a1 !important;
   }
 
@@ -193,6 +196,16 @@
     filter: none;
   }
 
+  /* The network dropdown draws the "Meta <site>" child row with an
+     L-shaped connector built from borders on .L-shaped-icon. SE keeps
+     it a light #b9c1c5 that glares as a bright corner line on dark —
+     invisible to a bg audit (it's a border). Recolor to a muted grey
+     that still reads as a connector but harmonizes with the dark menu. */
+  .L-shaped-icon,
+  .related-site .L-shaped-icon {
+    border-color: #3d444d !important;
+  }
+
   /* The centered Stack Overflow wordmark on the login / auth pages
      is an SVG carrying .fc-black (pure #000) and renders nearly
      invisible black-on-dark. The monochrome "new" logo is fine in
@@ -240,11 +253,24 @@
   input[type="url"],
   input[type="number"],
   textarea,
+  select,
   select.s-select,
+  .s-select select,
   .s-input__search {
     background-color: #222831 !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
+  }
+
+  /* The "Sorted by" answer-sort control (and any other native
+     <select>) is a bare, unclassed <select> nested inside a
+     .s-select div wrapper — SE styles the wrapper and leaves the
+     real control its default white #fff with black text. It's short
+     (~32px) so it slips the audit height filter, but renders as a
+     glaring white pill on dark. Darken its option list too. */
+  select option {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
   }
 
   .s-input:focus,
@@ -267,6 +293,29 @@
   /* The top-bar search icon */
   .s-input__icon, .svg-icon.iconSearch {
     color: #8b949e !important;
+  }
+
+  /* Checkboxes & radios (filter panels, ask-flow, notification prefs).
+     Stacks renders .s-checkbox / .s-radio-button as appearance:none
+     custom controls painted a solid WHITE box/disc — invisible to a
+     bg-COLOR audit on the page base but glaring light squares/circles
+     on dark (the Questions "Filter" panel and every settings form).
+     Darken the unchecked control to an elevated surface; keep the
+     accent-blue fill + white glyph for the checked state. */
+  input[type="checkbox"],
+  input[type="radio"],
+  .s-checkbox,
+  .s-radio-button {
+    background-color: #222831 !important;
+    border-color: #2d333b !important;
+  }
+
+  input[type="checkbox"]:checked,
+  input[type="radio"]:checked,
+  .s-checkbox:checked,
+  .s-radio-button:checked {
+    background-color: #2f6f9f !important;
+    border-color: #3b82b8 !important;
   }
 
   /* ============================================================
@@ -696,6 +745,19 @@
     color: #8cc6f0 !important;
   }
 
+  /* Linked/Related sidebar vote-count pills: the ".answer-votes.default"
+     state (question with answers but none accepted) keeps SE's white
+     #f1f2f3 fill with near-black #3b4045 text — a glaring light pill on
+     dark, and short enough (38x21) to slip the audit height filter. The
+     ".answered-accepted" green and ".answered" blue variants are themed
+     above; only the plain default state leaks. Dark elevated + muted. */
+  .answer-votes.default,
+  #sidebar .answer-votes.default,
+  .module .answer-votes.default {
+    background-color: #20262d !important;
+    color: #9198a1 !important;
+  }
+
   #sidebar .status.unanswered, #sidebar .iconClock {
     color: #9198a1 !important;
   }
@@ -840,6 +902,33 @@
     color: #f0a8a8 !important;
   }
 
+  /* Legacy ".val-message" validation banners (login / ask-gate / form
+     errors) predate the Stacks .s-notice system: SE paints .val-info a
+     cream #faecc6, .val-warning/.val-error a pale yellow/red — all with
+     near-black text. Their cream blue-channel (198) sneaks under the
+     audit's >200 near-white threshold, so a bg-color scan passes clean
+     while the panel glares light. Retone to tinted-dark with light text. */
+  .val-message,
+  .val-message.val-info {
+    background-color: #221d14 !important;
+    border-color: #3a3320 !important;
+    color: #e8c98a !important;
+  }
+
+  .val-message.val-warning {
+    background-color: #2a2114 !important;
+    border-color: #4a3a1c !important;
+    color: #e8c98a !important;
+  }
+
+  .val-message.val-error {
+    background-color: #2a1718 !important;
+    border-color: #5a2a2c !important;
+    color: #f0a8a8 !important;
+  }
+
+  .val-message a { color: #5fb0e6 !important; }
+
   .s-badge,
   .s-badge__bounty {
     background-color: #20303d !important;
@@ -929,6 +1018,122 @@
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
     color: #c4cdd6 !important;
+  }
+
+  /* ============================================================
+     Network home (stackexchange.com) — LEGACY layout
+     ------------------------------------------------------------
+     The network landing page is NOT the Stacks "unified-theme"
+     frontend: it keeps an old bespoke markup (.hero-box promo,
+     #question-list hot rows, #sideBar .module widgets, .navMain)
+     that none of the Stacks class rules above reach. So it shipped
+     a light-blue hero panel, white row dividers, and dark-on-dark
+     headings / site names. Theme those legacy classes explicitly.
+     ============================================================ */
+  /* The network home wordmark is an unclassed <h1> under
+     header.siteHeader carrying a CDN background-image logo (dark
+     "Stack" + blue "Exchange", baked for the white site). The dark
+     half vanishes on our dark header, and it's neither an <img> (the
+     logo-invert rule above misses it) nor DOM text (audit-blind).
+     Apply the same luminance invert + hue-rotate the img logos use so
+     "Stack" lifts to light while the blue brand hue is preserved. */
+  header.siteHeader .contentWrapper h1,
+  .siteHeader h1 {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+
+  .hero-box {
+    background-color: #16202c !important;
+    border-color: #234055 !important;
+  }
+
+  .hero-box .blurb,
+  .hero-box .blurb em,
+  .hero-box .blurb span {
+    color: #c4cdd6 !important;
+  }
+
+  /* hot / real-time question rows: white #f0f0f0 divider -> dark */
+  #question-list .question-container,
+  .question-container {
+    border-color: #262c33 !important;
+  }
+
+  /* main nav (All Sites / Top 400 Users / Digests): dark navy -> accent */
+  .navMain a,
+  .contentWrapper .navMain a {
+    color: #6fb3e8 !important;
+  }
+
+  /* sidebar module headings ("Today's Featured Site", "Top Network
+     Askers") + subheader tab label: near-black #444 on dark -> light */
+  #sideBar .module .heading,
+  .featured-sidebar .heading,
+  .users-sidebar .heading,
+  .module .heading {
+    color: #e6edf3 !important;
+  }
+
+  /* featured-site detail text, stat labels and the per-asker site
+     names (span.sb-siteName): all near-black #444 -> muted grey */
+  .featured-site .site-details,
+  .featured-site .stats-label,
+  .stats-label,
+  .sb-siteName,
+  .userDetails .sb-siteName {
+    color: #9198a1 !important;
+  }
+
+  /* inactive "real-time" tab (#666) vs active "hot" tab */
+  .subheader .tabs a {
+    color: #9198a1 !important;
+  }
+  .subheader .tabs a.youarehere,
+  .subheader .tabs a.selected {
+    color: #e6edf3 !important;
+  }
+
+  /* legacy light frames: subheader underline (#e5e5e5), the featured-
+     site card (#e8edee 2px) and the pager page-number chips (#d2d2d2) */
+  .subheader,
+  #mainArea .subheader {
+    border-color: #262c33 !important;
+  }
+
+  #sideBar .module.featured-sidebar .featured-site,
+  .featured-site {
+    border-color: #2d333b !important;
+  }
+
+  /* Legacy pager / page-sizer chips ("2 3 4 next", "15 30 50 per page").
+     SE paints each non-current chip with a white-to-grey bg-IMAGE gradient
+     (linear-gradient(#fff, #e7e7e7)) while its background-COLOR stays
+     transparent — so a bg-color audit passes clean while the chips glare as
+     white pills on the dark home. Kill the gradient and darken the fill;
+     the .current chip keeps SE's red brand gradient (readable light text). */
+  #question-list .page-numbers:not(.current),
+  #question-list .page-sizer .page-numbers:not(.current),
+  #question-list .pager .page-numbers:not(.current),
+  .pager .page-numbers:not(.current),
+  .page-sizer .page-numbers:not(.current) {
+    background-image: none !important;
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  #question-list .page-numbers:not(.current):hover,
+  .pager .page-numbers:not(.current):hover,
+  .page-sizer .page-numbers:not(.current):hover {
+    background-color: #222831 !important;
+    color: #e6edf3 !important;
+  }
+
+  /* current page/size chip: keep the site's red pill but pin the text light */
+  #question-list .page-numbers.current,
+  .pager .page-numbers.current,
+  .page-sizer .page-numbers.current {
+    color: #ffffff !important;
   }
 
   /* ============================================================
@@ -1105,8 +1310,25 @@
     border-color: #2d333b !important;
   }
 
-  .s-prose td, .s-table td {
+  /* Row-header cells (<th scope="row">) — e.g. the "Search type"
+     column of the /search "Advanced Search Tips" table (Tags, Exact,
+     Author, Score…). These live in <tbody>, so the thead-th rule
+     misses them: SE leaves them its near-black #0c0d0e (dark-on-dark)
+     with light #d6d9dc row-divider borders. Lift the text and darken
+     the borders without forcing the filled header bg. */
+  .s-table tbody th,
+  .s-table th[scope="row"] {
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+    background-color: transparent !important;
+  }
+
+  .s-prose td, .s-table td,
+  .s-table tbody th {
     border-color: #262c33 !important;
+  }
+
+  .s-prose td, .s-table td {
     color: #c4cdd6 !important;
   }
 
@@ -1231,6 +1453,38 @@
     background-color: #2a1718 !important;
     border-color: #5a2a2c !important;
     color: #f0bcbc !important;
+  }
+
+  /* Light-blue info tint (#edf5fd). Used to highlight the SELECTED
+     revision row on a post's /revisions page and other light-blue
+     "info" callouts — a glaring near-white blue panel on dark. Its
+     blue-channel (253) sneaks under some near-white thresholds but
+     the surface reads bright. Retone to the same tinted-dark-blue as
+     the .s-notice__info panels. */
+  .bg-blue-100, .bg-blue-200 {
+    background-color: #14222e !important;
+    border-color: #234055 !important;
+    color: #cfe0ef !important;
+  }
+
+  /* Diff "skipped lines" separator on /revisions (inline diff view):
+     SE draws the collapsed-region marker as a 2px light #c4cdd6
+     border-bottom on a full-width strip — a glaring bright horizontal
+     rule on dark. Recolor to a subtle dark divider. */
+  .diff-skipped,
+  .diff-skipped > div,
+  .s-prose .diff-skipped > div {
+    border-color: #2d333b !important;
+  }
+
+  /* Post /revisions header meta links ("Source" / "Link" toggles):
+     bare <a class="flex--item"> inheriting SE's near-black #636b74 —
+     dark-on-dark on the (now dark) revision header panel. The base
+     `a` rule is unimportant so SE's inherited color wins; lift these
+     scoped links to a legible accent. */
+  .js-revision .d-flex a.flex--item,
+  .js-revision .d-flex a.flex--item:visited {
+    color: #5fb0e6 !important;
   }
 
   .bc-purple-400 { border-color: #3a2f55 !important; }

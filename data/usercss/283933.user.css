@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for CSDN: comfortable dark articles, homepage and search, with fully dark code blocks and a readable syntax palette.
-@version      20260629.17.04
+@version      20260705.21.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -226,6 +226,33 @@
     background-color: var(--csdn-chrome) !important;
   }
 
+  /* Toolbar search autocomplete flyout: the .toolbar-search-drop-menu
+     (associate-word) panel + its .drop-menu-list are flattened to
+     transparent by the broad neutralizer, so the open suggestion list
+     bleeds the page content (carousel + feed) through behind its rows.
+     Re-establish a solid dark surface + a hover state. */
+  body div.toolbar-search-drop-menu,
+  body div.associate-word-drop-menu,
+  .toolbar-search-drop-menu .drop-menu-list,
+  .drop-menu-list,
+  .drop-menu-list li {
+    background-color: var(--csdn-chrome) !important;
+    color: var(--csdn-text-2) !important;
+  }
+  .drop-menu-list li:hover,
+  .drop-menu-list li.active {
+    background-color: var(--csdn-elev2) !important;
+  }
+  /* The "创作" (write) toolbar flyout is the .csdn-toolbar-plugin panel; it is
+     listed in the elevated-cards block but the broad neutralizer
+     (body div[class], higher specificity) flattens it to transparent, so the
+     open flyout header bleeds the nav chips + page through. Boost specificity
+     to re-seat its opaque chrome surface. */
+  body div.csdn-toolbar-plugin,
+  body div.csdn-toolbar-plugin-container {
+    background-color: var(--csdn-chrome) !important;
+  }
+
   /* Toolbar dropdown menus + their items */
   .menus-view_content__inner,
   .menus-view,
@@ -241,6 +268,16 @@
   .menus-item a:hover,
   .toolbar-menu-list li:hover {
     background-color: var(--csdn-elev2) !important;
+  }
+  /* toolbar top-nav dropdown items (.toolbar-subMenu — e.g. "更多" holding
+     会议/学习) paint a near-white rgb(240,240,245) highlight on the trigger
+     box when hovered/open (audit-blind: :hover state + 67px wide, under the
+     big() threshold). Repaint the hover box + its flyout to dark chrome. */
+  .toolbar-subMenu-box:hover,
+  .toolbar-subMenu:hover .toolbar-subMenu-box,
+  .toolbar-subMenu-list,
+  .toolbar-subMenu-list li:hover {
+    background-color: var(--csdn-chrome) !important;
   }
 
   /* Article action-bar "觉得还不错？" nudge bubble: the .tool-active-list
@@ -398,6 +435,30 @@
     border-color: var(--csdn-border) !important;
   }
 
+  /* CSDN's interactive code widgets (the "运行项目/登录复制" blocks that show a
+     language label like "undefined"/"groovy"/"erlang-repl") drive the <code>
+     text through a rule that ALSO sets -webkit-text-fill-color to a dark
+     #4f4f4f — which overrides our plain `color` at RENDER time, so plain /
+     unhighlighted code lines ship dark-on-dark (audit-blind: text-fill-color).
+     Re-assert a readable base color with higher specificity and pin the
+     text-fill so it can't override us. */
+  .markdown_views pre code,
+  .markdown_views pre code.hljs,
+  #content_views pre code,
+  #content_views pre code.hljs,
+  pre.set-code-show code,
+  pre.set-code-show code.hljs {
+    color: #c9d1d9 !important;
+    -webkit-text-fill-color: #c9d1d9 !important;
+  }
+  /* keep every syntax-token span rendering its OWN palette color — make the
+     text-fill follow `color` so the pinned base fill above can't bleed in */
+  pre code span,
+  .hljs span,
+  pre code [class*="hljs-"] {
+    -webkit-text-fill-color: currentColor !important;
+  }
+
   /* inline code inside prose */
   #content_views p code,
   #content_views li code,
@@ -408,7 +469,15 @@
     border-color: var(--csdn-border) !important;
   }
 
-  /* code line numbers */
+  /* code line numbers — the gutter container (ul.pre-numbering) ships a
+     near-white #fafafa bg (it's a <ul>, so the div/section neutralizer misses
+     it), leaving the numbers in white cells beside the dark code. Paint the
+     gutter to the code base and mute the numbers. */
+  ul.pre-numbering,
+  .pre-numbering {
+    background-color: var(--csdn-code-bg) !important;
+    border-color: var(--csdn-border) !important;
+  }
   .hljs-ln-numbers,
   .hljs-ln-n,
   .pre-numbering li,
@@ -531,6 +600,23 @@
     color: var(--csdn-text-2) !important;
     border-color: var(--csdn-border) !important;
   }
+  /* article-footer tag pills (.tag-link-new — #java / #python / #算法) ship a
+     pale-blue rgb(229,241,255) bg with blue link text = pale-on-pale on dark
+     (audit-blind: ~49-66px wide pills under the big() threshold). Darken to an
+     elevated surface, keep the blue tag-link text. */
+  .tag-link-new,
+  .article-footer-pill-list a {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-link) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  /* author-card "博客等级" blog-level badge (.profile-intro-name-leve) ships a
+     light-grey rgb(245,246,247) pill; our lightened text then goes light-on-
+     light (audit-blind: 84×21 pill). Darken it. */
+  .profile-intro-name-leve {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-text-2) !important;
+  }
 
   /* ---------- Search-results filters / sort tabs (all states) ---------- */
   .so-search,
@@ -559,6 +645,17 @@
   .so-tab .active {
     background-color: var(--csdn-elev2) !important;
     color: var(--csdn-link) !important;
+  }
+  /* so.csdn.net "相关搜索" related-term chips: the first (hot) chip is a
+     classless .so-hot-words li with a hardcoded white bg (92×28 — below the
+     audit height threshold, so audit-blind) carrying pale-blue link text
+     that washes out on white. Darken every chip uniformly to an elevated
+     surface so the blue term text reads. */
+  .so-hot-words ul li,
+  .so-hot-words .hw-bd li {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-text-2) !important;
+    border-color: var(--csdn-border) !important;
   }
 
   /* search submit button — brand red, white glyph */
@@ -643,6 +740,25 @@
   .flexible-btn-new {
     color: var(--csdn-link) !important;
   }
+  /* home category chip carousel edge fades: the horizontal-scroll nav
+     (.menus-view_prev / _next) paints a white→transparent linear-gradient
+     mask over the left/right chips to hint "more categories" (a background-
+     IMAGE, so the bg-color audit misses it, and each mask is <52px wide so
+     the big() height/width filter skips it too). Remap the white stop to the
+     dark page base so the fade blends into the chip row. */
+  .menus-view_next {
+    background-image: linear-gradient(90deg, rgba(20, 24, 29, 0), var(--csdn-base) 52px) !important;
+  }
+  .menus-view_prev {
+    background-image: linear-gradient(270deg, rgba(20, 24, 29, 0), var(--csdn-base) 32px) !important;
+  }
+  /* code-block header InsCode runner-button strip: a .mask child paints a
+     horizontal white→transparent fade (background-IMAGE, audit-blind) at the
+     strip edge — drop it so the dark code header stays clean */
+  .ins-code-runner-btn .mask,
+  div.ins-code-runner-btn > .mask {
+    background-image: none !important;
+  }
 
   /* ---------- AtomGit / GitCode "quick-app" promo card (article sidebar) ----------
      A large promo tile whose .gitcode-work-space carries a near-white
@@ -666,13 +782,18 @@
     background-image: none !important;
   }
 
-  /* ---------- AI search card (so.csdn.net right rail) ----------
-     The "开发者首选的 AI 搜索引擎" promo card wraps its dark textarea in a
-     .chat-input-main box painted white via a background-IMAGE gradient
-     (bg-color transparent, so audit-blind). Flatten it to a dark elevated
-     surface so only the textarea + brand-purple submit button read on it. */
+  /* ---------- AI search card ("开发者首选的 AI 搜索引擎") ----------
+     The AI-search promo wraps its dark textarea in a .chat-input-main box
+     painted white via a background-IMAGE gradient (bg-color transparent, so
+     audit-blind). Flatten it to a dark elevated surface so only the textarea
+     + brand-purple submit button read on it. On the so.csdn.net results page
+     this card now renders inside an ai.csdn.net/chat IFRAME, where
+     .chat-input-main has NO .ai-search-card ancestor (that wrapper lives in
+     the parent document) — so match .chat-input-main standalone too, else the
+     iframe card ships bright white. */
   body div.ai-search-card,
-  body .ai-search-card .chat-input-main {
+  body .ai-search-card .chat-input-main,
+  .chat-input-main {
     background-color: var(--csdn-elev) !important;
     background-image: none !important;
     border-color: var(--csdn-border) !important;
@@ -753,6 +874,45 @@
     background-color: var(--csdn-elev) !important;
     color: var(--csdn-text-2) !important;
     border-color: var(--csdn-border) !important;
+  }
+
+  /* ---------- passport.csdn.net login / register page ----------
+     The login page paints a full-viewport decorative isometric-city
+     illustration as a background-IMAGE on .passport-container (bg-color
+     transparent, so audit-blind), and the .login-box / .passport-main card
+     is flattened to transparent by the broad neutralizer — the login form
+     (titles, tab labels, "扫码登录" copy) then floats unreadably over the
+     busy light illustration. Drop the raster and re-seat the card as a
+     solid dark elevated surface. Higher specificity (body div.…) so it
+     wins over the equal-specificity neutralizer by source order. */
+  .passport-container {
+    background-image: none !important;
+    background-color: var(--csdn-base) !important;
+  }
+  body div.passport-main,
+  body div.login-box,
+  body div.passport-box,
+  body div.login-content,
+  body div.login-form {
+    background-color: var(--csdn-elev) !important;
+    border-color: var(--csdn-border) !important;
+    color: var(--csdn-text-2) !important;
+  }
+  .login-box .title,
+  .passport-main .title {
+    color: var(--csdn-text) !important;
+  }
+  /* "上次登录/扫码登录更方便" last-login hint pill above the login tabs ships a
+     warm cream rgb(254,247,240) bg with pale text — light-on-light (audit-blind:
+     120×22 pill under the big() threshold). Repaint dark + its down-arrow pseudo. */
+  .last-login-way {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-text-2) !important;
+  }
+  .last-login-way::before,
+  .last-login-way::after {
+    background-color: var(--csdn-elev2) !important;
+    border-top-color: var(--csdn-elev2) !important;
   }
 
   /* ---------- Element UI cards (download.csdn.net / 文库 + Vue pages) ----------

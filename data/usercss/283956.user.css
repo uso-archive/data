@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260629.17.07
+@version      20260705.21.22
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -193,6 +193,18 @@
   [class*="CalendarDateCell--dayCell"] {
     border-color: var(--wx-border) !important;
   }
+  /* the day-cell's WEEK-DIVIDER (border-top) is set by a SEPARATE higher-specificity
+     Helios rule (a [dir]-prefixed .Calendar--gridWrapper .CalendarDateCell--dayCell
+     selector) targeting border-top-color: #dedede !important -- so it out-specifies
+     the rule above and only the TOP edge stayed light (the bottom/right edges took
+     our dark border). It rendered as a bright horizontal lattice line between weeks.
+     Re-match it with the gridWrapper ancestor + button tag to raise our specificity
+     above the module rule, and pin border-top-color explicitly. */
+  [class*="Card--card"] [class*="Calendar--gridWrapper"] button[class*="CalendarDateCell--dayCell"],
+  [class*="Calendar--gridWrapper"] button[class*="CalendarDateCell--dayCell"] {
+    border-color: var(--wx-border) !important;
+    border-top-color: var(--wx-border) !important;
+  }
   /* the legacy location search ships a light #f2f2f2 fill via a high-specificity
      module rule that beats the generic `input` override -- pin it by id + module
      prefix so the field reads dark. */
@@ -220,6 +232,14 @@
      -- fine on the original white grid but only ~3.4:1 on our dark card. Lift to
      the muted token for a comfortable read; the high/low temps stay as-is. */
   [class*="CalendarDateCell--date"] {
+    color: var(--wx-text-muted) !important;
+  }
+  /* future / no-forecast day cells carry a small "Avg" caption
+     (CalendarDateCell--label) shipping the same near-black #6f7585 module color as
+     the date -- ~3.5:1 on our dark card (an AA fail for this small label), and left
+     visibly dimmer than the lifted day numbers. Raise it to the muted token so the
+     whole calendar grid reads at a consistent, legible muted light. */
+  [class*="CalendarDateCell--label"] {
     color: var(--wx-text-muted) !important;
   }
   /* the legacy Monthly "Almanac" card title ships a hardcoded near-black #2b2b2b
@@ -303,6 +323,20 @@
   .bg-gray-900,
   .bg-black {
     background-color: var(--wx-chrome) !important;
+  }
+  /* Tailwind HOVER-VARIANT grey fills (hover:bg-gray-100 / -200 / -50) compile to
+     variant-prefixed class names (`hover:bg-gray-100`) that our plain .bg-gray-100
+     rule doesn't match. The forecast-type nav tabs (Today / Hourly / 10 Day /
+     Monthly / Gardening / ...) ship hover:bg-gray-100, so hovering a tab flashed a
+     bright #f2f2f2 pill under our lifted light text -> light-on-light and the tab
+     label vanished. Remap the hovered fill to the elevated dark surface so the
+     hovered tab stays legible (the active tab already reads dark). */
+  [class*="hover:bg-gray-100"]:hover,
+  [class*="hover:bg-gray-200"]:hover,
+  [class*="hover:bg-gray-50"]:hover,
+  [class*="hover:bg-neutral-100"]:hover,
+  [class*="hover:bg-neutral-200"]:hover {
+    background-color: var(--wx-surface-2) !important;
   }
 
   /* ---- cards / modules / wells ----------------------------------------- */
@@ -423,6 +457,15 @@
   footer [class*="Footer--link"]:hover {
     color: var(--wx-link-hover) !important;
   }
+  /* content-strip / news-teaser article SUMMARY paragraphs ship a near-black
+     #252422 via MediaObject--mediaCaption -> dark-on-dark once the card is dark
+     (the headline + "Watch Now" CTA were already lifted, but the description body
+     stayed invisible -- seen on the Cold & Flu "Your Daily Flu Risk..." teaser).
+     Lift the caption body to readable light. The mediaCaptionCTA link keeps its
+     own treatment (matched more specifically above / by the link rules). */
+  [class*="MediaObject--mediaCaption"]:not([class*="mediaCaptionCTA"]) {
+    color: var(--wx-text-2) !important;
+  }
 
   /* ---- temperature scale (semantic, NEUTRAL ends only) ------------------ */
   /* weather.com renders the temperature readouts with NEUTRAL colors: the high
@@ -521,6 +564,20 @@
   [data-testid="daily-forecast"] [aria-expanded="true"] {
     background-color: var(--wx-surface-2) !important;
   }
+  /* the expanded day-row's circular collapse toggle (the up-chevron disc) paints
+     a light fill via Tailwind STATE-VARIANT utilities -- group-data-[state=open]:
+     group-hover:bg-gray-200 and max-sm:group-data-[state=open]:bg-gray-100. Those
+     compile to variant-prefixed class names (NOT the plain .bg-gray-100 selector
+     our surface rule matches), and we never mapped bg-gray-200 at all -- so on
+     hover the disc flashed a bright grey #cdcdcd circle on the dark card. Match
+     the variant classes by substring + scope to the forecast so the toggle reads
+     as a subtle elevated dark disc (the temperature range bar is untouched). */
+  [data-testid="daily-forecast"] [class*="bg-gray-100"],
+  [data-testid="daily-forecast"] [class*="bg-gray-200"],
+  [data-testid="daily-forecast"] [class*="bg-neutral-100"],
+  [data-testid="daily-forecast"] [class*="bg-neutral-200"] {
+    background-color: var(--wx-surface-2) !important;
+  }
 
   /* ---- forms / location search ----------------------------------------- */
   input,
@@ -575,6 +632,44 @@
   [data-testid="header-search"] li,
   [role="option"] {
     color: var(--wx-text-2) !important;
+  }
+  /* the LEGACY header (radar / monthly / health pages) uses its own location
+     search whose "Recents" flyout is a `RecentLocations--container` that ships a
+     WHITE panel. It only appears on focus+type, so an audit scanning the closed
+     header never sees it -- and the "Recents" title is already lifted light, so
+     it renders light-on-white and nearly vanishes, while the "Favorite places"
+     sign-up prompt (LocationsUpsell) draws a light-blue #cbdef0 CTA card. Darken
+     the flyout panel + the upsell card, lift the near-black "Clear" button and
+     the upsell copy so the whole dropdown reads on dark. Stable module-name
+     prefixes (only the trailing build-hash rotates); the recent-location rows
+     themselves already sit on the dark Listbox surface. */
+  /* the white fill is set by a `[dir] .RecentLocations--container--<hash>` Helios
+     rule at specificity (0,2,0) with !important, so a single-class override loses
+     the cascade; raise ours above it with the combobox ancestor + the `--open`
+     modifier compound (0,3,0). */
+  [class*="SearchCombobox"] [class*="RecentLocations--container"][class*="RecentLocations--open"],
+  [class*="RecentLocations--container"] {
+    background-color: var(--wx-surface) !important;
+  }
+  [class*="RecentLocations--clearButton"] {
+    color: var(--wx-link) !important;
+  }
+  [class*="LocationsUpsell--locationsUpsell"] {
+    background-color: var(--wx-surface-2) !important;
+  }
+  [class*="LocationsUpsell--locationsUpsell"] * {
+    color: var(--wx-text-2) !important;
+  }
+  /* the recent-location ROWS sit on the dark Listbox surface, but each place
+     NAME ("Koreatown", "New York City") ships a hardcoded near-black via its
+     module class (styles--locationName) -- dark-on-dark and near-invisible on
+     the flyout. It's set through `-webkit-text-fill-color` too, so pin BOTH.
+     Scoped to the search flyout so the fragile styles-- prefix can't leak; the
+     grey "state" subline (locationState) is already a legible muted token. */
+  [class*="RecentLocations--container"] [class*="styles--locationName"],
+  [class*="SearchCombobox"] [class*="styles--locationName"] {
+    color: var(--wx-text) !important;
+    -webkit-text-fill-color: var(--wx-text) !important;
   }
 
   /* ---- buttons ---------------------------------------------------------- */
@@ -762,6 +857,20 @@
   #dd-widget .dd-widget-branding-logo svg path {
     fill: var(--wx-text) !important;
   }
+  /* The widget added a redesigned "compact" suggested-question list
+     (.dd-widget-questions -> .dd-widget-question-container rows). The FIRST /
+     highlighted row (and the :hover state of every row) ships a near-white fill
+     authored in modern color(srgb 0.96 0.96 0.96) NOTATION -- which a bg-color
+     audit reading rgb() can't pattern-match, so it scanned clean while rendering
+     a bright pill. Our text rules already lift the question copy to light, so it
+     landed light-on-light and the first suggestion was nearly invisible. Darken
+     every question row + its hover to the elevated dark surface so the light text
+     reads; the blue send button keeps its identity. */
+  #dd-widget .dd-widget-question-container,
+  #dd-widget .dd-widget-question-container:hover {
+    background-color: var(--wx-surface-2) !important;
+    color: var(--wx-text) !important;
+  }
 
   /* ====================================================================== */
   /* Keep weather imagery / data viz untouched.                             */
@@ -805,6 +914,15 @@
   [data-testid="DonutChart"] circle[stroke="#E7ECF1"],
   [data-testid="DonutChart"] circle[class*="stroke-[#E7ECF1]"],
   [data-testid="DonutChart"] circle[class*="stroke-[#e7ecf1]"],
+  /* weather.com now paints the donut TRACK ring's light #E7ECF1 stroke via a
+     CSS-module class (DonutChart--track--<hash>) with NO stroke attribute, so the
+     attribute selectors above no longer match and the track rendered a bright
+     white ring -- glaring on low-percentage donuts (the Cold & Flu "Type B 1%"
+     donut showed an almost-full white circle). Match the track by its stable
+     module-class prefix; the value arc (DonutChart--indicator) keeps its data
+     color (blue / orange / green). */
+  [data-testid="DonutChart"] circle[class*="DonutChart--track"],
+  circle[class*="DonutChart--track"],
   .stroke-\[\#E7ECF1\],
   .stroke-\[\#e7ecf1\] {
     stroke: var(--wx-border-2) !important;

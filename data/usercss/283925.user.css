@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A polished dark look across the whole site: the home page, video pages and their comment lists, the rankings, search results and user profiles.
-@version      20260629.17.19
+@version      20260705.21.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -121,10 +121,20 @@
      creative paints over these, so only the blank state is affected.) */
   .Ads, [class*="Ads"], [class^="Ads"],
   iframe[id*="google_ads"], iframe[id^="ads_"], ins.adsbygoogle,
-  aside#header-ad, aside#header-ad > div, aside#header-ad .ad-banner {
+  aside#header-ad, aside#header-ad > div, aside#header-ad .ad-banner,
+  aside.ad-banner, aside.ad-banner > div, aside#player-ad-panel > div {
     background-color: #161b21 !important;
     border-color: #262c33 !important;
   }
+
+  /* Pre-roll video-ad overlay controls (watch page). The skip prompt
+     ("○秒後にスキップできます") and the countdown timer color their labels
+     through monotone.l95 — which we remap to a dark elevated surface — so over
+     the black ad video they read dark-on-dark and nearly vanish. Force the ad
+     overlay's own controls back to a light label; the ad creative itself is an
+     image/video and is untouched. */
+  #nv_watch_VideoAdContainer button,
+  #nv_watch_VideoAdContainer [class*="pos_absolute"] { color: #e6edf3 !important; }
 
   /* Live (live.nicovideo.jp) hover tooltip — its surface hardcodes a light
      fill (#f2f2f2 / #1a1a1a text) that bypasses the tooltip token, so on the
@@ -135,6 +145,42 @@
     color: #e6edf3 !important;
     border-color: #3a424c !important;
   }
+
+  /* Live (live.nicovideo.jp) program-card badges. The "有料" (paid) badge keeps
+     a white pill background while our broad legacy label rule lightens its text,
+     so light-grey text landed on white and the badge read invisible. Repaint it
+     as a dark pill (matching its "会員無料" sibling) and soften the card
+     menu-area's light #c4cdd6 divider line to the standard dark border. */
+  [class*="pay-program-label"] {
+    background-color: #1a1a1a !important;
+    border-color: #3a424c !important;
+  }
+  [class*="menu-area"] { border-bottom-color: #262c33 !important; }
+
+  /* Live (live.nicovideo.jp) watch page — the "アニメ公式生放送タイムシフト
+     ランキング" column (.official-live-ts-ranking) hardcodes a near-white
+     #fafafa wrapper fill that no token reaches, so the whole ranking panel
+     rendered as a tall white slab: the dark cards floated on it and its own
+     light #e6edf3 heading read invisibly light-on-light. Repaint the wrapper
+     to the page base; the cards and text inside are already dark-correct. */
+  .official-live-ts-ranking { background-color: #14181d !important; }
+
+  /* Selected segmented-control pill — the search type tabs (動画 / ショート /
+     シリーズ / マイリスト / ユーザー), the comment vs. tag search toggle and
+     similar active "inverted" pills paint the active item with the site's
+     dark-mode transparentWhite.A95 (#f2f2f2 @95%) fill + transparentGray.A95
+     (#1a1a1a @95%) label, which lands as a stark white blob on the near-black
+     base. Repaint the active pill as an elevated dark surface with a light
+     label, matching the watch-page active tab. Scoped to the token's own
+     class so only the SELECTED pill is touched (the unselected pills sit on a
+     subtle 10% white track that already reads correctly on dark). */
+  [class*="transparentWhite.A95"] {
+    background-color: #2d333b !important;
+    color: #e6edf3 !important;
+    fill: #e6edf3 !important;
+  }
+  [class*="transparentWhite.A95"] svg,
+  [class*="transparentWhite.A95"] path { fill: #e6edf3 !important; }
 
   /* ============================================================
      Common top header bar (shared chrome) + campaign strip
@@ -250,6 +296,17 @@
   .StageBackground {
     background-image: none !important; background-color: transparent !important;
   }
+  /* Event-decoration sections (seasonal campaign rows on the 2026 home) wrap
+     their video rows in a full-width backdrop that carries an inline
+     background-color:#fafafa plus a decorative film-strip PNG. The cards
+     inside are transparent, so on the dark theme the cream backdrop flooded
+     ~1280px behind every row (the audit saw only the one inline #fafafa
+     element; everything else bled through it). Drop the light decoration and
+     repaint the backdrop dark, matching the StageBackground treatment. */
+  .EventDecorationContainer, .EventDecorationContainer-background,
+  .EventDecorationContainer-backgroundImage, .EventDecorationContainer-footer {
+    background-image: none !important; background-color: transparent !important;
+  }
   .ContentsPickupContainer, .ContentsPickupContainer-waku,
   .ContentsPickupContainer-wakuItems { background-color: transparent !important; }
   .StageRecommendLiveCard, .StageRequestedContentCard, .StageEventContentCard {
@@ -276,6 +333,15 @@
      ::after line (#eee) that the element-bg pass can't see — repaint it
      as a dark divider so the seam matches the rest of the legacy DOM. */
   .UserDetailsContainer::after { background-color: #262c33 !important; }
+  /* The collapsed profile "self-introduction" box fades its clipped last
+     rows with a transparent→#fff scroll-fade overlay (.ExpandBoxButton-
+     overlay); on the dark card that painted a white fog over the lower text
+     and the "もっと見る" toggle. (Only 36px tall, so the bg-image audit's
+     height filter skips it.) Remap the gradient to fade to the dark card
+     surface so the clip still reads but stays dark. */
+  .ExpandBoxButton-overlay {
+    background-image: linear-gradient(rgba(28, 33, 40, 0) 0px, #1c2128) !important;
+  }
 
   /* Generic legacy card / panel fallbacks */
   .RankingMatrixVideoMediaObject, .VideoMediaObject, .NiconicoVideoCard,

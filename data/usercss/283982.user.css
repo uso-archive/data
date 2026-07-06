@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260628.11.26
+@version      20260705.21.19
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -210,6 +210,52 @@
     background-color: var(--d-bg) !important;
   }
 
+  /* ------------------------------------------------------------
+     CATALOG MEGA-MENU (Каталог flyout) — the full category panel is
+     rendered through a Vue portal (.vue-portal-target) mounted at body
+     level, OUTSIDE the catalogMenu widget, as a literal-WHITE panel
+     (hashed uw_* class, no role/aria). The widget-scoped header rules
+     never reach it, so on dark the whole category flyout opens stark
+     white. It only mounts on click, so the page-load element-bg audit
+     never sees it. Darken the portal panel to the base canvas; the
+     category links keep the brand blue via the link rule, and headings
+     are lifted to readable light below. ------------------------- */
+  .vue-portal-target,
+  .vue-portal-target > div {
+    background-color: var(--d-bg) !important;
+  }
+  .vue-portal-target [class*="tsHeadline"],
+  .vue-portal-target [class*="tsTitle"] {
+    color: var(--d-text) !important;
+  }
+  /* the currently-selected left-rail category paints a near-white pill
+     (#f5f7fa via a hashed class, NOT a token) as its active highlight —
+     a stark white box in the dark flyout. It only mounts on hover, so the
+     page-load audit never sees it. It is uniquely the one loaded category
+     (a[isload="true"]); repaint it to an elevated active dark surface so
+     the highlight reads as a selection, not a white box. */
+  .vue-portal-target a[isload="true"] {
+    background-color: var(--layerActiveFloor0) !important;
+  }
+
+  /* ------------------------------------------------------------
+     BODY-MOUNTED MODAL PORTALS — Ozon mounts marketing / auth popups
+     (e.g. the "Покупайте на Ozon как юридическое лицо" B2B modal) into a
+     body-level [mountto="body"] wrapper, NOT a role="dialog", so the
+     floating-surface dialog rule never reaches them. Their content panel
+     ships literal #fff via hashed uw_* DIVs; the panel's own text is
+     already lifted to light by the token/typography remaps, so on the
+     white panel it goes light-on-light (invisible), and the panel is a
+     stark white box on dark. The modal only mounts on interaction, so the
+     load-time element-bg audit never sees it. Darken the panel DIVs to the
+     elevated surface — this leaves the blue CTA and the white close-X
+     (both <button>, not div) untouched, and the top promo banner (an
+     image) unaffected — so the modal reads as a dark panel and its light
+     text becomes legible. ---------------------------------------- */
+  [mountto="body"] div[class*="uw_"] {
+    background-color: var(--d-surface) !important;
+  }
+
   /* ============================================================
      HEADER / NAV (data-widget="header") + sub-bars
      ============================================================ */
@@ -354,6 +400,22 @@
   div[class*="search_"] {
     background-color: var(--d-bg) !important;
   }
+  /* COUNTRY-CODE SELECTOR (OZON ID login modal — a same-origin
+     www.ozon.ru/ozonid-lite iframe, so the theme applies inside it).
+     The phone field's country picker renders the flag + dial code
+     ("+7"/"+33") on a dark button, with a searchable dropdown driven by
+     a role="combobox" name="filter" text input laid OVER the collapsed
+     button to capture keystrokes. Our generic input background rule
+     painted that overlay input opaque (--d-surface), covering the dial
+     code so the box looked empty (the code text is light but hidden
+     BEHIND the opaque overlay — an audit-blind overlapping-input miss;
+     only elementsFromPoint reveals it). The main search input is
+     name="text", so scoping to name="filter" avoids any collision.
+     Make the overlay transparent so the dial code reads; typed filter
+     text still shows light on the button's dark surface. */
+  input[role="combobox"][name="filter"] {
+    background-color: transparent !important;
+  }
 
   /* ============================================================
      PRODUCT TILES / CARDS  (.tile-root, tileGridDesktop)
@@ -489,6 +551,25 @@
   [data-widget="webProductHeading"] h1,
   [data-widget="webProductHeading"] [class*="tsHeadline"] {
     color: var(--d-text) !important;
+  }
+  /* TITLE TRUNCATION FADE — when the product name is long enough to
+     clip, Ozon appends a "…ещё" (show more) toggle whose wrapper paints
+     a horizontal linear-gradient ::before that fades the last line of
+     text into the page background (…transparent -> #fff). On the light
+     site that blended into the white page; on dark it renders a stark
+     WHITE smear across the end of the title. The gradient is a
+     background-IMAGE with a transparent background-color, so the
+     element-bg audit passes clean (it only mounts when the title is
+     truncated, so short-title PDPs never show it). Remap the fade to the
+     base canvas so it blends into the dark page instead of flashing
+     white. Only one heading ::before ever carries a background-image (this
+     fade), so scoping to the widget's pseudos is safe. */
+  [data-widget="webProductHeading"] *::before {
+    background-image: linear-gradient(
+      90deg,
+      rgba(20, 24, 29, 0),
+      var(--d-bg) 57%
+    ) !important;
   }
 
   /* The PDP buybox/grid hardcodes near-black/navy text on delivery,
@@ -632,6 +713,22 @@
     background-color: var(--d-header) !important;
     color: var(--d-text) !important;
     border-color: var(--d-border) !important;
+  }
+  /* The affixed PDP product bar (webStickyProducts) slides in on scroll
+     and carries text Ozon hardcodes as navy rgba(0,26,51,.6) via hashed
+     pdp_* classes — most visibly the seller "Перейти в магазин" row, which
+     reads ~1.1:1 (invisible) on our dark bar. Because the bar only mounts
+     on scroll, the static element-bg audit never sees it. Lift its text
+     descendants to readable light; the seller name + links stay blue via
+     the link rule and the "В корзину" CTA stays bright (button rule below). */
+  [data-widget="webStickyProducts"] span,
+  [data-widget="webStickyProducts"] div {
+    color: var(--d-text-2) !important;
+  }
+  [data-widget="webStickyProducts"] button,
+  [data-widget="webStickyProducts"] button span,
+  [data-widget="webStickyProducts"] button div {
+    color: var(--d-text) !important;
   }
 
   /* ============================================================

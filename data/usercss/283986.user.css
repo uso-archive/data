@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for OLX Brasil.
-@version      20260628.14.35
+@version      20260705.21.13
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -50,6 +50,69 @@
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
     color: #e6edf3 !important;
+  }
+
+  /* ============================================================
+     Auth flow (conta.olx.com.br) — the login/register pages run a
+     separate shell with the "focus" header variant and a
+     styled-components divider. Both ship literal white surfaces the
+     main-site header rules don't reach.
+     ============================================================ */
+  header.olx-focus-header,
+  .olx-focus-header {
+    background-color: #0d1117 !important;
+    border-color: #2d333b !important;
+  }
+  /* "Ou acesse com" divider: an absolutely-positioned label span carries
+     a white bg to mask the rule line under it. Repaint it onto the card
+     surface + lift the grey label to a readable tone. The Tailwind margin
+     utility on the wrapper churns between redesigns (mt-6 -> mt-5), so
+     cover both variants. */
+  .flex.mb-2.mt-6 span,
+  .flex.mb-2.mt-5 span {
+    background-color: #1c2128 !important;
+    color: #9aa6b0 !important;
+  }
+  /* Register (/cadastro) renders its form on a white styled-components
+     card the main rules don't reach — meanwhile our generic input/label
+     rules already darken the fields and lighten the labels, so the copy
+     ends up light-on-white. Dark the CSS-module shell + its card panel
+     (hashed child) so the whole form coheres. */
+  [class*="mainWrapper_mainContainer"] {
+    background-color: #14181d !important;
+  }
+  [class*="mainWrapper_mainContainer"] > div > div {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  /* Its form copy (olx-text variants, radio labels, password-rule hints
+     and helper/error captions) all carry near-black hex — dark-on-dark
+     now the card is dark. Lift within the auth shell only. */
+  [class*="mainWrapper_mainContainer"] .olx-text,
+  [class*="mainWrapper_mainContainer"] .olx-radio__content .olx-text {
+    color: #c4cdd6 !important;
+  }
+  [class*="mainWrapper_mainContainer"] .olx-text--body-large,
+  [class*="mainWrapper_mainContainer"] .olx-text--body-medium {
+    color: #e6edf3 !important;
+  }
+  [class*="mainWrapper_mainContainer"] .olx-text--caption,
+  [class*="mainWrapper_mainContainer"] [id*="text-input-error"] {
+    color: #9aa6b0 !important;
+  }
+  /* Its "ou" divider label is an absolutely-positioned white chip that
+     masks the rule line — repaint it onto the card surface. */
+  [class*="mainWrapper_mainContainer"] span[class*="typo-body-small"] {
+    background-color: #1c2128 !important;
+  }
+  /* Login (/acesso) card ships a "Preciso de ajuda" footer strip on a
+     near-white #f5f6f7 styled-component bg — only 35px tall, so it slips
+     under the audit's height floor and glares at the foot of the dark
+     card. Its classes are hashed (sc-*), but it's reliably the card's
+     last-child footer; the conta auth app is Next.js (#__next) vs the
+     main SPA (#root), so scope there and flatten it onto the card. */
+  #__next .olx-container--outlined > div:last-child > div {
+    background-color: transparent !important;
   }
 
   /* ============================================================
@@ -149,6 +212,14 @@
   picture {
     background-color: #21262d !important;
   }
+  /* Loading skeletons paint a light shimmer (linear-gradient of
+     #eff1f5 -> #cfd4dd) that flashes bright on the dark page during
+     every load — swap the gradient for a flat dark placeholder. */
+  .olx-core-skeleton,
+  [class*="skeleton"] {
+    background-image: none !important;
+    background-color: #21262d !important;
+  }
   /* Card title / price text */
   .olx-adcard__title,
   .olx-adcard a.olx-core-link--main { color: #e6edf3 !important; }
@@ -202,10 +273,46 @@
     border-color: #2d333b !important;
     border-radius: 8px !important;
   }
+  /* Subcategory-header icon tile: a small (~36px) rounded #EFF1F5 chip
+     holding the category glyph — under the audit's size floor, so it
+     slips past as a bright square glaring in the dark filters rail.
+     Settle onto the elevated media tone; the colored glyph stays legible. */
+  [class*="SubcategoryFilterHeader_icon"] {
+    background-color: #21262d !important;
+    border-color: #2d333b !important;
+  }
 
-  /* Advertising placeholders (white/grey ad slots) -> blend into base */
+  /* Filter form controls (checkboxes / radios) — olx-ui paints the box
+     itself on a `::before` pseudo (element bg is transparent), so the
+     element-bg audit is blind to it: every UNCHECKED box renders a
+     glaring literal-white square/circle down the filters rail. Settle
+     the empty box onto an elevated dark surface with a light-grey
+     hairline so it reads as an outline, and keep the CHECKED state on
+     the brand OLX purple (#6E0AD6) with its white tick intact. */
+  .olx-core-checkbox-radio__input::before {
+    background-color: #1c2128 !important;
+    border-color: #6b7681 !important;
+  }
+  .olx-core-checkbox-radio__input:checked::before {
+    background-color: #6e0ad6 !important;
+    border-color: #6e0ad6 !important;
+  }
+  /* Toggle switch (e.g. "Anunciantes bem avaliados") ships a light-grey
+     #cfd4dd OFF track that glares on dark; darken only the unchecked
+     track (scope with :not(:checked)) so the native ON accent + white
+     knob are untouched. */
+  .olx-core-toggle-switch:not(:checked) {
+    background-color: #484f58 !important;
+  }
+
+  /* Advertising placeholders (white/grey ad slots) -> blend into base.
+     Attribute substring matching is case-sensitive, so cover both the
+     lower-case slot classes and the hashed React `AdvertisingAnchor`
+     (sticky bottom ad) container, whose light-grey panel leaks. */
   [data-testid="advertising-placeholder"],
-  [class*="advertising"] {
+  [class*="advertising"],
+  [class*="Advertising"],
+  [class*="anchor-container"] {
     background-color: #14181d !important;
   }
 
@@ -246,6 +353,28 @@
   h1, h2, h3 { color: #e6edf3 !important; }
   [class*="price"] strong,
   [class*="price-box"] h2 { color: #ffffff !important; }
+
+  /* OLX "secondary" (purple) design tokens used as RAW vars via inline
+     styles in the ad body — e.g. the price-box discount-coupon banner
+     paints `background: var(--color-secondary-70)` (light lavender)
+     with `--color-secondary-120/130` dark-purple copy on top. The
+     class-based secondary overrides can't reach inline-var usage, so
+     flip the scale at the token level within #adview: light surface
+     token -> dark violet chip, deep text shades -> a readable violet. */
+  #adview {
+    --color-secondary-70: #2a2440 !important;
+    --color-secondary-120: #c9b6f5 !important;
+    --color-secondary-130: #c9b6f5 !important;
+  }
+  /* The "ver número" phone-reveal control OLX auto-generates inside the
+     ad description is a hashed styled-component span carrying the raw
+     saturated OLX purple (#6E0AD6) on BOTH color and -webkit-text-fill,
+     so it reads dark-on-dark. Target its stable data-element hook (the
+     hashed class churns) and lift to the readable violet. */
+  #adview [data-element="button_show-phone"] {
+    color: #b794f6 !important;
+    -webkit-text-fill-color: #b794f6 !important;
+  }
 
   /* ============================================================
      Text utilities — olx-ui ships Tailwind-style text-color and
@@ -326,15 +455,59 @@
   [class*="text-feedback-warning"] { color: #e6c463 !important; }
 
   /* ============================================================
-     Third-party consent / CMP dialog (fc-*, adopt-c-*) — dark it
-     so it is not a blinding white sheet before it is dismissed.
+     Third-party consent / CMP dialog. OLX uses Google Funding
+     Choices (.fc-consent-root), whose stylesheet is injected AFTER
+     our theme — so a bare `.fc-dialog` rule TIES on specificity and
+     LOSES on source order, leaving a blinding white sheet on first
+     visit. Scope every rule from `.fc-consent-root` to out-specify
+     the CMP and dark the whole sheet + lift its dark Material text.
      ============================================================ */
-  .fc-dialog, .fc-dialog-content,
-  [class*="fc-choice-dialog"],
+  .fc-consent-root .fc-dialog,
+  .fc-consent-root .fc-dialog-content,
+  .fc-consent-root .fc-choice-dialog,
+  .fc-consent-root .fc-header,
+  .fc-consent-root .fc-footer,
   [class*="adopt-"][class*="dialog"] {
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
+  }
+  .fc-consent-root .fc-dialog h1,
+  .fc-consent-root .fc-dialog h2,
+  .fc-consent-root .fc-dialog p,
+  .fc-consent-root .fc-dialog li,
+  .fc-consent-root .fc-dialog span,
+  .fc-consent-root .fc-dialog div,
+  .fc-consent-root .fc-dialog-headline,
+  .fc-consent-root .fc-dialog-content {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  /* Logo tile + FAQ panel keep a literal white bg */
+  .fc-consent-root .fc-faq-icon,
+  .fc-consent-root .fc-faq-contents {
+    background-color: #14181d !important;
+  }
+  .fc-consent-root .fc-dialog hr,
+  .fc-consent-root .fc-dialog [class*="divider"] {
+    background-color: #2d333b !important;
+    border-color: #2d333b !important;
+  }
+  /* "Manage options" preferences panel: the sticky header bar, each
+     per-purpose card (.fc-preference-container) and the manage-vendors
+     row all ship a literal white surface with a light hairline — our
+     lifted near-white text ghosts onto them. Settle them onto an
+     elevated dark surface so the copy + toggles read. */
+  .fc-consent-root .fc-dialog-header,
+  .fc-consent-root .fc-preference-container,
+  .fc-consent-root .fc-navigation-button,
+  .fc-consent-root .fc-manage-vendors,
+  .fc-consent-root [class*="preferences-container"] {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  .fc-consent-root .fc-preference-container {
+    background-color: #21262d !important;
   }
 
   /* ============================================================
@@ -425,6 +598,23 @@
   .olx-footer a,
   [data-ds-component="DS-Footer-Link"] { color: #9aa6b0 !important; }
   footer a:hover { color: #e6edf3 !important; }
+
+  /* ============================================================
+     Taboola sponsored-content widget (trc_* / videoCube) at the foot of
+     the search results renders bright-white video tiles with black
+     titles. Dark the tiles, drop the white hover-fade overlay, and
+     lift the labels so the unit blends into the dark page.
+     ============================================================ */
+  [id^="internal_trc"], [id*="taboola"],
+  .trc_rbox, .trc_rbox_outer, .videoCube, .trc_spotlight_item,
+  .trc_popover, .trc_popover_fade {
+    background-color: #1c2128 !important;
+  }
+  .trc_exclude_overlay { background-color: transparent !important; }
+  .videoCube .video-title, .videoCube .video-label,
+  .trc_spotlight_item .video-title, .trc-main-label,
+  .trc_spotlight_item .trc-main-label *,
+  .trc_popover, .trc_popover * { color: #c4cdd6 !important; }
 
   /* ============================================================
      Scrollbar polish

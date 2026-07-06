@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Pepper.pl with comfortable browsing across the deal feed, deal pages, coupons and search, with prices and deal heat kept clear.
-@version      20260624.11.04
+@version      20260705.21.19
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -682,6 +682,75 @@
   [role="tooltip"] { background-color: #21262d !important; border-color: #2d333b !important; }
 
   /* ============================================================
+     Merchant coupon pages (/kupony/<merchant>, e.g. /kupony/temu.com)
+     ------------------------------------------------------------
+     These render the coupon content WITHOUT the Next.js #__next root of
+     the /kupony listing: the shell is server-rendered as <main>'s .nalu
+     sections + a .p7sajb* sub-nav wrapper (both coupon-app-only markers —
+     absent on home/deal). So every #__next-scoped coupon rule above misses
+     this page and it shipped almost fully white with a black-text footer.
+     Mirror the coupon retheme structurally here: dark base on the sections,
+     blank the hashed white card/section fills to transparent, then
+     re-establish elevated dark cards. Text is forced light (orange chips /
+     "Szczegóły" links keep their own fill — buttons aren't recolored). */
+  main > [class*="p7sajb"], main > .nalu.section, main > .nalu {
+    background-color: #14181d !important;
+  }
+  .nalu section, .nalu > div, .nalu div,
+  main > [class*="p7sajb"] div, main > [class*="p7sajb"] nav {
+    background-color: transparent !important;
+  }
+  /* Re-establish elevated coupon cards / hero / info blocks + the white
+     hero action button, over the dark base. */
+  .nalu [class*="_13wrug"], .nalu [class*="_1jbscxu"],
+  .nalu [class*="fed1vu"], .nalu [class*="_1w99urm"],
+  .nalu [class*="_1tyhinu"], .nalu [class*="n9fwq6"],
+  .nalu [class*="poqd91"], .nalu [class*="xvjmln"],
+  .nalu button[class*="_62by6g"] {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  /* Unselected filter chip (white pill, orange label) -> dark chip; the
+     selected chip keeps its orange fill (different hashed variant). */
+  .nalu button[class*="_175sa5n2"] {
+    background-color: #21262d !important;
+    border-color: #2d333b !important;
+  }
+  /* Force the coupon-app body text light — its utility classes resolve to
+     literal charcoal/black (they don't read our tokens), so headings, card
+     titles, the "N% ZNIŻKI" discount and the details table all shipped
+     dark-on-dark. */
+  .nalu, .nalu p, .nalu span, .nalu div, .nalu li, .nalu strong,
+  .nalu h1, .nalu h2, .nalu h3, .nalu h4, .nalu h5, .nalu h6, .nalu a,
+  .nalu td, .nalu th, .nalu table,
+  main > [class*="p7sajb"] a, main > [class*="p7sajb"] span,
+  main > [class*="p7sajb"] div {
+    color: #c4cdd6 !important;
+  }
+  .nalu h1, .nalu h2, .nalu h3, .nalu h4 { color: #e6edf3 !important; }
+  .nalu a:hover { color: #ffffff !important; }
+
+  /* Header nav pills on the merchant coupon shell (Kategorie / Kupony /
+     Za darmo / Okazje / Dyskusje / Club): these pages render the header with a
+     #header-navigation sub-nav whose .button--mode-flat pills (a mix of
+     <button> dropdowns and <a> links) fall back to a LITERAL white bg — the
+     Magritte token frontend that resolves them to #1c2128 on home/deal isn't
+     loaded here, and there's no #__next root, so every coupon-app rule above
+     misses them. They're short (~40px) pills in a sticky header that scrolls
+     off = audit-blind. #header-navigation is ABSENT on the home/deal header
+     (its pills already compute #1c2128 from tokens), so scoping here darkens
+     ONLY the coupon shell — no home/deal regression. Match the home pill shade;
+     orange CTAs keep their own fill (later brand-CTA rules, !important). */
+  #header-navigation .button--mode-flat {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+  #header-navigation .button--mode-flat:hover {
+    background-color: #2d333b !important;
+  }
+
+  /* ============================================================
      Generic links + footer
      ============================================================ */
   a { color: #c4cdd6; }
@@ -700,6 +769,19 @@
   }
   footer a { color: #9aa6b0 !important; }
   footer a:hover { color: #e6edf3 !important; }
+  /* The expanded footer on /kupony/<merchant> pages colours its headings /
+     trust-signals / ratings / copyright with literal light-mode charcoal &
+     black via utility classes (not tokens), so they shipped dark-on-dark on
+     our #0d1117 footer. Force footer descendant text light; keep column
+     headings brighter and preserve the brand-orange stat highlights. */
+  footer div, footer p, footer span, footer strong, footer li,
+  footer [class*="text--"], footer [class*="color--text"],
+  footer [class*="footer-"] {
+    color: #9aa6b0 !important;
+  }
+  footer h1, footer h2, footer h3, footer h4,
+  footer [class*="footer-"] [class*="text--b"] { color: #e6edf3 !important; }
+  footer [class*="highlight"] { color: #ff8a4d !important; }
   /* The deal-card action row (comment / share / bookmark + "Idź do okazji")
      carries a "footer" classname too — keep it TRANSPARENT so it inherits the
      #1c2128 card body and the card reads as one uniform surface (no band). */

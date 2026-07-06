@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Investopedia: definitions, guides, search and the homepage in an easy-on-the-eyes dark look, with finance colors kept clear.
-@version      20260629.17.24
+@version      20260705.21.17
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -158,6 +158,14 @@
   #icon-logo circle,
   #icon-logo path[fill="#f64e00"],
   #icon-logo circle[fill="#f64e00"] { fill: #f64e00 !important; }
+  /* Newsletter-dialog wordmark uses a separate sprite (#icon-logo-finance) whose
+     source paths are pure black — invisible on the now-dark dialog. Light them,
+     keep the brand orange dot. */
+  .newsletter__logo svg, svg.icon-logo-finance, svg.icon-logo-finance path,
+  #icon-logo-finance path { fill: #e6edf3 !important; }
+  #icon-logo-finance path[fill="#f64e00"],
+  #icon-logo-finance circle[fill="#f64e00"],
+  svg.icon-logo-finance path[fill="#f64e00"] { fill: #f64e00 !important; }
 
   /* Dropdown / fullscreen-nav panels must be opaque */
   .mntl-fullscreen-nav__menu, .mntl-fullscreen-nav__container,
@@ -241,6 +249,16 @@
   }
   .mntl-universal-card:hover, .card:hover, .home-hero-card:hover,
   .mntl-carousel__card:hover { background-color: #21262d !important; }
+
+  /* Key-terms / carousel card body: a ::after scroll-fade "more below" gradient
+     fades the clamped definition text to pure WHITE (rgba(255,255,255,0) → #fff)
+     — doubly audit-blind (a pseudo-element AND a bg-IMAGE gradient) — so it paints
+     a glaring white strip across the bottom of every dark card. Remap the fade to
+     the card's own dark surface so the affordance survives without the white. */
+  .carousel-card__body::after, .comp.carousel-card__body::after,
+  [id^="carousel-card__body"]::after {
+    background-image: linear-gradient(rgba(28, 33, 40, 0) 75%, #1c2128) !important;
+  }
 
   /* Decorative card "fold" square: a 16px ::after the live site paints pure
      white — invisible on the white card, but a glaring white speck on the dark
@@ -357,6 +375,7 @@
   }
   .journey-accordion__item--current-article,
   .journey-accordion__current-article,
+  .journey-accordion__sublist-item--current-article,
   .journey-accordion__series-eyebrow, .journey-accordion__eyebrow {
     color: #8b949e !important;
     -webkit-text-fill-color: #8b949e !important;
@@ -392,6 +411,14 @@
   /* List track (group ::after light-grey rgb(239,239,239)) + chip tracks */
   .mntl-taxonomysc-article-list-group::after,
   .mntl-taxonomysc-child-node::after { background-color: #2d333b !important; }
+  /* "More" flyout panel: the absolutely-positioned dropdown container itself is
+     transparent — only its pills are opaque — so the article grid behind it
+     bleeds through the gaps between pills. Give the panel a solid dark surface. */
+  .mntl-taxonomysc-child-node__dropdown,
+  .comp.mntl-taxonomysc-child-node__dropdown {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
 
   /* "Investopedia Answers" (askmiso) GenAI query widget */
   .askmiso-ask-query, .askmiso-ask-query-base,
@@ -455,15 +482,39 @@
     -webkit-text-fill-color: #9bd4ff !important;
   }
 
+  /* Homepage "Investopedia for Advisors" band carries a light lavender raster
+     background-IMAGE (homepage-advisor-background) painted on the wrapper whose
+     own bg-color is transparent — audit-blind (a url(), not a gradient) — so the
+     whole band renders light and hides its (light) title + subtitle. Kill the
+     image and darken the wrapper; the item cards are already dark. */
+  .advisors, .comp.advisors, [id^="advisors_"] {
+    background-image: none !important;
+    background-color: #14181d !important;
+  }
+
   /* ====================================================================
      Tables  (rate tables, data tables) — keep finance green/red intact
      ==================================================================== */
   table, .mntl-table, .comp.mntl-sc-block-table,
   .rate-table, .mid-bankingtable, .mid-ad-table-group,
-  .mntl-sc-block-table__table {
+  .mntl-sc-block-table__table,
+  .mntl-sc-block-universal-table__table,
+  .mntl-sc-block-universal-table__table-wrapper,
+  .mntl-sc-block-universal-table__table-wrapper--no-scroll,
+  .mntl-sc-block-universal-table__table-wrapper--scroll {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
     color: #c4cdd6 !important;
+  }
+  /* The universal-table wrapper also carries a white horizontal scroll-shadow
+     background-IMAGE gradient (linear-gradient(to right, #fff, ...)) that paints
+     over the dark bg-color — audit-blind, and it bleeds a white strip at the
+     wrapper's left edge wherever a child (e.g. the transparent figcaption
+     footnote) doesn't cover it. Kill the image so the dark surface stays clean. */
+  .mntl-sc-block-universal-table__table-wrapper,
+  .mntl-sc-block-universal-table__table-wrapper--no-scroll,
+  .mntl-sc-block-universal-table__table-wrapper--scroll {
+    background-image: none !important;
   }
   th, .mntl-table thead, .mntl-table th, table thead th {
     background-color: #21262d !important;
@@ -633,6 +684,44 @@
   .mntl-newsletter-dialog--footer-link, .mntl-newsletter-dialog--footer-link .link__wrapper,
   .mntl-newsletter-dialog *, .newsletter-signup * { color: #e6edf3 !important; }
   .mntl-newsletter-dialog--footer-link:hover { background-color: #2d333b !important; }
+  /* Newsletter Sign Up modal (a11y dialog). Live markup is .dialog__content /
+     .newsletter__form / .newsletter__subscriptions-wrapper — NOT the
+     .mntl-newsletter-dialog classes above — so the panel shipped WHITE and its
+     (already-light) labels went invisible on it. Darken every surface; the blue
+     .dialog__header band and "I'm In!" CTA are brand and stay. */
+  .dialog__content, .dialog__body, .dialog__inner,
+  .newsletter__form, .js-newsletter-form,
+  .newsletter__subscriptions-wrapper, .newsletter__subscriptions {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  .newsletter__subscriptions-wrapper { background-color: #181d23 !important; }
+  .dialog__content .newsletter__label, .dialog__content .newsletter__description,
+  .dialog__content .newsletter__email-address, .dialog__content .dialog__title,
+  .newsletter__subscriptions-wrapper, .newsletter__subscriptions-wrapper * {
+    color: #c4cdd6 !important;
+  }
+  .dialog__content .dialog__title, .newsletter__subscriptions-title { color: #e6edf3 !important; }
+
+  /* ====================================================================
+     Investopedia Simulator (/simulator) — a SEPARATE Vuetify microsite
+     (.v-application.v-theme--light) with its own coherent light+blue+lime
+     branded design that the theme does not (and should not) fully repaint.
+     Our generic text rules bleed onto two spots and make them light-on-light:
+     the FAQ question headings (span.faq-title) and the lime "Get Started"
+     button labels. Restore dark text so the microsite stays readable.
+     Scope everything to .v-application so the editorial site is untouched.
+     ==================================================================== */
+  .v-application .faq-title {
+    color: #14181d !important;
+    -webkit-text-fill-color: #14181d !important;
+  }
+  .v-application .v-btn.bg-grellow,
+  .v-application .v-btn.bg-grellow .v-btn__content,
+  .v-application .v-btn.bg-grellow span {
+    color: #14181d !important;
+    -webkit-text-fill-color: #14181d !important;
+  }
 
   /* ====================================================================
      Borders / dividers / misc
