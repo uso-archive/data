@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260705.21.18
+@version      20260707.15.31
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -126,7 +126,7 @@
      #main-content. */
   #main-content button[aria-expanded] { color: #e6edf3 !important; }
   p, li, label, dd, dt, blockquote, figcaption, td, th, caption,
-  article, section, main { color: #c4cdd6 !important; }
+  legend, article, section, main { color: #c4cdd6 !important; }
   span:not([class*="color"]):not([style*="color"]) { color: inherit; }
 
   /* ====================================================================
@@ -144,6 +144,22 @@
      ==================================================================== */
   .exercise-chrome-content-for-mobile-zoom button { color: #9aa4af !important; }
   .exercise-chrome-content-for-mobile-zoom button:hover { color: #c4cdd6 !important; }
+
+  /* ====================================================================
+     Discussion tabs ("Questions" / "Tips & Thanks") under articles and
+     videos. Khan hardcodes the active tab to the raw brand blue (#1865f2,
+     ~3.7:1 on near-black) and the inactive tab to a mid grey (#717378,
+     ~3.8:1) via -webkit-text-fill-color, both bypassing the Wonder Blocks
+     token remaps and landing dark-on-dark. Scoped to the stable ARIA tab
+     ids; lift the inactive label to a readable muted light and the active
+     one to the theme's refined Khan blue. Set text-fill too (fill drives
+     the rendered color, so color alone would not stick). */
+  #questions-tab, #comments-tab {
+    color: #9aa4af !important; -webkit-text-fill-color: #9aa4af !important;
+  }
+  #questions-tab[aria-selected="true"], #comments-tab[aria-selected="true"] {
+    color: #5fb0e6 !important; -webkit-text-fill-color: #5fb0e6 !important;
+  }
 
   /* ====================================================================
      Search box (header) — white-on-white in light theme
@@ -332,6 +348,12 @@
   [mathcolor="#9D38BD"], [mathcolor="#9D38BD"] * { color: #d2a8ff !important; }
   [mathcolor="#CA337C"], [mathcolor="#CA337C"] * { color: #ff8ac4 !important; }
   [mathcolor="#E07D10"], [mathcolor="#E07D10"] * { color: #f0a868 !important; }
+  /* Perseus exercise answer-choice tints (a muted green + mauve used to
+     colour the multiple-choice math on practice pages) hardcode dark values
+     built for the white page and land ~3.5:1 on the dark surface. Lift each
+     to the lighter same-hue shade already used for the worked-example set. */
+  [mathcolor="#447A53"], [mathcolor="#447A53"] * { color: #7ee787 !important; }
+  [mathcolor="#B25071"], [mathcolor="#B25071"] * { color: #ff8ac4 !important; }
 
   /* Article content tables: Khan renders some data/function tables with
      hardcoded pale cells (rgb(247,248,250)) on classless <td>/<th>, which the
@@ -339,6 +361,37 @@
      page; borders are already softened by the universal border rule. */
   #main-content table, #main-content thead, #main-content tbody,
   #main-content tr, #main-content td, #main-content th {
+    background-color: transparent !important;
+  }
+
+  /* Perseus exercise multiple-choice cards: each choice `li` draws its card
+     frame/divider through `::before` + `::after` pseudo-elements hardcoded to
+     a light grey (rgb(219,220,221)) built for the white page — invisible to an
+     element-bg audit, but they render as bright white frames around the (dark)
+     answer cards here. Remap the pseudo fills to the theme's border tone so the
+     choices read as subtle dark cards. Scoped to the stable Perseus renderer
+     class so nothing else is touched. */
+  .framework-perseus li::before,
+  .framework-perseus li::after,
+  .perseus-renderer li::before,
+  .perseus-renderer li::after { background-color: #2d333b !important; }
+
+  /* Perseus "choose all / choose 1" answer cards were rendering as empty dark
+     boxes — only the A-E letter tile showed, the math statement inside each card
+     was invisible. Root cause: the logged-out donation-form rule above
+     (`form fieldset …`) is broad enough to also match the Perseus choice
+     <fieldset> (choices are grouped inside a <form>), painting an opaque #1c2128
+     onto the choice fieldset/ul/li. Perseus renders each choice's block math
+     (a MathJax `mjx-container` given compensating negative margins) on a lower
+     paint layer, so that opaque fill covered the math — the letters (drawn on a
+     separate button) stayed visible. Reset the Perseus choice containers to
+     transparent so the math paints again; the cards keep their dark look from the
+     surrounding exercise surface. Higher specificity than the `form fieldset`
+     rule, so it wins without touching the donation widget. */
+  .framework-perseus fieldset, .framework-perseus fieldset ul,
+  .framework-perseus fieldset li, .framework-perseus fieldset li label,
+  .perseus-renderer fieldset, .perseus-renderer fieldset ul,
+  .perseus-renderer fieldset li, .perseus-renderer fieldset li label {
     background-color: transparent !important;
   }
 

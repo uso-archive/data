@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for OLX that turns the bright marketplace into an easy-on-the-eyes dark interface, perfect for late-night browsing.
-@version      20260705.21.19
+@version      20260707.14.32
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -466,6 +466,24 @@
     -webkit-text-fill-color: #9aa6b0 !important;
   }
 
+  /* OLX's SSR ad slots (e.g. #baxter-top on the offer/listing pages) ship a
+     full-width house-ad placeholder ("OLX REKLAMA") baked onto a WHITE canvas
+     as a background-IMAGE, so the unfilled slot renders as a glaring white
+     banner on dark. Because the white is a raster background-image (not a
+     bg-color, and not a light gradient stop) BOTH the element-bg scan and the
+     light-gradient scan miss it. Strip the placeholder image and drop the slot
+     onto the dark base — a real ad loading into the slot lives in its own child
+     iframe, so it is unaffected. Two class conventions ship these placeholders:
+     `*-baxter-ssr-placeholder`/`with-placeholder-image` (e.g. #baxter-top on the
+     offer/listing) and `baxter-placeholder--*` (e.g. #baxter-seller-billboard on
+     the profile) — cover both. */
+  [class*="ssr-placeholder"],
+  [class*="baxter-placeholder"],
+  [class*="with-placeholder-image"] {
+    background-image: none !important;
+    background-color: #14181d !important;
+  }
+
   /* ============================================================
      Top promo / info banner strip (was pale yellow #FFF6D9)
      ============================================================ */
@@ -571,6 +589,56 @@
   #mainContent ul li a:hover span {
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
+  }
+
+  /* ============================================================
+     Seller / user profile page (/oferty/uzytkownik/)
+
+     A distinct #mainContent layout whose profile-header follow/share
+     buttons, the "Wszystkie ogłoszenia / Oceny" tab bar, the filter &
+     sort section labels, the result-count line, the seller metadata
+     and the card location lines all ship the near-black #02282c / dim
+     #406367 content tokens through -webkit-text-fill-color, so they
+     render dark-on-dark. The offer/search remaps are anchored on
+     testids this page doesn't use — cover its stable anchors here.
+     ============================================================ */
+  /* Profile tab bar — both tabs carry data-is-active (true/false) */
+  #mainContent button[data-is-active],
+  #mainContent button[data-is-active] span {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  /* (Profile follow/share button remap uses a Selectors-4 relational
+     selector and lives only in the .user.css build — unsupported by the
+     old userstyles.org parser, so it is omitted here.) */
+  /* Filter/sort section labels (Kategorie / Sortuj / Znajdź na tej
+     stronie) — lift, then re-assert the card title/price the broad
+     seller-listing rule would otherwise flatten. */
+  #mainContent [data-testid="seller-listing"] h4,
+  #mainContent [data-testid="seller-listing"] > header,
+  #mainContent [data-testid="seller-listing"] > header * {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  #mainContent [data-testid="seller-listing"] [data-testid="ad-card-title"],
+  #mainContent [data-testid="seller-listing"] [data-testid="ad-card-title"] h4 {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  /* Result count + seller metadata (member-since / last-online) + card
+     location lines (bare <p>, no location-date testid on this variant) */
+  #mainContent [data-testid="results-counter"],
+  #mainContent [data-testid="results-counter"] *,
+  #mainContent [data-testid="lastSeenBox"],
+  #mainContent [data-testid="lastSeenBox"] *,
+  #mainContent [data-testid="l-card"] p {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+  #mainContent [data-testid="seller-listing"] [data-testid="ad-price"],
+  #mainContent [data-testid="seller-listing"] [data-testid="ad-price"] * {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
   }
 
   /* ============================================================

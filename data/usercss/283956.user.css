@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260705.21.22
+@version      20260707.14.34
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -89,6 +89,16 @@
   [data-testid="subnavigation"] {
     background-color: var(--wx-chrome) !important;
     color: var(--wx-text) !important;
+  }
+
+  /* the legacy header (radar / monthly) ships a `Skip to Main Content` skip-nav
+     link (MainMenuHeader--accessibilityLink) that is off-screen until keyboard
+     focus, then reveals a WHITE pill. Our global `a { color: var(--wx-link) }`
+     paints its text a light blue on that white pill -> ~2.3:1 light-on-light on
+     Tab-focus. Darken the pill to the chrome so the blue link text reads. */
+  [class*="MainMenuHeader--accessibilityLink"] {
+    background-color: var(--wx-chrome) !important;
+    color: var(--wx-link) !important;
   }
 
   /* left sidebar navigation rail */
@@ -465,6 +475,17 @@
      own treatment (matched more specifically above / by the link rules). */
   [class*="MediaObject--mediaCaption"]:not([class*="mediaCaptionCTA"]) {
     color: var(--wx-text-2) !important;
+  }
+  /* the content-media / promo thumbnails (news strips, "Stay Safe" fallback,
+     "Spring Is Here", sidebar teasers) paint a LIGHT #f3f3f3 -> #e5e5e5 gradient
+     placeholder (Image--gradient) behind the lazy-loaded <img>. It's a
+     background-IMAGE (a bg-color audit is blind to it), and until the thumbnail
+     paints -- or on image-less promo fallbacks -- it renders as a bright box on
+     the dark card (glaring across the Monthly / Allergy / radar content strips).
+     Darken the placeholder gradient so the load state reads dark; the real <img>
+     paints over it unchanged (imgs already keep a transparent bg below). */
+  [class*="Image--gradient"] {
+    background-image: linear-gradient(135deg, var(--wx-surface-2), var(--wx-surface)) !important;
   }
 
   /* ---- temperature scale (semantic, NEUTRAL ends only) ------------------ */
