@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Vinted with the homepage, catalog and search, item pages and seller profiles in a comfortable dark look that's easy on the eyes for late-night browsing.  Works on every country version of Vinted (vinted.fr, .de, .com, .co.uk, .es, .it, .nl, .be, .pl and more).   Prices, ratings and Vinted's teal stay clear and recognizable.
-@version      20260707.14.34
+@version      20260710.13.16
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -113,12 +113,31 @@
 
   /* ---- Soften every default light border into a dark line ---- */
   * { border-color: #262c33 !important; }
+  /* web_ui buttons encode their identity in `color`: Button__filled fills with
+     currentColor, Button__outlined rings with currentColor, and both filled and
+     flat are natively border-transparent. The blanket rule above overwrote all
+     three — the primary CTA lost its teal ring and every flat icon button grew
+     a grey box. Restore the component's own border behaviour. */
+  .web_ui__Button__filled, [class*="Button__filled"],
+  .web_ui__Button__flat, [class*="Button__flat"] {
+    border-color: transparent !important; }
+  .web_ui__Button__outlined, [class*="Button__outlined"] {
+    border-color: currentColor !important; }
+  /* Outlined/flat primary buttons draw ring, label and icon from `color`;
+     the raw brand teal is too dark on our surfaces, so lift the whole
+     button. Filled primary is untouched — its fill IS this colour. */
+  [class*="Button__outlined"][class*="Button__primary"],
+  [class*="Button__flat"][class*="Button__primary"] { color: #4db8c4 !important; }
 
   /* ============================================================
      Header / global nav
      ============================================================ */
   .l-header, .l-header__main, header.l-header, .js-header,
   .l-header__wrapper { background-color: #0d1117 !important; }
+  /* The logo is a web_ui Image; the item-photo placeholder fill below would
+     otherwise paint a light box behind it on the darker header. */
+  .l-header__logo-container [class*="Image__image"],
+  .l-header__logo [class*="Image__image"] { background-color: transparent !important; }
   .l-header__main { border-bottom: 1px solid #262c33 !important; }
   .nav-links, .header-nav, [data-testid="nav-tabs"] { background-color: #0d1117 !important; }
   .nav-links a, .header-nav a, [data-testid="nav-tabs"] a,
@@ -189,12 +208,31 @@
   a[class*="Button__tertiary"] [class*="Button__label"],
   a[class*="Button__outlined"] [class*="Button__label"] { color: #4db8c4 !important; }
   /* Flat/text buttons (e.g. the search-type "Articles" selector) bake
-     a muted grey label — lift it to the primary text colour. */
+     a muted grey label — lift it to the primary text colour. A flat
+     PRIMARY button ("Ton guide Vinted") is a teal text link, though. */
   .web_ui__Button__flat .web_ui__Button__label,
   [class*="Button__flat"] [class*="Button__label"] { color: #e6edf3 !important; }
+  [class*="Button__flat"][class*="Button__primary"]
+    [class*="Button__label"] { color: #4db8c4 !important; }
   /* Filled primary CTA keeps the teal fill — pure white label for AA */
   .web_ui__Button__filled .web_ui__Button__label,
   [class*="Button__filled"] [class*="Button__label"] { color: #ffffff !important; }
+  /* An INVERSE filled button is the light pill used on brand/photo surfaces:
+     the fill is neutral and the LABEL carries the variant colour (teal /
+     green / red / grey). The white rule above flattened all four to white.
+     Re-assert the accent, lifted for the dark pill. The pill itself needs
+     to sit ABOVE the card it lands on, or it reads as bare text. */
+  [class*="Button__inverse"][class*="Button__filled"] {
+    background-color: #2a3139 !important;
+    border-color: #39424e !important; }
+  [class*="Button__inverse"][class*="Button__filled"][class*="Button__primary"]
+    [class*="Button__label"] { color: #4db8c4 !important; }
+  [class*="Button__inverse"][class*="Button__filled"][class*="Button__success"]
+    [class*="Button__label"] { color: #57c98a !important; }
+  [class*="Button__inverse"][class*="Button__filled"][class*="Button__warning"]
+    [class*="Button__label"] { color: #f2707a !important; }
+  [class*="Button__inverse"][class*="Button__filled"][class*="Button__muted"]
+    [class*="Button__label"] { color: #9ca7b0 !important; }
 
   /* Tabs (seller profile, item page sections) bake the dark literal */
   .web_ui__Tabs__title, [class*="Tabs__title"] { color: #c4cdd6 !important; }
@@ -256,15 +294,17 @@
   [class*="Chip__chip"][aria-pressed="true"] {
     background-color: #12363d !important; border-color: #1a7d88 !important; }
 
-  /* Pagination — the ACTIVE page baked a dark literal text colour that
-     was readable on the original light pill but vanishes on dark. Lift
-     it and give it a subtle elevated pill so it reads as "current". */
+  /* Pagination — natively the current page is near-black text against
+     mid-grey siblings. Our page-link colour was so close to the active
+     colour, and the active pill the same #1c2128 as the bar behind it,
+     that page 2 of 4 looked identical to pages 1, 3 and 4. Mute the
+     siblings and give the current page a genuinely elevated pill. */
   .web_ui__Pagination__pagination a, .web_ui__Pagination__item a,
   [data-testid*="pagination--page-"], [data-testid="catalog-pagination"] a {
-    color: #c4cdd6 !important; }
+    color: #9ca7b0 !important; }
   .web_ui__Pagination__is-active, .web_ui__Pagination__is-active a,
   [data-testid*="pagination--page-"][aria-current="true"] {
-    color: #e6edf3 !important; background-color: #1c2128 !important;
+    color: #ffffff !important; background-color: #2f3742 !important;
     border-radius: 8px !important; }
 
   /* ============================================================
@@ -307,8 +347,11 @@
      rectangles. Darken their containers; leave 3rd-party iframe
      interiors untouched.
      ============================================================ */
+  /* `[data-testid*="ad-"]` used to live here and matched the substring in
+     "…upl(oad-)button" and "feed-l(oad-)more-button", painting both primary
+     teal CTAs the page background. Anchor the match to the start. */
   [id*="ad"][class*="slot"], [class*="ad-slot"],
-  [class*="advertisement"], [data-testid*="ad-"], ins,
+  [class*="advertisement"], [data-testid^="ad-"], ins,
   [class*="Banner__ad"], div[id^="google_ads"],
   [class*="adunit"], [class*="slot-container"],
   [class*="slot-placeholder"], .slot-info {
@@ -325,6 +368,43 @@
   .web_ui__Dialog__content, [role="dialog"], .modal__content,
   [class*="Modal__content"], [class*="Dialog__content"] {
     background-color: #1c2128 !important; }
+
+  /* Scrims and the photo lightbox stage are painted with
+     rgba(var(--greyscale-level-1), a). That token is near-black in the
+     light theme, so we inverted it to a LIGHT value for primary text —
+     which flipped the modal scrim to a 48% white wash over the page and
+     turned the lightbox letterbox into a full-screen white panel.
+     Re-anchor every surface that reads level-1 as a background. */
+  .web_ui__Dialog__overlay, [class*="Dialog__overlay"],
+  .web_ui__BottomSheet__overlay, [class*="BottomSheet__overlay"] {
+    background-color: rgba(6, 8, 10, 0.72) !important; }
+  .image-carousel__image-wrapper,
+  .complaints-image-carousel__wrapper,
+  .complaints-image-carousel__wrapper--phone {
+    background-color: #0d1117 !important; }
+  .image-carousel__icon-wrapper,
+  .complaints-image-carousel__icon-wrapper {
+    background-color: rgba(13, 17, 23, 0.55) !important; }
+  /* web_ui paints "icon on a dark/photo surface" as Icon__greyscale-level-6,
+     i.e. the white-surface token. Inverting that token to an elevated dark
+     turned the lightbox close/next/prev glyphs dark-on-dark. Level-6 icons
+     only ever sit on photos or scrims, so pin them light. The glyph paths
+     carry fill="currentColor", so `color` must be set alongside `fill`. */
+  .web_ui__Icon__greyscale-level-6 svg,
+  [class*="Icon__greyscale-level-6"] svg {
+    fill: #e6edf3 !important; color: #e6edf3 !important; }
+
+  /* CMS-authored help tables (size charts) hardcode an inline light-grey
+     header row that goes light-on-light under our text colours. */
+  .table-wrapper thead tr, .user-created-content thead tr {
+    background-color: #2f3742 !important; }
+
+  /* The 404/error mascot is a <video> with white baked into its frames, so
+     no background rule can reach it. Invert it (hue-rotate restores the
+     teal laptop and blue collar) and screen the now-black field away. */
+  .fullpage-layout video {
+    filter: invert(1) hue-rotate(180deg) !important;
+    mix-blend-mode: screen !important; }
 
   /* Inputs / forms / selects in modals & pages */
   input, textarea, select,

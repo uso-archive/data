@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for the official F1 site with home, news, race results and standings, schedule, drivers and teams, with team colors kept intact.
-@version      20260705.21.16
+@version      20260711.00.14
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -22,12 +22,16 @@
   :root {
     color-scheme: dark !important;
 
-    /* ---- Surface neutral ramp (was light #fff..#000, now dark) ----
-       1 = page-level lightest surface -> base bg
-       2/3 = subtle off-white panels -> elevated dark surfaces
-       4 = light border grey -> dark border
-       5/6 = mid greys -> kept mid (used for chips/dividers)
-       7/8/9/10/11 = darks the site already uses -> nudged to our palette */
+    /* ---- Surface neutral ramp ----
+       Read off the live page, not assumed: the site's own ramp is ALREADY
+       dark at the low end and climbs to white at the top.
+       native 1=#000  2=#26262b  3=#15151e  4=#303037  5=#47464c  6=#606066
+              7=#aaa  8=#cdcdcd  9=#e0dedc  10=#f7f4f1  11=#fff
+       1/2/3 = page + panel darks -> our base and elevated surfaces
+       4/5/6 = borders, dividers, mid greys -> our border/mid greys
+       7/8/9 = light greys, used for muted text -> kept light
+       10 and 11 are the two genuinely LIGHT surfaces -> darkened.
+       Note 11 doubles as a mask-glyph fill; see the exception below. */
     --f1rd-colour-surface-neutral-surface-neutral-1: #14181d !important;
     --f1rd-colour-surface-neutral-surface-neutral-2: #1a1f26 !important;
     --f1rd-colour-surface-neutral-surface-neutral-3: #1c2128 !important;
@@ -48,11 +52,12 @@
     --f1rd-colour-surface-neutral-transparent-0-surface-neutral-3: rgba(28, 33, 40, 0) !important;
     --f1rd-colour-surface-neutral-transparent-0-surface-neutral-10: rgba(20, 24, 29, 0) !important;
 
-    /* ---- Text ramp (was dark-on-light, now light-on-dark) ----
-       text-1/2 were already light (sit on dark heroes) -> keep light
-       text-3 = muted grey label -> lift for contrast on dark
-       text-4 = near-black primary -> light
-       text-5 = pure black -> light */
+    /* ---- Text ramp ----
+       native 1=#000  2=#15151e  3=#aaa  4=#fff  5=#fff
+       text-1/2 are the DARK labels the site prints on its light surfaces
+       (neutral-10/11) -> those surfaces go dark, so these must go light.
+       text-3 = muted grey label -> kept muted.
+       text-4/5 already sit light on dark heroes -> only nudged. */
     --f1rd-colour-text-text-1: #ffffff !important;
     --f1rd-colour-text-text-2: #e6edf3 !important;
     --f1rd-colour-text-text-3: #9aa4af !important;
@@ -91,6 +96,16 @@
      those sit on coloured/dark heroes.
      ==================================================================== */
   .bg-static-static-1 { background-color: #14181d !important; }
+  /* …EXCEPT when the element is a mask-image glyph: the site paints the driver
+     card's car-number artwork by masking a solid `bg-static-static-1` block, so
+     there `background-color` is the GLYPH FILL, not a panel. Those elements
+     declare `mask-image` in their inline style, which is a reliable marker.
+     Keep the fill white so the number stays legible on the team-coloured card. */
+  .bg-static-static-1[style*="mask-image"] { background-color: #ffffff !important; }
+  /* Same trick, different token: the schedule cards draw each circuit outline as
+     a mask over a `bg-surface-neutral-11` block. That token is white here, so
+     retoning it to our darkest surface erased the maps. Restore the light fill. */
+  .bg-surface-neutral-11[style*="mask-image"] { background-color: #e6edf3 !important; }
   .bg-static-static-2 { background-color: #1a1f26 !important; }
   .bg-static-static-3 { background-color: #1c2128 !important; }
   .bg-static-static-4 { background-color: #2d333b !important; }
@@ -109,10 +124,15 @@
      Light borders / dividers — neutralise bright default lines.
      ==================================================================== */
   [class*="Divider-module_light-grey"],
-  [class*="Divider-module_grey"],
-  [class*="Divider-module_divider"] { background-color: #2d333b !important; border-color: #2d333b !important; }
+  [class*="Divider-module_grey"] { background-color: #2d333b !important; border-color: #2d333b !important; }
 
   hr { border-color: #2d333b !important; background-color: #2d333b !important; }
+
+  /* The `red` divider variant is a 4px #e10600 F1 accent rule (article body,
+     schedule section breaks). The bare `hr` rule above, and the base-class
+     `Divider-module_divider` selector this replaces, both greyed it out —
+     a lost brand signal that every contrast check passes. Keep it red. */
+  [class*="Divider-module_red"] { background-color: #e10600 !important; border-color: #e10600 !important; }
 
   /* Soften remaining hard-light borders on common components */
   [class*="-module_"][style*="border"],
@@ -166,8 +186,11 @@
   }
   [class*="FeaturedButtonCard-module_purple"]:hover { background: #322a52 !important; }
 
-  /* DRS diagonal-stripe pattern backdrop behind driver/team cards (light grey) */
-  [class*="DRSPattern-module_drs"] { background-color: #1a1f26 !important; }
+  /* NOTE — do NOT repaint `DRSPattern-module_drs`. It is not a panel: it is a
+     mask-image glyph (the diagonal DRS stripe artwork) whose `background-color`
+     is the SHAPE FILL, set inline per instance to `var(--f1-accessible-colour)`
+     on driver and team pages. Overriding it flattens every team's accent to
+     one dull slab. The module's own CSS declares no background. */
 
   /* Image buttons hardcode a #aaa border + can carry a white surface
      (the TAG Heuer clock / FIA chrome widgets) -> dark surface + border */
@@ -180,9 +203,21 @@
 
   /* ====================================================================
      NAVIGATION / HEADER / MEGA-NAV — keep opaque & dark when scrolled.
+
+     `Header-module_` is ANCHORED, not a substring. As a substring it never
+     matched a site header at all (the chrome is a plain <header> element);
+     it only matched `PageHeader-module_overlay`, which painted an opaque
+     slab over the bottom of every race-hero photo, and
+     `BundleHeader-module_bheader`, a dark band behind section titles.
+
+     Bare `nav` is likewise NOT targeted: every <nav> on the site is
+     natively transparent and sits inside <header> or <footer>, so the rule
+     bought nothing and left a floating dark slab behind the in-page results
+     tab strip (Races / Drivers / Teams / Awards).
      ==================================================================== */
-  header, nav,
-  [class*="Header-module_"],
+  header,
+  [class^="Header-module_"],
+  [class*=" Header-module_"],
   [class*="MegaNav-module_"],
   [class*="Navigation-module_"],
   .f1rd-dropdown-menu {
@@ -237,10 +272,14 @@
   [class*="Button-module_brand"]:hover,
   [class*="IconButton-module_brand"]:hover { background-color: #e10600 !important; }
 
-  /* Outlined "stroke" buttons keep a light border + need light label */
+  /* Outlined "stroke" buttons keep a light border + need light label.
+     The border was #2d333b, which is our DIVIDER grey: 1.6:1 against the
+     page and 1.3:1 against a card, so the button lost its outline entirely
+     (WCAG 1.4.11 wants 3:1 for a control boundary). The site draws it pure
+     white; #6b7682 keeps the softened look and measures ~3.9:1 on #14181d. */
   [class*="Button-module_stroke"] {
     color: #e6edf3 !important;
-    border-color: #2d333b !important;
+    border-color: #6b7682 !important;
   }
   [class*="Button-module_stroke"]:hover { background-color: #1c2128 !important; }
 
@@ -257,12 +296,13 @@
   [class*="Button-module_secondary"],
   [class*="Button-module_tonal"] { color: #e6edf3 !important; }
 
-  /* Tags / chips that hardcode light fills */
-  [class*="Tag-module_"][class*="grey"],
-  [class*="Tag-module_"][class*="white"] {
-    background-color: #2d333b !important;
-    color: #e6edf3 !important;
-  }
+  /* NOTE — there is deliberately no `Tag-module_` override. Read the site's
+     own stylesheet before trusting a variant name: `Tag-module_white` is NOT
+     white, it is `background:#ffd100; color:#000` — the yellow BREAKING-news
+     tag, identical to `Tag-module_breaking`. Greying it out flattened a
+     signal while passing every contrast check. There is no `grey` variant at
+     all. The remaining variants (brand-red `unlocked`, blue `live`, magenta)
+     are all deliberate brand fills that must survive. */
 
   /* "NEXT RACE" / status badge: a white pill (`bg-static-static-1`) carrying
      hardcoded dark-red text (`text-[#9D0400]`), shown on the red hero card.
@@ -296,7 +336,10 @@
      ==================================================================== */
   .text-brand-hot-red,
   [class*="text-brand-hot-red"] { color: #ff7a73 !important; }
-  a:hover { color: #9bd4ff !important; }
+  /* Hover is scoped to inline prose links ONLY. A blanket `a:hover` repainted
+     every card title, nav item and the red Subscribe CTA label light blue. */
+  .text-brand-hot-red:hover,
+  [class*="text-brand-hot-red"]:hover { color: #ffa39e !important; }
 
   /* Cookie / consent modal stays opaque on dark */
   #onetrust-banner-sdk, #onetrust-pc-sdk,
@@ -319,7 +362,76 @@
   #f1-age-gate-modal li {
     color: #e6edf3 !important;
   }
+  /* The Terms/Cookie disclaimer fine-print is a bare <div> (not p/span/a), so it
+     slipped past the rule above and kept its hardcoded #606066 — dark-on-dark
+     (~1.5:1) once the panel went dark. Lift to a muted but legible grey; the
+     inline links keep their own light colour from the rule above. */
+  #f1-age-gate-modal div { color: #9aa4af !important; }
   [id*="onetrust"] .ot-sdk-container { color: #e6edf3 !important; }
+
+  /* ====================================================================
+     404 PAGE — a standalone legacy template (header/main/footer, no tokens).
+     Its `<li>` copy is hardcoded pure black, so it vanished on our dark bg.
+     ==================================================================== */
+  section.content ul.list li { color: #e6edf3 !important; }
+  section.content ul.list li a { color: #ff7a73 !important; }
+
+  /* ====================================================================
+     LIVE TIMING (/en/timing/*) — a SEPARATE legacy Tailwind frontend with
+     its own palette (`bg-brand-white`, `f1-heading`, `text-carbonBlack`,
+     `nav-global`). None of the token work above reaches it, so it shipped
+     with full-white panels and a dark-on-dark utility bar. These class
+     names exist ONLY on this frontend, so they are safe to target flat.
+     ==================================================================== */
+  .bg-white,
+  .bg-brand-white,
+  .bg-warmWhite,
+  .bg-lightGray {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
+  main.bg-white { background-color: #14181d !important; }
+
+  .f1-heading,
+  .text-carbonBlack { color: #e6edf3 !important; }
+  /* Element-qualified: the header's decorative slash SVGs also carry
+     `text-grey-80` and paint themselves with `fill: currentColor`, so a bare
+     `.text-grey-80` recolour turns them into bright silver bars. */
+  div.text-grey-80,
+  p.text-grey-80,
+  span.text-grey-80,
+  li.text-grey-80 { color: #9aa4af !important; }
+  p.f1-text, div.f1-text, li.f1-text { color: #e6edf3 !important; }
+
+  /* "Register for an account, or Sign in" band: bare text buttons that keep a
+     hardcoded black label once its white panel goes dark. Compound-scoped so
+     the white CTA buttons INSIDE the two cards keep their dark labels. */
+  .bg-brand-white.text-center button,
+  .bg-brand-white.text-center span { color: #e6edf3 !important; }
+
+  /* Utility bar (Authentics / Store / Tickets …): we darkened its white
+     surface but its labels stayed near-black. */
+  .nav-global { background-color: #0d1117 !important; }
+  .nav-global a,
+  .nav-global span,
+  .nav-global button { color: #c4cdd6 !important; }
+  /* …but the red Subscribe CTA in that bar keeps its white label. */
+  .nav-global .bg-primary,
+  .nav-global .bg-primary span { color: #ffffff !important; }
+
+  /* The bar's two raster logos ship as dark-ink artwork for a white bar, so
+     they vanish once it goes dark. Flatten to white — this matches the white
+     F1 wordmark the same page already uses in the row below. (An invert +
+     hue-rotate would keep a red mark but degrades it to salmon.) */
+  .nav-global img[alt*="TV"] { filter: brightness(0) invert(1) !important; }
+  .nav-global img[alt^="Federation"] {
+    filter: invert(1) !important;
+    opacity: .6 !important;
+  }
+
+  .border-gray-300,
+  .border-gray20,
+  .border-grey-70 { border-color: #2d333b !important; }
 
   /* Sourcepoint consent modal (consent.formula1.com iframe). Its body copy
      (`<p>`/`<li>` under `.message-container`) is hardcoded black -> dark-on-dark

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260707.14.30
+@version      20260711.00.14
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -26,8 +26,12 @@
   #global-nav, .Nav__Primary, .Nav__Secondary, #global-nav-secondary,
   .global-nav-container, .navigation { background-color: #0d1117 !important; }
   #global-header { border-bottom: 2px solid #c8102e !important; } /* ESPN red accent */
-  .Nav__Primary__Menu, .Nav__Dropdown, .Nav__Dropdown__Menu, .dropdown-menu,
+  /* .Nav__Primary__Menu is the top-level nav <ul>, NOT a dropdown — painting it
+     the elevated panel colour striped the header into two tones (#1c2128 behind
+     the link groups, #0d1117 in the gaps). The real flyout is .Nav__Dropdown. */
+  .Nav__Dropdown, .Nav__Dropdown__Menu, .dropdown-menu,
   .Flyout, .Flyout__Inner { background-color: #1c2128 !important; }
+  .Nav__Primary__Menu { background-color: transparent !important; }
   .Nav a, .nav__link, #global-nav a, .Nav__Primary__Menu__Link,
   .Nav__Secondary__Menu__Link, .global-nav a { color: #e6edf3 !important; }
   .Nav a:hover, #global-nav a:hover, .Nav__Primary__Menu__Link:hover { color: #ffffff !important; }
@@ -47,7 +51,12 @@
   .cscore_date-time, .cscore_date, .cscore_network, .cscore_info, .cscore_info-overview,
   .cscore_notes, .cscore_status, .cscore_odds, .scoreEvent__status,
   .ScoreCell__Time, .Schedule__Time, .scoreEvent__event, .scoreEvent__title { color: #8b949e !important; }
-  .media-duration, .video-length, .timestamp--overlay { color: #ffffff !important; }
+  /* Legacy video-duration chips paint a translucent WHITE pill with dark #1d1e1f
+     text; a bare white label turned them white-on-white. Re-tone the pill dark,
+     matching the next-gen .Media__Duration treatment further down. */
+  .media-duration, .video-length {
+    background-color: rgba(13,17,23,0.78) !important; color: #ffffff !important; }
+  .timestamp--overlay { color: #ffffff !important; }
 
   /* ---- Score-section labels / headers (default light bg) ---- */
   #pane-main, .scoreLabel_content, .scoreLabel, #favfeed-footer {
@@ -158,6 +167,41 @@
   .ContentList__Button {
     background-color: #c8102e !important; border-color: #c8102e !important; color: #ffffff !important; }
   .button--primary:hover, .Button--primary:hover { background-color: #e01b3c !important; }
+  /* The neutral .button rule above swallows ESPN's filled brand CTAs, which are the
+     ONLY thing separating a primary action from a dropdown pill. Restore them.
+     .button--flagship WAS the ESPN+ subscribe CTA; the ESPN-on-Disney+ rebrand
+     renamed it to .button--disneyPlus-watch (site: #3772df/white) and left our
+     flagship rule matching nothing → the Subscribe conversion button shipped as an
+     anonymous grey pill beside Create Account / Log In. Cover both class names; on
+     dark we reuse ESPN's own [data-appearance="dark"] pairing (#588ae4 on near-black). */
+  .button.button--flagship, .button.button--disneyPlus-watch {
+    background-color: #588ae4 !important; border-color: #588ae4 !important;
+    color: #121213 !important; -webkit-text-fill-color: #121213 !important; }
+  .button.button--flagship:hover, .button.button--disneyPlus-watch:hover {
+    background-color: #7aa1ea !important; }
+  /* Fantasy sign-up rail: already dark by design, with a per-sport brand fill on the
+     first CTA and white-outline secondaries. We flattened all three to one grey pill. */
+  .fantasySignupV2 .button {
+    background-color: transparent !important; border-color: #ffffff !important;
+    color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+  .fantasySignupV2.fantasySignup-football .fantasySignup__cta .button:first-child {
+    background-color: #2dcc30 !important; border-color: #2dcc30 !important;
+    color: #101113 !important; -webkit-text-fill-color: #101113 !important; }
+  .fantasySignupV2.fantasySignup-basketball .fantasySignup__cta .button:first-child {
+    background-color: #ffaa00 !important; border-color: #ffaa00 !important;
+    color: #101113 !important; -webkit-text-fill-color: #101113 !important; }
+  .fantasySignupV2.fantasySignup-womens-basketball .fantasySignup__cta .button:first-child {
+    background-color: #ff7700 !important; border-color: #ff7700 !important;
+    color: #101113 !important; -webkit-text-fill-color: #101113 !important; }
+  .fantasySignupV2.fantasySignup-hockey .fantasySignup__cta .button:first-child {
+    background-color: #2eddf1 !important; border-color: #2eddf1 !important;
+    color: #101113 !important; -webkit-text-fill-color: #101113 !important; }
+  .fantasySignupV2.fantasySignup-baseball .fantasySignup__cta .button:first-child {
+    background-color: #ff645f !important; border-color: #ff645f !important;
+    color: #101113 !important; -webkit-text-fill-color: #101113 !important; }
+  .fantasySignupV2 .fantasySignupEplus__cta .button {
+    background-color: #fab200 !important; border-color: #fab200 !important;
+    color: #101113 !important; -webkit-text-fill-color: #101113 !important; }
 
   /* ---- Tabs ---- */
   .tabs__list, .Tabs, .mod-tabs, .ui-tabs-nav, .ContentList__Tabs {
@@ -180,8 +224,11 @@
   .PageFooter a, .PageFooter__QuickLinks a, .Footer a { color: #8ab4d8 !important; }
   .PageFooter__Footer span, .PageFooter small, .copyright { color: #8b949e !important; }
 
-  /* ---- Ad surrounds: dark, no bright leaks (don't theme iframe content) ---- */
-  .Ad, .ad, [class*="ad-"], [id*="ad-"], .advertisement, .Ad--banner,
+  /* ---- Ad surrounds: dark, no bright leaks (don't theme iframe content).
+       Match "ad-" only at a CLASS-NAME BOUNDARY: a bare [class*="ad-"] also hits
+       every contentItem__subhead--* (sub-h-e-"ad-"), painting a base-dark band
+       behind story descriptions inside our elevated cards. ---- */
+  .Ad, .ad, [class^="ad-"], [class*=" ad-"], [id^="ad-"], .advertisement, .Ad--banner,
   .Ad--inContent, .ad-banner-wrapper, .sponsoredHeadlines {
     background-color: #14181d !important; border-color: #262c33 !important; }
   .tbl-feed-header-text, .sponsoredHeadlines__title, .ad-feedback-text { color: #8b949e !important; }
@@ -204,6 +251,13 @@
   .clr-gray-01, .clr-gray-02 { color: #e6edf3 !important; } /* #151617 / darkest → primary text (numbers, names) */
   .clr-gray-03 { color: #c4cdd6 !important; }               /* #48494a → body */
   .clr-gray-04, .clr-gray-05 { color: #9aa4ae !important; } /* #6c6d6f → muted metadata (still ≥4.5 on cards) */
+  /* ESPN semantic colour utilities: .clr-negative (#dd0000 — live match minute on the
+     scoreboard, down movement, losses) and .clr-positive (green — up movement, wins)
+     are a live/gain-loss signal. The .ScoreCell__Time grey rule + generic text rules
+     flatten them to grey, so a live "71'" reads identical to a scheduled kickoff. Lift
+     both to readable-on-dark equivalents so the signal survives. */
+  .clr-negative { color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
+  .clr-positive { color: #4ac76a !important; -webkit-text-fill-color: #4ac76a !important; }
   /* Module / section / panel titles ESPN colors with a dark grey (#2b2c2d) */
   .Stats__LeadersTitle, .Table__Title, .Card__Header__Title, .module-header,
   .headerCell__title, .pageHeader__title, .Wrapper__Header, .ContentList__Title,
@@ -258,10 +312,55 @@
   .submenu-wrapper a:hover, ul.split a:hover, .submenu a:hover,
   .submenu-wrapper a:hover span { color: #9bd4ff !important; }
   /* flyout caret: a CSS-border triangle pointing at the nav item — recolor its
-     bottom border (the fill) to the dark panel so it doesn't glare white. */
+     bottom border (the fill) to the dark panel so it doesn't glare white. The
+     caret is painted by the ACTIVE PARENT <li> (::before), not by the panel
+     wrapper — audit-blind twice over (pseudo + only while a flyout is open). */
   .submenu-wrapper::before, .submenu-wrapper::after,
-  .submenu-wrapper ul::before, .submenu-wrapper ul::after {
+  .submenu-wrapper ul::before, .submenu-wrapper ul::after,
+  .submenu-parent-active::before, .submenu-parent-active::after,
+  #global-header li.user a::before, #global-header li.user a::after,
+  #global-header li.search a::before, #global-header li.search a::after {
     border-bottom-color: #1c2128 !important; border-top-color: #1c2128 !important; }
+
+  /* ---- Per-sport SECONDARY nav (#global-nav-secondary "Scores / Teams / Stats /
+       Odds / More") dropdowns: the panel is a bare unclassed <div> holding a
+       ul.single / ul.split, none of which the .submenu-wrapper rules above reach,
+       so every one of them ships solid white. Closed at load = audit-blind. ---- */
+  #global-nav-secondary li.has-sub > div,
+  #global-nav-secondary li.has-sub > div div,
+  #global-nav-secondary li.has-sub > div ul,
+  #global-nav-secondary li.has-sub > div li,
+  #global-nav-secondary li.has-sub > div a {
+    background-color: #1c2128 !important; border-color: #2d333b !important; }
+  #global-nav-secondary li.has-sub > div a,
+  #global-nav-secondary li.has-sub > div a span { color: #e6edf3 !important; }
+  #global-nav-secondary li.has-sub > div a:hover,
+  #global-nav-secondary li.has-sub > div a:hover span {
+    background-color: #21262d !important; color: #ffffff !important; }
+  /* division / conference group headings inside the Teams mega-panel */
+  #global-nav-secondary li.has-sub > div .label,
+  #global-nav-secondary li.has-sub > div .conference { color: #9aa4ae !important; }
+
+  /* ---- Header search autocomplete flyout (.search_results): opens over the nav
+       as a solid white panel with dark section headers. Closed at load, so the
+       element-bg scan never sees it. ---- */
+  .search_results, .search_results--active, .search_results__wrapper,
+  .search_results__autocomplete, .search_result__group, .search_results__group,
+  .search_results__suggestions, .search_results__item {
+    background-color: #1c2128 !important; border-color: #2d333b !important; }
+  .search_results__header { color: #e6edf3 !important; }
+  .search_results__cat { color: #9aa4ae !important; }
+  .search_results__item:hover, .search_results__link:hover { background-color: #21262d !important; }
+
+  /* ---- Account flyout (li.user > .global-user): white panel + a lighter
+       #f1f2f3 "Favourites" pane whose copy is a pale grey → invisible on white
+       AND unreadable once only the panel is darked. Dark both, lift the text. ---- */
+  .global-user, .global-user-container, .display-user,
+  .global-user .favs, .global-user .favs__container {
+    background-color: #1c2128 !important; border-color: #2d333b !important; }
+  .global-user .favs { background-color: #181d23 !important; }
+  .global-user .favs, .global-user .favs p, .global-user .favs h3,
+  .global-user .favs span, .global-user h3 { color: #c4cdd6 !important; }
 
   /* ---- Video-playlist modules ("Top Videos" / "NBA Videos") — white tiles ---- */
   .mediaList, .mediaList__content, .mediaList__link, .video-playlist,
@@ -290,7 +389,9 @@
   /* Schedule group header band (team page left rail) hardcodes a near-white
      bg-clr-gray-10 (#f9f9fb) under our already-light title text → light-on-light. */
   .Schedule__Group__Title { background-color: #1c2128 !important; }
-  hr { border-color: #2d333b !important; }
+  /* Story-body <hr> is painted by its BACKGROUND (#dcdddf), not its border, so a
+     border-only override left a bright white hairline across the article. */
+  hr { border-color: #2d333b !important; background-color: #2d333b !important; }
   /* Pseudo-element divider lines ESPN paints with a near-white #dcdddf bar
      (footer column rule + news-feed item separators) — invisible to a bg-color
      scan; remap to our divider grey. ---- */
@@ -504,4 +605,93 @@
      theme divider grey. Audit sees it as a pseudo-white but it's a thin rule. ---- */
   .Athletes__Container .Athlete::after, .Athletes__Container .Athlete::before {
     background-color: #2d333b !important; }
+
+  /* ---- More light hairlines painted by pseudo-elements (#edeef0): the vertical
+       rule inside every scoreboard-strip game chip and the scores-carousel label
+       underline. Thin, so they slip the audit's size filter. ---- */
+  .cscore_overview::before, .cscore_overview::after,
+  .scoreLabel_content::before, .scoreLabel_content::after {
+    background-color: #2d333b !important; }
+
+  /* ---- 404 page ships its own white hero panel + near-white quick-links block
+       (with our already-light headline text on top → light-on-light). ---- */
+  .Error404, .Error404__Wrapper, .Error404__QuickLinks {
+    background-color: #14181d !important; border-color: #2d333b !important; }
+  .Error404__QuickLinks::before, .Error404__QuickLinks::after {
+    background-color: #2d333b !important; }
+
+  /* ---- Story bodies embed a RASTER divider (a.espncdn.com/i/.../greyline.png):
+       a light bar image, so no background rule can touch it. Invert it into a dark
+       rule that reads as a divider on our base. ---- */
+  img[src*="greyline"] { filter: invert(1) !important; }
+
+  /* ---- Batter hot/cold zone (.HitMap, MLB gamecast): each cell paints a saturated
+       blue/red brand fill with a WHITE batting average in a bare unclassed <span>.
+       Our generic `span { color: #c4cdd6 }` rule repaints it to grey → 2.1:1 on the
+       red cells. Restore white-on-brand, as the site renders it. ---- */
+  .HitMap__Item, .HitMap__Item span {
+    color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+
+  /* ---- Prism <ProgressBar> (gamecast team-stat comparison bars): the TRACK is a
+       hardcoded light grey (#cecfcf) — the team-colored fill is a child div, so
+       darking the track keeps every brand color intact. Bars are 10px tall, well
+       under the audit's height filter. ---- */
+  [data-testid="prism-ProgressBar"] { background-color: #3a4149 !important; }
+
+  /* ---- ESPNIcons glyphs drawn through ::before / ::after in ESPN's hardcoded darks
+       (#2b2c2d, #48494a, #6c6d6f) or link-blue #0066cc. Doubly audit-blind: a
+       pseudo-element has no box background and no text node, so neither a surface
+       scan nor a colour scan sees it. On our dark chrome they land at 1.3–3.1:1 —
+       the scoreboard carousel arrows, the sub-nav dropdown carets, the external-link
+       markers and the filter-button caret were all effectively invisible. ---- */
+  #global-scoreboard .scores-prev::before, #global-scoreboard .scores-next::before,
+  .scoreCenter .scores-prev::before, .scoreCenter .scores-next::before,
+  #global-nav-secondary .global-nav-container > ul > li.has-sub > a::after,
+  #global-nav-secondary .tertiary-nav li.has-sub > a::after,
+  .button-filter::before, .button-filter::after,
+  .quicklinks_list__icon::before, .contentItem__content__meta::after,
+  a.external::after, li.external > a::after { color: #9aa4ae !important; }
+
+  /* ---- One-feed card top rule (.contentItem__teamBorder) carries the TEAM colour
+       inline; when a card has no team ESPN falls back to #cbccce, a light hairline
+       that reads as a glaring white bar across our dark cards. Dark only the
+       fallback so every real team colour survives. ---- */
+  .contentItem__teamBorder[style*="#cbccce"],
+  .contentItem__teamBorder[style*="#CBCCCE"] { background-color: #2d333b !important; }
+
+  /* ---- Gamecast Matchup Predictor: the win-probability percentages and their "%"
+       suffix hardcode near-black #101113 (fine on the site's white card) → ~1.4:1
+       once the card is dark. The team abbreviations beside them are already light. */
+  .matchupPredictor__teamValue, .matchupPredictor__teamValue div,
+  .matchupPredictor__suffix { color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
+
+  /* ---- Player headshot discs ship a solid white circle behind a transparent PNG.
+       This was already fixed inside .Gamecast__Baseball, but every sibling using the
+       same component (gamecast WIN/LOSS/SAVE pitchers, athlete rows) kept the glare. */
+  .headshot { background-color: #1c2128 !important; }
+
+  /* ---- espnfitt maps its .bg-clr-gray-NN SURFACE utilities onto the same
+       --color-neutral-* tokens we remap for TEXT. Result: gray-01/02 (ESPN's darkest
+       surfaces, #151617 / #2b2c2d) resolved to our light text greys — the mobile-nav
+       icon rail and the sticky .Site__Header shipped as #c4cdd6 panels. Pin the
+       surface utilities directly so they no longer ride the text tokens. ---- */
+  .bg-clr-gray-01, .bg-clr-gray-02 { background-color: #0d1117 !important; }
+  .bg-clr-gray-03, .bg-clr-gray-04, .bg-clr-gray-05 { background-color: #21262d !important; }
+  .bg-clr-gray-06, .bg-clr-gray-07, .bg-clr-gray-08,
+  .bg-clr-gray-09, .bg-clr-gray-10 { background-color: #1c2128 !important; }
+  /* Mobile hamburger flyout (#global-nav-mobile): the dark left icon rail is ul.tier-1
+     (rides the bg-clr-gray utilities above), but the sport-list panel that slides out
+     — ul.tier-2 (and the nested ul.tier-3 league list) — ships a solid WHITE panel.
+     Closed at load + only on a narrow viewport = audit-blind twice over. Dark the tier
+     panels + their rows; the sport links are already our readable blue. ---- */
+  #global-nav-mobile ul.tier-2, #global-nav-mobile ul.tier-3,
+  #global-nav-mobile ul.tier-2 li, #global-nav-mobile ul.tier-3 li {
+    background-color: #14181d !important; border-color: #262c33 !important; }
+  #global-nav-mobile ul.tier-2 a:hover, #global-nav-mobile ul.tier-3 a:hover {
+    background-color: #1c2128 !important; }
+
+  /* ---- Taboola "why this ad" fade / popover panels are solid white and only exist
+       once the widget's exclude control is used — invisible to a load-time scan. ---- */
+  .trc_exclude_overlay, .trc_popover, .trc_popover_title_wrapper {
+    background-color: #1c2128 !important; }
 }

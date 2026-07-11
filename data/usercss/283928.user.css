@@ -3,23 +3,27 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Depop, easy on the eyes across home, search, categories and product pages, with prices, sale tags and the Depop red kept readable.
-@version      20260627.19.44
+@version      20260710.13.08
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
 @-moz-document domain("depop.com") {
 /* ============================================================
      Depop is a React SPA with content-hashed class names
-     (styles_*, template_*, baseFilterStyles_*, sharedStyles_*)
-     and NO CSS custom-property theme system: surfaces and text
-     are hardcoded white / #f3f3f3 / #efefef / #000 / #262626.
-     We retheme via STABLE hooks only — semantic tags, ARIA
-     roles, data-testid attributes and structural relationships —
-     never the hashed class hashes. The base palette flows through
-     html/body; opaque dark surfaces are re-established on the
-     sticky header, filter bar, dropdowns and footer so nothing
+     (styles_*, template_*, baseFilterStyles_*, sharedStyles_*).
+     A :root design-token layer exists (--surface-*, --text-*),
+     but almost every surface and text colour is still hardcoded
+     white / #f3f3f3 / #efefef / #d7d7d7 / #000 / #262626, so the
+     tokens are not a usable single point of remap. We retheme via
+     STABLE hooks only — semantic tags, ARIA roles, data-testid
+     attributes, module-name class fragments and structural
+     relationships. The base palette flows through html/body;
+     opaque dark surfaces are re-established on the sticky header,
+     filter bar, dropdowns, mobile drawers and footer so nothing
      bleeds through. Depop's brand red is preserved as identity
-     but toned for dark.
+     but toned for dark, and the design system's semantic button
+     colours (green/blue/yellow/facebook, disabled) are kept
+     distinct from it.
      ============================================================ */
 
   :root {
@@ -85,6 +89,26 @@
     color: #e6edf3 !important;
   }
 
+  /* The "Sale" category-nav item is the ONE accent item in the nav:
+     the site paints it via an inline `--textColor:#E20020` custom
+     property. The blanket banner-text rule above flattens it to the
+     same white as Women/Men/Kids, erasing the only colour signal in
+     the nav. Restore it, toned for dark. */
+  [role="banner"] [style*="--textColor"],
+  [role="banner"] [style*="--textColor"] * {
+    color: #ff6b7d !important;
+  }
+
+  /* The header's icon for the page you are ON (Likes / Bag) is tinted
+     #2960af — the only "you are here" indicator in the chrome. The
+     banner-text rule painted it the same white as the inactive icons. */
+  [role="banner"] [class*="navigationLink--active"],
+  [role="banner"] [class*="navigationLink--active"] *,
+  a[class*="navigationLink--active"],
+  a[class*="navigationLink--active"] * {
+    color: #6ea8fe !important;
+  }
+
   /* Category nav buttons (Women / Men / Kids / Brands ...) and the
      header's inner containers sit on white pills — flatten to dark */
   [role="banner"] button {
@@ -126,6 +150,18 @@
     background-color: transparent !important;
   }
 
+  /* The mega-menu's "Featured" tiles overlay their caption ('80s,
+     Carhartt, Crochet...) directly ON a light product photo, where
+     the site paints it #262626. The blanket menu-text rule above
+     re-lights it to #c4cdd6 → light-on-light, unreadable. Photos are
+     image content we must not touch, so restore the original dark
+     caption for captions inside an image container only (the plain
+     dark-panel menu links keep the light colour). */
+  [class*="featuredImageContainer"] [class*="descriptionText"] {
+    color: #262626 !important;
+    -webkit-text-fill-color: #262626 !important;
+  }
+
   /* ============================================================
      Global search bar + dropdown
      ============================================================ */
@@ -150,6 +186,20 @@
   input[type="checkbox"]::before {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
+  }
+
+  /* ...but the CHECKED box is natively filled #2960af and the
+     DISABLED one #d7d7d7. Flattening all three to the same
+     #1c2128 leaves checked/unchecked/disabled visually identical
+     apart from the tick glyph. Keep the state colours. */
+  input[type="checkbox"]:checked::before {
+    background-color: #2960af !important;
+    border-color: #2960af !important;
+  }
+
+  input[type="checkbox"]:disabled::before {
+    background-color: #30363d !important;
+    border-color: #30363d !important;
   }
 
   [data-testid="searchBar__input"] {
@@ -209,7 +259,8 @@
   [class*="homepageHero"],
   [class*="HomepageHero"],
   [class*="heroBanner"],
-  [class*="promoBanner"] {
+  [class*="promoBanner"],
+  [class*="quizEntryPoint"] {
     background-image: none !important;
     background-color: transparent !important;
   }
@@ -218,8 +269,13 @@
     color: #e6edf3 !important;
   }
 
-  /* Filter / sort trigger pills and dropdown buttons */
-  [aria-haspopup],
+  /* Filter / sort trigger pills and dropdown buttons.
+     NOT [aria-haspopup]: Depop puts aria-haspopup="dialog" on plain
+     text and icon controls (every product card's heart, the profile
+     follower counts, the message icon, the seller-rating stars), so
+     that selector boxed them all in an opaque #1c2128 square painted
+     over the product photo. [aria-expanded] marks the real
+     disclosure triggers; the trigger classes cover the rest. */
   [aria-expanded] {
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
@@ -237,39 +293,109 @@
     border-color: #2d333b !important;
   }
 
+  /* The panel rule above wins over the site's own light hover
+     (#eaeaea) on filter options, leaving them with no hover
+     feedback at all. Give the rows a dark hover back. */
+  [class*="FilterDropdownOption"]:hover,
+  [class*="searchFilterCheckbox"]:hover {
+    background-color: #262c33 !important;
+  }
+
+  /* The mobile "Filter" drawer is a position:fixed, full-viewport
+     panel painted #fff — and it lives inside <main>, so the blanket
+     `main div` transparent reset above makes it fully see-through:
+     the product grid scrolls visibly behind its title, options and
+     "Clear all / View items" footer. Re-establish an opaque base. */
+  [class*="filtersContainer"] {
+    background-color: #14181d !important;
+  }
+
+  [class*="filtersContainer"] [class*="footer"] {
+    background-color: #14181d !important;
+    color: #8b949e !important;
+  }
+
+  /* Colour swatch dots take their fill from an inline
+     `--background-color` (multi-colour options use `--background-image`).
+     The blanket `main div` transparent reset above wipes every dot, so
+     the whole colour list renders as bare labels. Re-assert the site's
+     own custom properties and give each dot a ring so the near-black
+     swatch stays visible on the dark panel. The SAME pattern is used by
+     the PDP's colour attribute under a different class name
+     (colourCircle) — fixing only the filter left the PDP dot erased. */
+  main [class*="colourFilterColourSpot"],
+  main [class*="colourCircle"] {
+    background-color: var(--background-color) !important;
+    background-image: var(--background-image) !important;
+    border: 1px solid #4a525b !important;
+  }
+
   /* Category / popular "pill" chips, filter chips and active-filter
      tags inside the results area carry hardcoded-white fills →
      elevated dark. (activeFilter = the removable "Women / Dresses"
-     applied-filter tag.) */
+     applied-filter tag.) Match the CONTROLS only: the bare
+     [class*="pill"] / [class*="activeFilter"] / [class*="FilterTrigger"]
+     forms also matched their plain <div> wrappers
+     (popularPillsContainer, pillsContainer, activeFiltersContainer) and
+     painted a grey slab behind each chip row, plus the <p> and <svg>
+     inside every trigger. */
   main button[class*="pill"],
   main button[class*="Pill"],
-  [class*="pill"],
-  [class*="Pill"],
-  [class*="chip"],
-  [class*="Chip"],
-  [class*="activeFilter"],
-  [class*="FilterTrigger"],
+  main a[class*="pill"],
+  main a[class*="Pill"],
+  [class*="badgePill"],
+  button[class*="chip"],
+  button[class*="Chip"],
+  button[class*="activeFilter"],
+  button[class*="FilterTrigger"],
+  label[class*="FilterTrigger"],
   button[class*="FilterButton"] {
     background-color: #1c2128 !important;
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
   }
 
-  [class*="activeFilter"] * {
+  button[class*="activeFilter"] * {
+    color: #c4cdd6 !important;
+  }
+
+  /* badgePill's glyph is #262626 — legible on its native #f3f3f3 fill,
+     invisible once the pill above turns dark. */
+  [class*="badgeIcon"] {
     color: #c4cdd6 !important;
   }
 
   main button[class*="pill"]:hover,
   main button[class*="Pill"]:hover,
-  [class*="pill"]:hover,
-  [class*="Pill"]:hover,
-  [class*="chip"]:hover,
-  [class*="Chip"]:hover,
-  [class*="activeFilter"]:hover,
-  [class*="FilterTrigger"]:hover,
+  main a[class*="pill"]:hover,
+  main a[class*="Pill"]:hover,
+  button[class*="chip"]:hover,
+  button[class*="Chip"]:hover,
+  button[class*="activeFilter"]:hover,
+  button[class*="FilterTrigger"]:hover,
+  label[class*="FilterTrigger"]:hover,
   button[class*="FilterButton"]:hover {
     background-color: #262c33 !important;
     color: #e6edf3 !important;
+  }
+
+  /* Depop separates content with 1px #d7d7d7 <hr>s and 6px #d7d7d7
+     dot separators; the "or" row on the login page draws its two arms
+     as ::before/::after borders (a pseudo — the `*` border reset above
+     structurally cannot reach it). All three render as bright rules
+     across the dark page. */
+  hr {
+    background-color: #262c33 !important;
+    border-color: #262c33 !important;
+  }
+
+  [class*="divider"]::before,
+  [class*="divider"]::after {
+    border-color: #262c33 !important;
+  }
+
+  [class*="dotDivider"] {
+    background-color: #4a525b !important;
   }
 
   /* ============================================================
@@ -284,6 +410,26 @@
   a[href*="/products/"] p,
   a[href*="/products/"] span {
     color: #e6edf3 !important;
+  }
+
+  /* On a discounted card the site mutes the struck-through original
+     price (#747474) against a strong current price (#262626). Both
+     land on #c4cdd6 here, flattening the distinction — mute the
+     struck-through one back. */
+  [class*="discountedFullPrice"],
+  [class*="originalPrice"] {
+    color: #8b949e !important;
+  }
+
+  /* The "SOLD" / "RESERVED" overlay stamped across a sold listing's
+     photo is the site's one yellow signal (#ffda0a). The card-price
+     rule directly above outranks a bare class selector, so it was
+     repainting the stamp plain white — a sold item then reads exactly
+     like an available one. */
+  [class*="soldText"],
+  a[href*="/products/"] [class*="soldText"] {
+    color: #ffda0a !important;
+    -webkit-text-fill-color: #ffda0a !important;
   }
 
   /* ============================================================
@@ -332,11 +478,10 @@
   }
 
   /* Seller rating "feedback" link (★★★★★ (6)) on PDP + profile.
-     It carries aria-haspopup="dialog" so the filter-pill rule above
-     wrapped it in an #1c2128 box — undo that (it's an inline link).
      Its review count sits in a <div class="_caption-sm-bold"> coloured
      #747474 (dark-on-dark) that the p/span text rules don't reach;
-     lighten the whole control so the stars and count stay legible. */
+     lighten the whole control so the stars and count stay legible, and
+     keep the inline link free of any button surface. */
   [class*="feedbackButton"] {
     background-color: transparent !important;
     border-color: transparent !important;
@@ -344,6 +489,18 @@
 
   [class*="feedbackButton"] * {
     color: #c4cdd6 !important;
+  }
+
+  /* "See more" on the description and the login page's link-buttons are
+     the site's only blue (#2960af) affordance; the generic link/text
+     rules flattened them to the same grey as body copy. */
+  [class*="seeMoreText"],
+  [class*="seeMoreText"] *,
+  [class*="buttonLinkWrapperVariant"],
+  [class*="buttonLinkWrapperVariant"] *,
+  [class*="buttonLinkTextVariant"],
+  [class*="buttonLinkTextVariant"] * {
+    color: #6ea8fe !important;
   }
 
   /* Like / save / interaction buttons (icon + count) */
@@ -358,7 +515,7 @@
      <button>/<span>/<a> carrying a "buttonWrapper" module class
      with hardcoded white/light fills (Sign up, Log in, Buy now,
      Make offer...). Re-skin those pills to an elevated dark
-     surface; the primary submit/CTA keeps the Depop red.
+     surface; the primary submit/CTA takes the Depop red.
      ============================================================ */
   /* Outline / secondary pills (Make offer, Add to bag-secondary,
      Log in) → elevated dark surface */
@@ -372,8 +529,8 @@
     background-color: #262c33 !important;
   }
 
-  /* Solid / primary pills (Buy now, Sign up, primary Add to bag)
-     carry Depop's high-emphasis fill → keep the brand red, toned */
+  /* Solid / primary pills (Buy now, Sell now, primary Add to bag)
+     carry Depop's high-emphasis fill → the brand red, toned */
   [class*="buttonWrapper"]:not([class*="outl"]),
   button[type="submit"] {
     background-color: #d1304a !important;
@@ -394,11 +551,108 @@
     color: #e6edf3 !important;
   }
 
+  /* The header's "Sign up" and "Log in" reuse the button component but
+     override it to a white fill: signup keeps the 2px border (reads as
+     an outline button), login drops it (reads as a plain text link).
+     Neither carries an "outl" class, so the solid rule above painted
+     BOTH the same red as "Sell now" — three identical red pills where
+     the site has a clear primary / secondary / tertiary ladder. */
+  [class*="buttonWrapper"][class*="textButton--"],
+  [class*="buttonWrapper"][class*="textButton--"] * {
+    background-color: transparent !important;
+    color: #e6edf3 !important;
+  }
+
+  [class*="buttonWrapper"][class*="textButton--login"] {
+    border-color: transparent !important;
+  }
+
+  [class*="buttonWrapper"][class*="textButton--signup"] {
+    border-color: #4a525b !important;
+  }
+
+  [class*="buttonWrapper"][class*="textButton--"]:hover {
+    background-color: #262c33 !important;
+  }
+
+  /* The button component also ships SEMANTIC solid variants and a
+     disabled state, none of which carry an "outl" class — so the solid
+     rule above swallowed every one of them into the primary red. A
+     disabled button then looks exactly like an enabled brand CTA.
+     Restore each variant's own hue, toned for dark. */
+  [class*="buttonWrapper"][class*="colorStyles--green"] {
+    background-color: #2f7d24 !important;
+    border-color: #2f7d24 !important;
+  }
+
+  [class*="buttonWrapper"][class*="colorStyles--blue"] {
+    background-color: #2960af !important;
+    border-color: #2960af !important;
+  }
+
+  [class*="buttonWrapper"][class*="colorStyles--facebook"] {
+    background-color: #4a66a0 !important;
+    border-color: #4a66a0 !important;
+  }
+
+  [class*="buttonWrapper"][class*="colorStyles--yellow"] {
+    background-color: #ffda0a !important;
+    border-color: #ffda0a !important;
+    color: #262626 !important;
+  }
+
+  [class*="buttonWrapper"][class*="colorStyles--yellow"] * {
+    color: #262626 !important;
+  }
+
+  [class*="buttonWrapper"]:disabled {
+    background-color: #30363d !important;
+    border-color: #30363d !important;
+    color: #8b949e !important;
+  }
+
+  [class*="buttonWrapper"]:disabled * {
+    color: #8b949e !important;
+  }
+
+  /* Outline variants tint only their label; the outline-text rule above
+     flattens all of them to the same grey. */
+  [class*="buttonWrapper"][class*="outline--green"] * {
+    color: #56b04a !important;
+  }
+
+  [class*="buttonWrapper"][class*="outline--blue"] * {
+    color: #6ea8fe !important;
+  }
+
+  [class*="buttonWrapper"][class*="outline--yellow"] * {
+    color: #ffda0a !important;
+  }
+
   /* Depop "Sale" / red accents — tone the raw #e20020 for dark */
   [style*="226, 0, 32"],
   [class*="sale"],
   [class*="Sale"] {
     color: #ff6b7d !important;
+  }
+
+  /* The "50% OFF" discount badge keeps its solid red fill, but the
+     generic span/p text rule repaints its label #c4cdd6 — ~3.3:1 on
+     that red, under the 4.5 the original white label cleared. Restore
+     white on the badge only. */
+  [class*="discountLabel"],
+  [class*="discountLabel"] * {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  /* The homepage style-quiz modal renders in a portal (outside <main>)
+     and its progress track keeps a hardcoded #f3f3f3 fill. At 8px tall
+     it slips every size-filtered surface scan while rendering as a
+     bright bar across the dark modal. Darken the track; the red
+     progress fill inside it stays Depop red. */
+  [class*="progressionBarContainer"] {
+    background-color: #30363d !important;
   }
 
   /* ============================================================

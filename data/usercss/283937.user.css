@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Weather Underground. Darkens forecasts, hourly and 10-day pages and data tables while keeping radar, maps and weather icons intact.
-@version      20260707.14.34
+@version      20260711.00.20
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -240,8 +240,14 @@
     color: var(--wu-text-muted) !important;
   }
 
-  /* Astronomy sunrise/sunset accent (#cc5500 / #e59900) -> readable amber. */
+  /* Astronomy sunrise/sunset accent (#cc5500 / #e59900) -> readable amber. WU now
+     colours these by CLASS (.sunrise-icon / .sunset-icon) instead of the old inline
+     style, so the [style*="204"] catch no longer matches and the generic .astro-data
+     grey lift flattened the sunrise/sunset TIMES to plain grey. Match the classes so
+     the amber reads; moonrise/moonset stay grey (they are natively grey). */
   .astro-data[style*="204"],
+  .astro-data.sunrise-icon,
+  .astro-data.sunset-icon,
   .sun-data,
   .moon-data {
     color: #ffb454 !important;
@@ -341,6 +347,13 @@
   a:focus {
     color: var(--wu-link-hover) !important;
   }
+  /* WU nests <b>/<strong> inside links (e.g. the hourly "20% / 0 in" precip
+     links). The generic bold lift below would paint them plain text, stripping
+     the link colour that is the only affordance -- keep them inheriting. */
+  a b,
+  a strong {
+    color: inherit !important;
+  }
 
   /* WU blue accents used as text (#006f9e / #19aadb) -> dark-friendly blue */
   .ui-tabs a,
@@ -377,8 +390,11 @@
     color: var(--wu-text-2) !important;
     border-color: var(--wu-border) !important;
   }
-  /* history "summary" table sets a #f9f9f9 bg on the bare thead element */
-  thead {
+  /* history "summary" table sets a #f9f9f9 bg on the bare thead element; the
+     Material tables paint the same #f7f7f7 on the header ROW behind its cells */
+  thead,
+  tr.mat-mdc-header-row,
+  .mdc-data-table__header-row {
     background-color: var(--wu-chrome) !important;
   }
   thead th,
@@ -491,6 +507,22 @@
     background-color: #2a93cf !important;
     color: #ffffff !important;
   }
+  /* Brand CTA buttons INSIDE a .data-module (e.g. health "Buy Your Sensor Now" and
+     "Learn more about air pollution") are flattened to a transparent fill by the
+     `.data-module *:not(img):not(svg):not(canvas):not(picture):not(.module-header)`
+     neutralizer, whose four element :not()s + .module-header put it at (0,2,4) --
+     it out-specifies the generic `.button` brand rule, so the cyan fill vanishes and
+     the button reads as bare white text with a thin border. Re-assert the brand fill
+     with a three-class prelude that clears (0,2,4). */
+  .data-module a.button.radius,
+  .data-module .content a.button,
+  .data-module .content .button,
+  .current-container .content a.button,
+  .list-container .content a.button {
+    background-color: #1f7fb8 !important;
+    border-color: #1f7fb8 !important;
+    color: #ffffff !important;
+  }
 
   /* ---- footer ----------------------------------------------------------- */
   footer,
@@ -544,15 +576,13 @@
   /* ====================================================================== */
 
   /* ---- (1) current-conditions temperature circle ------------------------ */
-  /* .conditions-circle is a border-radius:50% div whose RING is an inline
-     red/orange linear-gradient and whose INTERIOR is a white ::before disc.
-     Darken the disc to an elevated surface; tone the ring to a refined red;
-     keep the temp text light + the orange current-temp accent. */
+  /* .conditions-circle is a border-radius:50% div whose INTERIOR is a white
+     ::before disc. Darken the disc to an elevated surface. The RING is a
+     linear-gradient WU recomputes from the current temperature (cool blues ->
+     warm oranges/reds), so it must be left exactly as authored -- painting a
+     fixed red over it destroys the reading. Only the disc is themed. */
   .conditions-circle::before {
     background: var(--wu-surface) !important;
-  }
-  .conditions-circle {
-    background: linear-gradient(to bottom, #c0444c, #b83a3a) !important;
   }
   .conditions-circle .condition-data,
   .conditions-circle .hi-lo,
@@ -578,6 +608,16 @@
   /* the small "Gusts" dial ring -> subtle dark border. */
   .dial {
     border-color: var(--wu-border-2) !important;
+  }
+  /* Its wind-direction needle is a CSS triangle (border-width: 18px 6px 0)
+     whose side borders must stay transparent. The blanket `*` border reset
+     paints all four sides, so the needle renders as a solid dark rectangle --
+     and dark-on-dark at that. Restore the triangle and light the tip. */
+  .dial .arrow-direction {
+    border-top-color: var(--wu-text) !important;
+    border-right-color: transparent !important;
+    border-bottom-color: transparent !important;
+    border-left-color: transparent !important;
   }
 
   /* ---- (2) 10-day multi-panel SVG charts -------------------------------- */
@@ -608,6 +648,12 @@
   svg.chart .pressure path,
   svg.chart path.pressure {
     stroke: var(--wu-text-2) !important;
+  }
+  /* Every chart legend swatch (span.legend-key) carries its series colour, but
+     Pressure's is the same near-black #1e2023 -- invisible on dark, and no
+     longer matching the line we just lifted. Match it to the lifted stroke. */
+  .legend-def.pressure .legend-key {
+    background-color: var(--wu-text-2) !important;
   }
 
   /* ---- (3) dashboard tiles (Precip / Pollen / Air Quality / UV) --------- */
@@ -653,6 +699,15 @@
   lib-uv-tile svg rect {
     fill: #3a424d !important;
   }
+  /* The tiles' <text> nodes are inline-styled. The VALUE lines carry saturated
+     semantic fills (precip cyan, pollen orange, AQI amber, UV red) and must be
+     kept; only the descriptive caption ("Slight rain chance...", "Grass Pollen")
+     is WU's neutral #4c4c4c, which drops to ~1.4:1 on the dark tile. `fill` is
+     not `color`, so every text-colour audit reads it as clean -- match the
+     inline fill directly and lift just that one. */
+  text[style*="fill: rgb(76, 76, 76)"] {
+    fill: var(--wu-text-muted) !important;
+  }
 
   /* ====================================================================== */
   /* Page-type fixes found in deep review (calendar, hourly, news,          */
@@ -690,9 +745,11 @@
   #nextForecasts {
     background-color: var(--wu-surface-2) !important;
   }
+  /* its label is WU blue (#006f9e) -- it is the module's only CTA, so keep the
+     link colour rather than greying it into plain text. */
   #nextForecasts,
   #nextForecasts * {
-    color: var(--wu-text-2) !important;
+    color: var(--wu-link) !important;
   }
 
   /* ---- news & blogs cards ----------------------------------------------- */
@@ -763,6 +820,26 @@
     color: var(--wu-text-2) !important;
   }
 
+  /* The video-promo / top-stories carousel pager is a row of .dot discs whose
+     ONLY styling is a background-color (#a3a3a3 idle, #19aadb current). The
+     blanket `.data-module *` transparent-neutralizer above zeroes both, so the
+     pager renders as empty space between the arrows -- there is no indication
+     of how many slides exist or which one is showing. */
+  .data-module .navigation .dot {
+    background-color: #6a737d !important;
+  }
+  .data-module .navigation .dot.active {
+    background-color: #19aadb !important;
+  }
+
+  /* The "brand-new Weather Underground" promo ribbon is a solid #19aadb band
+     with a white inline link. Our generic `a` rule repaints it the dark-page
+     link blue -> 1.7:1 on the cyan. Restore white inside the ribbon. */
+  .infoBox a,
+  .msgWrapper a {
+    color: #ffffff !important;
+  }
+
   /* ---- wundermap page --------------------------------------------------- */
   /* #inner-wrap is a white page wrapper (flashes white while leaflet tiles
      load); the top ad slot (#top-banner-ad-browser) is a light-grey band; the
@@ -771,7 +848,8 @@
   #inner-wrap {
     background-color: var(--wu-base) !important;
   }
-  #top-banner-ad-browser {
+  #top-banner-ad-browser,
+  #position-1-banner-ad-browser {
     background-color: var(--wu-chrome) !important;
   }
   wm-layer .accordion-content,
@@ -779,6 +857,31 @@
   .layers-container .accordion-content,
   .accordion-content {
     background-color: var(--wu-surface) !important;
+  }
+  /* The Layers/Save Pref/Share/Settings/Legend rail marks its ACTIVE tab with a
+     3px WU-red left border. The blanket `*` border reset flattens it to the
+     line colour, leaving the open panel with no tab indicator at all. */
+  .sidebar-tab-container .tab-buttons li.active,
+  .tab-buttons .items-list li.active {
+    border-left-color: #d5202a !important;
+  }
+
+  /* ---- station selector ("CHANGE" next to the city name) ---------------- */
+  /* Click-gated, so no load-time scan sees it. Each row paints #fff on THREE
+     separate cells (.icon-wrapper, the row anchor, .temp) rather than on the
+     row, so darkening the panel leaves white strips behind every station. The
+     .temp cell is worse: our light-value lift left white-on-white numbers. */
+  /* WU paints the cells with its own `!important` at (1,4,0) specificity, so
+     the second id is load-bearing: it is what lets us win the cascade. */
+  #stationselector_list,
+  #stationselector_table {
+    background-color: var(--wu-surface) !important;
+  }
+  #stationselector_list #stationselector_table .table-row > * {
+    background-color: var(--wu-surface) !important;
+  }
+  #stationselector_list #stationselector_table .table-row:hover > * {
+    background-color: var(--wu-surface-2) !important;
   }
 
   /* ---- search autocomplete (jQuery UI, not Material) -------------------- */
@@ -837,6 +940,28 @@
     background-color: var(--wu-link) !important;
   }
 
+  /* ---- mobile sub-navigation tab bar ------------------------------------ */
+  /* Below the desktop breakpoint WU swaps the .subnav for a scrolling
+     ul#subnav-mobile whose bar, every li AND every anchor each carry their own
+     #f7f7f7. None of the .subnav selectors reach it, so the tab bar shipped as
+     a full-width white strip -- invisible to a desktop-only review. */
+  #subnav-mobile,
+  #subnav-mobile li,
+  #subnav-mobile li > a {
+    background-color: var(--wu-base) !important;
+  }
+  #subnav-mobile li.selected,
+  #subnav-mobile li.selected > a {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text) !important;
+  }
+  /* the overflow scroll chevrons that cap the bar are their own #fff chips */
+  .subnav-arrow,
+  .subnav-arrow-left,
+  .subnav-arrow-right {
+    background-color: var(--wu-base) !important;
+  }
+
   /* ---- global header geolocate icon ------------------------------------- */
   /* The "use my location" gps icon is WU blue (#006f9e) -> too dim on dark. */
   .geolocate-wrap i.material-icons,
@@ -861,6 +986,8 @@
   .trc_rbox_header_span,
   .trc_desktop_attribution_link span,
   .trc_desktop_disclosure_link span,
+  .trc_mobile_attribution_link span,
+  .trc_mobile_disclosure_link span,
   .videoCube .branding,
   .videoCube .video-label-source {
     color: var(--wu-text-muted) !important;
@@ -1022,5 +1149,109 @@
   .monitors .station-row .columns,
   .monitors .station-row .label-unit {
     color: var(--wu-text-muted) !important;
+  }
+
+  /* ---- restore WU's semantic colour SCALES (flattened by our own rules) --- */
+  /* The `.data-module *` transparent-neutralizer and the blanket `*` border
+     reset above are what make the white module bodies dark -- but they also
+     erase every colour WU uses to ENCODE data on the health page. All four of
+     these read as a legible dark surface, so no contrast, border or background
+     audit flags them; the reading is simply gone. The hexes below are WU's own,
+     copied verbatim from its stylesheet, so each scale keeps its meaning. */
+
+  /* (a) air-quality legend: the six-band colour scale under the county map. */
+  .aq-legend .rating.good {
+    background-color: #5b9f49 !important;
+  }
+  .aq-legend .rating.moderate {
+    background-color: #ffb92f !important;
+  }
+  .aq-legend .rating.unhealthy-sensitive {
+    background-color: #ff8833 !important;
+  }
+  .aq-legend .rating.unhealthy {
+    background-color: #d5202a !important;
+  }
+  .aq-legend .rating.very-unhealthy {
+    background-color: #802674 !important;
+  }
+  .aq-legend .rating.hazardous {
+    background-color: #990008 !important;
+  }
+
+  /* (b) AQI callout: a 6px left stripe whose colour IS the current level. */
+  .aqi .level-none .aqi-callout {
+    border-left-color: var(--wu-text-muted) !important;
+  }
+  .aqi .level-1 .aqi-callout {
+    border-left-color: #5b9f49 !important;
+  }
+  .aqi .level-2 .aqi-callout {
+    border-left-color: #ffb92f !important;
+  }
+  .aqi .level-3 .aqi-callout {
+    border-left-color: #ff8833 !important;
+  }
+  .aqi .level-4 .aqi-callout {
+    border-left-color: #d5202a !important;
+  }
+  .aqi .level-5 .aqi-callout {
+    border-left-color: #802674 !important;
+  }
+  .aqi .level-6 .aqi-callout {
+    border-left-color: #990008 !important;
+  }
+
+  /* (c) pollen forecast: each day is a 5-segment column, filled bottom-up.
+     WU's empty segment is #d7d7d7 (too light on dark) -> component border;
+     the reached segments keep the green -> red scale. */
+  /* :nth-child(n) matches every li; it is here to out-specify the blanket
+     `.data-module *:not(img)...` neutralizer, which carries five compound
+     arguments and otherwise wins this declaration. */
+  .pollen-levels .rating li:nth-child(n) {
+    background-color: var(--wu-border-2) !important;
+  }
+  .pollen-levels .high li:nth-child(1) {
+    background-color: #d5202a !important;
+  }
+  .pollen-levels .high li:nth-child(2),
+  .pollen-levels .medium-high li:nth-child(2) {
+    background-color: #ff8833 !important;
+  }
+  .pollen-levels .high li:nth-child(3),
+  .pollen-levels .medium-high li:nth-child(3),
+  .pollen-levels .medium li:nth-child(3) {
+    background-color: #ffb92f !important;
+  }
+  .pollen-levels .high li:nth-child(4),
+  .pollen-levels .medium-high li:nth-child(4),
+  .pollen-levels .medium li:nth-child(4),
+  .pollen-levels .low-medium li:nth-child(4) {
+    background-color: #87c404 !important;
+  }
+  .pollen-levels .high li:nth-child(5),
+  .pollen-levels .medium-high li:nth-child(5),
+  .pollen-levels .medium li:nth-child(5),
+  .pollen-levels .low-medium li:nth-child(5),
+  .pollen-levels .low li:nth-child(5) {
+    background-color: #5b9f49 !important;
+  }
+
+  /* (d) UV skin-type picker: the SELECTED swatch is marked only by a #15aadc
+     ring (its white fill is irrelevant on dark). The `*` reset erased it, so
+     all three swatches looked identically unselected. */
+  .uv-index .skin-types li.active {
+    border-color: #15aadc !important;
+  }
+
+  /* (e) wind-chill/heat "feels like" scale: a three-band bar reading cold DANGER
+     (blue gradient) -> OK (green) -> heat DANGER (orange gradient). The chill/heat
+     bands paint their gradients via background-IMAGE (untouched), but the middle
+     .scale-ok band is a solid green (#5b9f49) background-COLOR the `.data-module *`
+     neutralizer flattened to transparent -- leaving a dark gap where the "you're in
+     the safe zone" reading should be. Restore the green; this (0,3,0) prelude clears
+     the (0,2,4) blanket. */
+  .data-module .feels-like-scale .scale-ok {
+    background-color: #5b9f49 !important;
   }
 }

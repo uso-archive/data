@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Pepper.pl with comfortable browsing across the deal feed, deal pages, coupons and search, with prices and deal heat kept clear.
-@version      20260707.14.33
+@version      20260711.00.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -260,9 +260,122 @@
   .button.button--type-primary *,
   [class*="button--type-primary"] * { color: #1a1205 !important; }
 
+  /* ---- ...but `button--type-primary` is only ORANGE in `button--mode-brand`.
+     The same type carries six other modes, each of which reads its own
+     `--background-default` token (grey / expired / danger / success / info /
+     warning). The blanket rule above painted every one of them brand orange:
+     the footer's "Obserwuj nas" social discs (mode-grey) became seven orange
+     blobs, the mobile bottom-bar "Alerty" tab became a raw orange square, and
+     — worst — an EXPIRED deal's dead "Idź do okazji" CTA (mode-expired) looked
+     exactly like a live one. Restore each mode from the tokens it should read.
+     Two classes = specificity (0,0,2,0), so these beat the (0,0,1,0) rule
+     above (and its `*` descendant rule) regardless of source order. */
+  .button--type-primary.button--mode-grey {
+    background-color: #2d333b !important;
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+  }
+  .button--type-primary.button--mode-grey * { color: #e6edf3 !important; }
+  .button--type-primary.button--mode-grey svg,
+  .button--type-primary.button--mode-grey svg use { fill: #e6edf3 !important; }
+  .button--type-primary.button--mode-expired {
+    background-color: #21262d !important;
+    color: #9aa6b0 !important;
+    border-color: #2d333b !important;
+  }
+  .button--type-primary.button--mode-expired * { color: #9aa6b0 !important; }
+  .button--type-primary.button--mode-danger {
+    background-color: #c2402b !important;
+    color: #fff2ef !important;
+    border-color: #c2402b !important;
+  }
+  .button--type-primary.button--mode-danger * { color: #fff2ef !important; }
+  .button--type-primary.button--mode-success {
+    background-color: #238012 !important;
+    color: #f2fff2 !important;
+    border-color: #238012 !important;
+  }
+  .button--type-primary.button--mode-success * { color: #f2fff2 !important; }
+  .button--type-primary.button--mode-info {
+    background-color: #1f6feb !important;
+    color: #f2f8ff !important;
+    border-color: #1f6feb !important;
+  }
+  .button--type-primary.button--mode-info * { color: #f2f8ff !important; }
+  .button--type-primary.button--mode-warning {
+    background-color: #9f5c0c !important;
+    color: #fff8ef !important;
+    border-color: #9f5c0c !important;
+  }
+  .button--type-primary.button--mode-warning * { color: #fff8ef !important; }
+
+  /* Outline / text buttons carry their meaning in the LABEL colour, which the
+     blanket `.btn, .button { color }` rule below flattens to one neutral grey:
+     the header's "Opublikuj" (secondary + mode-brand) and the filter panel's
+     "Zresetuj" (text + mode-primary) both ship brand orange natively. The
+     blanket `* { border-color }` reset likewise erases their orange outline.
+     Restore label + outline per mode; two classes beat both blankets. */
+  .button--type-secondary.button--mode-brand,
+  .button--type-tertiary.button--mode-brand,
+  .button--type-text.button--mode-brand,
+  .button--type-text.button--mode-primary {
+    color: #ff8a4d !important;
+    border-color: #f7641b !important;
+  }
+  .button--type-secondary.button--mode-brand *,
+  .button--type-tertiary.button--mode-brand *,
+  .button--type-text.button--mode-brand *,
+  .button--type-text.button--mode-primary * { color: #ff8a4d !important; }
+  .button--type-secondary.button--mode-danger,
+  .button--type-tertiary.button--mode-danger,
+  .button--type-text.button--mode-danger {
+    color: #f0857d !important;
+    border-color: #c2402b !important;
+  }
+  .button--type-secondary.button--mode-danger *,
+  .button--type-tertiary.button--mode-danger *,
+  .button--type-text.button--mode-danger * { color: #f0857d !important; }
+  .button--type-secondary.button--mode-success,
+  .button--type-tertiary.button--mode-success,
+  .button--type-text.button--mode-success {
+    color: #3fb950 !important;
+    border-color: #238012 !important;
+  }
+  .button--type-secondary.button--mode-success *,
+  .button--type-tertiary.button--mode-success *,
+  .button--type-text.button--mode-success * { color: #3fb950 !important; }
+  .button--type-secondary.button--mode-info,
+  .button--type-tertiary.button--mode-info,
+  .button--type-text.button--mode-info {
+    color: #5fb0e6 !important;
+    border-color: #1f6feb !important;
+  }
+  .button--type-secondary.button--mode-info *,
+  .button--type-tertiary.button--mode-info *,
+  .button--type-text.button--mode-info * { color: #5fb0e6 !important; }
+  .button--type-secondary.button--mode-warning,
+  .button--type-tertiary.button--mode-warning,
+  .button--type-text.button--mode-warning {
+    color: #d6a425 !important;
+    border-color: #9f5c0c !important;
+  }
+  .button--type-secondary.button--mode-warning *,
+  .button--type-tertiary.button--mode-warning *,
+  .button--type-text.button--mode-warning * { color: #d6a425 !important; }
+
   /* Brand-orange count/notification circle badge (native white text on the
      #f7641b fill only reaches ~3:1) -> dark text for a readable, on-brand chip */
   .circle--primary, .circle--primary * { color: #1a1205 !important; }
+
+  /* Red notification/alert count badge on the header bell (span.circle--alert).
+     The header layout blanket `header span[class] { background: transparent }`
+     (0,0,1,2) stripped its native red fill, so the indicator vanished. Restore a
+     vivid red dot; `header .circle--xxs.circle--alert` is (0,0,2,1) so it wins. */
+  header .circle--xxs.circle--alert,
+  .circle--alert {
+    background-color: #da3633 !important;
+    color: #ffffff !important;
+  }
 
   /* Active/selected segmented-control tab (e.g. "Auto"/sort segments, and the
      "Powiązane dyskusje" tab on a deal page). Natively it's a pale-peach bg
@@ -313,9 +426,14 @@
   input::placeholder, textarea::placeholder { color: #8b949e !important; }
   .input-with-icon svg, .input-icon { color: #9aa6b0 !important; }
 
-  /* Search autocomplete / suggestion dropdown */
-  .autocomplete, .typeahead, [class*="popover"], [role="listbox"],
-  [class*="dropdown"], [class*="menu--"] {
+  /* Search autocomplete / suggestion dropdown.
+     Only `.popover-content` is a real panel — `[class*="popover"]` also matched
+     the full-viewport `.popover-cover` scrim, the `.popover--layout-fixed`
+     wrapper, `.popover-portal` and `.popover-origin`, all natively transparent
+     (see the popover block near the end). `[class*="dropdown"]` is qualified to
+     block elements so it can't paint a box behind the 10x7 `svg` caret. */
+  .autocomplete, .typeahead, [class*="popover-content"], [role="listbox"],
+  div[class*="dropdown"], ul[class*="dropdown"], [class*="menu--"] {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
     color: #e6edf3 !important;
@@ -333,6 +451,46 @@
     border-color: #2d333b !important;
   }
   .chip:hover, [class*="chip"]:hover { background-color: #2d333b !important; }
+  /* The blanket chip rule above is a substring match, so it also swallowed
+     every SEMANTIC chip variant: `.chip--type-expired` (natively an inverted
+     light chip), danger, warning and info all collapsed to the same neutral
+     grey — an expired deal's "Wygasła 2 tyg. temu" chip became visually
+     identical to a live deal's "Dodano 3 godz. temu" chip. Restore each state
+     (dark-mode equivalents of the tokens the site reads); one extra class of
+     specificity is unnecessary since these are later in source. */
+  .chip--type-expired {
+    background-color: #3a424c !important;
+    color: #e6edf3 !important;
+    border-color: #3a424c !important;
+  }
+  .chip--type-danger {
+    background-color: #c2402b !important;
+    color: #fff2ef !important;
+    border-color: #c2402b !important;
+  }
+  .chip--type-warning {
+    background-color: #3a1b16 !important;
+    color: #f0857d !important;
+    border-color: #5a2a22 !important;
+  }
+  .chip--type-info {
+    background-color: #15233a !important;
+    color: #5fb0e6 !important;
+    border-color: #1f3a5a !important;
+  }
+  /* A chip's inner spans must not paint their own surface: the "Wygasa za
+     22g 41m" countdown wraps its timer in a `box--all-i` span, which the
+     deal-detail rule `main [class*="box--"]` (0,0,1,1) filled with the card
+     shade — a darker block sitting inside the chip. Two classes = (0,0,2,0),
+     so these win and the chip reads as one pill in its own state colour. */
+  .chip.chip--type-default *, .chip.chip--type-expired *,
+  .chip.chip--type-danger *, .chip.chip--type-warning *,
+  .chip.chip--type-info * { background-color: transparent !important; }
+  .chip.chip--type-default * { color: #c4cdd6 !important; }
+  .chip.chip--type-expired * { color: #e6edf3 !important; }
+  .chip.chip--type-danger * { color: #fff2ef !important; }
+  .chip.chip--type-warning * { color: #f0857d !important; }
+  .chip.chip--type-info * { color: #5fb0e6 !important; }
   /* Selected chip/filter pill -> brand-orange fill with dark text. Scoped to
      chip/pill/tag/tab controls; nav-menu "selected" links are handled below as
      coloured text, NOT an orange fill (avoids blue-link-on-orange). */
@@ -394,12 +552,42 @@
     color: #e6edf3 !important;
   }
   .thread-title a:hover { color: #ffffff !important; }
-  /* Deal price (orange) + struck-through old price */
-  .thread-price, .threadItemCard-price, [class*="text-AccentPrice"] {
+  /* Deal price (orange) + struck-through old price.
+     `span.threadItemCard-price` raises specificity to (0,0,1,1): the deal-detail
+     card rule `[class*="threadItemCard"]` (0,0,1,0, later in source) was a
+     substring match on `threadItemCard-price` and greyed every price in the
+     "Podobne okazje" strip — this beats it so prices stay orange. */
+  .thread-price, .threadItemCard-price, span.threadItemCard-price,
+  [class*="text-AccentPrice"] {
     color: #ff8a4d !important;
   }
   .mute--text, .text--strikethrough, del, s {
     color: #8b949e !important;
+  }
+
+  /* Coupon-code "voucher" ticket (the dashed pill holding a copyable code like
+     "SLC26" beside "Pobierz kod"): its dashed BRAND-ORANGE border is the
+     copy-the-code affordance. The `* { border-color: #2d333b }` reset flattened
+     it to a plain grey box. `.voucher.border--dash` (0,0,2,0) restores the hue. */
+  .voucher.border--dash, div.aGrid.voucher {
+    border-color: #f7641b !important;
+  }
+
+  /* Rating stars (App Store / merchant ratings) are SVG <use href="…#star">
+     glyphs that paint from `color`/`fill`; a broad neutral rule greyed them so a
+     "4,6 ★★★★★" read as neutral grey stars. Keep them gold. */
+  svg.icon--star, svg.icon--star use,
+  .icon--star, .icon--star use {
+    color: #f3a21c !important;
+    fill: #f3a21c !important;
+  }
+
+  /* Active carousel-pagination dot (the "••••" nav on merchant/coupon rails)
+     is brand-orange natively; a neutral rule collapsed it to grey, erasing the
+     current-slide indicator. `.dot.color--graphic-AccentBrand` (0,0,2,0) wins. */
+  .dot.color--graphic-AccentBrand {
+    background-color: #ff8a4d !important;
+    color: #ff8a4d !important;
   }
 
   /* ============================================================
@@ -410,8 +598,30 @@
     background-color: #21262d !important;
     border-color: #2d333b !important;
   }
-  .vote-temp, .cept-vote-temp { color: #ff8a4d !important; }
+  /* Pepper's signature is the temperature SCALE: a deal's degrees run cold-blue
+     -> warm-orange -> hot-red, and a brand-new deal shows a neutral "Nowe"
+     label (--inert) instead of a number. A flat `.vote-temp { color }` rule
+     used to paint all four states the same orange, so "Nowe", a 7° dud and a
+     7401° smash hit were indistinguishable. Colour each state from the
+     temperature tokens instead (the site's own modifier rules are not
+     !important, so the flat rule beat them on source order). */
+  .vote-temp, .cept-vote-temp { color: #c4cdd6 !important; }
+  .vote-temp--inert { color: #e6edf3 !important; }
+  .vote-temp--cold, .vote-temp--colder, .vote-temp--frozen,
+  .vote-temp-chip--cold { color: #5fb0e6 !important; }
+  .vote-temp--warm, .vote-temp-chip--warm { color: #f7641b !important; }
+  .vote-temp--hot, .vote-temp--burn, .vote-temp-chip--hot { color: #f0857d !important; }
+  .vote-box--muted .vote-temp { color: #9aa6b0 !important; }
   .vote-button, .cept-vote-button { color: #9aa6b0 !important; }
+  /* The two vote arrows carry the hot/cold affordance: "colder" (down) is blue,
+     "hotter" (up) is red — both coloured natively (the arrow glyph is an SVG
+     <use> whose fill = currentColor). The flat `.vote-button {color}` above
+     greyed both, so they read identically. Restore per mode; the icon selector
+     is (0,0,2,0) so it also beats the button-level grey via the glyph. */
+  .vote-button--mode-down, .vote-button--mode-down .vote-icon,
+  .cept-vote-button--mode-down { color: #5fb0e6 !important; }
+  .vote-button--mode-up, .vote-button--mode-up .vote-icon,
+  .cept-vote-button--mode-up { color: #f0857d !important; }
 
   /* ============================================================
      Buttons (secondary / shaped)
@@ -429,9 +639,14 @@
   .btn--mode-secondary:hover,
   .button--type-secondary:hover { background-color: #2d333b !important; }
 
-  /* "Idź do okazji" / go-to-deal CTA keeps the brand orange */
-  .cept-dealBtn, [class*="dealBtn"],
-  a[rel*="nofollow"][class*="button"] {
+  /* "Idź do okazji" / go-to-deal CTA keeps the brand orange.
+     A former `a[rel*="nofollow"][class*="button"]` fallback lived here and was
+     far too broad: EVERY nofollow anchor carrying "button" in its class got the
+     orange fill, which turned the header's ghost "Utwórz alert" pill orange, the
+     mobile bottom-bar "Alerty" tab into a raw orange square, and an expired
+     deal's dead CTA into a live-looking one. The real CTA already resolves via
+     `.button--type-primary.button--mode-brand`, so the fallback only did harm. */
+  .cept-dealBtn, [class*="dealBtn"] {
     background-color: #f7641b !important;
     color: #1a1205 !important;
     border-color: #f7641b !important;
@@ -494,9 +709,14 @@
     border: 2px solid #14181d !important;
     cursor: pointer !important;
   }
+  /* Split by engine: one invalid selector drops the WHOLE list, so a mixed
+     -webkit-/-moz- prelude styles the track in neither browser. */
   input.rangeSlider::-webkit-slider-runnable-track,
-  input[class*="rangeSlider--"]::-webkit-slider-runnable-track,
-  input.rangeSlider::-moz-range-track {
+  input[class*="rangeSlider--"]::-webkit-slider-runnable-track {
+    background-color: transparent !important;
+  }
+  input.rangeSlider::-moz-range-track,
+  input[class*="rangeSlider--"]::-moz-range-track {
     background-color: transparent !important;
   }
   /* Any explicit handle element the widget renders */
@@ -535,7 +755,7 @@
      ============================================================ */
   .modal, .modal-body, .dialog, [role="dialog"],
   [class*="modal"], [class*="overlay-content"],
-  .popover, [class*="popover"], .cept-overlay-content {
+  [class*="popover-content"], .cept-overlay-content {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
     color: #e6edf3 !important;
@@ -780,6 +1000,18 @@
   a:hover { color: #ffffff !important; }
   .link, a.link, [class*="link--"] { color: #5fb0e6 !important; }
 
+  /* The selected feed / search tab ("Popularne", "Wszystkie", "Okazje") is
+     brand orange natively. Two later blanket rules stole it back: the anchor
+     matched `[class*="link--"]` (painted link-blue) and its label <span>
+     matched `main [class*="box--"]` at (0,0,1,1) (painted neutral). Only the
+     orange ::after underline survived, so the ACTIVE tab read the same as its
+     neighbours. `a.<class> span` is (0,0,1,2) — it beats both. */
+  a.subNavMenu-link--selected, a.subNavMenu-link--selected span,
+  a.navMenu-link--selected, a.navMenu-link--selected span {
+    color: #ff8a4d !important;
+    background-color: transparent !important;
+  }
+
   /* Page footer ONLY — the real <footer class="footer …"> at the very bottom.
      Scoped tightly to the footer ELEMENT (footer / footer.footer): a bare
      [class*="footer"] was far too broad and also matched each deal card's
@@ -819,8 +1051,20 @@
      Popover / flyout menus (Menu, Kategorie) — white panels with
      black text on the legacy layout; make opaque dark + light text.
      ============================================================ */
+  /* Only `.popover-content` paints natively. Its ancestors are structural:
+     `.popover--layout-fixed` is a `position:fixed; inset:0; pointer-events:none`
+     flex centering box and `.popover-cover` is the dimming scrim
+     (`--bgTranslucentOverlay`, #010408ad). Painting those two solid #1c2128 —
+     which a bare `[class*="popover"]` did — replaced the whole viewport with a
+     raised grey slab the moment the Kategorie / Menu flyout opened, hiding the
+     feed instead of dimming it. Keep the wrappers transparent, the scrim
+     translucent, and put the surface back on the panel itself. */
+  .popover, [class*="popover--"], .popover-portal, .popover-origin {
+    background-color: transparent !important;
+  }
+  .popover-cover { background-color: rgba(1, 4, 8, 0.68) !important; }
   .popover-content, [class*="popover-content"],
-  .popover--default, .flyout, [class*="flyout"],
+  .flyout, [class*="flyout"],
   .popover-content [class*="category"],
   [class*="popover-content"] [class*="category"] {
     background-color: #1c2128 !important;
@@ -830,7 +1074,7 @@
   /* Every descendant of a flyout/popover -> light text + transparent
      so no inner light panel leaks through the category mega-menu. */
   .popover-content *, [class*="popover-content"] *,
-  .popover--default *, [class*="flyout"] * {
+  [class*="flyout"] * {
     background-color: transparent !important;
     color: #c4cdd6 !important;
   }

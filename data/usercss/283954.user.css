@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Investopedia: definitions, guides, search and the homepage in an easy-on-the-eyes dark look, with finance colors kept clear.
-@version      20260707.14.31
+@version      20260710.13.10
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -166,6 +166,29 @@
   #icon-logo-finance path[fill="#f64e00"],
   #icon-logo-finance circle[fill="#f64e00"],
   svg.icon-logo-finance path[fill="#f64e00"] { fill: #f64e00 !important; }
+  /* "People Inc." wordmark in the Dotdash universal-nav strip. The rendered
+     <use> instance inherits our light `fill`, but the source <symbol>'s paths
+     carry a hardcoded near-black fill via an inline <style>
+     (.people-inc-logo-st1/-st2 { fill:#131920 }) — so the wordmark disappears
+     on the dark strip while a bg-color audit stays clean. Light the two lettering
+     classes only; the unclassed path is the brand yellow dot and stays. */
+  #mntl-dotdash-universal-nav__logo .people-inc-logo-st1,
+  #mntl-dotdash-universal-nav__logo .people-inc-logo-st2 {
+    fill: #c4cdd6 !important;
+  }
+  /* Sprite carets (journey-accordion "Part of the Series" expand chevron and any
+     other #icon-caret <use>): the SOURCE path carries fill="#191919" as an
+     ATTRIBUTE, which beats the inherited fill our `svg { fill }` rules set on the
+     <use> site — so the chevron renders near-black on the dark card. */
+  #icon-caret path, #icon-caret polygon { fill: #c4cdd6 !important; }
+
+  /* 404 "page not found" magnifier glyph: a large svg.icon-not-found painted
+     pure black (fill from the sprite), invisible on the dark page. */
+  svg.icon-not-found, svg.icon-not-found use,
+  .mntl-not-found-content__icon, .mntl-not-found-content__icon use {
+    color: #8b949e !important;
+    fill: #8b949e !important;
+  }
 
   /* Dropdown / fullscreen-nav panels must be opaque */
   .mntl-fullscreen-nav__menu, .mntl-fullscreen-nav__container,
@@ -174,6 +197,24 @@
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
+  /* Mobile "Main menu" hamburger panel + its per-section sublist screens
+     ("NEWS >" -> Markets / Companies / Earnings …). The sublist container is a
+     full-screen WHITE panel that only exists once the burger AND a section are
+     opened, so a load-time scan never sees it — our light nav links then render
+     white-on-white. Darken the panel, the back-arrow header and its links. */
+  .mntl-header__nav-panel, .mntl-fullscreen-nav__sublist-container,
+  .mntl-fullscreen-nav__sublist, .mntl-fullscreen-nav__sublist-header {
+    background-color: #14181d !important;
+    border-color: #262c33 !important;
+  }
+  .mntl-fullscreen-nav__sublist-header-text,
+  .mntl-fullscreen-nav__sublist-header svg,
+  .mntl-fullscreen-nav__sublist-header use {
+    color: #e6edf3 !important;
+    fill: #e6edf3 !important;
+  }
+  .mntl-fullscreen-nav__sublist a,
+  .mntl-fullscreen-nav__sublist-item a { color: #c4cdd6 !important; }
   /* Top-nav hover flyout submenu ("Stocks / Cryptocurrency / Bonds …" under
      INVESTING etc.). The live panel is a white ul.mntl-header-nav__sublist; its
      items already inherit our light header-link color, so on the white panel
@@ -219,7 +260,7 @@
   .mntl-hero-search__title, .mntl-hero-search__subtitle,
   .mntl-hero-search .link__wrapper { color: #e6edf3 !important; }
   .miso-search-box__input, .mntl-search-form__input,
-  input[type="search"], input[type="text"], textarea, select {
+  input[type="search"], input[type="text"], input[type="email"], textarea, select {
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
@@ -241,8 +282,39 @@
   a.miso-list__item-body, .miso-list a.miso-list__item-body,
   a.miso-list__item-body * { color: #c4cdd6 !important; }
   .miso-list__item:hover, a.miso-list__item-body:hover { background-color: #2d333b !important; }
+  /* Search submit buttons are FILLED brand pills on the live site — the header /
+     mobile-nav magnifier (.button--contained-standard-square) and the "GO" button
+     on /search (.button--contained-standard) are both rgb(51,62,139) indigo with a
+     white glyph/label; the askmiso "ASK" pill is rgb(201,13,0). Flattening them to
+     transparent leaves a bare white label with no affordance, and no colour audit
+     sees it (a dark-on-dark check passes: white text on the dark input group). */
+  .mntl-search-form__button,
+  .mntl-search-form__button.button--contained-standard,
+  .mntl-search-form__button.button--contained-standard-square {
+    background-color: #333e8b !important;
+    color: #ffffff !important;
+    border-color: #333e8b !important;
+  }
+  .mntl-search-form__button:hover { background-color: #4450a8 !important; }
   .miso-search-box__input-group .miso-search-box__button,
-  .mntl-search-form__button { background-color: transparent !important; }
+  .miso-search-box__button {
+    background-color: #c90d00 !important;
+    color: #ffffff !important;
+    border-color: #c90d00 !important;
+  }
+  /* The askmiso input group draws a pastel brand ring with the two-layer
+     gradient-border trick: a 4px TRANSPARENT border shows the border-box gradient
+     layer, and a `linear-gradient(#fff,#fff)` padding-box layer fills the pill.
+     Painting that border opaque (our `.miso-search-box__input-group` border-color,
+     and the blanket `*` reset) erases the ring; the #fff layer stays audit-visible.
+     Restore the ring, repaint the fill layer with the card surface. */
+  .miso-search-box__input-group,
+  div.miso-search-box__input-group,
+  .miso-search-box .miso-search-box__input-group,
+  .miso-search-box div.miso-search-box__input-group {
+    border-color: transparent !important;
+    background-image: linear-gradient(#1c2128, #1c2128), linear-gradient(258deg, #fbd1b4 -1.68%, #f6ccf0 47.69%, #cbc5f9 97.07%) !important;
+  }
 
   /* ====================================================================
      Cards / lists / carousels  (universal-card, home-hero, carousel)
@@ -299,6 +371,57 @@
     background-image: none !important;
   }
 
+  /* Card category eyebrow ("INVESTING", "DIVIDEND STOCKS" …). It is not a text
+     node — it is `content: attr(data-tag)` on .card__content::before, so every
+     text-color audit walks straight past it. The site paints it brand indigo
+     rgb(44,64,208), which reads 2.1:1 on the dark card. Lift it to a legible
+     periwinkle that keeps the indigo identity. */
+  .card__content::before, .mntl-card .card__content::before,
+  .mntl-universal-card .card__content::before {
+    color: #8f9dfb !important;
+    -webkit-text-fill-color: #8f9dfb !important;
+  }
+  /* Card "Read more" affordance: also a ::after pseudo, painted the raw brand
+     blue rgb(7,88,167) — 2.3:1 on the dark card. Same accent the real links use. */
+  .card__summary::after, .comp.card__summary::after,
+  .card__content .card__summary::after {
+    color: #5fb0e6 !important;
+    -webkit-text-fill-color: #5fb0e6 !important;
+  }
+  /* Homepage "Our Mission" trust stats: the sub-labels ("MONTHLY READERS",
+     "EDUCATIONAL ARTICLES") are ::after pseudo text in brand indigo — 2.1:1. */
+  .eat-trust-stats__stat__text::after,
+  .comp.eat-trust-stats__stat__text::after {
+    color: #8f9dfb !important;
+    -webkit-text-fill-color: #8f9dfb !important;
+  }
+  /* Key-term carousel card: the "DEFINITION" kicker is a ::after label painted
+     rgba(0,0,0,.65) — 1.3:1 on the dark card, and pseudo-element text is invisible
+     to the color audit. */
+  .carousel-card__title::after, .comp.carousel-card__title::after,
+  [id^="carousel-card__title"]::after {
+    color: #8b949e !important;
+    -webkit-text-fill-color: #8b949e !important;
+  }
+
+  /* Article reading-progress bar under the sticky header: a full-width 2px track
+     painted #efefef, with the read portion filled brand indigo. Only 2px tall, so
+     the light-surface audit (which needs >40px height) skips it — it ships as a
+     bright white rule across the whole viewport. Darken the track and lift the
+     fill so progress stays visible on it. */
+  .mntl-scroll-progress-bar, .comp.mntl-scroll-progress-bar {
+    background-color: #262c33 !important;
+  }
+  .mntl-scroll-progress-bar-fill { background-color: #6d7cf0 !important; }
+
+  /* Ad-slot "Advertisement" disclosure label: a ::before/::after on the slot's
+     .wrapper, painted rgba(0,0,0,.65) -> invisible on the dark slot. */
+  [class*="mm-ads"] .wrapper::before, [class*="mm-ads"] .wrapper::after,
+  [class*="leaderboard"] .wrapper::before, [class*="leaderboard"] .wrapper::after {
+    color: #8b949e !important;
+    -webkit-text-fill-color: #8b949e !important;
+  }
+
   /* Card / figure image CONTAINERS (white bg behind/around images) */
   .card__media, .universal-image, .universal-image__image,
   .card__img, .figure-image, .img-placeholder, .loading-image,
@@ -317,6 +440,18 @@
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
+  /* Mobile only (<=1023px): the "TABLE OF CONTENTS" bar is `position:fixed` and the
+     list it opens is an absolutely-positioned #efefef panel. The bar carries
+     .mntl-block, so the layout-wrapper transparent neutralizer at the top of this
+     file blanked it — article text then scrolls straight THROUGH the fixed bar —
+     and the panel kept its light grey while our light link colour sat on it. Both
+     surfaces are off-screen at desktop widths, so no desktop pass sees either. */
+  .mntl-toc__mobile-toggle, .comp.mntl-toc__mobile-toggle,
+  .mntl-toc__list, .comp.mntl-toc__list {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  .mntl-toc__mobile-toggle, .mntl-toc__mobile-toggle * { color: #e6edf3 !important; }
   .mntl-toc__list-item-link, .toc__link, .mntl-toc a { color: #c4cdd6 !important; }
   .mntl-toc__list-item-link:hover, .mntl-toc__list-item--active a,
   .mntl-toc__list-item-link.is-active { color: #5fb0e6 !important; }
@@ -340,24 +475,79 @@
     border-color: #2d333b !important;
     color: #c4cdd6 !important;
   }
-  .finance-sc-block-callout.theme-whatyouneedtoknow,
-  .mntl-sc-block-universal-callout.theme-whatyouneedtoknow {
-    border-left: 4px solid #5fb0e6 !important;
-  }
-  .finance-sc-block-callout.theme-important,
-  .mntl-sc-block-universal-callout.theme-important {
-    border-left: 4px solid #e0823d !important;
-  }
-  .finance-sc-block-callout.theme-note,
-  .mntl-sc-block-universal-callout.theme-note {
-    border-left: 4px solid #3fb950 !important;
-  }
+  /* No accent rail here. The live callouts already carry their own semantic marker
+     and none of them has a left border: "Key Takeaways"
+     (.finance-sc-block-callout--whatyouneedtoknow) draws a 2px coral #ff8c6c
+     bracket through ::before and its body's :last-child::after, while FAST FACT and
+     IMPORTANT are a plain bordered box with a coral / tan icon. An added rail
+     renders a second, mismatched bar flush against the coral bracket. The brackets
+     and icons are already light enough to read on the dark surface. */
   .finance-sc-block-callout *, .mntl-sc-block-universal-callout * {
     background-color: transparent !important;
   }
   .finance-sc-block-callout .mntl-sc-block-heading,
   .finance-sc-block-callout strong,
   .mntl-sc-block-universal-callout .mntl-sc-block-heading { color: #e6edf3 !important; }
+
+  /* ====================================================================
+     FAQ accordion (mntl-sc-block-universal-faq). The answer panel
+     (.accordion__body) is a WHITE surface that is COLLAPSED to height:0 at page
+     load — every load-time scan reports it clean, and it only turns into a white
+     slab with our light-grey answer text on it once the question is expanded.
+     Darken the panel and re-establish readable body text inside it.
+     ==================================================================== */
+  .mntl-accordion, .mntl-sc-block-universal-faq__content,
+  .accordion__item, .accordion__header, .accordion__body,
+  .accordion__item.is-active > .accordion__body {
+    background-color: transparent !important;
+    border-color: #262c33 !important;
+  }
+  .accordion__body, .accordion__body p, .accordion__body li,
+  .accordion__body span, .accordion__body div {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  .accordion__body a { color: #5fb0e6 !important; -webkit-text-fill-color: #5fb0e6 !important; }
+  .accordion__header, .accordion__header * { color: #e6edf3 !important; }
+
+  /* ====================================================================
+     Search-results pagination. The page-number discs are <a> pills painted pure
+     white (36×36 — under the audit's 40px height floor, so they slip the
+     light-surface scan). Darken the unselected discs; keep the site's indigo
+     selected pill but force a white label on it (our accent blue only reaches
+     ~4:1 there). The "NEXT >" chevron is a near-black indigo SVG on dark.
+     ==================================================================== */
+  .mntl-pagination__item a, li.mntl-pagination__item > a,
+  .mntl-pagination__item a.button--outlined-little-round {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+  .mntl-pagination__item a:hover {
+    background-color: #2d333b !important;
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  .mntl-pagination__item--selected a.button--outlined-little-round,
+  li.mntl-pagination__item--selected > a,
+  li.mntl-pagination__item--selected > a.button--outlined-little-round {
+    background-color: transparent !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+  .mntl-pagination__next svg, .mntl-pagination__next use,
+  .mntl-pagination__previous svg, .mntl-pagination__previous use {
+    fill: #5fb0e6 !important;
+    color: #5fb0e6 !important;
+  }
+
+  /* Dictionary "TERM OF THE DAY" / "IN THE NEWS" kicker: a ::before label the
+     site paints near-black; pseudo text, so the color audit never sees it. */
+  .tod__title::before, a.tod__title::before {
+    color: #8b949e !important;
+    -webkit-text-fill-color: #8b949e !important;
+  }
 
   /* Question & answer / definition blocks */
   .finance-sc-block-questionandanswer,
@@ -451,6 +641,23 @@
   /* askmiso decorative ::after halo paints a large white disc on dark */
   .askmiso-ask-query::after, .askmiso-ask-query-base::after,
   .askmiso-ask-query-secondary::after { background: #1c2128 !important; }
+  /* The animated ::before "glow ring" is a blurred conic-gradient whose first
+     and last stops are pure WHITE. On the light original those stops vanish into
+     the white card; on our dark card they blur into a glaring white halo along
+     the widget's top edge. Repaint the same brand ring with the white stops
+     replaced by the card surface (the gradient is a bg-IMAGE, so neither the
+     bg-color audit nor the pseudo scan sees it). */
+  .askmiso-ask-query::before, .askmiso-ask-query-base::before,
+  .askmiso-ask-query-secondary::before {
+    background-image: conic-gradient(#1c2128 10deg, #6d5dff 32deg, #ff84ed 50deg, #ffa262 87deg, #ff84ed 171deg, #6d5dff 209deg, #1c2128 210deg) !important;
+  }
+  /* "Investopedia Answers" logotype + its sparkle icon are SVG <use> instances
+     painted by linearGradient paint-servers whose stops run #303FC8 -> #0F1864
+     (near-black navy). Fine on the white original, ~1.2:1 on the dark card and
+     invisible to both the fill scan (fill is url(#…)) and the color audit.
+     Lift both stops, keeping the blue-violet brand ramp. */
+  stop[stop-color="#303FC8"] { stop-color: #9aa8ff !important; }
+  stop[stop-color="#0F1864"] { stop-color: #5061d6 !important; }
   .askmiso-ask-query__heading, .askmiso-ask-query-heading { color: #e6edf3 !important; }
   .askmiso-ask-query__subheading { color: #8b949e !important; }
   .askmiso-ask-query__search, .askmiso-ask-query input, .askmiso-ask-query textarea {
@@ -564,6 +771,17 @@
     background-color: transparent !important;
     color: #5fb0e6 !important;
   }
+  /* The dictionary hub's A-Z bar is position:sticky (top:64px) and gets its
+     opacity from the child .terms-bar__list (natively #efefef). Transparent
+     there means the term list scrolls straight through the letters, so this one
+     instance needs an opaque surface. The in-flow .terms-bar--footer variant on
+     term pages is natively transparent and stays that way. */
+  .terms-bar--dictionary,
+  .terms-bar--dictionary .terms-bar__list {
+    background-color: #1c2128 !important;
+  }
+  .terms-bar--dictionary { border-bottom: 1px solid #2d333b !important; }
+
   .terms-bar__item, .terms-bar__item a { color: #c4cdd6 !important; }
   .terms-bar__item.is-active, .terms-bar__item:hover {
     background-color: #2d333b !important; color: #e6edf3 !important;
@@ -577,6 +795,36 @@
     background-color: transparent !important; color: #c4cdd6 !important;
   }
   .mntl-attribution__item-name:not(.mntl-author-tooltip__name) { color: #e6edf3 !important; }
+
+  /* Contributor page (/contributors/<id>/). Two surfaces the site paints white
+     because they sit on its light bio header, and both are only 44-64px so the
+     light-surface floor skips them:
+       1. the LinkedIn / X / website discs — white circles whose X and globe glyphs
+          are near-black, so darkening the disc alone would erase them;
+       2. the pull-quote mark — a 64px svg with a literal white background.
+     Keep LinkedIn blue (lifted for contrast) and the indigo quote glyph (lifted to
+     the same periwinkle the card eyebrows use). The FOOTER social icons are a
+     different, already-transparent set — scope by the bio-header id. */
+  [id^="bio-header-social-nav"] .social-nav__link,
+  [id^="bio-header-social-nav"] a.social-nav__link {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  [id^="bio-header-social-nav"] .social-nav__link--x svg,
+  [id^="bio-header-social-nav"] .social-nav__link--website svg {
+    fill: #e6edf3 !important;
+    color: #e6edf3 !important;
+  }
+  [id^="bio-header-social-nav"] .social-nav__link--linkedin svg {
+    fill: #4aa3e0 !important;
+    color: #4aa3e0 !important;
+  }
+  /* the svg's opaque background is load-bearing: it masks the horizontal rule the
+     quote block draws behind it, so repaint it rather than clearing it */
+  [id^="mntl-bio-quote"] > svg, .mntl-bio-quote > svg {
+    background-color: #14181d !important;
+    fill: #8f9dfb !important;
+  }
 
   /* ====================================================================
      Footer  (already dark navy rgb(50,58,86) -> align to palette)
@@ -632,10 +880,21 @@
   [class*="extendable-ad-slot"] {
     background-color: #14181d !important;
   }
+  /* In-article partner "ad table" cards carry a hard offset drop shadow
+     (box-shadow: rgb(236,240,241) 5px 5px 0 0). A box-shadow is neither a
+     background nor a border, so every surface/border scan walks past it — on the
+     dark page it paints a bright white L down the right and under each card.
+     Keep the offset-card look with a palette shade. */
+  [class*="mm-ads-ad-table-column"] {
+    box-shadow: #262c33 5px 5px 0 0 !important;
+  }
 
   /* ====================================================================
      TradingView market-ticker (cross-origin iframe) — can't recolor its
      contents, so darken the wrapper + dim the iframe to remove the white band.
+     The iframe's own `title` varies per render — both "Stock Ticker" and
+     "ticker tape TradingView widget" occur — hence one selector per casing
+     rather than the `i` attribute flag, which the userstyles.org parser rejects.
      ==================================================================== */
   .tradingview-widget-container, .tradingview-widget-container__widget,
   [class*="tradingview"], [id*="tradingview"],
@@ -643,7 +902,8 @@
     background-color: #0d1117 !important;
   }
   iframe[src*="tradingview"], iframe[id*="tradingview"],
-  iframe[src*="s.tradingview"], iframe[title*="ticker"] {
+  iframe[src*="s.tradingview"],
+  iframe[title*="Ticker"], iframe[title*="ticker"] {
     background-color: #0d1117 !important;
     filter: invert(1) hue-rotate(180deg) brightness(0.95) !important;
   }
@@ -747,6 +1007,87 @@
      Borders / dividers / misc
      ==================================================================== */
   * { border-color: #262c33 !important; }
+
+  /* CSS-TRIANGLE CARETS must be exempted from the blanket border reset above.
+     A caret is a 0x0 box whose side borders are `transparent` and whose single
+     visible edge is coloured; repainting every border-color turns all four sides
+     opaque and the triangle renders as a solid rectangle. The "Article Sources"
+     show/hide carets are the only real-element triangles on the site (pseudo
+     triangles are safe — `*` does not match pseudo-elements). Restore the
+     transparent sides, tint only the visible edge. */
+  .article-sources__show-icon, .article-sources__hide-icon,
+  .comp.article-sources__show-icon, .comp.article-sources__hide-icon {
+    border-color: transparent !important;
+  }
+  .article-sources__show-icon, .comp.article-sources__show-icon {
+    border-top-color: #5fb0e6 !important;
+  }
+  .article-sources__hide-icon, .comp.article-sources__hide-icon {
+    border-bottom-color: #5fb0e6 !important;
+  }
+
+  /* ====================================================================
+     Hover tooltips (author bio on bylines, source popup on inline citations)
+     Two faults stack on the JS-mounted panel: the wrapper .mntl-dynamic-tooltip
+     carries `color: initial` (= CanvasText), and our `:root{color-scheme:dark}`
+     flips CanvasText black -> WHITE, while the panel keeps a literal #fff
+     background -> white-on-white body copy. Hover-only, and the panel only
+     gains its --content class when JS mounts it, so no static audit sees it.
+     The panel is .mntl-author-tooltip.mntl-tooltip on bylines but a bare
+     .mntl-dynamic-tooltip--content on citations — match both. Its ::before is
+     the rotated-square caret (also #fff). The --trigger::before/::after pair is
+     the visibility:hidden CSS-only fallback of the same tooltip; keep in palette.
+     ==================================================================== */
+  .mntl-dynamic-tooltip {
+    background-color: transparent !important;
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  .mntl-dynamic-tooltip--content,
+  .mntl-author-tooltip, .mntl-tooltip {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  .mntl-author-tooltip::before { /* rotated-square caret */
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  .mntl-author-tooltip__bottom::before { border-top-color: #2d333b !important; }
+  .mntl-author-tooltip__bio, .mntl-author-tooltip__bio p,
+  .mntl-author-tooltip__learn-more-text {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  .mntl-author-tooltip__name {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  .mntl-author-tooltip__name .mntl-attribution__item-date {
+    color: #8b949e !important;
+    -webkit-text-fill-color: #8b949e !important;
+  }
+  /* the inner span (.link__wrapper on "Full Bio", a.wrapped > span on a citation
+     link) would otherwise take the generic `span` body colour and render as
+     plain grey text */
+  .finance-author-tooltip__link, .mntl-author-tooltip__learn-more-link,
+  .mntl-dynamic-tooltip--content a,
+  .mntl-dynamic-tooltip--content a span,
+  .finance-author-tooltip__link .link__wrapper {
+    color: #5fb0e6 !important;
+    -webkit-text-fill-color: #5fb0e6 !important;
+  }
+  .mntl-dynamic-tooltip--trigger::after {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+  .mntl-dynamic-tooltip--trigger::before {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
   hr, .divider, .mntl-divider { border-color: #2d333b !important; background-color: #2d333b !important; }
   ::selection { background-color: #2563a8 !important; color: #ffffff !important; }
 

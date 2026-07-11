@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A cosy Catppuccin Mocha dark theme for BBC News, Sport and the homepage: easy on the eyes, with the BBC logo, photos and live colors kept intact.
-@version      20260707.14.29
+@version      20260711.00.13
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -14,11 +14,16 @@
        • "Dotcom" React (home / News front / articles): stable
          data-testid + data-component hooks, styled-components whose
          hashed suffix changes but whose readable prefix is stable
-         (e.g. Header-styles__HeaderStyled-sc-…  →  [class*="HeaderStyled"]).
+         (e.g. Header-styles__HeaderStyled-sc-… → match on the FULL
+         "Header-styles__HeaderStyled", never the bare "HeaderStyled",
+         which also hits SocialFollowUs-styles__SocialFollowUsHeaderStyled).
        • Legacy Simorgh "ssrcss" (Sport): Emotion classes
          ssrcss-<hash>-<ComponentName>; the <ComponentName> suffix is
          stable  →  [class*="GlobalNavigation"], [class*="StyledParticipant"].
      We retheme by targeting those stable hooks, never the hashes.
+     Every [class*=…] token must be the longest distinguishing string:
+     a bare [class*="Win"] once matched Windsor-styles__* and painted a
+     promo's copy green.
      Palette: official Catppuccin Mocha, inlined (self-contained).
      ============================================================ */
 
@@ -72,9 +77,12 @@
      DOTCOM REACT FRONTEND  (home / News front / articles)
      ============================================================ */
 
-  /* ---- Masthead / global header ---- */
+  /* ---- Masthead / global header ----
+     Anchor on the FULL component name: a bare [class*="HeaderStyled"] also
+     matches SocialFollowUs-styles__SocialFollowUsHeaderStyled and painted a
+     mantle rectangle behind the footer's "Follow BBC on:" label. */
   header,
-  [class*="HeaderStyled"],
+  [class*="Header-styles__HeaderStyled"],
   [data-testid="level1-navigation-container"],
   [class*="GlobalNavigationBar"] {
     background-color: var(--ctp-mantle) !important;
@@ -121,6 +129,24 @@
   [data-testid="subNavigationLink"]:hover,
   [class*="NavLink"]:hover { color: var(--ctp-sky) !important; }
 
+  /* Active top-nav item is marked ONLY by a 4px li::after bar. Every section
+     but News paints it pure black (News uses the brand #b80000), so on the
+     dark masthead the "you are here" cue disappears on Home / Business /
+     Culture / Travel and the mobile nav panel. `*` never matches a pseudo,
+     so no other rule reaches it. Repaint with the readable Mocha red — the
+     BBC brand accent this indicator already carries on News. The bar only
+     renders on the current item (content:none elsewhere). */
+  li[class*="MainNavigationItemStyled"]::after {
+    background-color: var(--ctp-red) !important;
+  }
+  /* Same indicator in the slide-out nav panel (the only nav at 390px): an
+     8x44 black ::before rail on the current item. Its siblings share the
+     class and differ only by a bare `selected` attribute, so key off that —
+     a blanket rule would draw a rail beside every item. */
+  [class*="NavButtonStyled"][selected]::before {
+    background-color: var(--ctp-red) !important;
+  }
+
   /* ---- Page section wrappers (keep transparent over base) ---- */
   main,
   /* Sections use US-state codenames with an optional trailing index
@@ -161,6 +187,14 @@
   [class*="Headline"] {
     color: var(--ctp-text) !important;
   }
+  /* Card separators are <hr>s coloured by background-color, not border — the
+     `*` border rule cannot reach them, and a 1px #e6e8ea rule is a glaring
+     white hairline on the dark base. Only the stacked (mobile) card layouts
+     render them, so a desktop-only pass never sees it. Covers every card
+     family's SeparatorStyled, including the footer's. */
+  hr[class*="SeparatorStyled"] {
+    background-color: var(--ctp-surface0) !important;
+  }
   [data-testid="card-description"],
   [class*="PromoBody"],
   [class*="Summary"],
@@ -180,10 +214,53 @@
   [class*="NewportBrandName"] {
     color: var(--ctp-subtext0) !important;
   }
+  /* Search-results pagination: each page tile is a 44×44 anchor with a
+     hardcoded #f6f6f6 fill (under the audit's 120×40 big() filter, so the
+     lightSurfaces scan never flags it) — our light link colour on it left the
+     page numbers white-on-white. Dark tile, light number; keep the "current
+     page" tile inverted so it still reads as selected. */
+  [class*="PaginationAnchorStyled"] {
+    background-color: var(--ctp-surface0) !important;
+    color: var(--ctp-text) !important;
+    border-color: var(--ctp-surface1) !important;
+  }
+  [class*="PaginationAnchorStyled"]:hover {
+    background-color: var(--ctp-surface1) !important;
+    color: var(--ctp-text) !important;
+  }
+  /* Card media badge (the play/audio glyph chip pinned over the artwork).
+     BBC ships it in two native flavours — white chip + black glyph (Ipswich,
+     London, Dundee) and black chip + white glyph (Edinburgh, Windsor) — and
+     our metadata rule greyed every glyph to overlay2. The old parent-scoped
+     fix (ImageContainer / CardMedia) reached only two of the five card
+     families: London kept its white chip under a ~2.5:1 washed-out triangle,
+     and Edinburgh/Windsor lost their crisp white glyph. Target the chip
+     component itself so all five match. The prefix is exact:
+     IndexCardContentTypeLabel-styles__ContentTypeLabelStyled can never match
+     the inline LIVE badge (IndexCardHeading-styles__ContentTypeLabel…), whose
+     dot must stay brand red. */
+  [class*="IndexCardContentTypeLabel-styles__ContentTypeLabelStyled"] {
+    background-color: var(--ctp-crust) !important;
+    color: var(--ctp-text) !important;
+  }
+  [class*="IndexCardContentTypeLabel-styles__ContentTypeLabelStyled"] svg,
+  [class*="IndexCardContentTypeLabel-styles__ContentTypeLabelStyled"] svg path {
+    color: var(--ctp-text) !important;
+    fill: var(--ctp-text) !important;
+  }
+  /* The inline glyph beside a "Watch:"/"Listen:" card headline is a 16px SVG
+     with a hardcoded #202224 fill → invisible on the dark base. Its wrapper
+     class is identical to the LIVE pulse dot's, so key off the icon's own
+     data-testid to leave the brand-red live dot alone. */
+  svg[data-testid="inline-icon"] path {
+    fill: var(--ctp-text) !important;
+  }
+
+  /* data-testid="content-type-label" is NOT metadata text — it is the media
+     badge chip above, and listing it here is what dimmed its glyph. */
   [data-testid="card-metadata-lastupdated"],
   [data-testid="card-metadata-tag"],
   [data-testid="card-metadata-separator"],
-  [data-testid="content-type-label"],
   [class*="MetadataStripStyled"],
   [class*="Timestamp"],
   time {
@@ -237,6 +314,9 @@
   [data-component="byline-block"] *,
   [data-testid="byline-new"],
   [class*="Contributor"],
+  /* live-post reporter name is a <strong> with its own hardcoded #181818 —
+     the parent Contributor colour doesn't reach it */
+  [class*="Contributor"] *,
   [class*="Byline"] {
     color: var(--ctp-subtext0) !important;
   }
@@ -257,6 +337,12 @@
   }
   [data-component="quote-block"] *,
   [class*="PullQuote"] * { color: var(--ctp-text) !important; }
+
+  /* "More on this story" / "Related" rail title is a <span>, not a heading, and
+     ships hardcoded #202224 → 1.2:1 on the base, effectively invisible. */
+  [class*="LinksTitleStyled"] {
+    color: var(--ctp-text) !important;
+  }
 
   /* ---- Related-story rails / tag chips ---- */
   [data-testid="tag-list"] a,
@@ -304,6 +390,13 @@
     background-color: var(--ctp-surface0) !important;
     border-color: var(--ctp-surface1) !important;
   }
+  /* The kick-off time block inside a head-to-head fixture card is a <time>
+     with a hardcoded #f8f8f8 fill (44px tall → under the audit's big()
+     threshold). The HeadToHead descendant rule above had already lightened
+     its text, so "FRI 20:00 10 JUL" rendered ~1.6:1 light-on-white. */
+  [class*="HeadToHeadContainer"] time {
+    background-color: var(--ctp-surface0) !important;
+  }
 
   /* ---- Scores & Fixtures page (ssrcss) ----
      A redesigned match-list view our older Sport rules didn't cover: the
@@ -315,6 +408,15 @@
   [class*="BackgroundWrapper"],
   [class*="HeaderWrapper"], [class*="HeaderWrapper"] div {
     background-color: transparent !important;
+  }
+  /* The fixtures reset above matches PersistentHeaderWrapper too (substring
+     over-match): the position:fixed z-1004 live sticky header (LIVE dot,
+     "Watch as…" strip, Listen-live) is natively opaque rgb(24,24,24) but got
+     flattened to transparent, so the left-rail "Key moments" list bled through
+     and overlapped its text. Re-opaque it to a dark surface (source order
+     wins the equal-specificity tie against the reset). */
+  [class*="PersistentHeaderWrapper"] {
+    background-color: var(--ctp-mantle) !important;
   }
   [class*="HeadToHeadWrapper"],
   [class*="StyledHeadToHead"] {
@@ -370,6 +472,15 @@
   [class*="ColouredContainer"] {
     background-color: var(--ctp-surface0) !important;
     color: var(--ctp-text) !important;
+  }
+  /* Newsletter / promo band CTA. BBC ships this button in two fills (solid
+     white "Sign up", solid black "Discover more") and our light link colour
+     left the white one at ~1.5:1. 88x44 → under the audit's big() floor.
+     Give both the same readable dark pill. */
+  [class*="ColouredContainer"] [class*="CallToActionLink"] {
+    background-color: var(--ctp-surface1) !important;
+    color: var(--ctp-text) !important;
+    border-color: var(--ctp-overlay1) !important;
   }
   [class*="StyledParticipant"],
   [class*="PromoHeadline"],
@@ -439,6 +550,132 @@
     color: var(--ctp-subtext0) !important;
   }
 
+  /* ============================================================
+     LIVE PAGES  (bbc.com/news/live/… and the Sport live streams — ssrcss)
+     A page type the theme never covered: the whole live stream ships a solid
+     #fff StreamContainer, an #f8f8f8 "Summary" panel, #f8f8f8 post-action
+     rows, avatar tiles and pagination buttons. Our generic p/li/heading rules
+     had already lightened the text → light-on-white, unreadable.
+     ============================================================ */
+  [class*="StreamContainer"],
+  [class*="StreamWrapperStyle"],
+  [class*="PostWrapper"],
+  [class*="PostBorderWrapper"] {
+    background-color: transparent !important;
+    border-color: var(--ctp-surface0) !important;
+  }
+  [class*="EditorialTextWrapper"],
+  [class*="PostActions"] {
+    background-color: var(--ctp-mantle) !important;
+    border-color: var(--ctp-surface0) !important;
+  }
+  /* Contributor avatar tile — scoped to the post, since [class*="ImageWrapper"]
+     alone also matches every Sport/News card image wrapper. */
+  [class*="ContentPost"] [class*="ImageWrapper"],
+  [class*="PageButtonContainer"] {
+    background-color: var(--ctp-surface0) !important;
+    color: var(--ctp-text) !important;
+  }
+  /* The numbered page tiles inside the live-feed pagination are bare <a>s that
+     keep a hardcoded #f8f8f8 fill (40×40 → under the audit big() floor) — our
+     light number on it read white-on-white. Darken every tile; keep the
+     aria-current page a lighter surface so it still reads as selected. */
+  [class*="PageButtonContainer"] a {
+    background-color: var(--ctp-surface0) !important;
+    color: var(--ctp-text) !important;
+    border-color: var(--ctp-surface1) !important;
+  }
+  [class*="PageButtonContainer"] a[aria-current="page"] {
+    background-color: var(--ctp-surface1) !important;
+    color: var(--ctp-text) !important;
+  }
+  /* Each live post wraps its title in a bare <header>, which our global
+     masthead rule painted mantle → a dark band behind every post headline. */
+  [class*="ContentPost"] header,
+  [class*="PostWrapper"] header {
+    background-color: transparent !important;
+  }
+  /* Reader "Get Involved" comment bubbles (both news + sport live streams) ship
+     a solid #fff SpeechBubble with a downward #fff ::after tail, plus a #f8f8f8
+     reaction pill and a #f8f8f8 "Send us your…" uploader form. Our text rules
+     lightened the copy → light-on-white, unreadable, and the DOM-bg scan flags
+     the white panels. Darken the bubble (and its pseudo tail, which `*` never
+     reaches) and the pill/form. */
+  [class*="SpeechBubble"] {
+    background-color: var(--ctp-mantle) !important;
+    color: var(--ctp-subtext1) !important;
+    border-color: var(--ctp-surface0) !important;
+  }
+  [class*="SpeechBubble"] * { color: var(--ctp-subtext1) !important; }
+  [class*="SpeechBubble"]::after,
+  [class*="SpeechBubble"]::before {
+    border-top-color: var(--ctp-mantle) !important;
+    border-bottom-color: var(--ctp-mantle) !important;
+  }
+  [class*="PostReactionWrapper"],
+  [class*="UploaderWrapper"] {
+    background-color: var(--ctp-mantle) !important;
+  }
+  /* Live-match commentary timeline: the minute markers (StyledPeriod) and the
+     connecting VerticalLine ship BBC-Sport live teal #00ccc7; our generic text
+     rule + blanket `* { border-color }` flattened both to grey, dropping the
+     live cue. Restore the readable Mocha teal (matching the LivePulse). */
+  [class*="StyledPeriod"] { color: var(--ctp-teal) !important; }
+  [class*="VerticalLine"] { border-color: var(--ctp-teal) !important; }
+
+  /* ---- Live MATCH page (ssrcss) ----
+     A distinct surface from the live news stream above. Three solid light
+     panels our rules never covered, each already carrying our lightened text:
+       • the Live Reporting / Report / Scores / Line-ups tab strip (white <li>),
+       • the "At a glance" key-points panel (#f8f8f8),
+       • the Player Rater widget (#fff) with its #f8f8f8 information block.
+     The tab strip also loses its active marker: the selected tab is flagged by
+     `a { border-bottom: 3px #387b12 }` (transparent on the others), and our
+     blanket `* { border-color }` repainted ALL of them the same surface line —
+     erasing the indicator while drawing a phantom underline under every tab.
+     Restore transparent + the BBC Sport accent (which BBC itself uses, as
+     #ffd53c, on its own dark-background tabs). */
+  li[class*="TabListItem"] {
+    background-color: var(--ctp-mantle) !important;
+  }
+  li[class*="TabListItem"] a {
+    color: var(--ctp-subtext1) !important;
+    border-bottom-color: transparent !important;
+  }
+  li.selected[class*="TabListItem"] a {
+    color: var(--ctp-text) !important;
+    border-bottom-color: var(--ctp-yellow) !important;
+  }
+  [class*="GistWrapper"],
+  [class*="PlayerRaterWrapper"],
+  [class*="StyledInformationWrapper"] {
+    background-color: var(--ctp-mantle) !important;
+    border-color: var(--ctp-surface0) !important;
+  }
+  /* Key-point bullets are 2x5px li::before discs filled a hardcoded #181818,
+     invisible once the panel is dark. `*` never matches a pseudo-element. */
+  [class*="GistWrapper"] li::before {
+    background-color: var(--ctp-overlay2) !important;
+  }
+  hr[class*="Divider"] {
+    background-color: var(--ctp-surface0) !important;
+  }
+  /* Player rows ship near-black #181818 names/scores — dark-on-dark once the
+     rater is darkened. The rating bar's own #ffd230 fill is untouched; only
+     its #d8d8d8 track is remapped. */
+  [class*="PlayerRow"],
+  [class*="PlayerRow"] * {
+    color: var(--ctp-text) !important;
+  }
+  [class*="RatingBarWrapper"] {
+    background-color: var(--ctp-surface1) !important;
+  }
+  /* "Player of the match" sits on the brand-yellow gradient banner; the
+     generic heading rule turned it light-on-yellow (~1.4:1). */
+  [class*="PlayerOfTheMatchWrapper"] h2 {
+    color: var(--ctp-crust) !important;
+  }
+
   /* Sport masthead + primary nav bar ship a huge brand-yellow fill that
      swamps the dark theme and washes out its text. Darken the bar and keep
      the BBC Sport yellow as the wordmark / active accent instead. */
@@ -462,11 +699,19 @@
   }
   [class*="Masthead"] a:hover,
   [class*="PrimaryNavBarContainer"] a:hover { color: var(--ctp-yellow) !important; }
-  /* active nav item keeps a yellow underline */
+  /* active nav item keeps a yellow underline.
+     NB: the two selectors below are dead on the live Sport nav — no element
+     carries a "Selected" class, and the bar is not a border on the
+     [aria-current] li. It is a 4px `a::after` painted pure black (readable on
+     the brand-yellow bar, invisible on our dark one). `*` cannot reach a
+     pseudo-element, so it survived every border rule. */
   [class*="PrimaryNavBarContainer"] [aria-current],
   [class*="PrimaryNavBarContainer"] [class*="Selected"] {
     color: var(--ctp-yellow) !important;
     border-color: var(--ctp-yellow) !important;
+  }
+  #product-navigation-menu [aria-current] a::after {
+    background-color: var(--ctp-yellow) !important;
   }
   /* "More" sub-nav toggle ships raw brand yellow. The label + hamburger
      glyph are an <a>, so the generic [role="navigation"] a rule (0,1,1)
@@ -484,6 +729,64 @@
   [class*="StyledToggle"] svg, [class*="StyledToggle"] svg path {
     color: var(--ctp-crust) !important;
     fill: var(--ctp-crust) !important;
+  }
+
+  /* ============================================================
+     LEGACY "ORB" GLOBAL HEADER  (bbc.com/weather and the other legacy
+     products the domain() rule covers). A third chrome besides Dotcom and
+     ssrcss: a full-width #fff bar. Our light link colour left the whole
+     Home/News/Sport/Weather nav white-on-white. The BBC blocks logo here is
+     a black-filled <svg> (and on the 404 page a black base64 PNG), so it has
+     to be lifted with the bar or it vanishes.
+     ============================================================ */
+  #orbit-header, #orb-header, #orb-banner,
+  .orb-nav-pri, .orb-nav-pri-white,
+  .orb-skip-links h2, .orb-skip-links a {
+    background-color: var(--ctp-mantle) !important;
+    color: var(--ctp-text) !important;
+  }
+  #homepage-link svg, #homepage-link svg path {
+    fill: var(--ctp-text) !important;
+    color: var(--ctp-text) !important;
+  }
+  #orbit-search-button, .orbit-search__button {
+    background-color: var(--ctp-surface0) !important;
+    color: var(--ctp-text) !important;
+    border-color: var(--ctp-surface1) !important;
+  }
+
+  /* BBC Weather (wr- plus ssrcss hybrid): ad rail, the video "media and text"
+     block and the units/language settings strip all ship #eee/#f8f8f8/#fff.
+     Both blocks carry their config in the id, so anchor on the id prefix
+     rather than the volatile ssrcss hash. */
+  .wr-c-advert, .wr-c-advert__leaderboard {
+    background-color: var(--ctp-crust) !important;
+  }
+  .ls-c-search__submit {
+    background-color: var(--ctp-surface0) !important;
+    color: var(--ctp-text) !important;
+  }
+  [id^="media-and-text-block"] [class*="StyledContainer"],
+  [id^="media-and-text-block"] [class*="MediaMetadataStyle"],
+  [id^="page-settings"] [class*="StyledWrapper"] {
+    background-color: var(--ctp-mantle) !important;
+    border-color: var(--ctp-surface0) !important;
+  }
+
+  /* 404 page ships its own tiny chrome: a white .nav inside .header, with the
+     BBC blocks logo as a black base64 PNG. Darken the bar and invert the
+     bitmap so the wordmark survives (light blocks, dark letters). */
+  .header > .nav {
+    background-color: var(--ctp-mantle) !important;
+    border-color: var(--ctp-surface0) !important;
+  }
+  .header > .nav .logo img {
+    filter: invert(1) !important;
+  }
+  /* The big "404" kicker ships brand #b80000 — 2.2:1 on the mantle heading
+     block, below the 3:1 floor even for large bold text. */
+  h1 span.StatusCode {
+    color: var(--ctp-red) !important;
   }
 
   /* ============================================================
@@ -541,6 +844,28 @@
   }
   #rbox-t2v::before, #rbox-t2v::after,
   .trc_rbox_div::before, .trc_rbox_div::after { background-color: var(--ctp-mantle) !important; }
+  /* The "Taboola Feed" ad-disclosure wordmark is black SVG artwork delivered as
+     a background-image, so no colour rule can reach it — it reads ~1.2:1 on the
+     base. Invert the artwork instead. */
+  .tbl-feed-header-logo {
+    filter: invert(1) !important;
+  }
+  /* Taboola's ad-choices popover and its "hide this ad" overlay are white
+     panels kept at visibility:hidden until you click their control, so a
+     load-time scan never sees them; our light link/text colours would land on
+     white. The popover's caret is a border triangle whose transparent sides
+     our blanket `* { border-color }` filled in, squaring it off. */
+  .trc_exclude_overlay, .trc_popover {
+    background-color: var(--ctp-mantle) !important;
+    border-color: var(--ctp-surface1) !important;
+    color: var(--ctp-text) !important;
+  }
+  .trc_popover_arrow {
+    border-top-color: transparent !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: var(--ctp-mantle) !important;
+  }
 
   /* ============================================================
      FORMS / INPUTS / BUTTONS
@@ -584,6 +909,14 @@
     color: var(--ctp-subtext1) !important;
   }
   footer a:hover { color: var(--ctp-text) !important; }
+  /* "Follow BBC on" row: the x / facebook / linkedin glyphs inherit
+     fill:currentColor and lift with the footer link colour, but instagram,
+     tiktok and youtube carry a literal fill="black" attribute on the <path>
+     that beats the inherited fill — three of six icons vanish on the crust
+     footer. Paint the paths explicitly. */
+  [class*="SocialFollowUs"] svg path {
+    fill: var(--ctp-subtext1) !important;
+  }
 
   /* ============================================================
      GENERIC TEXT / LINK CATCH (within news+sport scope only)
@@ -624,7 +957,10 @@
   [class*="LivePulse"] svg circle {
     fill: var(--ctp-teal) !important;
   }
-  /* Sport result wins/losses + status accents */
-  [class*="Win"], [class*="Winner"], [class*="Increase"] { color: var(--ctp-green) !important; }
+  /* Sport result wins/losses + status accents.
+     NB: a bare [class*="Win"] also matches the Dotcom "Windsor" lead-promo
+     component (Windsor-styles__…) and painted every word of the newsletter /
+     featured promo card green. Match the full "Winner" token instead. */
+  [class*="Winner"], [class*="Increase"] { color: var(--ctp-green) !important; }
   [class*="Loss"], [class*="Decrease"] { color: var(--ctp-red) !important; }
 }

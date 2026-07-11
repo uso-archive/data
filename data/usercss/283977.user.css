@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for KHInsider's game-music archive: easy on the eyes across album pages, song lists, the audio player, search and comments.
-@version      20260707.14.31
+@version      20260711.00.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -37,6 +37,14 @@
   #pageContent, #leftColumn, #rightColumn,
   #pageContent div, #homepagePopularSeries, #homepageLatestSoundtracks {
     border-color: #262c33 !important;
+  }
+  /* .arrow-play is a 0x0 CSS triangle: transparent top/bottom borders plus one
+     solid left edge. The blanket rule above paints all four edges and fills the
+     triangle into a blob — restore the transparent sides, colour only the edge. */
+  #pageContent div.arrow-play {
+    border-top-color: transparent !important;
+    border-bottom-color: transparent !important;
+    border-left-color: #8b949e !important;
   }
 
   /* ---- Sidebar logo + navigation ---- */
@@ -77,23 +85,38 @@
     background-color: transparent !important;
     border-color: #2d333b !important;
   }
-  /* tan (#cccc99) header + total rows -> elevated dark */
+  /* tan (#cccc99) header + total rows -> elevated dark.
+     #top40 / .uploadList / #requests_table share the same light header rules. */
   #songlist th, .albumList th, .requestList th,
+  #top40 th, .uploadList th, #requests_table th,
   #songlist tr.header td, #songlist .clickable-row.collapsed,
   #songlist #songlist_footer td, #songlist tr#songlist_footer th {
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
   }
-  #songlist td, .albumList td, .requestList td {
+  #songlist td, .albumList td, .requestList td,
+  #top40 td, .uploadList td, #requests_table td, #requests_table th {
     border-color: #262c33 !important;
     color: #c4cdd6 !important;
   }
-  #songlist tr td a, .albumList td a, .requestList td a { color: #5fb0e6 !important; }
-  /* zebra + hover */
+  #songlist tr td a, .albumList td a, .requestList td a,
+  #top40 td a, .uploadList td a, #requests_table td a { color: #5fb0e6 !important; }
+  /* Top 40 rank movement: the site marks a week's gain/loss with an inline
+     `color:green` / `color:red` on the +N / -N div. Our broad `#pageContent div`
+     colour is !important, so it outranks the inline pair and every gain, loss and
+     no-change row rendered the same grey. Restore the two semantics with hues that
+     survive a dark backdrop, and keep the arrow glyph neutral as the site does. */
+  #top40 .movement div[style*="color:green"] { color: #3fb950 !important; }
+  #top40 .movement div[style*="color:red"] { color: #ff7b72 !important; }
+  /* zebra + hover (site paints these rows #aaa / #d2d2d2) */
   #songlist tr:hover td,
   .albumList tr:hover td,
-  .requestList tr:hover td { background-color: #1c2128 !important; }
+  .requestList tr:hover td,
+  #top40 tr:hover td, .uploadList tr:hover td,
+  #requests_table tr:hover td, #editAlbumInfoTable tr:hover td { background-color: #1c2128 !important; }
+  /* playlist row selection ships a translucent light grey */
+  #songlist tr.plSel, #songlist tr.plSel td { background-color: #22303f !important; }
   /* the song "Total:" footer row */
   #songlist tr:last-child td,
   #songlist tr:last-child th { background-color: #1c2128 !important; color: #e6edf3 !important; }
@@ -106,8 +129,20 @@
   .playlistDownloadSong .material-icons:hover,
   .playlistAddTo .material-icons:hover { color: #9bd4ff !important; }
 
-  /* ---- Album art ---- */
-  .albumImage img, .albumImage a { border-color: #2d333b !important; }
+  /* ---- Pagination (album lists, search, comment threads) ----
+     The current page is a `span.pagenav` sitting on the site's own blue chip with
+     `color:#fff`; the hovered page anchor is styled the same way. Our broad
+     `#pageContent span` / `#pageContent a:hover` colours outrank both, so the ACTIVE
+     page rendered dimmer than its unselected neighbours. Restore the white. */
+  #pageContent .pagination span.pagenav { color: #ffffff !important; }
+  #pageContent .pagination a:hover { color: #ffffff !important; }
+
+  /* ---- Album art ----
+     These ship `border: solid 1px` with no colour, so the border takes
+     currentColor — i.e. our blue link colour — framing every thumbnail. */
+  .albumImage img, .albumImage a,
+  td.albumIcon img, td.albumIconLarge img,
+  .albumIconDefaultSmall, .albumIconDefaultLarge { border-color: #2d333b !important; }
 
   /* ---- Native <audio> element (per-song download page) ----
      The song download page uses a real HTML5 <audio controls> that
@@ -127,6 +162,15 @@
     border-color: #2d333b !important;
   }
   .audioplayer * { color: #e6edf3 !important; border-color: #2d333b !important; }
+  /* every player button paints a light #d7dee5 cell on hover/focus, hiding its
+     white glyph — the widget is otherwise dark */
+  .audioplayerPlayPause:hover, .audioplayerPlayPause:focus,
+  .audioplayerVolume:hover, .audioplayerVolume:focus,
+  .audioplayerButtons:hover, .audioplayerButtons:focus,
+  .audioplayerButtons2:hover, .audioplayerButtons2:focus,
+  .audioplayerButtons3:hover, .audioplayerButtons3:focus {
+    background-color: #1c2128 !important;
+  }
   .audioplayerTimeCurrent, .audioplayerTimeDuration { color: #c4cdd6 !important; }
   .audioplayer .material-icons { color: #e6edf3 !important; }
   /* progress track + played accent */
@@ -161,8 +205,20 @@
     border-color: #2d333b !important;
   }
   .comment_message a { color: #5fb0e6 !important; }
+  /* Commenter online/offline status ships an inline `color:red` (Offline) /
+     `color:green` (Online). Our broad `#pageContent span` colour is !important and
+     outranks the inline pair, so the status flattened to the same grey as the meta
+     text, erasing the signal. Restore both with dark-friendly hues. */
+  #pageContent .comment_meta span.status[style*="color:red"] { color: #ff7b72 !important; }
+  #pageContent .comment_meta span.status[style*="color:green"] { color: #3fb950 !important; }
   /* speech-bubble pointer is a white raster triangle — tint it to the bubble color */
   .comment_graphic { filter: brightness(0.14) !important; }
+  /* Commenters with no avatar get an opaque raster placeholder: a #c5c5c5 tile
+     carrying a #ffffff silhouette, which glares on dark. It is image data, so it can
+     only be remapped photometrically. brightness() then contrast() is an affine ramp
+     that lands the tile near #2c2c2c while pushing the silhouette up to a legible
+     grey. Scoped by filename so real user avatars are never touched. */
+  img[src*="comment_avatar_default"] { filter: brightness(0.523) contrast(3.42) !important; }
   .quote {
     background-color: #161d27 !important;
     color: #c4cdd6 !important;
@@ -240,6 +296,9 @@
   }
   .p-nav-opposite a, .p-navEl-link, .p-navgroup-link,
   .p-header-content a, .p-header-logo a { color: #c4d3e8 !important; }
+  /* the .is-selected WRAPPER keeps a #f5f5f5 bg of its own; the link covers it
+     exactly today, so darken both rather than rely on that staying true */
+  .p-navEl.is-selected { background-color: #1c232c !important; }
   .p-navEl.is-selected > .p-navEl-link,
   .p-navEl-link:hover {
     color: #ffffff !important;
@@ -337,6 +396,24 @@
     border-color: #1f6feb !important;
   }
   .button.button--cta:hover { background-color: #3b82f6 !important; }
+  /* This XenForo build marks its primary action (Log in, Register, Post) with
+     `button--primary` — natively white-on-blue — not `button--cta`. The base
+     `.button` rule above carries equal specificity and lands later, so every primary
+     CTA was flattened to the same grey as its secondary siblings. Raise the variants
+     to `.button.button--X` so they outrank the base, as XenForo's own rules do. */
+  .button.button--primary, a.button.button--primary {
+    background-image: none !important;
+    background-color: #1f6feb !important;
+    color: #ffffff !important;
+    border-color: #1f6feb !important;
+  }
+  .button.button--primary:hover, a.button.button--primary:hover { background-color: #3b82f6 !important; }
+  /* `button--plain` is a borderless, background-less text button (the mobile nav
+     hamburger is one). The base rule painted it an opaque chip with a visible edge. */
+  .button.button--plain, a.button.button--plain {
+    background-color: transparent !important;
+    border-color: transparent !important;
+  }
   /* password-strength meter (register): native <meter> track is white */
   meter, .meterBar { background: #161b22 !important; border: 1px solid #2d333b !important; }
   meter::-webkit-meter-bar { background: #161b22 !important; border: none !important; }
@@ -373,21 +450,127 @@
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
   }
+  /* Member card (hover a username): XenForo paints the header band #e8f4fc and lets
+     its text inherit. Inside our dark tooltip the band stays light while the username
+     and user title inherit our light palette, so both read as ghosts. Darken the band
+     rather than re-darken the text. The class carries a per-user size suffix
+     (memberProfileBanner-u123-m / -l), so target the base class. */
+  .memberProfileBanner {
+    background-color: #161b22 !important;
+    border-color: #2d333b !important;
+  }
+  /* ---- Tooltip pointer arrows ----
+     Each arrow is a 0x0 box: exactly ONE border side is opaque and draws the
+     triangle, the neighbours must stay transparent or the triangle fills into a
+     rectangle. The rich families (member / preview / share / bookmark) paint that
+     side #d6d6d6 and stack a #ffffff ::after fill on top, so a bright spike hung off
+     our dark tooltip. Repaint only the side that is natively opaque for each
+     placement. The basic tooltip has no fill; its arrow is a near-black triangle
+     that no longer matches our elevated bubble. */
+  .tooltip--basic.tooltip--top .tooltip-arrow { border-top-color: #1c2128 !important; }
+  .tooltip--basic.tooltip--bottom .tooltip-arrow { border-bottom-color: #1c2128 !important; }
+  .tooltip--basic.tooltip--right .tooltip-arrow { border-right-color: #1c2128 !important; }
+  .tooltip--basic.tooltip--left .tooltip-arrow { border-left-color: #1c2128 !important; }
+
+  .tooltip--member.tooltip--top .tooltip-arrow,
+  .tooltip--preview.tooltip--top .tooltip-arrow,
+  .tooltip--share.tooltip--top .tooltip-arrow,
+  .tooltip--bookmark.tooltip--top .tooltip-arrow { border-top-color: #2d333b !important; }
+  .tooltip--member.tooltip--bottom .tooltip-arrow,
+  .tooltip--preview.tooltip--bottom .tooltip-arrow,
+  .tooltip--share.tooltip--bottom .tooltip-arrow,
+  .tooltip--bookmark.tooltip--bottom .tooltip-arrow { border-bottom-color: #2d333b !important; }
+  .tooltip--member.tooltip--right .tooltip-arrow,
+  .tooltip--preview.tooltip--right .tooltip-arrow,
+  .tooltip--share.tooltip--right .tooltip-arrow,
+  .tooltip--bookmark.tooltip--right .tooltip-arrow { border-right-color: #2d333b !important; }
+  .tooltip--member.tooltip--left .tooltip-arrow,
+  .tooltip--preview.tooltip--left .tooltip-arrow,
+  .tooltip--share.tooltip--left .tooltip-arrow,
+  .tooltip--bookmark.tooltip--left .tooltip-arrow { border-left-color: #2d333b !important; }
+
+  .tooltip--member.tooltip--top .tooltip-arrow::after,
+  .tooltip--preview.tooltip--top .tooltip-arrow::after,
+  .tooltip--share.tooltip--top .tooltip-arrow::after,
+  .tooltip--bookmark.tooltip--top .tooltip-arrow::after { border-top-color: #1c2128 !important; }
+  .tooltip--preview.tooltip--bottom .tooltip-arrow::after,
+  .tooltip--share.tooltip--bottom .tooltip-arrow::after,
+  .tooltip--bookmark.tooltip--bottom .tooltip-arrow::after { border-bottom-color: #1c2128 !important; }
+  .tooltip--member.tooltip--right .tooltip-arrow::after,
+  .tooltip--preview.tooltip--right .tooltip-arrow::after,
+  .tooltip--share.tooltip--right .tooltip-arrow::after,
+  .tooltip--bookmark.tooltip--right .tooltip-arrow::after { border-right-color: #1c2128 !important; }
+  .tooltip--member.tooltip--left .tooltip-arrow::after,
+  .tooltip--preview.tooltip--left .tooltip-arrow::after,
+  .tooltip--share.tooltip--left .tooltip-arrow::after,
+  .tooltip--bookmark.tooltip--left .tooltip-arrow::after { border-left-color: #1c2128 !important; }
+  /* a member card opening downward points at its own profile banner, not the body */
+  .tooltip--member.tooltip--bottom .tooltip-arrow::after { border-bottom-color: #161b22 !important; }
+  /* the preview tooltip masks its clipped text with a white "more below" gradient */
+  .tooltip--preview .tooltip-content-cover { background-image: none !important; }
+
   .offCanvasMenu-content, .offCanvasMenu-header {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
-  /* error / info notices */
-  .blockMessage--error {
-    background-color: #3a1d1f !important;
-    color: #ff9a93 !important;
-    border-color: #5a2b2e !important;
+  /* the open mobile nav marks the current section with a #f5f5f5 bar, which left the
+     pale link text stranded on white */
+  .offCanvasMenu-linkHolder.is-selected { background-color: #1c232c !important; }
+  .offCanvasMenu-linkHolder.is-selected > a,
+  .offCanvasMenu-linkHolder.is-selected > a > span {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
   }
+  /* the "or" rule on the login form/overlay is a #d6d6d6 pseudo-element border */
+  .blocks-textJoiner span::before,
+  .blocks-textJoiner span::after { border-color: #2d333b !important; }
+  /* ---- Notice blocks ----
+     Every notice carries the base `.blockMessage` class plus a modifier. A bare
+     `.blockMessage` rule therefore has the SAME specificity as `.blockMessage--error`
+     and, landing later, silently overrode it — our red error styling never rendered,
+     and XenForo's own success / warning / important variants were flattened to the
+     same neutral grey, accent stripe included. Every modifier below is written
+     `.blockMessage.blockMessage--X` so it outranks the base, mirroring XenForo. */
   .blockMessage, .blockMessage--none, .blockMessage--info {
     background-color: #1c2128 !important;
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
   }
+  .blockMessage.blockMessage--error {
+    background-color: #3a1d1f !important;
+    color: #ff9a93 !important;
+    border-color: #5a2b2e !important;
+    border-left-color: #f53d43 !important;
+  }
+  .blockMessage.blockMessage--success {
+    background-color: #16261b !important;
+    color: #7ee787 !important;
+    border-color: #24512d !important;
+    border-left-color: #3fb950 !important;
+  }
+  .blockMessage.blockMessage--warning,
+  .blockMessage.blockMessage--important {
+    background-color: #2e2312 !important;
+    color: #e3b341 !important;
+    border-color: #5a4520 !important;
+    border-left-color: #f2930d !important;
+  }
+  .blockMessage.blockMessage--highlight {
+    background-color: #16263a !important;
+    color: #a5d6ff !important;
+    border-color: #2d4a6b !important;
+  }
+  .blockMessage.blockMessage--alt {
+    background-color: #161b22 !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+  /* the notice's inline links inherit its hue natively; the broad body-link colour
+     would otherwise repaint them brand blue on a red or amber panel */
+  .blockMessage.blockMessage--error a,
+  .blockMessage.blockMessage--success a,
+  .blockMessage.blockMessage--warning a { color: inherit !important; }
+  .blockMessage.blockMessage--important a { color: #f2930d !important; }
   /* inline field-validation tooltip bubble */
   .inputValidationError, .js-validationError {
     background-color: #3a1d1f !important;
@@ -467,7 +650,19 @@
   }
   .p-footer a { color: #aab4bf !important; }
 
-  /* avatars / image wrappers stay transparent (no white tile) */
+  /* avatars / image wrappers stay transparent (no white tile). The <img> itself
+     carries a white disc that opaque JPEGs hide but transparent PNGs do not. */
   .avatar, .avatarWrapper, .contentRow-figure,
-  .structItem-iconContainer { background-color: transparent !important; }
+  .structItem-iconContainer, .avatar img { background-color: transparent !important; }
+  /* Letter avatars: XenForo paints a per-user chip via inline style
+     (background-color + a matched darker/lighter initial). The transparent rule
+     above erases the chip and the broad link colour repaints the initial, leaving
+     a bare blue letter. The inline pair can't be restored — an !important rule of
+     ours always outranks inline — so give them one coherent dark chip instead.
+     `a.avatar--default` must stay at least as specific as `.p-body-content a`. */
+  .avatar--default, a.avatar--default {
+    background-color: #21262d !important;
+    color: #c4d3e8 !important;
+    -webkit-text-fill-color: #c4d3e8 !important;
+  }
 }

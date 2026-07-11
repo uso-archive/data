@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for FanFiction.Net and FictionPress, with an easy-on-the-eyes story reader, dark browse filters, profiles and forums.
-@version      20260707.14.30
+@version      20260710.13.09
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -38,6 +38,53 @@
     border-color: var(--ff-border) !important;
   }
 
+  /* Bootstrap draws .caret as a pure-CSS triangle: one coloured border side and
+     the other three `transparent`. The blanket reset above paints all four, so
+     every nav / button / chapter-select caret renders as a solid rectangle. */
+  .caret {
+    border-top-color: var(--ff-muted) !important;
+    border-right-color: transparent !important;
+    border-bottom-color: transparent !important;
+    border-left-color: transparent !important;
+  }
+  /* the story-actions menu opens upward: its triangle is drawn on border-bottom */
+  .dropup .caret,
+  .navbar-fixed-bottom .dropdown .caret {
+    border-top-color: transparent !important;
+    border-bottom-color: var(--ff-muted) !important;
+  }
+
+  /* FFN underlines story titles with a 1px #357BD6 rule (border-bottom, not
+     text-decoration), which the blanket reset above flattens into the page line
+     colour. Restore the accent so titles read as links again. */
+  .stitle,
+  .novtitle {
+    border-bottom-color: var(--ff-link) !important;
+  }
+
+  /* ---- Divider rules ---------------------------------------------------- */
+  /* FFN draws <hr> with border-style:none and a white→#cbcbcb→white gradient as
+     its background, so the border-color reset above cannot reach it. */
+  hr {
+    background-color: var(--ff-border-2) !important;
+    background-image: none !important;
+  }
+  /* The rule behind a section heading is painted by .lc-wrapper::after, and `*`
+     never matches pseudo-elements — its #cdcdcd border-top survives untouched. */
+  .lc-wrapper::after {
+    border-top-color: var(--ff-border-2) !important;
+  }
+  /* .lc-left / .lc-right are the opaque white pills that mask the rule behind
+     the heading text (breadcrumbs, reader toolbar, forum headers). */
+  .lc-left,
+  .lc-right {
+    background-color: var(--ff-surface) !important;
+  }
+  /* Bootstrap separator inside the nav dropdowns */
+  .dropdown-menu .divider {
+    background-color: var(--ff-border-2) !important;
+  }
+
   /* ---- Main content surfaces ------------------------------------------- */
   #content_wrapper,
   #content_wrapper_inner,
@@ -70,8 +117,11 @@
   }
 
   /* ---- Header / top brand bar ------------------------------------------ */
-  /* FFN navy + FP maroon raw bars refined to harmonize with the dark palette */
-  #top {
+  /* FFN navy + FP maroon raw bars refined to harmonize with the dark palette.
+     Every selector here is qualified with `div` on purpose: on m.fanfiction.net
+     and m.fictionpress.com the id lives on <body id="top">, so a bare `#top`
+     repaints the whole mobile page and turns every link into header text. */
+  div#top {
     background-color: var(--ff-header) !important;
     border-bottom: 1px solid var(--ff-border-2) !important;
   }
@@ -84,20 +134,27 @@
     background-color: var(--ff-header) !important;
     border-bottom: 1px solid var(--ff-border-2) !important;
   }
-  #top a,
-  #top .icon-fictionpress,
+  /* the mobile nav labels are header chrome (natively black, not link blue) */
+  .t_head a {
+    color: var(--ff-text) !important;
+  }
+  .t_head a:hover {
+    color: var(--ff-link-hover) !important;
+  }
+  div#top a,
+  div#top .icon-fictionpress,
   #name_login,
   #name_login a {
     color: var(--ff-text) !important;
   }
   /* Login / Sign Up pills in the header keep an accent so they stand out */
-  #top .btn,
+  div#top .btn,
   #name_login .btn {
     background-color: var(--ff-brand) !important;
     color: var(--ff-text) !important;
     border-color: var(--ff-border-2) !important;
   }
-  #top .btn:hover,
+  div#top .btn:hover,
   #name_login .btn:hover {
     background-color: #2d4a80 !important;
   }
@@ -146,8 +203,47 @@
     color: var(--ff-link-hover) !important;
   }
   /* keep header / nav links from inheriting the body link blue where set above */
-  #top a:hover {
+  div#top a:hover {
     color: var(--ff-link-hover) !important;
+  }
+
+  /* The general text rules below carry a class (.xcontrast_txt) or an element
+     name (b) that outranks the bare `a` above, so FFN's breadcrumbs, author
+     names, rating links and the bolded keyword runs in search-result titles all
+     lose their link colour. Re-assert it on anchors and on runs inside one. */
+  a.xcontrast_txt,
+  #profile_top a,
+  #profile_top a.xcontrast_txt,
+  a b,
+  a strong {
+    color: var(--ff-link) !important;
+  }
+  a.xcontrast_txt:hover,
+  #profile_top a:hover,
+  #profile_top a.xcontrast_txt:hover,
+  a:hover b,
+  a:hover strong {
+    color: var(--ff-link-hover) !important;
+  }
+  /* forum topic rows carry a clickable "jump to latest post" chevron painted
+     #0033cc — a plain <span> wrapping the glyph <span>, so the body-text rule
+     below greys out both */
+  span._thread,
+  span._thread span {
+    color: var(--ff-link) !important;
+  }
+  span._thread:hover,
+  span._thread:hover span {
+    color: var(--ff-link-hover) !important;
+  }
+  /* Two fontello glyphs get their brand hue from an inline style attribute, and
+     the blanket `span` rule below beats it. The crossover blue is lifted out of
+     the 2:1 range it would land in on the dark surface. */
+  span.icon-rss-squared {
+    color: #ff8f00 !important;
+  }
+  span.icon-shuffle {
+    color: #6d86f0 !important;
   }
 
   /* ---- Headings & general text ----------------------------------------- */
@@ -328,6 +424,19 @@
     background-color: var(--ff-brand) !important;
     color: var(--ff-text) !important;
   }
+  /* The site distinguishes the selected/hovered forum topic-filter chip with a
+     plain .badge-active / .badge:hover (no !important), which our generic
+     .badge rule above outranks — both states collapse into the default chip.
+     Re-establish them so the active filter reads as selected. */
+  .badge:hover {
+    background-color: #232a32 !important;
+  }
+  .badge-active,
+  .badge-active:hover {
+    background-color: var(--ff-brand) !important;
+    border-color: var(--ff-brand) !important;
+    color: var(--ff-text) !important;
+  }
 
   /* ---- Profile / story tabs (Bootstrap .nav-tabs) ---------------------- */
   /* FFN renders the active tab (li.active > a.current) with a white "folder"
@@ -361,6 +470,12 @@
     background-color: var(--ff-surface) !important;
     color: var(--ff-body) !important;
     border-color: var(--ff-border-2) !important;
+  }
+  /* Bootstrap paints a white inset highlight along the footer's top edge; a
+     box-shadow is invisible to every background-color audit. */
+  .modal-footer,
+  .modal-header {
+    box-shadow: none !important;
   }
   .modal-backdrop { background-color: rgba(0,0,0,.6) !important; }
 

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Stack Overflow and the whole Stack Exchange network: easy-on-the-eyes questions, answers, code blocks, comments and sidebar.
-@version      20260705.21.21
+@version      20260711.00.19
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -187,6 +187,22 @@
   .s-topbar .s-topbar--item > .s-btn:hover,
   .s-topbar .-link:hover {
     background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
+
+  /* Mobile hamburger. Once the drawer is open SE marks it `.is-selected`
+     and paints it #e3e6e8 — a white tile on our dark topbar with a
+     near-invisible light-grey close glyph (~1.2:1). Only visible below the
+     `md` breakpoint, so a desktop-only review never sees it. */
+  .s-topbar--menu-btn,
+  .s-topbar .s-topbar--menu-btn {
+    color: #c4cdd6 !important;
+  }
+
+  .s-topbar--menu-btn:hover,
+  .s-topbar--menu-btn.is-selected,
+  .s-topbar .s-topbar--menu-btn.is-selected {
+    background-color: #21262d !important;
     color: #e6edf3 !important;
   }
 
@@ -463,7 +479,16 @@
     color: #9198a1 !important;
   }
 
-  .s-prose hr { border-color: #262c33 !important; }
+  /* SE draws every <hr> as a 1px block with `background-color: #d6d9dc`
+     and `border-width: 0` — so a `border-color` override never paints and
+     the rules render as bright white lines through answers and the login
+     card. Recolor the BACKGROUND (keep the border-color for old markup). */
+  hr,
+  .s-prose hr,
+  .s-card hr {
+    background-color: #262c33 !important;
+    border-color: #262c33 !important;
+  }
 
   /* Accepted answer highlight */
   .answer.accepted-answer,
@@ -583,8 +608,12 @@
 
   .s-tag.s-tag__moderator { background-color: #3a2b20 !important; color: #e0a878 !important; }
 
-  /* tag count / multiplier badges */
-  .s-tag--count, .post-tag-count { color: #9198a1 !important; }
+  /* tag count / multiplier badges. The sidebar "Recent tags" widget on the
+     network Q&A sites (MathOverflow et al.) keeps SE's #636b74 for the
+     count next to each tag — 3.1:1 dark-on-dark. */
+  .s-tag--count, .post-tag-count,
+  .item-multiplier-count,
+  .item-multiplier .item-multiplier-count { color: #9198a1 !important; }
 
   /* ============================================================
      Code blocks + inline code + syntax highlighting
@@ -825,6 +854,17 @@
     color: #8fdc9e !important;
   }
 
+  /* The count NUMBER inside the "answered" pill has its own
+     .s-post-summary--stats-item-number rule (muted grey) that beat the
+     green above, so the pill rendered a grey "1" next to a green "answer"
+     — the green signal only half-applied (the accepted pill's number was
+     already pinned white; this outline variant was missed). Lift the
+     number back to the pill's green so the whole pill reads as one. */
+  .s-post-summary--stats-item.has-answers:not(.has-accepted-answer) .s-post-summary--stats-item-number,
+  .s-post-summary--stats-item.has-answers:not(.has-accepted-answer) .s-post-summary--stats-item-unit {
+    color: #8fdc9e !important;
+  }
+
   /* Filter / sort tabs (segmented controls) */
   .s-btn-group .s-btn,
   .s-btn.s-btn__muted.s-btn__outlined,
@@ -874,6 +914,65 @@
     border-color: #2d333b !important;
   }
 
+  /* Stacks is BEM: every `.s-btn__<variant>` only sets custom properties
+     (--_bu-fc, --_bu-filled-bg) that the base `.s-btn` rule consumes. Our
+     base-class `!important` above therefore beats EVERY variant and
+     flattens them all to one muted grey. Restore each variant's semantics
+     with a 2-class selector (higher specificity than the base rule). */
+
+  /* OAuth buttons are brand assets (SE's own dark theme keeps them too):
+     white Google, near-black GitHub, blue Facebook. Our `.s-btn` grey left
+     "Log in with Google" at ~1.8:1 on its white pill. Restore native text. */
+  .s-btn.s-btn__google {
+    color: #3b4045 !important;
+  }
+
+  .s-btn.s-btn__github,
+  .s-btn.s-btn__facebook {
+    color: #ffffff !important;
+  }
+
+  /* Link-styled buttons ("Copy link" in the share popover, "Search help")
+     are blue links natively. The post-menu ones (Share / Follow) are
+     deliberately muted grey — keep those muted. */
+  .s-btn.s-btn__link {
+    color: #5fb0e6 !important;
+  }
+
+  .js-post-menu .s-btn.s-btn__link,
+  .post-menu .s-btn.s-btn__link {
+    color: #9198a1 !important;
+  }
+
+  /* Outlined CTAs ("Log in", "Ask question") are the accent colour; only
+     the muted variant is grey. */
+  .s-btn.s-btn__outlined {
+    color: #5fb0e6 !important;
+    border-color: #3b82b8 !important;
+  }
+
+  .s-btn.s-btn__outlined.s-btn__muted {
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* Destructive + neutral-filled variants */
+  .s-btn.s-btn__danger {
+    color: #f0a8a8 !important;
+  }
+
+  .s-btn.s-btn__danger.s-btn__filled {
+    background-color: #8b2c31 !important;
+    color: #ffffff !important;
+    border-color: #a03a40 !important;
+  }
+
+  .s-btn.s-btn__filled.s-btn__muted {
+    background-color: #2d333b !important;
+    color: #e6edf3 !important;
+    border-color: #3d444d !important;
+  }
+
   /* "Ask Question" big button */
   .ask-question-btn, .s-btn.s-btn__primary.ws-nowrap {
     background-color: #2f6f9f !important;
@@ -896,10 +995,17 @@
     color: #e8c98a !important;
   }
 
-  .s-notice__danger {
+  .s-notice__danger,
+  .s-notice__important {
     background-color: #2a1718 !important;
     border-color: #5a2a2c !important;
     color: #f0a8a8 !important;
+  }
+
+  .s-notice__success {
+    background-color: #16221a !important;
+    border-color: #25402d !important;
+    color: #aee0bb !important;
   }
 
   /* Legacy ".val-message" validation banners (login / ask-gate / form
@@ -934,6 +1040,86 @@
     background-color: #20303d !important;
     color: #8cc6f0 !important;
     border-color: #2b4253 !important;
+  }
+
+  /* …and the same BEM trap as the buttons: every `.s-badge__<variant>` only
+     sets --_ba-bg / --_ba-fc custom properties, so the base rule above
+     flattened the WHOLE family — the green "accepted answers" pill on a
+     user profile, the blue bounty pill, the gold/silver/bronze metals and
+     the danger/warning/staff tints all rendered as one identical blue chip.
+     Restore each variant with a 2-class selector, retoned for dark. */
+  .s-badge.s-badge__answered {
+    background-color: #1f7a45 !important;
+    color: #ffffff !important;
+    border-color: #1f7a45 !important;
+  }
+
+  .s-badge.s-badge__bounty {
+    background-color: #2f6f9f !important;
+    color: #ffffff !important;
+    border-color: #3b82b8 !important;
+  }
+
+  .s-badge.s-badge__important {
+    background-color: #8b2c31 !important;
+    color: #ffffff !important;
+    border-color: #8b2c31 !important;
+  }
+
+  .s-badge.s-badge__rep {
+    background-color: transparent !important;
+    color: #8fdc9e !important;
+    border-color: #2b6e44 !important;
+  }
+
+  .s-badge.s-badge__rep-down {
+    background-color: transparent !important;
+    color: #f0a8a8 !important;
+    border-color: #5a2a2c !important;
+  }
+
+  .s-badge.s-badge__gold {
+    background-color: #2a2417 !important;
+    color: #e8c98a !important;
+    border-color: #6b5518 !important;
+  }
+
+  .s-badge.s-badge__silver {
+    background-color: #24282c !important;
+    color: #c0c6cc !important;
+    border-color: #5a6068 !important;
+  }
+
+  .s-badge.s-badge__bronze {
+    background-color: #2a2018 !important;
+    color: #d0a07a !important;
+    border-color: #6b4a30 !important;
+  }
+
+  .s-badge.s-badge__danger {
+    background-color: #2a1718 !important;
+    color: #f0a8a8 !important;
+    border-color: #5a2a2c !important;
+  }
+
+  .s-badge.s-badge__warning {
+    background-color: #2a2114 !important;
+    color: #e8c98a !important;
+    border-color: #4a3a1c !important;
+  }
+
+  .s-badge.s-badge__staff,
+  .s-badge.s-badge__admin,
+  .s-badge.s-badge__moderator {
+    background-color: #3a2b20 !important;
+    color: #e0a878 !important;
+    border-color: #5a4326 !important;
+  }
+
+  .s-badge.s-badge__new {
+    background-color: #221c2e !important;
+    color: #c0a8e8 !important;
+    border-color: #3a2f55 !important;
   }
 
   /* reputation / badge counts on user cards */
@@ -1053,10 +1239,14 @@
     color: #c4cdd6 !important;
   }
 
-  /* hot / real-time question rows: white #f0f0f0 divider -> dark */
+  /* hot / real-time question rows: white #f0f0f0 divider -> dark. The row
+     ALSO carries `box-shadow: 0 1px 0 #fff` — a pure-white 1px rule under
+     every row that no background / border / gradient audit bucket can see.
+     Kill the shadow; the border-color above is the visible divider. */
   #question-list .question-container,
   .question-container {
     border-color: #262c33 !important;
+    box-shadow: none !important;
   }
 
   /* main nav (All Sites / Top 400 Users / Digests): dark navy -> accent */
@@ -1088,9 +1278,15 @@
   .subheader .tabs a {
     color: #9198a1 !important;
   }
+  /* Active "hot" tab. SE marks it with its brand red (#f35d5f text + a 2px
+     red underline). Our blanket `.youarehere { border-color }` reset in the
+     filter/sort-tab block flattened the underline to a dark grey and the
+     text to white — the selected tab lost its accent entirely. Restore it;
+     the red reads ~5.6:1 on the dark base. */
   .subheader .tabs a.youarehere,
   .subheader .tabs a.selected {
-    color: #e6edf3 !important;
+    color: #f35d5f !important;
+    border-bottom-color: #f35d5f !important;
   }
 
   /* legacy light frames: subheader underline (#e5e5e5), the featured-
@@ -1150,7 +1346,16 @@
 
   #footer a, .site-footer a { color: #8aa6bb !important; }
   #footer .site-footer--categories-item-link { color: #9198a1 !important; }
-  .site-footer--nav-link, .fc-white { color: #c4cdd6 !important; }
+  /* `.fc-white` is Stacks' "paint this white" utility. It sits on glyphs
+     that live ON brand fills (the purple AI-Assist / Agents / Chat discs in
+     the left nav, the announcement-banner links). A blanket override dimmed
+     every one of them to grey on saturated colour. Scope the dimming to the
+     footer, where .fc-white is plain text on our dark footer. */
+  .site-footer--nav-link,
+  #footer .fc-white,
+  .site-footer .fc-white {
+    color: #c4cdd6 !important;
+  }
 
   /* ============================================================
      Modals / popovers / dropdowns (opaque, no bleed-through)
@@ -1283,12 +1488,44 @@
     border-color: #3b82b8 !important;
   }
 
-  /* secondary "Customize settings" link-button -> readable accent */
+  /* secondary "Customize settings" link-button -> readable accent.
+     In the preference center the reject button carries
+     `.ot-pc-refuse-all-handler` as a CLASS (no id), and SE's own OneTrust
+     skin paints it `background: var(--black-150) !important` — so the
+     id-only selector never matched and the button shipped as a white pill.
+     Mirror SE's selector at 2-id specificity so we win. */
   #onetrust-banner-sdk #onetrust-button-group button#onetrust-pc-btn-handler,
-  #onetrust-pc-sdk #ot-pc-refuse-all-handler {
+  #onetrust-pc-sdk #ot-pc-refuse-all-handler,
+  #onetrust-consent-sdk #onetrust-pc-sdk button.ot-pc-refuse-all-handler {
     background-color: transparent !important;
     color: #5fb0e6 !important;
     border-color: #2d333b !important;
+  }
+
+  /* "Always Active" status label: SE's skin colours it var(--black-600)
+     (#0c0d0e) — pure dark-on-dark inside the (now dark) panel. */
+  #onetrust-pc-sdk .ot-always-active,
+  #onetrust-pc-sdk .ot-cat-grp .ot-always-active,
+  #onetrust-pc-sdk .ot-vs-list .ot-always-active {
+    color: #8fdc9e !important;
+  }
+
+  /* Category / sub-group row dividers keep OneTrust's light greys
+     (#d6d9dc, #d8d8d8, #e2e2e2) and glare as bright rules on dark. */
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-cat-item,
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-acc-hdr,
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-subgrp-cntr,
+  #onetrust-consent-sdk #onetrust-pc-sdk li.ot-subgrp {
+    border-color: #2d333b !important;
+  }
+
+  /* the accordion "+" expander is drawn from two dark-navy bars */
+  #onetrust-pc-sdk .ot-plus-minus span {
+    background-color: #9198a1 !important;
+  }
+
+  #onetrust-pc-sdk #clear-filters-handler {
+    color: #5fb0e6 !important;
   }
 
   /* preference-center close glyph */
@@ -1519,8 +1756,16 @@
     color: #c4cdd6 !important;
   }
 
-  /* hide blank ad slots so they don't leak white frames */
-  .js-zone-container.js-ad-zone:empty,
+  /* Hide blank ad slots so they don't leak white frames. `.js-ad-zone` is
+     unconditional: a FILLED zone is covered by its own iframe, so a transparent
+     parent is invisible there. The previous iframe-presence guard used a relational
+     selector, which sanitization strips from .org.css — so userstyles.org never
+     received that arm at all. (Measured 2026-07-10: `.js-ad-zone` currently matches
+     0 elements on a live question page; `.js-zone-container` and
+     `.everyonelovesstackoverflow` are natively transparent and 0px tall. This rule
+     is defensive, not load-bearing.) */
+  .js-zone-container,
+  .js-ad-zone,
   .everyonelovesstackoverflow,
   .js-report-ad {
     background-color: transparent !important;
@@ -1541,4 +1786,12 @@
 
   /* keep images untouched (no filter/recolor) */
   .s-prose img, img { /* intentionally no override */ }
+}
+
+@-moz-document domain("serverfault.com") {
+header.site-header,
+  .site-header {
+    background-color: #0d1117 !important;
+    border-bottom: 1px solid #262c33 !important;
+  }
 }

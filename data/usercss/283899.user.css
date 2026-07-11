@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for PyPI with a proper dark code-highlighting palette.
-@version      20260707.14.33
+@version      20260710.13.14
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -20,11 +20,29 @@
   * { border-color: #262c33 !important; }
 
   /* ---- Header / nav (dark with a PyPI-blue accent) ---- */
-  .site-header, .-js-stickybar, .stickybar, [class*="stickybar"],
-  .horizontal-section.horizontal-section--medium, .mobile-search { background-color: #0d1117 !important; }
+  /* No sticky bar exists in warehouse's CSS; .mobile-search (#005d94) is the only
+     other header surface, and it only unhides at the narrow breakpoint. */
+  .site-header, .mobile-search { background-color: #0d1117 !important; }
   .site-header { border-bottom: 2px solid #2f6fb8 !important; }
   .banner { background-color: #1a1f26 !important; }
   .horizontal-menu, .horizontal-menu__item, .horizontal-menu__link { background-color: transparent !important; }
+  /* Language picker strip: a #0070b2 band that reads as brand trim on PyPI's blue
+     footer, but glares as a bright stripe between our dark footer and sponsors. */
+  .language-switcher { background-color: #1a1f26 !important; border-top: 1px solid #262c33 !important; }
+
+  /* ---- Header "Menu" dropdown + row action menus ----
+     .dropdown__content is position:absolute, so it must stay OPAQUE. The plain
+     variant is a white panel (#fff/#464646); .dropdown--on-menu paints its links
+     #0073b7, and our global link blue on top of that renders blue-on-blue. */
+  .dropdown__content { background-color: #1c2128 !important; border-color: #2d333b !important; }
+  .dropdown__link, .dropdown button.dropdown__link,
+  .dropdown--on-menu .dropdown__link, .dropdown--on-menu button.dropdown__link {
+    background-color: #1c2128 !important; color: #e6edf3 !important; border-bottom-color: #2d333b !important; }
+  .dropdown__link a { color: #e6edf3 !important; }
+  .dropdown__link:hover, .dropdown__link:focus, .dropdown__link:active,
+  .dropdown button.dropdown__link:hover, .dropdown button.dropdown__link:focus,
+  .dropdown button.dropdown__link:active {
+    background-color: #21262d !important; color: #e6edf3 !important; }
 
   /* ---- Typography ---- */
   h1, h2, h3, h4, h5, h6, .package-header__name, .sidebar-section__title { color: #e6edf3 !important; }
@@ -32,16 +50,33 @@
   b, em, strong, small, sub, sup, abbr, label, time, figcaption,
   .package-header__date, .sidebar-section__maintainer,
   .package-snippet__meta, .package-snippet__description, .package-snippet__name, .package-snippet__version,
+  .package-snippet__created,
   .horizontal-menu__link, .sponsors__name, .sponsors__service, .sponsors__cycle { color: #c4cdd6 !important; }
   a, a span { color: #5fb0e6 !important; }
   a:hover, .horizontal-menu__link:hover { color: #9bd4ff !important; }
-  /* Badge / status-pill text (Latest release link, version pills) keeps readable on-badge white, not the global link blue */
+  /* Badge / status-pill text. These pills keep their own semantic background, so the
+     text colour has to follow the pill, not the global link blue. The three light
+     pills (base .status-badge #fff, --warn/--warning #ffdf76, --neutral #ececec)
+     need DARK text — a blanket #fff makes "PRE-RELEASE" white-on-pale-yellow. */
   .status-badge, .status-badge span, a.status-badge, a.status-badge span,
   .badge, .badge a, .badge span {
     color: #fff !important; text-decoration: none !important; }
+  .status-badge { background-color: #1c2128 !important; }
+  .status-badge--good { background-color: #148024 !important; }
+  .status-badge--bad { background-color: #d52d40 !important; }
+  .status-badge--warn { background-color: #ffdf76 !important; }
+  .status-badge--warn, .status-badge--warn span,
+  .badge--warning, .badge--warning a, .badge--warning span { color: #3d2f02 !important; }
+  .badge--neutral { background-color: #2d333b !important; }
+  .badge--neutral, .badge--neutral a, .badge--neutral span { color: #c4cdd6 !important; }
   /* Search filter accordion labels: PyPI's #006dad is too dark on dark → theme link blue */
   .accordion__link, .accordion__link.-js-accordion-trigger, [class*="accordion"] a {
     color: #5fb0e6 !important; }
+  /* Pseudo-element icon glyphs (content:"") carry no text node, so colour audits
+     walk straight past them. FAQ headings ship #006dad (3.2:1); the sponsor
+     "hooray" checkmarks ship #464646 (1.8:1) — both unreadable on dark. */
+  .faq-group h3::before { color: #5fb0e6 !important; }
+  .hooray-list li::before { color: #8b949e !important; }
 
   /* ---- Sidebar / tab icons: readable blue (PyPI's #006dad is too dark on dark) ---- */
   .sidebar-section .fa, .sidebar-section [class*="fa-"],
@@ -75,10 +110,16 @@
   pre .p, pre .n, pre .nx { color: #c9d1d9 !important; }
   pre .err { color: #ffa198 !important; background: transparent !important; }
 
-  /* ---- Tabs ---- */
+  /* ---- Tabs ----
+     Warehouse gives .vertical-tabs__tab no border at all (border-width:0), so a bare
+     border-left-color never paints: the active tab used to be indistinguishable from
+     a hovered one. Declare the width too, and pull the padding back by 3px so the
+     label doesn't shift. */
   .vertical-tabs__tab { color: #c4cdd6 !important; border-color: #2d333b !important; }
   .vertical-tabs__tab:hover { background-color: #1c2128 !important; color: #e6edf3 !important; }
-  .vertical-tabs__tab--is-active { background-color: #1c2128 !important; color: #e6edf3 !important; border-left-color: #5fb0e6 !important; }
+  .vertical-tabs__tab--is-active, .vertical-tabs__tab--is-active:hover {
+    background-color: #1c2128 !important; color: #e6edf3 !important;
+    border-left: 3px solid #5fb0e6 !important; padding-left: 12px !important; }
 
   /* ---- Tables (incl. README HTML tables: neutralize light base + odd rows) ---- */
   table, th, td, .table { border-color: #2d333b !important; }
@@ -89,22 +130,88 @@
 
   /* ---- Forms ---- */
   input, textarea, select { background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
+  /* PyPI's #757575 placeholder passed on white but only reaches 3.5:1 on our input bg */
+  input::placeholder, textarea::placeholder { color: #8b949e !important; opacity: 1 !important; }
   .search-form__button, .button--search { background-color: #21262d !important; border-color: #2d333b !important; }
+  /* Classifier tree connectors are ::before/::after borders, which `*` cannot reach,
+     so they keep warehouse's #bbb and end up as bright as the labels. */
+  .checkbox-tree li::before, .checkbox-tree li::after { border-color: #3d444d !important; }
 
-  /* ---- Buttons ---- */
+  /* ---- Buttons ----
+     .button is !important, so it also swallows the semantic variants' own colours
+     (danger red, warning gold) and the disabled affordance. Restore them after. */
   .button { background-color: #21262d !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   .button--primary { background-color: #2563a8 !important; border-color: #2f6fb8 !important; color: #fff !important; }
+  .button--danger { background-color: #d52d40 !important; border-color: #d52d40 !important; color: #fff !important; }
+  .button--warning { background-color: #664e04 !important; border-color: #664e04 !important; color: #fff !important; }
+  .button--disabled, .button[disabled] {
+    background-color: #1a1f26 !important; border-color: #262c33 !important; color: #7d8590 !important; }
+  /* The base rules above are !important on a single class, so warehouse's own :hover /
+     :focus declarations (same specificity, never important) can no longer land: every
+     button on the site sat completely inert under the cursor. Re-declare the states. */
+  .button:hover, .button:focus { border-color: #5fb0e6 !important; color: #fff !important; }
+  .button--primary:hover, .button--primary:focus {
+    background-color: #2f6fb8 !important; border-color: #9bd4ff !important; color: #fff !important; }
+  .button--danger:hover, .button--danger:focus {
+    background-color: #c6283a !important; border-color: #ff8b96 !important; color: #fff !important; }
+  .button--warning:hover, .button--warning:focus {
+    background-color: #523f03 !important; border-color: #d8b23a !important; color: #fff !important; }
+  .button--disabled:hover, .button--disabled:focus,
+  .button[disabled]:hover, .button[disabled]:focus {
+    background-color: #1a1f26 !important; border-color: #262c33 !important; color: #7d8590 !important; }
 
   /* ---- Callouts / notifications ---- */
   .callout-block, .notification-bar, .banner, .filter-panel, .statistics-bar {
     background-color: #1a1f26 !important; color: #c4cdd6 !important; border-color: #2d333b !important; }
+  /* ...but keep each callout's semantic ring (the blanket `*` border-color flattens them) */
+  .callout-block--danger { border-color: #d52d40 !important; }
+  .callout-block--warning { border-color: #8a6a06 !important; }
+  .callout-block--success { border-color: #148024 !important; }
+  /* The neutral callout paints its left/right bars through ::before / ::after, which the
+     blanket `*` border rule cannot reach and no background-color rule touches, so they
+     keep warehouse's #d3d3d3 and glare as a bright grey slab against the dark card. */
+  .callout-block--neutral { border-color: #3d444d !important; }
+  .callout-block--neutral::before, .callout-block--neutral::after { background-color: #3d444d !important; }
+  /* Flash-message bars. The base rule above is !important on a single class, so it also
+     swallows warehouse's semantic variants (equal specificity, none important): an
+     "Invalid token" error and a "Saved" confirmation both rendered as the same grey
+     strip. Restore the site's own fills and their on-colour text. */
+  .notification-bar--danger { background-color: #d52d40 !important; color: #fff !important; }
+  .notification-bar--success { background-color: #148024 !important; color: #fff !important; }
+  .notification-bar--warning, .notification-bar--banner {
+    background-color: #ffdf76 !important; color: #3d2f02 !important; }
+  .notification-bar--danger .notification-bar__message a:not(.button),
+  .notification-bar--success .notification-bar__message a:not(.button) { color: #fff !important; }
+  .notification-bar--warning .notification-bar__message a:not(.button),
+  .notification-bar--banner .notification-bar__message a:not(.button) { color: #3d2f02 !important; }
+  /* ---- Modals (delete-project / remove-role confirmations, manage pages) ----
+     .modal__content is a hard #fff panel; on top of it our heading rule paints
+     .modal__title #e6edf3, i.e. white on white. The node is display-gated behind
+     :target, so no load-time scan of a public page can ever see it. */
+  .modal__content { background-color: #1c2128 !important; }
+  .modal__footer { border-top-color: #2d333b !important; }
+  .modal__close, .modal__close:hover { color: #c4cdd6 !important; }
   blockquote { background-color: #1a1f26 !important; border-left-color: #2d333b !important; }
-  hr { border-color: #2d333b !important; }
+  /* Warehouse draws rules as a BACKGROUND on <hr>, not a border: a #ececec fill on
+     section dividers and a linear-gradient(90deg,#d3d3d3,#fff) on README rules. So
+     border-color alone leaves a bright bar, and background-color alone leaves the
+     gradient — both have to go. */
+  hr { background-color: #2d333b !important; background-image: none !important;
+    border-color: #2d333b !important; }
+
+  /* ---- 404 / error pages ---- */
+  /* Full-viewport #006dad hero: not "light", so both scanners walk past it. */
+  .viewport-section--dark { background-color: #1a1f26 !important; }
+  /* The easter-egg heading keeps its yellow plate, so its text must stay dark navy */
+  .viewport-section--ee .viewport-section__heading { color: #003d61 !important; }
 
   /* ---- Search result cards ---- */
-  /* The card carries a light cubes.svg package glyph; it reads fine as a 3D icon on
-     the dark card, so leave the image untouched (an earlier multiply-blend erased it). */
-  .package-snippet { background-color: #1a1f26 !important; border-color: #2d333b !important; }
+  /* The card's package glyph is a pure-white cubes.svg painted as a background-image,
+     so it glares on the dark card and no filter can reach it. Blending it against the
+     card colour dims it to a muted grey (~#4d5662), matching the timeline cubes below.
+     multiply erases it outright; soft-light keeps the 3D shading. */
+  .package-snippet { background-color: #1a1f26 !important; border-color: #2d333b !important;
+    background-blend-mode: soft-light !important; }
   .package-snippet:hover { background-color: #21262d !important; border-color: #5fb0e6 !important; }
 
   /* ---- Release-history cards (release timeline tab) ---- */
@@ -133,12 +240,16 @@
      standalone policies.python.org MkDocs Material site (hence the added domain in
      the @-moz-document above). It ships its own light "psf" / dark "slate" palettes;
      on a light-OS device the light palette wins, leaving a white page under our dark
-     body. MkDocs is fully
-     CSS-variable driven, so redefine its palette vars (an !important custom-property
-     declaration beats both the light and the JS-set slate scheme). Warehouse pages
+     body. MkDocs is fully CSS-variable driven, so redefine its palette vars.
+     Material puts data-md-color-scheme on <body>, NOT on <html>: under the dark
+     "slate" scheme body re-declares these vars on itself, and a closer ancestor beats
+     an inherited !important — so a :root-only remap is a silent no-op there (verified:
+     --md-default-bg-color read back as hsla(225deg,15%,14%,1) from a deep node). It
+     only ever won under the light "psf" scheme, which leaves the vars on :root.
+     Declaring on body too makes both schemes resolve our palette. Warehouse pages
      don't reference these vars, so this is inert everywhere else. The PSF-blue header
      (--md-primary-*) is left untouched as brand. */
-  :root {
+  :root, body {
     --md-default-bg-color: #14181d !important;
     --md-default-fg-color: rgba(196,205,214,.9) !important;
     --md-default-fg-color--light: rgba(196,205,214,.62) !important;

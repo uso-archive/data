@@ -3,13 +3,15 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Ppomppu (뽐뿌).
-@version      20260705.21.20
+@version      20260711.00.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
 @-moz-document url-prefix("https://ppomppu.co.kr"), url-prefix("https://www.ppomppu.co.kr") {
-/* Ppomppu is an old-school, table-heavy legacy site: no CSS custom properties,
-     colours are hardcoded per element (white wrappers over a transparent <body>,
+/* Ppomppu is an old-school, table-heavy legacy site. It declares a handful of
+     :root custom properties but barely uses them (var(--color-basic) appears 3
+     times in the whole sheet), so a token remap buys nothing: colours are
+     hardcoded per element (white wrappers over a transparent <body>,
      grey table rows/cells, literal hex borders). The retheme paints a dark base
      on the root, then overrides every light wrapper / row / cell / input / menu
      to a dark equivalent, softens the bright gridlines, and remaps the dark body
@@ -86,6 +88,14 @@
     border-color: #2d333b !important;
   }
 
+  /* Ranked-keyword hover: the site highlights the hovered keyword row with a light
+     #f1f1f1 background, so on dark the hovered item shows a bright white band and
+     its light label washes out light-on-white. Hover-only, invisible to a
+     load-time scan. Darken the hover fill so the highlighted keyword reads. */
+  .hot-keyword-wrapper a:hover {
+    background-color: #21262d !important;
+  }
+
   /* ---- Nav / tab strips ---------------------------------------------------- */
   .nav,
   .post_nav,
@@ -94,6 +104,56 @@
   .cate_view {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
+  }
+
+  /* Top-nav tab labels (뽐뿌 / 정보 / 커뮤니티 …). The site paints each tab a mid
+     grey (#595959) and its label pure white; the generic body-text rule above
+     matches these anchors and drops them to #c4cdd6, which lands at 4.45:1 on
+     that grey — a WCAG fail introduced by us, not the site. Restore white. */
+  .top-nav > ul > li > a.menu {
+    color: #ffffff !important;
+  }
+
+  /* Top-nav hover flyouts. Every tab owns a `.sub-menu` panel the site hardcodes
+     to pure white (`background:#fff`), and the 포럼 / 오픈포럼 tabs render a wide
+     mega-menu inside it (div.sub-menu.forum-favourite, #favorite-forum-panel).
+     They are display:none until the tab is hovered, so no load-time scan can see
+     them; our light body text then lands light-on-white and the whole flyout is
+     unreadable. Repaint to the elevated dark surface.
+     The column headers (li.title) are a light-grey #ededed strip whose label we
+     lift to #e6edf3 via the heading rule — invisible light-on-light — so they
+     need the same dark treatment. */
+  .top-nav li .sub-menu,
+  .top-nav .sub-menu.forum-favourite,
+  #favorite-forum-panel {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  .top-nav .sub-menu li.title,
+  #favorite-forum-panel li.title {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+  }
+
+  /* Sub-menu link hover: the site highlights the hovered forum link with a light
+     #f1f1f1 background (a subtle grey on the original white). On dark that hover
+     ships as a bright white band and our light label lands light-on-white =
+     unreadable. Hover-only, so no load-time scan sees it. Darken the hover fill so
+     the highlighted link reads. */
+  .top-nav .sub-menu a:hover,
+  #favorite-forum-panel a:hover {
+    background-color: #21262d !important;
+  }
+
+  /* Mega-menu 분류 / ㄱㄴㄷ sort toggle: the SELECTED segment is `span.on`, which
+     the site fills with its accent blue (#3a66a4) and white bold text. The
+     generic `span.on` pill rule further down flattens it to a neutral dark chip,
+     erasing the "which sort is active" signal. Re-assert the brand accent. */
+  .top-nav li.extand .off .toggle-btn span.on {
+    background-color: #3a66a4 !important;
+    color: #ffffff !important;
+    border-color: #3a66a4 !important;
   }
 
   /* Board-list category filter chips (#navlist in .navcontainer): the site
@@ -119,6 +179,14 @@
   #navlist a mark {
     color: #5fb0e6 !important;
     background-color: transparent !important;
+  }
+
+  /* …but the "핫" half of that chip is a separate <em> the site paints pure red
+     (#ff0000) to flag the hot-deal filter, while "/인기" stays the blue above. The
+     generic body-text `em` rule flattens it to grey, so the two-state 핫/인기 toggle
+     loses its hot signal. Restore the refined report-red so 핫 reads warm. */
+  #navlist a mark em {
+    color: #ff7b72 !important;
   }
 
   /* Home 이슈 news-keyword chips (li.cate-keyword > a — the tappable person /
@@ -160,6 +228,15 @@
   .error2 {
     background-image: none !important;
     background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* The "이전 화면" (go back) button under that same notice card is a separate
+     div.error3 the site paints #f1f1f1; the light body text on it washes out.
+     (92x31 — under the white-surface scan's size floor.) */
+  .error3 {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
     border-color: #2d333b !important;
   }
 
@@ -290,6 +367,20 @@
     color: #e6edf3 !important;
   }
 
+  /* Board-list status labels in the number column: the site marks 공지 (notice)
+     rows with a blue `#notice_con` label and 알림 (alert) rows with an orange
+     `#alert_con` label — the row-type signal. The generic body-text `span` rule
+     flattens both to the same neutral grey, so notice and alert become
+     indistinguishable. Restore each in the theme accent / warm accent. (Duplicate
+     IDs in the legacy markup — the selector matches every instance.) */
+  #notice_con {
+    color: #5fb0e6 !important;
+  }
+
+  #alert_con {
+    color: #f0883e !important;
+  }
+
   /* Notice rows (lightly tinted) */
   tr.baseNotice,
   tr.baseNotice td,
@@ -319,6 +410,34 @@
     background-color: #2a2017 !important;
   }
 
+  /* 장터 (market) board list. Unlike every other board, this one is not a <table>
+     but a flex list (div.table-New-contents > ul.cont01|cont02|cont03), and the
+     site paints the header row and notice rows #f8f8f8, the odd item rows
+     #fdfdfd and the hover state #f5f5f5. None of the table-row rules above reach
+     it, so the entire 장터 list ships as bright white rows carrying our light
+     text — the worst-hit page type. Repaint each row class to its table
+     equivalent so the zebra + hover feedback survive on dark. */
+  .table-New-contents .cont01 {
+    background-color: #21262d !important;
+  }
+
+  .table-New-contents .cont02 {
+    background-color: #1b2026 !important;
+  }
+
+  .table-New-contents .cont03 {
+    background-color: #14181d !important;
+  }
+
+  .table-New-contents .cont03:nth-of-type(2n-1) {
+    background-color: #161b22 !important;
+  }
+
+  .table-New-contents > ul:hover,
+  .table-New-contents .cont03:hover {
+    background-color: #1f252d !important;
+  }
+
   /* Board-list shopping-forum promo banner (.bridge_area) — site hardcodes a
      near-white bg with dark text; repaint dark so the light text inherits. */
   .bridge_area,
@@ -340,6 +459,44 @@
   #div_new_power_link a.title {
     color: #5fb0e6 !important;
     -webkit-text-fill-color: #5fb0e6 !important;
+  }
+
+  /* Search-results scope tabs (전체 / 커뮤니티 / 뉴스 / 장터 …). The site marks the
+     selected scope with a 3px #074bc8 bottom border AND a #074bc8 label; the
+     blanket `* { border-color }` reset above flattens the underline to the
+     generic line colour and the generic anchor rule flattens the label, so the
+     active scope becomes indistinguishable from the inactive ones. Re-assert
+     both in the theme accent. */
+  .result2 .tabs li.active {
+    border-bottom-color: #5fb0e6 !important;
+  }
+
+  .result2 .tabs li.active a {
+    color: #5fb0e6 !important;
+  }
+
+  /* Search-results comment-count chip (font.comment-cnt beside each hit title):
+     hardcoded #f3f3f3 pill, so the count washes out light-on-light. (14x15 —
+     under the white-surface scan's size floor.) */
+  font.comment-cnt,
+  .results_board .comment-cnt {
+    background-color: #21262d !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* News-hub feed (recent_main_article.php?type=news): each headline carries a
+     comment-count chip the site hardcodes #f0f0f0, and each thumbnail sits in a
+     light-grey #e6e6e6 <i class="Bbox"> frame that shows around photos which
+     don't fill the tile. Both are below the white-surface scan's size floor. */
+  span.list_comment2,
+  .list_comment2 {
+    background-color: #21262d !important;
+    color: #c4cdd6 !important;
+  }
+
+  .board_list i.Bbox,
+  i.Bbox {
+    background-color: #161b22 !important;
   }
 
   /* ---- Comments ------------------------------------------------------------ */
@@ -397,6 +554,59 @@
     background-color: #21262d !important;
   }
 
+  /* …but 신고 (report) and 삭제요청 (delx) are the site's DESTRUCTIVE actions and
+     it colours their labels `red`. They are <span>s, so the generic body-text
+     rule at the top of this file overrides that red to the ordinary grey and the
+     two buttons become visually identical to the neutral 질렀어요 pill beside
+     them. Restore the danger colour (refined for dark, matching the .report red
+     used elsewhere). */
+  #buttonBox .buttonBox-report,
+  #buttonBox .buttonBox-delx {
+    color: #ff7b72 !important;
+  }
+
+  /* Post-header ⋮ overflow menu (span#view-top-three-rung-menu.topTitle-submenu:
+     공유하기 / 신고하기 / 사용자신고) and the 공유하기 share sheet it opens
+     (div#share-menu-popup.share-popup), plus the ★ bookmark hover tooltip. All
+     three are hardcoded pure-white panels that are display:none until clicked or
+     hovered, so no load-time scan sees them; our light labels then land
+     light-on-white and the menus read as blank cards. Repaint to the elevated
+     dark surface. The share sheet's orange 공유하기 header is the site's brand
+     accent and is left alone. */
+  #topTitle .topTitle-submenu,
+  .share-popup,
+  .bookmark-mouseover-popup {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* The share sheet's close control is <span class="btn btn-close"> — a
+     transparent element whose X is a background-IMAGE. The generic `.btn` rule
+     fills it dark, stamping a black square onto the orange header. Let the icon
+     sit on the brand orange as designed. */
+  .share-popup .share-header .btn-close {
+    background-color: transparent !important;
+  }
+
+  /* Share sheet internals: the url field's rails were #ccc, and the 주소복사하기
+     copy button's label is a deep navy (#1e4780) tuned for white. */
+  .share-popup .share-body .url-wrapper {
+    border-color: #2d333b !important;
+  }
+
+  .share-popup .share-body .btn-copy {
+    color: #5fb0e6 !important;
+  }
+
+  /* Bookmark tooltip's two buttons: the site marks the primary one `.type2` with
+     a filled grey (#999) + white label. The generic button rule flattens both to
+     the same neutral chip, erasing which one is primary. */
+  .bookmark-mouseover-popup-btn.type2 {
+    background-color: #3a66a4 !important;
+    color: #ffffff !important;
+    border-color: #3a66a4 !important;
+  }
+
   /* Default profile avatar (img.over_hide src=no_face.jpg): the site's
      placeholder avatar is a 100×100 white JPG with a faint watermark, so every
      comment from a user without a custom photo — and the post author thumb —
@@ -406,6 +616,15 @@
      and a raster fill the bg-color walk can't see.) */
   img[src*="no_face"] {
     filter: brightness(0.2) !important;
+  }
+
+  /* Board-list "no thumbnail" placeholder (img src=noimage_60x50.jpg): a white
+     JPG with a grey camera glyph, served for every post without an attached
+     photo, so a deal list can show a column of bright white squares. Same raster
+     class as no_face above — invisible to the bg-color walk. Darken the tile;
+     the grey camera glyph still reads. */
+  img[src*="noimage"] {
+    filter: brightness(0.25) !important;
   }
 
   /* Same default-avatar placeholder, but applied as an inline CSS
@@ -463,6 +682,15 @@
     border-color: #2d333b !important;
   }
 
+  /* Post / comment pagination current page (font.page_inert — the non-linked
+     "you are here" number in .pagelist_han): the site paints it red to stand out
+     from the grey page links; the generic body-text `font` rule flattens it to the
+     same grey as the links, so the current page is no longer marked. Re-assert an
+     accent tone so the active page reads distinct from the neutral page links. */
+  font.page_inert {
+    color: #5fb0e6 !important;
+  }
+
   /* List comment-count badge (span.baseList-c next to deal / board titles): the
      site hardcodes a light-grey #f0f0f0 pill and the numeral inherits the light
      body text, so the count washes out light-on-light. Repaint to a dark
@@ -485,6 +713,59 @@
     background-color: #21262d !important;
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
+  }
+
+  /* Home shopping-strip pagers (ol.numb_btns / .main_numb_btns). Every dot is a
+     #f7f7f7 square with a #ccc numeral; only when its tab is ACTIVE does the
+     site mark the current page by filling `li.on` #626262 with white text. So
+     on dark the whole pager ships as bright 16x16 squares, and the `li.on`
+     accent rule further down repaints the active dot's numeral theme-blue,
+     costing it its white-on-grey contrast. Map the idle squares to dark chips
+     and re-assert the site's active-dot fill. (16x16 — under the white-surface
+     scan's size floor.) */
+  .numb_btns li,
+  .main_numb_btns li {
+    background-color: #21262d !important;
+    border-color: #2d333b !important;
+    color: #8b949e !important;
+  }
+
+  /* `li.on` ties on specificity with `.numb_btns li` and the link-blue rule
+     below declares it later, so the current dot would render blue. Restate it. */
+  .numb_btns li.on,
+  .main_numb_btns li.on {
+    color: #8b949e !important;
+  }
+
+  .tabs li.active .numb_btns li,
+  .main_numb_btns.active li {
+    color: #c4cdd6 !important;
+  }
+
+  .tabs li.active .numb_btns li.on,
+  .main_numb_btns.active li.on {
+    background-color: #626262 !important;
+    border-color: #626262 !important;
+    color: #ffffff !important;
+  }
+
+  /* News-hub pager arrows (a.page_prev / a.page_next) — hardcoded #f1f1f1 chips. */
+  .page_prev,
+  .page_next {
+    background-color: #21262d !important;
+    border-color: #2d333b !important;
+  }
+
+  /* Post-page hairline separators: the 1px rules are drawn as an INLINE
+     background-color (#E0E0E0) on a td.lined, not as a border, so the blanket
+     border-color reset never reaches them and they ship as bright lines across
+     the dark post. Match the inline value, not the class — most td.lined cells
+     are transparent spacers and painting those would draw lines that the site
+     never draws. (The attribute value is case-sensitive; the markup uses upper
+     case, but match both so a future lowercasing doesn't silently un-fix it.) */
+  td.lined[style*="background-color:#E0E0E0"],
+  td.lined[style*="background-color:#e0e0e0"] {
+    background-color: #2d333b !important;
   }
 
   /* Comment "load more" button + similar grey action chips */
@@ -650,6 +931,37 @@
     color: #e6edf3 !important;
   }
 
+  /* 상담실 board CTA bar (td.btn_advice): the site paints the bar #f8f8f8 and
+     splits it into 상담하기 (a pale-blue #edf7ff pill with a #1970b5 label) and
+     상담결과 확인하기 (a pure-white pill). On dark both pills stay bright and
+     their labels — which our body-text rule lifted to light grey — vanish
+     light-on-light. Repaint the bar + pills; keep 상담하기 as the accented
+     primary so the pair still reads primary/secondary. */
+  td.btn_advice,
+  .btn_advice {
+    background-color: #1c2128 !important;
+  }
+
+  .btn_advice span.advice_btn {
+    background-color: #21262d !important;
+    color: #5fb0e6 !important;
+    border-color: #2d333b !important;
+  }
+
+  .btn_advice span.advice_result {
+    background-color: #21262d !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* Full-page login form (login.php): the submit control is span#ptn.it on the
+     site's brand orange with a pure-white label. The generic body-text rule
+     matches that <span> and drops the label to #c4cdd6, which reads 1.6:1 on the
+     orange. Restore white. */
+  #zb_login #ptn {
+    color: #ffffff !important;
+  }
+
   /* Floating pop menus / dropdowns — keep opaque so content doesn't bleed */
   .list_pop_menu01,
   .user_box_out,
@@ -738,6 +1050,31 @@
   .recommendArea,
   .topTitle-rec {
     color: #c4cdd6 !important;
+  }
+
+  /* Vote / recommend count numerals. The site colour-codes these across page types
+     to signal positive vs negative: the post recommend count (span.up-numb) is
+     blue; the search-result 추천 count (span.like) and news gain count
+     (span.gcon.up) are orange; the search 비추 count (span.dislike) and news loss
+     count (span.gcon.down) are blue. The generic body-text `span` rule flattens
+     every one to the same grey, erasing the up/down signal. Restore each in its
+     native hue, brightened for dark. */
+  span.up-numb,
+  span.gcon.down,
+  span.dislike {
+    color: #5fb0e6 !important;
+  }
+
+  span.like,
+  span.gcon.up {
+    color: #f0883e !important;
+  }
+
+  /* News-hub "HOT" flag (span.nav_hot_ico beside the ranked-post header and hot
+     tabs) is a red brand badge the site paints #e80505; the body-text rule drops
+     it to grey. Restore the refined red. */
+  .nav_hot_ico {
+    color: #ff7b72 !important;
   }
 
   /* Link blue used for in-content links / counts / comment counts / tabs

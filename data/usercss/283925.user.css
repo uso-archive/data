@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A polished dark look across the whole site: the home page, video pages and their comment lists, the rankings, search results and user profiles.
-@version      20260707.14.32
+@version      20260711.00.17
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -43,7 +43,11 @@
     --colors-text-on-layer-medium-em: #c4cdd6 !important;
     --colors-text-on-layer-medium-em-inv: #14181dcc !important;
     --colors-text-on-layer-low-em: #8b949e !important;
-    --colors-text-on-layer-lower-em: #6e7681 !important;
+    /* "lower emphasis" hint text (e.g. the watch page's "マイリストのはじめから
+       連続再生する") only reached 3.9:1 on the page base at #6e7681, failing WCAG
+       AA for small text. Lift it just enough to clear 4.5:1 on both the base and
+       the elevated card surface while staying dimmer than low-em. */
+    --colors-text-on-layer-lower-em: #828b95 !important;
     --colors-text-on-layer-visited: #a9b4c0 !important;
 
     /* ---- Borders (soften the bright default lines) ---- */
@@ -67,12 +71,14 @@
 
     /* ---- Tabs / on-base actions ---- */
     /* The selected tab pill (comment-list / uploader-videos toggle on the
-       watch page) defaults to a near-solid white fill (#f2f2f2 @95%); with
-       the light tab label on top it read white-on-white. Repaint the active
-       pill as an elevated dark surface so the label stays legible. The
-       unselected/hover bases are low-alpha white that read as subtle grey
-       highlights on the dark strip, so they are left untouched. */
-    --colors-tab-base-active: #2d333b !important;
+       watch page, the ranking genre chips) defaults to a near-solid white fill
+       (#f2f2f2 @95%); with the light tab label on top it read white-on-white.
+       An elevated grey (#2d333b) fixed the legibility but destroyed the
+       SEMANTICS: the unselected chips sit on a 10% white track that computes to
+       ~#25292e on the page base, so the selected chip stood out at 1.14:1 —
+       indistinguishable. Repaint the selected pill with the brand azure surface
+       instead: clearly "chosen", and the light label clears 7:1 on it. */
+    --colors-tab-base-active: #1f4a78 !important;
     --colors-tab-text-on-base: #c4cdd6 !important;
     --colors-tab-object-on-base: #c4cdd6 !important;
     --colors-tab-text-on-base-active: #e6edf3 !important;
@@ -108,6 +114,12 @@
     --colors-action-text-on-tertiary-azure-inv: #5fb0e6 !important;
     --colors-icon-primary-azure: #5fb0e6 !important;
     --colors-layer-surface-accent-azure: #1f4a78 !important;
+
+    /* The "lust" accent is the site's semantic red (the ショート "New" flag in
+       the left rail, live/error markers). At its own #e61a1a it only reaches
+       3.7:1 on the elevated card surface — a fail for the small bold label it
+       always carries. Lift it while keeping it unmistakably red. */
+    --colors-text-on-layer-accent-lust: #ff5c5c !important;
   }
 
   /* ============================================================
@@ -126,6 +138,23 @@
     background-color: #161b21 !important;
     border-color: #262c33 !important;
   }
+  /* Each slot's direct child (the creative's <a>, or the pre-load skeleton) carries
+     its own `background:#f0f0f0; border:1px solid #ddd !important` from a
+     `.PcUniTop…AdContainer .Ads > *` rule, which the .Ads container rule above never
+     reaches — so even a FILLED creative sat in a bright letterbox frame. Match that
+     rule's specificity (and land later in the cascade) to beat its !important border. */
+  [class*="AdContainer"] .Ads > *, .Ads > a {
+    background-color: #161b21 !important;
+    border-color: #262c33 !important;
+  }
+  /* NOTE (verified, do not "fix"): a white 300x250 / 728x90 block sometimes sits
+     in these slots. It is NOT the frame's default canvas — with Google's tag
+     blocked, the ads.nicovideo.jp frame is transparent and the dark iframe
+     background above shows through correctly. The white is a real creative
+     rendered inside a NESTED doubleclick.net frame, i.e. genuine ad content that
+     happens to be white. `color-scheme: dark` on the outer iframe computes but
+     changes nothing, and no CSS from this document can reach a cross-origin
+     grandchild frame. Leave it: darkening real content is worse than a white ad. */
 
   /* Pre-roll video-ad overlay controls (watch page). The skip prompt
      ("○秒後にスキップできます") and the countdown timer color their labels
@@ -155,7 +184,56 @@
     background-color: #1a1a1a !important;
     border-color: #3a424c !important;
   }
-  [class*="menu-area"] { border-bottom-color: #262c33 !important; }
+  /* The divider between the card thumbnail and its info row is the menu-area's
+     border-TOP (#c4cdd6), not its bottom — the earlier bottom-only rule missed it,
+     so a bright light line ran across all 28 program cards. Soften every side. */
+  [class*="menu-area"] { border-color: #262c33 !important; }
+
+  /* Live (live.nicovideo.jp) program-card provider-type badges ("公式" / "CH").
+     The site colours them by data-provider-type — official = azure, channel =
+     gold — but our broad legacy `-label` text pass flattened both to the same
+     grey, erasing the official-vs-channel distinction. Restore the two type
+     colours (both clear AA on the badge's dark #1a1a1a pill). The tag prefix
+     lifts specificity to 0,1,1 so this beats the broad `[class*="-label"]`
+     flatten (0,1,0) that lands LATER in the file. */
+  span[data-provider-type="official"] { color: #559cff !important; }
+  span[data-provider-type="channel"] { color: #d9a300 !important; }
+
+  /* The nicoad-support point count ("22.6万") is painted gold to mark it as an
+     ad-support metric; the meta-grey pass flattened it to look like a plain view
+     count. Restore the gold, lifted to #d9a300 for AA on the dark card. Tag
+     prefixes beat the later `[class*="-count"]` grey rule on specificity. */
+  li[class*="nicoad-count"], li[class*="nicoad-count"] span { color: #d9a300 !important; }
+
+  /* The nicoad supporter strip ("提供：〇〇さん") is a 44%-white frosted caption bar
+     over the card with near-black text — on the dark card the white went muddy and
+     the #1a1a1a text read dark-on-dark. Repaint the strip to a dark frosted bar and
+     lift its text to a legible light. */
+  [class*="nicoad-frame"] [class*="message"] {
+    background-color: rgba(20, 24, 29, 0.6) !important;
+  }
+  [class*="nicoad-frame"] [class*="message"],
+  .advatisor, .advatisor [class*="name"] { color: #e6edf3 !important; }
+
+  /* Live (live.nicovideo.jp) watch page — the "ニコニ広告" and "ギフト" buttons in
+     the comment/interaction bar (and the program-application menu) default to a
+     solid #fff square, so two white tiles glared on the dark control bar. Their
+     glyph is a mask-image whose own background-color (#666) IS the fill. Repaint
+     the tile to a dark elevated surface and lift the glyph to a light fill —
+     darkening the glyph bg (the reflex for a "background") would erase it. */
+  button[class*="nicoad-button"], button[class*="gift-button"] {
+    background-color: #2d333b !important;
+  }
+  button[class*="nicoad-button"] [class*="symbol-mark"],
+  button[class*="gift-button"] [class*="symbol-mark"] {
+    background-color: #c4cdd6 !important;
+  }
+  /* The scheduled-program start-time pill ("5時間後 開始（10分前開場）") in the
+     player's watch-rejected overlay is a 90%-white badge with #252525 text — a
+     bright blob on the dark stage. Repaint it to a dark pill with a light label. */
+  [class*="watch-rejected"] [class*="value-area"] {
+    background-color: #2d333b !important; color: #e6edf3 !important;
+  }
 
   /* Live (live.nicovideo.jp) watch page — the "アニメ公式生放送タイムシフト
      ランキング" column (.official-live-ts-ranking) hardcodes a near-white
@@ -178,12 +256,13 @@
      similar active "inverted" pills paint the active item with the site's
      dark-mode transparentWhite.A95 (#f2f2f2 @95%) fill + transparentGray.A95
      (#1a1a1a @95%) label, which lands as a stark white blob on the near-black
-     base. Repaint the active pill as an elevated dark surface with a light
-     label, matching the watch-page active tab. Scoped to the token's own
-     class so only the SELECTED pill is touched (the unselected pills sit on a
-     subtle 10% white track that already reads correctly on dark). */
+     base. Repaint the active pill with the brand azure surface + a light label,
+     matching --colors-tab-base-active above: an elevated GREY here read only
+     1.14:1 against the unselected pills' 10%-white track, so "which tab am I
+     on" was lost. Scoped to the token's own class so only the SELECTED pill is
+     touched (the unselected pills already read correctly on dark). */
   [class*="transparentWhite.A95"] {
-    background-color: #2d333b !important;
+    background-color: #1f4a78 !important;
     color: #e6edf3 !important;
     fill: #e6edf3 !important;
   }
@@ -191,10 +270,95 @@
   [class*="transparentWhite.A95"] path { fill: #e6edf3 !important; }
 
   /* ============================================================
-     Common top header bar (shared chrome) + campaign strip
+     Common top header bar (shared chrome) + its two flyouts
      ============================================================ */
   .CommonHeader, [class*="CommonHeader"] { background-color: #0d1117 !important; }
   header [class*="common-header-"] { color: #e6edf3; }
+
+  /* The bar hosts two flyouts, both closed at audit time so no element-bg scan
+     ever sees them, and both built from hashed `common-header-*` classes:
+       • the "その他" mega-dropdown — a #f4f4f4 panel of #fff service rows;
+       • the account panel behind the avatar chevron — a #fafafa panel with a
+         #fff login card, a #f4f4f4 section heading and a #f4f4f4 footer strip.
+     Both hardcode their surfaces (no design token reaches them) and their row
+     labels hardcode #333 / #252525, so once the panel is repainted the labels
+     go dark-on-dark.
+
+     Nothing inside either panel is hookable by name: the panel roots, the grid
+     and column wrappers, the section heading and the "もっと見る" footer strip are
+     pure hashed divs, and the service rows share `pos=header_servicelink` in
+     their cmnhd_ref with the eight ALWAYS-VISIBLE nav links of the bar itself.
+
+     The previous rules reached for the Level-4 relational selector twice, and
+     both guesses misfired:
+       • an anchor matched on "rows have a chevron svg the nav links lack" — the
+         bar's own TV-logo anchor has an svg too, so it wore a permanent #1c2128
+         rectangle behind the logo on the #252525 bar;
+       • a div matched on "contains the コモンズ service link" — the relational
+         argument ended in a DESCENDANT, which every ancestor of the flyout also
+         satisfies. It matched nine elements up to and including the header bar,
+         which flipped #252525 -> #1c2128 for as long as the menu stayed open.
+
+     DEPTH is the discriminator that actually holds. Measured live: the bar's own
+     chrome never nests more than six divs deep (the nav links sit at four),
+     while everything inside either flyout starts at seven. A plain descendant
+     chain selects the flyout interiors exactly — and, being CSS2, it survives
+     the .org.css sanitizer that strips relational selectors, so userstyles.org
+     finally gets this fix too. */
+  #CommonHeader div div div div div div div,
+  #CommonHeader div div div div div div div a {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+    color: #c4cdd6 !important;
+  }
+  #CommonHeader div div div div div div div a *,
+  #CommonHeader div div div div div div div span,
+  #CommonHeader div div div div div div div label {
+    color: #c4cdd6 !important;
+  }
+  #CommonHeader div div div div div div div a:hover {
+    background-color: #262c33 !important;
+  }
+  /* One thing in the ALWAYS-VISIBLE bar reaches seven divs too: the wrapper pair
+     around the account avatar, which the rule above stamped as a #1c2128 square
+     on the #252525 bar. It is the FIRST child of the avatar button, whereas the
+     account panel and its click-scrim are that button's later children — so an
+     exact child-chain + :first-child isolates the avatar branch and nothing else
+     (verified against both flyouts open). */
+  #CommonHeader > div > div > div > div > div > div:first-child div {
+    background-color: transparent !important;
+  }
+  /* The account panel's two CTAs are anchors inside that same subtree, so the
+     rule above flattened the blue ログイン and orange 新規会員登録 into two identical
+     grey rows. They carry the same `pos=userpanel` marker as the plain rows
+     around them, so the only thing that separates a CTA from a row is where it
+     points: account.nicovideo.jp. Restore the site's own brand fills — same
+     chain plus one attribute, so this lands later AND heavier. The ヘッダー追従
+     toggle is a <label> + <input>, so its switch colours are never touched. */
+  #CommonHeader div div div div div div div a[href*="account.nicovideo.jp/login"] {
+    background-color: #498dca !important; color: #ffffff !important;
+  }
+  #CommonHeader div div div div div div div a[href*="account.nicovideo.jp/register"] {
+    background-color: #e5a100 !important; color: #ffffff !important;
+  }
+
+  /* Header search autocomplete (nicolib). The suggestion panel hardcodes a #fff
+     surface; our legacy text passes then painted every suggestion #c4cdd6, so the
+     open dropdown rendered near-white words on white (~1.9:1). The panel only
+     exists while a query is typed, so it never appears in a static scan. */
+  .nicolib-SuggestSearch {
+    background-color: #1c2128 !important; border-color: #2d333b !important;
+  }
+  .nicolib-SuggestSearch-item.active, .nicolib-SuggestSearch-item:hover,
+  .nicolib-SuggestSearch-item > button:hover {
+    background-color: #262c33 !important;
+  }
+  /* The legacy header's search-type pull-down (動画 / 静画 / 生放送) opens onto a
+     #f5f5f5 sheet — closed, and therefore invisible, at audit time. */
+  .CrossSearch-pullDownList {
+    background-color: #1c2128 !important; border-color: #2d333b !important;
+  }
+  .CrossSearch-pullDownList li:hover { background-color: #262c33 !important; }
 
   /* ============================================================
      LEGACY DOM — home (video_top) + profiles (UserPage)
@@ -291,10 +455,41 @@
   .NicoNewsContainer-photoNews {
     background-color: #1c2128 !important;
   }
-  /* NicoNews featured "photo news" thumbnail well (light grey by default) */
-  .NicoNewsContainer-photoNewsThumbnail { background-color: #262c33 !important; }
+  /* NicoNews featured "photo news" thumbnail well. The dark fill below was only
+     half the story: the well ALSO carries an inline data:image/svg+xml
+     placeholder (`<svg style="background:#f5f5f5">` + a grey TV glyph) as its
+     background-IMAGE, which paints over the background-colour. The article photo
+     is a separate child div, so whenever it 404s or has not lazy-loaded the well
+     rendered a 206x206 white slab. Not a gradient, so the bg-image audit skips
+     it. Dropping the image can never hide artwork — only the placeholder. */
+  .NicoNewsContainer-photoNewsThumbnail {
+    background-color: #262c33 !important;
+    background-image: none !important;
+  }
   /* Empty thumbnail wells / skeletons */
   .NC-VideoCardSkeleton-barContainer, [class*="Skeleton"] { background-color: #262c33 !important; }
+  /* ...-hoverMenuPositioner is a natively transparent 32x21 anchor for the
+     three-point menu, sitting on the thumbnail's top-right corner. Its class
+     contains "VideoCard", so the arm above paints it opaque and stamps a black
+     notch on every recommended card. Override additively rather than adding
+     :not() to that arm, whose specificity would then rise and outrank later
+     same-specificity !important rules. */
+  [class*="hoverMenuPositioner"] { background-color: transparent !important; }
+
+  /* live.nicovideo.jp program cards paint a white "no thumbnail" SVG as their
+     background, under a real <img> thumbnail when one exists. Programs without
+     artwork (and every card while its image loads) render it full-size: a large
+     white glare block. The background layer is ONLY ever this placeholder, so
+     dropping it cannot touch real artwork. The video-side twin
+     (.NC-Thumbnail-image) is inverted instead, which is safe only because that
+     element has no children; a.preview wraps the <img> and the LIVE / start-time
+     badges, and a filter here would invert all of them.
+     Two plain classes rather than a Level 4 relational selector, which the
+     .org.css sanitizer strips. */
+  a.preview.program-preview {
+    background-image: none !important;
+    background-color: #262c33 !important;
+  }
 
   /* ---- TopPage (2026 home) surfaces the token/legacy passes miss ----
      The home "stage" paints a light faceted texture image behind the
@@ -322,10 +517,39 @@
   }
   .TopPage-footer { background-color: #14181d !important; }
   .TopPage-middleBillboardAdSection { background-color: #161b21 !important; }
+  /* The site-notice strip above the stage ("【重要】…料金を改定します") is a solid
+     #fff rounded bar. At exactly 40px tall it slips the element-bg audit's
+     `height > 40` filter, so it shipped as a bright white slab across the home
+     page. Its own link text is the site's semantic blue and clears 4.5:1 on the
+     repainted surface, so only the bar is touched. */
+  .OneLineNewsContainer {
+    background-color: #1c2128 !important; border-color: #2d333b !important;
+  }
+  /* The home page's wordmark is the site's BLACK logo variant (the site swaps in
+     .NiconicoLogo_white only on its own dark pages), drawn as a data-URI SVG
+     background-image whose every path is #252525 — 1.3:1 on the repainted base.
+     It is a single-colour glyph, so inverting the layer is exact and cannot
+     touch a photo; the sibling _white variant used on the legacy pages is
+     already correct and is left alone. */
+  .NiconicoLogo_black { filter: invert(1) !important; }
+
   /* The hero pickup title and the section "see more" links sat dark-on-dark */
   .AuroraVisionCard-metaPickUpComment { color: #e6edf3 !important; }
+  /* Every section's "もっと見る" pill is a #fff button (100×30 — under the audit's
+     size filter). The colour rule below was written when the pill was transparent;
+     against the white fill it left #c4cdd6 words on white at ~1.9:1. Repaint the
+     pill itself so the light label lands on an elevated dark surface. */
+  .SeeMoreLink-text {
+    background-color: #2d333b !important; border-color: #3a424c !important;
+  }
   .SeeMoreLink-text, .SeeMoreLink-text span, a.SeeMoreLink span { color: #c4cdd6 !important; }
   .NicoNewsContainer .Tabs-tab, .NicoNewsContainer-skeleton .Tabs-tab { color: #8b949e !important; }
+
+  /* Owner-avatar wells default to a `lightgray` fill behind a lazily-loaded
+     background-image. 10 of the 11 on the home page are still image-less on first
+     paint, so a row of bright grey discs flashes over the dark cards. At 32×32 they
+     sit under the element-bg audit's size floor. The avatar paints over this. */
+  .NC-OwnerIcon-image { background-color: #262c33 !important; }
 
   /* ---- Profile / user page components ---- */
   .UserPage-header, .UserPage-content, .UserDetailsHeader, .UserDetailsContainer,
@@ -351,6 +575,62 @@
     background-image: linear-gradient(rgba(28, 33, 40, 0) 0px, #1c2128) !important;
   }
 
+  /* Profile popovers. Both are closed at audit time and both keep a #fff root that
+     no token reaches: the "他サービスのユーザーページ" panel (.Dropdown) rendered a
+     white sheet under near-white item labels, and the ⋮ report menu leaked white
+     padding strips above and below its dark row. */
+  .Dropdown, .NC-ThreePointMenu-menu {
+    background-color: #1c2128 !important; border-color: #2d333b !important;
+  }
+  /* Only the :hover row was ever recoloured, so at rest the ⋮ menu's labels kept the
+     site's black on the repainted #1c2128 panel (~1.3:1) and the opened menu read as
+     an empty dark box. The hover rule below is more specific and still wins. */
+  .NC-ThreePointMenu-menu, .NC-ThreePointMenu-menu * { color: #c4cdd6 !important; }
+  /* The menu's own hover paints #e9e9e9 with black text — keep it a dark highlight. */
+  .OtherMypageLinks-link:hover, .NC-ThreePointMenu-menu > :hover {
+    background-color: #262c33 !important; color: #e6edf3 !important;
+  }
+
+  /* Footer language picker. The .FooterContainer transparent-neutraliser blanked the
+     candidate list's own background, so the opened flyout had NO surface at all and
+     the footer links behind it showed straight through, under #333 labels. Give the
+     floating list a solid dark surface and restore the closed pill's affordance. */
+  .CountrySelector-currentItem { background-color: #262c33 !important; }
+  .CountrySelector-currentItem:hover { background-color: #2d333b !important; }
+  .CountrySelector-candidates {
+    background-color: #1c2128 !important; border-color: #2d333b !important;
+  }
+  .CountrySelector-item { color: #c4cdd6 !important; }
+  .CountrySelector-item:hover { background-color: #262c33 !important; }
+
+  /* The mylist / series left rail (.InfiniteList) hardcodes a #f5f5f5 fill behind
+     its transparent link rows, so a white column ran down both pages. */
+  .MylistSideContainer-infiniteList, .VideoSideContainer-infiniteList {
+    background-color: transparent !important;
+  }
+  /* The "N件" count badge stamped on a mylist's thumbnail strip colours itself
+     #252525 for the light theme; on the repainted dark strip it vanished. */
+  .NC-MylistMediaObject-itemCount { color: #c4cdd6 !important; }
+  /* Series header's 1px separator is drawn as a #ddd ::after bar, not a border. */
+  .SeriesDetailHeader::after { background-color: #262c33 !important; }
+  /* The share glyph (profile / mylist / series) is a MASK-IMAGE button: its
+     `background-color` IS the artwork's fill, not a panel. The site paints it #555
+     for a white page, which leaves a ~2.2:1 icon on our dark surface. Lighten the
+     fill — darkening it (the usual reflex for a "background") would erase the glyph. */
+  .ShareButton-button { background-color: #c4cdd6 !important; }
+  /* The series "連続再生" button is a 92×32 white pill (under the audit's size
+     filter); the legacy text pass then put #c4cdd6 words on that white fill. */
+  .ContinuousPlayButton {
+    background-color: #2d333b !important; border-color: #3a424c !important;
+  }
+  /* The "no thumbnail" placeholder is a white raster with a grey TV glyph, painted
+     as a background-image so the dark well behind it never shows. Invert it (only
+     this one URL) so the glyph survives instead of the white square. Real artwork
+     thumbnails use the same class and are left alone. */
+  .NC-Thumbnail-image[style*="no_thumbnail"] {
+    filter: invert(1) hue-rotate(180deg) brightness(1.7) !important;
+  }
+
   /* Generic legacy card / panel fallbacks */
   .RankingMatrixVideoMediaObject, .VideoMediaObject, .NiconicoVideoCard,
   [class*="-card"], .Card, .Panel, .Box {
@@ -371,6 +651,20 @@
   [class*="-description"], [class*="Description"], [class*="-label"], [class*="Label"] {
     color: #c4cdd6 !important;
   }
+  /* …but a brand-coloured pill wants the WHITE label the site gave it. The `-label`
+     arm above dimmed the stage card's "LIVE" chip on brand red #ff0033 (3.96:1 →
+     2.46:1), and the `Label` arm overmatched Panda's atomic colour class — literally
+     named `c_textOnLabel.white` — dropping the ranking/search "限定" chip on nicoad
+     gold to 1.42:1. Both sit on saturated fills, so restore white. Must stay AFTER
+     the rule above: same specificity, later wins. */
+  .StageRecommendLiveCard-label,
+  [class*="c_textOnLabel.white"] { color: #ffffff !important; }
+  /* Same family, different cause: the nicoad "supporter comment" banner is painted
+     brand gold and takes its label from the high-emphasis TEXT TOKEN, which we remap
+     to #e6edf3 — dropping the site's own white to 1.96:1. Restore the white the site
+     ships (2.31:1 is nicoad's own choice on gold; we simply must not make it worse). */
+  [class*="bg_serviceColor.nicoadGold"],
+  [class*="bg_serviceColor.nicoadGold"] * { color: #ffffff !important; }
 
   /* Secondary / meta text (timestamps, dates, count labels) */
   .RankingMatrixVideoMediaObject-metaRow, [class*="-metaRow"],
@@ -379,11 +673,26 @@
   .UserDetailsHeader-accountType, [class*="accountType"],
   [class*="-registeredAt"], [class*="-postedAt"], time,
   [class*="-count"], [class*="Meta"] { color: #8b949e !important; }
+  /* …but "プレミアム会員" is a paid-status mark, not metadata: the site paints it
+     its own gold (#d9a300) and the accountType arm above flattened it to the
+     same grey as the ID and the registration year, erasing the distinction
+     between a premium and a free account. Gold clears 6.6:1 on the base, so the
+     site's own value is restored verbatim. (The free-account variant is grey
+     natively and is correctly left alone.) Must stay AFTER the rule above. */
+  .UserDetailsHeader-accountType_premium { color: #d9a300 !important; }
   /* The timeline period dividers ("1週間"/"1か月"…) label themselves in
      near-black #252525, which the legacy text passes don't reach — lift
      them to the muted meta grey so the section markers stay readable. */
   .Timeline-divider, .Timeline-divider span,
   [class*="Timeline-divider"] { color: #8b949e !important; }
+  /* Ranking / recommendation "posted N ago" timestamps are painted with the
+     site's own --recentTimeColor (#e61a1a) to flag a RECENT upload — a real
+     signal. The broad `time { color:#8b949e }` meta rule above flattened all 51
+     of them to the same grey as every other date, erasing the distinction. The
+     class is a Panda atomic (c_[var(--recentTimeColor)]); restore the red,
+     lifted to the AA-clear #ff5c5c we use for the "lust" accent. Must stay AFTER
+     the meta grey rule (same specificity, later wins). */
+  [class*="recentTimeColor"] { color: #ff5c5c !important; }
 
   /* Active nav tab + internal accent links */
   .MainMenuItem.NC-Tab_active, .NC-Tab_active { color: #e6edf3 !important; }
@@ -391,6 +700,14 @@
   .UserDetailsStatusItem-linkLabel, a[class*="SubMenuLink"] {
     background-color: transparent !important; color: #5fb0e6 !important;
   }
+  /* The profile/mylist "サポート" button is an <a>, so the broad `.BaseUniLayout a`
+     grey rule (no !important, spec 0,1,1) flattened its label to #c4cdd6 — while
+     the "フォロー" button beside it is a <button> we never touch and kept the site's
+     blue. A blue star next to a grey "サポートする" read as broken. Restore the
+     site's blue on the whole support CTA so the pair matches (specificity + the
+     !important both beat the anchor rule and make it deterministic). */
+  a.CreatorSupportButton, a.CreatorSupportButton .CreatorSupportButton-text,
+  a.CreatorSupportButton .CreatorSupportButton-icon { color: #0080ff !important; }
 
   /* Search box (legacy header) */
   .SearchInput, .CrossSearch input, .SearchField input,

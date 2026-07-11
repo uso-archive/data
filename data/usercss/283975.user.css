@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Juejin (掘金): comfortable reading of articles, the feed, pins and comments, with fully readable dark code blocks and syntax.
-@version      20260707.14.31
+@version      20260711.00.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -44,6 +44,26 @@
     --juejin-font-brand-normal: #5fb0e6 !important;
     --juejin-brand-normal: #1e80ff !important;
     --juejin-brand-1-normal: #5fb0e6 !important;
+
+    /* ---------- Surface tokens for floating panels ----------
+       `--juejin-popup` (#fff) paints EVERY floating panel: the feed-card dislike
+       flyout, the author hover-card, the search suggest list, the nav category
+       popover, byte-design modals/tooltips, and the caret triangles drawn from it
+       as a border-color. Each of those panels only enters the DOM on hover/click,
+       so a load-time scan reports zero nodes and they shipped white. Remap the
+       token once — it reaches the panels we cannot open while logged out. The two
+       grays are background/border-only (never a text colour), so darkening them is
+       safe: `-2` fills chips and control borders, `-3` is the hover-row highlight. */
+    --juejin-popup: #1c2128 !important;    /* was #fff  — floating panel surface */
+    --juejin-gray-2: #21262d !important;   /* was #f2f3f5 — chip / control fill */
+    --juejin-gray-3: #262c33 !important;   /* was #f7f8fa — hover-row highlight */
+
+    /* `--juejin-navigation` (#fff) is the header's own surface token. We repaint
+       `.main-header` directly, so on desktop the token never shows — but below
+       ~960px juejin reflows the nav and `li.main-nav-list` becomes an absolutely
+       positioned block painted FROM THE TOKEN, so a 68×52 pure-white slab landed
+       behind the active nav label. Desktop-only review never sees it. */
+    --juejin-navigation: #0d1117 !important; /* was #fff — header surface */
   }
 
   /* ---------- Base ---------- */
@@ -68,6 +88,30 @@
     border-color: #262c33 !important;
   }
 
+  /* …but that reset also repaints the two places a border is not a border:
+     (a) CSS-triangle carets built from transparent side borders — the search
+         filter caret rendered as a solid grey RECTANGLE instead of a ▼;
+     (b) the `.login-popover` 20px transparent top border used as a hover-bridge
+         spacer, which became an opaque grey band above the popover;
+     (c) the booklet tab's 2px brand-blue active underline, flattened to the
+         border tone and thus invisible.
+     Restore each explicitly. (`*` matches elements only — pseudo-element
+     triangles are unaffected.) */
+  .dropdown-toggle .icon,
+  .drop-down .icon {
+    border-top-color: #8b949e !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+  }
+
+  .login-popover {
+    border-top-color: transparent !important;
+  }
+
+  .book-menu .item.active {
+    border-bottom-color: #1e80ff !important;
+  }
+
   /* Row dividers in the article-page recommended lists ("为你推荐"/"相关推荐")
      are drawn as a 1px `.content-wrapper::before` with a hardcoded light bg
      (#e4e6eb) — NOT a border, so the `*` border rule above can't reach it and
@@ -76,6 +120,16 @@
   .entry .content-wrapper::before,
   .follow-block::after,
   .follow-block::before {
+    background-color: #262c33 !important;
+  }
+
+  /* Standalone `.divider` hairlines (creator-center dropdown, sidebar rank cards,
+     course filter header) are 1px DIVs painting a hardcoded #e4e6eb — a bright
+     white rule across the dark panel. At 1px tall they slip every audit height
+     filter. The nested `.divider > .content` carries a 50%-alpha variant. */
+  .divider,
+  .divider .content,
+  .course-header::after {
     background-color: #262c33 !important;
   }
 
@@ -145,6 +199,34 @@
     border-color: #37c700 !important;
   }
 
+  /* Brand-tinted GHOST buttons: rgba(30,128,255,.05) fill, rgba(30,128,255,.3)
+     outline, #1e80ff label. Two of them shipped flat grey — the sidebar "去签到"
+     lost its outline to the `*` border reset, and the author hover-card's "私信"
+     lost both outline and label, so it read as a disabled control next to the blue
+     "关注". Neither is a filled CTA, so they keep the tint + accent label. */
+  .signin-tip .btn.signin-btn,
+  .btn.signin-btn {
+    border-color: rgba(30, 128, 255, 0.35) !important;
+  }
+
+  /* The hover card renders INSIDE the feed row, so `.entry-footer *` (0,1,0) also
+     claims the "私信" label — a bare `.im-button *` only ties it and loses on order. */
+  .im-button,
+  .im-button.im-btn,
+  .im-button.im-btn *,
+  .operate-btn .im-button,
+  .operate-btn .im-button * {
+    border-color: rgba(30, 128, 255, 0.35) !important;
+    color: #5fb0e6 !important;
+  }
+
+  /* The pin sidebar's logged-out "登录 / 注册" is a brand-blue link, not a name —
+     our `.user-name, .username` remap greyed it into the "即刻玩转沸点" subtitle. */
+  p.username.nouser,
+  .username.nouser {
+    color: #5fb0e6 !important;
+  }
+
   /* Hot-ranking page (juejin.cn/hot/articles → 掘金热榜): the whole tree lives in a
      `.hot-lists` / `.hot-list-wrap` / `.hot-list-body` namespace with white
      container bgs, a white `.hot-side-nav` category sidebar, and a decorative
@@ -194,6 +276,26 @@
     border-color: #262c33 !important;
   }
 
+  /* Booklet DETAIL page (juejin.cn/book/<id>) is a separate namespace the course
+     rules never reached: `.book-card-header` (cover + buy box), the `.book-card`
+     body holding the 介绍/目录 tabs and the whole chapter description, and the
+     `.books-recommend` aside all ship a plain white bg. With our lightened text on
+     top the entire page read white-on-white. The `.book-menu::after` tab underline
+     is a light hairline. */
+  .book-card,
+  .book-card-header,
+  .book-menu-wrap,
+  .books-recommend,
+  .book-catalog,
+  .book-intro {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+  }
+
+  .book-menu::after {
+    background-color: #262c33 !important;
+  }
+
   /* ---------- Header / nav (opaque, sits above scrolling content) ---------- */
   .main-header,
   .main-header-box,
@@ -201,6 +303,18 @@
     background-color: #0d1117 !important;
     border-bottom: 1px solid #262c33 !important;
     box-shadow: none !important;
+  }
+
+  /* The wordmark is an <img> SVG whose 稀土掘金 glyph paths are `fill="#323232"`
+     (only the chevron mark is brand #1E80FF). On the dark header that is 1.48:1 —
+     the site's own name is effectively invisible, on every page. It's a raster-ish
+     <img>, so its paths cannot be restyled; the standard dark-mode filter pair
+     lifts the grey glyphs to #cdcdcd (11.9:1) while hue-rotate carries the chevron
+     back to (52,150,255), within a hair of the brand blue. Measured, not guessed. */
+  .main-header .logo-img,
+  .logo .logo-img,
+  img.logo-img {
+    filter: invert(1) hue-rotate(180deg);
   }
 
   .main-header .nav-item,
@@ -216,6 +330,55 @@
   .nav-item-active,
   .nav-list a:hover {
     color: #e6edf3 !important;
+  }
+
+  /* The CURRENT section / sort tab. Juejin marks it `.active` (+ vue-router's
+     `.route-active` / `.router-link-exact-active`) and colours the anchor #1e80ff:
+     the main header (课程 on /course, 沸点 on /pins), the search type nav
+     (综合/文章/…), the search sort nav (综合排序/…), and the tag page's 热门/最新/最热.
+     Our own `a`, `.nav-list a` and `.list-header .nav-item` rules repainted that
+     anchor the same grey as its inactive siblings, so no page showed which tab was
+     selected. The `li` guard matters: the user-profile tab bar uses `div.nav-item`
+     and marks its active tab with primary text (#252933 natively), not the accent —
+     it must keep the white `.item-title` treatment below. */
+  li.nav-item.active,
+  li.nav-item.route-active,
+  li.nav-item.router-link-exact-active,
+  li.nav-item.active > a,
+  li.nav-item.route-active > a,
+  li.nav-item.router-link-exact-active > a {
+    color: #5fb0e6 !important;
+  }
+
+  /* Left category rail: the selected row keeps its blue-tinted `.active-nav` fill,
+     but our blanket `.nav-item-text` literal remap greyed the label that native
+     paints #1e80ff — the tint alone read as a hover, not a selection. The 热榜 page's
+     SUB-category rail (综合/后端/前端…) marks the selected row with `.active-sub-nav` /
+     `.router-link-exact-active` on a `.sub-nav-item` (NOT `.active-nav`), so the
+     generic `.nav-item-text` grey won there and the current category read identical
+     to its siblings — no selection indicator. Restore the accent for that state too. */
+  .nav-item-content.active-nav .nav-item-text,
+  .active-nav .nav-item-text,
+  .sub-nav-item.active-sub-nav .nav-item-text,
+  .sub-nav-item.router-link-exact-active .nav-item-text,
+  .active-sub-nav .nav-item-text {
+    color: #5fb0e6 !important;
+  }
+
+  /* The header "HOT" activity badge (`span.new-font`, 23×11px, one per page).
+     Two of our own rules broke it: `.nav-item.link-item span` painted its label
+     #c4cdd6 (2.26:1 on the #f64242 pill) and the `*` border reset repainted the
+     1px ring that natively matches the header. Restore the white label, deepen the
+     fill to juejin's OWN `--juejin-danger-2-deep` (#c62633 → 5.64:1 white, same hue
+     family, exactly the move the brand blue makes below), and point the ring at the
+     dark header so it cuts out the way #fff did on the light one. */
+  .main-header .nav-item.link-item span.new-font,
+  span.new-font,
+  .new-font {
+    background-color: #c62633 !important;
+    border-color: #0d1117 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
   }
 
   /* Global search box in the header */
@@ -262,7 +425,6 @@
   .global-component-box,
   .recommended-area,
   .author-block,
-  .author-info-block,
   .side-info,
   .popular-box,
   .recommended-tags,
@@ -276,6 +438,11 @@
   .comment-list,
   .comment-item,
   .reply-list,
+  .post-list-box,
+  .collection-list-box,
+  .collection-list,
+  .like-list-box,
+  .concern-list-box,
   .dropdown-list,
   .byte-popover,
   .byte-select-dropdown,
@@ -315,6 +482,45 @@
     background-color: #1c2128 !important;
     border-color: #262c33 !important;
     box-shadow: none !important;
+  }
+
+  /* `.author-info-block` is the article-page BYLINE ROW (author · date · views),
+     not a card — it is transparent on the live site. Painting it as an elevated
+     surface drew a stray grey band across the article header. */
+  .author-info-block {
+    background-color: transparent !important;
+  }
+
+  /* Profile list sort pills ("最新"/"热门") ship a light-grey #f2f3f5 fill, and the
+     selected one a light-blue #eaf2ff — 52×28 chips that slip the audit's size
+     filter and glare as pale pills on the dark list. The follow pill on the
+     关注 tab (`.jj-follow-btn`) is a white 90×30 button with green text. */
+  .sort-action {
+    background-color: #21262d !important;
+    color: #9aa6b0 !important;
+  }
+
+  .sort-action.active {
+    background-color: #1a2433 !important;
+    color: #5fb0e6 !important;
+  }
+
+  .jj-follow-btn {
+    background-color: #1c2128 !important;
+    border-color: #37c700 !important;
+  }
+
+  /* Avatar wells (`.jj-avatar`) keep a hardcoded #f9f9f9 disc behind the picture —
+     a bright circle while the image lazy-loads or when the user has none. */
+  .avatar.jj-avatar,
+  .jj-avatar {
+    background-color: #1c2128 !important;
+  }
+
+  /* Booklet cover wells on 课程 hold a light rgba(228,230,235,.5) placeholder. */
+  .book-thumb,
+  .book-poster {
+    background-color: #1c2128 !important;
   }
 
   /* User-profile content column (juejin.cn/user/<id>): the activity/post feed,
@@ -437,13 +643,32 @@
     background-color: #1a2433 !important;
   }
 
-  /* Hover state for feed rows / list items */
+  /* Hover state for feed rows / list items. The 掘金热榜 row (`.article-item-wrap`)
+     flips to a hardcoded #f7f8fa on hover — a full-width white bar whose (now light)
+     title text disappears into it. Hover states never show up in a static scan. */
   .entry:hover,
   .item:hover,
   .article-item:hover,
+  .article-item-wrap:hover,
   .hot-list-item:hover,
   .pin-item:hover,
   .activity-item:hover {
+    background-color: #232a32 !important;
+  }
+
+  /* The same #f7f8fa hover fill is used by the left category rail
+     (`.nav-item-content`, and the 热榜 page's `.sub-nav-item-content`), the sidebar
+     rank rows (`.hot-item`), the 沸点 dock nav and the 课程 announcement links. Each
+     paints a white block under text we have already lightened → the label vanishes
+     on hover. Hover states are invisible to any static scan. */
+  .nav-item-content:hover,
+  .sub-nav-item-content:hover,
+  .books-recommend-item:hover,
+  .hot-item:hover,
+  .dock-nav .title:hover,
+  .dock-nav .topic:hover,
+  .announcement-content:hover,
+  .jj-link.announcement-content:hover {
     background-color: #232a32 !important;
   }
 
@@ -502,6 +727,31 @@
     color: #ff9d8a !important;
     background-color: transparent !important;
     font-style: normal;
+  }
+
+  /* …but the abstract line of a search result is wrapped in `a.jj-link.abstract`,
+     and our own `.abstract-row *` / `a.jj-link.abstract *` remaps (0,2,1) outrank a
+     bare `em` (0,0,1) — so the matched words were highlighted in the result TITLE
+     and rendered as plain body text one line below. Re-assert the highlight at a
+     specificity those wildcards cannot beat. */
+  .info-row a.jj-link.abstract em,
+  .info-row.abstract-row em,
+  a.jj-link.abstract em,
+  .abstract em {
+    color: #ff9d8a !important;
+    background-color: transparent !important;
+  }
+
+  /* Juejin draws the author hover-card / category-popover pointer as
+     `<em class="triangle">` — a rotated square filled from `var(--juejin-popup)`.
+     It is an `em` ONLY as a tag choice, so the search-highlight rule above blanked
+     its background and the `*` reset repainted its two borders: the card shipped
+     with no pointer at all. Not an `em`: give it the panel fill back. */
+  em.triangle,
+  .triangle-bottom .triangle {
+    background-color: #1c2128 !important;
+    border-color: #1c2128 !important;
+    color: #c4cdd6 !important;
   }
 
   p,
@@ -571,6 +821,22 @@
   .pin-item .topic,
   .pin a.theme,
   .pin-content a {
+    color: #5fb0e6 !important;
+  }
+
+  /* The inline `#话题#` hashtags in a pin body are `span[data-node="theme"]` carrying
+     an inline `color: var(--juejin-font-brand1-normal)`. The block above claims the
+     token remap covers them — it does not: our own `.pin span` (0,1,1) is !important
+     and beats a non-important inline style, so every hashtag rendered as plain body
+     grey. Same for the `发布在 X 圈子` chip label, whose span lost the chip's accent. */
+  .pin span[data-node="theme"],
+  .pin-item span[data-node="theme"],
+  .pin-list span[data-node="theme"],
+  .pin-view span[data-node="theme"],
+  .pin-view .content span[data-node="theme"],
+  .pin-club-box .club span,
+  .club span,
+  .new_topic span {
     color: #5fb0e6 !important;
   }
 
@@ -649,7 +915,12 @@
     color: #9bd4ff !important;
   }
 
-  /* ---------- Brand blue (refined for dark) ---------- */
+  /* ---------- Brand blue (refined for dark) ----------
+     Every filled CTA takes #0060dd — Juejin's OWN active-state blue (its
+     `.confirm-btn:visited`), not the raw #1e80ff resting hex. Same hue family,
+     site-authentic, and it carries a white 14px/400 label at 5.65:1 where the
+     verbatim #1e80ff manages only 3.76:1. Accent LINES (the booklet tab underline,
+     the checked-checkbox tick) keep #1e80ff — they are graphical, not text. */
   .login-button,
   .btn-login,
   button.primary,
@@ -660,9 +931,46 @@
   .add-group,
   .add-group .add-btn,
   .add-group .more {
-    background-color: #1e80ff !important;
-    border-color: #1e80ff !important;
+    background-color: #0060dd !important;
+    border-color: #0060dd !important;
     color: #ffffff !important;
+  }
+
+  /* Juejin's real follow / login / purchase CTAs (`.animation-follow-btn` in the
+     article sidebar + profile header, `.jj-follow-button`, its `.follow-text` label,
+     the inline `.login-btn`, the comment-box `.login-guide-button`, the booklet
+     `.book-buy-button` and the share-modal `.short-btn`) fill from
+     `--juejin-brand-1-normal`, which we remap to the light accent used for TEXT.
+     That painted them pale #5fb0e6 with white labels (2.4:1). They ship natively as
+     #1e80ff/#fff, so restore the brand fill on the exact button subset — at the same
+     #0060dd the block above uses, so no CTA is a different blue from its neighbour.
+     The already-followed state stays a ghost button. */
+  .animation-follow-btn,
+  .follow-btn,
+  .jj-follow-button.follow,
+  .follow-text,
+  .login-btn,
+  .item-login-button,
+  .login-guide-button,
+  .book-buy-button,
+  .short-box .short-btn {
+    background-color: #0060dd !important;
+    border-color: #0060dd !important;
+    color: #ffffff !important;
+  }
+
+  /* The booklet CTA nests its price / `原价` spans, which take the light body-text
+     token (#e6edf3) rather than inheriting — force them white on the blue fill. */
+  .book-buy-button * {
+    color: #ffffff !important;
+  }
+
+  .animation-follow-btn.followed,
+  .follow-btn.followed,
+  .jj-follow-button.followed {
+    background-color: #21262d !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
   }
 
   /* The header "创作者中心" CTA (`.add-group` → `.add-btn` + caret `.more`) drove its
@@ -792,6 +1100,13 @@
   .code-block-extension-lineNumber {
     color: #5c6570 !important;
     border-color: #262c33 !important;
+  }
+
+  /* The rendered gutter number is `.code-block-extension-codeLine::before`
+     (content: attr(...)) — pseudo TEXT with no text node, so no `color` walk sees
+     it. It kept a #808080 grey = 4.2:1 on the code surface, under AA. */
+  .code-block-extension-codeLine::before {
+    color: #8b949e !important;
   }
 
   .code-block-extension-copyCodeBtn {
@@ -998,6 +1313,65 @@
     border-color: #2d333b !important;
   }
 
+  /* The 课程 filter chips are `.tag-item`s too, but they encode SELECTION, not a
+     link: natively the unselected chip is a transparent outlined pill and the
+     selected one a filled `--juejin-gray-2` pill with bold `--juejin-font-1` text.
+     Both tokens are already remapped correctly — it was the blanket chip rule above
+     that painted BOTH states the same fill and the same blue label, leaving the two
+     distinguishable only by a 1px border. Hand each state back its own look.
+     (Scoped to `.course-header`: the `.dislike-menu` tag chips are also `.tag-item`
+     and drive their active state off the brand-fill tokens.) */
+  .course-header .tag-item {
+    background-color: transparent !important;
+    color: #9aa6b0 !important;
+  }
+
+  .course-header .tag-item.active {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+  }
+
+  /* The course-card "新品" badge is a `span.new-tag-wrap.tag` — a `.tag`, so the
+     blanket chip rule above flattened its native red (`--juejin-danger-1-normal`
+     #f64242) fill to the grey chip surface, erasing the "new" signal. It carries a
+     white label, so restore a deepened danger red (white reads 5.6:1, same move the
+     header HOT badge makes). Higher specificity than `.tag` so it wins outright. */
+  span.new-tag-wrap,
+  .new-tag-wrap.tag,
+  .new-tag-wrap {
+    background-color: #c62633 !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+  }
+
+  /* Booklet prices: `.price` keeps juejin's red (#f64242) but its `¥` sign is a
+     nested `span.price-unit`, and our broad `.jj-link span` remap (0,2,0) repainted
+     it body-grey — the currency mark fell off the price. `.origin-price` (the struck
+     original) is a muted grey natively; the same rule made it as bright as body text. */
+  .jj-link .price .price-unit,
+  .price .price-unit,
+  .price-unit {
+    color: inherit !important;
+  }
+
+  .jj-link .origin-price,
+  .origin-price {
+    color: #8b949e !important;
+  }
+
+  /* Two more #eaf2ff chips, both too small for the audit's size floor on the pages
+     we sampled first: the "作者" badge on an author's own comment (30×18) and the
+     "优秀作者" achievement pill in the article byline card (48×15). The achievement
+     pill also took our body-text grey, so it read light-on-light. Same brand-tinted
+     dark treatment the club/select chips get. */
+  .author-tag,
+  .achievements .name,
+  .achievement-item .name {
+    background-color: #1a2433 !important;
+    border-color: #24314a !important;
+    color: #5fb0e6 !important;
+  }
+
   /* Hot / 热 rank markers — keep the warm accent, refined */
   .hot-number,
   .rank-number.top,
@@ -1035,6 +1409,169 @@
     background: #4a525d;
   }
 
+  /* ---------- Interaction-only floating surfaces ----------
+     These panels are `display:none` until hovered/clicked, so a static scan never
+     sees them. Each keeps a white background and NO `color` of its own, so with
+     `color-scheme: dark` the initial text colour is now WHITE — the labels render
+     white-on-white and vanish. (Verified: the share flyout and the pin "屏蔽作者/举报"
+     menu.) Dark the panel AND state the text colour explicitly. */
+  .share-popup,
+  .share-panel,
+  .wechat-qrcode,
+  .dislike-list,
+  .dislike-entry,
+  .action-box-wrap,
+  .action-box,
+  .action-bar,
+  .carousel-body,
+  .navigation.navigator,
+  .dislike-entry .icon {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+  }
+
+  .share-popup,
+  .share-popup span,
+  .share-panel,
+  .share-panel span,
+  .wechat-qrcode,
+  .wechat-qrcode span,
+  .dislike-list,
+  .dislike-list span,
+  .dislike-list .item,
+  .action-box,
+  .action-box span,
+  .action-bar,
+  .action-bar span,
+  .navigation.navigator span {
+    color: #c4cdd6 !important;
+  }
+
+  /* The feed card's "…" (dislike) flyout. It is NOT `.dislike-list`/`.dislike-entry`
+     — juejin renders `.dislike-menu`, which replaces a Vue comment placeholder only
+     AFTER the trigger is clicked, so `querySelectorAll('.dislike-menu')` returns 0 at
+     rest and the panel evades every load-time scan. It painted `var(--juejin-popup)`
+     white, and its `.menu-text` lost to our own `.entry-footer *` rule (#8b949e),
+     giving a 2.9:1 grey label on a white pill over the dark feed. The token remap
+     above darkens the panel; these rules restore the label/icon hierarchy (native:
+     icon dimmer than label) and beat `.entry-footer *` on specificity. */
+  .dislike-menu {
+    background-color: #1c2128 !important;
+    border: 1px solid #2d333b !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .dislike-menu .menu-item:hover {
+    background-color: #262c33 !important;
+  }
+
+  .dislike-menu .menu-text {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+
+  .dislike-menu .menu-item .menu-icon path {
+    fill: #9aa6b0 !important;
+  }
+
+  /* Below 960px the menu rows and the tag block gain 1px #e5e6eb `::after`
+     separators — pseudo-element backgrounds, so no border reset reaches them. */
+  .dislike-menu .menu-item::after,
+  .dislike-menu .tags-row::after {
+    background: #2d333b !important;
+  }
+
+  /* Surfaces juejin's stylesheet paints a hardcoded #fff that we could NOT reach
+     logged-out on any page type (they need an account, a live campaign, or a paged
+     result set), enumerated straight out of `app.css` / `10.css` rather than left to
+     ship white: the byte-design pagination strip, the generic `.dropdown-menu`, the
+     aside promo panel, the `secondary` button, the footer WeChat QR flyout, and the
+     activity nav tooltip (white panel + #17181a text + a white ::before-less
+     `.triangle` span). Unverified against a live element — see the review notes. */
+  ul .byte-pagination__item,
+  .byte-pagination__item,
+  .dropdown-menu,
+  .aside-top-section,
+  .qr-panel,
+  .nav-item.activities .tip {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  ul .byte-pagination__item--active,
+  ul .byte-pagination__item:hover,
+  .byte-pagination__item--active {
+    background-color: #1a2433 !important;
+    color: #5fb0e6 !important;
+  }
+
+  .nav-item.activities .tip .triangle {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  .ui-btn.secondary {
+    background-color: #21262d !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* byte-design floating surfaces hardcode DARK text (#1d252f / #282f38) on the
+     white `--juejin-popup` panel. `.byte-popover` already read dark-on-dark; the
+     modal and light tooltip only turn dark-on-dark once the token above darkens
+     them, so their text MUST be lifted in the same pass. */
+  .byte-popover,
+  .byte-tooltip--light {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+
+  .byte-popover__content {
+    color: #c4cdd6 !important;
+  }
+
+  .byte-modal__content {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
+
+  /* The profile "…" overflow menu is another white display:none panel. */
+  .more-panel {
+    background-color: #1c2128 !important;
+  }
+
+  .more-panel,
+  .more-panel .more-item {
+    color: #c4cdd6 !important;
+  }
+
+  /* Their pointer arrows are PSEUDO-element triangles, so the `*` border reset
+     above never reached them and they keep the site's white fill — invisible while
+     the panel was white, a bright spike once we darken it. `.more-panel` draws a
+     two-layer arrow (::before = outline, ::after = fill). */
+  .share-popup::after {
+    border-right-color: #1c2128 !important;
+  }
+
+  .more-panel::before {
+    border-bottom-color: #262c33 !important;
+  }
+
+  .more-panel::after {
+    border-bottom-color: #1c2128 !important;
+  }
+
+  /* 1px `.split` separators inside those panels hardcode #e4e6eb; the course
+     author link draws its separator as a light 1px `::after` right border. */
+  .split {
+    background-color: #262c33 !important;
+  }
+
+  .jj-link.items.author::after {
+    border-right-color: #262c33 !important;
+  }
+
   /* ---------- Misc surfaces / overlays ---------- */
   .byte-tooltip__content,
   .byte-popconfirm,
@@ -1057,6 +1594,22 @@
     background-color: #1c2128 !important;
     border: 1px solid #262c33 !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Article pages float an "AI 助手" vertical pill (`.btn.btn-ai`) against the right
+     margin with a hardcoded white fill — a bright capsule on the dark page. */
+  .btn.btn-ai {
+    background-color: #1c2128 !important;
+    border: 1px solid #262c33 !important;
+    color: #c4cdd6 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Its "AI 助手" caption is an `::after` with `content:` and its OWN hardcoded
+     #0c0d0e — pseudo text, so no `color` walk sees it and the element rule above
+     cannot reach it. Darkening the pill alone left the caption near-black, 1.2:1. */
+  .btn.btn-ai::after {
+    color: #c4cdd6 !important;
   }
 
   /* Article-page left action rail (like/comment/collect/share/report/fullscreen +

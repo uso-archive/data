@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Pikabu.
-@version      20260707.14.33
+@version      20260710.13.13
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -59,7 +59,9 @@
     --color-black-200: var(--pk-surface);        /* was #f9f9fb */
     --color-black-300: var(--pk-bg);             /* was #f7f8fc */
     --color-black-400: var(--pk-border);         /* was #e9e9e9 */
-    --color-black-420: var(--pk-border);
+    /* NOT a surface token: black-420 is only ever used as `color`, for the label on
+       the video-player scrim. Pikabu keeps it #e9e9e9 in its own dark theme too. */
+    --color-black-420: #e9e9e9;
     --color-black-430: var(--pk-border);         /* was #ebedf2 */
     --color-black-440: var(--pk-border);
     --color-black-500: #4a525c;                  /* was #d8dadd */
@@ -77,9 +79,12 @@
     --s-colorBg-special: #2a2718;
     --s-colorBg-popup: rgba(0, 0, 0, 0.64);
 
+    --s-text-heading-primary: var(--pk-text);
     --s-text-paragraph-primary: var(--pk-text);
+    --s-text-paragraph-secondary: var(--pk-text-soft);
     --s-text-subheading-primary: var(--pk-text);
     --s-text-label-primary: var(--pk-text-soft);
+    --s-text-label-secondary: var(--pk-text-muted);
     --s-text-label-tertiary: var(--pk-text-muted);
     --user-name-text: var(--pk-text);
 
@@ -98,11 +103,27 @@
     --c-combobox-strokeDefault: var(--pk-border);
     --c-combobox-content-stroke: var(--pk-border);
     --c-combobox-contentDefault: var(--pk-text-muted);
+    --c-combobox-contentFilled: var(--pk-text);
+    --c-combobox-contentDisabled: var(--pk-text-muted);
+    /* Suggestion list (tag/author filters). Only rendered once the field is focused
+       and typed into, so no load-time scan sees it: the item label kept #292a2e and
+       the matched substring a pale #eaffd9 chip — invisible / glaring on the dark list. */
+    --c-combobox-list-textPrimary: var(--pk-text-soft);
+    --c-combobox-list-textSecondary: var(--pk-text-muted);
+    --c-combobox-list-hover: var(--pk-surface);
+    --c-combobox-list-click: var(--pk-border);
+    --c-combobox-searchBg: #3a4d2a;
     --c-select-main-bgDefault: var(--pk-surface-2);
     --c-select-main-bgDisabled: var(--pk-bg);
     --c-select-main-strokeDefault: var(--pk-border);
     --c-select-list-bg: var(--pk-surface);
     --c-select-list-item-text: var(--pk-text);
+    /* The Select/Dropdown panel paints itself from --c-select-list-item-default (NOT
+       -bg). It is portaled into <body> only while open, so a load-time scan never sees
+       it: the panel stayed #fcfdff white under our light item text. */
+    --c-select-list-item-default: var(--pk-surface);
+    --c-select-list-item-hover: var(--pk-surface-2);
+    --c-select-list-item-click: var(--pk-border);
     --c-selectBtn-bgDefault: var(--pk-surface-2);
     --c-selectBtn-bgHover: var(--pk-surface);
     --c-selectBtn-stroke: var(--pk-border);
@@ -118,7 +139,11 @@
     --c-tooltip-bg: var(--pk-surface);
     --c-tooltip-text: var(--pk-text);
     --c-menu-item-text: var(--pk-text);
+    --c-menu-item-hover: var(--pk-surface-2);
+    --c-menu-item-click: var(--pk-border);
     --c-counter-bgTertiary: var(--pk-surface-2);
+    /* filled counters keep a light brand/alert fill — flip their label dark to read */
+    --c-counter-text: var(--pk-bg);
 
     /* ---- Secondary buttons (neutral greys) ---- */
     --c-btn-secondary-bgDefault: var(--pk-surface-2);
@@ -313,9 +338,9 @@
   .search-suggest { background-color: var(--pk-surface) !important; }
 
   /* ===== Login form — third-party provider buttons ===== */
-  /* The provider buttons (VK / Yandex ID) keep their brand background but hardcode
-     a near-black #1c2128 label that survives the theme; on the black Yandex button
-     it is near-invisible. Lift every provider label to a readable light tone. */
+  /* The provider buttons (VK / Yandex ID) keep their brand background, but their label
+     is painted with --color-bright-900, which this theme remaps to a dark tone — on the
+     black Yandex button that is near-invisible. Pin the label light. */
   .auth__provider-text,
   [class*="auth__provider"] .auth__provider-text { color: var(--pk-text) !important; }
 
@@ -351,14 +376,22 @@
     border-color: var(--pk-border) !important;
   }
   [class*="TabItem__tab"]:hover::before { background-color: var(--pk-surface) !important; }
-  /* active tab: white label on the brand-green pill */
-  [class*="TabItem__tab_active"],
-  [class*="TabItem__tab_active"] span,
-  [class*="TabItem__tab--active"] { color: #ffffff !important; font-weight: 600 !important; }
-  [class*="TabItem__tab_active"]::before,
-  [class*="TabItem__tab--active"]::before {
+  /* The selected tab is marked by a data-tab-active ATTRIBUTE, not a class — the old
+     [class*="TabItem__tab_active"] selectors never matched, so our neutral pill above
+     painted the selected tab too and it read as unselected. Restore the green pill. */
+  [class*="TabItem__tab"][data-tab-active],
+  [class*="TabItem__tab"][data-tab-active] span { color: #ffffff !important; font-weight: 600 !important; }
+  [class*="TabItem__tab"][data-tab-active]::before {
     background-color: var(--pk-green-deep) !important;
     border-color: var(--pk-green-deep) !important;
+  }
+  /* Counter pills nested in a tab must not inherit the tab's label colour: the filled
+     "primary" counter sits on brand green, where a light label lands at ~1.1:1. The
+     doubled attribute selector is needed to outrank the tab's own label rule. */
+  [class*="Counter__host"][class*="_primary"],
+  [class*="Counter__host"][class*="_primary"] span {
+    color: var(--pk-bg) !important;
+    -webkit-text-fill-color: var(--pk-bg) !important;
   }
 
   /* Search period / type segmented buttons (Сегодня / Неделя / Текстовые …) */
@@ -453,18 +486,61 @@
   }
   .page-topic-links__link:hover { background-color: var(--pk-surface-2) !important; color: var(--pk-text) !important; }
 
-  /* Shop / gamification user badges keep their warm accent text but get a dark,
-     low-saturation surface instead of the light cream original. */
-  .story__user-badge.pkb-badge-shop,
-  .pkb-badge-shop,
   .gamification-btn { background-color: var(--pk-surface-2) !important; }
 
-  /* The purchasable "mint" (myata) nickname badge hardcodes a dark-green #338065
-     label that reads ~3.7:1 on our dark badge surface — below the WCAG floor.
-     Lift it to a brighter mint that keeps the badge's green identity but stays
-     legible on the dark pill. */
-  .pkb-badge-shop_myata,
-  [class*="pkb-badge-shop_myata"] { color: #5cb98a !important; -webkit-text-fill-color: #5cb98a !important; }
+  /* Purchasable nickname badges. Each variant carries its own identity in
+     --badge-shop-{bg,stroke,content}; a flat neutral surface plus the old `.hint`
+     muting collapsed all six to the same grey pill. Drive the badge from its own
+     tokens and pin each variant to a dark tint with a label above the WCAG floor.
+     `!important` on the custom property is required: Pikabu re-declares these under
+     :root[data-theme-dark], which outranks a plain override. */
+  .pkb-badge-shop {
+    background-color: var(--badge-shop-bg) !important;
+    border-color: var(--badge-shop-stroke) !important;
+    color: var(--badge-shop-content) !important;
+    -webkit-text-fill-color: var(--badge-shop-content) !important;
+  }
+  .pkb-badge-shop_myata {
+    --badge-shop-bg: #11261f !important;
+    --badge-shop-stroke: #1d4034 !important;
+    --badge-shop-content: #5cb98a !important;
+  }
+  .pkb-badge-shop_bubblegum {
+    --badge-shop-bg: #330d1d !important;
+    --badge-shop-stroke: #4d142c !important;
+    --badge-shop-content: #e5679c !important;
+  }
+  .pkb-badge-shop_papaya {
+    --badge-shop-bg: #2e1707 !important;
+    --badge-shop-stroke: #47240b !important;
+    --badge-shop-content: #e58d4e !important;
+  }
+  .pkb-badge-shop_banana {
+    --badge-shop-bg: #1f1d17 !important;
+    --badge-shop-stroke: #332f23 !important;
+    --badge-shop-content: #e8ba23 !important;
+  }
+  .pkb-badge-shop_berry {
+    --badge-shop-bg: #121633 !important;
+    --badge-shop-stroke: #1e254d !important;
+    --badge-shop-content: #8b96e8 !important;
+  }
+  .pkb-badge-shop_sliva {
+    --badge-shop-bg: #231233 !important;
+    --badge-shop-stroke: #371d4d !important;
+    --badge-shop-content: #b98be0 !important;
+  }
+
+  /* The "donated" reaction pill keeps a cream #fff3eb fill (Pikabu only darkens it in
+     its own dark theme, so a light-OS user gets a glaring island among dark pills). */
+  button.emotion-btn_donated,
+  .emotion-btn_donated {
+    background-color: #2a2318 !important;
+    color: #e0975a !important;
+    -webkit-text-fill-color: #e0975a !important;
+  }
+  button.emotion-btn_donated:hover,
+  .emotion-btn_donated:hover { background-color: #352c1e !important; }
 
   /* ===== Generic light surfaces caught by literal colours ===== */
   [style*="background: #fff"],
@@ -498,8 +574,11 @@
     color: var(--pk-text-soft) !important;
   }
 
-  /* ===== Generic muted / hint text ===== */
-  .hint, .text-muted, .date, time, .comment__time, .story__date {
+  /* ===== Generic muted / hint text =====
+     `.hint` is NOT a muted-text class on Pikabu — it marks "this element owns a
+     tooltip", and it lands on shop badges, reaction pills and the logo. Muting it
+     erased their colours; list the genuinely-muted elements instead. */
+  .text-muted, .date, time, .comment__time, .story__date, .story__views {
     color: var(--pk-text-muted) !important;
   }
 
@@ -524,6 +603,31 @@
   [class*="player-block__preview"],
   [class*="video-file-player__player"],
   [class*="player-block__poster"] { background-color: #0d1117 !important; }
+
+  /* --color-bright-900 (#ffffff) is Pikabu's ALWAYS-white foreground: it paints the
+     label/icon of every brand fill, and it stays #ffffff even in Pikabu's own dark
+     theme. We remap it to a dark tone at :root so labels read on this theme's
+     lightened brand-green fills — but the same token also paints the chrome that
+     floats over photos, video scrims and the black image viewer, where a dark tone is
+     invisible. Restore the white foreground for those subtrees only. --color-black-440
+     rides along: it colours the viewer's help/zoom icons on the same black backdrop. */
+  .image-viewer,
+  .external-video-viewer,
+  .story__adult-overlay,
+  .story_overlayed,
+  .toast,
+  .pls-not-block,
+  .image-thumb__information,
+  .image-thumb__duration,
+  .story-fragment__play,
+  .comment-external-video__play,
+  .comment-external-video__state,
+  .carousel_images .carousel__cur-slide,
+  .dnd-overlay__content,
+  [class*="player-block__state"] {
+    --color-bright-900: #e9e9e9;
+    --color-black-440: #e9e9e9;
+  }
 
   /* Header ad-slot containers default to a literal white background; before an ad
      paints (or when none loads) that flashes a bright strip across the top of

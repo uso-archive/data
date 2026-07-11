@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for DaFont. Browse fonts late at night without the  glare: the homepage, font categories, search, font pages and author pages all get an  easy-on-the-eyes dark look.
-@version      20260707.14.30
+@version      20260711.00.14
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -15,13 +15,46 @@
     background-color: #14181d !important;
     color: #c4cdd6 !important;
   }
-  .layout, .container, .width, .minwidth, .contain, .out,
+  /* The 404 page (and only the 404 page) paints a bright penguin photo as a
+     `body` background-image, which our light body text then sits on unreadably.
+     It's a raster, so bg-color and gradient audits both miss it. */
+  body { background-image: none !important; }
+  /* NOTE: `.contain` is NOT a layout wrapper — it is the little pink "Accents"/
+     "Euro" badge on each font row. Blanking it strips the pill and drops black
+     glyphs straight onto the red bar, so it must stay out of this reset. */
+  .layout, .container, .width, .minwidth, .out,
   #content, table, tbody, tr, td {
     background-color: transparent !important;
   }
 
   /* ---- Soften all default light/black borders ---- */
   * { border-color: #2d333b !important; }
+  /* DaFont uses fat `solid #fff` borders as invisible spacers on its white page.
+     The remap above turns those into visible grey slabs — keep them invisible. */
+  div[style*="solid #fff"] { border-color: transparent !important; }
+  /* The blanket reset above also swallows every BRAND-RED rule DaFont draws
+     (`#menuthemes table` 4px frame, the .titlebar/h1/.headerpage hairlines, the
+     current-page pagination pill, the new-fonts date divider). Give them back the
+     softened brand red — a grey slab where the site drew red is a lost signal that
+     no contrast or luminance check can see. */
+  #menuthemes table, .menupselect,
+  .titlebar, h1, h3.headerpage, .headindex, .select, .new_date,
+  .help {
+    border-color: #b3322f !important;
+  }
+  /* Forum thread status ring: DaFont encodes reply state as an inline border-color
+     on .thumb_cont (#d4d4d4 none / #fc3 has replies / #3d6 answered) and repeats the
+     same three hues in the .square legend swatches below the list. Flattening them
+     to grey drops the state AND breaks the legend, so keep the two chromatic ones
+     verbatim; the neutral #d4d4d4 stays the softened grey from the reset above. */
+  div.thumb_cont[style*="#fc3"] { border-color: #fc3 !important; }
+  div.thumb_cont[style*="#3d6"] { border-color: #3d6 !important; }
+  /* The .square swatches (forum-list legend + the per-page status boxes in the
+     pagination) repeat those same three hues, but as a BACKGROUND, not a border —
+     the reset above only softens borders, so the neutral #d4d4d4 swatch stayed a
+     bright light-grey square glaring on dark AND no longer matched its softened-grey
+     ring. Bring it in line; the two chromatic swatches keep their inline #fc3/#3d6. */
+  span.square[style*="#d4d4d4"] { background-color: #2d333b !important; }
 
   /* ---- Links ---- */
   a { color: #5fb0e6 !important; }
@@ -56,14 +89,26 @@
     background-color: #b3322f !important;
     color: #ffffff !important;
   }
-  /* Category-nav links sit in a bar that also carries .dfsmall; keep them white
-     so the muted-.dfsmall text rules below don't grey them out (higher
-     specificity wins regardless of source order). */
+  /* Category-nav links sit in a bar that also carries .dfsmall. These selectors
+     are NOT enough on their own — `.dfsmall a:not(.dl)` below scores higher and
+     greys them out on the red bar; the brand-bar block near the end restores
+     them. Keep this rule for the plain (non-.dfsmall) metacat bars. */
   .metacat a, .metacat.dfsmall a { color: #ffffff !important; }
   .catpp { background-color: transparent !important; color: #c4cdd6 !important; }
+  /* `.catpp a:hover` hardcodes a light-grey #e3e3e3 pill (drawn for the white page).
+     Neutralizing `.catpp` alone leaves it: the hovered link becomes a glaring white
+     chip with our light-blue label on it (~1.5:1). Hover-only, so no load-time scan
+     ever sees it. */
+  .catpp a:hover { background-color: #21262d !important; }
+  /* The CURRENT subcategory is the only `#menuthemes b` on the page and DaFont paints
+     it brand red — that red is the entire "you are here" cue (its siblings are links).
+     Our broad `b, strong` rule greyed it out. Scoped to .catpp so the .metacat headers
+     on the red bars keep the white text set at the end of this sheet. */
+  .catpp b { color: #e86a64 !important; }
 
   /* ---- Search form + submit ---- */
-  .search_form, input[type="text"], input[type="search"], textarea, select {
+  .search_form, input[type="text"], input[type="search"], input[type="password"],
+  input[type="email"], textarea, select {
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
     border: 1px solid #2d333b !important;
@@ -90,6 +135,7 @@
      is softened by the global border rule, consistent with other bars. */
   div[style*="border-top:1px solid #CC0000"][style*="background:#f0f0f0"] {
     background: #1c2128 !important;
+    border-top-color: #b3322f !important;
   }
   /* Listing option-bar checkbox pill ("Show variants") — DaFont wraps it in a
      hardcoded light-grey (#ebebeb) .form_elt_bg box. Left alone it glares on the
@@ -114,6 +160,21 @@
     border-radius: 4px !important;
   }
 
+  /* ---- Black icon rasters (pagination arrows, dropdown caret) ---- */
+  /* These GIFs are solid-black glyphs on transparent, drawn for the white page;
+     on dark they render as invisible dark-on-dark shapes. Raster, so no colour
+     audit sees them. Invert to white glyphs. */
+  /* out3_black.gif is the BLACK twin of out3.gif (the white one DaFont uses on its red
+     bars) — it marks external author links on the plain page. Measured mean luminance
+     0/255, so on dark it is an invisible glyph. Do NOT invert out3.gif: that one is
+     already white. */
+  img[src*="/img/dropdown.gif"],
+  img[src*="/img/page_suivante.gif"],
+  img[src*="/img/theme_suivant.gif"],
+  img[src*="/img/out3_black.gif"] {
+    filter: invert(1) !important;
+  }
+
   /* ---- Download box + button ---- */
   .dlbox {
     background-color: #1c2128 !important;
@@ -126,6 +187,11 @@
     border: 1px solid #2d333b !important;
   }
   .dl:hover { background-color: #2d333b !important; color: #ffffff !important; }
+  /* DaFont's whole hover affordance on both buttons is `border: 2px solid #c00`.
+     The blanket border reset repaints it grey, so `.donate` (which has no background
+     of its own) ends up with NO hover feedback at all. Give the red edge back. */
+  .dl:hover, .donate:hover { border-color: #b3322f !important; }
+  .donate:hover { background-color: #21262d !important; }
 
   /* ---- Font-file caption bar (glyph map header) + filename chip ---- */
   /* Original is a light grey→white gradient with white text — recolor to a dark
@@ -147,15 +213,19 @@
   .titlebar, h1 {
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
-    border-color: #2d333b !important;
   }
-  .titlebar .dffont2, .titlebar a, h1 a { color: #e6edf3 !important; }
+  .titlebar a { color: #e6edf3 !important; }
+  /* DaFont paints the page title itself in brand red (`h1, .headerpage {color:#c00}`
+     and `.dffont2 {color:#c00}`), and on the search page the echoed query sits inside
+     it as `<div class="dffont2"><b><i>query</i></b></div>` — our broad `b, strong` and
+     `p, td, i` rules repaint those children grey. Keep the whole title red. */
+  h1, h1 a, .dffont2, .titlebar .dffont2,
+  .dffont2 a, .dffont2 b, .dffont2 i { color: #e86a64 !important; }
   /* Forum section-title band (h3.headerpage) is a light-grey bar like .titlebar,
      with DaFont-red heading text — raise to an elevated dark surface, keep red. */
   h3.headerpage {
     background-color: #1c2128 !important;
     color: #e86a64 !important;
-    border-color: #2d333b !important;
   }
   /* Forum thread title is a bare <h2> on the base dark bg — DaFont's base
      `body,div,td:{color:#000}` leaves it black-on-dark. Lift it to readable. */
@@ -202,6 +272,18 @@
   div[style*="margin-left:140px"],
   div[style*="margin-left:140px"] li,
   div[style*="margin-left:140px"] div:not([class]) { color: #c4cdd6 !important; }
+  /* …but the author-profile username is exactly such a classless div, inline-coloured
+     brand red — it is that page's only heading and the rule above greys it out. The
+     column-scoped selectors below match its specificity (0,2,2) and come later, so
+     they win the tie; the bare ones cover the same div outside the column.
+     (`border-top:1px solid #CC0000` on the wrapper does NOT contain the substring
+     `color:#CC0000`, so the wrapper's background is untouched.) */
+  div[style*="color:#CC0000"],
+  div[style*="color:#cc0000"],
+  div[style*="margin-left:140px"] div[style*="color:#CC0000"],
+  div[style*="margin-left:140px"] div[style*="color:#cc0000"] {
+    color: #e86a64 !important;
+  }
   /* Listing subtitle ("- N font files") + truncation ellipsis */
   .lv2right, .cut { color: #c4cdd6 !important; }
   /* New-fonts page date divider (.new_date): the date keeps DaFont's red but the
@@ -214,7 +296,12 @@
      (#eee default, #cfb answered-green, #fff5af highlighted) wash the .tdh title
      and the bare "N reply" text node out. Raise to an elevated dark surface and
      keep the green "answered" status as a dark-green tint. */
+  /* The three inline bgs are a status key matched by the .square legend swatches:
+     #eee = no reply, #fff5af = has replies, #cfb = answered. Keep all three
+     distinguishable — collapsing #fff5af into the neutral surface silently drops
+     the "has replies" state the yellow legend swatch still promises. */
   .thumb_text { background: #1c2128 !important; color: #c4cdd6 !important; }
+  .thumb_text[style*="#fff5af"] { background: #3a2f0c !important; }
   .thumb_text[style*="#cfb"] { background: #16361f !important; }
 
   /* ---- Secondary / muted text ---- */
@@ -228,7 +315,6 @@
   .noindex .select, .select {
     background-color: #21262d !important;
     color: #e86a64 !important;
-    border-color: #2d333b !important;
   }
 
   /* ---- Help / FAQ boxes ---- */
@@ -243,12 +329,51 @@
     background-color: #14181d !important;
   }
 
+  /* ---- Horizontal rules drawn as repeating raster GIFs ---- */
+  /* /img/points.gif is a black dot on transparent (a black dotted rule on the
+     white page, invisible on dark); /img/points_test.gif is a SOLID WHITE tile
+     used as an invisible spacer on the white page, which paints a glaring white
+     band above the footer on dark. Both are background-IMAGES, so the bg-color
+     scan reports them clean. Drop the rasters; redraw the real rule in CSS. */
+  .points, div[style*="points.gif"], div[style*="points_test.gif"] {
+    background-image: none !important;
+  }
+  .points, div[style*="points.gif"] {
+    border-bottom: 1px dotted #2d333b !important;
+  }
+
   /* ---- "Back to top" strip (inline light-grey background) ---- */
   /* A full-width clickable bar above the footer hardcodes background:#e6e6e6;
      darken it to match the elevated surface (its white arrow icons stay visible). */
   .tdn[style*="#e6e6e6"], [style*="background:#e6e6e6"] {
     background: #1c2128 !important;
   }
+
+  /* ---- Brand-red bar text stays white (must outrank our own muted rules) ---- */
+  /* The broad `b, strong` and `.dfsmall a:not(.dl)` rules above repaint the font
+     name and the category headers a muted grey ON the red bar (~3.8:1 — the site
+     ships them white). Same specificity as `.dfsmall b` / `.dfsmall a:not(.dl)`,
+     so this block has to come last to win the tie. */
+  .dfbg b, .dfbg strong, .metacat b, .metacat strong,
+  .lv1left b, .lv1left strong, .lv1right b, .lv1right strong,
+  .lv2left b, .lv2left strong,
+  .metacat.dfsmall a, .metacat.dfbg a, .dfbg a.tdn, .lv1left a.tdn {
+    color: #ffffff !important;
+  }
+
+  /* ---- Account-only surfaces (present in DaFont's stylesheet, login-gated) ---- */
+  /* `div.notif b {background:#ff3; color:#b00}` is the yellow confirmation banner.
+     Our `b, strong` rule repaints its text light grey — 1.9:1 on that yellow. Keep the
+     site's dark red. `.pselect {color:#c00}` is the selected preview-size label; raw
+     #c00 is only 2.6:1 on our base. Neither renders logged-out, so both are matched
+     from DaFont's own base11.css rather than a live element. */
+  div.notif b { color: #b00 !important; }
+  .pselect { color: #e86a64 !important; }
+
+  /* Forum breadcrumb separator: DaFont's base `div { color:#000 }` leaves this
+     arrow glyph pure black — 1.18:1 on the dark page. It carries no own colour
+     rule, and it is a single character, so the dark-on-dark scan skips it. */
+  .rr { color: #8b949e !important; }
 
   /* ---- Tables / generic light cells safety net ---- */
   td[bgcolor="#FFFFFF"], td[bgcolor="#ffffff"], td[bgcolor="white"],

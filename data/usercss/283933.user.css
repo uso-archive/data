@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for CSDN: comfortable dark articles, homepage and search, with fully dark code blocks and a readable syntax palette.
-@version      20260705.21.15
+@version      20260711.00.14
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -225,6 +225,14 @@
   #csdn-toolbar {
     background-color: var(--csdn-chrome) !important;
   }
+  /* The www.csdn.net category-chip bar (.home_box_nav) is position:fixed and
+     natively opaque white, but it is a <div class>, so the broad neutralizer
+     (body div[class], higher specificity) flattens it to transparent — the feed
+     then scrolls straight through the gaps between the chips. Re-seat it
+     opaque on the page base. */
+  body div.home_box_nav {
+    background-color: var(--csdn-base) !important;
+  }
 
   /* Toolbar search autocomplete flyout: the .toolbar-search-drop-menu
      (associate-word) panel + its .drop-menu-list are flattened to
@@ -254,20 +262,41 @@
   }
 
   /* Toolbar dropdown menus + their items */
-  .menus-view_content__inner,
-  .menus-view,
-  .menus-item,
-  .menus-item p,
-  .menus-item a,
   .toolbar-menu-list,
   .toolbar-menu-list li {
     background-color: var(--csdn-chrome) !important;
     color: var(--csdn-text-2) !important;
   }
-  .menus-item:hover,
-  .menus-item a:hover,
   .toolbar-menu-list li:hover {
     background-color: var(--csdn-elev2) !important;
+  }
+
+  /* Home category-chip carousel (.menus-view). Each chip is a <p> inside
+     li.menus-item: natively a light #f2f2f2 pill, and the SELECTED chip is a
+     BLACK pill with white text. Painting every chip (and both states) the same
+     dark chrome erased the selection entirely — the active category read
+     identically to the eleven inactive ones. Mirror the native inversion:
+     recessed pill for inactive, bright pill with dark text for the selected. */
+  .menus-view,
+  .menus-view .menus-item {
+    background-color: transparent !important;
+  }
+  /* category chips are <p>; the sponsored "tag-nav" chips are <a> — both ship
+     the same light #f2f2f2 pill, so both need the recessed dark pill */
+  .menus-view .menus-item p,
+  .menus-view .menus-item a {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-text-2) !important;
+  }
+  .menus-view .menus-item p:hover,
+  .menus-view .menus-item a:hover {
+    background-color: #30363d !important;
+  }
+  /* declared after :hover on purpose — equal specificity, so the selected chip
+     keeps its bright pill while hovered (and no :not() reaches the .org mirror) */
+  .menus-view .menus-item p.active {
+    background-color: var(--csdn-text) !important;
+    color: var(--csdn-chrome) !important;
   }
   /* toolbar top-nav dropdown items (.toolbar-subMenu — e.g. "更多" holding
      会议/学习) paint a near-white rgb(240,240,245) highlight on the trigger
@@ -293,6 +322,80 @@
     color: var(--csdn-text-2) !important;
   }
 
+  /* ---------- Right-edge floating side toolbar (every page) ----------
+     Each .option-box circle (手机看 QR / 客服 / 返回顶部 / CSDN GO) ships a
+     literal white 44px disc: it is an <a>, so the div/section neutralizer
+     never touches it, and at 44px it sits under the audit big() threshold.
+     Darken the disc and invert the monochrome near-black raster glyphs that
+     were drawn for a white background. The colored CSDN-GO badge
+     (Group.png) is deliberately NOT inverted so it keeps its brand colors. */
+  .csdn-side-toolbar a.option-box,
+  a.option-box {
+    background-color: var(--csdn-elev2) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  /* the label layer that covers each disc (hover caption, and the always-on
+     "GO" caption on the CSDN-GO badge) is its own white <span> */
+  a.option-box .show-txt {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-text-2) !important;
+    -webkit-text-fill-color: var(--csdn-text-2) !important;
+  }
+  a.option-box > img[src*="/mobile"],
+  a.option-box > img[src*="/customer"],
+  a.option-box > img[src*="/totop"],
+  a.option-box > img[src*="/qr."],
+  a.option-box > img[src*="/fanhuidingbu"] {
+    filter: invert(1) brightness(0.85) !important;
+  }
+  /* the 手机看 hover flyout (.app-qr-box) is a <div>, so the neutralizer
+     flattens it to transparent and the page scrolls through behind the QR
+     panel — re-establish a solid chrome surface (floating-surface bleed) */
+  body div.app-qr-box,
+  body div.app-qr-box .bg-box {
+    background-color: var(--csdn-chrome) !important;
+    border-color: var(--csdn-border) !important;
+  }
+
+  /* ---------- Blog-article floating bars (must stay opaque) ----------
+     Both are <div>s flattened by the broad neutralizer, so the article text
+     scrolls straight through them: the bottom action bar (.left-toolbox —
+     赞/收藏/评论/分享 + the author follow strip) and the guest "登录后您可以
+     享受以下权益" tip card (.passport-login-tip-container, z-index 9999). */
+  body div.left-toolbox,
+  body div.passport-login-tip-container {
+    background-color: var(--csdn-elev) !important;
+    border-color: var(--csdn-border) !important;
+  }
+
+  /* article aside 归档 (archive) month tiles: the month label ships a light
+     rgb(237,240,243) box and the post-count a rgb(246,248,250) one — 56×22,
+     under the audit big() floor, so both go light-on-light once our theme
+     lifts their labels. */
+  .archive-box .archive-item span.time,
+  .archive-box .archive-item span.count {
+    background-color: var(--csdn-elev2) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  .archive-box .archive-item span.count {
+    color: var(--csdn-text-2) !important;
+  }
+
+  /* profile aside "展开" expand buttons (.aside-common-box-bottom-btn) ship a
+     light-grey rgb(245,246,247) 40×16 pill — a <button>, audit-blind twice.
+     Its chevron is an <i class="el-icon-arrow-down"> whose own #555666 survives
+     the button's color (a ::before glyph, 2.11:1 on the dark pill). */
+  .aside-common-box-bottom-btn,
+  .aside-common-box-bottom button {
+    background-color: var(--csdn-elev2) !important;
+    border-color: var(--csdn-border) !important;
+    color: var(--csdn-muted) !important;
+  }
+  .aside-common-box-bottom-btn i,
+  .aside-common-box-bottom button i {
+    color: var(--csdn-muted) !important;
+  }
+
   /* Side copyright/contact footer popover */
   .csdnside-copyright-footer-contact,
   .csdnside-copyright-footer-contact .work-time-btn,
@@ -316,6 +419,11 @@
     color: var(--csdn-text) !important;
   }
 
+  /* NOTE: no `#content_views span` here. An ID-scoped span rule is (1,0,2) and
+     therefore out-specifies EVERY syntax-token class (.hljs-keyword (0,1,0),
+     .token.keyword (0,2,0)) — it silently repainted both palettes body-grey, so
+     article code blocks rendered with no highlighting at all. The plain `span`
+     rule below already covers article prose. */
   p, span, li, td, th, dd, dt, label, div,
   .text,
   .summary,
@@ -325,7 +433,6 @@
   #content_views,
   #content_views p,
   #content_views li,
-  #content_views span,
   .comment-content {
     color: var(--csdn-text-2) !important;
   }
@@ -377,6 +484,29 @@
   .toolbar-container a:hover,
   .home_box_nav a:hover {
     color: var(--csdn-link-hover) !important;
+  }
+  /* the toolbar 会员·新人礼包 promo link carries an inline color:#FC5531 — our
+     blanket `a` / `.toolbar-container a` rules erase it (inline colours lose to
+     !important), so the one deliberately-red toolbar item shipped plain white.
+     Restore a dark-tuned brand red. */
+  .toolbar-btn-vip a,
+  .toolbar-btn-vip a:hover {
+    color: var(--csdn-red) !important;
+  }
+  /* home feed card summaries are <a class="article-desc">, natively a muted
+     #999 — the blanket `a` rule painted them link-blue, so every card body read
+     as a hyperlink. Put them back to metadata grey. */
+  a.article-desc {
+    color: var(--csdn-muted) !important;
+  }
+  a.article-desc:hover {
+    color: var(--csdn-text-2) !important;
+  }
+  /* in-article promoted keyword (span.new-words-blog) ships an inline
+     color:#FC5531 that our `span` rule flattens to body grey — the hot-word
+     stops looking clickable */
+  span.new-words-blog {
+    color: var(--csdn-red) !important;
   }
 
   /* ---------- Inputs / forms / search ---------- */
@@ -459,13 +589,36 @@
     -webkit-text-fill-color: currentColor !important;
   }
 
-  /* inline code inside prose */
+  /* Inline code inside prose. Written WITHOUT `:not(pre code)` — a complex
+     :not() is stripped from .org.css, so userstyles.org only ever received the
+     `p code` / `li code` arms and left inline code in tables, headings and
+     blockquotes unstyled. Matching every `code` under the article roots and then
+     re-asserting the block appearance below is equivalent and survives sanitizing.
+     The reset is REQUIRED: `#content_views code` is (1,0,1) and out-ranks the
+     block rule's bare `pre code` (0,0,2), so without it a code block's <code>
+     would take the inline pill background. */
+  #content_views code,
+  .markdown_views code,
   #content_views p code,
   #content_views li code,
   p code,
   li code {
     background-color: var(--csdn-elev2) !important;
     color: #e6a98c !important;
+    border-color: var(--csdn-border) !important;
+  }
+
+  /* …and put code INSIDE a block back to the block appearance. (1,0,2) beats the
+     inline rule above; the bare `pre code` arm is later in source order, so it
+     also beats the bare `p code` / `li code` arms. */
+  #content_views pre code,
+  #content_views pre code.hljs,
+  .markdown_views pre code,
+  .markdown_views pre code.hljs,
+  pre code,
+  pre code.hljs {
+    background-color: var(--csdn-code-bg) !important;
+    color: #c9d1d9 !important;
     border-color: var(--csdn-border) !important;
   }
 
@@ -500,9 +653,18 @@
     color: var(--csdn-link) !important;
   }
 
-  /* ---- highlight.js syntax palette (GitHub-dark) ---- */
+  /* ---- highlight.js syntax palette (GitHub-dark) ----
+     CSDN's markdown_views stylesheet ships its own hljs skin as
+     `.markdown_views .hljs-keyword { color: #000088 !important }` — (0,2,0) and
+     !important, so a bare `.hljs-keyword !important` (0,1,0) LOSES and the whole
+     palette silently reverted to the site's light-theme token colours inside
+     every article. #content_views IS the .markdown_views element, so an
+     ID-prefixed twin of each selector (1,1,0) out-specifies it. The bare
+     selectors stay for hljs blocks outside the article body. */
   .hljs-comment,
-  .hljs-quote {
+  .hljs-quote,
+  #content_views .hljs-comment,
+  #content_views .hljs-quote {
     color: #8b949e !important;
     font-style: italic;
   }
@@ -511,25 +673,43 @@
   .hljs-literal,
   .hljs-type,
   .hljs-deletion,
-  .hljs-subst {
+  .hljs-subst,
+  #content_views .hljs-keyword,
+  #content_views .hljs-selector-tag,
+  #content_views .hljs-literal,
+  #content_views .hljs-type,
+  #content_views .hljs-deletion,
+  #content_views .hljs-subst {
     color: #ff7b72 !important;
   }
   .hljs-string,
   .hljs-meta-string,
   .hljs-regexp,
-  .hljs-addition {
+  .hljs-addition,
+  #content_views .hljs-string,
+  #content_views .hljs-meta-string,
+  #content_views .hljs-regexp,
+  #content_views .hljs-addition {
     color: #a5d6ff !important;
   }
   .hljs-number,
   .hljs-symbol,
   .hljs-bullet,
-  .hljs-link {
+  .hljs-link,
+  #content_views .hljs-number,
+  #content_views .hljs-symbol,
+  #content_views .hljs-bullet,
+  #content_views .hljs-link {
     color: #79c0ff !important;
   }
   .hljs-title,
   .hljs-function .hljs-title,
   .hljs-section,
-  .hljs-name {
+  .hljs-name,
+  #content_views .hljs-title,
+  #content_views .hljs-function .hljs-title,
+  #content_views .hljs-section,
+  #content_views .hljs-name {
     color: #d2a8ff !important;
   }
   .hljs-attr,
@@ -539,25 +719,102 @@
   .hljs-selector-attr,
   .hljs-selector-pseudo,
   .hljs-selector-class,
-  .hljs-selector-id {
+  .hljs-selector-id,
+  #content_views .hljs-attr,
+  #content_views .hljs-attribute,
+  #content_views .hljs-variable,
+  #content_views .hljs-template-variable,
+  #content_views .hljs-selector-attr,
+  #content_views .hljs-selector-pseudo,
+  #content_views .hljs-selector-class,
+  #content_views .hljs-selector-id {
     color: #79c0ff !important;
   }
   .hljs-built_in,
   .hljs-builtin-name,
   .hljs-class .hljs-title,
-  .hljs-meta {
+  .hljs-meta,
+  #content_views .hljs-built_in,
+  #content_views .hljs-builtin-name,
+  #content_views .hljs-class .hljs-title,
+  #content_views .hljs-meta {
     color: #ffa657 !important;
   }
   .hljs-operator,
   .hljs-punctuation,
-  .hljs-params {
+  .hljs-params,
+  #content_views .hljs-operator,
+  #content_views .hljs-punctuation,
+  #content_views .hljs-params {
     color: #c9d1d9 !important;
   }
-  .hljs-tag {
+  .hljs-tag,
+  #content_views .hljs-tag {
     color: #7ee787 !important;
   }
   .hljs-emphasis { font-style: italic; }
   .hljs-strong { font-weight: bold; }
+
+  /* ---- Prism.js syntax palette (`code.prism`) ----
+     CSDN's CURRENT default renderer is Prism (span.token.*), not highlight.js —
+     the .hljs-* map above never touches it. Our broad `span { color }` rule then
+     flattened every Prism token to one body grey, so a modern CSDN code block
+     shipped with NO syntax colours at all. `.token.x` is (0,2,0) so it beats the
+     `span` rule without !important games. Same GitHub-dark palette as hljs. */
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: #8b949e !important;
+    font-style: italic;
+  }
+  .token.keyword,
+  .token.atrule,
+  .token.important,
+  .token.deleted {
+    color: #ff7b72 !important;
+  }
+  .token.string,
+  .token.char,
+  .token.attr-value,
+  .token.regex,
+  .token.inserted {
+    color: #a5d6ff !important;
+  }
+  .token.number,
+  .token.boolean,
+  .token.constant,
+  .token.symbol {
+    color: #79c0ff !important;
+  }
+  .token.function,
+  .token.class-name {
+    color: #d2a8ff !important;
+  }
+  .token.property,
+  .token.attr-name,
+  .token.variable {
+    color: #79c0ff !important;
+  }
+  .token.builtin,
+  .token.namespace {
+    color: #ffa657 !important;
+  }
+  .token.tag,
+  .token.selector {
+    color: #7ee787 !important;
+  }
+  /* Prism's stock theme paints .token.operator/.entity/.url on a translucent
+     WHITE background (hsla(0,0%,100%,.5)) — clear it, keep punctuation neutral */
+  .token.operator,
+  .token.punctuation,
+  .token.entity,
+  .token.url {
+    color: #c9d1d9 !important;
+    background: transparent !important;
+  }
+  .token.bold { font-weight: bold; }
+  .token.italic { font-style: italic; }
 
   /* ---------- Markdown content extras ---------- */
   #content_views blockquote,
@@ -617,6 +874,19 @@
     background-color: var(--csdn-elev2) !important;
     color: var(--csdn-text-2) !important;
   }
+  /* member/course-card "VIP" pill (p.tag) is a GOLD gradient background-IMAGE
+     with dark-brown label text. The bg-image survives our neutralizer, but the
+     muted-metadata `.tag` rule repainted the label light grey — grey-on-gold,
+     ~1.9:1. Restore the site's brown so the gold pill stays legible. */
+  .member-item p.tag,
+  a > div.image > p.tag {
+    color: #69421b !important;
+  }
+  /* headline-list bullets (span.border) are literal 8px #ccc squares — a subtle
+     marker on the native white page, the brightest pixels on ours */
+  .home-info-headlines a span.border {
+    background-color: #30363d !important;
+  }
 
   /* ---------- Search-results filters / sort tabs (all states) ---------- */
   .so-search,
@@ -656,6 +926,23 @@
     background-color: var(--csdn-elev2) !important;
     color: var(--csdn-text-2) !important;
     border-color: var(--csdn-border) !important;
+  }
+  /* so.csdn.net "搜索发现" rank ordinals: the site colours the top three
+     (#fe2d46 / #f60 / #faa90e) and greys the rest — our muted `.num` rule
+     flattened all of them. Restore, lifting only #1 (#fe2d46 is 4.07:1 on the
+     dark base) to a readable red. The widget renders as .wrap-hot on the live
+     results page; .related-list is the same list on the sidebar variant. */
+  .wrap-hot ul li:first-child .num,
+  .related-list ul li:first-child .num {
+    color: #ff5a6e !important;
+  }
+  .wrap-hot ul li:nth-child(2) .num,
+  .related-list ul li:nth-child(2) .num {
+    color: #f60 !important;
+  }
+  .wrap-hot ul li:nth-child(3) .num,
+  .related-list ul li:nth-child(3) .num {
+    color: #faa90e !important;
   }
 
   /* search submit button — brand red, white glyph */
@@ -839,6 +1126,14 @@
      The Q&A subdomain ships a light active channel pill, a white
      leaderboard header, and a selected filter tag whose dark text
      (driven by -webkit-text-fill-color) goes dark-on-dark. */
+  /* every channel-list row turns a light rgb(245,246,247) on :hover (audit-blind:
+     the light bg only exists while hovered, and each row is 160×32, under the big()
+     floor). Left the hovered row a bright light-grey box with pale text on dark.
+     Recolor the hover state to a dark tint; declared BEFORE .cur/.active (equal
+     specificity) so the selected row keeps its brighter active surface while hovered. */
+  .channelList li:hover {
+    background-color: var(--csdn-elev) !important;
+  }
   .channelList li.cur,
   .channelList li.active {
     background-color: var(--csdn-elev2) !important;
@@ -867,6 +1162,17 @@
     background-image: none !important;
     background-color: var(--csdn-base) !important;
   }
+  /* profile content tab strip (.navList): the site signals the ACTIVE tab only
+     by darkness (#222226 active vs #555666 inactive), so once our theme lifted
+     every li to the same body grey the selected tab became indistinguishable.
+     Re-establish the contrast, inverted for dark. */
+  .navList ul li {
+    color: var(--csdn-muted) !important;
+  }
+  .navList ul li.active {
+    color: var(--csdn-text) !important;
+  }
+
   /* the "原力等级" achievement / influence card (active state is white) */
   .user-influence-list,
   .user-influence-list.active,
@@ -914,6 +1220,24 @@
     background-color: var(--csdn-elev2) !important;
     border-top-color: var(--csdn-elev2) !important;
   }
+  /* login-method tabs (微信登录 / 验证码登录 / APP登录): the selected tab is marked
+     ONLY by a near-black #222226 label plus a #222226 ::after underline. On the
+     dark card the underline is invisible and every tab reads the same, so the
+     form gives no sign of which login method is active. */
+  .login-box-tabs-items span {
+    color: var(--csdn-muted) !important;
+  }
+  .login-box-tabs-items span.tabs-active {
+    color: var(--csdn-text) !important;
+  }
+  /* the "上次登录" hint pill is a sibling span in the same row — restore it after
+     the muted rule above rather than excluding it with a :not() */
+  .login-box-tabs-items span.last-login-way {
+    color: var(--csdn-text-2) !important;
+  }
+  .login-box-tabs-items span.tabs-active::after {
+    background-color: #fc5531 !important;
+  }
 
   /* ---------- Element UI cards (download.csdn.net / 文库 + Vue pages) ----------
      The 文库/download frontend is built on Element UI; its .el-card panels
@@ -933,6 +1257,83 @@
     background-color: transparent !important;
     color: var(--csdn-text-2) !important;
   }
+  /* Element UI toasts (.el-message) and confirm dialogs (.el-message-box) are
+     floating div[class] surfaces, so the broad neutralizer strips their light
+     background and the page bleeds through the toast. They are transient — a
+     chroma scan caught one mid-flight — so no load-time screenshot shows them.
+     Re-seat them opaque, and keep the error/success/warning type colours that
+     the blanket text rules would otherwise collapse into one grey. */
+  body div.el-message,
+  body div.el-message-box,
+  body div.el-message-box__header,
+  body div.el-message-box__content {
+    background-color: var(--csdn-elev) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  .el-message__content {
+    color: var(--csdn-text-2) !important;
+  }
+  .el-message--error .el-message__content {
+    color: var(--csdn-red) !important;
+  }
+  .el-message--success .el-message__content {
+    color: #7ee787 !important;
+  }
+  .el-message--warning .el-message__content {
+    color: #e3a75f !important;
+  }
+
+  /* Element UI checkbox (so.csdn.net "VIP内容" result filter, download forms)
+     ships a literal white 14px box — too small for the audit size filter.
+     Only repaint the UNCHECKED box so the checked brand-blue fill survives. */
+  .el-checkbox__input:not(.is-checked) .el-checkbox__inner,
+  .el-radio__input:not(.is-checked) .el-radio__inner {
+    background-color: var(--csdn-elev2) !important;
+    border-color: var(--csdn-border) !important;
+  }
+
+  /* download.csdn.net sidebar panels paint a light PNG as a background-IMAGE
+     behind real DOM copy (bg-color audit-blind): the 会员 promo header
+     (.user-info > .top-info) and the 创作灵感 / upload panel
+     (.upload-sidebar). Our lifted text ships white-on-white on both. */
+  body div.user-info > div.top-info,
+  body div.upload-sidebar {
+    background-image: none !important;
+    background-color: var(--csdn-elev) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  /* resource-card category chips (.header-tag) + the el-card header pill ship
+     a pale rgb(247,247,252) bg under pale-blue link text = pale-on-pale */
+  .resource-card .header-tag,
+  a.header-tag,
+  .el-card__header button.header-info {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-link) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  /* download.csdn.net paints price, "免费"/membership markers and the 查看 /
+     去上传 affordances in brand red #fc5531 — the blanket div/span text rules
+     collapsed every one of them to body grey. 查看 and 免费 additionally sit on a
+     rgba(252,85,49,.1) red-tinted chip, so grey text there is a genuine
+     mismatch. Restore a dark-tuned brand red. */
+  body div.price,
+  body span.price,
+  .price em,
+  span.free,
+  span.view-btn,
+  span.to-upload {
+    color: var(--csdn-red) !important;
+  }
+  /* the gold "开通会员" pill is a raster background-IMAGE, so its brown label
+     must stay brown — our grey washed it out on the gold */
+  a.vip-button span.preferential {
+    color: #925417 !important;
+  }
+  /* the active toolbar tab is marked ONLY by a 2px #fc5531 top border, which the
+     blanket `* { border-color }` rule flattened into the ordinary line colour */
+  a.custom_toolbar_content_active {
+    border-color: #fc5531 !important;
+  }
 
   /* download.csdn.net "新版内容上线啦" onboarding modal: .right-content paints
      a white raster panel (bg-IMAGE, audit-blind) and all the title/feature
@@ -948,9 +1349,16 @@
   .dialog-tip .title {
     color: var(--csdn-text) !important;
   }
-  .dialog-tip .text,
-  .dialog-tip .btn {
+  .dialog-tip .text {
     color: var(--csdn-text-2) !important;
+  }
+  /* the modal's "体验新功能" CTA is a <div class="btn"> with a #fc5531 fill — the
+     broad neutralizer stripped the fill and our .btn rule greyed the label, so
+     the only action in the dialog rendered as plain body text */
+  body div.dialog-tip div.btn {
+    background-color: #d6492b !important;
+    color: #ffffff !important;
+    border-color: #d6492b !important;
   }
   /* the left panel is a decorative cube-animation <video> with a baked-in
      light background — hide it so the flattened dark left panel stays clean */
@@ -994,6 +1402,47 @@
     border-color: var(--csdn-border) !important;
     color: var(--csdn-text-2) !important;
   }
+  /* bbs community-recommend rail "加入" buttons ship a literal white 48×24
+     pill (a <button>, so the div/section neutralizer misses it, and it is
+     under the audit big() threshold). */
+  .bbs-recommend-list_ul li button,
+  .bbs-recommend-list_ul button {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-link) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  /* bbs feed red-packet greeting pill: pale-pink rgb(253,231,232) bg whose
+     label our muted grey then renders light-on-light. Tint it dark, keep the
+     red-packet brand red on the label. */
+  .red-packet-icon-mini .num,
+  span.red-packet-icon-mini > span.num {
+    background-color: #3d2124 !important;
+    color: var(--csdn-red) !important;
+  }
+
+  /* ---------- 问答 (ask.csdn.net) question-card meta pills ----------
+     The .slug-nav row under each question renders its tag pill on a pale
+     rgb(235,242,247) and its view-count / timestamp pills on literal white
+     (20px tall, so under the audit big() floor). Our lightened labels then
+     go light-on-light. Darken the whole row. */
+  .question-header .slug-nav li,
+  .slug-nav li.other-data,
+  .slug-nav li.other-data.views {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-text-2) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  /* the 采纳榜 leaderboard's selected range chip paints a mid-grey
+     rgb(193,193,193) box under our light label */
+  .diff-camp .active-camp span,
+  .diff-camp span.camp.active-camp > span {
+    background-color: #30363d !important;
+    color: var(--csdn-text) !important;
+  }
+  /* white sliver behind the collapsed channel-list button row */
+  .channelList li.btns_li {
+    background-color: transparent !important;
+  }
 
   /* ---------- Images / avatars keep their own pixels ---------- */
   img,
@@ -1028,6 +1477,52 @@
   /* active item glyph stays a touch brighter */
   .layout-menus .layout-menu-item.active .layout-menu-item_icon img[src*="20241216111623"] {
     filter: invert(1) brightness(1) !important;
+  }
+
+  /* ---------- Google Funding Choices consent sheet ----------
+     CSDN serves the IAB-TCF CMP (.fc-consent-root) to EU visitors on first
+     visit; its stylesheet is injected AFTER our theme, so a bare .fc-dialog
+     rule ties on specificity and loses on source order. Scope every rule from
+     .fc-consent-root to out-specify it and dark the whole white sheet. */
+  .fc-consent-root .fc-dialog,
+  .fc-consent-root .fc-dialog-content,
+  .fc-consent-root .fc-choice-dialog,
+  .fc-consent-root .fc-header,
+  .fc-consent-root .fc-footer {
+    background-color: var(--csdn-elev) !important;
+    color: var(--csdn-text) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  .fc-consent-root .fc-dialog h1,
+  .fc-consent-root .fc-dialog h2,
+  .fc-consent-root .fc-dialog p,
+  .fc-consent-root .fc-dialog li,
+  .fc-consent-root .fc-dialog span,
+  .fc-consent-root .fc-dialog div,
+  .fc-consent-root .fc-dialog-headline,
+  .fc-consent-root .fc-dialog-content {
+    color: var(--csdn-text) !important;
+    -webkit-text-fill-color: var(--csdn-text) !important;
+  }
+  .fc-consent-root .fc-faq-icon,
+  .fc-consent-root .fc-faq-contents {
+    background-color: var(--csdn-base) !important;
+  }
+  .fc-consent-root .fc-dialog hr {
+    background-color: var(--csdn-border) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  /* "Manage options" preferences panel: sticky header, each purpose card and
+     the vendor rows all ship a literal white surface */
+  .fc-consent-root .fc-dialog-header,
+  .fc-consent-root .fc-navigation-button,
+  .fc-consent-root .fc-manage-vendors {
+    background-color: var(--csdn-elev) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  .fc-consent-root .fc-preference-container {
+    background-color: var(--csdn-elev2) !important;
+    border-color: var(--csdn-border) !important;
   }
 
   /* ---------- Scrollbar ---------- */

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete, polished dark theme for Chefkoch. Homepage, recipe pages and search/category results all get a calm GitHub-dark treatment while Chefkoch's signature green brand accent stays intact. Easy on the eyes for late-night recipe browsing.
-@version      20260707.14.29
+@version      20260711.00.13
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -70,6 +70,10 @@
     color: #e6edf3 !important;
   }
   .w-header a:hover, .w-main-menu a:hover, .ds-tab-nav__link:hover { color: #ffffff !important; }
+  /* "Eine Marke von FUNKE" wordmark: its <svg> carries its own color:#000 and
+     the paths fill with currentColor -> pure black on the dark banner */
+  .w-funke-banner__link, .w-funke-banner__link svg { color: #c4cdd6 !important; }
+  .w-funke-banner__link svg path { fill: currentColor !important; }
   /* logo glyphs (green hat + dark wordmark) -> keep hat green, lift letters */
   [data-testid="logo-hat"], [data-testid="logo-hat"] path { fill: #4cae5e !important; }
   [data-testid="logo-letters"], [data-testid="logo-letters"] path { fill: #e6edf3 !important; }
@@ -81,6 +85,21 @@
   }
   .w-header__search input::placeholder { color: #8b949e !important; }
   .w-header__search svg, .w-header svg { fill: #c4cdd6 !important; }
+  /* The header search is now a <search-input> web component whose shadow root
+     hardcodes a #fff pill (.ds-search-bar__control) — no selector can reach it.
+     Only inherited properties cross the shadow boundary, so:
+       - `color` is reset to the site's original ink, otherwise our light body
+         colour lands on the component's white fullscreen search overlay (which
+         lives in the TOP LAYER and therefore ignores the filter below) and the
+         suggestion list renders white-on-white;
+       - the collapsed pill in the header is darkened with a hue-preserving
+         invert on the host (top-layer overlay is unaffected by it).
+     The wrapper loses its own fill so no light plate shows around the pill. */
+  .w-header__search { background-color: transparent !important; }
+  search-input {
+    color: #212018 !important;
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
 
   /* PLUS flyout / menu panels */
   .w-flyout__col, .w-flyout__teaser-link, .w-flyout__menu-btn {
@@ -202,11 +221,36 @@
   .ds-slider-image__info, .ds-slider-image__info-link { color: #e6edf3 !important; }
   .ds-teaser-link:hover, .ds-editorial-card:hover, .rsel-recipe:hover,
   .ds-collection-card:hover, .ds-category-card:hover { background-color: #21262d !important; }
+  /* the trend / category tiles each carry their own pastel (yellow, green, pink,
+     blue, cream) that names the category. Collapsing all five to one grey erased
+     that signal — keep every hue, darkened so the white tile label still reads. */
+  .ds-category-card--mirabelle { background-color: #6b5410 !important; }
+  .ds-category-card--broccoli { background-color: #2f5c3b !important; }
+  .ds-category-card--watermelon { background-color: #6e3034 !important; }
+  .ds-category-card--blueberry { background-color: #22485a !important; }
+  .ds-category-card--garlic { background-color: #1c2128 !important; }
+  .ds-category-card--mirabelle:hover { background-color: #7d6314 !important; }
+  .ds-category-card--broccoli:hover { background-color: #386c46 !important; }
+  .ds-category-card--watermelon:hover { background-color: #813940 !important; }
+  .ds-category-card--blueberry:hover { background-color: #2a5569 !important; }
+  .ds-category-card--garlic:hover { background-color: #21262d !important; }
+  /* horizontal sliders fade their edges with a WHITE gradient painted by a
+     ::before/::after background-IMAGE — no element-background scan can see it,
+     and it renders as a bright wash over the last tile of every carousel */
+  .ds-h-scroll-wrap--gradient-left::before {
+    background-image: linear-gradient(90deg, #14181d, #14181d 50%, rgba(20, 24, 29, 0)) !important;
+  }
+  .ds-h-scroll-wrap--gradient-right::after {
+    background-image: linear-gradient(270deg, #14181d, #14181d 50%, rgba(20, 24, 29, 0)) !important;
+  }
   /* image-wrap skeleton placeholders (light-green #e2ece3 behind thumbnails) */
   .ds-teaser-link__image-wrap, .ds-editorial-card__image-wrap,
   .ds-slider-image__image-wrap, .ds-recipe-card__image-wrap,
   .ds-collection-card__image-wrap, .ds-category-card__image-wrap,
   [class*="__image-wrap"] { background-color: #1c2128 !important; }
+  /* the category tile's image-wrap covers the WHOLE tile and its artwork is a
+     transparent PNG, so filling it hides the per-category tint set below */
+  .ds-category-card__image-wrap { background-color: transparent !important; }
   /* profile-card top: a cream #f6f7f4 plate painted by ::before sits behind the
      circular avatar/brand-logo image (home "Profis", magazine "Rezepte von
      Profis"). The avatar img keeps its own circle, so darken just the plate. */
@@ -332,12 +376,18 @@
     border-color: #2d333b !important;
   }
   .ck-check__badge, .ck-check__badge--tip,
-  .ck-check__badge--warning, .ck-check__badge--success {
+  .ck-check__badge--warning, .ck-check__badge--check {
     background-color: #21262d !important;
   }
   .ck-check__label, .ck-check__text { color: #e6edf3 !important; }
   .ck-check__body, .ck-check__body p { color: #c4cdd6 !important; }
   .ck-check__badge i, .ck-check__badge .chefkoch-icons { color: #9aa5af !important; }
+  /* each tip type is identified ONLY by the colour of its glyph: gold bulb =
+     Kniff, red triangle = Stolperfalle, green tick = richtig gut. The broad
+     icon-font grey collapsed all three into the same badge. */
+  .ck-check__badge--tip i, .ck-check__badge--tip .chefkoch-icons { color: #ffcd12 !important; }
+  .ck-check__badge--warning i, .ck-check__badge--warning .chefkoch-icons { color: #f0736e !important; }
+  .ck-check__badge--check i, .ck-check__badge--check .chefkoch-icons { color: #4cae5e !important; }
 
   /* recipe-header "TOP-REZEPT" award pill ships the light-green #e2ece3
      header tint with a grey laurel + grey label that wash out on it ->
@@ -347,7 +397,7 @@
     background-color: #21262d !important;
     border-color: #2d333b !important;
   }
-  .editorial-info-card__pill-label { color: #e6edf3 !important; }
+  .editorial-info-card__pill-label { color: #6fd382 !important; }
   .editorial-info-card__pill .chefkoch-icons,
   .editorial-info-card__pill i { color: #9aa5af !important; }
 
@@ -358,45 +408,137 @@
   /* ====================================================================
      Buttons
      ==================================================================== */
-  /* primary / conversion green CTAs keep the brand fill */
-  .ds-btn--primary, .ds-btn--conversion, .ds-btn--save {
+  /* primary green CTA keeps the brand fill */
+  .ds-btn--primary {
     background-color: #3b8047 !important;
     color: #ffffff !important;
     border-color: #3b8047 !important;
   }
-  .ds-btn--primary:hover, .ds-btn--conversion:hover, .ds-btn--save:hover {
+  .ds-btn--primary:hover {
     background-color: #4a9a58 !important;
     border-color: #4a9a58 !important;
   }
+  /* the CONVERSION CTA ("Speichern" on a recipe, "Jetzt kostenlos testen") is
+     CORAL #ff565d on the light site, NOT green — painting it with the brand
+     green swapped the hue of the site's loudest call to action. Deepen the
+     coral instead so the white label still clears 4.5:1. */
+  .ds-btn--conversion {
+    background-color: #cf444a !important;
+    color: #ffffff !important;
+    border-color: #cf444a !important;
+  }
+  .ds-btn--conversion:hover {
+    background-color: #e05159 !important;
+    border-color: #e05159 !important;
+  }
   .ds-btn--primary .ds-btn__label, .ds-btn--conversion .ds-btn__label,
-  .ds-btn--primary .ds-btn__icon, .ds-btn--conversion .ds-btn__icon { color: #ffffff !important; }
-  /* tertiary / secondary / flat / monochrome / control / round buttons
-     -> dark elevated (the white "Planen"/"Drucken"/"Folgen" pills are
-     .ds-btn--secondary and need the same dark fill) */
-  .ds-btn--tertiary, .ds-btn--secondary, .ds-btn--flat, .ds-btn--monochrome,
-  .ds-btn--control, .ds-btn--round, .ds-btn--close {
+  .ds-btn--primary .ds-btn__icon, .ds-btn--conversion .ds-btn__icon,
+  .ds-btn--primary .chefkoch-icons, .ds-btn--conversion .chefkoch-icons { color: #ffffff !important; }
+  /* round icon buttons ship a white circle -> dark elevated circle */
+  .ds-btn--round {
     background-color: #21262d !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
   }
-  .ds-btn--tertiary:hover, .ds-btn--secondary:hover, .ds-btn--flat:hover,
-  .ds-btn--monochrome:hover, .ds-btn--control:hover, .ds-btn--round:hover { background-color: #2d333b !important; }
-  .ds-btn--tertiary .ds-btn__label, .ds-btn--secondary .ds-btn__label,
-  .ds-btn--flat .ds-btn__label,
-  .ds-btn--monochrome .ds-btn__label { color: #e6edf3 !important; }
+  .ds-btn--round:hover { background-color: #2d333b !important; }
+  /* the "merken" favourite button is a white circle holding a CORAL heart —
+     only the circle goes dark; the heart keeps its red */
+  .ds-btn--save {
+    background-color: #21262d !important;
+    color: #ff7a80 !important;
+    border-color: #2d333b !important;
+  }
+  .ds-btn--save .ds-btn__icon, .ds-btn--save .chefkoch-icons { color: #ff7a80 !important; }
+  .ds-btn--save:hover { background-color: #2d333b !important; }
+  .ds-btn--save:hover .ds-btn__icon, .ds-btn--save:hover .chefkoch-icons { color: #ff9a9e !important; }
+  /* "ghost" buttons ("Planen"/"Drucken"/"Folgen", slider arrows, action menus)
+     are a white fill with a GREEN border and a GREEN label — keep the green */
+  .ds-btn--secondary, .ds-btn--control, .ds-btn--action-menu {
+    background-color: #1c2128 !important;
+    color: #4cae5e !important;
+    border-color: #3b8047 !important;
+  }
+  .ds-btn--secondary .ds-btn__label, .ds-btn--control .ds-btn__label,
+  .ds-btn--action-menu .ds-btn__label,
+  .ds-btn--secondary .chefkoch-icons, .ds-btn--control .chefkoch-icons,
+  .ds-btn--action-menu .chefkoch-icons { color: #4cae5e !important; }
+  .ds-btn--secondary:hover, .ds-btn--control:hover, .ds-btn--action-menu:hover {
+    background-color: #21262d !important;
+    border-color: #6fd382 !important;
+  }
+  /* tertiary = a bare green text button (no fill natively); monochrome/close =
+     a bare grey text button. Neither should grow a pill. */
+  .ds-btn--tertiary {
+    background-color: transparent !important;
+    color: #4cae5e !important;
+    border-color: transparent !important;
+  }
+  .ds-btn--tertiary .ds-btn__label, .ds-btn--tertiary .ds-btn__icon,
+  .ds-btn--tertiary .chefkoch-icons { color: #4cae5e !important; }
+  .ds-btn--tertiary:hover, .ds-btn--tertiary:hover .ds-btn__label { color: #6fd382 !important; }
+  .ds-btn--tertiary-inverted, .ds-btn--tertiary-inverted .ds-btn__label,
+  .ds-btn--tertiary-inverted .chefkoch-icons {
+    background-color: transparent !important;
+    color: #ffffff !important;
+  }
+  .ds-btn--monochrome, .ds-btn--close {
+    background-color: transparent !important;
+    color: #c4cdd6 !important;
+    border-color: transparent !important;
+  }
+  .ds-btn--monochrome .ds-btn__label, .ds-btn--close .ds-btn__label { color: #c4cdd6 !important; }
+  .ds-btn--monochrome:hover, .ds-btn--close:hover {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+  }
   .ds-btn__icon, .ds-btn--round .ds-btn__icon { fill: #c4cdd6 !important; }
+  /* the SELECTED ("--active") state ships a mint fill + green rule; without it
+     a chosen portion size / sort option looks exactly like an unchosen one */
+  .ds-btn--control.ds-btn--active, .ds-btn--action-menu.ds-btn--active,
+  .ds-btn--active {
+    background-color: #1f3a26 !important;
+    border-color: #4cae5e !important;
+    color: #6fd382 !important;
+  }
+  .ds-btn--active .ds-btn__label, .ds-btn--active .chefkoch-icons { color: #6fd382 !important; }
+  /* DISABLED variants ship a #a7a7a2 grey; our variant fills were repainting
+     them as fully enabled buttons */
+  .ds-btn--disabled, .ds-btn:disabled, .ds-btn[disabled] { color: #6e7681 !important; }
+  .ds-btn--disabled .ds-btn__label, .ds-btn:disabled .ds-btn__label,
+  .ds-btn[disabled] .ds-btn__label, .ds-btn--disabled .chefkoch-icons,
+  .ds-btn:disabled .chefkoch-icons, .ds-btn[disabled] .chefkoch-icons { color: #6e7681 !important; }
+  .ds-btn--primary.ds-btn--disabled, .ds-btn--primary:disabled, .ds-btn--primary[disabled],
+  .ds-btn--conversion.ds-btn--disabled, .ds-btn--conversion:disabled, .ds-btn--conversion[disabled] {
+    background-color: #363b43 !important;
+    border-color: #363b43 !important;
+    color: #8b949e !important;
+  }
+  .ds-btn--secondary.ds-btn--disabled, .ds-btn--secondary:disabled, .ds-btn--secondary[disabled],
+  .ds-btn--control.ds-btn--disabled, .ds-btn--control:disabled, .ds-btn--control[disabled] {
+    color: #6e7681 !important;
+    border-color: #3a4048 !important;
+  }
 
   /* ====================================================================
      Filter chips / tabs / context menus / overlays (search + recipe)
      ==================================================================== */
+  /* filter chips are a white pill with a GREEN 2px rule and a GREEN label;
+     the selected one ("--active") swaps to a mint fill. Flattening both to the
+     same grey pill made "Bewertung 4+" look identical whether it was on or off. */
   .ds-filter-chip, .ds-chip {
     background-color: #1c2128 !important;
-    color: #c4cdd6 !important;
-    border-color: #2d333b !important;
+    color: #4cae5e !important;
+    border-color: #3b8047 !important;
   }
-  .ds-filter-chip:hover { background-color: #2d333b !important; }
-  .ds-filter-chip__label { color: #c4cdd6 !important; }
-  .ds-filter-chip__icon { fill: #c4cdd6 !important; }
+  .ds-filter-chip:hover { background-color: #21262d !important; border-color: #6fd382 !important; }
+  .ds-filter-chip__label { color: #4cae5e !important; }
+  .ds-filter-chip__icon { fill: #4cae5e !important; color: #4cae5e !important; }
+  .ds-filter-chip__icon--basic { color: #6b8f72 !important; }
+  .ds-filter-chip__icon--highlight { color: #ffbd1e !important; }
+  .ds-filter-chip.ds-filter-chip--active, .ds-filter-chip:active {
+    background-color: #1f3a26 !important;
+    border-color: #4cae5e !important;
+  }
 
   .ds-tab-nav, .ds-tab-nav__item { background-color: transparent !important; }
   .ds-tab-nav__link { color: #c4cdd6 !important; }
@@ -411,6 +553,12 @@
   .ds-context-menu__btn, .ds-context-menu__action-link { color: #e6edf3 !important; }
   .ds-context-menu__action-item:hover, .ds-context-menu__btn:hover { background-color: #2d333b !important; }
   .ds-context-menu__action-icon { fill: #c4cdd6 !important; }
+  /* destructive menu entries ("Aus dem Kochbuch entfernen") are #a70000 red;
+     our neutral link/icon colours made them read as an ordinary action */
+  .ds-context-menu__action-item--danger .ds-context-menu__action-link,
+  .ds-context-menu__action-item--danger .ds-context-menu__action-icon { color: #f0736e !important; }
+  .ds-context-menu__action-item--danger:hover .ds-context-menu__action-link,
+  .ds-context-menu__action-item--danger:hover .ds-context-menu__action-icon { color: #ff9a9e !important; }
 
   .ds-overlay, .ds-overlay__inner, .ds-overlay__body, .ds-overlay__content,
   .ds-overlay__head, .ds-overlay__footer {
@@ -478,7 +626,43 @@
   .ds-rating--empty .ds-rating__stars-item .chefkoch-icons { color: #565c64 !important; }
   [class*="rating"] svg [fill="#FFC107"] { /* leave gold svg fill untouched */ }
 
-  /* PLUS badge keeps a gold pill */
+  /* rating INPUT (comment "Bewerten" widget): the unfilled stars are #a7a7a2
+     and a frozen/submitted rating turns gold. Both arrive as <label>s, so the
+     broad label{} rule painted every star near-white. */
+  .ds-rating-input__label { color: #565c64 !important; }
+  .ds-rating-input--frozen .ds-rating-input__input ~ .ds-rating-input__label { color: #ffbd1e !important; }
+
+  /* comment info badge: a #d9e7ee plate with #006090 ink — a bright chip on
+     the dark comment card. Its "--highlight" sibling is a genuine gold badge
+     with dark ink and stays as the site drew it. */
+  .ds-info-badge {
+    background-color: #16303c !important;
+    color: #7fc4e8 !important;
+  }
+  .ds-info-badge--highlight {
+    background-color: #ffe894 !important;
+    color: #212018 !important;
+  }
+
+  /* toast/notification: a white card whose left 36px is a status-tinted stripe
+     and whose ::before glyph carries the status colour */
+  .ds-notification { background-color: #1c2128 !important; border-color: #2d333b !important; }
+  .ds-notification__title, .ds-notification__body { color: #e6edf3 !important; }
+  .ds-notification--info {
+    background-image: linear-gradient(90deg, #16303c 0 36px, #1c2128 0, #1c2128) !important;
+  }
+  .ds-notification--success {
+    background-image: linear-gradient(90deg, #1f3a26 0 36px, #1c2128 0, #1c2128) !important;
+  }
+  .ds-notification--danger {
+    background-image: linear-gradient(90deg, #3d1f1f 0 36px, #1c2128 0, #1c2128) !important;
+  }
+  .ds-notification--info::before { color: #7fc4e8 !important; }
+  .ds-notification--success::before { color: #6fd382 !important; }
+  .ds-notification--danger::before { color: #f0736e !important; }
+
+  /* PLUS badge is an SVG background-image; the gold fill is only a fallback
+     for when the CDN asset does not load */
   .ds-plus-badge {
     background-color: #d6a93b !important;
     color: #14181d !important;
@@ -493,7 +677,12 @@
   .ds-social-icons__item svg { fill: #c4cdd6 !important; }
   .ds-social-icons__headline { color: #c4cdd6 !important; }
   .ds-card-badge { background-color: rgba(13,17,23,0.7) !important; color: #e6edf3 !important; }
-  .ds-card-badge__icon { fill: #e6edf3 !important; }
+  /* the badge glyph is an icon FONT (color, not fill) and is brand green; the
+     PLUS badge keeps its own aubergine fill with a white glyph */
+  .ds-card-badge__icon { fill: #6fd382 !important; color: #6fd382 !important; }
+  .ds-card-badge--plus { background-color: #734b6d !important; }
+  .ds-card-badge--plus .ds-card-badge__icon,
+  .ds-card-badge--inverted .ds-card-badge__icon { fill: #ffffff !important; color: #ffffff !important; }
 
   /* ====================================================================
      Footer  ("w-" shell)
@@ -516,7 +705,23 @@
     background-color: #14181d !important;
   }
   spark-ad, .ad-wrapper { color: #c4cdd6 !important; }
+  /* the "Anzeige" disclosure above every slot is a ::before with no text node,
+     hardcoded to the olive #595852 -> 2.5:1 on the dark page */
+  spark-ad::before, spark-ad::after { color: #8b949e !important; }
   ins.adsbygoogle, [id^="google_ads"], [id*="div-gpt-ad"] { background-color: #14181d !important; }
+  /* mobile sticky "anchor" ad (Google DFP): the collapsible frame + its collapse
+     toggle carry an inline WHITE *shorthand* background (background: rgb(255,255,255)),
+     which the background-COLOR safety net at the foot of the file does not match, so
+     the frame band + toggle glare white on the dark page. Darken the frame like every
+     other ad surround — the ad iframe inside keeps its own creative. */
+  [id^="mob_anchor_ad"], [id^="box_anchor"], [id^="border_box_anchor"],
+  [id^="arrow_box_anchor"] {
+    background-color: #14181d !important;
+    border-color: #262c33 !important;
+  }
+  /* the collapse chevron is a CSS-border arrow; the blanket border rule greyed it to
+     #262c33, which vanishes on the now-dark toggle -> lift it to a light caret */
+  [id^="arrow_anchor"] { border-color: #c4cdd6 !important; }
   /* Taboola "Empfehlungen für dich" recommendation feed: its section header
      ("tbl-feed-header-text") ships hardcoded black and renders in the MAIN
      document (not an iframe) so it reads black-on-dark — lift to light. The
@@ -589,8 +794,9 @@
     border-color: #2d333b !important;
   }
   .ds-split-button__button:hover { background-color: #2d333b !important; }
+  /* the thumb glyphs are brand green natively — keep them green, not grey */
   .ds-split-button__button svg, .ds-split-button__button .ck-icon,
-  .ds-split-button__button i { fill: #c4cdd6 !important; color: #c4cdd6 !important; }
+  .ds-split-button__button i { fill: #4cae5e !important; color: #4cae5e !important; }
 
   /* ====================================================================
      Legacy COMMUNITY / forum frontend (chefkoch.de/forum/* — a separate
@@ -657,10 +863,23 @@
     border-color: #2d333b !important;
   }
   /* forum-thread pagination (ck-pagination component, distinct from the
-     search-list ds-pagination): the disabled "zurück" prev button ships a
-     light #ddd fill, and the green "weiter" next button's white label was
-     recolored green-on-green by the global a{} rule -> restore white */
-  .ck-pagination__link { background-color: transparent !important; color: #4cae5e !important; }
+     search-list ds-pagination). Natively: page numbers are transparent chips
+     with a green rule, "weiter" is a filled green pill, the disabled "zurück"
+     is a #ddd pill, and the CURRENT page is the one chip with a dark rule.
+     Blanking every fill turned "weiter" into bare text and left the current
+     page indistinguishable from its neighbours. */
+  .ck-pagination__link {
+    background-color: #3b8047 !important;
+    color: #ffffff !important;
+    border-color: #3b8047 !important;
+  }
+  .ck-pagination__link:hover { background-color: #4a9a58 !important; border-color: #4a9a58 !important; }
+  .ck-pagination__link--inverted {
+    background-color: transparent !important;
+    color: #4cae5e !important;
+    border-color: #4cae5e !important;
+  }
+  .ck-pagination__link--inverted:hover { background-color: #21262d !important; color: #6fd382 !important; }
   .ck-pagination__link--dummy,
   .ck-pagination__link-prevnext--prev.ck-pagination__link--dummy {
     background-color: #21262d !important;
@@ -670,7 +889,18 @@
   .ck-pagination__link-prevnext--next { color: #ffffff !important; }
   .ck-pagination__link-prevnext--next .ck-icon,
   .ck-pagination__link-prevnext--next svg { fill: #ffffff !important; }
-  .ck-pagination__link--active, .ck-pagination__link--current { color: #6fd382 !important; }
+  .ck-pagination__currentpage, .ck-pagination-forum__currentpage,
+  .ck-pagination__link--inverted.ck-pagination-forum__currentpage {
+    background-color: #2d333b !important;
+    color: #e6edf3 !important;
+    border-color: #8b949e !important;
+  }
+  /* the mobile page-picker is a bare <select> whose drop caret is a dark SVG
+     asset — invisible on the dark chip. Swap in a light caret; overriding only
+     background-image keeps the site's own position/size. */
+  .ck-pagination__select {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%23c4cdd6' d='M1 1l5 5 5-5z'/%3E%3C/svg%3E") !important;
+  }
 
   /* legacy styleguide secondary ("--light") button (forum reply-box hint
      "Zur letzten Seite springen und antworten") ships a dark-green #537a29
@@ -712,15 +942,88 @@
   section.background--white, section.background--sand {
     background-color: #14181d !important;
   }
+  /* the sand band's search box is ringed in the brand green — the blanket
+     border-color softener above swallowed the ring */
   section.background--sand .search, .search-bar .search {
     background-color: #1c2128 !important;
-    border-color: #2d333b !important;
+    border-color: #4cae5e !important;
   }
   /* this template's header logo is a two-path SVG: the wordmark path carries
      no fill (renders black -> invisible on dark) while the hat keeps its own
      green (#618f30). Lift only the fill-less wordmark path. */
   a.header__logo svg path:not([fill]) { fill: #e6edf3 !important; }
   .header__nav a, .header a { color: #4cae5e !important; }
+
+  /* ====================================================================
+     CleverPush push-notification opt-in prompt (floats over the home page)
+     ==================================================================== */
+  .cleverpush-confirm {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  .cleverpush-confirm-hide { color: #9aa5af !important; }
+  /* the deny pill and the branding links carry their colours in an INLINE
+     style with !important, which outranks any author !important — repaint the
+     button with a background-image and the link text with text-fill-color,
+     neither of which the inline declarations set */
+  .cleverpush-confirm-btn-deny {
+    background-image: linear-gradient(#21262d, #21262d) !important;
+    -webkit-text-fill-color: #6fd382 !important;
+    border-color: #2d333b !important;
+  }
+  .cleverpush-confirm-branding a {
+    -webkit-text-fill-color: #6fd382 !important;
+  }
+
+  /* ====================================================================
+     PLUS / Kochbuch / Wochenplaner landing pages — a marketing template
+     with its own slim white header, cream hero bands and cream/pastel
+     promotion cards. Our light copy washes out on all of them.
+     ==================================================================== */
+  .ds-slim-header {
+    background-color: #0d1117 !important;
+    border-color: #262c33 !important;
+  }
+  .welcome__banner, .ds-plus-banner, .lp-stage {
+    background-color: #14181d !important;
+  }
+  /* the Wochenplaner hero paints its light artwork as a full-bleed raster
+     <picture class="ds-plus-banner__bg">, so the band stays light whatever we
+     do to the box — keep the artwork and put the site's own ink back on it */
+  .ds-plus-banner__content, .ds-plus-banner__content h1,
+  .ds-plus-banner__content h2, .ds-plus-banner__content h3,
+  .ds-plus-banner__content p, .ds-plus-banner__content span {
+    color: #212018 !important;
+  }
+  .ds-promotion-card__inner, .ds-bg-basmati,
+  .ds-bg-garlic-medium, .ds-bg-blackberry-xxlight {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* "Nichts dabei?" white infobox (recipe suggestion pages); its corporate
+     green title (#3b8047) also fails contrast once the box goes dark */
+  .ds-infobox {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  .ds-infobox__title, .ds-text-corp { color: #6fd382 !important; }
+
+  /* Taboola sponsored-disclosure popover (white, shows on card hover) */
+  .trc_popover, .trc_popover .popupContentWrapper,
+  .trc_popover .trc_popover_title_wrapper {
+    background-color: #1c2128 !important;
+  }
+  .trc_popover, .trc_popover div { color: #c4cdd6 !important; }
+  /* its speech-bubble tang is a CSS triangle: three of the four borders are
+     transparent by design, so the blanket `* { border-color }` above filled
+     them in and the tang rendered as a solid rectangle */
+  .trc_popover_arrow, .trc_popover_arrow::before, .trc_popover_arrow::after {
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-top-color: #1c2128 !important;
+    border-bottom-color: #1c2128 !important;
+  }
 
   /* ====================================================================
      Safety nets

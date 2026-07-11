@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for Slashdot, easy-on-the-eyes story feed and threaded comment discussions, with the classic Slashdot green kept intact.
-@version      20260705.21.20
+@version      20260711.00.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -46,7 +46,7 @@
   /* top navigation / masthead — keep the iconic Slashdot green identity,
      deepened so it sits on the dark palette (the two green bars) */
   .nav-wrap, #main-top-nav-wrapper, nav.nav-user, nav.nav-primary, .nav-primary,
-  #topbar, #user-bar, .menu {
+  #topbar, #user-bar {
     background: #0c3433 !important;
     color: #e6edf3 !important;
   }
@@ -84,8 +84,15 @@
   h2.story a, .story a, .story-title, .story-title a,
   h2.story span, .story span.no,
   h2.firehose a, h2.firehose span.story-title { color: #e6edf3 !important; }
-  /* source link inside the green bar */
-  a.story-sourcelnk, .story-sourcelnk { color: #8fd9c8 !important; }
+  /* source link inside the green bar — the "(source.com)" flag that follows the
+     title. `h2.story a` / `h2.firehose a` above are (0,1,2) and outrank a bare
+     `a.story-sourcelnk` (0,1,1), so the link flattened to the same near-white as
+     the title on every card. Match the bar-scoped specificity so its distinct
+     teal survives (covers the submission page's .submission-sourcelnk too). */
+  a.story-sourcelnk, .story-sourcelnk,
+  h2.story a.story-sourcelnk, h2.firehose a.story-sourcelnk,
+  h2.story a.submission-sourcelnk, h2.firehose a.submission-sourcelnk,
+  .story a.story-sourcelnk, .story a.submission-sourcelnk { color: #8fd9c8 !important; }
 
   /* comment-count bubble */
   .comment-bubble { background: #0d1117 !important; color: #e6edf3 !important; }
@@ -210,15 +217,18 @@
   .ccw-score-label, .ccw-score-label * { color: #c4cdd6 !important; }
   .morelink, .morelink a { color: #5fb0e6 !important; }
 
-  /* comment-threshold slider (#ccw widget): the Full/Abbreviated/Hidden zone
-     panels ship a light→white gradient (the "Hidden" zone is pure #fff) and the
-     thumb-corner .slant triangles are light grey — all audit-blind (short/nested,
-     colored from a cross-origin sheet via two-id !important rules). Remap to a
-     teal→dark scale that keeps the zone distinction on the dark green bar. */
+  /* comment-threshold slider (#ccw widget): the Full/Abbreviated/Hidden zone panels
+     are hardcoded light (full #669898, abbreviated #b2cbcb, Hidden pure #fff) — all
+     audit-blind (short/nested, colored from a cross-origin sheet via two-id
+     !important rules). Remap to a teal→dark scale that keeps the zone distinction. */
   #ccw-body #ccw-full-panel, #ccw #ccw-full-panel { background-color: #3ca58f !important; }
   #ccw-body #ccw-abbr-panel, #ccw #ccw-abbr-panel { background-color: #27645a !important; }
   #ccw-body #ccw-hide-panel, #ccw #ccw-hide-panel { background-color: #2d333b !important; }
-  #ccw .slant, #commentwrap .slant { background-color: #1c2128 !important; }
+  /* the two draggable thumbs (.ccwa/.ccwb) paint their light #eee fill as a
+     background-IMAGE gradient, so a background-color override alone leaves them
+     white; they are 11px wide, under every size-filtered scan. */
+  .ccwa, .ccwb { background-image: none !important; }
+  #commentwrap .slant { background-color: #1c2128 !important; }
 
   /* ---------- sidebars / boxes (Firehose / Popular / Polls) ---------- */
   .block, .slashbox, aside.block, #links-sidebar, #slashboxes > div {
@@ -259,6 +269,19 @@
   }
   table.data td, table.listComments td { border-color: #262c33 !important; }
 
+  /* BOTH site sheets ship a global `table { background: white }`. The rules above
+     only covered table.data / table.listComments, so every bare <table> stayed
+     white — the whole Hall of Fame page rendered our light text on pure white.
+     `table thead tr th` also ships #363636 text with a white text-shadow, and
+     `tr.even` cells a whitesmoke zebra stripe. */
+  table { background-color: #14181d !important; }
+  table thead th, table thead tr th {
+    background-color: #0d1117 !important;
+    color: #e6edf3 !important;
+    text-shadow: none !important;
+  }
+  table tbody tr.even td, table tbody tr.even th { background-color: #1c2128 !important; }
+
   /* ---------- search / filter / inputs ---------- */
   input[type="text"], input[type="search"], input[type="password"],
   input[type="email"], input[name="fhfilter"], textarea, select, #search input {
@@ -276,13 +299,24 @@
     color: #8b949e !important;
     opacity: 1 !important;
   }
-  /* buttons */
+  /* buttons — text-shadow:none clears the site's `text-shadow: white 0 1px`
+     on submit inputs and .btn, which outlines every glyph on a dark fill */
   input[type="submit"], input[type="button"], button, .btn, a.button {
     background: #21262d !important;
     color: #e6edf3 !important;
     border: 1px solid #2d333b !important;
+    text-shadow: none !important;
   }
   input[type="submit"]:hover, button:hover, .btn:hover { background: #2d333b !important; }
+  /* disabled controls: the site paints them `background: rgb(207,207,207) !important`
+     from `button[disabled=disabled], input:disabled` — (0,1,1), which outranks the
+     `.btn` fill above, so the "Archived Discussion" button shipped a near-white
+     label on light grey. Match that specificity and give it a real disabled look. */
+  button[disabled], button[disabled="disabled"], input:disabled, input[disabled] {
+    background: #1c2128 !important;
+    color: #6e7681 !important;
+    border-color: #2d333b !important;
+  }
 
   /* ---------- story submission form ---------- */
   /* header + subtitle were near-black (#2e2e2e / #676767) on the dark bg */
@@ -332,8 +366,10 @@
   #commentlisting .oneline .commentBody a,
   .oneline .commentBody a { color: #5fb0e6 !important; }
 
-  /* comment score-selector widget + "You may like" header bar (light-grey #e1e1e1) */
-  .grid_3, .sc, span.sc, h3, .ccwa, .ccwb, .tag-menu-admin, menu#tag-menu,
+  /* comment score-selector widget + "You may like" header bar (light-grey #e1e1e1).
+     Only the #newa2footerv2 h3's are natively light — a bare `h3` here boxed every
+     heading on the site (poll questions, "Most Votes" dividers). */
+  .grid_3, .sc, span.sc, #newa2footerv2 h3, .ccwa, .ccwb, .tag-menu-admin, menu#tag-menu,
   menu#feedback-menu, .nf, input.fno {
     background-color: #1c2128 !important;
     color: #c4cdd6 !important;
@@ -359,9 +395,15 @@
      on a hardcoded white or light-grey bg → darken to the base */
   section, section.grid_24, .ad-blocked-newsletter, .ntv-preview-img-wrapper,
   .sticky-cta, .sticky-wrapper, .sticky-left, .sticky-gradient,
-  label, td, .thisday-yr, .commentControlBox, .a2 {
+  .thisday-yr, .commentControlBox, .a2 {
     background-color: #14181d !important;
   }
+  /* the ONLY natively light <label>s are the poll option rows (#eee); the ONLY
+     natively light <td>s are the "This day on Slashdot" cells (#e6e6e6). Painting
+     the bare element types instead left dark chips behind every form label
+     (login modal) and every transparent table cell. */
+  #pollBooth label { background-color: #21262d !important; }
+  table.thisday-tb td { background-color: #14181d !important; }
   section.bq, .bq, blockquote.msg, blockquote,
   .bq p, blockquote.msg p, section.bq p {
     background-color: #161b22 !important;
@@ -371,7 +413,11 @@
   .bq *, blockquote.msg *, .msg, td, label, .legend, h3 {
     color: #c4cdd6 !important;
   }
-  .thisday-yr { background-color: #0a2826 !important; color: #cdd9d6 !important; }
+  /* the year column keeps a subtle teal accent (native #006666). The td-neutralizer
+     `table.thisday-tb td` (0,1,2) above outranks a bare `.thisday-yr` (0,1,0), so the
+     year cell flattened to the base grey; match its specificity to restore the tint. */
+  .thisday-yr,
+  table.thisday-tb td.thisday-yr { background-color: #0a2826 !important; color: #cdd9d6 !important; }
 
   /* comment-filter / "Comments Filter:" bar + its links */
   .commentControlBox, .commentControlBox *, #commentControlBox,
@@ -386,6 +432,15 @@
     border-color: #262c33 !important;
   }
   .info-meta a, .info-byline a { color: #5fb0e6 !important; }
+  /* the divider between the two footer rows is drawn as a `border-bottom: 1px solid
+     #ccc` on `.info-meta::after` — the blanket `* { border-color }` reset never
+     matches a pseudo-element, so a bright line survived on every poll card */
+  .info-meta::after, .info-byline::after { border-color: #262c33 !important; }
+
+  /* poll-feed card headers keep the site's brand teal (#006666); the global link
+     colour landed mid-blue on it at 2.9:1 */
+  .feed-header a, header.feed-header a, .feed-header h2 a { color: #ffffff !important; }
+  .feed-header a:hover, header.feed-header a:hover { color: #9be7d6 !important; }
 
   /* poll RESULT bars (after voting): the unfilled track ships a hardcoded light
      grey (#e1e1e1) — audit-blind (only ~20px tall). Darken the track; keep the
@@ -398,6 +453,31 @@
   .btn-success, a.btn-success, .nel-button, .btn-polls, button.btn-polls,
   .btn-primary, input.button {
     color: #ffffff !important;
+  }
+  /* …and keep their FILL too. The generic `.btn` rule above is !important at the
+     same (0,1,0) specificity, so it swallowed every Bootstrap modifier: the green
+     "Submit" CTA in the masthead came out the same grey as a plain button, and the
+     danger/warning/info states lost their meaning. Restore the site's own fills at
+     (0,2,0) so the outcome no longer depends on stylesheet order. */
+  .btn.btn-success, a.btn-success, button.btn-success {
+    background-color: #5cb85c !important;
+    border-color: #4cae4c !important;
+  }
+  .btn.btn-primary, a.btn-primary, button.btn-primary {
+    background-color: #006666 !important;
+    border-color: #025c5c !important;
+  }
+  .btn.btn-danger, a.btn-danger, button.btn-danger {
+    background-color: #d9534f !important;
+    border-color: #d43f3a !important;
+  }
+  .btn.btn-warning, a.btn-warning, button.btn-warning {
+    background-color: #f0ad4e !important;
+    border-color: #eea236 !important;
+  }
+  .btn.btn-info, a.btn-info, button.btn-info {
+    background-color: #5bc0de !important;
+    border-color: #46b8da !important;
   }
   /* prev/next pager buttons sat on white */
   .prevnextbutdis, .prevnextbutact, .pad-btns a {
@@ -413,18 +493,31 @@
   }
   .sticky-cta a, .sticky-wrapper a { color: #5fb0e6 !important; }
 
-  /* native-ad "Sponsored / Featured Content" label — darken its brown/orange chip
-     (Nativo classes: ntv-sponsored-disclaimer + dynamic-suffix ntv_link… link) */
-  .ntv-ad-label, .ntv-sponsored, .nel-sponsored, .ntv-sponsored-disclaimer,
-  span.sponsored, .sponsored-label, a[class*="ntv_link"] {
+  /* native-ad "Sponsored / Featured Content" label (Nativo classes) */
+  .ntv-ad-label, .ntv-sponsored, .nel-sponsored,
+  span.sponsored, .sponsored-label {
     background-color: #2d333b !important;
     color: #c4cdd6 !important;
   }
-  .ntv-sponsored-disclaimer a, a[class*="ntv_link"] { color: #9bd4ff !important; }
+  /* The disclaimer WRAPPER is natively transparent — painting it invented a grey
+     box on the brown bar. The visible chip is the dynamic-suffix `ntv_link…`
+     anchor, natively a lighter brown (#a66934) with a white label: that tint IS
+     the ad-disclosure signal, so deepen it rather than flattening it to grey. */
+  .ntv-sponsored-disclaimer { background-color: transparent !important; }
+  /* the sidebar copy of the chip sits inside `.block > header`, whose (0,2,1) link
+     rule outranks a bare `a[class*=…]` — hence the extra header-scoped selectors */
+  a[class*="ntv_link"], header a[class*="ntv_link"],
+  .block > header a[class*="ntv_link"], #slashboxes header a[class*="ntv_link"],
+  h2 a[class*="ntv_link"] {
+    background-color: #6b4321 !important;
+    color: #ffffff !important;
+  }
 
   /* selected pager / tab list-items (load-more-comments, Related Links, All)
-     render with a hardcoded white highlight → make them a dark active state */
-  li.fleft, li.fleft.selected, ul.fleft li, nav ul li.selected,
+     render with a hardcoded white highlight → make them a dark active state.
+     ONLY the selected ones: an unselected li.fleft is natively transparent, so
+     matching the bare class boxed every footer day-tab. */
+  li.fleft.selected, ul.fleft li.selected, nav ul li.selected,
   .btmrel, a.btmrel, li.btmrel, .filter-firehose li.selected {
     background-color: #21262d !important;
     color: #e6edf3 !important;
@@ -460,4 +553,103 @@
     border-color: #262c33 !important;
   }
   .tlnav a, h5.tlnav a { color: #9bd4ff !important; }
+
+  /* ---------- real-element CSS triangles ---------- */
+  /* The fortune-quote pointer is a border triangle (transparent sides + a white
+     bottom border), so the blanket `* { border-color }` above fills all four sides
+     into a solid blob. Restore the transparent sides and follow the quote's bg. */
+  blockquote.msg .slant, section.bq .slant {
+    background: none !important;
+    border-color: transparent transparent #161b22 !important;
+  }
+  /* The "Most Votes" / "Most Comments" divider rules are ::before/::after top
+     borders (#e6e6e6) — `*` never matches pseudo-elements, so they stayed light. */
+  .center-line span::before, .center-line span::after { border-top-color: #262c33 !important; }
+  /* comment-count bubble tail: a ::after triangle that keeps the site's original
+     #1e2329 while we repaint the bubble itself */
+  span.comment-bubble::after { border-top-color: #0d1117 !important; }
+
+  /* ---------- header user dropdown (.menu) ---------- */
+  /* The .menu container is natively transparent and absolutely positioned; the
+     visible panel is the .menu-list inside it, hardcoded #fff. Its pointer is a
+     pair of pseudo border triangles (#aaa outer / #fff inner). */
+  .menu, .menu-share { background: transparent !important; }
+  .menu .menu-list, .menu-share .menu-list {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
+  .menu .menu-list li { border-top-color: #2d333b !important; }
+  .menu::before, .menu-share::before { border-bottom-color: #2d333b !important; }
+  .menu::after, .menu-share::after { border-bottom-color: #1c2128 !important; }
+
+  /* user-profile tab pointer: a rotated #e5e5e5 <span> diamond beside the active tab */
+  nav#u2tabs li.active > span, #u2tabs li.active span { background-color: #21262d !important; }
+
+  /* ---------- the rest of the "active tab" family ----------
+     One site rule paints EVERY active tab `background: rgb(229,229,229)`, labels it
+     #999 and adds a WHITE `text-shadow` halo; a second rotates a #e5e5e5 <span> into
+     a diamond pointer under it. The theme only covered the `li` forms and only the
+     #u2tabs diamond, so the story-archive / profile / journal tabs shipped a white
+     glow around every glyph and a bright diamond below. The span-shaped siblings
+     (#fh-paginate, .preftab, .hoftab, .linkCommentPage) were never covered at all. */
+  #story_archive_opts .active, #story_archive_opts_year .active,
+  #fh-paginate > span.active, .pref .preftab.active, .mhof .hoftab.active,
+  #friendsmenu li.active, .linkCommentPage .active, #formtabs .active,
+  ul.menu li.selected, #hofnew .active {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+  }
+  #story_archive_opts .active, #story_archive_opts_year .active,
+  #fh-paginate > span.active, .pref .preftab.active, .mhof .hoftab.active,
+  #friendsmenu li.active, .linkCommentPage .active, #formtabs .active,
+  ul.menu li.selected, #hofnew .active, #hofnew .active a,
+  li.active, li.active a, li.selected, li.selected a,
+  span.preftab.active a, ul.menu li.selected a {
+    text-shadow: none !important;
+  }
+  /* the rotated diamond pointer under each active tab */
+  #story_archive_opts .active > span, #story_archive_opts_year .active > span,
+  #archpagin .active > span, .hoftab.active > span, .pref .preftab.active > span,
+  #formtabs .active > span, #friendsmenu li.active > span,
+  ul.menu li.selected > span, li.active > span {
+    background-color: #21262d !important;
+  }
+
+  /* /archive.pl day markers: `.archive_breaks > span` is a hardcoded #e5e5e5 pill
+     and `> .slant` its rotated pointer — 13 bright chips down the page, both under
+     every light-surface size floor */
+  nav.abdb .archive_breaks > span, .archive_breaks > span {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+  }
+  nav.abdb .archive_breaks > .slant, .archive_breaks > .slant {
+    background-color: #21262d !important;
+  }
+
+  /* collapsed ("oneline") comments have NO title bar natively — the site sets
+     `background:none` on their h4 — so the green title-bar rule above painted a
+     pill behind every "Re:" link. */
+  #comments .oneline .commentTop h4, #comments .oneline .title h4 { background: none !important; }
+  #comments .oneline .commentTop h4 a, #comments .oneline .title h4 a { color: #6fd8be !important; }
+
+  /* sponsored / native-ad story bars ship a brown (#6d4634) title bar instead of the
+     editorial green — keep that disclosure distinction rather than flattening it */
+  article[class*="article-nel-"] h2.story, article[class*="article-nel-"] .story {
+    background: #3d2a1f !important;
+    border-color: #5a3f2e !important;
+  }
+
+  /* ---------- polls list feed ---------- */
+  /* the "Older"/"Newer" pager buttons keep a hardcoded #ecf2f2 fill (57x36 — below
+     the light-surface scan's size floor) and our link colour then lands blue on it */
+  .btn-view-more, a.btn-view-more {
+    background-color: #21262d !important;
+    border-color: #2d333b !important;
+    color: #9bd4ff !important;
+  }
+  .btn-view-more a, .btn-view-more a:visited { color: #9bd4ff !important; }
+  .btn-view-more:hover, .btn-view-more a:hover { background-color: #2d333b !important; }
+  /* "Posted on … | N votes" metadata is #7d7d7d — readable on the site's white,
+     only 4.3:1 on our base */
+  .content-list li span, .content-list li span i { color: #9aa4ad !important; }
 }

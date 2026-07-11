@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for OLX that turns the bright marketplace into an easy-on-the-eyes dark interface, perfect for late-night browsing.
-@version      20260707.14.32
+@version      20260711.00.17
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -44,11 +44,43 @@
     --color-foreground-placeholder: #7d8893 !important;
     --color-foreground-on-dark: #e6edf3 !important;
 
+    /* The "action" foreground (#02282c) is OLX's near-black. It paints the
+       Nexus design-system components: rating-histogram counts, chip labels,
+       secondary/tertiary button labels, and every `fill="currentColor"` icon
+       (favourite hearts, dropdown check marks, location pins, chevrons). It
+       is NOT one of the tokens the theme originally remapped, so all of those
+       rendered dark-on-dark. Disabled/accent/status foregrounds ship dark or
+       low-contrast values for the same reason. `on-accent` stays dark: it is
+       the label colour on the mint accent fill. */
+    --color-foreground-action-primary: #c4cdd6 !important;
+    --colorsForegroundActionPrimary: #c4cdd6 !important;
+    --color-foreground-accent: #5fd0c6 !important;
+    --colorsForegroundAccent: #5fd0c6 !important;
+    --color-foreground-disabled: #6b7681 !important;
+    --colorsForegroundDisabled: #6b7681 !important;
+    --colorsForegroundPlaceholder: #7d8893 !important;
+    --color-foreground-status-success: #57ccc4 !important;
+    --colorsForegroundStatusSuccess: #57ccc4 !important;
+    --color-foreground-status-warning: #d6a425 !important;
+    --colorsForegroundStatusWarning: #d6a425 !important;
+    --color-foreground-status-error: #f0795f !important;
+    --colorsForegroundStatusError: #f0795f !important;
+
     /* ---- Borders ---- */
     --color-border-subtle: #2d333b !important;
     --colorsBorderSubtle: #2d333b !important;
     --color-border-primary: #2d333b !important;
     --colorsBorderPrimary: #2d333b !important;
+    --color-border-strong: #454d57 !important;
+    --colorsBorderStrong: #454d57 !important;
+    --color-border-medium: #2d333b !important;
+    --colorsBorderMedium: #2d333b !important;
+    --color-border-focus: #1fcabf !important;
+    --colorsBorderFocus: #1fcabf !important;
+    --color-border-disabled: #2d333b !important;
+    --colorsBorderDisabled: #2d333b !important;
+    --color-border-status-error: #c2402b !important;
+    --colorsBorderStatusError: #c2402b !important;
 
     /* ---- OLX accent (raw #23E5DB mint) refined for dark ----
        Keep the recognizable OLX teal/mint identity but pull the
@@ -81,8 +113,60 @@
     color: #c4cdd6 !important;
   }
 
+  /* `domain("olx.pl")` also matches every OLX subdomain, including the help
+     centre at pomoc.olx.<tld> — a Salesforce Lightning community this theme
+     does not cover. The base paint above turned its body dark while its own
+     near-black article headings and paragraphs kept their light-page colours,
+     so every help article rendered dark-on-dark. Salesforce roots every
+     community page at <html class="slds-no-wcag">, which nothing on the OLX
+     marketplace carries: hand that surface back rather than half-theme it. */
+  html.slds-no-wcag,
+  html.slds-no-wcag body {
+    background-color: #ffffff !important;
+    color: #181818 !important;
+  }
+  html.slds-no-wcag a:hover { color: #014486 !important; }
+
   /* ---- Soften every default light border into a dark hairline ---- */
   * { border-color: #2d333b !important; }
+
+  /* OLX's icons are inline <svg>s whose paths are fill="currentColor", and the
+     colour is set ON THE SVG by a per-deploy hashed emotion class holding the
+     literal near-black #02282c — not by a design token and not by the icon's
+     container. So every one of them (dropdown check marks, chevrons, the
+     geolocation pin, the sort/list-view toggles, the category caret) rendered
+     dark-on-dark even though its surrounding text was correctly light. Let the
+     icon inherit the colour of the thing it belongs to; icons with explicit
+     path fills (brand logos, country flags, illustrations, rating stars) are
+     untouched because an explicit fill wins over currentColor. */
+  #mainContent svg,
+  #footerContent svg { color: inherit !important; }
+  /* …except the rating stars, whose gold IS the artwork: they are currentColor
+     glyphs too, so plain inheritance would grey them out. */
+  #mainContent svg[data-testid="star-filled"],
+  #mainContent svg[data-testid="star-half"] { color: #ffce32 !important; }
+
+  /* Selected-tab underline. OLX draws it as an INSET box-shadow in the literal
+     near-black #02282c (not a border, not a token), so on dark it disappears
+     and the active tab is indistinguishable from the inactive ones. The search
+     filters (Wszystkie / Firmowe / Prywatne) and the seller-profile tabs
+     (Wszystkie ogłoszenia / Oceny) mark the selected tab with
+     data-is-active="true"; login.olx.<tld> instead uses a roving tabindex where
+     the SELECTED tab is the one carrying tabindex="-1". (aria-selected is NOT a
+     tab hook here — the sort dropdown puts it on its options, which must stay
+     underline-free.) Repaint the underline in the OLX accent and brighten the
+     active label. */
+  button[data-is-active="true"],
+  [data-testid="tabs"] button[tabindex="-1"] {
+    box-shadow: inset 0 -3px 0 0 #1fcabf !important;
+  }
+  button[data-is-active="true"],
+  button[data-is-active="true"] span,
+  [data-testid="tabs"] button[tabindex="-1"],
+  [data-testid="tabs"] button[tabindex="-1"] span {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
 
   /* Skip-navigation links ("Przejdź do głównej części / stopki") live at the
      top of the #hydrate-root shell and slide into view on keyboard focus. The
@@ -230,12 +314,35 @@
   [data-cy="search-bar-input"],
   [data-testid="location-search-input"],
   [data-cy="location-search-input"],
-  input[type="text"], input[type="search"], textarea, select {
+  input[type="text"], input[type="search"], input[type="number"],
+  input[type="email"], input[type="password"], input[type="tel"],
+  textarea, select {
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
   }
   ::placeholder { color: #7d8893 !important; opacity: 1 !important; }
+
+  /* Nexus checkboxes ("tylko ze zdjęciem", "Tylko z przesyłką", the sign-up
+     consents). The real <input> is visually replaced by a sibling
+     .n-checkbox-icon-wrapper <div>, which draws the box: a 2px #02282c outline
+     when unchecked, and the SAME near-black as a solid fill (plus a white tick)
+     when checked. Two of our own rules gutted it — the blanket border reset
+     dropped the outline to the #2d333b hairline (1.4:1 on the page base, below
+     the 3:1 needed for a control boundary), and the structural
+     `#mainContent div { background: transparent }` neutraliser wiped the checked
+     fill, so checked and unchecked differ only by a faint tick. Restore a
+     legible outline and give the checked state the OLX accent fill. */
+  .n-checkbox-icon-wrapper { border-color: #6b7681 !important; }
+  input[aria-checked="true"] + .n-checkbox-icon-wrapper,
+  #mainContent input[aria-checked="true"] + .n-checkbox-icon-wrapper {
+    background-color: #1fcabf !important;
+    border-color: #1fcabf !important;
+  }
+  input[aria-checked="true"] + .n-checkbox-icon-wrapper svg,
+  #mainContent input[aria-checked="true"] + .n-checkbox-icon-wrapper svg {
+    color: #07232a !important;
+  }
   [data-testid="search-submit"] {
     background-color: #1fcabf !important;
     color: #07232a !important;
@@ -302,6 +409,26 @@
   [data-testid="home-page"] a:hover span {
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
+  }
+
+  /* The homepage "site information" block (big OLX wordmark, SEO blurb and the
+     "Dołącz do nas" Facebook / Instagram / TikTok / YouTube / LinkedIn /
+     Pinterest row) draws its glyphs with fill="currentColor" over the literal
+     near-black #02282c, so both the wordmark and five of the six social icons
+     rendered invisible on the dark base. The Pinterest mark carries no fill at
+     all and falls back to SVG's default black — force currentColor on the
+     paths so it follows the link colour like its siblings. All six marks are
+     monochrome, so nothing brand-coloured is flattened here. */
+  #mainContent [data-testid="site-information"] > svg,
+  #mainContent [data-testid="site-information"] a svg {
+    color: #9aa6b0 !important;
+  }
+  #mainContent [data-testid="site-information"] a svg path,
+  #mainContent [data-testid="site-information"] a svg g {
+    fill: currentColor !important;
+  }
+  #mainContent [data-testid="site-information"] a:hover svg {
+    color: #e6edf3 !important;
   }
 
   /* ============================================================
@@ -379,6 +506,19 @@
     color: #6fe3da !important;
     -webkit-text-fill-color: #6fe3da !important;
   }
+  /* The delivery pills sit under #mainContent / #searchmain-container, where the
+     blanket neutraliser (`#mainContent div`, 1,0,1) out-specifies the bare
+     [data-testid] fill above (0,1,0) and strips it to transparent — so on the
+     listing the badge lost its dark-accent pill and rendered as naked mint text
+     floating on the card photo (contrast then depends on the user's photo).
+     Re-assert the pill scoped under the page containers so it wins the cascade. */
+  #mainContent [data-testid="free-delivery-tag"],
+  #mainContent [data-testid="card-delivery-badge"],
+  #searchmain-container [data-testid="free-delivery-tag"],
+  #searchmain-container [data-testid="card-delivery-badge"] {
+    background-color: #103c3b !important;
+    border-color: #1fcabf !important;
+  }
 
   /* "Wyróżnione" (Featured/highlighted-ad) badge sits over the dark card
      thumbnail carrying its own near-black #02282c -webkit-text-fill token, so
@@ -406,6 +546,19 @@
     color: #9aa6b0 !important;
     -webkit-text-fill-color: #9aa6b0 !important;
   }
+  /* Services ads (and the whole seller-profile listing) hang "specialisation"
+     chips under the title — "Elewacje i tynkowanie", "+3 więcej", … Each chip
+     is a nested <span> with a literal `background:#FFFFFF` and a 1px #D8DFE0
+     outline: a white pill on a white card, i.e. really just an outline chip.
+     The blanket neutraliser only reaches div/section/article/ul, so the white
+     survived while the param-lift above dimmed the label to #9aa6b0 — 1.6:1,
+     unreadable. Drop the fill and let the (already softened) outline carry the
+     pill; `transparent` is a no-op on every other span, and the card's delivery
+     / promoted / "Wyróżnione" badges are <div>s, so none of them are flattened. */
+  #mainContent [data-testid="l-card"] span > span,
+  #searchmain-container [data-testid="l-card"] span > span {
+    background-color: transparent !important;
+  }
   /* Re-assert semantic card colours the param-lift above would otherwise flatten */
   #mainContent [data-testid="l-card"] [data-testid="ad-price"],
   #mainContent [data-testid="l-card"] [data-testid="ad-price"] span,
@@ -423,8 +576,14 @@
     -webkit-text-fill-color: #6fe3da !important;
   }
 
-  /* Favourite (heart) toggle */
-  [data-testid="adAddToFavorites"] { color: #c4cdd6 !important; }
+  /* Favourite (heart) toggle. The heart is an inline <svg> whose <path> is
+     fill="currentColor", and OLX sets the colour on the SVG itself through a
+     hashed emotion class carrying a literal #02282c — so colouring the wrapping
+     <button> (which the theme already did) never reached the artwork and the
+     heart rendered near-black on the dark card. Colour the SVG directly. */
+  [data-testid="adAddToFavorites"],
+  [data-testid="adAddToFavorites"] svg,
+  [data-testid="observe-ad"] svg { color: #c4cdd6 !important; }
 
   /* Native "SPONSOROWANE" ads (OLX baxter native template) render inside the
      listing grid as plain HTML carrying their own near-black #02282c
@@ -442,12 +601,42 @@
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
   }
-  [id^="baxter-native-listing"] [class*="_spnu"],
-  [id^="baxter-native-listing"] [class*="attribution"],
-  [id^="baxter-native-listing"] [class*="popup"],
-  [id^="baxter-native-listing"] [class*="tooltip"] {
-    background-color: #1c2128 !important;
+  /* These surfaces sit inside #mainContent, so the blanket neutraliser
+     (`#mainContent div`, specificity 1,0,1) out-specifies a bare
+     [id^=…] [class*=…] (0,2,0) and the background never landed: the ad's
+     "Informacja o tej reklamie" popup rendered fully SEE-THROUGH over the
+     creative, and the mint "SPONSOROWANE" disclosure band lost its tint
+     entirely. Anchor under #mainContent (1,2,0) so they actually paint.
+     The popup's downward caret is a real-element CSS triangle whose left/right
+     borders must stay transparent — the blanket `* { border-color }` reset
+     painted all four sides, so it rendered as a solid grey rectangle. */
+  #mainContent [id^="baxter-native-listing"] [class*="_spnu"],
+  #mainContent [id^="baxter-native-listing"] [class*="attribution"],
+  #mainContent [id^="baxter-native-listing"] [class*="popup"],
+  #mainContent [id^="baxter-native-listing"] [class*="tooltip"] {
+    background-color: #103c3b !important;
     border-color: #2d333b !important;
+  }
+  #mainContent [id^="baxter-native-listing"] [class*="attribution-link"] {
+    background-color: #1c2128 !important;
+    border-color: #83a4ec !important;
+  }
+  #mainContent [id^="baxter-native-listing"] [class*="template__after"] {
+    border-top-color: #83a4ec !important;
+    border-right-color: transparent !important;
+    border-left-color: transparent !important;
+  }
+
+  /* OLX's ad server pins a "ZAMKNIJ X" close button over each sticky/expandable
+     slot with an INLINE `background: white` (not !important). Its label has no
+     colour of its own, so it inherits the body text colour — which we flipped
+     to light — and the only control that dismisses the ad became white-on-white.
+     Give it the elevated dark surface it now needs. */
+  .baxter-inner-sticky-close-button {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+    box-shadow: none !important;
   }
 
   /* Offer pages also inject an in-page ING loan-calculator native ad
@@ -465,6 +654,28 @@
     color: #9aa6b0 !important;
     -webkit-text-fill-color: #9aa6b0 !important;
   }
+  /* Its amount / term fields are `input[type="number"]` on a literal #eeeeee,
+     and the "zł" / "msc" unit suffix is a white .inter-box_spec pill. The
+     theme's generic input rule only listed text/search inputs, so the amount
+     inherited the light text colour and read light-on-light. */
+  #inter-box_ad-detail input[type="number"],
+  #inter-box_ad-detail .inter-box_spec {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  /* ING brands the calculator in its orange: an #FF6200 "Oblicz ratę" CTA and
+     #F2A066 field outlines. The CTA is a `button[type="submit"]`, so the OLX
+     accent rule further down repainted an advertiser's brand button OLX teal,
+     and the blanket border reset erased the field outlines. Give them back. */
+  #inter-box_ad-detail .calculator_button_cta {
+    background-color: #ff6200 !important;
+    border-color: #ff6200 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+  #inter-box_ad-detail input[type="number"] { border-color: #f2a066 !important; }
+  #inter-box_ad-detail .inter-box_spec { border-color: #2d333b !important; }
 
   /* OLX's SSR ad slots (e.g. #baxter-top on the offer/listing pages) ship a
      full-width house-ad placeholder ("OLX REKLAMA") baked onto a WHITE canvas
@@ -602,15 +813,18 @@
      render dark-on-dark. The offer/search remaps are anchored on
      testids this page doesn't use — cover its stable anchors here.
      ============================================================ */
-  /* Profile tab bar — both tabs carry data-is-active (true/false) */
-  #mainContent button[data-is-active],
-  #mainContent button[data-is-active] span {
+  /* Profile tab bar — inactive tabs only; the active one keeps the brighter
+     label + accent underline set in the tab block near the top of the file. */
+  #mainContent button[data-is-active="false"],
+  #mainContent button[data-is-active="false"] span {
     color: #c4cdd6 !important;
     -webkit-text-fill-color: #c4cdd6 !important;
   }
-  /* (Profile follow/share button remap uses a Selectors-4 relational
-     selector and lives only in the .user.css build — unsupported by the
-     old userstyles.org parser, so it is omitted here.) */
+  /* (The profile-header Obserwuj / Podziel się buttons used to need a
+     parent-match rule here. They are Nexus secondary/tertiary buttons whose
+     label reads the foreground-action-primary token, so the token remap at the
+     top of the file now covers them — the .org.css build drops no rule.) */
+
   /* Filter/sort section labels (Kategorie / Sortuj / Znajdź na tej
      stronie) — lift, then re-assert the card title/price the broad
      seller-listing rule would otherwise flatten. */
@@ -740,9 +954,23 @@
   }
   /* Contact / chat / phone buttons + the login-dialog CTA -> accent
      fill with dark legible text (set BOTH color + text-fill). */
+  /* The bottom "SKONTAKTUJ SIĘ" block repeats the message CTA under a different
+     hook — [data-testid="chat-button"] — and paints it with OLX's near-black
+     #02282c "inverse" fill instead of the accent. On white that reads as the
+     primary button; on our #1c2128 card it is a 1.3:1 slab with no visible
+     edge, sitting right next to the mint "Pokaż". Give it the same accent fill
+     as its twin in the right rail so the two contact CTAs match. */
+  /* The "Kup" safe-deal buy button ([data-testid="go-to-delivery-options"]) is
+     OLX's near-black #02282c primary — the STRONGEST CTA on the light site. On
+     our #1c2128 card that near-black sits at ~1.1:1, so the most important action
+     on the page rendered as a near-invisible slab that reads as disabled next to
+     the vivid teal message/call CTAs. It isn't in the accent group below, so give
+     it the same accent fill as the other purchase CTAs. */
   #mainContent [data-testid="ad-contact-message-button"],
   #mainContent [data-testid="ad-contact-phone"],
   #mainContent [data-testid="show-phone"],
+  #mainContent [data-testid="chat-button"],
+  #mainContent [data-testid="go-to-delivery-options"],
   #mainContent [data-testid="phones-container"] button,
   #mainContent [data-testid="login-button"],
   #mainContent button[data-testid*="contact"] {
@@ -752,9 +980,20 @@
   }
   #mainContent [data-testid="login-button"] span,
   #mainContent [data-testid="ad-contact-message-button"] span,
+  #mainContent [data-testid="chat-button"] span,
+  #mainContent [data-testid="go-to-delivery-options"] span,
   #mainContent [data-testid="phones-container"] button span {
     color: #07232a !important;
     -webkit-text-fill-color: #07232a !important;
+  }
+  /* The phone glyph beside "Pokaż" is an <svg> that IS the mint disc (the
+     accent is its own background-color) with a fill="currentColor" handset.
+     The blanket `#mainContent svg { color: inherit }` handed it the light body
+     colour, so the handset washed out to 1.5:1 on its own accent fill. It is
+     dark-on-mint natively; restore that and settle the disc on our accent. */
+  #mainContent [data-testid="phones-container"] svg {
+    background-color: #1fcabf !important;
+    color: #07232a !important;
   }
 
   /* OLX serves logged-out offer pages with a full-bleed "skin"/wallpaper
@@ -769,6 +1008,57 @@
   #mainContent [data-testid="main"] {
     background-color: #14181d !important;
   }
+  /* The offer page's RIGHT rail ([data-testid="aside"]) needs the same
+     treatment: the neutraliser strips its light background, so the wallpaper
+     takeover ad shows straight through the gaps between its cards. Two of its
+     cards are white natively but have no testid of their own — the price/action
+     card (first child) and the Zwroty / Pakiet Ochronny block (the sibling
+     right after the location card) — so re-elevate them structurally. */
+  #mainContent [data-testid="aside"] {
+    background-color: #14181d !important;
+  }
+  #mainContent [data-testid="aside"] > div:first-child,
+  #mainContent [data-testid="map-aside-section"] + div {
+    background-color: #1c2128 !important;
+  }
+  /* Same takeover-ad bleed, one level further down the offer page: the two
+     recommendation carousels ("Więcej od tego ogłoszeniodawcy" / "Zobacz też")
+     paint their own #F2F4F5 band natively (the seller one via an INLINE style
+     on its wrapper), and the neutraliser stripped both — so the full-bleed
+     wallpaper ad showed straight through the band, behind the section heading
+     and in every gap between cards. Both live inside a position:relative
+     wrapper that paints after the ad slot, so an opaque background on the
+     section itself is enough. */
+  #mainContent [data-cy="seller-other-ads"],
+  #mainContent [data-testid="ad-recommendations"] {
+    background-color: #14181d !important;
+  }
+  /* …and the page-background bands BETWEEN those blocks. OLX writes them as an
+     inline `background:#F2F4F5` on hashed wrappers — the 16px channel between
+     the offer column and the right rail, and the 24-32px gaps between sections.
+     An inline declaration without !important loses to the neutraliser, so those
+     strips went transparent and the wallpaper ad striped the whole page. Match
+     them on the serialized inline value (stable: the CSSOM always writes
+     `rgb(242, 244, 245)`); the one band that also carries !important is
+     #searchmain-container, whose children we re-opaque separately. */
+  #mainContent div[style*="background: rgb(242, 244, 245)"] {
+    background-color: #14181d !important;
+  }
+  /* Swiper draws the carousel arrows as ::after glyphs (content:"prev"/"next"
+     in its icon font) that inherit the element's colour — OLX sets the literal
+     near-black #02282c there, not a token, so both arrows rendered at 1.1:1 on
+     the dark band. `*` cannot reach a pseudo-element; colour the button. The
+     photo lightbox uses its own arrows and is outside #mainContent. */
+  #mainContent .swiper-button-prev,
+  #mainContent .swiper-button-next {
+    color: #c4cdd6 !important;
+  }
+  /* "Zobacz wszystkie" (see all of this seller's ads) is a bare <a> in the
+     carousel header carrying the same near-black fill token. */
+  #mainContent [data-cy="seller-other-ads"] h3 + a {
+    color: #5fd0c6 !important;
+    -webkit-text-fill-color: #5fd0c6 !important;
+  }
 
   /* Image gallery surrounds (out-specify the blanket neutraliser) */
   #mainContent [data-testid="image-galery-container"],
@@ -776,6 +1066,52 @@
   #mainContent [data-testid="gallery"],
   #mainContent [data-testid="swiper-list"] {
     background-color: #0d1117 !important;
+  }
+
+  /* Full-screen photo lightbox. It renders into a `.n-modal-portal` OUTSIDE
+     #mainContent, so none of the offer-page text rules reach it. Its dialog is
+     the design system's INVERSE surface, and it colours the ad title with the
+     `--color-background-primary` token — white on the light site, which we had
+     to remap to the page base #14181d. So opening the lightbox printed the
+     title in #14181d on a #0d1117 panel: the headline vanished completely, and
+     the "Dodane <date>" line under it dropped to 1.9:1. Repaint both directly;
+     the token itself must keep pointing at the page base. */
+  .n-modal-portal [role="dialog"] [data-testid="offer_title"],
+  .n-modal-portal [role="dialog"] [data-testid="offer_title"] h4 {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  .n-modal-portal [role="dialog"] [data-testid="ad-posted-at"] {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+  /* The lightbox also duplicates the offer's login-nudge + contact CTAs, but every
+     offer-page contact rule is #mainContent-scoped and this dialog lives in the
+     .n-modal-portal OUTSIDE #mainContent. So inside the lightbox the login card
+     kept its native OLX blue (#1d3c81) and the "Wyślij wiadomość" button its native
+     grey secondary fill — both glare on the dark lightbox. Mirror the offer
+     treatment for the portal so it matches the main page. */
+  .n-modal-portal [data-testid="ad-login-dialog"] {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  /* Its prompt copy carries the near-black #14181d fill (designed for the light
+     card), so once the card goes dark it drops to ~1:1 — lift it like the offer
+     page does for #mainContent [data-testid="prompt-message"]. */
+  .n-modal-portal [data-testid="prompt-message"] {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  .n-modal-portal [data-testid="ad-contact-message-button"],
+  .n-modal-portal [data-testid="chat-button"] {
+    background-color: #1fcabf !important;
+    color: #07232a !important;
+    border-color: #1fcabf !important;
+  }
+  .n-modal-portal [data-testid="ad-contact-message-button"] span,
+  .n-modal-portal [data-testid="chat-button"] span {
+    color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
   }
 
   /* ============================================================
@@ -820,6 +1156,10 @@
   }
   [data-testid="facebook-button"], [data-testid="apple-button"],
   [data-testid="google-button"] { color: #e6edf3 !important; }
+  /* The Apple wordmark is a monochrome black SVG (hardcoded #000 / #002F34
+     path fills), so it disappears once its pill goes dark. Facebook and Google
+     keep their multi-colour marks. */
+  [data-testid="apple-button"] svg path { fill: #e6edf3 !important; }
   /* Email + password fields */
   #username, #password,
   [data-testid="login-form"] input,
@@ -857,6 +1197,18 @@
     color: #9aa6b0 !important;
     -webkit-text-fill-color: #9aa6b0 !important;
   }
+  /* Sign-up password checklist. Each unmet rule ("9 lub więcej znaków", …) is
+     an <svg data-testid="false-icon"> whose disc is a literal `fill="white"`
+     <rect> with a grey dash across it — invisible on the white card, so only
+     the dash reads. On the dark card the disc becomes a row of glaring white
+     dots. Sink the disc into the card surface; the dash stays. (The met state
+     is a currentColor tick and needs nothing.) */
+  svg[data-testid="false-icon"] rect[fill="white"] { fill: #1c2128 !important; }
+
+  /* Show-password eye. The login app is a separate bundle that hardcodes the
+     old #406367 secondary colour on the icon instead of reading the token. */
+  [data-testid="toggle-password"],
+  [data-testid="toggle-password"] svg { color: #9aa6b0 !important; }
   [data-testid="or-separator"],
   [data-testid="or-separator"] span {
     color: #8b949e !important;
@@ -894,6 +1246,34 @@
   [data-testid="terms-conditions-link"],
   a[href*="login"], a[href*="register"],
   [data-testid="link"], a.link { color: #5fd0c6 !important; }
+
+  /* ============================================================
+     404 / error page ("Ups, mamy problem")
+
+     A completely separate, non-React template: no design tokens, no page
+     shell ids, just .c-container / .c-wrapper on a literal cream #FFFBEF
+     canvas. None of the theme's anchors reach it, so it shipped as a
+     full-viewport cream page whose heading inherited the light body text
+     colour and became unreadable. Anchor on the stable data-cy hook.
+     ============================================================ */
+  [data-cy="404-page"],
+  [data-cy="404-page"] .c-wrapper {
+    background-color: #14181d !important;
+  }
+  [data-cy="404-page"] .c-container__title {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  [data-cy="404-page"] .c-container__description {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+  [data-cy="404-page"] button.button {
+    background-color: #1fcabf !important;
+    border-color: #1fcabf !important;
+    color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
+  }
 
   /* ============================================================
      Breadcrumbs (literal dark-teal text on the listing/offer pages)
@@ -938,6 +1318,14 @@
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
   }
+  /* The partner strip at the very bottom (OLX.bg / OLX.ro / OLX.ua / OLX.pt /
+     Fixly / Otodom / Otomoto / obido) is the ONLY place #footerContent holds
+     <svg>s, and OLX desaturates every one of them with `filter: grayscale(1)`.
+     Their marks are dark ink drawn for the light #F2F4F5 footer — Otomoto's
+     navy ring and obido's unfilled (so pure-black) wordmark all but disappear
+     against #0d1117. They carry explicit path fills, so neither `color:inherit`
+     nor a `fill` override reaches them; invert the already-grey ink instead. */
+  #footerContent a svg { filter: grayscale(1) invert(1) !important; }
 
   /* ============================================================
      Scrollbar polish

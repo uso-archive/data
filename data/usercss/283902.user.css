@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260707.14.30
+@version      20260711.00.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -20,11 +20,33 @@
   /* Soften every default light border to a subtle dark line */
   * { border-color: #262c33 !important; }
 
-  /* Login / Sign-up hero: the page grid paints a bright yellow->white gradient that
-     washes the whole auth screen (and hides the light "Sign In" title). Clear the
-     decorative gradient so the dark base shows; PageGrid is a layout wrapper that
-     carries no other meaningful background image. */
-  [class*="PageGrid-desktop"] { background-image: none !important; }
+  /* Login / Sign-up hero: the page grid paints a decorative gradient (and, since the
+     auth redesign, a solid white background-color) that washes the whole auth screen
+     and hides the light "Sign In"/"Sign Up" title. Pin it to the dark base.
+     NOTE: PageGrid-desktop is NOT only a layout wrapper. On a song page the
+     annotation portal's grid carries the same class (AnnotationPortal-desktop__Grid):
+     it is position:absolute, z-index:2, pointer-events:none and natively transparent,
+     used solely to position the callout. Painting it opaque buries the entire lyrics
+     column the moment an annotation opens. The exception below must stay. */
+  [class*="PageGrid-desktop"] {
+    background-color: #14181d !important; background-image: none !important; }
+
+  /* Annotation portal grid: transparent overlay, must never be painted. */
+  [class*="AnnotationPortal-desktop__Grid"] {
+    background-color: transparent !important; }
+
+  /* Sign-in / Sign-up modal (nav "Sign Up", mobile menu): the panel is a brand-yellow
+     card with black copy. Our lifted light text lands on the yellow at ~1.5:1, so the
+     title, the "Or Sign Up with Email" divider and the terms line all disappear.
+     Darken the card like every other floating surface; the copy is already light. */
+  [class*="AuthenticationModal__Container"],
+  [class*="Modal-desktop__Contents"], [class*="Modal-mobile__Contents"] {
+    background-color: #14181d !important; background-image: none !important; }
+  /* the "Join millions of contributors…" strapline is a plain <div> the site paints pure
+     black (fine on the yellow card, invisible once it is dark) — the shared typography
+     list only covers inline/text tags, so name it explicitly */
+  [class*="AuthenticationFormComponents__Reason"],
+  [class*="AuthenticationModal__Container"] div { color: #c4cdd6 !important; }
 
   /* ====================================================================
      MODERN (React / styled-components) shell
@@ -53,6 +75,13 @@
     color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
   [class*="StickyNavSectionLink__StyledLink"]:hover,
   [class*="StickyNav"] a:hover { color: #ffffff !important; }
+  /* Every nav section link ships "border: 1px solid transparent" and the CURRENT section
+     turns that border white — it is the only "you are here" cue. The blanket border reset
+     paints all four sides of every link, so the whole nav renders as grey boxes and the
+     active tab becomes indistinguishable. Clear them, then repaint the active one. */
+  [class*="StickyNavSectionLink__StyledLink"] { border-color: transparent !important; }
+  [class*="StickyNavSectionLink__StyledLink"][data-active="true"] {
+    border-color: #ed4337 !important; color: #ffffff !important; }
   /* GENIUS wordmark: the inline SVG fill is black on some pages (home/charts) ->
      force light so it's visible on the dark header across all page types */
   [class*="PageHeaderLogo__Link"] svg, [class*="StickyNav-desktop__Logo"] svg,
@@ -79,10 +108,17 @@
   [class*="SearchDropdown"], [class*="search_dropdown"],
   .search_results, .quick_search-results {
     background-color: #1c2128 !important; border-color: #2d333b !important; color: #e6edf3 !important; }
-  /* sign-up pill keeps the brand red */
-  [class*="StickyNavSignUp__Button"] {
-    background-color: #ed4337 !important; color: #ffffff !important; border-color: #ed4337 !important; }
-  [class*="StickyNavSignUp__Button"]:hover { background-color: #f26659 !important; }
+  /* "Sign Up" is a zero-padding TEXT button on the live site, so painting it a
+     solid brand-red box wraps the glyphs in a tight red rectangle (and white on
+     #ed4337 is only 3.85:1). Keep it a text button and carry the brand red in
+     the label, lifted so it clears 4.5:1 on the dark nav. */
+  [class*="StickyNavSignUp__Button"],
+  [class*="StickyNavSignUp__Button"] * {
+    background-color: transparent !important; border-color: transparent !important;
+    color: #f26659 !important; -webkit-text-fill-color: #f26659 !important; }
+  [class*="StickyNavSignUp__Button"]:hover,
+  [class*="StickyNavSignUp__Button"]:hover * {
+    color: #ff8a7d !important; -webkit-text-fill-color: #ff8a7d !important; }
 
   /* ---- Song hero: bright-red gradient -> deep dark gradient w/ red tint ---- */
   [class*="SongHeader-desktop__Container"],
@@ -116,6 +152,14 @@
   [class*="ChartSong"], [class*="ChartSong"] *,
   [class*="RecommendedSong"] [class*="Title"],
   [class*="RecommendedSong"] [class*="Artist"] { color: #c4cdd6 !important; }
+
+  /* The "Credits" block and the "Other Albums" cards render their labels, values and
+     artist-name separators in plain <div>s the site paints black / black-60% — the
+     shared typography list above only covers inline/text tags, so they stay
+     black-on-dark and read as blank columns. */
+  [class*="Credit__Contributor"], [class*="Credit__Contributor"] div,
+  [class*="OtherAlbum__Info"], [class*="OtherAlbum__ArtistNames"] { color: #c4cdd6 !important; }
+  [class*="Credit__Label"], [class*="SongTags__Title"] { color: #8b949e !important; }
 
   /* lyrics-header label row "<Song> Lyrics" sits right after the ⓘ info icon
      and is a non-link title the site paints near-black via -webkit-text-fill
@@ -217,14 +261,27 @@
     background-color: #1c2128 !important; color: #c4cdd6 !important; border-color: #2d333b !important; }
 
   /* ---- Apple Music player strip / media ---- */
-  [class*="AppleMusicPlayer"], [class*="MediaPlayersContainer__Container"],
-  [class*="MusicVideo__Container"] { background-color: #1c2128 !important; }
+  [class*="AppleMusicPlayer"] { background-color: #1c2128 !important; }
+  /* ...but "AppleMusicPlayer-desktop__PageGrid" and "MediaPlayersContainer__Container" are
+     the full-width LAYOUT grid around the 940px player, natively transparent (the grid is
+     even pointer-events:none). Painting them draws an elevated band bleeding 170px past
+     the player on each side. Only the IframeContainer is a real surface. */
+  [class*="AppleMusicPlayer-desktop__PageGrid"],
+  [class*="AppleMusicPlayer-mobile__PageGrid"],
+  [class*="MediaPlayersContainer__Container"] { background-color: transparent !important; }
   /* The actual player UI renders in a same-origin genius.com/songs/<id>/apple_music_player
      iframe, so domain("genius.com") matches inside it. Its container/player/popup paint
      pure white by default -> dark; the divider is pure black -> soften to a dark line. */
   .apple_music_player-container, .apple_music_player-player,
   .apple_music_player-player-popup { background-color: #1c2128 !important; }
   .apple_music_player-divider { background-color: #2d333b !important; }
+  /* Seekbar chrome is drawn for a WHITE player: the track is a pure-black ::before bar
+     (invisible to element-bg scans) and the scrubber knob is a pure-black disc, both
+     black-on-dark once the strip is themed. The Apple Music wordmark path is black too. */
+  .apple_music_player-seekbar::before { background-color: #4a525c !important; }
+  .apple_music_player-seekbar-scrubber-circle { background-color: #e6edf3 !important; }
+  .apple_music_player-logo path,
+  .apple_music_player-expanded_header-logo path { fill: #c4cdd6 !important; }
   /* "Featured Videos" module (artist/album pages) is a same-origin Primis video player
      served in a genius.com iframe. Our body rule darkens its document, but the inner
      #largeUnit slate stays pure white and frames the video with glaring white bands
@@ -236,23 +293,55 @@
   [class*="SquareSelectTitle__Container"], [class*="SquareManySelects__Select"] {
     background-color: #1c2128 !important; color: #c4cdd6 !important; border-color: #2d333b !important; }
   [class*="SongTags__Tag"]:hover { background-color: #2d333b !important; }
+  /* "SongTags__TagContainer" is the transparent flex wrapper AROUND the chips, not a chip;
+     the substring above swallows it and paints a grey slab behind the whole tag row. */
+  [class*="SongTags__TagContainer"] { background-color: transparent !important; }
 
   /* ---- Buttons ---- */
   [class*="Button__Container"], [class*="VotingActions__Button"],
-  [class*="ExpandableContent__Button"], [class*="Charts__LoadMore"],
-  [class*="Latest-desktop__LoadMore"], [class*="Community-desktop__LoadMore"],
-  [class*="Videos-desktop__LoadMore"], [class*="List__More"],
+  [class*="ExpandableContent__Button"], [class*="List__More"],
   [class*="SquareButton"], [class*="Charts__LoadMore"] button {
     background-color: #21262d !important; color: #e6edf3 !important; border-color: #2d333b !important; }
+  /* The "*__LoadMore" and "ExpandableContent__ButtonContainer" classes sit on the
+     full-width GRID WRAPPER around the button, not on the button — giving them the
+     button surface paints a long grey slab behind (and level with) the button. They
+     are transparent on the live site; keep them that way. */
+  [class*="Charts__LoadMore"], [class*="Latest-desktop__LoadMore"],
+  [class*="Community-desktop__LoadMore"], [class*="Videos-desktop__LoadMore"],
+  [class*="ExpandableContent__ButtonContainer"] {
+    background-color: transparent !important; }
   [class*="SquareButton"] *, [class*="Charts__LoadMore"] * { color: #e6edf3 !important; }
   [class*="Button__Container"]:hover, [class*="VotingActions__Button"]:hover {
     background-color: #2d333b !important; }
+  /* dropdown pointer: an 11px square rotated 45deg, painted pure white */
+  [class*="DropdownList__Caret"] {
+    background-color: #1c2128 !important; border-color: #2d333b !important; }
   [class*="DropdownList__ItemsContainer"], [class*="Dropdown__ContentContainer"],
-  [class*="DropdownList__Item"], [class*="DropdownList__LabeledButton"],
-  [class*="PortalTooltip__Container"], [class*="InfoTooltip__Container"],
-  [class*="LyricsHeader__MetadataTooltip"], [class*="MetadataTooltip"] {
+  [class*="DropdownList__Item"], [class*="DropdownList__LabeledButton"] {
     background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   [class*="DropdownList__Item"]:hover { background-color: #2d333b !important; }
+
+  /* ---- Hover tooltips (artist cards, the ⓘ metadata popup) ----
+     "PortalTooltip__Container" / "InfoTooltip__Container" / "MetadataTooltip__InfoTooltip"
+     are the inline TRIGGER wrappers (a 12x21 icon box, an 88x16 credit name), natively
+     transparent — painting them draws a lighter rectangle behind every contributor name
+     and every ⓘ. The floating panel is a separate portal node, "TooltipShadow". */
+  [class*="PortalTooltip__Container"], [class*="InfoTooltip__Container"],
+  [class*="MetadataTooltip__InfoTooltip"], [class*="LyricsHeader__MetadataTooltip"] {
+    background-color: transparent !important; }
+  /* The panel ships pure white for a normal artist and brand-yellow for a verified one —
+     both keep black text, so our lifted light text lands unreadable on them. The two
+     variants differ only by a build-volatile styled-components hash, so darken both and
+     carry the verified signal on its own stable "Verified" eyebrow, in the brand yellow. */
+  [class*="TooltipShadow"] {
+    background-color: #1c2128 !important; background-image: none !important;
+    border-color: #2d333b !important; }
+  [class*="ArtistTooltip__Container"], [class*="ArtistTooltip__Container"] * {
+    color: #c4cdd6 !important; -webkit-text-fill-color: #c4cdd6 !important; }
+  [class*="ArtistTooltip__ArtistTooltipName"] {
+    color: #9aa7f0 !important; -webkit-text-fill-color: #9aa7f0 !important; }
+  [class*="ArtistTooltip__Verified"] {
+    color: #ffff64 !important; -webkit-text-fill-color: #ffff64 !important; }
 
   /* ====================================================================
      Homepage modules
@@ -268,9 +357,25 @@
   [class*="ChartItem-desktop__Row"]:hover, [class*="EditorialPlacement__Container"]:hover {
     background-color: #1c2128 !important; }
   [class*="ChartSong-desktop__Title"], [class*="EditorialPlacement__Title"] { color: #e6edf3 !important; }
+  /* Homepage news cards repeat the article-link underline-skip trick on hover: a black
+     1px background-image "underline" plus a WHITE text-shadow halo (out to .15em) that
+     punches gaps around the glyphs so the rule skips descenders. On the dark card the
+     black underline vanishes and the fat white halo floods the letters into a blob.
+     Re-point the halo at the hovered card surface and the underline at the title tone.
+     Keeping the halo (rather than dropping it) preserves the descender skip. */
+  [class*="EditorialPlacement__Link"]:hover [class*="EditorialPlacement__Title"] h2,
+  [class*="EditorialPlacement__Link"]:hover [class*="EditorialPlacement__Title"] h3 {
+    color: #e6edf3 !important;
+    background-image: linear-gradient(#e6edf3, #e6edf3) !important;
+    text-shadow: 0.03em 0 #1c2128, -0.03em 0 #1c2128, 0 0.03em #1c2128, 0 -0.03em #1c2128,
+                 0.06em 0 #1c2128, -0.06em 0 #1c2128, 0.09em 0 #1c2128, -0.09em 0 #1c2128,
+                 0.12em 0 #1c2128, -0.12em 0 #1c2128, 0.15em 0 #1c2128, -0.15em 0 #1c2128 !important; }
   [class*="ChartSong-desktop__Artist"], [class*="EditorialPlacement__Author"],
   [class*="EditorialPlacement__PublishedAt"], [class*="ChartSong-desktop__Metadatum"] { color: #8b949e !important; }
-  [class*="EditorialPlacement__Label"] { color: #ed4337 !important; } /* red eyebrow label */
+  /* red eyebrow label — the word sits in a <span> inside the card's <a>, so the generic
+     "a span" link rule repaints it periwinkle unless the descendant is named too */
+  [class*="EditorialPlacement__Label"],
+  [class*="EditorialPlacement__Label"] * { color: #ed4337 !important; }
   [class*="UserBadge__Name"] { color: #c4cdd6 !important; }
   [class*="UserBadge__Role"], [class*="Community-desktop__Iq"], [class*="CommunityRanking-desktop__Iq"] { color: #8b949e !important; }
 
@@ -298,6 +403,11 @@
   .profile_contribution, .full_width_link, .full_width_card, .grid_video {
     background-color: #1c2128 !important; color: #c4cdd6 !important; border-color: #2d333b !important; }
   .full_width_link, .full_width_link * { color: #c4cdd6 !important; }
+  /* legacy "gray_container" (album/article comment boxes, the ellipsis menu, the
+     bottom strip) paints rgba(204,204,204,.2) — a translucent light wash that turns
+     into a washed-out grey slab over the dark base. Make it a normal dark card. */
+  .gray_container, .comments.gray_container, .ellipsis_menu.gray_container {
+    background-color: #1c2128 !important; }
   .mini_card:hover, .mini_article_card:hover, .song_card:hover { background-color: #21262d !important; }
   .full_width_container { background-color: transparent !important; }
   /* legacy 404 / error page: the render_404 panel keeps a pure-white background while
@@ -305,8 +415,12 @@
      invisible title. Darken the panel so the error text reads. */
   .render_404, [class*="render_404"] { background-color: #14181d !important; }
   /* the 404 "sgnarly" mascot is a black-on-white raster GIF that renders as a glaring
-     white square on the dark error page -> invert so it reads as a light mascot on dark */
-  .render_404-image, img.render_404-image { filter: invert(1) !important; }
+     white square on the dark error page -> invert so it reads as a light mascot on dark.
+     Inverting turns the GIF's white ground pure black, which is a visible square against
+     #14181d; "lighten" then lets the (lighter) page show through the black ground while
+     the now-white mascot still wins per channel. */
+  .render_404-image, img.render_404-image {
+    filter: invert(1) !important; mix-blend-mode: lighten !important; }
 
   /* legacy editorial article / news page (<article-page>): the .grid_layout content
      wrapper inside the dark .white_container stays pure-white, and the byline/share
@@ -327,6 +441,14 @@
     color: #c4cdd6 !important; }
   .article_title, .article_title--o {
     -webkit-text-stroke: 0 !important; color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
+  /* article body + sidebar reference links fake an underline-skip: a black 1px
+     background-image "underline" plus a WHITE text-shadow halo punched around each
+     glyph. On dark the underline vanishes and the white halo outlines every letter,
+     so the links read as double-struck. Re-point both at the card surface / link hue. */
+  .article_reference_link, .article_rich_text_formatting a {
+    background-image: linear-gradient(#9aa7f0, #9aa7f0) !important;
+    text-shadow: 0.84px 0 0 #1c2128, -0.84px 0 0 #1c2128,
+                 1.68px 0 0 #1c2128, -1.68px 0 0 #1c2128 !important; }
 
   /* legacy text colors (#222 / #444) -> light */
   .mini_card-title, .mini_article_card-title, .song_card-title,
@@ -346,6 +468,12 @@
   /* legacy profile header is already dark — keep it, just soften */
   .profile_header { background-color: #0d1117 !important; }
   .profile_tabs-tab--selected { border-bottom-color: #ed4337 !important; color: #ffffff !important; }
+  /* The blanket border reset above repaints EVERY border, including two the site
+     uses as accents rather than as dividers: the periwinkle 2px underline that marks
+     a "text_label--purple" link-button, and the white ring separating the profile
+     avatar from the (already dark) hero. Restore both. */
+  .text_label--purple { border-bottom-color: #9aa7f0 !important; }
+  .profile_header-avatar { border-color: #e6edf3 !important; }
 
   /* legacy buttons / tags */
   .normal_button, .text_button, .quinary_button, .tag,
@@ -377,6 +505,13 @@
   /* periwinkle count chips: keep accent bg, dark label for contrast */
   .profile_contributions_group-count, .profile_contributions_group-count * { color: #14181d !important; }
 
+  /* legacy contribution vote score ("+1793" between the thumb buttons): the site paints
+     it green when net-positive and red when negative — a real sentiment cue. It carries
+     "square_button", so the neutral .square_button color rule above flattens both to grey
+     and the up/down signal is lost. Restore it, lifted for contrast on the dark card. */
+  .voting-total--positive, .voting-total--positive * { color: #3fb950 !important; }
+  .voting-total--negative, .voting-total--negative * { color: #f85149 !important; }
+
   /* legacy active header tab: yellow underline -> brand red */
   .header-primary.active, .header_with_login .active {
     background-color: transparent !important; box-shadow: inset 0 -3px 0 #ed4337 !important; }
@@ -395,6 +530,12 @@
   .dropdown_menu, .dropdown_menu-item, .menu {
     background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   .dropdown_menu-item:hover { background-color: #2d333b !important; }
+  /* the legacy flyout menu (profile "All contributions", and the other docked menus) is a
+     white .tooltip panel with black <div> rows — the shared typography list covers inline
+     tags only, so it stays a glaring white card. It only exists once opened. */
+  .tooltip { background-color: #1c2128 !important; border-color: #2d333b !important; }
+  .tooltip-list_item, .tooltip-list_item * { color: #e6edf3 !important; }
+  .tooltip-list_item:hover { background-color: #2d333b !important; }
   /* legacy search autocomplete: the feed_dropdown panel paints #f7f7f7 behind the
      result rows -> dark so the section-header bands stop flashing white */
   .feed_dropdown, .feed_dropdown--medium_width {

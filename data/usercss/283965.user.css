@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for Syosetu (小説家になろう). Easy-on-the-eyes reading for novel chapters, plus the home, rankings, search and bookmark controls.
-@version      20260707.14.32
+@version      20260711.00.16
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -12,18 +12,39 @@
      Syosetu (Narou) Dark
      The Syosetu network shares one frontend across the portal
      (syosetu.com), the novel reader (ncode/novel18.syosetu.com),
-     the ranking/search site (yomou.syosetu.com) and mypage. Colors
-     are HARDCODED (no CSS custom properties), so this reskins per
-     element. Priorities: a calm reading surface for long-form
-     Japanese text (soft off-white body on a dark bg, never glare),
-     opaque sticky reader header/menu, legible chapter nav and font
-     /bookmark controls, and the signature Narou brown + ranking
-     medal colors refined for dark. Layout/typography untouched —
-     colors only.
+     the ranking/search site (yomou.syosetu.com) and mypage. Most
+     colors are hardcoded per element, but the modern components
+     also read a few :root design tokens — those are remapped below
+     so every surface painted through them follows. Priorities: a
+     calm reading surface for long-form Japanese text (soft
+     off-white body on a dark bg, never glare), opaque sticky reader
+     header/menu, legible chapter nav and font/bookmark controls,
+     and the signature Narou brown + ranking medal colors refined
+     for dark. Layout/typography untouched — colors only.
      ============================================================ */
 
   :root {
     color-scheme: dark !important;
+    /* --color-ui-bg (#fff) is used ONLY as a background: panel bodies,
+       the header, the "more →" scroll-fade gradient stops, the
+       collapsed-panel bottom fade and the --nolink row hover. Remap it
+       once instead of chasing each surface. --color-ui-bg--hover is a
+       translucent light wash (rgba(241,243,245,.5)) painted on ranking
+       rows, panel items and nav tabs on hover — it turned every hovered
+       row into a grey glare block on dark. */
+    --color-ui-bg: #14181d !important;
+    --color-ui-bg--hover: #22272e !important;
+    /* Every headline on the network is painted from this one token: the
+       Narou brown #582b13 on yomou, the teal #0d6572 on the portal and
+       mypage. Both are ~1.5-2:1 on dark. Remapping the token covers all
+       of its consumers at once — page titles, card/cluster/aside
+       headlines (incl. the aside bullet, which reads the token as a
+       background-color), the ranking tabs' current item and the
+       announce-bar telop — so a new consumer never lands unstyled. The
+       per-selector rules further down stay as a belt-and-braces for the
+       legacy markup that hardcodes the same hexes. */
+    --color-text-headline: #e6c9a8 !important;
+    --color-site-text-headline: #e6c9a8 !important;
   }
 
   /* ---- Base surfaces ---- */
@@ -36,6 +57,111 @@
   /* Soften every default light border into a subtle dark divider */
   * {
     border-color: #262c33 !important;
+  }
+
+  /* ...but a border IS the affordance (or the accent) for some elements.
+     The blanket rule above flattens them, so restore the coloured edges:
+     the active ranking/news tab's 3px underline (its ONLY active
+     indicator), the checked radio/checkbox ring, and the signature cyan
+     2px rules that top-and-tail every panel body. */
+  .c-horizontalnav__item.is-active {
+    border-bottom-color: #5fb0e6 !important;
+  }
+  .c-form__radio-input:checked,
+  .c-form__checkbox-input:checked {
+    border-color: #58a6ff !important;
+  }
+  .c-panel__body {
+    border-top-color: rgba(24, 183, 205, 0.5) !important;
+    border-bottom-color: rgba(24, 183, 205, 0.5) !important;
+  }
+
+  /* ============================================================
+     Selected-state indicators
+     The network marks the selected item four different ways and every
+     one of them died on dark:
+       - the yomou ranking period tabs (日間…累計) draw the current label
+         AND a 4px underline from --color-text-headline — the token remap
+         fixes the label, the blanket border reset above still flattens
+         the underline;
+       - the filter row below it (連載中…すべて) is a pill filled with
+         --color-ui-bg, which we remap to the page bg — the pill vanished;
+       - the section-heading accent bar is a border-left, also flattened;
+       - the pager's current page draws a 3px bar from the brown
+         --color-ui-accent (#823f1c, 2.1:1 — under the 3:1 floor for a
+         non-text indicator);
+       - the logged-in main-nav inverts the active item to a WHITE pill
+         (--color-text--light) and our brown-nav rule paints its label
+         cream on it (1.3:1). Give it a warm raised chip instead.
+     Inactive siblings are plain links and stay accent blue.
+     ============================================================ */
+  .c-tabnav-1st__current,
+  .c-tabnav-2nd__current {
+    color: #e6c9a8 !important;
+    -webkit-text-fill-color: #e6c9a8 !important;
+  }
+  .c-tabnav-1st__current {
+    border-bottom-color: #e6c9a8 !important;
+  }
+  .c-tabnav-2nd__current {
+    background-color: #21262d !important;
+  }
+  .c-card-cluster-title {
+    border-left-color: #e6c9a8 !important;
+  }
+  .c-pager__item.is-current::after {
+    background-color: #5fb0e6 !important;
+  }
+  .p-main-nav__item.is-active > a {
+    background-color: #4a2e1c !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  /* ============================================================
+     Icon-font glyphs (::before / ::after `content:`)
+     These render as visible symbols but are NOT text nodes, so every
+     color audit walks past them. Each kept a hardcoded legacy colour
+     and went invisible on dark: the ranking dropdown caret and the
+     search "series" chevrons at #333 (1.4:1), the mypage kebab at
+     #666 (3.3:1). The ユーザ登録 pill is the mirror image — its icon
+     stayed light-on-orange (1.7:1) while its label was darkened.
+     ============================================================ */
+  .p-ranktop-nav__category-name::after,
+  .series_search__series::before,
+  #main_search .p-icon::before {
+    color: #c4cdd6 !important;
+  }
+  .c-dropdown__icon::before {
+    color: #9aa3ad !important;
+  }
+  /* The kebab's flyout (mypage 設定 -> ブロックする / ミュートする) is a solid
+     WHITE panel: --color-dropdown-bg-chips paints each bare <li>, and the
+     wrapper is transparent, so no element-bg scan of the loaded page can see
+     it — the node only exists once the kebab is clicked. The kebab itself
+     grows an #eee hover disc (--color-dropdown-icon-bg-hover). */
+  .c-dropdown__chips-group,
+  .c-dropdown__chips-group li {
+    background-color: #1c2128 !important;
+  }
+  .c-dropdown__icon:hover {
+    background-color: #21262d !important;
+  }
+  .p-main-nav__item--useradd a,
+  .p-main-nav__item--useradd .p-icon::before {
+    color: #1a1109 !important;
+  }
+  /* The rank medal crown is a separate glyph from the number and keeps
+     the site's own gold/silver/bronze; the bronze reads 3.7:1 on the
+     card, so give the crowns the same refined medal tones as the digits. */
+  .c-rank-place--1::before {
+    color: #e3b341 !important;
+  }
+  .c-rank-place--2::before {
+    color: #c9d1d9 !important;
+  }
+  .c-rank-place--3::before {
+    color: #cd7f47 !important;
   }
 
   /* Generic light wrappers / panels -> elevated dark surface */
@@ -100,8 +226,12 @@
     color: #c4cdd6 !important;
   }
 
-  /* Signature Narou brown nav -> deep warm-brown bar that keeps the
-     identity but sits on dark without glare */
+  /* Main nav bar. Each site paints this from its own --color-ui-accent:
+     brown #823f1c on yomou, brand cyan #18b7cd on the portal/mypage. One
+     token cannot carry two hues, so the bar is unified on the classic Narou
+     brown — a deliberate re-tune, and the only place the network's accent
+     hue is not preserved. It keeps the identity and sits on dark without
+     the glare a full-saturation cyan band would throw. */
   .p-main-nav,
   .p-sub-nav {
     background-color: #2a1a10 !important;
@@ -350,6 +480,14 @@
   .novel_bn a:hover {
     color: #9bd4ff !important;
   }
+  /* ...but the pager's dead ends (前の50作品へ on page 1, 次の… on the last)
+     are <span class="is-disabled"> painted from --color-text--disable (#bbb).
+     The rule above swallowed them, so a disabled control read exactly like a
+     live link. Give them a muted grey that reads as "not clickable". */
+  .c-pager__item.is-disabled,
+  .c-pager__item.is-disabled a {
+    color: #7d8590 !important;
+  }
 
   /* ============================================================
      Sticky reader menu / layout-adjust (font-size) controls
@@ -439,6 +577,57 @@
     background-color: #21262d !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
+  }
+
+  /* ============================================================
+     .c-button modifiers — the site's whole button semantics
+     The bare .c-button is natively WHITE (--color-ui-button-bg), so the
+     neutral chip above is right for it. But the network layers a modifier on
+     top for every meaning, each painted from its own token, and the rule
+     above flattened all of them into that same chip: the 404's only action
+     and mypage's お気に入り (--primary #1b8ef3) became indistinguishable from
+     a disabled control, and a destructive --delete would have read as a
+     neutral one. Restore each meaning; the modifier out-specifies nothing,
+     so these must come after .c-button, not before.
+     ============================================================ */
+  .c-button--primary {
+    background-color: #1f6feb !important;
+    color: #ffffff !important;
+    border-color: #1f6feb !important;
+  }
+  /* Hover DEEPENS the blue rather than lightening it. #1f6feb already sits at
+     4.6:1 under white, so the site's lighten-on-hover move would drop the
+     label (and the button's icon glyph) to 3.3:1 — a hover-only contrast
+     fail no load-time scan would ever see. */
+  .c-button--primary:hover,
+  .c-button--primary:focus,
+  .c-button--primary:active {
+    background-color: #1a5fd0 !important;
+    color: #ffffff !important;
+  }
+  .c-button--delete {
+    background-color: #da3633 !important;
+    color: #ffffff !important;
+    border-color: #da3633 !important;
+  }
+  /* Brand orange kept, label darkened — same treatment as the nav's
+     ユーザ登録 pill (white-on-orange is 2.1:1) */
+  .c-button--useradd {
+    background-color: #ff922b !important;
+    color: #1a1109 !important;
+    border-color: #ff922b !important;
+  }
+  /* Natively transparent link-buttons, not filled chips */
+  .c-button--minor,
+  .c-button--outline {
+    background-color: transparent !important;
+    color: #5fb0e6 !important;
+  }
+  /* The "already done" state (e.g. already favourited) — must read inactive */
+  .c-button--none-active {
+    background-color: #30363d !important;
+    color: #8b949e !important;
+    border-color: #30363d !important;
   }
 
   /* Rating stars / point form */
@@ -546,10 +735,19 @@
   .c-novel-item__info {
     color: #c4cdd6 !important;
   }
+  /* The portal ranking cards (週間/短編ランキング, 更新された連載作品…) wrap the
+     WHOLE item in one <a> and render the title as a bare .c-novel-item__title
+     DIV nested inside .c-novel-item__info — so the `… a` form below is a no-op
+     there and the title inherited the info grey, flattening every ranking title
+     to plain body text (yomou's differently-marked ranking still shows orange).
+     Target the element itself so the title keeps the Narou orange; the ` a`
+     form stays for the list markup that does nest an anchor. */
+  .c-novel-item__title,
   .c-novel-item__title a {
     color: #f0954a !important;
   }
-  .c-novel-item__title a:hover {
+  .c-novel-item__title a:hover,
+  .c-novel-item:hover .c-novel-item__title {
     color: #ffb877 !important;
   }
 
@@ -585,6 +783,28 @@
     border-color: #2d333b !important;
   }
 
+  /* The custom <select> (header scope picker, sort order, 感想絞り込み)
+     paints its chevron with an inline SVG data-URI whose <path> has no
+     fill — i.e. pure black. On the dark input that is ~1.05:1, an
+     invisible caret. Repaint the glyph light.
+     The geometry canNOT be inherited from the site: mypage ships its own
+     form stylesheet where .c-form__select gets neither `appearance:none`
+     nor a `background:` shorthand, so a bare `background-image` lands on
+     the initial values — `repeat` tiled the 512×512 chevron across the
+     whole 76×36 control and `appearance:auto` left Chromium's native
+     arrow painted on top of it, burying the 作品 label. Pin every
+     component. The values reproduce the site's own shorthand exactly
+     where it does exist (0.85em = 11.9px at the portal/yomou/mypage 14px
+     font, 10.71px at the reader's 12.6px), so only mypage changes. */
+  .c-form__select {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23c4cdd6' d='M256,372a24.94,24.94,0,0,1-17.68-7.33L76.39,202.71a25,25,0,0,1,35.36-35.35L256,311.61,400.25,167.36a25,25,0,0,1,35.36,35.35L273.68,364.64A24.94,24.94,0,0,1,256,372Z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 5px center !important;
+    background-size: 0.85em !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+  }
+
   ::placeholder {
     color: #8b949e !important;
     opacity: 1 !important;
@@ -610,6 +830,15 @@
   button:hover,
   input[type="submit"]:hover {
     background-color: #2d333b !important;
+  }
+  /* The chapter footer's 縦書きPDF is an <input type=button> the site renders
+     as a plain link beside 作者マイページ / 誤字報告 / 情報提供. The rule above
+     made it the only chip in that row. It ties `input[type="button"]` on
+     specificity, so it MUST sit after it — not up with the .c-button block. */
+  input.c-under-nav__pdflink {
+    background-color: transparent !important;
+    color: #5fb0e6 !important;
+    border-color: transparent !important;
   }
 
   /* Search builder legacy tables / labels / keyword tags. This older
@@ -667,6 +896,51 @@
   .tab_box a,
   .tab_box .pointer {
     color: #5fb0e6 !important;
+  }
+  /* The keyword-picker's three tabs (おすすめキーワード① / ② / リプレイ用) are
+     bare <li>s carrying their own #eee fill, and #fff for the current one —
+     three bright pills, and once darkened the current/inactive distinction is
+     gone. They only exist after 検索ワードを選択 is clicked, and at exactly 40px
+     tall they sit under the surface scanner's floor. Elevate the current tab
+     and give it the amber label the rest of the network uses for "selected". */
+  .tab_box li.pointer {
+    background-color: #161b22 !important;
+  }
+  .tab_box li.select {
+    background-color: #21262d !important;
+    color: #e6c9a8 !important;
+  }
+
+  /* The legacy sidebar headings (サイト案内 / ヘルプ) bullet themselves with a
+     19x19 raster help.gif — a WHITE rounded square. It cannot be recoloured,
+     so it flashed two white chips down the dark sidebar. Swap in a matching
+     amber "?" chip and pin every background component: the site's shorthand
+     leaves background-size at `auto`, which an override would resolve against
+     the SVG rather than the gif. */
+  .h2_help {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='19' height='19' viewBox='0 0 19 19'%3E%3Crect x='0.75' y='0.75' width='17.5' height='17.5' rx='3' fill='%2321262d' stroke='%23e6c9a8' stroke-width='1.5'/%3E%3Ctext x='9.5' y='14' font-family='sans-serif' font-size='12' font-weight='bold' fill='%23e6c9a8' text-anchor='middle'%3E?%3C/text%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: 0% 50% !important;
+    background-size: 19px 19px !important;
+  }
+
+  /* The search-builder CTAs (検索ワードを選択 / ジャンル選択 / 詳細条件設定 /
+     検索履歴 and the 検索 submit) are the site's brand-blue #2babff buttons.
+     The generic button rule flattened all six to the same neutral chip, so the
+     page's primary action stopped looking like one. `#trad a` (an ID) outranks
+     a bare .btn-add, so the anchor form must be named under the ID too. */
+  #trad a.btn-add,
+  a.btn-add,
+  input.btn-search {
+    background-color: #1f6feb !important;
+    color: #ffffff !important;
+    border-color: #1f6feb !important;
+  }
+  #trad a.btn-add:hover,
+  a.btn-add:hover,
+  input.btn-search:hover {
+    background-color: #1a5fd0 !important;
+    color: #ffffff !important;
   }
 
   /* Expanding search-builder panels (ジャンル選択 / 詳細条件設定) are white
@@ -764,9 +1038,17 @@
   .marginleft,
   .series_search__lead,
   .series_search__lead-supplement,
-  .attenstion2,
-  .attention {
+  .attenstion2 {
     color: #9aa3ad !important;
+  }
+  /* .attention is NOT metadata — it is the emphasised 総合ポイント figure the
+     site paints #dd0000 on every result row. Lumping it in with the muted
+     lines above made the ONE emphasised line the dimmest thing on the row.
+     (#trad/#main_search out-specify a bare .attention, so name them.) */
+  #trad .attention,
+  #main_search .attention,
+  .attention {
+    color: #ff7b72 !important;
   }
   /* Result count + metadata counters are bare <b> at #333 — keep them
      bright so the figures stand out from their labels */
@@ -806,6 +1088,18 @@
   }
   #trad a {
     color: #5fb0e6 !important;
+  }
+  /* ...but the result TITLES are natively the warm Narou orange (#fd6532)
+     and live inside #trad, so the ID rule above out-specified the
+     .novel_h a accent and flattened all 20 titles per page to link blue.
+     Re-assert the orange on that exact subset. */
+  #trad .novel_h a,
+  #main_search .novel_h a {
+    color: #f0954a !important;
+  }
+  #trad .novel_h a:hover,
+  #main_search .novel_h a:hover {
+    color: #ffb877 !important;
   }
 
   /* ============================================================
@@ -891,11 +1185,18 @@
     border-color: #2d333b !important;
   }
   .c-announce,
-  .c-announce--note,
-  .c-announce__emphasis {
+  .c-announce--note {
     background-color: #1c2128 !important;
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
+  }
+  /* The emphasis span is the reader's CONTENT WARNING — <R15>, 〔残酷描写〕,
+     the age gate — painted #dd0000 by the site. It used to inherit the box's
+     body colour above and read as ordinary prose. Warm red keeps the warning
+     legible AND alarming. Anchors with the same class stay link-blue via
+     .c-announce a, which out-specifies this. */
+  .c-announce__emphasis {
+    color: #ff7b72 !important;
   }
   .c-announce a,
   .c-announce--note a,
@@ -1019,5 +1320,73 @@
   .c-ad__item-horizontal,
   .c-pr {
     background-color: transparent !important;
+  }
+
+  /* ============================================================
+     Error / 404 page (syosetu.com/<bad-url>)
+     A full-width solid #fff panel; its teal #0d6572 heading would go
+     dark-on-dark once the panel darkens, so lift it to the page amber.
+     ============================================================ */
+  .p-error-panel {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
+  .p-error-panel__heading {
+    color: #e6c9a8 !important;
+  }
+  .p-error-panel__support-text {
+    color: #c4cdd6 !important;
+  }
+
+  /* ============================================================
+     Google Funding Choices consent dialog (.fc-consent-root)
+     Rendered in the MAIN document on first visit — a solid white
+     modal flashing over the dark page. Darken the panels and dividers;
+     the blue CTA buttons keep their brand fill.
+     ============================================================ */
+  .fc-consent-root .fc-dialog,
+  .fc-consent-root .fc-dialog-content,
+  .fc-consent-root .fc-dialog-header,
+  .fc-consent-root .fc-faq-contents,
+  .fc-consent-root .fc-faq-icon,
+  .fc-consent-root .fc-preference-container {
+    background-color: #1c2128 !important;
+  }
+  .fc-consent-root .fc-dialog-headline,
+  .fc-consent-root .fc-header-text,
+  .fc-consent-root .fc-dialog p,
+  .fc-consent-root .fc-dialog div,
+  .fc-consent-root .fc-dialog span,
+  .fc-consent-root .fc-dialog h1 {
+    color: #c4cdd6 !important;
+  }
+  .fc-consent-root .fc-dialog a {
+    color: #5fb0e6 !important;
+  }
+  /* The CMP ships its own !important rules at higher specificity, so the
+     headline, the footer "List of partners" link and the FAQ disc must be
+     matched selector-for-selector or they stay black-on-dark / white. */
+  .fc-consent-root .fc-dialog .fc-header h1.fc-dialog-headline {
+    color: #e6edf3 !important;
+  }
+  .fc-consent-root .fc-dialog .fc-footer a.fc-footer-link-v2,
+  .fc-consent-root .fc-dialog .fc-footer a.fc-footer-link-v2:visited {
+    color: #5fb0e6 !important;
+  }
+  .fc-consent-root .fc-faq-header .fc-faq-icon {
+    background-color: #21262d !important;
+    border-color: #2d333b !important;
+  }
+  .fc-consent-root .fc-faq-header .fc-faq-icon svg {
+    fill: #c4cdd6 !important;
+  }
+  .fc-consent-root .fc-footer-buttons-divider,
+  .fc-consent-root .fc-preference-divider {
+    background-color: #2d333b !important;
+  }
+  /* Re-assert the label on the brand-blue CTAs (the broad text rule
+     above would otherwise dim them). */
+  .fc-consent-root .fc-button .fc-button-label {
+    color: #ffffff !important;
   }
 }

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260707.14.34
+@version      20260711.00.19
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -80,6 +80,21 @@
      below). Maps / charts are excluded at the bottom. */
   * {
     border-color: var(--wx-border) !important;
+  }
+  /* ...but weather.com uses Tailwind's EXPLICIT border utilities as semantic
+     indicators, and the blanket rule above swallowed all three:
+     - `border-black` marks the SELECTED unit in the °F / °C / Hybrid picker
+       (the others carry `border-transparent`), so the selected unit lost its
+       underline while the unselected ones GAINED a phantom 2px line -- the
+       control no longer showed which unit was active.
+     - `border-white` is the ring of the map's location pin.
+     Restore each to its intent (black -> light, since the surface flipped). */
+  .border-transparent {
+    border-color: transparent !important;
+  }
+  .border-black,
+  .border-white {
+    border-color: var(--wx-text) !important;
   }
 
   /* ---- header / sidebar chrome ----------------------------------------- */
@@ -237,6 +252,31 @@
   [class*="adBackground"],
   [class*="combinedTopAds"] {
     background-color: var(--wx-surface-2) !important;
+  }
+  /* the ad-disclosure label ("Advertisement") ships #6f7585 -- 3.68:1 on the
+     darkened ad frame at 10px, an AA fail. It is a legal disclosure, so it must
+     stay readable. The top ad slot draws its own label via a ::after content
+     string (no text node), which no text audit can see. */
+  .adLabel,
+  [class*="BaseAd--adLabel"] {
+    color: var(--wx-text-muted) !important;
+  }
+  [class*="combinedTopAdsPlaceholder"]::after {
+    color: var(--wx-text-muted) !important;
+  }
+  /* the Almanac's two section headings ("Reported Conditions", "Historical
+     Monthly Avg") are <th> cells inside <thead>; the generic `th` chrome fill
+     below painted each of them as a black rectangle hugging the words, since
+     they only span one column. weather.com leaves them transparent. */
+  [class*="Almanac--tableTitle"] {
+    background-color: transparent !important;
+  }
+  /* every Almanac row draws `border-bottom: 1px solid #dedede !important` from a
+     [dir]-prefixed module rule at (0,2,0), which out-ranks the global
+     `* { border-color }` at (0,0,0) -- so the card kept a bright white lattice.
+     Re-match it one class deeper (0,2,1) to win. */
+  [class*="Card--card"] tr[class*="Almanac--row"] {
+    border-bottom-color: var(--wx-border) !important;
   }
   /* the calendar day numbers ship a #6f7585 module color (CalendarDateCell--date)
      -- fine on the original white grid but only ~3.4:1 on our dark card. Lift to
@@ -406,6 +446,22 @@
   [style*="color: rgb(141, 141, 141)"] {
     color: var(--wx-text-muted) !important;
   }
+  /* the Sunrise / Sunset markers in the Hourly graph (and the Today outlook
+     strip) carry a SEMANTIC inline colour on both the label and its icon: a warm
+     burnt-orange rgb(37,36,34)-style sunrise (rgb(203,74,20)) and a dusky-mauve
+     sunset (rgb(163,81,112)). Our `.text-gray-900` !important rule flattened both
+     to plain light, so sunrise/sunset read like every other hour label and lost
+     the warm/cool signal. The native hues are too dark for our surface (~2.2:1),
+     so restore a LIGHTENED warm tint for sunrise and a cool mauve for sunset --
+     the icon fill is currentColor, so setting the colour recolours it too. */
+  [style*="color: rgb(203, 74, 20)"] {
+    color: #ec9a5c !important;
+    -webkit-text-fill-color: #ec9a5c !important;
+  }
+  [style*="color: rgb(163, 81, 112)"] {
+    color: #d891ac !important;
+    -webkit-text-fill-color: #d891ac !important;
+  }
 
   /* ---- Air Quality page (All Pollutants list + AQI status heading) ------ */
   /* The Air Quality page colors its key headings with a NEAR-BLACK Tailwind
@@ -525,6 +581,14 @@
   [class*="text-[#007EA8]"] {
     color: #45a8db !important;
   }
+  /* the SAME percentages switch to a muted grey `text-[#9ca3af]` when the
+     chance of rain is negligible -- that grey/blue pair is the signal. Our
+     generic `p` rule repainted the grey ones as body text, so a 3% hour and a
+     53% hour read at the same weight (only the hue differed). Keep the muted
+     ones muted. */
+  [class*="text-[#9ca3af]"] {
+    color: var(--wx-text-muted) !important;
+  }
 
   /* ---- links / accent --------------------------------------------------- */
   a,
@@ -537,6 +601,25 @@
   a:hover,
   a:focus {
     color: var(--wx-link-hover) !important;
+  }
+
+  /* ---- restore the site's own `text-white` ------------------------------- */
+  /* weather.com marks every piece of text that sits ON a saturated fill with
+     the `text-white` utility. It ships un-!important inside Tailwind's utilities
+     cascade layer, so our unlayered `p, li, ...`/`a` !important rules beat
+     it and repainted ALL of it -- 22 nodes on a single Today page. The damage
+     is worst where the fill carries the meaning:
+     - the SEVERE-WEATHER ALERT banner (`bg-alert-severe` #ba0d00): the
+       "Tornado Warning" line and its "Until ..." / "+6 More" text dropped to
+       our body grey #c4cdd6 -> 4.2:1 on the red (an AA fail for the 14px line)
+       and the whole banner read as muted chrome rather than an emergency.
+     - the current-conditions hero (Feels Like / High / Low / Chance of Rain).
+     - the brand CTAs ("Unlock 15 minute details" on #204794, "See Details",
+       "Sign in") whose label took our LINK BLUE on a blue fill -> 3.7:1.
+     Restore pure white -- it is what the site paints and it reads on every one
+     of those fills. The alert / brand background colors are never touched. */
+  .text-white {
+    color: #ffffff !important;
   }
 
   /* ---- data tables (hourly / 10-day details) ---------------------------- */
@@ -612,6 +695,18 @@
   textarea::placeholder {
     color: var(--wx-text-muted) !important;
     opacity: 1 !important;
+  }
+  /* EXCEPT range sliders: weather.com renders the radar timeline scrubber and
+     the Cold-&-Flu / Allergy "extended forecast" scrubber as a natively
+     TRANSPARENT `input[type=range]` stacked on top of the real, styled track
+     (a white pill + a coloured elapsed bar + a dark knob). The blanket `input`
+     rule above filled that box with an opaque dark surface, so the slider
+     covered its own track: both scrubbers rendered as a flat empty bar with no
+     visible handle and no risk-level colour. Give the range input its
+     transparency back; the track beneath paints normally. */
+  input[type="range"] {
+    background-color: transparent !important;
+    border-color: transparent !important;
   }
 
   /* the location-search dialog + its results list must be opaque dark */
@@ -692,6 +787,22 @@
     color: var(--wx-text) !important;
     -webkit-text-fill-color: var(--wx-text) !important;
   }
+  /* every result row in that flyout carries two icons the audit can't see: a
+     map-pin <svg> with NO fill attribute (so it paints the SVG default, pure
+     black) and a "favorite" star drawn as a currentColor STROKE inheriting the
+     module's near-black #252422. Both were invisible against the dark listbox.
+     Lift them; a star that is actually favorited keeps its amber (#fdc107). */
+  [class*="SearchedLocations--locationIcon"],
+  [class*="SearchedLocations--locationIcon"] path {
+    fill: var(--wx-text-2) !important;
+  }
+  [class*="FavoriteStar--icon"] {
+    color: var(--wx-text-muted) !important;
+  }
+  [class*="FavoriteStar--isFavorite"] [class*="FavoriteStar--icon"] {
+    color: #fdc107 !important;
+    fill: #fdc107 !important;
+  }
 
   /* ---- buttons ---------------------------------------------------------- */
   button {
@@ -710,8 +821,10 @@
   }
 
   /* ---- settings / units menu (must be opaque) --------------------------- */
+  /* NOTE: no case-insensitive attribute flag (`[... i]`) anywhere in this file --
+     the userstyles.org parser rejects it and drops the whole upload. The bare
+     [role="menu"] below already covers every settings/units popover. */
   [data-settings-menu-trigger] + *,
-  [data-testid*="settings"] [role="menu"],
   [role="menu"],
   [data-radix-popper-content-wrapper] > * {
     background-color: var(--wx-surface) !important;
@@ -720,6 +833,35 @@
   [role="menuitem"]:hover {
     background-color: var(--wx-surface-2) !important;
     color: var(--wx-text) !important;
+  }
+  /* the LEGACY header (radar / monthly / allergy / health pages) opens its
+     units + language/region picker from the "US °F" control as a full-width
+     ExpandableMenu that ships a WHITE panel (ExpandableMenu--inner). Its unit
+     tabs are already lifted light (so they read invisibly on the white panel)
+     and its region list ships 170+ near-black rgb(37,36,34) ListItem names plus
+     near-black expander/"Add" SVG icons -> the whole dropdown rendered as a
+     bright sheet of dark-on-white / light-on-white text. Darken the panel and
+     lift the near-black list text + icons; the active-unit tab keeps its light
+     underline (handled by the TabList--tabSelected rule above). The stable
+     module-name prefixes are matched by substring (only the build-hash rotates).
+     This ExpandableMenu is the legacy component only -- the new SPA header's
+     units popover is a Radix popper handled above, and its mobile nav drawer is
+     dark already, neither of which carries ExpandableMenu--inner. */
+  [class*="ExpandableMenu--inner"] {
+    background-color: var(--wx-surface) !important;
+  }
+  /* the panel is a neutral units/region/language picker with no semantic colours,
+     so lift ALL of its text + icons to readable body light: the region-section
+     headers (Disclosure--SummaryDefault) and expander "+" icons ship near-black
+     rgb(43,43,43), the country ListItem rows ship rgb(37,36,34), all dark-on-dark
+     once the panel is darkened. The active-unit tab is marked by its light
+     underline (TabList--tabSelected), not colour, so a blanket lift keeps it. */
+  [class*="ExpandableMenu--inner"] * {
+    color: var(--wx-text-2) !important;
+  }
+  [class*="ExpandableMenu--inner"] svg,
+  [class*="ExpandableMenu--inner"] svg * {
+    fill: var(--wx-text-2) !important;
   }
 
   /* ---- footer ----------------------------------------------------------- */
@@ -760,6 +902,15 @@
   .trc_rbox .branding,
   .trc_rbox_header_span {
     color: var(--wx-text-2) !important;
+  }
+  /* Taboola's popover points at its trigger with a CSS-triangle: a 0/11/11/11
+     border box whose left/right/top edges are transparent. The blanket
+     `* { border-color }` painted all four, so the caret renders as a solid
+     rectangle once the popover opens. Restore the triangle, pointing up into
+     the darkened popover. */
+  .trc_popover_arrow {
+    border-color: transparent !important;
+    border-bottom-color: var(--wx-surface) !important;
   }
 
   /* ---- interactive radar map: floating control / insight panels --------- */
@@ -815,6 +966,51 @@
   [class*="TimeLine--nowContainer"] [class*="TimeLine--tickLabelButton"] {
     color: var(--wx-text) !important;
   }
+  /* the map's SELECTED layer (Radar / Clouds / Temperatures) is marked ONLY by
+     brand blue: a 2px ring on its thumbnail and a blue label. The blanket
+     `* { border-color }` rule flattened the ring and the ControlPanel text rule
+     above (specificity 0,1,5 thanks to its five :not()s) repainted the label
+     primary-light -- so every layer looked identical and nothing showed which
+     one was on. Re-mark the selection with the theme's link blue (the site's
+     own #1b4de4 only reaches 2.4:1 on our dark panel). Two classes deep to
+     out-rank the ControlPanel rule. */
+  [class*="LayerDetail--layerDetailContainer"] [class*="LayerDetail--selectedLayerTypeTitle"] {
+    color: var(--wx-link) !important;
+  }
+  [class*="LayerDetail--selectedLayerType"] [class*="LayerDetail--layerDetailImage"] {
+    border-color: var(--wx-link) !important;
+  }
+  /* the layer thumbnails sit on an #e8e8e8 placeholder that shows through until
+     each preview image loads (and on every re-render of the All Layers list) --
+     a grid of bright squares on the dark panel. */
+  [class*="LayerDetail--thumbnailPlaceholder"] {
+    background-color: var(--wx-surface-2) !important;
+  }
+  /* the Map Options tabs ("Layers and Styles" / "Specialty Maps") mark the
+     active tab with a 2px black border-bottom; the `*` rule painted it the
+     subtle border grey (1.15:1) and the active tab lost its underline. */
+  [class*="TabList--tabSelected"] {
+    border-bottom-color: var(--wx-text) !important;
+  }
+  /* with the range input transparent again, the radar scrubber's real track is
+     visible -- and it is `background: var(--PureWhite)`, a bright 264x14 pill on
+     the dark panel. Remap the Helios token ON the track (variable resolution is
+     specificity-agnostic) and lift the near-black #252422 slider handle so it
+     still reads on the darkened track. The grey elapsed fill (--Koala30) and the
+     Cold-&-Flu scrubber's PURPLE risk bar are data and stay untouched -- which is
+     why the handle rule is scoped to the radar ControlPanel and not to every
+     range input on the site. */
+  [class*="ControlPanel--controlContainer"] [class*="TimeLine--historyContainer"] {
+    --PureWhite: var(--wx-surface-2);
+  }
+  /* Chromium and Gecko thumb pseudo-elements must be SEPARATE rules -- a mixed
+     vendor selector list is invalid in both engines and drops the whole rule. */
+  [class*="ControlPanel--controlContainer"] input[type="range"]::-webkit-slider-thumb {
+    background-color: var(--wx-text) !important;
+  }
+  [class*="ControlPanel--controlContainer"] input[type="range"]::-moz-range-thumb {
+    background-color: var(--wx-text) !important;
+  }
 
   /* ---- Cold & Flu "Extended Flu Forecast" timeline control ---------------- */
   /* Below the flu-risk choropleth map sits a timeline control that ships a #fafafa
@@ -834,6 +1030,15 @@
   [class*="ExtendedFluForecast--controlContainer"] svg path[fill="#2B2B2B"],
   [class*="ExtendedFluForecast--controlContainer"] svg path[fill="#2b2b2b"] {
     fill: var(--wx-text-2) !important;
+  }
+  /* the "Very Low ... Very High" legend floats over the choropleth map in a
+     WHITE box; it inherits the card's lifted light text from our Card--card
+     rule, so its two labels rendered light-on-white (~1.7:1) and vanished.
+     Darken the box (like the map's own "Now" chip) so the lifted labels read;
+     the purple risk gradient swatch inside keeps its data colors. */
+  [class*="ExtendedFluForecast--legendBox"],
+  [class*="ExtendedAllergyForecast--legendBox"] {
+    background-color: var(--wx-surface) !important;
   }
 
   /* ---- 15-day allergy forecast SVG area chart ---------------------------- */
@@ -913,6 +1118,23 @@
   .mapboxgl-map * {
     border-color: transparent !important;
   }
+  /* ...but the map's own UI is NOT basemap: the blanket transparent rules above
+     erased the two things drawn on top of it.
+     - LocationPin is a `bg-[#1944DE] border-2 border-white` disc marking YOUR
+       location -- it went fully invisible (transparent fill + dark ring), so
+       the Today-page map showed no "you are here" marker at all.
+     - DynamicMapTimeStamp is the "Now" chip, natively an rgba(37,36,34,.8) pill
+       with white text; stripped of its fill it left light-blue link text
+       floating on the bright map (~1.9:1).
+     Both carry a data-testid, so restore them at (0,2,0) -- above the (0,1,0)
+     neutralizers -- without touching a single map tile. */
+  [data-testid="DynamicMap"] [data-testid="LocationPin"] {
+    background-color: #1944de !important;
+    border-color: #ffffff !important;
+  }
+  [data-testid="DynamicMap"] [data-testid="DynamicMapTimeStamp"] {
+    background-color: rgba(13, 17, 23, 0.85) !important;
+  }
 
   /* ====================================================================== */
   /* SVG data-viz chrome a DOM-background audit can't see.                  */
@@ -966,6 +1188,39 @@
   svg text[class*="fill-text-"],
   svg tspan[class*="fill-text-"] {
     fill: var(--wx-text) !important;
+  }
+
+  /* (2c) the WIND COMPASS is a bare <svg> with no testid: a dashed #d1d5db dial
+     ring, a #6b7280 "N" label, and the direction needle drawn as three
+     near-black #1f2937 shapes (line shaft, hub circle, arrowhead polygon).
+     Nothing about it is an HTML box, so every background audit passed while the
+     needle -- the entire point of the widget -- rendered #1f2937 on our #1c2128
+     card and disappeared, leaving only a glaring white dial. Flip the needle to
+     light, mute the "N", and drop the dial ring to the component border so it
+     stays as subtle against dark as #d1d5db was against white. */
+  svg line[stroke="#1f2937"] {
+    stroke: var(--wx-text) !important;
+  }
+  svg circle[fill="#1f2937"],
+  svg polygon[fill="#1f2937"] {
+    fill: var(--wx-text) !important;
+  }
+  svg text[fill="#6b7280"] {
+    fill: var(--wx-text-muted) !important;
+  }
+  /* (2d) the Sunrise-Sunset and Moonrise-Moonset arcs draw the sun/moon PATH as
+     a #111827 stroke with #111827 end dots (sunrise + sunset markers) over a
+     #f3f4f6 ground rect, with #d1d5db dotted time guides. The arc and both dots
+     went dark-on-dark: the widget showed two labels and an empty sky. */
+  svg path[stroke="#111827"] {
+    stroke: var(--wx-text) !important;
+  }
+  svg circle[fill="#111827"] {
+    fill: var(--wx-text) !important;
+  }
+  svg circle[stroke="#d1d5db"],
+  svg line[stroke="#d1d5db"] {
+    stroke: var(--wx-border-2) !important;
   }
 
   /* (3) bar/line chart plot backgrounds shipped as a white <rect> behind the

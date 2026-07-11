@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A full dark theme for Thingiverse: browse the feed, model pages, search and profiles in comfortable dark while 3D model previews stay true to color.
-@version      20260707.14.34
+@version      20260711.00.19
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -56,8 +56,11 @@
     --tv-border-faint: #1c2128 !important;
     --tv-border-subtle: #262c33 !important;
     --tv-border-inverse: #2d333b !important;
+    /* on-primary/on-secondary draw control outlines (checkbox box, checked
+       checkbox, active pagination underline) that used to sit on white. Keep
+       them light enough to read on the dark surfaces they now sit on. */
     --tv-border-on-primary: #e6edf3 !important;
-    --tv-border-on-secondary: #c4cdd6 !important;
+    --tv-border-on-secondary: #8b949e !important;
 
     /* ---- white/black aliases that some components paint directly ---- */
     --tv-white: #1c2128 !important;
@@ -103,6 +106,16 @@
     --tv-highlight-subtle: #221833 !important;
     --tv-highlight-faint: #221833 !important;
     --tv-bg-highlight-light: #221833 !important;
+
+    /* The `*-dark` aliases resolve to the `*-ink` ramp — very dark status text
+       (#6b1827 red, #004c43 teal, #6b5201 amber, #290064 purple) that the site
+       paints on its LIGHT status tints. Those tints are dark now, so the ink
+       would be dark-on-dark. Flip each to the light end of its own hue so the
+       status meaning survives (.text-color--negative-dark & friends). */
+    --tv-content-negative-dark: #ff8fa3 !important;
+    --tv-content-positive-dark: #6fd8c9 !important;
+    --tv-content-warning-dark: #ffd75c !important;
+    --tv-content-highlight-dark: #c4a2ff !important;
 
     /* Toastify (in-app toasts) */
     --toastify-color-light: #1c2128 !important;
@@ -180,38 +193,145 @@
   [class*="AuthCard__authCard"] {
     background-color: #1c2128 !important; }
   .gsi-material-button { background-color: #ffffff !important; }
+  /* AuthPage titles ("Welcome back!", "Continue with email") are drawn by
+     EntryView header/title classes in the site's dark-navy heading colour
+     (#12226b) — not h1-h6 and not token-driven, so they render dark-on-dark on
+     the now-dark card. Lift to the primary light ink. */
+  [class*="EntryView__header"], [class*="EntryView__introTitle"] {
+    color: #e6edf3 !important; }
 
   /* ====================================================================
-     Buttons — Thingiverse uses a stable `tv-button` BEM system, not
-     hashed classes. Re-establish each variant after the neutralizer.
+     Semantic fills the neutralizer eats. `#react-app [class]` outranks every
+     single-class background rule the site writes, so each of these carries its
+     entire meaning in a `background-color` that got flattened to transparent:
+     a card's "New"/"Featured"/"Verified"/"Work in Progress" dot, the avatar's
+     Featured/Verified Creator flair, the header's unread counter, the "this
+     filter section is active" dot, the selected option in a picker. Restore
+     each with the site's own hue (retoned only where it must read on dark).
+     Class hashes change per deploy, so anchor on the stable prefix.
      ==================================================================== */
-  /* primary CTA: keep the brand blue fill + white label (Download, Explore) */
-  .tv-button.tv-button--primary {
+  [class*="cardBadge--new"], [class*="cardBadge--source"] { background-color: #2563c9 !important; }
+  [class*="cardBadge--featured"] { background-color: #718bfe !important; }
+  [class*="cardBadge--verified"] { background-color: #01b49f !important; }
+  [class*="cardBadge--contest"] { background-color: #ffc402 !important; }
+  [class*="cardBadge--ai"] { background-color: #6200ee !important; }
+  /* wip keeps a slate fill ringed in the site's warning yellow */
+  [class*="cardBadge--wip"] { background-color: #525b75 !important; border-color: #ffd755 !important; }
+
+  [class*="featuredFlair"] { background-color: #2563c9 !important; }
+  [class*="verifiedFlair"] { background-color: #01b49f !important; }
+
+  [class*="filterSectionIndicator"], [class*="detailSidebarButtonCounter"],
+  [class*="indicatorBar"], [class*="Badge__primary"] { background-color: #2563c9 !important; }
+  /* Sort-bar "New" pill (marks the Fresh Makes tab): a filled brand-blue badge
+     with white text natively; the neutralizer ate the fill, leaving bare white
+     text with no pill, so the "new" emphasis is lost. */
+  [class*="SearchSort__newBadge"] { background-color: #2563c9 !important; color: #ffffff !important; }
+  [class*="thingCardAIBadge"] { background-color: #6200ee !important; }
+  [class*="PageHeader__counter"] { background-color: #ff385c !important; border-color: #ff385c !important; }
+
+  /* Hero carousel pager: the selected slide's dot is the ONLY indicator of
+     where you are in the carousel, and it is drawn purely as a fill+border. */
+  .carousel .control-dots .dot {
+    background-color: #18222f !important; border-color: #4f86c6 !important; }
+  .carousel .control-dots .dot.selected,
+  .carousel .control-dots .dot:hover {
+    background-color: #2563c9 !important; border-color: #9bd4ff !important; }
+
+  /* Sort pills (Popular / Newest / Most Makes / Relevant). They are ghost
+     buttons, so the ghost rule would paint every label accent-blue and the
+     selected one would be indistinguishable. */
+  [class*="searchSortButton"].tv-button {
+    background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
+  [class*="searchSortButton"].tv-button:hover { background-color: #21262d !important; }
+  [class*="searchSortButton"].tv-button[class*="isSelected"] {
+    background-color: #18222f !important; color: #9bd4ff !important; border-color: #5fb0e6 !important; }
+
+  /* Gallery image-name chip floats on the photo (native: translucent white) */
+  [class*="mediaItemName"] { background-color: rgba(0, 14, 26, 0.55) !important; color: #ffffff !important; }
+
+  /* Inline status notifications: tint + coloured edge stripe carry the meaning */
+  [class*="Notification__success"] { background-color: #122a25 !important; }
+  [class*="Notification__error"] { background-color: #2a1419 !important; }
+  [class*="Notification__warning"] { background-color: #2a2410 !important; }
+  [class*="Notification__info"] { background-color: #18222f !important; }
+  [class*="Notification__success"] [class*="notificationBorderHighlight"] { background-color: #01b49f !important; }
+  [class*="Notification__error"] [class*="notificationBorderHighlight"] { background-color: #ff385c !important; }
+  [class*="Notification__warning"] [class*="notificationBorderHighlight"] { background-color: #ffc402 !important; }
+  [class*="Notification__info"] [class*="notificationBorderHighlight"] { background-color: #5fb0e6 !important; }
+
+  /* Site-wide alert bars keep their native status colours */
+  [class*="SiteWideNotification__ok"] { background-color: #018071 !important; }
+  [class*="SiteWideNotification__info"] { background-color: #b36b00 !important; }
+  [class*="SiteWideNotification__problem"] { background-color: #a3253d !important; }
+  [class*="SiteWideNotification__tv"] { background-color: #1d51b0 !important; }
+
+  /* ====================================================================
+     Buttons — Thingiverse uses a stable `tv-button` BEM system, not hashed
+     classes. The neutralizer above strips every variant's fill (it is an
+     #id rule, so it beats the site's own single-class background rules), so
+     each variant has to be re-established here. `!important` beats the
+     neutralizer regardless of specificity.
+
+     `tv-button--link` is NOT a visual variant: the site defines it as
+     `box-sizing:border-box` only. It is added whenever a button renders as
+     an <a>. Treating it as a ghost/text variant stripped the fill off every
+     anchor CTA on the site ("Go ad-free!", "Sign up", "See Files",
+     "Discover more", 404's "Back to Thingiverse"), so it is deliberately
+     absent below and inherits whatever colour variant it is paired with.
+     ==================================================================== */
+  /* primary CTA: brand blue fill + white label (Download, Explore, Log In) */
+  .tv-button--primary {
     background-color: #2563c9 !important; color: #ffffff !important; border-color: #2563c9 !important; }
-  .tv-button.tv-button--primary:hover { background-color: #2f6fd6 !important; }
-  .tv-button.tv-button--primary * { color: #ffffff !important; }
+  .tv-button--primary:hover { background-color: #2f6fd6 !important; border-color: #2f6fd6 !important; }
+  .tv-button--primary:active { background-color: #1d51b0 !important; border-color: #1d51b0 !important; }
+  .tv-button--primary * { color: #ffffff !important; }
 
-  /* outline / neutral buttons: dark surface, light label */
-  .tv-button.tv-button--outlineNeutral,
-  .tv-button.tv-button--secondary,
-  .tv-button.tv-button--outline {
+  /* secondary: the site's OUTLINED accent button (transparent fill, accent
+     label + accent border) — not a neutral grey button */
+  .tv-button--secondary {
+    background-color: transparent !important; color: #5fb0e6 !important; border-color: #5fb0e6 !important; }
+  .tv-button--secondary:hover { background-color: #18222f !important; color: #9bd4ff !important; border-color: #9bd4ff !important; }
+
+  /* outlineNeutral: elevated dark surface, light label */
+  .tv-button--outlineNeutral {
     background-color: #21262d !important; color: #e6edf3 !important; border-color: #2d333b !important; }
-  .tv-button.tv-button--outlineNeutral:hover,
-  .tv-button.tv-button--secondary:hover,
-  .tv-button.tv-button--outline:hover { background-color: #2d333b !important; }
-  .tv-button.tv-button--outlineNeutral *,
-  .tv-button.tv-button--secondary { color: #e6edf3 !important; }
+  .tv-button--outlineNeutral:hover { background-color: #2d333b !important; }
+  .tv-button--outlineNeutral * { color: #e6edf3 !important; }
 
-  /* ghost / link buttons: transparent, brand-blue label lifted for dark */
-  .tv-button.tv-button--ghost,
-  .tv-button.tv-button--link,
-  .tv-button.tv-button--secondary.tv-button--link {
-    background-color: transparent !important; color: #5fb0e6 !important; }
-  .tv-button.tv-button--ghost:hover,
-  .tv-button.tv-button--link:hover { color: #9bd4ff !important; background-color: #1c2128 !important; }
-  /* neutral ghost (e.g. a dark-on-light counter) -> readable light */
-  .tv-button.tv-button--ghostNeutral { background-color: transparent !important; color: #c4cdd6 !important; }
-  .tv-button.tv-button--ghostNeutral:hover { background-color: #1c2128 !important; }
+  /* ghost: transparent, brand-blue label lifted for dark. Borderless. */
+  .tv-button--ghost { background-color: transparent !important; color: #5fb0e6 !important; }
+  .tv-button--ghost:hover { color: #9bd4ff !important; background-color: #18222f !important; }
+  /* neutral ghost (like/collect counters, pagination arrows) -> readable light */
+  .tv-button--ghostNeutral { background-color: transparent !important; color: #c4cdd6 !important; }
+  .tv-button--ghostNeutral:hover { background-color: #21262d !important; }
+
+  /* destructive variants: keep the site's negative red, or a delete button
+     reads as an ordinary borderless control */
+  .tv-button--danger {
+    background-color: #ff385c !important; color: #ffffff !important; border-color: #ff385c !important; }
+  .tv-button--danger:hover { background-color: #b52841 !important; border-color: #b52841 !important; }
+  .tv-button--danger:active { background-color: #8c1f33 !important; border-color: #8c1f33 !important; }
+  .tv-button--danger * { color: #ffffff !important; }
+  .tv-button--outlineDanger {
+    background-color: transparent !important; color: #ff385c !important; border-color: #ff385c !important; }
+  .tv-button--outlineDanger:hover { background-color: #2a1419 !important; }
+
+  /* whiteTransparent: an overlay control that floats on top of a photo. Its
+     native translucent-WHITE scrim would swallow our light label, so invert
+     it to the site's own dark overlay tone and keep the label white. */
+  .tv-button--whiteTransparent {
+    background-color: rgba(0, 14, 26, 0.55) !important; color: #ffffff !important; border-color: transparent !important; }
+  .tv-button--whiteTransparent:hover { background-color: rgba(0, 14, 26, 0.78) !important; }
+
+  /* disabled must never look enabled: the variant fills above are
+     `!important`, so [disabled] has to win on specificity */
+  .tv-button[disabled] {
+    background-color: #2d333b !important; color: #8b949e !important; border-color: #2d333b !important; }
+  .tv-button[disabled] * { color: #8b949e !important; }
+  .tv-button--ghost[disabled], .tv-button--ghostNeutral[disabled],
+  .tv-button--secondary[disabled], .tv-button--outlineDanger[disabled] {
+    background-color: transparent !important; border-color: #2d333b !important; }
 
   /* ====================================================================
      Inputs — stable `tv-input` class (search box, email fields, filters)
@@ -246,20 +366,28 @@
   a:hover { color: #9bd4ff; }
 
   /* ====================================================================
-     Tabs / segmented controls (Files / Comments / Remixes / Makes,
-     category & sort pills). Unselected must stay readable; selected
-     gets the brand-blue underline/accent.
+     Tabs / segmented controls (Thing details / Files / Comments / Remixes /
+     Makes / Apps). The site builds them from `tv-button--ghost`, whose accent
+     label would make EVERY tab look selected — it overrides that with a muted
+     `--tv-content-secondary`. Restore that, and give the selected tab the
+     accent label + underline and the accent count chip.
      ==================================================================== */
-  [role="tab"], [class*="Tab"] a, [class*="tab"] a {
-    color: #c4cdd6 !important; }
+  [role="tab"], [class*="Tab"] a, [class*="tab"] a { color: #c4cdd6 !important; }
   [role="tab"]:hover { color: #e6edf3 !important; }
-  [role="tab"][aria-selected="true"],
-  [class*="isActive"], [class*="active"][role="tab"] {
+  [role="tab"][aria-selected="true"], [class*="active"][role="tab"] {
     color: #ffffff !important; border-bottom-color: #5fb0e6 !important; }
-  /* active pagination / nav item */
-  [class*="Pagination"][class*="isActive"],
-  [class*="paginationItem"][class*="isActive"] {
-    color: #ffffff !important; background-color: #1d2a3a !important; }
+
+  [class*="Tabs__tab"].tv-button { color: #9aa4af !important; }
+  [class*="Tabs__tab"].tv-button:hover { color: #e6edf3 !important; border-bottom-color: #e6edf3 !important; }
+  [class*="Tabs__tab"].tv-button[class*="isActive"] {
+    color: #9bd4ff !important; border-bottom-color: #5fb0e6 !important; }
+  [class*="Tabs__tabCounter"] {
+    background-color: #14181d !important; color: #9aa4af !important; border-color: #262c33 !important; }
+  [class*="Tabs__isActive"] [class*="Tabs__tabCounter"] {
+    background-color: #2563c9 !important; color: #ffffff !important; border-color: #2563c9 !important; }
+
+  /* Active pagination page: the site underlines the inner <span>. */
+  [class*="paginationItem"][class*="isActive"] > span { border-bottom-color: #e6edf3 !important; }
 
   /* ====================================================================
      Dropdown / menu / popover surfaces (sort + category + filter menus)
@@ -271,11 +399,46 @@
     color: #e6edf3 !important; background-color: transparent !important; }
   [role="menuitem"]:hover, [role="option"]:hover,
   [class*="MenuItem"]:hover, [class*="menuItem"]:hover { background-color: #2d333b !important; }
+  /* react-select marks the current choice with an accent fill; the blanket
+     `[role="option"]` reset above would erase it, so it has to come after and
+     out-specify it. */
+  [role="option"][class*="react-select__option--is-selected"] {
+    background-color: #2563c9 !important; color: #ffffff !important; }
+
+  /* Tooltips. `.tv-tooltip` (footer, share modal) is lowercase, so the
+     `[class*="Tooltip"]` selector above never matched it: it kept painting
+     `--tv-bg-inverse-secondary` under `--tv-content-inverse` white text.
+     The `-arrow` elements are CSS triangles (three transparent borders + one
+     coloured), so they must be given the tooltip's fill on the bottom edge
+     ONLY — colouring all four sides renders them as a solid square. */
+  .tv-tooltip, [class*="tv-tooltip--"], [class*="userTooltip--"] {
+    background-color: #1c2128 !important; color: #e6edf3 !important; }
+  .tv-tooltip-arrow, [class*="tv-tooltip-arrow"], [class*="userTooltipArrow"] {
+    border-color: transparent transparent #1c2128 transparent !important; }
 
   /* ====================================================================
-     Soften any remaining bright borders across the app
+     NO blanket `* { border-color }` reset here. The site drives every border
+     through the `--tv-border-*` tokens retoned above, so a blanket reset buys
+     nothing and destroys a lot: it repainted the `border:1px solid transparent`
+     that every `.tv-button` carries (boxing in every ghost button), erased the
+     accent border that marks the selected sort pill, the selected gallery
+     thumbnail, the selected filter chip and the active filter tab, greyed the
+     "Work in Progress" badge's yellow ring and the checkbox outline, and filled
+     all four sides of the tooltip's CSS-triangle caret so it rendered as a
+     solid square. Anything genuinely too bright is handled by a token or by a
+     scoped rule below.
      ==================================================================== */
-  * { border-color: #262c33 !important; }
+
+  /* Mobile menu divider: the site's menu is brand blue, so it separates its
+     sections with a near-white hairline (--tv-border-on-primary). Our menu is
+     dark, so that hairline glares — mute it to the standard divider tone. */
+  [class*="pageHeaderMobileMenu"] [class*="mobileSubSection"] { border-top-color: #2d333b !important; }
+
+  /* Gallery thumbnail rail: the site hardcodes a light scrollbar track here,
+     scoped tightly enough to beat our global scrollbar rule. */
+  [class*="carouselThumbnailsWrapper"] ::-webkit-scrollbar-track { background: #14181d !important; }
+  [class*="carouselThumbnailsWrapper"] ::-webkit-scrollbar-thumb { background-color: #2d333b !important; }
+  [class*="carouselThumbnailsWrapper"] * { scrollbar-color: #2d333b #14181d !important; }
 
   /* ====================================================================
      Image / thumbnail loading skeletons: light-grey -> dark, so empty

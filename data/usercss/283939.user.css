@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for TechPowerUp: easy on the eyes across news, reviews, the GPU/CPU spec databases and the forums, with readable tables and code.
-@version      20260707.14.34
+@version      20260711.00.19
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -90,10 +90,20 @@
 
   /* The site logo is an SVG background-image with a BLACK "TECH"/"UP" wordmark
      that reads on the original white bar but goes near-invisible on the dark
-     header. Invert luminance (black → white) while keeping the red power-button
-     accent via the hue-rotate compensation. */
+     header. Invert luminance (black → white). hue-rotate(180deg) brings the red
+     power button back to a red HUE, but CSS hue-rotate is a linear-matrix
+     approximation that desaturates: brand #c20000 lands on salmon (238,106,110).
+     saturate(4) brightness(.92) pulls it back to (234,12,23) ≈ the brand red.
+     The wordmark is achromatic, so saturate() leaves it untouched. */
   .page-header__logo {
-    filter: invert(1) hue-rotate(180deg) !important;
+    filter: invert(1) hue-rotate(180deg) saturate(4) brightness(0.92) !important;
+  }
+
+  /* Mobile header controls: both toggles are SVG background-images with black
+     ink (#231F20 / default fill), invisible on the dark header bar. */
+  .navigation-toggle,
+  .s--toggle {
+    filter: invert(1) !important;
   }
 
   /* ---- Main nav (TPU brand #223344 → keep the dark-blue identity) ---- */
@@ -239,6 +249,21 @@
     color: #8b949e !important;
   }
 
+  /* "Latest GPU Drivers" links are vendor-coloured (#272 green / #991010 red /
+     #002d73 navy). The blanket `a:link` rule is (0,1,1) and flattens all three
+     to one blue, so re-assert them at (0,2,1) with dark-tuned vendor hues. */
+  .s--drivers a.s--drivers__driver--nvidia {
+    color: #7ec242 !important;
+  }
+
+  .s--drivers a.s--drivers__driver--amd {
+    color: #e8585c !important;
+  }
+
+  .s--drivers a.s--drivers__driver--intel {
+    color: #5fb0e6 !important;
+  }
+
   /* ---- News feed ---- */
   article.newspost,
   .newspost,
@@ -328,7 +353,43 @@
 
   .pager a.disabled,
   .prevnext a.disabled {
-    color: #6b7480 !important;
+    color: #7d8590 !important;
+  }
+
+  /* Review-article header "Discuss in our Forums" chip: a #f6f6f6 plate whose
+     two labels are ::before/::after text (#444 / #999) and whose speech-bubble
+     background SVG is #FAFAFA-filled, so it survives on a dark plate. */
+  .discuss {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #5fb0e6 !important;
+    opacity: 1 !important;
+  }
+
+  .discuss::before {
+    color: #e6edf3 !important;
+  }
+
+  .discuss::after {
+    color: #8b949e !important;
+  }
+
+  .discuss:hover {
+    background-color: #21303f !important;
+    border-color: #3d4450 !important;
+  }
+
+  /* Review "one page" nav strip + the image-comparison widget's white controls */
+  .onepage-nav,
+  .image-comparison2__toggle-fullscreen,
+  .image-comparison2__zoom {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+    border-color: #262c33 !important;
+  }
+
+  .image-comparison2__zoom:hover {
+    background-color: #21303f !important;
   }
 
   /* Article body image placeholders (light-grey #ddd sizing box behind figures) */
@@ -375,8 +436,11 @@
     background-color: #161d27 !important;
   }
 
-  /* Colored category / deal flags keep their tinted identity but are
-     deepened so white labels stay legible on the dark theme */
+  /* Colored category / deal flags keep their tinted identity but are deepened
+     so white labels stay legible on the dark theme. The site ships ELEVEN
+     semantic variants (news.css `.flags .flag.*`); the plain `.flag` grey is
+     only the fallback for uncategorised tags, so every variant needs its own
+     rule or the whole taxonomy collapses into one neutral pill. */
   .flag,
   .flag span,
   span.flag {
@@ -387,16 +451,49 @@
     background-color: #3d4450 !important;
   }
 
-  .flag.sponsored {
-    background-color: #6e5d27 !important;
+  .flag.draft {
+    background-color: #6b4a12 !important;
+  }
+
+  .flag.pr {
+    background-color: #21303f !important;
+  }
+
+  .flag.featured {
+    background-color: #7d2a2c !important;
+  }
+
+  .flag.editorial {
+    background-color: #2a5c2d !important;
   }
 
   .flag.updated {
     background-color: #2a6363 !important;
   }
 
-  .flag.pr {
-    background-color: #21303f !important;
+  .flag.review {
+    background-color: #6b3823 !important;
+  }
+
+  .flag.article {
+    background-color: #6b6224 !important;
+  }
+
+  .flag.sponsored {
+    background-color: #6e5d27 !important;
+  }
+
+  .flag.live {
+    background-color: #a51414 !important;
+  }
+
+  .flag.ces,
+  .flag.computex {
+    background-color: #6e2c74 !important;
+  }
+
+  .flag.video {
+    background-color: #8c1312 !important;
   }
 
   /* Front-page poll widget (white card) */
@@ -413,6 +510,86 @@
   .frontpagepoll .pollanswer {
     color: #c4cdd6 !important;
     background-color: transparent !important;
+  }
+
+  /* Poll RESULT bars: the #dfe3ef track is a ~14px-tall light strip (under the
+     audit size floor); the #5a6fb1 fill inside it is the data and stays. */
+  .frontpagepoll ul.results .bar,
+  .newspoll > ul.results > li .bar {
+    background-color: #21262d !important;
+  }
+
+  .newspoll_btn::before {
+    color: #8b949e !important;
+  }
+
+  /* "Today's Reviews" list separators are a `content:"-"` ::after painted #555 */
+  .todayslist ul > li::after {
+    color: #8b949e !important;
+  }
+
+  /* Pinned / featured news tiles (#f8f8f8 cards, #ddd image wells) and their
+     `> a:hover` which the site flips to pure WHITE */
+  .pinned-news__item,
+  .pinned-news2__item,
+  .pinned-news2__image {
+    background-color: #1c2128 !important;
+  }
+
+  .featured-news__item > a:hover,
+  .pinned-news__item > a:hover,
+  .pinned-news2__item > a:hover {
+    background-color: #21303f !important;
+  }
+
+  .pinned-news__title,
+  .pinned-news2__item-title {
+    color: #cfe2f3 !important;
+  }
+
+  /* "Up next" strip (#f9d8d8 pink) and the sitewide yellow notice bar
+     (#ffeaa8 + a tiled PNG stripe background-image) */
+  .upnext {
+    background-color: #3a2020 !important;
+    border-color: #5c3030 !important;
+  }
+
+  .infobar {
+    background-color: #3a2f10 !important;
+    background-image: none !important;
+    border-bottom-color: #6e5d27 !important;
+  }
+
+  /* The notice text IS an <a>, so `.infobar__link` (0,1,0) would lose to the
+     blanket `a:link` (0,1,1) rule; scope it under `.infobar` to win at (0,2,1). */
+  .infobar,
+  .infobar a.infobar__link {
+    color: #e3c46a !important;
+  }
+
+  .infobar a.infobar__link:hover {
+    color: #ffe08a !important;
+  }
+
+  /* Tag cloud on news articles (#f8f8f8 pills) */
+  .tagcloud a {
+    background-color: #21262d !important;
+    color: #c4cdd6 !important;
+  }
+
+  .tagcloud a:hover {
+    background-color: #2d333b !important;
+    color: #ffffff !important;
+  }
+
+  /* The Patreon strip's scrollbar is painted white by a ::-webkit-scrollbar rule
+     (the `scrollbar-color` shorthand at the end of this sheet is Firefox-only) */
+  .patreon-previews__list-wrapper::-webkit-scrollbar {
+    background-color: #14181d !important;
+  }
+
+  .patreon-previews__list-wrapper::-webkit-scrollbar-thumb {
+    background-color: #2d333b !important;
   }
 
   .newspost h2,
@@ -585,24 +762,48 @@
     color: #d6e2ee !important;
   }
 
-  /* GPU/CPU spec database: rows carry a hardcoded light bg (#f0f0f0 /
-     #fafafa, plus vendor-tinted variants) — darken every body row */
+  /* GPU/CPU spec database + review spec tables.
+     The site paints the zebra AND the 7px vendor colour stripe
+     (`linear-gradient(to right, red 7px, transparent 7px)`) on the <tr>, and
+     leaves every <td> transparent. Painting the td opaque therefore covers the
+     stripe and flattens the zebra to one flat tone — so keep tds transparent
+     and drive both the stripe and the alternation from the row. */
   .items-desktop-table tbody tr,
-  .items-desktop-table tbody tr td,
   .contnt table tbody tr,
-  .contnt table tbody tr td,
   table tbody tr[style],
-  tr[class*="vendor-"],
-  tr[class*="vendor-"] td {
-    background-color: #171c22 !important;
+  tr[class*="vendor-"] {
+    background-color: transparent !important;
     color: #c4cdd6 !important;
   }
 
+  .items-desktop-table tbody tr:nth-child(odd),
+  .contnt table tbody tr:nth-child(odd) {
+    background-color: #171c22 !important;
+  }
+
+  .items-desktop-table tbody tr td,
+  .contnt table tbody tr td,
+  tr[class*="vendor-"] td {
+    background-color: transparent !important;
+  }
+
   .items-desktop-table tbody tr:hover,
+  .contnt table tbody tr:hover,
+  tr[class*="vendor-"]:hover {
+    background-color: #21303f !important;
+  }
+
   .items-desktop-table tbody tr:hover td,
   .contnt table tbody tr:hover td,
   tr[class*="vendor-"]:hover td {
-    background-color: #21303f !important;
+    background-color: transparent !important;
+  }
+
+  /* Spec-DB group / generation header rows (#555 label on a light band) */
+  .generation-header,
+  .generation-header-mobile {
+    background-color: #21262d !important;
+    color: #8b949e !important;
   }
 
   /* "Recent changes" / sidebar info widgets on spec pages (light inner box) */
@@ -653,22 +854,107 @@
     background-color: #171c22 !important;
   }
 
-  /* Relative-performance entry titles: the PRIMARY (this-card) row paints its
-     title in the site's dark brand navy (#455588) and any plain title text is
-     #666 — both go dark-on-dark on the card. Lift them; the other rows' titles
-     are blue <a> links handled by the link rule and stay as-is. */
+  /* Relative-performance entry titles: the current card's row paints its title
+     in the site's dark brand navy (#455588) and any plain title text is #666 —
+     both go dark-on-dark on the card. Lift them; the other rows' titles are
+     blue <a> links handled by the link rule and stay as-is. */
   .gpudb-relative-performance-entry__title {
     color: #c4cdd6 !important;
   }
 
-  .gpudb-relative-performance-entry--primary .gpudb-relative-performance-entry__title {
+  .gpudb-relative-performance-entry--primary .gpudb-relative-performance-entry__title,
+  .gpudb-relative-performance-entry--highlight .gpudb-relative-performance-entry__title {
     color: #e6edf3 !important;
+  }
+
+  /* The row for the card you are actually viewing carries `--highlight` (NOT
+     `--primary`, which the site also sets) and a #fbf1cb amber tint. The
+     entry rule above would flatten it into every other row, erasing the only
+     row-level "you are here" signal. Restore it as a dark amber. The site
+     declares its tint `!important` at (0,1,0), so match on both classes to
+     win on specificity rather than on injection order. */
+  .gpudb-relative-performance-entry.gpudb-relative-performance-entry--highlight {
+    background-color: #332d1a !important;
+  }
+
+  /* Same "current record" tint elsewhere in the databases: the custom-board row,
+     and the active entry in the all-GPUs / GPU-history lists (#e0eaf7) */
+  .customboard-current,
+  .customboard-current td {
+    background-color: #332d1a !important;
+  }
+
+  .all-gpus__entry-active,
+  .gpu-history__entry-active {
+    background-color: #21303f !important;
+  }
+
+  .customboards .sort-key {
+    background-color: #21262d !important;
+  }
+
+  /* Unreleased / estimated / unverified warning panels (#f9d8d8, #f2dede) */
+  .gpudb-unreleased,
+  .gpudb-estimated-specs,
+  .gpudb-warning,
+  .cpudb-details .unreleased,
+  .ssddb-details .unreleased,
+  .bios-unverified-warning {
+    background-color: #2d1a1a !important;
+    border-color: #7d2a2c !important;
+    color: #e0b7b7 !important;
+  }
+
+  .gpudb-unreleased *,
+  .gpudb-estimated-specs *,
+  .gpudb-warning * {
+    color: #e0b7b7 !important;
+  }
+
+  /* Multi-GPU "yes" pill is a light-green ::after badge */
+  .gpudb-details section.details .multigpu::after {
+    background-color: #182a1a !important;
+    color: #7ee787 !important;
+  }
+
+  /* Add-Filters flyout internals: the value list, its buttons row, and the
+     SELECTED value chip (#ebeff2) all shipped white */
+  .filter-list-item,
+  .filter-list-buttons {
+    background-color: #1c2128 !important;
+  }
+
+  .filter-list-item:hover,
+  .filter-list-item.is-selected:hover {
+    background-color: #21303f !important;
+  }
+
+  .filter-list-item-items > a.is-selected,
+  .filter-options > a.is-selected {
+    background-color: #21303f !important;
+    color: #ffffff !important;
+  }
+
+  /* Capacity / image chips in the CPU, SSD and VGA-BIOS list tables */
+  .items .item-capacity,
+  .drives .drive-capacity {
+    background-color: #21262d !important;
+    color: #c4cdd6 !important;
+  }
+
+  .items .item-capacity:hover,
+  .drives .drive-capacity:hover {
+    background-color: #2d333b !important;
+    color: #ffffff !important;
   }
 
   /* Image filmstrip caption pills (Back / PCB Front / PCB Back) overlay each
      thumbnail with a hardcoded #f5f5f5 pill + dark #443b3b label — audit-blind
      (short <40px pills) and a bright eyesore on the dark thumbnails */
   .gpudb-filmstrip__title,
+  .ssddb-filmstrip__title,
+  .chip-image--type,
+  .drive-image--type,
   [class*="filmstrip"] [class*="title"] {
     background-color: #1c2128 !important;
     color: #c4cdd6 !important;
@@ -725,6 +1011,60 @@
   .popular a.clearfix:hover,
   .dltree li a:hover {
     background-color: #21303f !important;
+  }
+
+  /* Currently-selected node in the downloads category tree (#cadbe5 pale blue).
+     The site sets this with `!important` at (0,5,4), so a short selector loses
+     even with our own `!important` — mirror its chain and add one class. */
+  .downloads .contnt > .dl-left > nav ul.dltree li > a.selected.selected {
+    background-color: #21303f !important;
+    color: #ffffff !important;
+  }
+
+  /* Downloads CATEGORY pages (/download/<category>/) — an entirely separate
+     layout from the index and the detail page: a #fdfdfd/#fafafa alternating
+     row list, a #f3f3f3 sort bar, and a green #b2eca3 hint. Untouched before,
+     so every row shipped white with our near-white headings on top of it. */
+  .download-list > a.download,
+  .download-list > a.download:nth-child(odd),
+  .sort-options {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .download-list > a.download:hover {
+    background-color: #21303f !important;
+  }
+
+  .latest a:nth-child(odd) {
+    background-color: #171c22 !important;
+  }
+
+  .download-hint {
+    background-color: #182a1a !important;
+    color: #7ee787 !important;
+  }
+
+  /* Download DETAIL extras: the selected version row (#fefced cream), the hash
+     panel, the "Get Notified" CTA (#f0e588) and the mirror-list hover */
+  .versions .files > li.selected {
+    background-color: #332d1a !important;
+    box-shadow: none !important;
+  }
+
+  .versions .files .hashes {
+    background-color: #0d1117 !important;
+  }
+
+  .downloads-details .notification > .button {
+    background-color: #6e5d27 !important;
+    border-color: #8a7433 !important;
+    color: #ffffff !important;
+  }
+
+  .downloads-mirrors .mirrorlist > button:hover {
+    background-color: #2d333b !important;
   }
 
   /* Download DETAIL page (/download/<app>): versions box, file rows, the
@@ -796,7 +1136,10 @@
     color: #8b949e !important;
   }
 
-  /* ---- Buttons ---- */
+  /* ---- Buttons ----
+     `.button` ships `text-shadow: 1px 1px 0 #fff` for its light-grey face; on a
+     dark button that white shadow outlines every glyph. Reset it explicitly —
+     neither `color` nor `background` clears it. */
   button,
   .btn,
   .button,
@@ -808,6 +1151,7 @@
     background-image: none !important;
     color: #e6edf3 !important;
     border: 1px solid #2d333b !important;
+    text-shadow: none !important;
   }
 
   button:hover,
@@ -821,6 +1165,7 @@
   /* Primary / CTA buttons keep a blue identity */
   .button--cta,
   .btn-primary,
+  .button.inverted,
   .submitUnit button[type="submit"] {
     background-color: #2563a8 !important;
     border-color: #2f74c0 !important;
@@ -828,8 +1173,29 @@
   }
 
   .button--cta:hover,
-  .btn-primary:hover {
+  .btn-primary:hover,
+  .button.inverted:hover {
     background-color: #2f74c0 !important;
+  }
+
+  /* Destructive variant: the base `.button` rule above would otherwise erase
+     its #900 label into the same neutral grey as every other button */
+  .button.danger {
+    color: #ff7b72 !important;
+  }
+
+  .button.danger:hover,
+  .button.danger:focus,
+  .button.danger:active {
+    background-color: #8c2b26 !important;
+    color: #ffffff !important;
+  }
+
+  /* Review-carousel prev/next: a #ddd plate carrying a BLACK arrow SVG as a
+     background-image. Darkening the plate would erase the arrow, so invert the
+     whole control (plate → #222, arrow → white) in one pass. */
+  .review-carousel__button {
+    filter: invert(1) !important;
   }
 
   /* ---- Code / pre (forum BBCode + any inline code) ---- */
@@ -980,6 +1346,34 @@
     color: #cfe2f3 !important;
   }
 
+  /* XenForo colours usernames by member group — administrator red, moderator
+     blue, super-moderator green and a staff blue — through its own CSS vars.
+     The broad `span` / `.username` rules above flattened every group to one
+     grey, so a staff/mod name in the members-online list (a bare span, no title
+     beside it) read LESS prominent than a regular blue link. Re-assert the group
+     colours, reusing XenForo's vars so a config change carries through. */
+  .username--staff {
+    color: #79c0ff !important;
+  }
+
+  .username--style3 {
+    color: hsl(var(--xf-userTitleColorAdministrator)) !important;
+  }
+
+  .username--style4 {
+    color: hsl(var(--xf-userTitleColorModerator)) !important;
+  }
+
+  .username--style24 {
+    color: hsl(var(--xf-userTitleColorSuperModerator)) !important;
+  }
+
+  /* Thread-prefix labels ship a dark-navy plate with a coloured label; the broad
+     `label` rule greyed the "primary" (blue) variant's text into the plate. */
+  .label--primary {
+    color: #79c0ff !important;
+  }
+
   .message-userTitle,
   .userTitle {
     color: #8b949e !important;
@@ -1007,6 +1401,12 @@
   .actionBar,
   .actionBar-set {
     background-color: transparent !important;
+  }
+
+  /* The reactions strip's 2px left rule is XenForo's #2970a3 accent, not a
+     surface border; the blanket `*` border-color pass above greys it out. */
+  .reactionsBar {
+    border-left-color: #2970a3 !important;
   }
 
   .actionBar-action {
@@ -1067,6 +1467,55 @@
   .label--orange,
   span[style*="color: orange"] {
     color: #e3a008 !important;
+  }
+
+  /* Bootstrap-style callouts (login/register errors, download notices) — the
+     site ships pastel panels with matching dark ink. Keep the hue, invert the
+     value. The `color: inherit` re-assert is needed because the broad
+     `p, li, span` body rule would otherwise wash the ink to neutral grey. */
+  .alert-success {
+    background-color: #182a1a !important;
+    border-color: #2a5c2d !important;
+    color: #7ee787 !important;
+  }
+
+  .alert-info {
+    background-color: #16242e !important;
+    border-color: #2970a3 !important;
+    color: #79c0ff !important;
+  }
+
+  .alert-warning {
+    background-color: #2b2412 !important;
+    border-color: #6b5a12 !important;
+    color: #e3c46a !important;
+  }
+
+  .alert-danger {
+    background-color: #2d1a1a !important;
+    border-color: #7d2a2c !important;
+    color: #ff7b72 !important;
+  }
+
+  .alert p,
+  .alert li,
+  .alert span,
+  .alert h4 {
+    color: inherit !important;
+  }
+
+  /* Remaining light cards on the low-traffic pages the document rule also
+     claims: the awards page, press-kit media assets, the staff roster's zebra,
+     and the trivia game's message log */
+  .awards .award,
+  .media-asset,
+  .trivia .messagecontainer {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+  }
+
+  .staff-member:nth-child(odd) {
+    background-color: #1c2128 !important;
   }
 
   /* Selection */
