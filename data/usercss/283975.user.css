@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Juejin (掘金): comfortable reading of articles, the feed, pins and comments, with fully readable dark code blocks and syntax.
-@version      20260711.00.15
+@version      20260711.19.58
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -148,7 +148,8 @@
   .search-view,
   .main-list,
   .search-list,
-  .result-list {
+  .result-list,
+  .pin-view .comment-wrap {
     background-color: transparent !important;
   }
 
@@ -194,9 +195,22 @@
     color: #8b949e !important;
   }
 
+  /* The user-profile header + activity-feed 关注 buttons are `.subscribe-btn.follow-btn`
+     too, and juejin paints THEM the SAME brand-green ghost (green #6cbd45 label + green
+     border) as the tag-page pill — but the generic `.follow-button:not(.followed)` blue
+     fill below (0,2,0) outranked our green `.subscribe-btn` rule (0,1,0), so every
+     profile follow rendered a solid blue button while the tag page stayed green: the
+     same class, two looks, and juejin's green follow signal lost. Give `.subscribe-btn`
+     its green label back and exclude it from the blue fill (below) so the outline reads. */
   .subscribe-btn {
     background-color: #1c2128 !important;
     border-color: #37c700 !important;
+    color: #4bd41f !important;
+  }
+
+  .subscribe-btn .follow-text,
+  .subscribe-btn span {
+    color: #4bd41f !important;
   }
 
   /* Brand-tinted GHOST buttons: rgba(30,128,255,.05) fill, rgba(30,128,255,.3)
@@ -332,20 +346,24 @@
     color: #e6edf3 !important;
   }
 
-  /* The CURRENT section / sort tab. Juejin marks it `.active` (+ vue-router's
-     `.route-active` / `.router-link-exact-active`) and colours the anchor #1e80ff:
-     the main header (课程 on /course, 沸点 on /pins), the search type nav
-     (综合/文章/…), the search sort nav (综合排序/…), and the tag page's 热门/最新/最热.
-     Our own `a`, `.nav-list a` and `.list-header .nav-item` rules repainted that
-     anchor the same grey as its inactive siblings, so no page showed which tab was
-     selected. The `li` guard matters: the user-profile tab bar uses `div.nav-item`
-     and marks its active tab with primary text (#252933 natively), not the accent —
-     it must keep the white `.item-title` treatment below. */
+  /* The CURRENT section / sort tab. Juejin marks it `.active` (main header, e.g. 课程
+     on /course, 沸点 on /pins) or, for the router-link tab groups, vue-router's
+     `.router-link-exact-active` (the search type nav 综合/文章/…, the search sort nav
+     综合排序/…, and the tag page's 热门/最新/最热). Our own `a`, `.nav-list a` and
+     `.list-header .nav-item` rules repainted that anchor the same grey as its inactive
+     siblings, so no page showed which tab was selected.
+     NOT `.route-active` (= vue-router's router-link-active): those tab groups all share
+     one path and differ only by query string, and router-link-active matches on PATH
+     ONLY — so EVERY tab in the group carries `.route-active`, not just the selected one.
+     Colouring it painted all five search type tabs the same blue, erasing the selected
+     indicator (native: exact tab #1e80ff, the rest #515767 grey). The exact-active class
+     is the reliable selected marker; the header uses `.active`, so neither needs it.
+     The `li` guard matters: the user-profile tab bar uses `div.nav-item` and marks its
+     active tab with primary text (#252933 natively), not the accent — it must keep the
+     white `.item-title` treatment below. */
   li.nav-item.active,
-  li.nav-item.route-active,
   li.nav-item.router-link-exact-active,
   li.nav-item.active > a,
-  li.nav-item.route-active > a,
   li.nav-item.router-link-exact-active > a {
     color: #5fb0e6 !important;
   }
@@ -924,9 +942,9 @@
   .login-button,
   .btn-login,
   button.primary,
-  .byte-btn--primary,
+  .byte-btn--primary:not(.byte-btn--ghost):not(.byte-btn--text),
   .submit-btn,
-  .follow-button:not(.followed),
+  .follow-button:not(.followed):not(.subscribe-btn),
   .creator-btn,
   .add-group,
   .add-group .add-btn,
@@ -982,10 +1000,22 @@
   }
 
   .login-button:hover,
-  .byte-btn--primary:hover,
-  .follow-button:not(.followed):hover {
+  .byte-btn--primary:not(.byte-btn--ghost):hover,
+  .follow-button:not(.followed):not(.subscribe-btn):hover {
     background-color: #3a91ff !important;
     border-color: #3a91ff !important;
+  }
+
+  /* Byte-design `--primary --ghost` outline buttons (the 掘金热榜 row "收藏", and
+     other secondary CTAs) natively ship a faint rgba(30,128,255,.05) tint with a
+     brand-blue border + label — a subtle SECONDARY action, not a filled primary.
+     The `.byte-btn--primary` fill above swallowed the `--ghost` modifier and painted
+     every one a loud solid blue, elevating a ghost action to look like the row's
+     primary. Restore the outline: brand-tinted dark fill, accent border + label. */
+  .byte-btn--primary.byte-btn--ghost {
+    background-color: #1a2433 !important;
+    border-color: rgba(30, 128, 255, 0.35) !important;
+    color: #5fb0e6 !important;
   }
 
   /* Ghost / outline buttons that used a light tinted bg */

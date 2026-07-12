@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260711.00.17
+@version      20260711.19.59
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -647,6 +647,21 @@
     background-color: transparent !important;
   }
 
+  /* PDP title truncation "…ещё" pill (span.pdp_h5b) + its sibling rating
+     background both ship `background: var(--graphicLightKey)` = literal #fff,
+     so they render a WHITE box on the dark title. --graphicLightKey is NOT
+     remapped at :root on purpose: it is a CONTEXT-named "light key" the site
+     also uses as `color:`/`--icon-color`/`--loader-color` for WHITE text and
+     glyphs on dark/coloured grounds (the .b5_7_0-a5 story labels, loaders,
+     icons). A :root lift would flip all of those dark-on-dark. So rebind only
+     the two BACKGROUND uses here to the page canvas — an opaque pill that
+     masks the clamped text edge and blends seamlessly, matching the native
+     white-on-white (invisible) pill. */
+  span.pdp_h5b,
+  .pdp_ar3 .pdp_r4a .pdp_ar5.pdp_a5r {
+    background: var(--d-bg) !important;
+  }
+
   /* MAIN CTA BUTTON (В корзину) — a genuine brand-coloured button; keep
      its label bright white on the blue fill. The secondary buttons
      (Купить сейчас / Оплатить позже) are NOT included: they ship a
@@ -669,6 +684,15 @@
   [data-widget="bigPromoPDP"],
   [data-widget="bigPromoPDP"] div {
     background-color: transparent !important;
+  }
+  /* REVIEW RATING HISTOGRAM ("5 звёзд … 1 звезда" bars): the webReviewTabs
+     `div { transparent }` reset above flattens BOTH the grey track and the gold
+     proportion fill, so the distribution bars vanish (only the counts remain).
+     Ratings are a kept-brand surface, so restore the gold fill. The fill is the
+     only descendant carrying an inline PERCENT width (the track/underline use px),
+     so this matches exactly the five bars and never the blue tab underline. */
+  [data-widget="webReviewTabs"] div[style*="width"][style*="%"] {
+    background-color: var(--d-gold) !important;
   }
 
   /* GALLERY: the stage + thumbnail tiles are white CONTAINERS
@@ -739,6 +763,19 @@
   [data-widget="filtersDesktop"] *::before,
   [data-widget="filtersDesktop"] *::after {
     background-color: var(--d-surface) !important;
+  }
+  /* BRAND-LOGO CHECKBOXES (Xiaomi / Apple / Poco / … in the Бренд filter) render
+     the logo as an <img> inside a checkbox box that carries a full-size,
+     natively near-transparent ::after overlay. The rule above repaints that
+     overlay to an OPAQUE elevated surface, which sat ON TOP of the logo and
+     blanked every brand tile to an empty dark square (the logo bitmap still
+     paints — canvas-samples orange for Xiaomi — it is simply covered). The
+     ::after is a positioned pseudo, so lift the logo images into their own
+     positive stacking layer to paint above it. Filter images are only these
+     brand/store logos, which carry their own light ground, so no mat needed. */
+  [data-widget="filtersDesktop"] img {
+    position: relative !important;
+    z-index: 1 !important;
   }
   /* Filter labels, category links and the "Посмотреть все" action row
      are token-coloured (--textPrimary / --textSecondary / --textAction);

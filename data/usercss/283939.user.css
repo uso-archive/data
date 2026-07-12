@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for TechPowerUp: easy on the eyes across news, reviews, the GPU/CPU spec databases and the forums, with readable tables and code.
-@version      20260711.00.19
+@version      20260711.20.01
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -438,17 +438,21 @@
 
   /* Colored category / deal flags keep their tinted identity but are deepened
      so white labels stay legible on the dark theme. The site ships ELEVEN
-     semantic variants (news.css `.flags .flag.*`); the plain `.flag` grey is
-     only the fallback for uncategorised tags, so every variant needs its own
-     rule or the whole taxonomy collapses into one neutral pill. */
+     semantic variants (news.css `.flags .flag.*`) PLUS the plain category tags
+     (Motherboards, Memory, CPU Coolers, …) which TPU colours per-category via an
+     INLINE `background-color:#…` (orange/blue/purple/…). Match the site's own
+     `.flags .flag` (0,2,0) WITHOUT !important for the neutral fallback: it wins
+     over the site's `gray` by source order for uncategorised tags, while the
+     inline category colour (1,0,0,0) still shows through — keeping the category
+     colour-coding — and each `.flag.*` modifier below wins via its !important. */
   .flag,
   .flag span,
   span.flag {
     color: #ffffff !important;
   }
 
-  .flag {
-    background-color: #3d4450 !important;
+  .flags .flag {
+    background-color: #3d4450;
   }
 
   .flag.draft {
@@ -494,6 +498,13 @@
 
   .flag.video {
     background-color: #8c1312 !important;
+  }
+
+  /* Download-page version badge: `.flag.latest` marks the newest release in a
+     GREEN pill (#497d2a). Our broad `.latest` downloads-tile rule below paints
+     it #1c2128 with !important, erasing the signal — reclaim it at (0,2,0). */
+  .flag.latest {
+    background-color: #2a5c2d !important;
   }
 
   /* Front-page poll widget (white card) */
@@ -1162,11 +1173,15 @@
     color: #ffffff !important;
   }
 
-  /* Primary / CTA buttons keep a blue identity */
+  /* Primary / CTA buttons keep a blue identity. `.startbutton` is the big blue
+     download CTA (#4486c7) on every /download/<app> page — the base `.button`
+     rule above would otherwise flatten it into the same neutral grey. */
   .button--cta,
   .btn-primary,
   .button.inverted,
-  .submitUnit button[type="submit"] {
+  .submitUnit button[type="submit"],
+  .button.startbutton,
+  input.startbutton {
     background-color: #2563a8 !important;
     border-color: #2f74c0 !important;
     color: #ffffff !important;
@@ -1174,7 +1189,9 @@
 
   .button--cta:hover,
   .btn-primary:hover,
-  .button.inverted:hover {
+  .button.inverted:hover,
+  .button.startbutton:hover,
+  input.startbutton:hover {
     background-color: #2f74c0 !important;
   }
 
@@ -1267,6 +1284,37 @@
     border-color: #21262d !important;
   }
 
+  /* Selected top-nav tab: the light style paints the active `.p-navEl` a #f5f5f5
+     pill (a bright block on the dark bar for a light-OS user). Give it the
+     nav-hover navy so "you are here" reads as an accent, not a white plate. */
+  .p-navEl.is-selected,
+  .p-navEl.is-selected .p-navEl-link {
+    background-color: #21303f !important;
+    color: #ffffff !important;
+  }
+
+  /* Guest / info notice banner (the "Welcome to TechPowerUp Forums, Guest!" bar)
+     ships as a #e8f4fc light-blue block; restyle as our dark info panel. */
+  .notice,
+  .notice--block,
+  .notices .notice {
+    background-color: #16242e !important;
+    border-color: #2970a3 !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* Collapsed contentRow fade-out is a `linear-gradient(transparent, #fff)` mask
+     that bleeds white over the truncated preview; retint to the card colour.
+     The sidebar block footer carries a light #f5f5f5→#fafafa gradient too. */
+  .contentRow-fader {
+    background-image: linear-gradient(rgba(28, 33, 40, 0), #1c2128 80%) !important;
+  }
+
+  .block-footer {
+    background-color: #161d27 !important;
+    background-image: none !important;
+  }
+
   /* Content blocks / cards */
   .block,
   .block-container,
@@ -1347,30 +1395,35 @@
   }
 
   /* XenForo colours usernames by member group — administrator red, moderator
-     blue, super-moderator green and a staff blue — through its own CSS vars.
-     The broad `span` / `.username` rules above flattened every group to one
-     grey, so a staff/mod name in the members-online list (a bare span, no title
-     beside it) read LESS prominent than a regular blue link. Re-assert the group
-     colours, reusing XenForo's vars so a config change carries through. */
+     blue, super-moderator green and a staff blue. The broad `span` / `.username`
+     rules above flattened every group to one grey, so a staff/mod name in the
+     members-online list (a bare span, no title beside it) read LESS prominent
+     than a regular blue link. Re-assert the group colours with fixed bright
+     values: the forum now serves a native DARK style under prefers-color-scheme
+     dark, so `hsl(var(--xf-userTitleColor*))` resolved to the *light* style's
+     dark navy/green for a light-OS user (dark-on-dark, invisible). Bake the
+     readable hues instead — they stay correct in both native schemes. */
   .username--staff {
     color: #79c0ff !important;
   }
 
   .username--style3 {
-    color: hsl(var(--xf-userTitleColorAdministrator)) !important;
+    color: #ff7b72 !important;
   }
 
   .username--style4 {
-    color: hsl(var(--xf-userTitleColorModerator)) !important;
+    color: #79c0ff !important;
   }
 
   .username--style24 {
-    color: hsl(var(--xf-userTitleColorSuperModerator)) !important;
+    color: #3fb950 !important;
   }
 
-  /* Thread-prefix labels ship a dark-navy plate with a coloured label; the broad
-     `label` rule greyed the "primary" (blue) variant's text into the plate. */
+  /* Thread-prefix / node labels ship a plate with a coloured label; the broad
+     `label` rule greyed the "primary" (blue) variant's text, and the light
+     style's #e8f4fc plate survived on a light-OS user. Repaint both. */
   .label--primary {
+    background-color: #21303f !important;
     color: #79c0ff !important;
   }
 
@@ -1404,9 +1457,53 @@
   }
 
   /* The reactions strip's 2px left rule is XenForo's #2970a3 accent, not a
-     surface border; the blanket `*` border-color pass above greys it out. */
+     surface border; the blanket `*` border-color pass above greys it out.
+     The strip itself + its per-reaction summary chips ship a #f5f5f5 light
+     footer band (the light forum style), so paint them onto the post. */
   .reactionsBar {
+    background-color: #161d27 !important;
     border-left-color: #2970a3 !important;
+  }
+
+  .reactionSummary li,
+  .reactionsBar .reactionSummary li {
+    background-color: transparent !important;
+  }
+
+  /* Avatar online-status marker: a #f5f5f5 ring around a green ::before dot;
+     retint the ring to the user-cell colour so only the green dot reads. */
+  .message-avatar-online {
+    background-color: #161d27 !important;
+  }
+
+  /* Forum pagination (XenForo `.pageNav`): the page pills + prev/next jumps ship
+     a #e8f4fc light-blue plate and the current page a #fef4e7 amber one, none
+     covered by the news-site `.pager` rules. Match the site's dark button tone
+     and keep the current page on our blue accent. */
+  .pageNav-page,
+  .pageNav-jump {
+    background-color: #21262d !important;
+    border-color: #2d333b !important;
+  }
+
+  .pageNav-page a,
+  .pageNav-jump {
+    color: #d6e2ee !important;
+  }
+
+  .pageNav-page:hover,
+  .pageNav-jump:hover {
+    background-color: #2d333b !important;
+  }
+
+  .pageNav-page--current {
+    background-color: #2563a8 !important;
+    border-color: #2f74c0 !important;
+  }
+
+  .pageNav-page--current,
+  .pageNav-page--current a {
+    color: #ffffff !important;
   }
 
   .actionBar-action {
