@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for Sohu (搜狐).
-@version      20260711.20.01
+@version      20260712.18.33
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -868,6 +868,16 @@
     color: #e6edf3 !important;
   }
 
+  /* a commenter's display name ships the Sohu brand red (rgb(207,20,26)) on
+     .author-area — the `.comment-item .name` rule above (0,2,0) flattened it to
+     plain white, so the name lost its identity colour. Restore the red at a
+     luminance that reads on dark. */
+  .comment-item .author-area.name,
+  .comment .author-area.name,
+  .comment-item .author-area {
+    color: #ff6a5a !important;
+  }
+
   .comment-item .content,
   .comment .content,
   .cmt-content {
@@ -1129,6 +1139,21 @@
      reads light-on-light. Darken every per-widget row class to a dark elevated
      surface (business .tpl-text-item-block; news.sohu.com .text-li /
      .multiple-text / .TPLTextItem / hot-list / video / house rows). */
+  /* the same rows natively turn their TEXT the brand red (rgb(201,20,29)) on
+     hover — our own `#Index *` (1,0,0 !important) out-specified `a:hover`, so a
+     hovered headline changed its background but never its text. Restore the red
+     affordance; the id prefix is what beats our own rule. */
+  #Index .tpl-text-item-block:hover,
+  #Index .tpl-text-item-block:hover *,
+  #Index .text-chain-item:hover,
+  #Index .text-chain-item:hover *,
+  #Index .text-li:hover,
+  #Index .text-li:hover *,
+  #Index .multiple-text:hover,
+  #Index .multiple-text:hover * {
+    color: #ff6a5a !important;
+  }
+
   .tpl-text-item-block:hover,
   .text-li:hover,
   .multiple-text:hover,
@@ -1268,6 +1293,19 @@
     border-color: #6d4c19 !important;
   }
 
+  /* channel 汽车专区 快速找车 price-range filter chips (.auto-hot-tag li a,
+     e.g. 5-10万 / 20万以上 / 精准选车): the site draws each as a light-blue-
+     bordered chip holding a #0a53a3 blue link — a "these are clickable filters"
+     affordance. `* { border-color }` greyed the outline and `#Index *` greyed
+     the link, collapsing all eight to identical neutral chips. Native #0a53a3
+     is ~2:1 on dark, so re-tune to the theme's readable link blue + muted
+     border rather than restoring the native hex. */
+  #Index .auto-hot-tag li,
+  #Index .auto-hot-tag li a {
+    border-color: #2f5d80 !important;
+    color: #5fb0e6 !important;
+  }
+
   /* ---------- Cards / elevated panels that keep a real background ---------- */
   .box-shadow,
   .panel,
@@ -1385,6 +1423,11 @@
     background-color: #262c33 !important;
   }
 
+  /* Do NOT darken .video-cta-button: the reco-reel flavour takes our color rule
+     (bordered, transparent, reads fine), but the trc_rbox "Play Now" flavour paints
+     its label black from a LAYERED sheet, which outranks an unlayered !important —
+     the text cannot be lifted, so its white pill has to stay white to stay legible. */
+
   .video-cta-button,
   .tbl-rr-discover-button,
   .tbl-rr-read-more-button {
@@ -1431,13 +1474,20 @@
      #new-list-loading ("正在加载中…") is the same white panel shown only during
      the fetch window. Darken both to the page base; the light illustration reads
      fine on dark. */
+  /* The 作者专栏 tab ships the SAME panel under its own class names
+     (.tabs-column / .tab-column-blank-wrap), which the -right selectors above never
+     matched — that tab kept a full white empty state. Cover both families. */
   .tab-right-blank-wrap,
+  .tab-column-blank-wrap,
+  .tabs-column,
   #new-list-loading {
     background-color: #14181d !important;
   }
 
   .tab-right-blank-wrap p,
   .tab-right-blank-wrap span,
+  .tab-column-blank-wrap p,
+  .tab-column-blank-wrap span,
   #new-list-loading,
   #new-list-loading p {
     color: #8b949e !important;
@@ -1446,7 +1496,8 @@
   /* the empty-state illustration (mushroom + "?") is a greyscale raster with a
      baked-in white background — luminance-invert it so the white flips dark and
      the grey line-art lifts, matching the darkened panel */
-  .tab-right-blank-wrap > div {
+  .tab-right-blank-wrap > div,
+  .tab-column-blank-wrap > div {
     filter: invert(1) !important;
   }
 
@@ -1455,6 +1506,43 @@
      untouched) — invert only the placeholder, keeping the fox's red. */
   .topic-img img[src^="data:image/png"] {
     filter: invert(1) hue-rotate(180deg) !important;
+  }
+
+  /* search 搜狐号 / 作者专栏 tabs (.tabs-right): switching off 综合 swaps the result
+     list for a 680-wide rgb(244,244,244) panel holding a grid of pure-white
+     rgb(255,255,255) media-account cards with rgb(64,64,64) names — the entire tab
+     renders as one glaring white block. It only exists after the tab is clicked, so
+     no load-time scan on the default tab sees it. The card carries the SAME class as
+     the grid container that wraps it, so the descendant selector is what picks out
+     the card alone and leaves the grid gutters on the page base. */
+  .tabs-right {
+    background-color: #14181d !important;
+  }
+
+  .tabs-right .tabs-right-cards .tabs-right-cards {
+    background-color: #1c2128 !important;
+  }
+
+  .tabs-right-cards-title {
+    color: #e6edf3 !important;
+  }
+
+  /* the per-card "栏目：资料 | 资讯" strip ships rgb(248,248,248) and the rule under
+     the read counts ships rgb(219,219,219) */
+  .tabs-right-cards-column {
+    background-color: #262c33 !important;
+  }
+
+  .card-bottom-divideline {
+    background-color: #2d333b !important;
+  }
+
+  .tabs-right-cards-desc,
+  .tabs-right-cards-bottom,
+  .tabs-right-cards-column,
+  .cards-bottom-left,
+  .cards-bottom-right {
+    color: #8b949e !important;
   }
 
   /* hot-search right rail = elevated card; autocomplete = floating surface */
@@ -1622,6 +1710,19 @@
   .backword,
   .logo-text,
   .more-link {
+    color: #ff7a45 !important;
+  }
+
+  /* "返回搜狐，查看更多" end-of-article CTA is a span.backword (+ fox icon
+     i.backsohu) nested in #mp-editor > a, so our own `.article span` body rule
+     (0,2,0) out-specified the bare `.backword` (0,1,0) and flattened the whole
+     link — text and icon — to reading grey. Restore the Sohu brand orange with
+     a selector that clears the body rule in both the #mp-editor and .article
+     templates. */
+  #mp-editor .backword,
+  #mp-editor .backword i,
+  .article .backword,
+  .article .backword i {
     color: #ff7a45 !important;
   }
 

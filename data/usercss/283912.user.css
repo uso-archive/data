@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for HeadHunter (hh.ru / hh.kz / hh.uz / hh.by / rabota.by). Job search, vacancies and companies in an easy-on-the-eyes dark UI.
-@version      20260711.19.57
+@version      20260712.18.28
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -296,6 +296,37 @@
   [class*="tmpl-hh"] *, [class*="tmpl_hh"] * { color: #c4cdd6 !important; }
   [class*="tmpl-hh"] h1, [class*="tmpl-hh"] h2, [class*="tmpl-hh"] h3,
   [class*="tmpl_hh"] h1, [class*="tmpl_hh"] h2, [class*="tmpl_hh"] h3 { color: #e6edf3 !important; }
+  /* Chameleon templates ship their own CTA button (`tmpl-hh-footer__link`): the
+     employer's brand colour as a solid fill, declared in the vacancy's INLINE
+     employer stylesheet (here `background: rgb(255,0,2)` + a white label). The
+     blanket background rule above painted that fill the card colour and the
+     global `* { border-color }` erased its matching border, so the CTA rendered
+     as a near-invisible ghost outline on the dark card — a lost control, not just
+     a lost hue (audit-chroma: bg rgb(253,0,2) → rgb(28,33,40)).
+     The employer's own colour can't be recovered (our !important already replaced
+     it) and employer CSS is unbounded — the same reason the text colours above are
+     deliberately flattened — so give the CTA the theme's accent surface instead:
+     it reads unmistakably as a button and its contrast holds on ANY employer page.
+     The brand hue is knowingly traded for that guarantee.
+     Scoped to `footer__link` — the filled CTA verified live — and NOT to a bare
+     `__link`: the blanket already paints every chameleon anchor a card-coloured
+     (invisible) slab, so widening this to all `__link`s would stamp a bright blue
+     box around any employer's plain TEXT link on a template we cannot inspect.
+     CTAs in other chameleon blocks stay flattened (unchanged, not a regression). */
+  a[class*="tmpl-hh"][class*="footer__link"],
+  a[class*="tmpl_hh"][class*="footer__link"] {
+    background-color: #2f81f7 !important; border-color: #2f81f7 !important; }
+  /* the CTA's own label/icon spans carry `tmpl-hh-*` classes too, so the blanket
+     painted each of them a card-coloured slab — a dark box stamped across the
+     button once the button itself is no longer that same colour. Clear them. */
+  a[class*="tmpl-hh"][class*="footer__link"] *,
+  a[class*="tmpl_hh"][class*="footer__link"] * {
+    background-color: transparent !important; }
+  a[class*="tmpl-hh"][class*="footer__link"],
+  a[class*="tmpl_hh"][class*="footer__link"],
+  a[class*="tmpl-hh"][class*="footer__link"] *,
+  a[class*="tmpl_hh"][class*="footer__link"] * {
+    color: #ffffff !important; }
   /* The chameleon CONTENT block (tmpl_hh_content) carries the vacancy's HTML body
      text, but the employer also paints it with an uploaded background-IMAGE — a
      near-white decorative JPG (e.g. img.hhcdn.ru/ichameleon/*.jpg). background-image
@@ -318,9 +349,16 @@
      right-hand illustration column then glare light — a bright panel on the dark
      results list. It's audit-blind-ish (rotates per employer, inline non-white).
      Dark the wrapper so the frame + illustration column read dark; the decorative
-     PNG (transparent) sits on dark like the rest of the card. */
+     PNG (transparent) sits on dark like the rest of the card.
+     Newer branded snippets ship the brand colour as a saturated linear-gradient
+     background-IMAGE on the wrapper (e.g. a bright green rgb(13,108,11) promo),
+     which paints OVER our background-color → the green frame glares around the
+     dark inner card, and a bg-COLOR scan is blind to it. Drop the image too so the
+     wrapper reads the same dark as the inline-colour variant; the ONLY match is the
+     base wrapper (child `branded-snippet-picture--`/`-logo--` never contain the
+     double-dash), so the decorative illustration + logo stay untouched. */
   [class*="branded-snippet--"] {
-    background-color: #1c2128 !important; }
+    background-color: #1c2128 !important; background-image: none !important; }
 
   /* ---- Typography ---- */
   h1, h2, h3, h4, h5, h6, [class*="magritte-title"], [class*="magritte-text"][class*="primary"],
@@ -340,14 +378,32 @@
   .bloko-text_tertiary, .supernova-navi-search-text {
     color: #8b949e !important; }
 
-  /* ---- Links: hh blue is too dark on dark → readable blue ---- */
-  a, a span, .bloko-link, [class*="magritte-link"], [data-qa$="-link"] {
+  /* ---- Links: hh blue is too dark on dark → readable blue ----
+     A link's LABEL is almost always an inner <span> (magritte-text___), not a
+     text node on the <a>. Two of our own rules outrank a plain `a span` (0-0-2)
+     on it: the blanket `[class*="magritte-text"]` (0-1-0) and `span:not(.metro-point)`
+     (0-1-1 — the :not() raised it). So every span-labelled link rendered body-grey:
+     the whole "Работа по профессиям" grid, the footer legal links, "Я ищу
+     сотрудника" — indistinguishable from prose, with no link affordance left.
+     Match the blanket's shape so the link arm wins on the span too. Every rule
+     below that must still beat this one (nav items, button labels, card titles)
+     carries the same `:not(.metro-point)` to clear 0-1-2. */
+  a, a span:not(.metro-point), .bloko-link, [class*="magritte-link"], [data-qa$="-link"] {
     color: #5fb0e6 !important; }
   a:hover, .bloko-link:hover, [class*="magritte-link"]:hover { color: #9bd4ff !important; }
+  /* header nav items are anchors whose label is a span: they must stay primary
+     text, not turn link-blue */
+  .supernova-navi a span:not(.metro-point),
+  .supernova-navi-item span:not(.metro-point) {
+    color: #e6edf3 !important; }
   /* card/headline links should read as bright primary text, blue on hover */
   [data-qa="serp-item__title"], [data-qa="serp-item__title-text"],
   [data-qa="vacancy-serp__vacancy-title"], [data-qa="bloko-header-2"] a,
   [data-qa="vacancy-company-name"], [data-qa="company-header-title-name"] a {
+    color: #e6edf3 !important; }
+  [data-qa="serp-item__title"] span:not(.metro-point),
+  [data-qa="vacancy-serp__vacancy-title"] span:not(.metro-point),
+  [data-qa="vacancy-company-name"] span:not(.metro-point) {
     color: #e6edf3 !important; }
   [data-qa="serp-item__title"]:hover, [data-qa="vacancy-serp__vacancy-title"]:hover {
     color: #5fb0e6 !important; }
@@ -430,7 +486,10 @@
   [class*="magritte-button_style-positive"][class*="magritte-button_mode-primary"] span,
   [class*="magritte-button_style-negative"][class*="magritte-button_mode-primary"] span {
     color: #ffffff !important; }
-  [class*="magritte-button_style-neutral"] span {
+  /* `:not(.metro-point)` here is a specificity brace, not a filter: an anchor-
+     button's label must outrank the link rule's `a span:not(.metro-point)` or a
+     neutral CTA reads link-blue instead of primary text. */
+  [class*="magritte-button_style-neutral"] span:not(.metro-point) {
     color: #e6edf3 !important; }
   [class*="magritte-button_style-accent"][class*="magritte-button_mode-secondary"] span,
   [class*="magritte-button_style-accent"][class*="magritte-button_mode-tertiary"] span {
@@ -551,6 +610,16 @@
   [class*="magritte-modal"] [class*="magritte-modal-close"] svg,
   [class*="magritte-modal"] [class*="magritte-modal-close"] svg path {
     color: #c4cdd6 !important; fill: currentColor !important; }
+  /* At 390px the login/signup flow opens as a FULL-SCREEN overlay whose backing
+     layer (a CSS-module `container--<hash> animated--<hash>`, position:fixed,
+     z-index 1000, the whole viewport) ships a hardcoded WHITE surface. The dark
+     Magritte card inside is inset ~16px, so the white reads as a bright frame
+     around the card on every edge — and it is exposed outright while the
+     `animated--` open transition runs. Desktop never renders it (the flow is a
+     centred page there), so a desktop-only pass misses it entirely. Both hashed
+     module prefixes are required, which matches this overlay and nothing else. */
+  div[class*="container--"][class*="animated--"] {
+    background-color: #14181d !important; }
   /* the ccTLD "Выберите язык" language picker (hh.kz/uz/by) was redesigned onto the
      Magritte "nav-bar-panes" component: its close button ships a light-glass
      (rgba(255,255,255,.68)) rounded square with a BLACK X glyph — a bright control

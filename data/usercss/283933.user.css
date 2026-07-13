@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for CSDN: comfortable dark articles, homepage and search, with fully dark code blocks and a readable syntax palette.
-@version      20260711.19.57
+@version      20260712.18.26
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -298,6 +298,26 @@
     background-color: var(--csdn-text) !important;
     color: var(--csdn-chrome) !important;
   }
+  /* blog.csdn.net/nav/<category> ships its OWN chip row inside .home_box_nav
+     (.home_box_nav_list > a — 推荐 / 付费专栏 / VIP文章): the inactive chips are a
+     light #f2f2f2 pill and the selected one a BLACK pill, exactly like the home
+     carousel, but they are <a> under a different container so the .menus-view
+     rules never reached them. Our `.home_box_nav a` rule lifted their labels to
+     white, leaving the two inactive chips white-on-white (81×32 — under the audit
+     big() floor). Mirror the home chip inversion; div-prefixed so it out-specifies
+     the later `.home_box_nav a` colour rule. */
+  div.home_box_nav_list a {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-text-2) !important;
+  }
+  div.home_box_nav_list a:hover {
+    background-color: #30363d !important;
+  }
+  div.home_box_nav_list a.active {
+    background-color: var(--csdn-text) !important;
+    color: var(--csdn-chrome) !important;
+  }
+
   /* toolbar top-nav dropdown items (.toolbar-subMenu — e.g. "更多" holding
      会议/学习) paint a near-white rgb(240,240,245) highlight on the trigger
      box when hovered/open (audit-blind: :hover state + 67px wide, under the
@@ -356,6 +376,17 @@
     background-color: var(--csdn-chrome) !important;
     border-color: var(--csdn-border) !important;
   }
+  /* the flyout's three tabs (下载APP / 公众号 / 视频号) stack their .tab-content
+     panels absolutely on top of each other; natively each is opaque WHITE, so the
+     selected one (z-index 1) hides the other two. The neutralizer flattened all
+     three to transparent, so the QR codes and captions of all three tabs rendered
+     superimposed. Re-seat them opaque. */
+  body div.app-qr-box .tab-content {
+    background-color: var(--csdn-chrome) !important;
+  }
+  body div.app-qr-box .tab-item {
+    color: var(--csdn-text-2) !important;
+  }
 
   /* ---------- Blog-article floating bars (must stay opaque) ----------
      Both are <div>s flattened by the broad neutralizer, so the article text
@@ -393,6 +424,19 @@
   }
   .aside-common-box-bottom-btn i,
   .aside-common-box-bottom button i {
+    color: var(--csdn-muted) !important;
+  }
+  /* Element-UI icon-FONT glyphs are drawn by an <i>'s ::before, so they keep the
+     site's dark #555666 (our text rules never reach a pseudo). The decorative
+     "更多 ›" chevrons (so.csdn 相关课程 header, bbs quick-links) measured 2.5:1 on the
+     dark base — under even the 3:1 non-text floor. Lift only the arrow/search
+     glyphs: the semantic ones (el-icon-plus in a brand CTA, close crosses) keep
+     their own colour. */
+  i.el-icon-arrow-right,
+  i.el-icon-arrow-left,
+  i.el-icon-arrow-down,
+  i.el-icon-arrow-up,
+  i.el-icon-search {
     color: var(--csdn-muted) !important;
   }
 
@@ -774,12 +818,30 @@
   .token.deleted {
     color: #ff7b72 !important;
   }
+  /* `.token.regex-delimiter` / `-source` / `-flags` and `.token.template-string`
+     are Prism's SPLIT token names (a regex literal and a template literal are
+     tokenised into parts, not one `.regex` / `.string` span). They were absent
+     from this palette, so our blanket `span { color !important }` — which beats
+     Prism's own non-important `.token.x` rules — painted every regex literal and
+     template string body grey: the two commonest string forms in JS code lost
+     their syntax colour entirely. Same blue as `.string`. */
   .token.string,
   .token.char,
   .token.attr-value,
   .token.regex,
+  .token.regex-delimiter,
+  .token.regex-source,
+  .token.regex-flags,
+  .token.template-string,
   .token.inserted {
     color: #a5d6ff !important;
+  }
+  /* function parameters + the ${…} interpolation body inside a template string
+     are plain code, not strings — keep them at the code base colour so they read
+     as expressions rather than inheriting the blue above. */
+  .token.parameter,
+  .token.interpolation {
+    color: #c9d1d9 !important;
   }
   .token.number,
   .token.boolean,
@@ -934,6 +996,19 @@
     background-color: var(--csdn-elev2) !important;
     color: var(--csdn-link) !important;
   }
+  /* so.csdn.net "筛选" filter panel (时间 / 类型 / 领域 rows, revealed by the 筛选
+     toggle — closed at load, so no load-time scan sees it): the site marks the
+     SELECTED value with brand orange rgb(254,107,0) and greys the rest (#555666).
+     Our blanket `span` rule painted every value the same body grey, erasing the
+     selection: all six time chips read identically. Restore the accent on the
+     selected chip and keep the others muted. */
+  .filters .filter .f-bd span {
+    color: var(--csdn-muted) !important;
+  }
+  .filters .filter .f-bd span.active {
+    color: #fe6b00 !important;
+  }
+
   /* so.csdn.net "相关搜索" related-term chips: the first (hot) chip is a
      classless .so-hot-words li with a hardcoded white bg (92×28 — below the
      audit height threshold, so audit-blind) carrying pale-blue link text
@@ -1166,6 +1241,19 @@
     background-color: var(--csdn-elev) !important;
     color: var(--csdn-text) !important;
   }
+  /* 采纳榜 leaderboard podium: the site colour-codes the top three ordinals through
+     dedicated classes (.ic_rank_1 red / _2 gold / _3 rose) and greys 4+ — the
+     blanket span text rule collapsed all ten to the same grey, so the podium read
+     exactly like the rest of the list. Restore the three, lifted for the dark base. */
+  span.rank.ic_rank_1 {
+    color: #ff6b52 !important;
+  }
+  span.rank.ic_rank_2 {
+    color: #f7c72d !important;
+  }
+  span.rank.ic_rank_3 {
+    color: #cb9696 !important;
+  }
 
   /* ---------- User profile page "skin" background ----------
      Profile pages render a user-chosen "skin" as a full-page light
@@ -1341,6 +1429,23 @@
   span.view-btn,
   span.to-upload {
     color: var(--csdn-red) !important;
+  }
+  /* download.csdn.net resource-rank list (.latest-file-card): the site colour-codes
+     the top three ordinals (#1 coral, #2 gold, #3 bronze) and greys the rest — the
+     blanket div/span text rules collapsed all of them to one body grey, erasing the
+     podium. Rows past the first are collapsed (li.fold) for guests, so no load-time
+     scan or screenshot reaches them; restore the three medal colours. */
+  .latest-file-card ul li:nth-child(1) .rank,
+  .latest-file-card ul li:nth-child(1) .rank span {
+    color: #f87e62 !important;
+  }
+  .latest-file-card ul li:nth-child(2) .rank,
+  .latest-file-card ul li:nth-child(2) .rank span {
+    color: #fab216 !important;
+  }
+  .latest-file-card ul li:nth-child(3) .rank,
+  .latest-file-card ul li:nth-child(3) .rank span {
+    color: #d29223 !important;
   }
   /* the gold "开通会员" pill is a raster background-IMAGE, so its brown label
      must stay brown — our grey washed it out on the gold */
@@ -1535,6 +1640,19 @@
   .fc-consent-root .fc-faq-contents {
     background-color: var(--csdn-base) !important;
   }
+  /* the "Learn more" expander disc: Funding Choices paints it white through
+     `.fc-consent-root .fc-faq-header .fc-faq-icon` (0,3,0) !important, which
+     out-specifies the (0,2,0) rule above — so a bright 28px white circle
+     survived on the dark sheet. Match their specificity, and lift the chevron
+     (a #5f6368 SVG drawn for a white disc) so it stays visible on the dark one. */
+  .fc-consent-root .fc-faq-header .fc-faq-icon {
+    background-color: var(--csdn-elev2) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  .fc-consent-root .fc-faq-header .fc-faq-icon svg,
+  .fc-consent-root .fc-faq-header .fc-faq-icon svg path {
+    fill: var(--csdn-text-2) !important;
+  }
   .fc-consent-root .fc-dialog hr {
     background-color: var(--csdn-border) !important;
     border-color: var(--csdn-border) !important;
@@ -1550,6 +1668,23 @@
   .fc-consent-root .fc-preference-container {
     background-color: var(--csdn-elev2) !important;
     border-color: var(--csdn-border) !important;
+  }
+  /* the "TCF vendors" section divider is a rgb(241,243,244) bar the rule above
+     never named, and the "Manage vendors" footer button is repainted white by
+     `.fc-consent-root .fc-data-preferences-dialog .fc-navigation-button` (0,3,0),
+     which out-specifies our (0,2,0) rule — both shipped as bright bars carrying
+     our lifted (near-white) label text. Match/beat their specificity. */
+  .fc-consent-root div.fc-preference-divider,
+  .fc-consent-root .fc-data-preferences-dialog .fc-navigation-button,
+  .fc-consent-root .fc-data-preferences-dialog .fc-manage-vendors {
+    background-color: var(--csdn-elev2) !important;
+    border-color: var(--csdn-border) !important;
+    color: var(--csdn-text) !important;
+  }
+  .fc-consent-root div.fc-preference-divider p,
+  .fc-consent-root .fc-data-preferences-dialog .fc-navigation-button span {
+    color: var(--csdn-text) !important;
+    -webkit-text-fill-color: var(--csdn-text) !important;
   }
 
   /* ---------- Scrollbar ---------- */

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for OLX Brasil.
-@version      20260710.13.13
+@version      20260712.18.31
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -269,6 +269,25 @@
     background-color: #21262d !important;
     color: #e6edf3 !important;
   }
+  /* The trigger draws its OUTLINE with an inset box-shadow off the neutral scale,
+     which no border rule can reach: the empty variant rings itself in
+     `--color-neutral-90` (#CFD4DD) and the DISABLED one in `--color-neutral-80`
+     (#EFF1F5) — both glare as bright white pills down the filters rail (Marca /
+     Modelo, desktop AND the mobile Filtros sheet) — while the `--filled` variant
+     rings itself in `--color-neutral-130` (#1A1D23), which vanishes on dark so
+     the sort/type controls lose their outline entirely. Remap the tokens on the
+     trigger (the focus/open ring paints from the purple selected token and is
+     untouched); the value text is already pinned by the rules above, so the -130
+     remap cannot dim it. Then restate the disabled state as a flat fill-equals-ring
+     chip, the way the site distinguishes it natively. */
+  .olx-core-singleselect__trigger {
+    --color-neutral-90: #484f58;
+    --color-neutral-130: #6b7681;
+  }
+  .olx-core-singleselect__trigger--disabled {
+    background-color: #21262d !important;
+    box-shadow: inset 0 0 0 1px #21262d !important;
+  }
 
   /* ============================================================
      OLX accent (raw #F28000 orange) refined for dark
@@ -367,10 +386,14 @@
   /* Disabled/current buttons ship a light #EFF1F5 surface (the auth submit
      before an e-mail is typed, pagination's "Página anterior" and the
      current-page marker) — mapped to the elevated dark tone so the state
-     still reads as inactive rather than as an enabled orange CTA. */
+     still reads as inactive rather than as an enabled orange CTA. The label
+     needs #8b949e, not a dimmer grey: the site reuses `--disabled` for the
+     CURRENT PAGE number, which is real information, and #6b7681 on this chip
+     lands at 3.2:1. This still reads clearly inactive against the near-white
+     copy and the amber page links beside it. */
   .olx-core-button.olx-core-button--disabled {
     background-color: #21262d !important;
-    color: #6b7681 !important;
+    color: #8b949e !important;
     box-shadow: inset 0 0 0 2px #21262d !important;
   }
   /* Search-results list/grid switcher: BOTH buttons ship `--primary`, and the
@@ -568,6 +591,17 @@
     --color-secondary-100: #c9b6f5;
     --color-secondary-110: #c9b6f5;
   }
+  /* The boosted "Impulsionado" ad-card badge is `--info` overridden by a
+     `bg-primary-100` utility that paints it the OLX orange, distinct from the
+     purple `bg-secondary-100` "Destaque". The explicit `--info` violet rule above
+     flattened BOTH to the same violet chip, erasing the boosted tier's orange
+     identity. Restore the orange (dark copy for contrast on the light orange). */
+  .olx-core-badge--info.bg-primary-100,
+  .olx-adcard__primary-badge.bg-primary-100 {
+    background-color: #f2901f !important;
+    color: #1a1206 !important;
+    border-color: #f2901f !important;
+  }
 
   /* ============================================================
      Search-results page: filters sidebar + form controls
@@ -748,6 +782,16 @@
     color: #e6edf3 !important;
   }
 
+  /* …and it blanks the photo LIGHTBOX's backdrop: the expanded gallery is a
+     fixed, full-viewport `section` whose only class is the hashed
+     styled-component, carrying an opaque #EFF1F5 sheet. Flattened to
+     transparent, the photo floats over the live ad page — the price box, cards
+     and the thumbnail strip all bleed through behind it. It is the ad page's
+     ONLY `section[class*="ad__sc-"]` (every other section there is an
+     `olx-adcard`), so re-establish an opaque photo-viewer backdrop from that. */
+  #adview section[class*="ad__sc-"] {
+    background-color: #0d1117 !important;
+  }
   /* …but that neutralizer also blanks the ad page's FIXED top bar (the
      Fotos/Descrição/Detalhes tabs + Comprar/Chat actions), which ships a
      literal white bg — content then scrolls straight through it. It is
@@ -883,6 +927,14 @@
   .olx-tabs__tab[aria-selected="true"] .olx-tabs__tab-label {
     color: #f6b35e !important;
   }
+  /* The selected tab also marks itself with a coloured bottom BORDER while the
+     unselected ones leave theirs transparent — and the blanket `* { border-color }`
+     reset at the top of the file painted ALL of them the same grey hairline, so the
+     footer tab strip lost its "you are here" underline. Restore the pair (the
+     accent matches the selected label above). */
+  .olx-tabs__tab { border-bottom-color: transparent !important; }
+  .olx-tabs__tab--active,
+  .olx-tabs__tab[aria-selected="true"] { border-bottom-color: #f6b35e !important; }
   /* An overflowing tab strip gets a scroll-fade at each end, painted as a
      `background-IMAGE` gradient running to `--color-neutral-70` (#FFF). A
      background-COLOR override can never reach it, so a white smear survives at
@@ -926,6 +978,20 @@
   .fc-consent-root .fc-dialog-content {
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
+  }
+  /* …but FC's text ACTIONS are links, not copy: "Manage options", each purpose's
+     "View details" and "List of partners" are painted its Material blue (#1967D2).
+     The blanket text rule above swallowed them (`-webkit-text-fill-color` inherits,
+     so even the anchors it never matched still rendered white), leaving the
+     dialog's third action looking like a heading rather than something clickable.
+     Give them back a link colour, lifted for the dark sheet. "Manage options" is a
+     <p>, so it needs the tag qualifier to out-specify the `.fc-dialog p` rule above
+     rather than tie it and lose. */
+  .fc-consent-root .fc-dialog a,
+  .fc-consent-root .fc-purpose-feature-more-info,
+  .fc-consent-root .fc-dialog p.fc-manage-options-third-button-label {
+    color: #79a8f0 !important;
+    -webkit-text-fill-color: #79a8f0 !important;
   }
   /* Logo tile + FAQ panel keep a literal white bg. The "Learn more" chevron
      disc is painted by FC's own `.fc-consent-root .fc-faq-header .fc-faq-icon`
@@ -1030,6 +1096,13 @@
   [class*="backdrop"] {
     background-color: rgba(0, 0, 0, 0.6) !important;
   }
+  /* Every BEM modal (share, report, delivery, favourite prompt) closes through
+     `.olx-modal__close-button`, whose X is `fill="currentColor"` over the
+     component's near-black `color` (#1A1D23) — on the now-dark dialog the
+     control all but disappears. Distinct from `.olx-modal-close` (the newer
+     single-dash side-sheet close, handled below). */
+  .olx-modal__close-button { color: #e6edf3 !important; }
+  .olx-modal__close-button:hover { color: #ffffff !important; }
 
   /* The header "Categorias" side-sheet uses the newer single-dash component
      names (olx-modal-content / -header / -body), which the BEM rules above

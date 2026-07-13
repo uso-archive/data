@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Neoseeker, easy-on-the-eyes walkthroughs, guides, cheats and FAQs, plus the home, game hubs, wikis, search and forums.
-@version      20260711.19.58
+@version      20260712.18.31
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -620,9 +620,54 @@
     color: #6fbf73 !important;
   }
 
+  /* The game-hub / news feed marks a live-blogged story with an ORANGE
+     `span.news_update` ("Update — Show's over, folks", #f89406). Our generic
+     `span` text rule greyed it, so the marker read as ordinary bold body copy.
+     The site's own orange reads ~7:1 on the elevated card — keep it verbatim. */
+  .news_update,
+  span.news_update {
+    color: #f89406 !important;
+  }
+
+  /* Bootstrap-2 base chip: `.label, .badge { background:#999; color:#fff }` —
+     white on light grey is 2.85:1 even on the site's own white page, and on ours
+     it renders as a BRIGHT grey blob whose glyph all but disappears (the icon
+     pill heading every forum category, the mobile menu's "Remember me"). Darken
+     the base chip.
+       The modifiers carry the actual semantics and are only 0,1,0 on the site —
+     the same weight as `.label` — so an `!important` base rule would SWALLOW
+     every one of them. Re-assert each below, remapped for dark (the native
+     amber #f89406 and green #486B38 are 2.3:1 / 3.6:1 under white text). */
   .label,
   .badge {
+    background-color: #2e3742 !important;
     color: #ffffff !important;
+    text-shadow: none !important;
+  }
+
+  .label-important,
+  .badge-important {
+    background-color: #8c3b3f !important;
+  }
+
+  .label-warning,
+  .badge-warning {
+    background-color: #8a6d1f !important;
+  }
+
+  .label-success,
+  .badge-success {
+    background-color: #2c6b3a !important;
+  }
+
+  .label-info,
+  .badge-info {
+    background-color: var(--neo-blue) !important;
+  }
+
+  .label-inverse,
+  .badge-inverse {
+    background-color: var(--neo-head) !important;
   }
 
   /* The game-hub product-info well (`.well.product-info.well-dark`) heads each
@@ -732,8 +777,6 @@
   a.prev,
   a.next *,
   a.prev *,
-  #nav_prev_next a,
-  #nav_prev_next a *,
   .pagenav_nextprev a,
   .pagenav_nextprev a.next,
   .pagenav_nextprev a.prev,
@@ -742,6 +785,29 @@
   .pagination-spaced a,
   .pagination .pagenav_pages a {
     color: var(--neo-text-2) !important;
+  }
+
+  /* …but the GUIDE's chapter navigation (`#nav_prev_next`, the "Next ▸ /
+     Prologue" bar that is a walkthrough's primary means of moving between
+     chapters) is the site's #0088cc LINK blue, not the forum pagination's
+     neutral #625e51. Sweeping it into the body-grey rule above stripped every
+     link affordance from it — it read as plain body text on the elevated strip.
+     Give it back the accent; the nested `div`/`span.next`/`i.icon-caret-right`
+     must be named too (the generic `span`/`div` text rules repaint children). */
+  #nav_prev_next a,
+  #nav_prev_next a:link,
+  #nav_prev_next a:visited,
+  #nav_prev_next a div,
+  #nav_prev_next a span,
+  #nav_prev_next a i {
+    color: var(--neo-link) !important;
+  }
+
+  #nav_prev_next a:hover,
+  #nav_prev_next a:hover div,
+  #nav_prev_next a:hover span,
+  #nav_prev_next a:hover i {
+    color: var(--neo-link-hover) !important;
   }
 
   /* ---- Forms / inputs / search ------------------------------ */
@@ -973,16 +1039,31 @@
     color: #ffffff !important;
   }
 
-  /* The navbar dropdown's pointer notch is a pseudo-element CSS triangle the
-     `*` border rule cannot reach (pseudos aren't matched by `*`), so it keeps
-     its `border-bottom: 6px solid #fff` and renders a white spike above the
-     dark menu. Recolor ONLY the single edge that forms it. */
-  .navbar .nav > li > .dropdown-menu:after {
+  /* The dropdown's pointer notch is a pseudo-element CSS triangle the `*` border
+     rule cannot reach (pseudos aren't matched by `*`), so it keeps its
+     `border-bottom: 6px solid #fff` and renders a white spike above the dark
+     menu. Recolor ONLY the single edge that forms it.
+       Scoping this to `.navbar .nav > li >` missed the forum platform bar
+     (`ul#forum-header-platforms > li.dropdown > div.dropdown-menu`), where every
+     one of the eight platform menus (PC / PS4 / PS5 / X1 / XSX / Switch / 3DS /
+     overflow) still flew a white spike. Match the menu itself. */
+  .dropdown-menu:after {
     border-bottom-color: var(--neo-elev) !important;
   }
 
-  .navbar .nav > li > .dropdown-menu:before {
+  .dropdown-menu:before {
     border-bottom-color: var(--neo-border) !important;
+  }
+
+  /* …and a dropUP flips the notch to the bottom edge (border-TOP forms it). */
+  .dropup .dropdown-menu:after,
+  .navbar-fixed-bottom .dropdown-menu:after {
+    border-top-color: var(--neo-elev) !important;
+  }
+
+  .dropup .dropdown-menu:before,
+  .navbar-fixed-bottom .dropdown-menu:before {
+    border-top-color: var(--neo-border) !important;
   }
 
   /* ---- Tabs / pills / pagination ---------------------------- */
@@ -1130,6 +1211,31 @@
   #community li.entry_alt.last {
     background-color: var(--neo-elev2) !important;
     border-color: var(--neo-border) !important;
+  }
+
+  /* A row the site marks as "just changed" carries `.highlight` — a bright
+     #f4f2b7 yellow wash with our LIGHT text on it (the rank digit read ~1.4:1
+     and simply vanished). The site ships it as
+     `#community div.module ul li.highlight { background:#f4f2b7 !important }`
+     (1,2,3), which out-specifies any `#community li.entry.highlight` (1,2,1) —
+     so mirror ITS selector and add a `body` element to win. Keep the highlight
+     SIGNAL as a dark amber tint: the row still reads as "recently updated"
+     against its neighbours and the light text keeps ~8:1. */
+  body #community div.module ul li.highlight,
+  body #community div.module ol li.highlight {
+    background-color: #574c1a !important;
+    border-color: #8a6d1f !important;
+  }
+
+  /* The leaderboard value bars (`.percentage_bar > div`, width = the datum) keep
+     the site's #c7edc8 mint fill with near-black digits — ~40 bright chips
+     scattered down the dark hub, each only ~90x20 so every size-floored scan
+     walks past them. Darken the fill to the theme's green and lift the digit;
+     the bar's WIDTH still encodes the value, so no data is lost. */
+  .percentage_bar > div {
+    background-color: #2c6b3a !important;
+    border-color: #2c6b3a !important;
+    color: #e6edf3 !important;
   }
 
   #stats_total_member,

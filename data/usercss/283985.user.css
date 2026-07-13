@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Ppomppu (뽐뿌).
-@version      20260711.20.00
+@version      20260712.18.32
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -146,6 +146,19 @@
     background-color: #21262d !important;
   }
 
+  /* Mega-menu featured forum links (li.strong > a — 휴대폰포럼 / PC·인터넷 /
+     재테크포럼 / 증권포럼 / DIY포럼 …, the highlighted forum of each column). The
+     site paints these with its brand blue #3a66a4 under its OWN !important, so
+     the generic body-text rule never reaches them: they keep a blue tuned for
+     the original white panel and land at 2.79:1 on the dark flyout — a WCAG fail
+     on the menu's most prominent links. Hover-only, so no load-time scan sees
+     them. Lift to the theme accent, which keeps the "featured" blue signal and
+     reads at ~7:1 on the panel. */
+  .top-nav .sub-menu li.strong > a,
+  #favorite-forum-panel li.strong > a {
+    color: #5fb0e6 !important;
+  }
+
   /* Mega-menu 분류 / ㄱㄴㄷ sort toggle: the SELECTED segment is `span.on`, which
      the site fills with its accent blue (#3a66a4) and white bold text. The
      generic `span.on` pill rule further down flattens it to a neutral dark chip,
@@ -176,6 +189,15 @@
      Re-assert the accent on the active tab's label. */
   li.tab02.pick,
   li.tab02.pick a {
+    color: #5fb0e6 !important;
+  }
+
+  /* Board-list "인기 검색어" strip (div.hot_tag — the popular-search chips above
+     the list): the site accents the word 인기 in the "인기 검색어" heading with a
+     periwinkle bold (#647aff) so the label reads as a heading, not body copy.
+     The generic body-text `b` rule greys it to the same tone as 검색어 beside it,
+     flattening the accent. Restore it in the theme accent. */
+  .hot_tag > span b {
     color: #5fb0e6 !important;
   }
 
@@ -271,6 +293,19 @@
   .forum_gategory_top {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
+  }
+
+  /* Forum-hub post rows (recent_forum_article.php): the comment count appended to
+     each post title (span.comment_num) is painted the site's link blue (#1d62aa)
+     so the "has replies" count reads apart from the title text. The generic
+     body-text `span` rule flattens all 25 of them to the same grey as the title,
+     so the count disappears into the headline. The theme already accents comment
+     counts (.comment-count / .comment_count in the blue group below) — this board
+     just spells the class differently, so it slipped through. Same for the
+     "포럼통합검색" label on the search bar (li.forum_all_menu, natively #2f73c0). */
+  span.comment_num,
+  li.forum_all_menu {
+    color: #5fb0e6 !important;
   }
 
   /* Forum-ranking numeral badges (span.ranking_num — the "1"/"2"/… rank chips
@@ -395,12 +430,17 @@
      `#alert_con` label — the row-type signal. The generic body-text `span` rule
      flattens both to the same neutral grey, so notice and alert become
      indistinguishable. Restore each in the theme accent / warm accent. (Duplicate
-     IDs in the legacy markup — the selector matches every instance.) */
-  #notice_con {
+     IDs in the legacy markup — the selector matches every instance.)
+     Newer consult-style boards (상담실 / 보험상담) ship the same labels under
+     hyphenated IDs (#notice-icon / #alert-icon) instead of the underscore form,
+     so they escaped the rule and rendered flat grey — cover both spellings. */
+  #notice_con,
+  #notice-icon {
     color: #5fb0e6 !important;
   }
 
-  #alert_con {
+  #alert_con,
+  #alert-icon {
     color: #f0883e !important;
   }
 
@@ -477,11 +517,15 @@
   }
 
   /* The block's link titles are a deep ad-blue (#071ac8) tuned for white — too
-     dark on the repainted surface; lift to the theme accent so they read. */
+     dark on the repainted surface; lift to the theme accent so they read. The
+     title is underlined with a 1px border-bottom in that same ad-blue, which the
+     blanket border-color reset flattens to the generic line grey — leaving a grey
+     rule under a blue link. Match the underline to the lifted title colour. */
   #powerlinknew a.title,
   #div_new_power_link a.title {
     color: #5fb0e6 !important;
     -webkit-text-fill-color: #5fb0e6 !important;
+    border-bottom-color: #5fb0e6 !important;
   }
 
   /* Search-results scope tabs (전체 / 커뮤니티 / 뉴스 / 장터 …). The site marks the
@@ -802,6 +846,15 @@
     background-color: #2d333b !important;
   }
 
+  /* Post action-bar separator (div.horizontal-line inside #buttonBox — the rule
+     above the 질렀어요 / 신고 buttons). Like the td.lined hairlines it is drawn as
+     a 1px-tall BLOCK with a #e0e0e0 background-color rather than a border, so the
+     blanket border-color reset never reaches it and it ships as a bright white
+     line straight across the dark post. Match the theme's line colour. */
+  .horizontal-line {
+    background-color: #2d333b !important;
+  }
+
   /* Comment "load more" button + similar grey action chips */
   .cmt-more-btn-pc,
   .new-cmt-btn-pc,
@@ -963,15 +1016,21 @@
     color: #e6edf3 !important;
   }
 
-  /* Home consult/inquiry CTA (.consult-btn) — site hardcodes a pure-white pill;
-     repaint to an elevated dark surface with a readable light label. */
-  .consult-btn-wrap,
-  .consult-btn {
+  /* Home consult/inquiry CTA. The WRAPPER (.consult-btn-wrap) is the pure-white
+     strip under the consult widget's list and must go dark — but the button
+     inside it (a.consult-btn, e.g. "휴대폰 가격 알아보기") is the widget's primary
+     CTA: the site fills it a solid blue (#7297b9) with a white label. Painting
+     the button the same neutral chip as the wrapper flattened it into just
+     another list row — the only call-to-action on the panel lost its identity.
+     Keep the wrapper dark and re-assert the CTA in the theme's brand blue. */
+  .consult-btn-wrap {
     background-color: #21262d !important;
   }
 
   .consult-btn {
-    color: #e6edf3 !important;
+    background-color: #2f6db0 !important;
+    color: #ffffff !important;
+    border-color: #2f6db0 !important;
   }
 
   /* 상담실 board CTA bar (td.btn_advice): the site paints the bar #f8f8f8 and
@@ -995,6 +1054,16 @@
     background-color: #21262d !important;
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
+  }
+
+  /* 상담실 board write CTA (a.write_btn — the 상담하기 button beside the pager).
+     The site fills it with its blue #4a86b6 and a WHITE label; the generic
+     body-text `a` rule drops that label to #c4cdd6, which reads 2.43:1 on the
+     blue — a WCAG fail on the board's primary action — and the blanket
+     border-color reset greys its matching blue rim. Restore both. */
+  a.write_btn {
+    color: #ffffff !important;
+    border-color: #4a86b6 !important;
   }
 
   /* Full-page login form (login.php): the submit control is span#ptn.it on the
@@ -1095,14 +1164,29 @@
     color: #c4cdd6 !important;
   }
 
+  /* …but the recommend COUNT in that post header ("추천 8" — span.topTitle-rec >
+     em) is the digit the site accents periwinkle (#647aff) so the score reads
+     apart from its 추천 label. The generic body-text `em` rule (and the
+     .topTitle-rec rule above) grey it, so the count reads as plain label text and
+     the post's score signal is lost — the same nested-digit trap as
+     span.up-numb > #vote_list_btn_txt. Re-assert the accent on the digit. */
+  .topTitle-rec em {
+    color: #5fb0e6 !important;
+  }
+
   /* Vote / recommend count numerals. The site colour-codes these across page types
      to signal positive vs negative: the post recommend count (span.up-numb) is
      blue; the search-result 추천 count (span.like) and news gain count
      (span.gcon.up) are orange; the search 비추 count (span.dislike) and news loss
      count (span.gcon.down) are blue. The generic body-text `span` rule flattens
      every one to the same grey, erasing the up/down signal. Restore each in its
-     native hue, brightened for dark. */
+     native hue, brightened for dark. The post recommend count digit lives in a
+     nested span (span.up-numb > #vote_list_btn_txt), which the generic body-text
+     `span` rule re-greyed even though the parent .up-numb was accented — so the
+     visible number stayed grey. Target the inner digit too. (The anti/다른의견
+     count #vote_anti_list_btn_txt is natively grey, so it is left alone.) */
   span.up-numb,
+  span.up-numb #vote_list_btn_txt,
   span.gcon.down,
   span.dislike {
     color: #5fb0e6 !important;
@@ -1118,6 +1202,21 @@
      it to grey. Restore the refined red. */
   .nav_hot_ico {
     color: #ff7b72 !important;
+  }
+
+  /* Home section-header accents (span.hot_post): the site colours the "HOT" word
+     in "실시간 HOT 게시글" red (span.v-font) and the "상품정보" word in
+     "뽐뿌 상품정보" blue (an inline color:blue) as section-header signals. The
+     broad body-text rule greys both, flattening the headers. Restore the refined
+     red / accent blue. (Scoped under .hot_post so the grey .v-font consult-review
+     titles elsewhere are untouched.) */
+  .hot_post .v-font {
+    color: #ff7b72 !important;
+  }
+
+  .hot_post span[style*="color:blue"],
+  .hot_post span[style*="color: blue"] {
+    color: #5fb0e6 !important;
   }
 
   /* Link blue used for in-content links / counts / comment counts / tabs

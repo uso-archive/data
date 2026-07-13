@@ -3,11 +3,11 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Vinted with the homepage, catalog and search, item pages and seller profiles in a comfortable dark look that's easy on the eyes for late-night browsing.  Works on every country version of Vinted (vinted.fr, .de, .com, .co.uk, .es, .it, .nl, .be, .pl and more).   Prices, ratings and Vinted's teal stay clear and recognizable.
-@version      20260710.13.16
+@version      20260712.18.34
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
-@-moz-document domain("vinted.fr"), domain("vinted.de"), domain("vinted.com"), domain("vinted.co.uk"), domain("vinted.es"), domain("vinted.it"), domain("vinted.nl"), domain("vinted.be"), domain("vinted.pl"), domain("vinted.cz"), domain("vinted.sk"), domain("vinted.at"), domain("vinted.lt"), domain("vinted.lu"), domain("vinted.pt"), domain("vinted.ro"), domain("vinted.hu"), domain("vinted.se"), domain("vinted.fi"), domain("vinted.dk"), domain("vinted.gr"), domain("vinted.hr"), domain("vinted.ie") {
+@-moz-document domain("vinted.fr"), domain("vinted.de"), domain("vinted.com"), domain("vinted.co.uk"), domain("vinted.es"), domain("vinted.it"), domain("vinted.nl"), domain("vinted.be"), domain("vinted.pl"), domain("vinted.cz"), domain("vinted.sk"), domain("vinted.at"), domain("vinted.lt"), domain("vinted.lu"), domain("vinted.pt"), domain("vinted.ro"), domain("vinted.hu"), domain("vinted.se"), domain("vinted.fi"), domain("vinted.dk"), domain("vinted.gr"), domain("vinted.hr"), domain("vinted.ie"), domain("vinted.si"), domain("vinted.ee"), domain("vinted.lv"), domain("vinted.bg") {
 /* ============================================================
      Vinted Dark
      Vinted's UI is built on a design-token system: CSS custom
@@ -147,6 +147,13 @@
   /* Category nav bar under the header */
   .catalog-tree-menu, .nav-tabs, .horizontal-navigation,
   [class*="HorizontalScroll"] { background-color: #0d1117 !important; }
+  /* The category row is a web_ui Tabs bar, whose surface reads the white
+     token (level-6). We map that to the elevated #1c2128, so inside the
+     darker header the bar rendered as a lighter floating box with the
+     header showing through as slivers at both ends. Pin it to the header
+     surface. Tabs elsewhere (profile, item page) stay elevated. */
+  .l-header .web_ui__Tabs__tabs,
+  .l-header [class*="Tabs__tabs"] { background-color: #0d1117 !important; }
 
   /* Dropdowns / flyouts / menus */
   .web_ui__Menu__menu, .web_ui__Dropdown__dropdown, .dropdown-menu,
@@ -214,6 +221,18 @@
   [class*="Button__flat"] [class*="Button__label"] { color: #e6edf3 !important; }
   [class*="Button__flat"][class*="Button__primary"]
     [class*="Button__label"] { color: #4db8c4 !important; }
+  /* An icon-ONLY flat button (the dismiss X on the shipping-fee banners) has
+     no label for the rules above to reach: its glyph is an SVG painted with
+     currentColor, and web_ui's neutral button colour is the near-black
+     #15191a token — so the X rendered invisible on our dark card. Colour the
+     flat button itself. Its background is transparent, so currentColor only
+     reaches the label, the icon and the ripple — never a fill. The variant
+     rules that this base rule would otherwise swallow are re-asserted below
+     (primary is already handled above at a higher specificity). */
+  [class*="Button__flat"] { color: #e6edf3 !important; }
+  [class*="Button__flat"][class*="Button__success"] { color: #57c98a !important; }
+  [class*="Button__flat"][class*="Button__warning"] { color: #f2707a !important; }
+  [class*="Button__flat"][class*="Button__muted"] { color: #9ca7b0 !important; }
   /* Filled primary CTA keeps the teal fill — pure white label for AA */
   .web_ui__Button__filled .web_ui__Button__label,
   [class*="Button__filled"] [class*="Button__label"] { color: #ffffff !important; }
@@ -325,6 +344,19 @@
   .profile, [class*="profile"], [data-testid="profile-username"] {
     background-color: transparent !important; }
   [data-testid="profile-username"] { color: #e6edf3 !important; }
+  /* The profile header is not a card: the site lays the username row, the
+     seller-badge row and the "about" block out as bare web_ui Cells on a
+     page-wide white <main>. Our elevated-surface rules turned each Cell into
+     an island, and the badge row — whose two cells do NOT span the full
+     width — punched base-coloured holes straight through the header. Native
+     renders one flat surface; do the same. Scoped by the header's own
+     `.u-flex-grow >` parent, so the review cards and item cards inside
+     `.profile__items-wrapper` keep their elevation. */
+  .profile .u-flex-grow > [class*="Cell__cell"],
+  .profile [class*="u-background-white"],
+  .profile [class*="u-background-white"] > [class*="Cell__cell"],
+  .profile [class*="Item__item"] [class*="Cell__cell"] {
+    background-color: transparent !important; }
 
   /* ============================================================
      Footer

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A cosy Catppuccin Mocha dark theme for BBC News, Sport and the homepage: easy on the eyes, with the BBC logo, photos and live colors kept intact.
-@version      20260711.19.56
+@version      20260712.18.26
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -104,6 +104,18 @@
     border-color: var(--ctp-surface1) !important;
   }
   [class*="HeaderMenuButtonStyled"] svg { color: var(--ctp-text) !important; }
+
+  /* The red "BBC NEWS" section wordmark (NestedNavigation NewsLogoContainer) is a
+     brand #b80000 <svg> filled via currentColor; our generic h1/header colour rule
+     flattened it to plain light text, dropping the News identity the theme keeps
+     everywhere else (LIVE badge, breaking flag, 404 kicker all use the Mocha red).
+     This is the News wordmark only — the top BBC-blocks logo is a separate
+     container and stays light. Restore the readable brand red. */
+  [class*="NewsLogoContainer"] svg,
+  [class*="NewsLogoContainer"] svg path {
+    color: var(--ctp-red) !important;
+    fill: var(--ctp-red) !important;
+  }
 
   /* ---- Top navigation links / items ---- */
   [data-testid^="navigationPanel-navItem"],
@@ -371,6 +383,15 @@
   }
   [class*="NavigationLink"] { color: var(--ctp-text) !important; }
   [class*="NavigationLink"]:hover { color: var(--ctp-sky) !important; }
+  /* The account / "For You" avatar disc in the global nav is BBC blue #0071f1
+     (the one chromatic glyph in an otherwise monochrome bar — it is what marks
+     the sign-in affordance). Our `header svg` rule flattened it to plain light,
+     so it read as just another nav icon. Restore the Mocha blue. */
+  [class*="ForYouIconWrapper"] svg,
+  [class*="ForYouIconWrapper"] svg path {
+    color: var(--ctp-blue) !important;
+    fill: var(--ctp-blue) !important;
+  }
   [class*="SearchLink"], [class*="NavigationLink-Search"] {
     background-color: var(--ctp-surface0) !important;
     color: var(--ctp-text) !important;
@@ -396,6 +417,20 @@
      its text, so "FRI 20:00 10 JUL" rendered ~1.6:1 light-on-white. */
   [class*="HeadToHeadContainer"] time {
     background-color: var(--ctp-surface0) !important;
+  }
+  /* Each fixture card in the head-to-head carousel carries a 4px left rail that
+     encodes its state: BBC-Sport yellow #ffd230 on a card that has a result to
+     read (it is the only one wrapped in an OnwardJourneyLink anchor), near-black
+     #181818 on the not-yet-played ones. Our blanket `* { border-color }` painted
+     ALL of them the same surface line — erasing the "there is a result here" cue
+     and drawing a phantom grey rail beside every upcoming fixture. Clear the rail
+     by default (the native black one is invisible on dark anyway) and restore the
+     brand yellow on the linked card. */
+  [class*="ParticipantsWrapper"] {
+    border-left-color: transparent !important;
+  }
+  a[class*="OnwardJourneyLink"] [class*="ParticipantsWrapper"] {
+    border-left-color: var(--ctp-yellow) !important;
   }
 
   /* ---- Scores & Fixtures page (ssrcss) ----
@@ -544,6 +579,41 @@
   [class*="PageTypeIndicator"] {
     background-color: var(--ctp-mantle) !important;
     color: var(--ctp-text) !important;
+  }
+  /* Share flyout (the panel behind every live-post / story "Share" button, and the
+     same information-panel component elsewhere in ssrcss). It is rendered only once
+     you CLICK, so no load-time scan ever sees it: a solid #fff panel carrying a
+     brand-yellow "Copy link" and close button whose labels BBC paints black. Our
+     page rules landed light text on both surfaces — "About sharing" at ~1.4:1 on the
+     white panel, "Copy link" at ~1.7:1 on the yellow pill. Darken the panel, lift its
+     links, and put the dark label back on the yellow buttons. The caret that points at
+     the Share button is the panel's own ::before/::after (a light-grey rotated square,
+     not a child element), so `*` never reaches it and it stayed a white notch on the
+     darkened panel. */
+  [class*="StyledPanelContent"] {
+    background-color: var(--ctp-mantle) !important;
+    border-color: var(--ctp-surface0) !important;
+    color: var(--ctp-text) !important;
+  }
+  [class*="StyledPanelContent"] [class*="StyledTitleArea"] {
+    color: var(--ctp-text) !important;
+  }
+  [class*="StyledPanelContent"] a {
+    color: var(--ctp-blue) !important;
+  }
+  [class*="StyledPanelContent"] button,
+  [class*="StyledPanelContent"] button span {
+    color: var(--ctp-crust) !important;
+  }
+  [class*="StyledPanelContent"] button svg,
+  [class*="StyledPanelContent"] button svg path {
+    color: var(--ctp-crust) !important;
+    fill: var(--ctp-crust) !important;
+  }
+  [class*="StyledPanelContent"]::before,
+  [class*="StyledPanelContent"]::after {
+    background-color: var(--ctp-mantle) !important;
+    border-color: var(--ctp-surface0) !important;
   }
   /* Match-coverage promo card embedded in a Sport story ("Mexico v England /
      Watch on iPlayer / Listen: …") ships a solid-white EventInformationContainer.
@@ -719,6 +789,19 @@
   [class*="Masthead"] h1,
   [class*="MastheadLink"] {
     color: var(--ctp-yellow) !important;
+  }
+  /* …but the "SPORT" wordmark is not a heading or a MastheadLink: it is an <svg>
+     LogoIcon inside a LogoLink anchor, so the three selectors above never reached
+     it and `[class*="Masthead"] a` (0,1,1) painted it plain light — the theme was
+     dropping the BBC Sport identity the very rule above claims to keep (News gets
+     its red wordmark; Sport got nothing). Win with a descendant match (0,2,0) and
+     paint the artwork, which fills via currentColor. */
+  [class*="Masthead"] [class*="LogoLink"] svg,
+  [class*="Masthead"] [class*="LogoLink"] svg path,
+  [class*="Masthead"] [class*="LogoIcon"],
+  [class*="Masthead"] [class*="LogoIcon"] path {
+    color: var(--ctp-yellow) !important;
+    fill: var(--ctp-yellow) !important;
   }
   [class*="Masthead"] a,
   [class*="PrimaryNavBarContainer"] a,

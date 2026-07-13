@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Juejin (掘金): comfortable reading of articles, the feed, pins and comments, with fully readable dark code blocks and syntax.
-@version      20260711.19.58
+@version      20260712.18.29
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -64,6 +64,55 @@
        positioned block painted FROM THE TOKEN, so a 68×52 pure-white slab landed
        behind the active nav label. Desktop-only review never sees it. */
     --juejin-navigation: #0d1117 !important; /* was #fff — header surface */
+
+    /* ---------- The rest of the surface + semantic-tint token layer ----------
+       Everything above was found one white element at a time. These are the
+       remaining light tokens, taken straight out of juejin's `.light-theme,body`
+       block: each was verified (by grepping every loaded stylesheet for
+       `prop: var(--token)`) to be used ONLY as a background / border and NEVER as
+       a text `color`, so darkening them cannot blank a label. That check matters:
+       `--juejin-gray-0` (#fff) IS used as a `color` — it is the white text on the
+       dark hover tooltips — so it is deliberately left alone.
+       These reach surfaces no logged-out page renders at rest: the byte-design
+       drawer + date-picker panels, the `dropdown-menu`, the `comment-item.anchor-
+       active::before` highlight band a permalinked comment paints, and the gold
+       VIP chips. `--juejin-brand-5-light` (#eaf2ff) alone is the fill behind the
+       nav active row, the select-option hover, the search-icon active state and
+       the creator-flyout "话题" chips.
+       The dark values are juejin's OWN: the site ships an unused `.dark-theme`
+       token block (it feeds the in-app webview) and these are the values it sets,
+       so the tints stay on-brand rather than being invented here. */
+    --juejin-layer-1: #1c2128 !important;          /* was #fff — card/panel surface */
+    --juejin-layer-2-1: #21262d !important;        /* was #f7f8fa */
+    --juejin-layer-2-2: rgba(33, 38, 45, 0.7) !important;
+    --juejin-layer-3-fill: #21262d !important;     /* was #f2f3f5 */
+    --juejin-layer-3-border: #262c33 !important;   /* was #e4e6eb */
+    --juejin-layer-4-dropdown: #1c2128 !important; /* was #fff — dropdown + its caret */
+    --juejin-layer-5: #1c2128 !important;
+    --juejin-gray-1-1: #262c33 !important;         /* was #e4e6eb — divider fill */
+    --juejin-gray-1-2: rgba(38, 44, 51, 0.5) !important;
+    --juejin-gray-1-3: #262c33 !important;
+    --juejin-component-hover: #262c33 !important;  /* was #e4e6eb */
+    --juejin-layer-loading-start: #21262d !important;
+    --juejin-layer-loading-end: #2d333b !important;
+
+    /* Semantic tints. The `-3-light` set are the pale chip fills (#eaf2ff blue,
+       #fff3e5 amber, #e2faed green, #fff2ff red) — background-only, so remap them
+       to juejin's own 20%-alpha dark tints, which layer over whatever surface the
+       chip sits on. `--juejin-warning-1-normal` is a `color` only, and #ff7426 on
+       the darkened amber tint is 4.1:1 — lift it to the site's dark-theme #ff8541
+       (4.6:1). `--juejin-danger-1-normal` is deliberately NOT remapped: unlike the
+       other two it is used as both a fill AND a text colour, and our badge rules
+       below already deepen the fills that matter (HOT, 新品). */
+    --juejin-brand-5-light: rgba(30, 128, 255, 0.2) !important;   /* was #eaf2ff */
+    --juejin-brand-4-disable: rgba(41, 134, 255, 0.4) !important; /* was #abcdff */
+    --juejin-warning-3-light: rgba(255, 133, 65, 0.2) !important; /* was #fff3e5 */
+    --juejin-warning-1-normal: #ff8541 !important;                /* was #ff7426 */
+    --juejin-success-3-light: rgba(64, 193, 123, 0.2) !important; /* was #e2faed */
+    --juejin-danger-3-light: rgba(248, 89, 89, 0.2) !important;   /* was #fff2ff */
+    --juejin-layer-golden-1: rgba(209, 171, 97, 0.23) !important; /* was #faf3e5 */
+    --juejin-layer-golden-2: rgba(237, 211, 167, 0.4) !important;
+    --juejin-layer_golden_2: rgba(209, 171, 97, 0.12) !important;
   }
 
   /* ---------- Base ---------- */
@@ -368,6 +417,23 @@
     color: #5fb0e6 !important;
   }
 
+  /* Below ~960px the header's category rail is rebuilt as ANCHORS (`a.nav-item`),
+     not list items, so the `li` guard above missed it and the selected category
+     fell through to the `.nav-item.active { color: #e6edf3 }` rule in the hover
+     block — leaving it #e6edf3 against #c4cdd6 siblings, i.e. no selection marker
+     at all where the site paints the current category #1e80ff. The `.dock-nav`
+     tab on 沸点 (`a.title.active`) lost the same accent to our blanket `.title`
+     heading rule: it kept only the faint tinted row, and native marks it blue.
+     Desktop-only review never sees the first; a load-time colour scan never sees
+     either, because both render as perfectly legible light text. */
+  a.nav-item.active,
+  a.nav-item.active span,
+  .dock-nav a.title.active,
+  .dock .dock-nav .item a.title.active,
+  a.title.active {
+    color: #5fb0e6 !important;
+  }
+
   /* Left category rail: the selected row keeps its blue-tinted `.active-nav` fill,
      but our blanket `.nav-item-text` literal remap greyed the label that native
      paints #1e80ff — the tint alone read as a hover, not a selection. The 热榜 page's
@@ -661,6 +727,15 @@
     background-color: #1a2433 !important;
   }
 
+  /* The inline "登录 / 注册" card in the feed also carries a light raster
+     (background.02a1562.jpeg — a pale-blue-to-white wash, purely decorative) that
+     paints OVER our dark background-color and glares as a near-white band across
+     the feed, taking the light secondary text with it. Audit-blind: the computed
+     background-COLOR reads dark, so the DOM scan passes it. */
+  .item-login-wrap {
+    background-image: none !important;
+  }
+
   /* Hover state for feed rows / list items. The 掘金热榜 row (`.article-item-wrap`)
      flips to a hardcoded #f7f8fa on hover — a full-width white bar whose (now light)
      title text disappears into it. Hover states never show up in a static scan. */
@@ -871,6 +946,18 @@
     color: #5fb0e6 !important;
   }
 
+  /* The feed/search author link (`a.jj-link.user-message`) is the one piece of row
+     metadata that is actually a LINK: juejin leaves it muted grey at rest and turns
+     it brand blue (#1171ee) on hover, which is the only cue that the name is
+     clickable. Our `.entry-footer *` / `.meta-list *` remaps paint it #8b949e with
+     `!important` and no hover state, so the name went completely inert. A hover
+     colour exists in no static scan and in no screenshot of a page at rest. */
+  .user-message:hover,
+  .user-message:hover *,
+  a.jj-link.user-message:hover {
+    color: #5fb0e6 !important;
+  }
+
   /* Muted metadata: dates, view/like/comment counts, tags meta */
   .meta-list,
   .meta-list *,
@@ -939,7 +1026,6 @@
      site-authentic, and it carries a white 14px/400 label at 5.65:1 where the
      verbatim #1e80ff manages only 3.76:1. Accent LINES (the booklet tab underline,
      the checked-checkbox tick) keep #1e80ff — they are graphical, not text. */
-  .login-button,
   .btn-login,
   button.primary,
   .byte-btn--primary:not(.byte-btn--ghost):not(.byte-btn--text),
@@ -999,11 +1085,63 @@
     border-left-color: rgba(255, 255, 255, 0.25) !important;
   }
 
-  .login-button:hover,
   .byte-btn--primary:not(.byte-btn--ghost):hover,
   .follow-button:not(.followed):not(.subscribe-btn):hover {
     background-color: #3a91ff !important;
     border-color: #3a91ff !important;
+  }
+
+  /* ---------- Brand-tinted GHOST buttons our filled-CTA rules swallowed ----------
+     Three of juejin's buttons are natively SECONDARY: a faint brand tint
+     (rgba(30,128,255,.05) or the #eaf2ff `--juejin-brand-5-light`), a brand-blue
+     1px outline and a brand-blue LABEL — the same shape as the `.byte-btn--ghost`
+     already restored above. Our filled-CTA blocks claimed all three by class and
+     repainted them solid #0060dd with a white label, so the site's own primary /
+     secondary hierarchy collapsed:
+
+       `.login-button`   the header 登录|注册. Juejin's own rule is
+                         `.nav-item .login-button{background:rgba(30,128,255,.05);
+                         border:1px solid rgba(30,128,255,.3);color:#007fff}` — a
+                         ghost sitting next to the FILLED 创作者中心 CTA. We painted
+                         it the same solid blue, so the header shipped two identical
+                         loud blue buttons where the site has a primary and a ghost.
+       `.item-container .ui-btn.follow-btn`  the article-page 订阅 (subscribe to the
+                                   author's 专栏) — `background-color:
+                                   var(--juejin-brand-fill1-normal)` + a
+                                   `--juejin-brand-stroke1-normal` outline.
+       `.first-line .btn`          the same shape on the sign-in card.
+       `.right-action .follow-btn.primary`  the pin-detail 关注 —
+                                   `background-color:var(--juejin-brand-5-light)`.
+
+     Give each its outline back. `.login-button` is the header ghost ONLY (juejin
+     scopes it `[data-v-60d7809b]`; the login MODAL's submit is `.login-btn`), so
+     dropping it from the filled list costs no real login CTA. The `.followed`
+     state of the 订阅 button drives off `--juejin-gray-3` / `--juejin-gray-1-1`,
+     both already remapped, so it stays a neutral ghost without extra rules. */
+  .login-button,
+  .login-button-inner,
+  .first-line .btn,
+  .first-line .btn-text,
+  .item-container .ui-btn.follow-btn,
+  .right-action .follow-btn.primary,
+  .right-action .follow-btn.primary .follow-text {
+    background-color: #1a2433 !important;
+    border-color: rgba(30, 128, 255, 0.35) !important;
+    color: #5fb0e6 !important;
+  }
+
+  .login-button-inner,
+  .first-line .btn-text,
+  .right-action .follow-btn.primary .follow-text {
+    background-color: transparent !important;
+    border-color: transparent !important;
+  }
+
+  .login-button:hover,
+  .first-line .btn:hover,
+  .item-container .ui-btn.follow-btn:hover,
+  .right-action .follow-btn.primary:hover {
+    background-color: #24314a !important;
   }
 
   /* Byte-design `--primary --ghost` outline buttons (the 掘金热榜 row "收藏", and
@@ -1400,6 +1538,36 @@
     background-color: #1a2433 !important;
     border-color: #24314a !important;
     color: #5fb0e6 !important;
+  }
+
+  /* The article-sidebar author card's "榜上有名" pill (`.extra-container .rank`,
+     66×15) hardcodes the #eaf2ff tint rather than taking it from the token, so the
+     remap above cannot reach it and it shipped as a bright white-blue chip beside
+     the (correctly dark) 优秀作者 pill. Same brand-tinted dark the other chips get;
+     its rgba(30,128,255,.8) label is lifted to the accent so it still reads. */
+  .user-item .rank,
+  .extra-container .rank,
+  .info-box .rank {
+    background-color: #1a2433 !important;
+    border-color: #24314a !important;
+    color: #5fb0e6 !important;
+  }
+
+  /* Booklet "首单券后价" (first-order coupon price) promo bubble. The label is drawn
+     as two SVG end-caps with a hardcoded `fill="#FFF2EF"` — an SVG paint, so no
+     element-background scan reaches it — and it renders a bright peach blob pinned
+     above the buy button, the lightest thing on the page. Keep the promo's warm
+     identity: dark warm fill, and lift the #f64242 text to the salmon accent
+     (6.3:1) so the discount still reads as a discount. */
+  .sale-tooltip-wrap svg path,
+  .sale-tooltip-entry svg path {
+    fill: #3d2320 !important;
+  }
+
+  .sale-tooltip-wrap,
+  .sale-tooltip-wrap span,
+  .sale-tooltip-entry {
+    color: #ff9d8a !important;
   }
 
   /* Hot / 热 rank markers — keep the warm accent, refined */

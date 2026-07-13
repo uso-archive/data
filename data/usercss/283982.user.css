@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260711.19.59
+@version      20260712.18.31
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -357,6 +357,16 @@
   .vue-portal-target a[isload="true"] svg {
     color: var(--d-blue) !important;
   }
+  /* Ozon also renders its DROPDOWN LISTS (the search-results sort menu, …) into
+     this portal, and marks the currently-chosen option with a brand-blue tick it
+     colours by INLINE `style="color: var(--graphicActionPrimary)"`. An inline
+     declaration carries no !important, so the flyout's `svg { --d-text-4 }` rail
+     rule above outranks it and greys the tick out — the "which option is active"
+     signal, reduced to the same muted grey as every idle glyph. Match the inline
+     token by name and give those glyphs the action blue back. */
+  .vue-portal-target [style*="graphicActionPrimary"] {
+    color: var(--d-blue) !important;
+  }
   /* the currently-selected left-rail category paints a near-white pill
      (#f5f7fa via a hashed class, NOT a token) as its active highlight —
      a stark white box in the dark flyout. It only mounts on hover, so the
@@ -365,6 +375,38 @@
      the highlight reads as a selection, not a white box. */
   .vue-portal-target a[isload="true"] {
     background-color: var(--layerActiveFloor0) !important;
+  }
+
+  /* ------------------------------------------------------------
+     PORTAL-MOUNTED MODALS (language/currency, address book, …). Ozon mounts
+     these into the SAME .vue-portal-target as the catalog flyout, so the
+     flyout rules above reach them. Three consequences, none of which any
+     load-time scan can see — the modals only exist once opened:
+
+       * the flyout's `button { color: blue }` (written for its "Еще"
+         toggles) repaints each modal's PRIMARY CTA label our blue ON its
+         brand-blue fill — blue-on-blue, ~1.3:1, the label all but gone.
+         Modal CTAs are natively white-on-blue; restore that.
+       * the currency/language modal's field labels ("Язык", "Валюта") ship
+         a literal #070707 that the token remap never reaches, so they go
+         near-black on the dark panel. They are the widget's only <p>.
+       * the address modal lays its title OVER a LIGHT splash illustration
+         (an <img>). Natively the title is near-black on that pale ground,
+         but our `[class*="tsHeadline600Medium"]` shelf-heading rule lifts it
+         to near-white -> light-on-light, fully invisible. The title box is
+         the illustration's adjacent sibling, so keep it dark there ONLY.
+     ------------------------------------------------------------ */
+  .vue-portal-target [data-widget="modalLayout"] button,
+  .vue-portal-target [data-widget="modalLayout"] button div,
+  .vue-portal-target [data-widget="modalLayout"] button span {
+    color: #ffffff !important;
+  }
+  [data-widget="currencyLanguageSelector"] p {
+    color: var(--d-text) !important;
+  }
+  [data-widget="commonAddressBook"] img + div,
+  [data-widget="commonAddressBook"] img + div span {
+    color: #081b2b !important;
   }
 
   /* ------------------------------------------------------------
@@ -506,6 +548,16 @@
     color: var(--d-text) !important;
     border-color: var(--d-border-2) !important;
   }
+  /* SEARCH-BAR FRAME — the search area is wrapped in Ozon's signature
+     2px brand-blue border (#005bff). Our blanket `* { border-color }`
+     softener flattens it to grey, erasing the single most recognisable
+     brand element in the header (chroma-scan flagged it: native blue
+     chroma 255 -> our neutral grey). The frame is the one direct DIV
+     child of the search form; lift its border back to the refined dark
+     Ozon blue so the search bar reads as Ozon on the near-black bar. */
+  .search-bar-wrapper form > div {
+    border-color: var(--d-blue) !important;
+  }
   [data-widget="searchBarDesktop"] input::placeholder,
   input::placeholder,
   textarea::placeholder {
@@ -642,9 +694,36 @@
      element-agnostic `[class*="pdp_"]` neutraliser stripped its brand
      blue fill, leaving a white label floating on the page with no
      button behind it. A flattened CTA still passes every contrast
-     check, so no scan reported it. */
-  [data-widget="webPdpGrid"] div[class*="pdp_"] {
+     check, so no scan reported it.
+
+     The `:not([style*="background"])` guard matters just as much: Ozon paints
+     its coloured BADGE pills with an INLINE background (the violet "Оплатить
+     позже" chip = `background: var(--bgMarketingPrimary)`, the violet marketing
+     label = `background-color: var(--textMarketing)`, the "250 баллов за отзыв"
+     pill = a literal rgb(91,81,222)). Those pills are DIVs with a pdp_/module
+     class, so the blanket swallowed their fill and left the label floating as
+     bare text on the page — a lost brand signal that every contrast check
+     passes. Never flatten a background Ozon explicitly asked for inline. */
+  [data-widget="webPdpGrid"] div[class*="pdp_"]:not([style*="background"]) {
     background-color: transparent !important;
+  }
+
+  /* OZON-CARD PRICE PILL — the buybox headline price sits on a solid GREEN pill
+     (#00c451, white text): Ozon's "this is the price with an Ozon card" signal,
+     and the single most prominent semantic colour on the PDP. It carries NO
+     inline style and no stable class (its `pdp_gb2` hash rotates every build),
+     so the neutraliser above flattened it and the price became plain light text
+     on the dark panel — indistinguishable from the ordinary bank price beneath
+     it. Its price <span> IS uniquely reachable: it is the only
+     tsHeadline600Large in the widget. Repaint the pill on that span, mirroring
+     the native geometry (radius 8px, padding 2px 8px) and cancelling the added
+     box with an equal negative margin so nothing shifts. */
+  [data-widget="webPrice"] span[class*="tsHeadline600Large"] {
+    background-color: #00c451 !important;
+    color: #ffffff !important;
+    border-radius: 8px;
+    padding: 2px 8px;
+    margin: -2px -8px;
   }
 
   /* PDP title truncation "…ещё" pill (span.pdp_h5b) + its sibling rating
@@ -702,8 +781,13 @@
   [data-widget="webGallery"] {
     background-color: transparent !important;
   }
-  [data-widget="webGallery"] div,
-  [data-widget="webListPhotos"] div {
+  /* Same inline guard as the PDP grid: Ozon overlays the gallery with its
+     marketing-label chips (webMarketingLabels), which paint a violet fill via an
+     INLINE `background-color: var(--textMarketing)`. Those chips are DIVs inside
+     the gallery, so an unguarded reset erased the pill and left the label as bare
+     text over the photo. */
+  [data-widget="webGallery"] div:not([style*="background"]),
+  [data-widget="webListPhotos"] div:not([style*="background"]) {
     background-color: transparent !important;
   }
   /* product photos sit on white in the source; give the photo
@@ -777,6 +861,47 @@
     position: relative !important;
     z-index: 1 !important;
   }
+  /* CHECKED filter radio / checkbox — Ozon fills the selected control with its
+     brand blue (#005bff) and draws the dot/tick in white on top of it. The
+     `div { transparent }` neutraliser above flattens that fill away, so a
+     CHECKED filter renders as a bare white dot, indistinguishable in kind from
+     the unchecked rings: the selection signal is gone while every contrast
+     threshold still passes (the chroma scan flagged it — native chroma 255 ->
+     transparent). The control's visual box is the input's ADJACENT SIBLING, so
+     the checked ones are reachable without a hashed class. Restore the native
+     #005bff: this is a FILL, not text, so the brand blue is correct here (the
+     lifted --d-blue is for text on near-black) and keeps its white glyph legible. */
+  [data-widget="filtersDesktop"] input:checked + div {
+    background-color: #005bff !important;
+  }
+  /* RANGE SLIDERS (Цена, Диагональ экрана …) — the same neutraliser erases BOTH
+     bars the slider is made of: its grey rail (#b3bcc5) and the light-blue
+     selected span (#99bdff). The slider then renders as two blue handles
+     floating over nothing, with no track and no indication of the chosen range.
+     The selected span is the only div in the rail carrying an inline width+left
+     pair (Ozon sets them as live percentages), so it is reachable structurally;
+     it must also be lifted a layer, because the two range <input>s follow it in
+     DOM order and would paint their track over it. The rail itself has no stable
+     hook, so redraw it on the input's own track pseudo, which occupies exactly
+     the same box. Paint it as a centred gradient BAND rather than shrinking the
+     track to 4px: WebKit lays the thumb out against the track box, so setting a
+     height there re-geometries Ozon's round blue handles into squashed bars.
+     That pseudo is kept in its OWN rule on purpose: a selector list mixing a
+     vendor pseudo with plain selectors is dropped wholesale by the old
+     userstyles.org parser. */
+  [data-widget="filtersDesktop"] div[style*="width"][style*="left"] {
+    background-color: #99bdff !important;
+    z-index: 1 !important;
+  }
+  [data-widget="filtersDesktop"] input[type="range"]::-webkit-slider-runnable-track {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 40%,
+      var(--d-border-2) 40%,
+      var(--d-border-2) 60%,
+      rgba(0, 0, 0, 0) 60%
+    ) !important;
+  }
   /* Filter labels, category links and the "Посмотреть все" action row
      are token-coloured (--textPrimary / --textSecondary / --textAction);
      no override. The old blanket here greyed every rail link, and a
@@ -826,7 +951,30 @@
      categories --textPrimary, tile titles --textPrimary), and painting
      every <a> blue turned the whole category mega-menu and filter rail
      into indistinguishable blue text with headings lost.
-     ============================================================ */
+
+     REVIEW LIST is the exception: its links ("Цвет товара: серебристый" on every
+     review, one per entry) hardcode the RAW brand blue #005bff instead of going
+     through --textAction, so the token lift never reaches them and they sit at
+     ~2.9:1 on the base — a whole widget of links below the WCAG floor. The review
+     list is lazy-mounted well down the page, so a load-time scan of the PDP never
+     sees it. Every <a> in this widget is a genuine action link, so lifting them
+     all is safe. (The "Читать полностью" expander next to them is a <span> whose
+     only handle is a rotating hash — see the caveat in the review notes; it keeps
+     the raw blue.) */
+  [data-widget="webListReviews"] a {
+    color: var(--d-blue) !important;
+  }
+
+  /* "Новинка" marketing chip — Ozon ships it as an INLINE pale-green plate with
+     green text (`background:#E4FDEC; color:#10C44C`). The inline guard on the
+     gallery reset above (correctly) stops flattening inline fills, but this one
+     is a LIGHT plate: kept as-is it glares as a white-green tile on the dark PDP.
+     Invert it instead of erasing it — the theme's own positive-secondary tint with
+     the green lifted to our scale keeps the "new" signal and reads at ~7:1. */
+  [data-widget="webMarketingLabels"] div[style*="#E4FDEC"] {
+    background: var(--bgOpaquePositiveSecondary) !important;
+    color: var(--d-green) !important;
+  }
 
   /* SCROLL-TO-TOP DISC (data-widget="homeButton") — a position:fixed
      44px circle that only mounts once you scroll, so no load-time audit
@@ -865,6 +1013,20 @@
      label vanished and only its value remained. */
   [data-widget="webAspects"] span span {
     color: var(--d-text-3) !important;
+  }
+
+  /* SELECTED variant swatch (colour/model picker) — Ozon rings the
+     currently-chosen aspect with a 2px brand-blue border; unselected
+     swatches carry a light grey border. Our blanket `* { border-color }`
+     softener flattens BOTH to the same dark grey, so the selected variant
+     becomes indistinguishable from the others (a lost selection indicator
+     no contrast/DOM scan catches — chroma flagged the native blue chroma
+     255 -> grey). Ozon renders the current selection as a <div> (not a
+     navigable <a> like the unselected ones), so `div[title] > span`
+     uniquely reaches each group's selected swatch without any hashed
+     class. Restore the blue ring. */
+  [data-widget="webAspects"] div[title] > span {
+    border-color: var(--d-blue) !important;
   }
 
   /* Carousel shelf headings ("Покупают вместе", "Рекомендуем также")

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Stack Overflow and the whole Stack Exchange network: easy-on-the-eyes questions, answers, code blocks, comments and sidebar.
-@version      20260711.20.01
+@version      20260712.18.34
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -107,7 +107,7 @@
   .fc-black-300, .fc-black-250, .fc-black-200,
   .fc-light, .s-description, .fs-caption,
   .relativetime, .relativetime-clean,
-  .s-user-card--time, .s-user-card--link,
+  .s-user-card--time,
   .js-share-link, .js-suggest-edit-post,
   .s-navigation--item, .disabled-link,
   .v-visible-sr, .post-menu .lsep,
@@ -117,6 +117,53 @@
   .s-prose .fc-light,
   .revision-comment, span.revision-comment {
     color: #9198a1 !important;
+  }
+
+  /* The SELECTED horizontal nav pill (.s-navigation--item.is-selected — the
+     "Profile"/"Activity" sub-nav on a user page, and similar sort tabs) is
+     filled with SE's theme-primary ORANGE (#e7700d) and natively carries
+     WHITE text. The broad `.s-navigation--item` muted-grey rule above
+     flattened that to grey #9198a1 on orange (~1.9:1, illegible). Restore the
+     bright label on the selected pill; the unselected items stay muted. */
+  .s-navigation--item.is-selected,
+  a.s-navigation--item.is-selected,
+  .s-navigation--item.is-selected .s-navigation--item-text {
+    color: #ffffff !important;
+  }
+
+  /* The user-card display NAME (`.s-user-card--link` — the author link under
+     every post and in the sidebar asker lists) is a real link SE paints its
+     link blue. It was grouped with the timestamps in the muted-grey list
+     above, which flattened all 74 of them on a question page to the same grey
+     as the metadata around them — the name stopped reading as a link. Restore
+     the accent; `.s-user-card--time` beside it stays muted. */
+  .s-user-card--link,
+  a.s-user-card--link,
+  .s-user-card--info .s-user-card--link {
+    color: #5fb0e6 !important;
+  }
+
+  .s-user-card--link:hover,
+  a.s-user-card--link:hover {
+    color: #9bd4ff !important;
+  }
+
+  /* `.fs-caption` is a SIZE utility, not a colour: SE puts it on small ACCENT
+     text and on small LINKS too. Our blanket muted-grey `.fs-caption` rule
+     above swallowed both — the sidebar "Last 1 hr" activity accent
+     (`.fc-orange-400`, SE's theme orange) and the login page's "Forgot
+     password?" link (`a.s-link.fs-caption`) both rendered as plain grey
+     metadata. Re-assert the accent/link colour on those two shapes; the
+     specificity (2 classes) beats the size utility. */
+  .fc-orange-400,
+  .fs-caption.fc-orange-400,
+  .fc-orange-400.fs-caption {
+    color: #d98b3a !important;
+  }
+
+  a.s-link.fs-caption,
+  .fs-caption a.s-link {
+    color: #5fb0e6 !important;
   }
 
   /* Site-switcher "Or search from our full list:" hint and other
@@ -187,6 +234,18 @@
   .s-topbar .s-topbar--item > .s-btn:hover,
   .s-topbar .-link:hover {
     background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
+
+  /* EVERY topbar dropdown trigger (help "?", inbox, achievements, the network
+     site-switcher) gets `.is-selected` while its dialog is open, and SE fills
+     the selected item with #e3e6e8 — a white pill in our dark topbar carrying
+     a near-invisible grey glyph. Only exists in the OPEN state, so no
+     load-time scan sees it. Same treatment as the hamburger below. */
+  .s-topbar .s-topbar--item.is-selected,
+  a.s-topbar--item.is-selected,
+  .s-topbar--item.is-selected {
+    background-color: #21262d !important;
     color: #e6edf3 !important;
   }
 
@@ -570,7 +629,31 @@
     color: #6f9ab0 !important;
   }
 
+  /* The POST OWNER's name in comments carries `.owner`, which SE highlights
+     with a light-blue #ebf6fa pill background to mark the author — a glaring
+     light pill on dark (short at 83x20, so it slips the audit height filter).
+     Retone to a subtle dark-blue tint; the #6f9ab0 name still reads on it. */
+  .comment .comment-user.owner,
+  .comment a.comment-user.owner {
+    background-color: #16202c !important;
+  }
+
   .comment-score, .comment-score b {
+    color: #9198a1 !important;
+  }
+
+  /* High-value comment scores get warmth tiers on the score number:
+     `.hot` (#e0913f, already lifted by the .hot rule) is fine, but SE's
+     `.warm` is a dark brown #813f09 (~2:1 dark-on-dark) and `.cool` its
+     muted #636b74 (~3:1). Lift both to legible tones — warm to a readable
+     amber (distinct from hot), cool to the standard muted grey. */
+  .comment-score .warm, .comment-score.warm,
+  .comment-actions .warm {
+    color: #d98b3a !important;
+  }
+
+  .comment-score .cool, .comment-score.cool,
+  .comment-actions .cool {
     color: #9198a1 !important;
   }
 
@@ -729,6 +812,17 @@
     background-color: #2a2417 !important;
   }
 
+  /* The header-band fill above assumes the header is the widget's full-width
+     `li` (Overflow Blog / Featured on Meta). The "Community activity" widget
+     instead puts `.s-sidebarwidget--header` on an INLINE div inside a flex row
+     next to the "Last 1 hr" caption — so the fill painted a grey rectangle
+     that stopped dead mid-row. Keep the band on the li; the inline div header
+     keeps only the header TEXT colour, on the widget's own surface. */
+  .s-sidebarwidget div.s-sidebarwidget--header,
+  .s-sidebarwidget div.s-sidebarwidget--header.s-sidebarwidget--header {
+    background-color: transparent !important;
+  }
+
   /* Overflow Blog / Featured-on-Meta links: SE wraps these widgets
      in .s-anchors__grayscale, which forces the links to a near-black
      GRAYSCALE tone via -webkit-text-fill-color (NOT plain color) — so
@@ -832,6 +926,31 @@
   .stats .vote-count-post,
   .stats .views {
     color: #9198a1 !important;
+  }
+
+  /* View-count HEAT tiers. Stacks marks a busy question's stats item
+     `.is-warm` (yellow-500), `.is-hot` (orange-500) or `.is-supernova`
+     (red-500) — the only signal on a list row that a question is trending.
+     Our blanket `.s-post-summary--stats-item` muted-grey rule (and its
+     -number/-unit children rule) flattened all three, so a 18k-view hot
+     question rendered the exact same grey as a 5-view one. Restore the three
+     tiers, retoned for dark. */
+  .s-post-summary--stats-item.is-warm,
+  .s-post-summary--stats-item.is-warm .s-post-summary--stats-item-number,
+  .s-post-summary--stats-item.is-warm .s-post-summary--stats-item-unit {
+    color: #d3a84a !important;
+  }
+
+  .s-post-summary--stats-item.is-hot,
+  .s-post-summary--stats-item.is-hot .s-post-summary--stats-item-number,
+  .s-post-summary--stats-item.is-hot .s-post-summary--stats-item-unit {
+    color: #e0913f !important;
+  }
+
+  .s-post-summary--stats-item.is-supernova,
+  .s-post-summary--stats-item.is-supernova .s-post-summary--stats-item-number,
+  .s-post-summary--stats-item.is-supernova .s-post-summary--stats-item-unit {
+    color: #f0776b !important;
   }
 
   /* "answered & accepted" pill: filled green with white text
@@ -958,6 +1077,19 @@
   .s-btn.s-btn__outlined.s-btn__muted {
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
+  }
+
+  /* An outlined button that is TOGGLED OPEN (the questions-list "Filter"
+     button while its panel is showing) gets `.is-selected`, which SE fills
+     with a pale blue (#92c2f2). Our outlined-CTA accent then painted a
+     light-blue label on that light-blue fill (~1.4:1 — the word "Filter"
+     all but vanished). Give the open state the same dark selected-chip
+     treatment the segmented sort tabs already use. */
+  .s-btn.s-btn__outlined.is-selected,
+  .s-btn.s-btn__outlined.is-selected:hover {
+    background-color: #20303d !important;
+    color: #bfe0f7 !important;
+    border-color: #2b4253 !important;
   }
 
   /* Destructive + neutral-filled variants */
@@ -1138,9 +1270,23 @@
 
   /* user cards (signature blocks) */
   .post-signature,
-  .user-info,
-  .user-details a {
+  .user-info {
     color: #c4cdd6 !important;
+  }
+
+  /* In the legacy signature block the display name is a BARE <a> (no class)
+     inside .user-details — a different element from the Stacks
+     `.s-user-card--link` restored above, and it was being painted the same
+     muted grey as the rep/badge metadata around it. It is the post author's
+     link: give it the accent. */
+  .user-details a,
+  .post-signature .user-details a {
+    color: #5fb0e6 !important;
+  }
+
+  .user-details a:hover,
+  .post-signature .user-details a:hover {
+    color: #9bd4ff !important;
   }
 
   .post-signature.owner,
@@ -1773,6 +1919,19 @@
   .everyonelovesstackoverflow,
   .js-report-ad {
     background-color: transparent !important;
+  }
+
+  /* The MOBILE sticky bottom anchor ad (Aditude) wraps its slot in a hard
+     #fff container pinned across the foot of the viewport. A creative that
+     fills it hides the white; an unfilled, transparent or narrower one leaves
+     a white band glued to the bottom of every page. Desktop review never sees
+     it — the slot only mounts below the `md` breakpoint. It is a floating
+     surface, so give it a solid dark fill rather than transparent. */
+  #pb-anchor--wrapper,
+  #pb-anchor--wrapper-inner,
+  .tude-anchor-wrapper-outer,
+  .tude-anchor-wrapper-inner {
+    background-color: #14181d !important;
   }
 
   /* "Report this ad" chrome pill on the sticky anchor ad renders a

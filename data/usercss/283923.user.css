@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Avito that's easy on the eyes, perfect for late-night browsing.
-@version      20260710.13.06
+@version      20260712.18.25
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -79,6 +79,16 @@
      near-black title bar across every modal (a hard seam against the modal's
      elevated surface). Let those inherit the panel they sit on. */
   [data-marker$="/popup-header"] {
+    background-color: transparent !important;
+  }
+  /* The other half of that same over-reach: Avito builds every listing card's
+     PHOTO FRAME out of a semantic `<header class="styles-picture-…">`, so the rule
+     above painted 55 near-black slabs behind the photos on the home grid (natively
+     transparent). Invisible while a `object-fit:cover` photo covers the frame, but
+     it is the frame that shows during lazy-load, behind transparent PNGs and in
+     any letterboxed gap. The bare `header` arm must stay — the legacy 404/error
+     template uses a real `<header class="header">` for its page chrome. */
+  header[class*="styles-picture"] {
     background-color: transparent !important;
   }
 
@@ -280,6 +290,23 @@
   a[data-marker$="-button"] {
     background-color: transparent !important;
   }
+  /* Search / company-card "Показать телефон" reveal CTA (marker
+     `item-phone-button/undefined`) is natively a SOFT light-blue button
+     (#cfedff fill, brand-blue label) — the per-card primary contact action,
+     revealed on card hover. The generic button rule greyed it to `--av-surface`,
+     which reads grey-on-grey with no affordance against the elevated card. Give
+     it a blue-tinted surface + light-blue label so it still reads as the contact
+     CTA. The item-page `item-phone-button/header` and `/card` primaries are
+     promoted to solid brand-blue by the rules just below (same specificity, later
+     source order wins), so this only re-tunes the softer search/card variant. */
+  [data-marker^="item-phone-button"] {
+    background-color: #1d2c3a !important;
+    border-color: #2f4a63 !important;
+  }
+  [data-marker^="item-phone-button"],
+  [data-marker^="item-phone-button"] * {
+    color: #9fd0f5 !important;
+  }
   /* Primary brand-blue CTAs */
   [data-marker="search-form/submit-button"],
   [data-marker="top-rubricator/all-categories"],
@@ -296,14 +323,57 @@
     background-color: var(--av-accent-hover) !important;
   }
 
+  /* Avito Доставка's "Запросить доставку" CTA (item page: sticky bar + buy-box)
+     is natively a SOLID PURPLE `#965EEB` button — the site's delivery accent, and
+     the visual counterpart to the blue phone CTA. Its fill comes from a hashed
+     CLASS (not an inline style), so none of the `[style*=…]` badge rules above
+     reach it and the generic dark `button` surface swallowed it whole: it read as
+     an anonymous grey tertiary button, identical to "Написать". Restore the purple
+     in the same refined tone the theme already uses for purple badges (#7d5bc4,
+     5.0:1 against white). Both markers, hence the prefix match. */
+  [data-marker^="delivery-item-button-request"] {
+    background-color: #7d5bc4 !important;
+    border-color: #7d5bc4 !important;
+  }
+  [data-marker^="delivery-item-button-request"],
+  [data-marker^="delivery-item-button-request"] * {
+    color: #fff !important;
+  }
+
+  /* ---- Segmented filter controls: the SELECTED option ---- */
+  /* The search filters ("Состояние": Любое/Новое/Б/у, "Продавцы": Все/Частные/
+     Компании) are radio groups whose pill is a SPAN next to a visually-hidden
+     checked <input>. Natively the selected pill is a solid BLACK chip with white
+     text and the unselected ones are light grey — but the generic button rule
+     paints every pill `--av-surface`, and the broad text rule paints every label
+     `--av-text-soft`, so all three options rendered IDENTICALLY: the active filter
+     was completely invisible. No contrast or luminance check can see this (all the
+     chips are legible dark controls); only the native diff shows the lost state.
+     Promote the checked pill to the accent, matching the current-page pagination
+     pill. */
+  input:checked + [class*="style-module-wrapper"] {
+    background-color: var(--av-accent) !important;
+    border-color: var(--av-accent) !important;
+  }
+  input:checked + [class*="style-module-wrapper"],
+  input:checked + [class*="style-module-wrapper"] * {
+    color: #0b1620 !important;
+  }
+
   /* ---- Text ---- */
   /* The site hardcodes near-black text colours; force them light. */
   body, p, span, li, td, th, div, label, dd, dt, time, small, b, strong, em,
   h1, h2, h3, h4, h5, h6 {
     color: var(--av-text-soft) !important;
   }
+  /* `[data-marker*="title"]` was too loose: Avito also hangs a bare
+     `data-marker="title"` on the top notification banner's "Подробнее" LINK — a
+     natively brand-blue CTA — so this rule (0,1,0) beat `a { color: accent }`
+     (0,0,1) and rendered the banner's only call-to-action as plain body text.
+     Listing titles all carry `item-title`; the item page's own H1 is covered by
+     the element arm above. */
   h1, h2, h3, h4, h5, h6,
-  [class*="title"], [data-marker*="title"] {
+  [class*="title"], [data-marker*="item-title"] {
     color: var(--av-text) !important;
   }
 
@@ -314,8 +384,10 @@
   a:hover {
     color: var(--av-accent-hover) !important;
   }
-  /* Titles that are links should stay light, not blue */
-  a[class*="title"], a[data-marker*="title"],
+  /* Titles that are links should stay light, not blue. Scoped to `item-title`
+     for the same reason as the rule above — a bare `title` marker is also used
+     for the notification banner's blue CTA link. */
+  a[class*="title"], a[data-marker*="item-title"],
   [data-marker="item-title"] a, h3 a {
     color: var(--av-text) !important;
   }
@@ -586,6 +658,16 @@
   }
   [data-marker="rating-and-reviews"] > div > div:first-child > div {
     background-color: #198049 !important;
+  }
+  /* The "138 отзывов о модели" label beside that pill is the LINK to the model's
+     reviews — the whole block is wrapped in an `<a>` whose native colour is the
+     rating green `#00a34c`. The label is a bare SPAN, so the broad text rule
+     (`span { color: --av-text-soft }`) beat the anchor and painted it plain body
+     grey: the review count lost both its green and any hint of being clickable.
+     Lift the green instead of blueing it, keeping it tied to the score pill. The
+     "4,7" inside the pill stays white — the rule above is more specific. */
+  [data-marker="rating-and-reviews"] span {
+    color: #57c98a !important;
   }
 
   /* ---- Pagination current page ---- */

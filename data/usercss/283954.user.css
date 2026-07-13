@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Investopedia: definitions, guides, search and the homepage in an easy-on-the-eyes dark look, with finance colors kept clear.
-@version      20260710.13.10
+@version      20260712.18.29
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -104,6 +104,48 @@
   a:hover, .mntl-sc-block-html a:hover, .article-body a:hover,
   .card a:hover, .related-articles__link:hover {
     color: #9bd4ff !important;
+  }
+  /* EVERY Mantle text link wraps its visible text in a span.link__wrapper — the
+     anchor carries the colour, the span paints the glyphs. Our generic `span`
+     body rule (0,0,1) therefore beats the `a` rule on the element that actually
+     renders, so the link text lands on body grey while the (invisible) anchor
+     stays accent blue. Worst on the dictionary hub, where all ~690 term links,
+     the A-Z heading links and every "See complete list of X terms" read as plain
+     grey text with no link affordance; also the carousel "Learn More" and the
+     "TERM OF THE DAY" links. Make the wrapper take its anchor's colour so one
+     rule covers every link variant (header, footer, breadcrumb, body, card). */
+  a .link__wrapper, .mntl-text-link .link__wrapper {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+  }
+  /* Category-hub FAQ "LEARN MORE" feature links wrap their visible text in a
+     span.link__wrapper, which the generic `span` body rule greys out — so the
+     link renders as plain grey underlined text next to the accent-blue inline
+     links in the same answer. Restore the accent on the wrapper. */
+  .accordion-content__feature-link,
+  .accordion-content__feature-link .link__wrapper {
+    color: #5fb0e6 !important;
+  }
+  /* Inline source citations in the article body ("… most recent earnings.[1]") are
+     a span.mntl-inline-citation, not an <a> — the site paints them brand blue
+     rgb(7,88,167) and they open the source tooltip on hover. Our generic `span`
+     body rule flattens them to body grey, so they read as plain punctuation next
+     to the accent-blue prose links. Keep them on the link accent. */
+  .mntl-inline-citation, span.mntl-inline-citation,
+  .mntl-inline-citation.mntl-dynamic-tooltip--trigger,
+  .mntl-inline-citation span {
+    color: #5fb0e6 !important;
+    -webkit-text-fill-color: #5fb0e6 !important;
+  }
+  /* "Advertiser Disclosure" button above the partner ad tables: a <button> the
+     site paints brand indigo rgb(44,64,208) to mark it clickable. The generic
+     text rules grey it out, so the ad-disclosure affordance disappears — a
+     wrong-but-readable colour no contrast gate can catch. */
+  .mm-ads-ad-table__disclosure-label,
+  button.mm-ads-ad-table__disclosure-label,
+  [class*="ad-table__disclosure-label"] {
+    color: #5fb0e6 !important;
+    -webkit-text-fill-color: #5fb0e6 !important;
   }
   /* Cards: titles/links over dark card surface */
   .mntl-universal-card .card__title, .mntl-universal-card .card__content,
@@ -395,6 +437,19 @@
     color: #8f9dfb !important;
     -webkit-text-fill-color: #8f9dfb !important;
   }
+  /* Homepage section kickers/eyebrows ("ORIGINAL RESEARCH", "THE INVESTOPEDIA
+     EXPRESS", "OUR TOP PICKS FOR JULY:"). All three are real elements carrying
+     .mntl-text-block, so the blanket heading/body rules swallow them: the site
+     paints them brand indigo/blue as eyebrows and we render two of them plain
+     white (reads as a heading, not a kicker) and the third body grey. The card
+     eyebrows next to them already use the lifted periwinkle — align these so the
+     eyebrow convention survives. */
+  .comp.home-featured-research__title,
+  .comp.home-featured-podcast-item__kicker,
+  h2.prm-block__top-picks--subtitle.mntl-text-block {
+    color: #8f9dfb !important;
+    -webkit-text-fill-color: #8f9dfb !important;
+  }
   /* Key-term carousel card: the "DEFINITION" kicker is a ::after label painted
      rgba(0,0,0,.65) — 1.3:1 on the dark card, and pseudo-element text is invisible
      to the color audit. */
@@ -420,6 +475,25 @@
   [class*="leaderboard"] .wrapper::before, [class*="leaderboard"] .wrapper::after {
     color: #8b949e !important;
     -webkit-text-fill-color: #8b949e !important;
+  }
+
+  /* The disclosure popover the label opens is a natively-WHITE floating panel that
+     carries .mntl-block — so the layout-wrapper transparent neutralizer at the top
+     of this file blanked it. It only exists once clicked (no load-time scan sees
+     it) and it floats over the partner ad's white iframe, so its light text lands
+     half on the dark page and half on white and is unreadable. Re-establish an
+     opaque dark surface. */
+  .mm-ads-ad-table__disclosure-description,
+  div.mm-ads-ad-table__disclosure-description,
+  [class*="ad-table__disclosure-description"] {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+  .mm-ads-ad-table__disclosure-content,
+  .mm-ads-ad-table__disclosure-close {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
   }
 
   /* Card / figure image CONTAINERS (white bg behind/around images) */
@@ -696,6 +770,14 @@
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
   }
+  /* The big "4.26%" rate figure sits inside the card's anchor, so it inherits the
+     anchor's -webkit-text-fill-color (which paints over its own `color`). Name it
+     explicitly on the accent it already renders, so intent and rendering agree. */
+  .prm-block__best-rate--percentage,
+  .prm-block__best-rate-item .prm-block__best-rate--percentage {
+    color: #5fb0e6 !important;
+    -webkit-text-fill-color: #5fb0e6 !important;
+  }
   /* "Compare Rates →" links + the OUR-TOP-PICKS bullet links
      (bullets are near-black via -webkit-text-fill-color) -> accent blue */
   .prm-block__best-rate--link,
@@ -904,8 +986,48 @@
   iframe[src*="tradingview"], iframe[id*="tradingview"],
   iframe[src*="s.tradingview"],
   iframe[title*="Ticker"], iframe[title*="ticker"] {
-    background-color: #0d1117 !important;
+    /* The iframe's own background sits INSIDE the filter below, so it must be
+       white to render black. A dark value here inverts to near-white and shows
+       as a light band while the widget loads or wherever it doesn't paint. */
+    background-color: #ffffff !important;
     filter: invert(1) hue-rotate(180deg) brightness(0.95) !important;
+  }
+
+  /* The widget's document is served from tradingview-widget.com, so this sheet
+     should never reach it — but some style managers apply a matched style to
+     every frame of the page. When that happens our broad text/border rules
+     repaint TradingView's LIGHT chrome dark, and the invert above then flips it
+     back: every quote collapses to one dim grey (up/down green/red lost) and the
+     widget's 1px #ebebeb frame turns into a bright outline box.
+     `theme-light` and the `tv-*` classes exist only inside that frame, so these
+     rules are inert on the page itself; there they restore the widget's native
+     light palette, which is what the invert expects to receive. */
+  html.theme-light body,
+  html.theme-light .tv-embed-widget-wrapper__body {
+    background-color: #ffffff !important;
+    color: #0f0f0f !important;
+  }
+  html.theme-light .tv-embed-widget-wrapper__body,
+  html.theme-light .tv-ticker-item-tape__border-wrapper {
+    border-color: #ebebeb !important;
+  }
+  html.theme-light a.tv-ticker-item-tape,
+  html.theme-light .tv-ticker-item-tape__short-name,
+  html.theme-light .tv-ticker-item-tape__last {
+    color: #0f0f0f !important;
+  }
+  /* "Market closed" label. Native #9c9c9c would come back through the invert as
+     #5e5e5e (3.0:1) — deliberately pre-darkened so it lands near #8c8c8c. */
+  html.theme-light .tv-market-status__label { color: #6d6d6d !important; }
+  html.theme-light .tv-data-mode { color: #ff9800 !important; }
+  /* preserve the up/down semantics — direction lives on the change wrapper */
+  html.theme-light .tv-ticker-item-tape__change-wrapper--up,
+  html.theme-light .tv-ticker-item-tape__change-wrapper--up span {
+    color: #089981 !important;
+  }
+  html.theme-light .tv-ticker-item-tape__change-wrapper--down,
+  html.theme-light .tv-ticker-item-tape__change-wrapper--down span {
+    color: #f23645 !important;
   }
 
   /* ====================================================================

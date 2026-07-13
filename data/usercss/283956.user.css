@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260711.20.02
+@version      20260712.18.35
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -116,6 +116,21 @@
     color: var(--wx-link) !important;
   }
 
+  /* The Weather Channel wordmark is a KNOCKOUT logo: one evenodd <path> paints the
+     #003399 square and the letters are HOLES punched through it, so the glyphs are
+     whatever sits BEHIND the svg. On the site's white page they read white; on our
+     dark chrome they filled with near-black and the wordmark went unreadable
+     (blue-on-black letters). Nothing about it is a background-color or a fill, so
+     every scan passed. Put the white backdrop back BEHIND the mark (exactly what the
+     native page provides) -- the letters read white again and the blue square, which
+     is the actual painted geometry, is untouched. Both frontends: the SPA header /
+     rail carries the Tailwind arbitrary class, the legacy Daybreak rail its module
+     class. */
+  svg[class*="text-[#003399]"],
+  svg[class*="SidebarNavigation--logoIcon"] {
+    background-color: #ffffff !important;
+  }
+
   /* left sidebar navigation rail */
   [data-testid="sidebar-navigation"],
   [data-component="sidebar-navigation"],
@@ -130,12 +145,29 @@
     color: var(--wx-text-2) !important;
   }
   [data-testid="sidebar-navigation"] a:hover,
-  [data-testid="sidebar-navigation"] button:hover,
+  [data-testid="sidebar-navigation"] button:hover {
+    background-color: var(--wx-surface) !important;
+    color: var(--wx-text) !important;
+  }
+  /* weather.com marks the CURRENT page in the rail with brand blue (#3a61cc) on the
+     label AND on the icon (the icon is `text-inherit`), on a grey pill. Our rules
+     above repainted that blue plain light, so the active rail item read exactly like
+     every inactive one and only the pill fill distinguished it. Restore the accent
+     with the theme's link blue (weather.com's own #3a61cc only reaches 2.9:1 on the
+     dark pill); the pill keeps its elevated dark fill. */
   [data-testid="sidebar-navigation"] a[aria-current],
   [data-testid="sidebar-navigation"] [aria-current="page"],
   [data-testid="sidebar-navigation"] a.bg-gray-100 {
     background-color: var(--wx-surface) !important;
-    color: var(--wx-text) !important;
+    color: var(--wx-link) !important;
+  }
+  /* the rail item's LABEL is a <p>, which the generic `p` text rule further down
+     repaints body-grey -- without this the icon turned blue and the word beside it
+     stayed grey. Colour the label with its item (no fill: the pill already has one). */
+  [data-testid="sidebar-navigation"] a[aria-current] p,
+  [data-testid="sidebar-navigation"] [aria-current="page"] p,
+  [data-testid="sidebar-navigation"] a.bg-gray-100 p {
+    color: var(--wx-link) !important;
   }
   /* the location-pill popover anchor (rounded-4xl bg-white wrapper) */
   [data-slot="popover-anchor"],
@@ -310,9 +342,16 @@
   [data-testid="subnavigation"] button {
     color: var(--wx-text-2) !important;
   }
-  [data-testid="subnavigation"] a:hover,
-  [data-testid="subnavigation"] [aria-current="page"] {
+  [data-testid="subnavigation"] a:hover {
     color: var(--wx-text) !important;
+  }
+  /* the forecast-type pill row (Today / Hourly / 10 Day / ...) marks the CURRENT page
+     with `text-blue-500` (#3a61cc) on a grey pill. The rule above repainted it plain
+     light -- and the inactive tabs ship `text-gray-900`, which our text rules ALSO
+     lift to the same light -- so every tab in the strip rendered identically and the
+     selected forecast lost its marker. Give the current tab the link accent back. */
+  [data-testid="subnavigation"] [aria-current="page"] {
+    color: var(--wx-link) !important;
   }
 
   /* ---- horizontal-scroll fade overlays (the white "more →" gradients) --- */
@@ -604,6 +643,16 @@
     color: var(--wx-text-muted) !important;
   }
 
+  /* the "BREAKING" kicker on news cards is the only place weather.com uses the
+     severe-alert red as TEXT rather than as a banner fill: `text-[var(--color-alert-
+     severe)]` = #ba0d00, which reads 6.5:1 on the site's white card but collapses to
+     2.66:1 on our base -- an AA fail at its 10px size, and the one label whose whole
+     job is to shout. Lift it to a brighter red that keeps the alert identity and
+     passes AA; the alert BANNER (bg-alert-severe with white text) is untouched. */
+  [class*="text-[var(--color-alert-severe)]"] {
+    color: #f4695c !important;
+  }
+
   /* ---- links / accent --------------------------------------------------- */
   a,
   a:visited,
@@ -892,6 +941,15 @@
   footer a:hover {
     color: var(--wx-link-hover) !important;
   }
+  /* the footer's nav links are neutral by design, but the ForecastWatch accuracy
+     citation is an INLINE link inside a sentence, blue (#1b4de4 legacy / text-blue-500
+     in the SPA) on both frontends -- `footer a` flattened it to body grey, so it read
+     as plain prose. Give the in-paragraph links their accent back; the link ROWS above
+     stay neutral. */
+  footer p a,
+  [class*="Footer--container"] p a {
+    color: var(--wx-link) !important;
+  }
 
   /* ---- Taboola "More from weather.com" recommendation strip ------------- */
   /* The Taboola widget (trc_*) renders white cards with hardcoded near-black
@@ -1110,6 +1168,86 @@
   #dd-widget .dd-widget-question-container:hover {
     background-color: var(--wx-surface-2) !important;
     color: var(--wx-text) !important;
+  }
+
+  /* ---- OpenWeb (Spot.IM) reactions + comments on news/video articles ------ */
+  /* Every article ends with OpenWeb's widgets ("How Do You Feel About This Video?"
+     reactions, then the comment thread). They render inside an OPEN SHADOW ROOT on a
+     custom element whose tag name is a per-publisher hash (<ow-u87ksa0ilag>), so no
+     rule of ours reaches inside and every DOM scan of the light DOM reports clean --
+     while the widget paints a full-width WHITE slab across the bottom of the article
+     plus a white notification bell.
+     It is themeable after all: the shadow root declares its whole palette as
+     `--spotim-*` custom properties on `:host`, and a rule in the OUTER tree that
+     matches the host beats a `:host` rule, so the variables we set here resolve
+     INSIDE the shadow tree. Match the host through its stable wrapper attributes
+     (`data-spotim-app` / `data-spotim-module`) rather than the hashed tag name.
+     `--spotim-color-scheme-l6` is the foreground base that l1..l5 derive their
+     translucent tints from -- flipping it to light is what makes the derived borders
+     and muted text work on dark. The brand blue (#0968ba, white text on it) already
+     reads on dark and is left alone, as are the reaction emoji. */
+  [data-spotim-app] > *,
+  [data-spotim-module] > * {
+    --spotim-page-background-color: #1c2128 !important;
+    --spotim-card-background-color: #1c2128 !important;
+    --spotim-surface: #161d27 !important;
+    --spotim-conversation-background-color: transparent !important;
+    --spotim-input-background-color: #161d27 !important;
+    --spotim-sayctrl-background-color: #161d27 !important;
+    --spotim-sticky-say-control-background-color: #1c2128 !important;
+    --spotim-list-item-background: #161d27 !important;
+    --spotim-list-item-foreground: #2d333b !important;
+    --spotim-overlay-background-color: #1c2128 !important;
+    --spotim-extract-background-color: #161d27 !important;
+    --spotim-embedded-comment-background-color: #161d27 !important;
+    --spotim-embedded-comment-preview-background-color: #161d27 !important;
+    --spotim-message-hover-menu-background-color: #161d27 !important;
+    --spotim-color-scheme-g1: #1c2128 !important;
+    --spotim-color-scheme-g2: #e6edf3 !important;
+    --spotim-color-scheme-l6: #e6edf3 !important;
+    --spotim-color-scheme-l6-rgb: 230, 237, 243 !important;
+    --spotim-color-scheme-l100: #14181d !important;
+    --spotim-text-color-default: #e6edf3 !important;
+    --spotim-message-text-color: #c4cdd6 !important;
+    --spotim-text-color-muted: #8b949e !important;
+    --spotim-text-color-x-muted: #8b949e !important;
+    --spotim-text-color-xx-muted: #8b949e !important;
+    --spotim-text-color-product-header: #e6edf3 !important;
+    --spotim-reactions-title-color: #e6edf3 !important;
+    --spotim-reactions-reaction-text-color: #8b949e !important;
+    --spotim-pitc-header-color: #e6edf3 !important;
+    --spotim-pitc-top-comment-color: #e6edf3 !important;
+    --spotim-user-image-font-color: #c4cdd6 !important;
+    --spotim-ads-text-color: #8b949e !important;
+    --spotim-ads-footer-color: #8b949e !important;
+    --spotim-share_icon_color: #c4cdd6 !important;
+    --spotim-border-color: #262c33 !important;
+    --spotim-border-color-muted: #262c33 !important;
+    --spotim-strong-border-color: #2d333b !important;
+    --spotim-say-control-border-color: #2d333b !important;
+    --spotim-message-separator-color: #262c33 !important;
+    --spotim-input-separator-color: #2d333b !important;
+    --spotim-star-color-empty: #2d333b !important;
+    --spotim-progress-bar-background-color: #262c33 !important;
+    --spotim-skeleton-background-color: #262c33 !important;
+    --spotim-skeleton-foreground-color: #1c2128 !important;
+    --spotim-content-loader-primary-color: #1c2128 !important;
+    --spotim-content-loaders-secondary-color: #262c33 !important;
+    --spotim-modal-backdrop-background-color: rgba(13, 17, 23, 0.7) !important;
+    --spotim-safeframe-modal-backdrop-color: rgba(13, 17, 23, 0.7) !important;
+  }
+  /* OpenWeb's floating notifications bell is a SECOND shadow root (host:
+     div[data-spot-im-shadow-host="floating-bell"]) whose 60px disc is a hardcoded
+     `background-color:#fff` with no custom property behind it, so the vars above
+     cannot reach it and it hung as a glaring white puck over every dark article.
+     `filter: invert()` on the host DOES darken it -- but a filtered element becomes
+     the containing block for its `position: fixed` descendants, and the bell then
+     stops floating (it lands 4000px down the page). `opacity` creates no containing
+     block, so knock the puck back with that instead: composited over the dark page it
+     reads as a muted disc, its own glyph contrast is unchanged from the site's, and
+     the button keeps floating and clicking. */
+  div[data-spot-im-shadow-host="floating-bell"] {
+    opacity: 0.35 !important;
   }
 
   /* ====================================================================== */

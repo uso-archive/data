@@ -3,11 +3,11 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for OLX that turns the bright marketplace into an easy-on-the-eyes dark interface, perfect for late-night browsing.
-@version      20260711.19.59
+@version      20260712.18.31
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
-@-moz-document domain("olx.pl"), domain("olx.ua"), domain("olx.ro"), domain("olx.pt"), domain("olx.bg"), domain("olx.kz") {
+@-moz-document domain("olx.pl"), domain("olx.ua"), domain("olx.ro"), domain("olx.pt"), domain("olx.bg"), domain("olx.kz"), domain("olx.uz") {
 /* ============================================================
      OLX ships a Tailwind + design-token frontend. Most colors
      resolve from CSS custom properties on :root, so re-pointing
@@ -520,18 +520,26 @@
     border-color: #1fcabf !important;
   }
 
-  /* "Wyróżnione" (Featured/highlighted-ad) badge sits over the dark card
-     thumbnail carrying its own near-black #02282c -webkit-text-fill token, so
-     it renders dark-on-dark and vanishes. It's the only card label using the
-     stable data-nx-name="Tag" component wrapper (delivery/promoted badges have
-     their own testids), so anchor there and lift it to the mint accent to keep
-     the "featured" highlight identity legible on the dark thumbnail. */
+  /* "Wyróżnione" (Featured/highlighted-ad) badge, the card's data-nx-name="Tag"
+     component (delivery/promoted badges have their own testids). It is NOT bare
+     text on the light site: it is a SOLID OLX-mint (#23E5DB) pill with a
+     near-black label, laid over the photo — the strongest badge on the card. The
+     blanket `#mainContent div` neutraliser stripped that mint fill, leaving the
+     label as naked text sitting directly on the user's photo, so its contrast
+     depended entirely on the picture behind it (over a bright thumbnail it
+     disappeared). Restore the pill on the accent and put the dark label back on
+     it, so "featured" keeps both its identity and its legibility. */
+  #mainContent [data-testid="l-card"] [data-nx-name="Tag"],
+  #searchmain-container [data-testid="l-card"] [data-nx-name="Tag"] {
+    background-color: #1fcabf !important;
+    border-color: #1fcabf !important;
+  }
   #mainContent [data-testid="l-card"] [data-nx-name="Tag"],
   #mainContent [data-testid="l-card"] [data-nx-name="Tag"] *,
   #searchmain-container [data-testid="l-card"] [data-nx-name="Tag"],
   #searchmain-container [data-testid="l-card"] [data-nx-name="Tag"] * {
-    color: #6fe3da !important;
-    -webkit-text-fill-color: #6fe3da !important;
+    color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
   }
 
   /* The homepage "recommended"/partner (Storia real-estate) l-card variant
@@ -730,6 +738,23 @@
     border-color: #2d333b !important;
     color: #e6edf3 !important;
   }
+  /* The search/category column sits INSIDE a position:relative; z-index:3 wrapper
+     (the only stacking layer that paints above OLX's full-bleed "screening"
+     wallpaper ad, a position:fixed z-index:1 iframe). Natively that wrapper is an
+     opaque #F2F4F5 sheet 24px wider than the listing form it holds, so the ad only
+     ever shows in the page gutters. The blanket `#mainContent div` neutraliser
+     turned it transparent, so the wallpaper ad bled back through the 24px inset —
+     a bright blue frame down both edges of the results column and a band above the
+     footer. It is the last div under #mainContent's shell (the SSR ad slot is its
+     only sibling), so anchor it structurally and give it the page base back.
+     The listing FORM is corrected to the base at the same time: it is the PAGE
+     under the cards, not a card itself (natively the grey #F2F4F5 sheet), and the
+     rule above had it at the #1c2128 card elevation — so every l-card sat at
+     exactly its own container's colour and the cards' elevation disappeared. */
+  #mainContent > div > div:last-of-type,
+  #mainContent form[data-testid="listing-filters-form"] {
+    background-color: #14181d !important;
+  }
   [data-testid="pagination-wrapper"] a,
   [data-testid="pagination-list"] li {
     background-color: transparent !important;
@@ -786,6 +811,23 @@
     color: #07232a !important;
     -webkit-text-fill-color: #07232a !important;
   }
+  /* …but on a search/category page BOTH accent CTAs — the hero "Szukaj" submit and
+     the "Zapisz" save-search button — live inside [data-testid="listing-filters-form"],
+     and the segmented-control rule above (`…listing-filters-form button span`, 1,1,2)
+     out-specifies the attribute-only label rules (1,1,1) that were meant to keep them
+     dark-on-mint. So their <span> labels resolved to the light #c4cdd6 and rendered at
+     1.27:1 on the mint fill — the page's primary search button read as an empty teal
+     slab next to its own (correctly dark) magnifier glyph. Re-assert the dark label
+     with the <button> type in the selector so it ties on specificity and wins on
+     source order. */
+  #mainContent button[data-testid="search-submit"],
+  #mainContent button[data-testid="search-submit"] span,
+  #mainContent button[data-testid="save-search-button"] span,
+  #mainContent button[data-testid="save-search-form-submit"] span,
+  #mainContent button[data-testid="l-save-search-banner-button"] span {
+    color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
+  }
 
   /* Footer SEO sub-category link list (Fotografia / Komputery / … )
      at the bottom of search/category pages ships dim #406367 link text
@@ -838,6 +880,18 @@
   #mainContent [data-testid="seller-listing"] [data-testid="ad-card-title"] h4 {
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
+  }
+  /* Shop/store subdomain (e.g. luxtradestore7.olx.<tld>) renders the seller's
+     ad list under [data-testid="shop-listing-desktop-layout"], NOT the
+     seller-listing hook above — a separate frontend the profile rules miss.
+     Its left filter panel's "Kategorie" section heading (and the result-count
+     heading) are <h4>s carrying the hardcoded dim #406367 (not a token), so
+     "Kategorie" rendered near-invisible dark-on-dark. The store l-cards carry
+     NO heading elements, so lifting every <h4> in this layout touches only the
+     two sidebar headings and cannot flatten a card title. */
+  #mainContent [data-testid="shop-listing-desktop-layout"] h4 {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
   }
   /* Result count + seller metadata (member-since / last-online) + card
      location lines (bare <p>, no location-date testid on this variant) */
@@ -986,6 +1040,49 @@
     color: #07232a !important;
     -webkit-text-fill-color: #07232a !important;
   }
+  /* …but the accent group above fills EVERY contact CTA, and OLX does not: it
+     ranks them. Each Nexus button carries the site's own data-button-variant, and
+     on an offer with OLX delivery the rail reads primary "Kup" (a solid fill) over
+     secondary "Wyślij wiadomość" / "Zadzwoń" and a tertiary login prompt (all three
+     plain OUTLINE buttons). Filling all four with the same mint turned that ladder
+     into four identical slabs, with nothing marking the actual purchase action — a
+     wrong-but-readable state no contrast check can catch. Hand the ranking back by
+     keying on the variant the site already publishes: primaries keep the accent
+     fill set above, everything below primary reverts to an accent outline. Scoped
+     to the contact/login CTAs so the filter and save-search buttons (also
+     "secondary" components) keep the treatment they were given. */
+  #mainContent [data-testid="ad-contact-message-button"][data-button-variant="secondary"],
+  #mainContent [data-testid="ad-contact-message-button"][data-button-variant="tertiary"],
+  #mainContent [data-testid="ad-contact-phone"][data-button-variant="secondary"],
+  #mainContent [data-testid="ad-contact-phone"][data-button-variant="tertiary"],
+  #mainContent [data-testid="show-phone"][data-button-variant="secondary"],
+  #mainContent [data-testid="chat-button"][data-button-variant="secondary"],
+  #mainContent [data-testid="login-button"][data-button-variant="secondary"],
+  #mainContent [data-testid="login-button"][data-button-variant="tertiary"],
+  #mainContent [data-testid="phones-container"] button[data-button-variant="secondary"],
+  .n-modal-portal [data-testid="ad-contact-message-button"][data-button-variant="secondary"],
+  .n-modal-portal [data-testid="chat-button"][data-button-variant="secondary"] {
+    background-color: transparent !important;
+    border-color: #5fd0c6 !important;
+  }
+  #mainContent [data-testid="ad-contact-message-button"][data-button-variant="secondary"],
+  #mainContent [data-testid="ad-contact-message-button"][data-button-variant="secondary"] span,
+  #mainContent [data-testid="ad-contact-phone"][data-button-variant="secondary"],
+  #mainContent [data-testid="ad-contact-phone"][data-button-variant="secondary"] span,
+  #mainContent [data-testid="show-phone"][data-button-variant="secondary"],
+  #mainContent [data-testid="show-phone"][data-button-variant="secondary"] span,
+  #mainContent [data-testid="chat-button"][data-button-variant="secondary"],
+  #mainContent [data-testid="chat-button"][data-button-variant="secondary"] span,
+  #mainContent [data-testid="login-button"][data-button-variant="tertiary"],
+  #mainContent [data-testid="login-button"][data-button-variant="tertiary"] span,
+  #mainContent [data-testid="phones-container"] button[data-button-variant="secondary"],
+  #mainContent [data-testid="phones-container"] button[data-button-variant="secondary"] span,
+  .n-modal-portal [data-testid="ad-contact-message-button"][data-button-variant="secondary"],
+  .n-modal-portal [data-testid="ad-contact-message-button"][data-button-variant="secondary"] span {
+    color: #5fd0c6 !important;
+    -webkit-text-fill-color: #5fd0c6 !important;
+  }
+
   /* The phone glyph beside "Pokaż" is an <svg> that IS the mint disc (the
      accent is its own background-color) with a fill="currentColor" handset.
      The blanket `#mainContent svg { color: inherit }` handed it the light body

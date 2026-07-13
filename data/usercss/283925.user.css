@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A polished dark look across the whole site: the home page, video pages and their comment lists, the rankings, search results and user profiles.
-@version      20260711.00.17
+@version      20260712.18.31
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -49,6 +49,19 @@
        the elevated card surface while staying dimmer than low-em. */
     --colors-text-on-layer-lower-em: #828b95 !important;
     --colors-text-on-layer-visited: #a9b4c0 !important;
+
+    /* ---- Disabled controls ----
+       The site paints every disabled label and icon #666 — a muted-but-legible
+       5.7:1 on its own white panels, but only 2.5:1 on our elevated surface, so
+       the search-filter's "設定をリセット", disabled tabs and the player's greyed
+       controller icons all faded to near-invisible. Lift the whole disabled family
+       to a grey that still reads as DISABLED (clearly dimmer than the #c4cdd6 body
+       text) while staying legible on dark. `--colors-service-color-ch` is also #666
+       but is the CHANNEL brand colour, not a disabled state, so it is left alone. */
+    --colors-action-text-on-base_disabled: #7d8590 !important;
+    --colors-tab-text-on-base-disabled: #7d8590 !important;
+    --colors-icon-base-disabled: #7d8590 !important;
+    --colors-icon-watch-controller-disabled: #7d8590 !important;
 
     /* ---- Borders (soften the bright default lines) ---- */
     --colors-border-base: #262c33 !important;
@@ -235,6 +248,17 @@
     background-color: #2d333b !important; color: #e6edf3 !important;
   }
 
+  /* Live (live.nicovideo.jp) home — the "好みで探す" (konomi-tag) section heading is an
+     <h2> whose only child is a banner PNG, sitting on its own #eee fill. The PNG is
+     opaque, so the fill is invisible while the image loads correctly — but it is a
+     1080x120 light slab the moment the image 404s or has not yet arrived. Dark the well.
+     NOTE (verified, do not "fix"): the banner ARTWORK itself is a white-background
+     illustration with red accents. It stays as-is — inverting it would flip those reds
+     to cyan, and darkening real artwork is worse than a bright banner. */
+  section[class*="konomi-tag-list-section"] > header > h2 {
+    background-color: #14181d !important;
+  }
+
   /* Live (live.nicovideo.jp) watch page — the "アニメ公式生放送タイムシフト
      ランキング" column (.official-live-ts-ranking) hardcodes a near-white
      #fafafa wrapper fill that no token reaches, so the whole ranking panel
@@ -242,6 +266,29 @@
      light #e6edf3 heading read invisibly light-on-light. Repaint the wrapper
      to the page base; the cards and text inside are already dark-correct. */
   .official-live-ts-ranking { background-color: #14181d !important; }
+
+  /* Live (live.nicovideo.jp) watch page — the program-list carousel's prev/next arrows
+     (.page-selector) are #f2f2f2 buttons holding a near-black #1a1a1a chevron. The site
+     rests them at opacity .2, so today they render as a grey bar rather than a white
+     slab — but the fill underneath is white and the glyph is 1.3:1 against it, so any
+     hover/active state that raises the opacity paints a bright column. Repaint the
+     button dark and lift the chevron, which is correct at every opacity. */
+  [class*="page-selector"] { background-color: #2d333b !important; }
+  [class*="page-selector"] svg, [class*="page-selector"] path { fill: #c4cdd6 !important; }
+
+  /* Live (live.nicovideo.jp) watch page — the player's menu-dock buttons (タイムシフト予約 /
+     共有 / ポストする) and the comment panel's NG設定 button each raise their tooltip as a
+     ::after with `content:`, styled #1a1a1a-on-#f2f2f2. No token reaches them and no
+     element-bg scan can see a pseudo, so a white tooltip box popped up over the dark
+     player on every hover. Repaint them to the dark tooltip surface used everywhere
+     else (matching .tooltip-layer .tooltip above). */
+  [class*="program-menu-dock"] button::after,
+  [class*="program-menu-dock"] a::after,
+  [class*="ng-setting-button"]::after {
+    background-color: #2d333b !important;
+    color: #e6edf3 !important;
+    border-color: #3a424c !important;
+  }
 
   /* Live (live.nicovideo.jp) watch page — each program-description section heading
      ("関連番組", "リンク", "初めてニコニコ生放送をご利用になる方"…) marks itself with a
@@ -522,8 +569,12 @@
      `height > 40` filter, so it shipped as a bright white slab across the home
      page. Its own link text is the site's semantic blue and clears 4.5:1 on the
      repainted surface, so only the bar is touched. */
+  /* …and it is an OUTLINED notice: the site draws the bar with a #0080ff border to
+     match its blue icon and link text. The `.BaseLayout *` blanket border reset greyed
+     the frame, leaving blue content in a grey box — same flattening as the follow /
+     support CTAs below. Restore the site's blue outline. */
   .OneLineNewsContainer {
-    background-color: #1c2128 !important; border-color: #2d333b !important;
+    background-color: #1c2128 !important; border-color: #0080ff !important;
   }
   /* The home page's wordmark is the site's BLACK logo variant (the site swaps in
      .NiconicoLogo_white only on its own dark pages), drawn as a data-URI SVG
@@ -544,6 +595,16 @@
   }
   .SeeMoreLink-text, .SeeMoreLink-text span, a.SeeMoreLink span { color: #c4cdd6 !important; }
   .NicoNewsContainer .Tabs-tab, .NicoNewsContainer-skeleton .Tabs-tab { color: #8b949e !important; }
+  /* The NicoNews "topics" tabs (トピックス / コメント数 / アクセス数 …) mark the
+     ACTIVE tab with a solid orange #ff8000 pill + white label and an orange caret
+     below it. The `.NicoNewsContainer *` neutraliser blanked the pill's fill and the
+     text pass above dimmed its label to the same grey as the inactive tabs, so the
+     only surviving "you are here" mark was the small caret — the selected tab read
+     identical to the rest. Restore an orange fill (toned to a burnt #a85400 so the
+     white label clears AA on it, where pure #ff8000 would not) and the white label. */
+  .NicoNewsContainer .Tabs-tab.is-active {
+    background-color: #a85400 !important; color: #ffffff !important;
+  }
 
   /* Owner-avatar wells default to a `lightgray` fill behind a lazily-loaded
      background-image. 10 of the 11 on the home page are still image-less on first
@@ -582,6 +643,16 @@
   .Dropdown, .NC-ThreePointMenu-menu {
     background-color: #1c2128 !important; border-color: #2d333b !important;
   }
+  /* …and the CLOSED trigger itself. Only the open PANEL was repainted above; the
+     button that opens it keeps a #eee fill, which the profile page happens not to
+     apply but the mylist / series pages do — and our body-text pass had already put
+     #c4cdd6 on its label, landing light-grey-on-#eee at ~1.7:1. It is 24px tall, so
+     the element-bg audit's height filter skipped it and it shipped as a bright pill
+     with an unreadable label. Repaint it to the elevated surface. */
+  .Dropdown-button {
+    background-color: #262c33 !important; border-color: #2d333b !important;
+  }
+  .Dropdown-button:hover { background-color: #2d333b !important; }
   /* Only the :hover row was ever recoloured, so at rest the ⋮ menu's labels kept the
      site's black on the repainted #1c2128 panel (~1.3:1) and the opened menu read as
      an empty dark box. The hover rule below is more specific and still wins. */
@@ -611,8 +682,42 @@
   /* The "N件" count badge stamped on a mylist's thumbnail strip colours itself
      #252525 for the light theme; on the repainted dark strip it vanished. */
   .NC-MylistMediaObject-itemCount { color: #c4cdd6 !important; }
+  /* A public mylist page paints three of its own labels in near-black that no meta
+     rule reached (they are plain divs/spans, not matched by the [class*="-count"]/
+     time passes): the header's stat VALUES (件数 / 公開 / フォロワー at #555) read
+     darker than their own #8b949e labels, and every item's "追加日時" added-at date
+     is #666 — all dark-on-dark on the #1c2128 card. Lift the primary header values to
+     the body text colour and the per-item timestamps to the standard meta grey. */
+  .MylistHeader-metaItemValue { color: #c4cdd6 !important; }
+  .MylistItemAddition-addedAt { color: #8b949e !important; }
+  /* Each mylist item's owner memo ("EditableField") is a #f5f5f5 box with #252525
+     text — a white note tile with dark text on every annotated item of a public
+     mylist. Repaint the tile to an elevated surface and lift its text to a light. */
+  .MylistItemMemo, .EditableField.MylistItemMemo {
+    background-color: #262c33 !important; color: #c4cdd6 !important;
+  }
+  /* Mylist menu controls. The sort <button> (.Selectbox-button) and its open panel
+     (.SortSelectbox) hardcode a #fff surface, and the inactive pagination discs
+     (.PaginationItem) are white too — so the sort control read white-on-white, the
+     opened sort list was light-grey-on-white, and the "2" / next-page tiles were
+     white with near-invisible light labels. Repaint them to the input / elevated
+     surfaces; keep the selected page a lighter chip so "which page" still reads. */
+  .MylistMenu .Selectbox-button { background-color: #0d1117 !important; color: #e6edf3 !important; }
+  .SortSelectbox { background-color: #1c2128 !important; border-color: #2d333b !important; }
+  .SortSelectbox-item:hover { background-color: #262c33 !important; }
+  .PaginationItem { background-color: #1c2128 !important; border-color: #2d333b !important; }
+  .PaginationItem_selected { background-color: #3a424c !important; color: #e6edf3 !important; }
+  /* The mylist header's bottom separator is a #ddd ::after bar (same pattern as the
+     series / profile header dividers already softened below). */
+  .MylistHeader::after { background-color: #262c33 !important; }
   /* Series header's 1px separator is drawn as a #ddd ::after bar, not a border. */
   .SeriesDetailHeader::after { background-color: #262c33 !important; }
+  /* The series description body is a plain div coloured #252525 (near-black) that no
+     legacy text pass reached — on the dark header card the whole blurb read
+     dark-on-dark. Lift it to the body text colour. */
+  .SeriesDetailHeader-description, .SeriesDetailHeader-description div {
+    color: #c4cdd6 !important;
+  }
   /* The share glyph (profile / mylist / series) is a MASK-IMAGE button: its
      `background-color` IS the artwork's fill, not a panel. The site paints it #555
      for a white page, which leaves a ~2.2:1 icon on our dark surface. Lighten the
@@ -685,6 +790,20 @@
      them to the muted meta grey so the section markers stay readable. */
   .Timeline-divider, .Timeline-divider span,
   [class*="Timeline-divider"] { color: #8b949e !important; }
+  /* Each timeline entry carries an activity-TYPE chip (.TimelineLabel) that the site
+     paints by kind — `_blue` #4990e2 for a post, `_red` #e64c4c for a live broadcast,
+     `_gray` #252525 for the neutral rest — always with a #fff label. Our profile arm
+     `[class*="Timeline"] { background-color:#1c2128 }` blanked all three fills and the
+     `[class*="Label"]` text pass dimmed the white label to the body grey, so every chip
+     collapsed into the same unreadable dark blob and "video post vs. live" was lost.
+     Restore the three fills (deepened just enough that the white label clears AA, where
+     the site's own lighter blue/red would not) and the white label. The tag prefix lifts
+     specificity to 0,1,1 so these beat both broad passes wherever they land. */
+  span.TimelineLabel, span.TimelineLabel_red,
+  span.TimelineLabel_blue, span.TimelineLabel_gray { color: #ffffff !important; }
+  span.TimelineLabel_blue { background-color: #2f6fb8 !important; }
+  span.TimelineLabel_red { background-color: #b3403f !important; }
+  span.TimelineLabel_gray { background-color: #2d333b !important; }
   /* Ranking / recommendation "posted N ago" timestamps are painted with the
      site's own --recentTimeColor (#e61a1a) to flag a RECENT upload — a real
      signal. The broad `time { color:#8b949e }` meta rule above flattened all 51
@@ -697,9 +816,38 @@
   /* Active nav tab + internal accent links */
   .MainMenuItem.NC-Tab_active, .NC-Tab_active { color: #e6edf3 !important; }
   .SubMenuLink-link, .SubMenuLink-link_internal, .SubMenuLink-label,
-  .UserDetailsStatusItem-linkLabel, a[class*="SubMenuLink"] {
+  a[class*="SubMenuLink"] {
     background-color: transparent !important; color: #5fb0e6 !important;
   }
+  /* The profile header's stat pairs were painted INVERTED. The site gives the CAPTION
+     ("フォロー中" / "フォロワー") a muted #555 and the VALUE — the clickable count, and the
+     LV number — its #0080ff link blue. We had `.UserDetailsStatusItem-linkLabel` in the
+     accent group above, so the caption came out blue while the count it labels was left
+     to the broad `.BaseUniLayout a` grey: exactly backwards, and the counts stopped
+     reading as links at all. Put the accent back on the values and the meta grey on the
+     captions. Must stay AFTER the accent group (same specificity, later wins). */
+  .UserDetailsHeader-levelLabelValue,
+  a.UserDetailsStatusItem-link { color: #5fb0e6 !important; }
+  .UserDetailsStatusItem-linkLabel { color: #8b949e !important; }
+  /* The "represented achievement" badge under the nickname is a TINTED pill whose hue IS
+     the achievement tier — green `_pleasure`, cyan `_hope`, pink `_star`, gold `_legend`,
+     each a 10%-alpha wash with a deep same-hue label. The `[class*="UserDetails"]` arm
+     painted the wash flat #1c2128 and the text pass lifted every label to the same
+     #e6edf3, so all four tiers rendered as one identical grey pill. Restore each tint at
+     a slightly higher alpha (a 10% wash disappears on near-black) and swap the deep
+     label — meant for a white page — for a light tint of its own hue. */
+  a.UserDetailsRepresentedAchievement_pleasure { background-color: rgba(20, 184, 102, 0.18) !important; }
+  a.UserDetailsRepresentedAchievement_hope { background-color: rgba(26, 192, 229, 0.18) !important; }
+  a.UserDetailsRepresentedAchievement_star { background-color: rgba(235, 71, 153, 0.18) !important; }
+  a.UserDetailsRepresentedAchievement_legend { background-color: rgba(242, 185, 13, 0.18) !important; }
+  a.UserDetailsRepresentedAchievement_pleasure,
+  a.UserDetailsRepresentedAchievement_pleasure * { color: #3fd98a !important; }
+  a.UserDetailsRepresentedAchievement_hope,
+  a.UserDetailsRepresentedAchievement_hope * { color: #5fd0ee !important; }
+  a.UserDetailsRepresentedAchievement_star,
+  a.UserDetailsRepresentedAchievement_star * { color: #ff8ac4 !important; }
+  a.UserDetailsRepresentedAchievement_legend,
+  a.UserDetailsRepresentedAchievement_legend * { color: #f2c53d !important; }
   /* The profile/mylist "サポート" button is an <a>, so the broad `.BaseUniLayout a`
      grey rule (no !important, spec 0,1,1) flattened its label to #c4cdd6 — while
      the "フォロー" button beside it is a <button> we never touch and kept the site's
@@ -708,6 +856,17 @@
      !important both beat the anchor rule and make it deterministic). */
   a.CreatorSupportButton, a.CreatorSupportButton .CreatorSupportButton-text,
   a.CreatorSupportButton .CreatorSupportButton-icon { color: #0080ff !important; }
+  /* サポート is the same outlined-blue button as フォロー; its blue #0080ff border was
+     greyed by the blanket border reset, so restore it to match (and pair with the
+     フォロー CTA beside it). */
+  a.CreatorSupportButton { border-color: #0080ff !important; }
+  /* The "フォローする" CTA is an OUTLINED button — the site draws it with a blue
+     #0080ff border and keeps its star + label blue. Its label/star stay blue on our
+     theme (a <button>, untouched by the anchor rule), but the blanket
+     `.BaseUniLayout * { border-color:#262c33 }` reset greyed its frame, leaving a
+     blue button with no blue outline. Restore the site's blue border so the primary
+     follow CTA reads as the button it is (same family as the サポート fix above). */
+  button.FollowButton { border-color: #0080ff !important; }
 
   /* Search box (legacy header) */
   .SearchInput, .CrossSearch input, .SearchField input,

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for DaFont. Browse fonts late at night without the  glare: the homepage, font categories, search, font pages and author pages all get an  easy-on-the-eyes dark look.
-@version      20260711.00.14
+@version      20260712.18.26
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -49,12 +49,26 @@
      verbatim; the neutral #d4d4d4 stays the softened grey from the reset above. */
   div.thumb_cont[style*="#fc3"] { border-color: #fc3 !important; }
   div.thumb_cont[style*="#3d6"] { border-color: #3d6 !important; }
+  /* Inside a thread, a solved font request gets an "Identified font:" callout drawn
+     as a bare inline-styled div with `border:2px solid #3d6` — the same success green
+     as the answered-thread ring. The blanket border reset greys it out, dropping the
+     "solved" signal; keep the green edge (and its amber #fc3 twin, if present). */
+  div[style*="solid #3d6"] { border-color: #3d6 !important; }
+  div[style*="solid #fc3"] { border-color: #fc3 !important; }
   /* The .square swatches (forum-list legend + the per-page status boxes in the
      pagination) repeat those same three hues, but as a BACKGROUND, not a border —
      the reset above only softens borders, so the neutral #d4d4d4 swatch stayed a
      bright light-grey square glaring on dark AND no longer matched its softened-grey
      ring. Bring it in line; the two chromatic swatches keep their inline #fc3/#3d6. */
   span.square[style*="#d4d4d4"] { background-color: #2d333b !important; }
+  /* The status-filter chips above the thread list encode "you are here" PURELY in the
+     border: `.curgroup{border:1px solid #ccc}` (the selected filter) vs
+     `.othgroup{border:1px solid #fff}` (the rest — white-on-white, i.e. an INVISIBLE
+     spacer). The blanket reset paints both the same grey, so every chip grows an
+     identical box and the selected-filter cue vanishes entirely. Restore the split:
+     the others go back to invisible, the current one keeps a clearly visible ring. */
+  .othgroup { border-color: transparent !important; }
+  .curgroup { border-color: #8b949e !important; }
 
   /* ---- Links ---- */
   a { color: #5fb0e6 !important; }
@@ -176,10 +190,19 @@
   }
 
   /* ---- Download box + button ---- */
+  /* `filter` on `.preview` above creates a STACKING CONTEXT, which promotes the
+     preview row — including the full-width transparent <a> DaFont lays over it —
+     above the statically-positioned .dlbox that overlaps it. The Télécharger /
+     Faire-don buttons then stop being hoverable AND clickable: the click lands on
+     the preview link and navigates to the font page instead of downloading. This
+     is a hit-test regression, invisible to every colour/contrast scan. Give the
+     download box its own stacking context so it paints back on top. */
   .dlbox {
     background-color: #1c2128 !important;
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
+    position: relative !important;
+    z-index: 1 !important;
   }
   .dl {
     background-color: #21262d !important;
@@ -282,6 +305,17 @@
   div[style*="color:#cc0000"],
   div[style*="margin-left:140px"] div[style*="color:#CC0000"],
   div[style*="margin-left:140px"] div[style*="color:#cc0000"] {
+    color: #e86a64 !important;
+  }
+  /* …and the authors page wraps ONE of its two red column headings in a <b>
+     ("Top Authors"), which our `b, strong` rule repaints grey — while its twin
+     ("Last referred authors", a bare text node in the same red div) stays red.
+     Direct child only: the nested `.tdh` period switcher inside that div carries
+     its own `color:#000` and its <b> must keep the muted grey, not turn red. */
+  div[style*="color:#CC0000"] > b,
+  div[style*="color:#cc0000"] > b,
+  div[style*="color:#CC0000"] > strong,
+  div[style*="color:#cc0000"] > strong {
     color: #e86a64 !important;
   }
   /* Listing subtitle ("- N font files") + truncation ellipsis */

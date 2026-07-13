@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260711.00.15
+@version      20260712.18.28
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -75,6 +75,16 @@
     color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
   [class*="StickyNavSectionLink__StyledLink"]:hover,
   [class*="StickyNav"] a:hover { color: #ffffff !important; }
+  /* Mobile hamburger menu: the flyout is a full-screen BRAND-YELLOW panel with black
+     links and black social glyphs. Our nav rules lift the links to near-white, so on the
+     yellow they land at ~1.2:1 and every menu item disappears. It only exists once the
+     hamburger is tapped (and only on the mobile bundle), so no load-time scan sees it.
+     Darken the panel like every other floating surface and lift the black glyphs. */
+  [class*="StickyNav-mobile__Navigation"],
+  [class*="StickyNavSiteLinks__MobileContainer"] {
+    background-color: #14181d !important; }
+  [class*="SocialLinks__Link"] svg, [class*="SocialLinks__Link"] svg path {
+    fill: #c4cdd6 !important; }
   /* Every nav section link ships "border: 1px solid transparent" and the CURRENT section
      turns that border white — it is the only "you are here" cue. The blanket border reset
      paints all four sides of every link, so the whole nav renders as grey boxes and the
@@ -378,6 +388,18 @@
   [class*="EditorialPlacement__Label"] * { color: #ed4337 !important; }
   [class*="UserBadge__Name"] { color: #c4cdd6 !important; }
   [class*="UserBadge__Role"], [class*="Community-desktop__Iq"], [class*="CommunityRanking-desktop__Iq"] { color: #8b949e !important; }
+  /* Section eyebrows ("MOST RECENT NEWS", "GENIUS ORIGINAL SERIES") and the community
+     leaderboard's IQ scores are the site's accent colour, carried on a stable
+     color="accent.main" attribute (the value itself lives on a build-volatile
+     styled-components hash). The blanket h1-h6 rule greys the eyebrows and the "a span"
+     link rule repaints the IQ scores periwinkle, so the accent is lost either way.
+     Accent is section-scoped: brand pink everywhere, brand yellow in the Videos band
+     (#videos). The pink is lifted from #ff1464 (4.4:1) to clear 4.5:1 on the base. */
+  [class*="HomeContent"] [color="accent.main"],
+  [class*="HomeContent"] [color="accent.main"] * {
+    color: #ff3d7f !important; -webkit-text-fill-color: #ff3d7f !important; }
+  #videos [color="accent.main"], #videos [color="accent.main"] * {
+    color: #ffff64 !important; -webkit-text-fill-color: #ffff64 !important; }
 
   /* ====================================================================
      LEGACY ("snarly") pages — artist + search results
@@ -468,12 +490,49 @@
   /* legacy profile header is already dark — keep it, just soften */
   .profile_header { background-color: #0d1117 !important; }
   .profile_tabs-tab--selected { border-bottom-color: #ed4337 !important; color: #ffffff !important; }
-  /* The blanket border reset above repaints EVERY border, including two the site
-     uses as accents rather than as dividers: the periwinkle 2px underline that marks
-     a "text_label--purple" link-button, and the white ring separating the profile
-     avatar from the (already dark) hero. Restore both. */
-  .text_label--purple { border-bottom-color: #9aa7f0 !important; }
+  /* The blanket border reset above repaints EVERY border, including the ones the site
+     uses as accents rather than as dividers: the coloured 2px underline that marks a
+     "text_label--<colour>" link-button, and the ring around the profile avatar.
+     The avatar ring is NOT decorative: the site paints it green for a VERIFIED artist
+     (.profile_header-avatar--verified) and white otherwise, so pinning every ring to
+     white erased the verified signal. Restore the ring per state. */
   .profile_header-avatar { border-color: #e6edf3 !important; }
+  .profile_header-avatar--verified { border-color: #38ef51 !important; }
+
+  /* Legacy semantic label colours. ".text_label" sits in the light-text list above, so
+     EVERY colour variant the site ships (pink / verified-green / green / red / yellow /
+     purple / gray / white — enumerated from bagon_desktop.css) was flattened to one
+     grey: the verified-annotations CTA, the "See All" alternate-names link, the pink
+     tab counts. Restore each, and the matching --button underline with it. Pink is
+     lifted from #ff1464 (4.4:1) and red from #ff1414 (4.3:1) to clear 4.5:1 on dark. */
+  .text_label.text_label--pink, .text_label.text_label--pink *,
+  .profile_tabs-tab-count, .profile_identity-alternate_names-see_all {
+    color: #ff3d7f !important; }
+  .text_label.text_label--pink { border-bottom-color: #ff3d7f !important; }
+  .text_label.text_label--red, .text_label.text_label--red * { color: #ff4d4d !important; }
+  .text_label.text_label--red { border-bottom-color: #ff4d4d !important; }
+  .text_label.text_label--verified, .text_label.text_label--verified * { color: #38ef51 !important; }
+  .text_label.text_label--verified { border-bottom-color: #38ef51 !important; }
+  .text_label.text_label--green, .text_label.text_label--green * { color: #0ecb27 !important; }
+  .text_label.text_label--green { border-bottom-color: #0ecb27 !important; }
+  .text_label.text_label--yellow, .text_label.text_label--yellow * { color: #ffff64 !important; }
+  .text_label.text_label--yellow { border-bottom-color: #ffff64 !important; }
+  .text_label.text_label--purple, .text_label.text_label--purple * { color: #9aa7f0 !important; }
+  .text_label.text_label--purple { border-bottom-color: #9aa7f0 !important; }
+  .text_label.text_label--gray, .text_label.text_label--gray * { color: #9a9a9a !important; }
+  .text_label.text_label--gray { border-bottom-color: #9a9a9a !important; }
+  /* annotation "Read More" affordance ships the periwinkle link hue; the shared span
+     rule greys it, so it stops reading as clickable */
+  .truncated_annotation_text-read_more { color: #9aa7f0 !important; }
+  /* contributor leaderboard: the rank, the username and the IQ score are the periwinkle
+     accent, greyed by the shared span rule — the column reads as plain metadata without it */
+  .leaderboard-rank, .leaderboard-rank *,
+  .leaderboard-sort_value, .leaderboard-sort_value *,
+  .leaderboard-user, .leaderboard-user *,
+  .header_with_cover_art-pyongs_count { color: #9aa7f0 !important; }
+  /* the periwinkle-filled count pill carries a 2px border in its OWN fill colour (so it
+     reads as a solid pill); the blanket border reset draws a dark ring around it */
+  .numbered_indicator--purple_filled { border-color: #99a7ee !important; }
 
   /* legacy buttons / tags */
   .normal_button, .text_button, .quinary_button, .tag,
@@ -482,10 +541,26 @@
   .normal_button:hover, .text_button:hover, .square_button:hover, .full_width_button:hover { background-color: #2d333b !important; }
   .tag:hover { background-color: #2d333b !important; }
   .square_button *, .full_width_button * { color: #e6edf3 !important; }
-  /* brand-colored share buttons keep their brand bg, force white label */
-  .square_button--facebook, .square_button--twitter, .square_button--google {
+  /* Brand share / artist-social buttons. The neutral ".square_button" surface above has
+     the same specificity and comes first, so it SWALLOWED every brand fill the site
+     ships (facebook/twitter/instagram/google/spotify/apple/email) and the buttons all
+     rendered as identical grey boxes — the earlier "keeps their brand bg" comment was
+     simply wrong. Re-assert each brand fill with a two-class selector so it wins.
+     Instagram/Apple are brand-black: keep the fill but give them a visible edge, or the
+     button reads as a hole punched in the dark page. */
+  .square_button.square_button--facebook { background-color: #3b5998 !important; border-color: #3b5998 !important; }
+  .square_button.square_button--twitter { background-color: #55acee !important; border-color: #55acee !important; }
+  .square_button.square_button--google { background-color: #dd4b39 !important; border-color: #dd4b39 !important; }
+  .square_button.square_button--spotify { background-color: #2ebd59 !important; border-color: #2ebd59 !important; }
+  .square_button.square_button--email { background-color: #9a9a9a !important; border-color: #9a9a9a !important; }
+  .square_button.square_button--instagram,
+  .square_button.square_button--apple { background-color: #000000 !important; border-color: #2d333b !important; }
+  .square_button--facebook, .square_button--twitter, .square_button--google,
+  .square_button--instagram, .square_button--spotify, .square_button--apple, .square_button--email {
     color: #ffffff !important; }
-  .square_button--facebook *, .square_button--twitter *, .square_button--google * { color: #ffffff !important; }
+  .square_button--facebook *, .square_button--twitter *, .square_button--google *,
+  .square_button--instagram *, .square_button--spotify *, .square_button--apple *,
+  .square_button--email * { color: #ffffff !important; }
   /* legacy inline action-button glyphs — the pyong (IQ lightning) button and the
      header search magnifier ship a pure-black SVG fill that vanishes on the dark
      surfaces. Lift them to a legible light neutral. The FB/Twitter share glyphs

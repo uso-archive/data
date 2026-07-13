@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for VOZ: easy on the eyes across the forums, threads and posts, with readable code blocks, quotes and the VOZ blue.
-@version      20260711.00.12
+@version      20260712.18.35
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -317,11 +317,13 @@
     border-color: #2d333b !important;
   }
 
+  /* NOTE: no blanket .userBanner border rule. The base chip's border is
+     transparent (hsla(0,0%,0%,0)) — a grey border there draws a box the site
+     never draws — and every rank variant (.userBanner--red / --green / --blue
+     / --staff / …) ships a border-color matched to its own fill, which an
+     !important grey would flatten into a clashing outline. */
+
   /* Hardcoded pure-white borders the --xf-borderColor token never reaches */
-  /* Rank/group chip under usernames in posts */
-  .userBanner {
-    border-color: #2d333b !important;
-  }
   /* XenForo input addons (login "Show" password toggle, search field addons) */
   .inputGroup-text,
   .inputGroup--joined .input {
@@ -454,20 +456,30 @@
   .tooltip-content {
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.6) !important;
   }
-  /* The basic tooltip's caret is a border triangle painted on the ARROW
-     ELEMENT itself (not a pseudo), and its colour comes from the light
-     paletteNeutral3 — it renders as a pale grey nib under a dark bubble. */
-  .tooltip--basic.tooltip--top .tooltip-arrow {
+  /* A tooltip's caret is a border triangle painted on the ARROW ELEMENT
+     itself (not a pseudo), coloured from a light token — it renders as a
+     pale grey nib hanging off a dark bubble. This applies to EVERY tooltip
+     flavour (basic, member hover-card, share), so key off the direction
+     modifier alone rather than .tooltip--basic. */
+  .tooltip--top .tooltip-arrow {
     border-top-color: #1c2128 !important;
   }
-  .tooltip--basic.tooltip--bottom .tooltip-arrow {
+  .tooltip--bottom .tooltip-arrow {
     border-bottom-color: #1c2128 !important;
   }
-  .tooltip--basic.tooltip--left .tooltip-arrow {
+  .tooltip--left .tooltip-arrow {
     border-left-color: #1c2128 !important;
   }
-  .tooltip--basic.tooltip--right .tooltip-arrow {
+  .tooltip--right .tooltip-arrow {
     border-right-color: #1c2128 !important;
+  }
+
+  /* Menus are topped by a 3px feature-blue rule and the .menu-arrow caret is
+     that rule's tip. The blanket border-color above greys the rule but cannot
+     reach the caret (it keeps painting #3c79c8), leaving an orphaned blue
+     triangle over a flat grey edge — restore the blue rule instead. */
+  .menu-content {
+    border-top-color: #3c79c8 !important;
   }
 
   /* ============================================================
@@ -688,6 +700,14 @@
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
   }
+  /* The attribution line ("<user> said:" + the jump-to-source arrow) is VOZ
+     orange, not body text — the rule above flattened it into the quoted text
+     and the quote lost its header. */
+  .bbCodeBlock-title,
+  .bbCodeBlock-title a,
+  a.bbCodeBlock-sourceJump {
+    color: #ff944d !important;
+  }
   /* .bbCodeBlock-expandLink is a 400px-tall position:absolute overlay sitting
      ON TOP of the collapsed quote; natively its background-color is
      transparent and only a fade gradient paints. Giving it an opaque colour
@@ -756,6 +776,14 @@
   }
   .pageNav-page--current a,
   .pageNav-page--current {
+    background-color: #d4691e !important;
+    color: #ffffff !important;
+    border-color: #d4691e !important;
+  }
+  /* Narrow viewports swap the numbered pager for .pageNavSimple ("1 of 8687").
+     It is a separate component, so it never inherited the orange current-page
+     chip above and fell back to the muted brown accent token instead. */
+  .pageNavSimple-el--current {
     background-color: #d4691e !important;
     color: #ffffff !important;
     border-color: #d4691e !important;
@@ -842,8 +870,10 @@
   }
 
   /* Avatar / image wrappers (avoid white tiles behind images). Exclude the
-     letter avatars (.avatar--default--dynamic): their per-user inline
-     background-color IS the disc, with a matching dark letter colour. */
+     letter avatars (.avatar--default--dynamic): those carry a per-user inline
+     background-color (#33cc66 …) that IS the disc, with a matching dark letter
+     colour — forcing them transparent drops the disc and leaves an invisible
+     dark-on-dark initial. Keep their inline colour intact. */
   .avatar:not(.avatar--default),
   .avatarWrapper,
   .contentRow-figure,
@@ -857,6 +887,26 @@
   .power_stickybanner__wrapper,
   .adsbypubpower {
     background-color: #14181d !important;
+  }
+  /* PubPower's sticky-banner collapse toggle is a separate, class-less element
+     with an inline white (#fafafa !important) background, a white SVG face
+     (rect + path) and a dark chevron — a glaring white pill at the page edge,
+     most visible on mobile. Inline !important background-color can't be beaten
+     by an external rule, so repaint via background-image; darken the SVG face
+     and lighten the chevron lines so the control stays legible on dark. The id
+     carries a volatile numeric suffix, so match on the stable prefix. */
+  [id^="close_stickybanner"] {
+    background-image: linear-gradient(#1c2128, #1c2128) !important;
+    border-top-color: #2d333b !important;
+    box-shadow: none !important;
+  }
+  [id^="close_stickybanner"] svg rect,
+  [id^="close_stickybanner"] svg path {
+    fill: #1c2128 !important;
+    stroke: #1c2128 !important;
+  }
+  [id^="close_stickybanner"] svg line {
+    stroke: #c4d3e8 !important;
   }
 
   /* Scrollbar */

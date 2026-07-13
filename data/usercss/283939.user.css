@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for TechPowerUp: easy on the eyes across news, reviews, the GPU/CPU spec databases and the forums, with readable tables and code.
-@version      20260711.20.01
+@version      20260712.18.34
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -356,6 +356,18 @@
     color: #7d8590 !important;
   }
 
+  /* The pager's non-control spans ("1 to 25 of 6263", "Go to Page") and the
+     .buttons wrapper are plain LABELS the site leaves bare; the `.pager span`
+     rule above paints them into the same pill as the page links, so a label
+     reads as a clickable button. Reset them back to bare text. */
+  .pager > span.counts,
+  .pager > span.description,
+  .pager > span.buttons {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    color: #8b949e !important;
+  }
+
   /* Review-article header "Discuss in our Forums" chip: a #f6f6f6 plate whose
      two labels are ::before/::after text (#444 / #999) and whose speech-bubble
      background SVG is #FAFAFA-filled, so it survives on a dark plate. */
@@ -534,6 +546,14 @@
     color: #8b949e !important;
   }
 
+  /* The "Quick Poll" opener is a raster PNG button (a light-grey plate with dark
+     ink and an orange "?" bubble) — a bright speck on the dark article header and
+     unreachable by any background-color rule. Invert it the same way as the logo:
+     plate → dark, label → light; hue-rotate/saturate keep the "?" bubble orange. */
+  .newspoll_btn {
+    filter: invert(1) hue-rotate(180deg) saturate(1.6) brightness(0.95) !important;
+  }
+
   /* "Today's Reviews" list separators are a `content:"-"` ::after painted #555 */
   .todayslist ul > li::after {
     color: #8b949e !important;
@@ -547,10 +567,14 @@
     background-color: #1c2128 !important;
   }
 
+  /* news.css hovers these tiles with `background-color:#fff; outline:2px solid #ccc`.
+     We already repaint the background, but nothing reads `outline` — so every
+     hovered tile still drew a bright grey 2px ring on the dark page. */
   .featured-news__item > a:hover,
   .pinned-news__item > a:hover,
   .pinned-news2__item > a:hover {
     background-color: #21303f !important;
+    outline-color: #2f74c0 !important;
   }
 
   .pinned-news__title,
@@ -702,6 +726,21 @@
 
   a:hover {
     color: #9bd4ff !important;
+  }
+
+  /* Link text the site wraps in a <span>/<b> (schema.org breadcrumbs, news
+     headlines, spec-DB crumbs) is matched DIRECTLY by our broad `span` / `.contnt b`
+     body rules — they win on the child element, so the anchor's blue never reaches
+     the glyphs and the link reads as plain body copy, indistinguishable from the
+     current crumb beside it. Hand the anchor's own colour back down to its children
+     (class-scoped children like `.flag span` keep winning on specificity). */
+  a span,
+  a b,
+  a strong,
+  a em,
+  .contnt a b,
+  .page a b {
+    color: inherit !important;
   }
 
   /* Keep nav / header / footer link colors handled by their own blocks above */
@@ -1102,6 +1141,23 @@
     color: #8b949e !important;
   }
 
+  /* Two more light form panels the earlier rules never claimed: the VGA-BIOS
+     collection's "Refine Search Parameters" box (a #fafafa slab whose labels are
+     a pale grey that vanishes on it) and the GPU-Z page's validation-ID lookup
+     strip (#eee, same washed-out labels). */
+  section.search,
+  section.search > div,
+  form.validationlookup {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+  }
+
+  section.search label,
+  form.validationlookup,
+  form.validationlookup label {
+    color: #c4cdd6 !important;
+  }
+
   /* Category index pages use bold tags (#333) on light tiles */
   .contnt b,
   .page b,
@@ -1125,6 +1181,17 @@
     background-color: #0d1117 !important;
     color: #e6edf3 !important;
     border: 1px solid #2d333b !important;
+  }
+
+  /* The sidebar search's submit is a 25px TRANSPARENT hit-area absolutely
+     positioned over the magnifier glyph, which the site paints as a
+     background-image on the INPUT. The `input[type="submit"]` button rule below
+     is (0,1,1) and paints it into a solid grey plate that juts past the field
+     and hides the glyph — reclaim it at (0,2,1) so it wins regardless of source
+     order, and the site's magnifier reads through again. */
+  .s--search__form input.s--search__submit {
+    background-color: transparent !important;
+    border: 0 !important;
   }
 
   input:focus,
@@ -1276,6 +1343,14 @@
     color: #e6edf3 !important;
   }
 
+  /* Forum logo is a separate PNG <img> (logo-v25.png) whose "TECH"/"UP"
+     wordmark is BLACK — invisible on the dark header (the news-site
+     `.page-header__logo` SVG filter never reaches it). Invert the same way:
+     black → white, and hue-rotate/saturate bring the red "POWER" back to red. */
+  .p-header-logo img {
+    filter: invert(1) hue-rotate(180deg) saturate(4) brightness(0.92) !important;
+  }
+
   .p-sectionLinks,
   .p-breadcrumbs,
   .p-description {
@@ -1291,6 +1366,14 @@
   .p-navEl.is-selected .p-navEl-link {
     background-color: #21303f !important;
     color: #ffffff !important;
+  }
+
+  /* The MOBILE off-canvas nav marks the current section on a different node than
+     the desktop bar (`.offCanvasMenu-linkHolder.is-selected`, not `.p-navEl`), so
+     the desktop rule above misses it and it shipped as a white #f5f5f5 slab across
+     the dark drawer. Only a narrow viewport ever renders this. */
+  .offCanvasMenu-linkHolder.is-selected {
+    background-color: #21303f !important;
   }
 
   /* Guest / info notice banner (the "Welcome to TechPowerUp Forums, Guest!" bar)
@@ -1506,6 +1589,37 @@
     color: #ffffff !important;
   }
 
+  /* NARROW viewports swap the numbered `.pageNav` for `.pageNavSimple` — a set of
+     pills the desktop rules never touch: the current one is a #fef4e7 cream plate
+     and Next/Last carry a `linear-gradient(0deg, #e8f4fc, #fff)` background-IMAGE
+     (bg-COLOR reads transparent, so a colour-only scan sees nothing). */
+  .pageNavSimple-el {
+    background-color: #21262d !important;
+    background-image: none !important;
+    color: #d6e2ee !important;
+    border-color: #2d333b !important;
+  }
+
+  .pageNavSimple-el--current {
+    background-color: #2563a8 !important;
+    color: #ffffff !important;
+    border-color: #2f74c0 !important;
+  }
+
+  /* Thread-list mini page-jump pills ("2", "3" next to a title): a #f5f5f5
+     white plate the pageNav rules don't reach, so it shipped as a bright
+     speck with our light-blue link text on white. Match the button tone. */
+  .structItem-pageJump a {
+    background-color: #21262d !important;
+    color: #d6e2ee !important;
+    border-color: #2d333b !important;
+  }
+
+  .structItem-pageJump a:hover {
+    background-color: #2d333b !important;
+    color: #ffffff !important;
+  }
+
   .actionBar-action {
     color: #8b949e !important;
   }
@@ -1538,6 +1652,92 @@
     background-color: #0d1117 !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
+  }
+
+  /* XenForo OVERLAY (the Log in / Register modal). None of this exists in the
+     DOM until you click "Log in", so no load-time scan can reach it — and it
+     shipped half-themed: a #e8e8e8 shell, a white-to-#e8f4fc title gradient, a
+     #f5f5f5 label column beside our dark inputs, and #141414 body ink. */
+  .overlay {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  .overlay-content,
+  .overlay .blocks-textJoiner,
+  .overlay .blocks-textJoiner em {
+    color: #c4cdd6 !important;
+  }
+
+  .overlay-title {
+    background-color: #161d27 !important;
+    background-image: none !important;
+    color: #e6edf3 !important;
+    border-color: #262c33 !important;
+  }
+
+  /* The form's left LABEL column is a light plate, not a text colour */
+  .formRow > dt,
+  .formRow-label {
+    background-color: #161d27 !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* The bar behind the submit button is an ABSOLUTELY POSITIONED sibling
+     (`.formSubmitRow-bar`, rgba(232,244,252,.9)) — it is not an ancestor of
+     anything, so an elementFromPoint/ancestor walk never sees it. */
+  .formSubmitRow-bar {
+    background-color: #161d27 !important;
+  }
+
+  /* `.inputGroup-text` is the affordance welded to an input: the password
+     "Show" toggle and the share flyout's copy-link button. Both ship #fafafa. */
+  .inputGroup-text,
+  .shareInput-button {
+    background-color: #21262d !important;
+    color: #5fb0e6 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* Member tooltip (hover a username): only its bottom stats strip inherited our
+     dark card — the header is a `.memberProfileBanner` painted #e8f4fc, and every
+     line in it (`.memberTooltip-blurb`: user title, trophy count, location) keeps
+     the light style's #141414 ink, which turns dark-on-dark the moment the banner
+     is darkened. Scope the banner fix to the TOOLTIP: the same class carries a
+     user's uploaded banner IMAGE on the full profile page, so only recolour here. */
+  .memberTooltip-header,
+  .memberTooltip .memberProfileBanner {
+    background-color: #161d27 !important;
+  }
+
+  .tooltip-content,
+  .tooltip-content-inner,
+  .memberTooltip,
+  .memberTooltip-headerInfo,
+  .memberTooltip-blurbContainer,
+  .memberTooltip-blurb {
+    color: #c4cdd6 !important;
+  }
+
+  /* Post attachment tiles ship a #f5f5f5 plate. An image attachment covers it
+     (object-fit: cover), but a non-image file, a broken image and every
+     lazy-load frame show the white square. */
+  .attachmentList .file,
+  .attachmentList .file--linked,
+  .file-preview {
+    background-color: #161d27 !important;
+    border-color: #262c33 !important;
+  }
+
+  /* Collapsed quote / code blocks fade out under a `linear-gradient(rgba(245,
+     245,245,0), #f5f5f5)` — a white wash over the truncated text. Retint each
+     to the surface it actually sits on (quotes #161d27, code #0d1117). */
+  .bbCodeBlock-expandLink {
+    background-image: linear-gradient(rgba(13, 17, 23, 0), #0d1117 80%) !important;
+  }
+
+  .bbCodeBlock--quote .bbCodeBlock-expandLink {
+    background-image: linear-gradient(rgba(22, 29, 39, 0), #161d27 80%) !important;
   }
 
   /* ============================================================

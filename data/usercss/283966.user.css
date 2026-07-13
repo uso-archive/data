@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Pikabu.
-@version      20260711.19.59
+@version      20260712.18.32
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -296,6 +296,22 @@
   .tags__tag:hover,
   .story__tags a:hover { background-color: var(--pk-surface) !important; color: var(--pk-text) !important; }
 
+  /* Tag STATE variants carry meaning, and the blanket label colour above swallowed
+     all three: `_nsfw` is the adult-content warning (danger red), `_added` /
+     `_removed` mark a tag just added to / removed from your filters (green / red).
+     Pikabu paints them from --color-danger-900 / --color-primary-900. Restore each,
+     dark-tuned. The selectors must outrank our own `.story__tags a` rule (0,1,1),
+     hence the doubled class / `.story__tags a…` forms. */
+  .tags__tag.tags__tag_nsfw,
+  .story__tags a.tags__tag_nsfw,
+  a.tag_nsfw,
+  .tags__tag.tags__tag_removed,
+  .story__tags a.tags__tag_removed,
+  a.tag_removed { color: #ef6a5d !important; }
+  .tags__tag.tags__tag_added,
+  .story__tags a.tags__tag_added,
+  a.tag_added { color: var(--pk-green) !important; }
+
   /* ===== Comments tree ===== */
   .comments,
   .page-story__comments { background-color: var(--pk-surface) !important; }
@@ -311,6 +327,18 @@
   .comment__branch,
   .comment__indent,
   .comment-thread__line { border-color: var(--pk-border) !important; background-color: var(--pk-border) !important; }
+
+  /* Pikabu marks the comment you wrote yourself with a filled username pill:
+     `[data-own=true]` paints it from --color-black-700, a mid-grey (#70737b) that
+     carried a white label. We lift that token to #aab3bd (it is a TEXT tone
+     everywhere else), which turns the pill into a light grey slab under our light
+     label — 1.3:1, effectively invisible. Give the pill its own dark fill so the
+     "this is mine" marker survives. The OP pill ([data-own-story]) keeps its brand
+     green, matching every other green fill on this theme. */
+  .comment__user[data-own="true"] .user__nick {
+    background-color: #4a525c !important;
+    color: var(--pk-text) !important;
+  }
 
   /* ===== Author / user blocks, avatars (do NOT tint the avatar image) ===== */
   .user__nick,
@@ -434,6 +462,15 @@
      brand green; neutral dropdown Selects keep their token colours. */
   [class*="Select__host_text"] [class*="Select__label"] { color: var(--pk-green) !important; }
 
+  /* The legacy sort selector on the Communities list ("Сортировать по
+     актуальности ⌄") is a plain span.link[data-role="sort"] whose label + Font
+     Awesome chevron keep Pikabu's darker brand green #67993d — it lands ~4.2:1 on
+     the dark card, just under the WCAG floor, and reads dimmer than the modern
+     Select above. Lift it (and its ::before chevron glyph) to the dark-tuned green. */
+  span.link[data-role="sort"],
+  span.link[data-role="sort"] span,
+  span.link[data-role="sort"] i.fa { color: var(--pk-green) !important; }
+
   /* The "primary-text" ghost + "outline" green-accent button variants (e.g. the
      "Сбросить запрос" reset-query action on an empty search result, and the
      "Расширенный поиск" advanced-search action in the search flyout) hardcode the
@@ -513,6 +550,15 @@
      `!important` on the custom property is required: Pikabu re-declares these under
      :root[data-theme-dark], which outranks a plain override. */
   .pkb-badge-shop {
+    /* The BASE token values are Pikabu's light default (#f2f3f7 pill / #5e6066 label),
+       and they are what any badge WITHOUT a colour variant resolves to — e.g. the
+       neutral `_gray` badge ("неисправен"), which Pikabu never gives a rule of its
+       own. Those badges shipped as a white pill on the dark card. Give the base a dark
+       default; the six colour variants below are later in this sheet at equal
+       specificity, so they still win for the badges that own an identity colour. */
+    --badge-shop-bg: #262c34 !important;
+    --badge-shop-stroke: #39414b !important;
+    --badge-shop-content: #c4cdd6 !important;
     background-color: var(--badge-shop-bg) !important;
     border-color: var(--badge-shop-stroke) !important;
     color: var(--badge-shop-content) !important;
@@ -645,6 +691,33 @@
   [class*="player-block__state"] {
     --color-bright-900: #e9e9e9;
     --color-black-440: #e9e9e9;
+  }
+
+  /* INVERTED TOKENS USED AS SURFACES.
+     --color-black-700/-800/-900/-940 are Pikabu's DARK greys; the palette flip above
+     lifts them to light tones because they are text colours nearly everywhere. In a
+     handful of places Pikabu instead uses them as a `background-color` — those
+     surfaces flip the wrong way and come out near-white on the dark canvas. A DOM
+     scan never catches them: every one is a transient, hover-only or state-only
+     surface that is not in the tree at load time. Pin each back to a dark fill.
+       .image-viewer-loader__stage   the lightbox spinner (a white disc on the black
+                                     scrim while a full-size image loads; #444850 natively)
+       .popup_warning .popup__container  a natively near-black (#212121) warning modal
+       .comment-external-video__state:hover  hover fill on an embedded video's state chip
+       .evaluation-emoji__title_framed / .avatar__note_banned / .icon--ui__close_story-preview
+       video.player                  the legacy Vue player's letterbox area */
+  .image-viewer-loader__stage,
+  .evaluation-emoji__title_framed { background-color: #3a4149 !important; }
+  .avatar__note_banned,
+  .icon--ui__close_story-preview { background-color: var(--pk-border) !important; }
+  video.player,
+  .comment-external-video__state:hover { background-color: var(--pk-header) !important; }
+  /* The warning modal paints its own text from --color-bright-900, which we remap to a
+     dark tone — so darkening the container alone would leave it dark-on-dark. Restore
+     the light foreground inside it, exactly as for the image viewer above. */
+  .popup_warning .popup__container {
+    background-color: var(--pk-surface) !important;
+    --color-bright-900: #e9e9e9;
   }
 
   /* Header ad-slot containers default to a literal white background; before an ad

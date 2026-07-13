@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for Slashdot, easy-on-the-eyes story feed and threaded comment discussions, with the classic Slashdot green kept intact.
-@version      20260711.20.00
+@version      20260712.18.33
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -60,8 +60,14 @@
   .nav-wrap span, .nav-secondary-wrap .nav-label,
   .nav-wrap .nav-label { color: #e6edf3 !important; }
   .nav-wrap a:hover, .nav-secondary-wrap a:hover, .nav-primary a:hover { color: #9be7d6 !important; }
-  /* "or" / "Topics:" / "Follow us:" small labels */
-  .nav-label, li.nav-label { color: #9fc7c0 !important; }
+  /* "Firehose" / "or" / "Topics:" / "Follow us:" small labels. The site paints these
+     `#00c2c2` with `cursor: default` — the cyan IS the not-a-link affordance. The
+     blanket masthead-link rules above are (0,2,0) and outranked a bare `.nav-label`
+     (0,1,0), so every label flattened to the same near-white as the real links and
+     "Firehose" looked as clickable as "Stories". Match the wrapper specificity. */
+  .nav-label, li.nav-label,
+  .nav-wrap li.nav-label, .nav-secondary-wrap li.nav-label,
+  .nav-wrap .nav-label, .nav-secondary-wrap .nav-label { color: #7fd4cf !important; }
 
   /* ---------- story listing cards (firehose) ---------- */
   article.fhitem, .fhitem,
@@ -448,6 +454,19 @@
      on both the orange fill and the dark track. */
   .poll-bar-bg { background-color: #21262d !important; }
   .poll-bar-text { color: #e6edf3 !important; }
+  /* The "N votes / P%" label is one fixed-width run that crosses BOTH the fill and
+     the track, so a single colour has to work on each. On the site's light track the
+     native dark label managed that; on our dark track only a light label does — and
+     light-on-#ff8c3f is 2.2:1. Deepen the fill (still unmistakably the brand orange)
+     so the white label clears 4.5:1 wherever it lands. */
+  .poll-bar-bg .poll-bar-fill, .poll-bar-fill { background-color: #a85a1c !important; }
+  /* "voting booth" / "other polls": the site ships these as white-on-orange chips
+     (`.polls-results a { color: white !important; background-color: orange !important }`).
+     That rule is (0,1,1) — exactly the specificity of our own `a:link`, so the later
+     sheet won and the labels came out link-blue on orange (~1.5:1). Restore the
+     site's white label at anchor specificity. */
+  .polls-results a, .polls-results a:link, .polls-results a:visited,
+  .polls-results a:hover { color: #ffffff !important; }
 
   /* ---------- brand / semantic buttons (keep their color, fix text) ---------- */
   .btn-success, a.btn-success, .nel-button, .btn-polls, button.btn-polls,
@@ -676,4 +695,147 @@
   /* "Posted on … | N votes" metadata is #7d7d7d — readable on the site's white,
      only 4.3:1 on our base */
   .content-list li span, .content-list li span i { color: #9aa4ad !important; }
+
+  /* ---------- /faq ---------- */
+  /* The FAQ's left index is a `#accordion` list whose every `li` is a hardcoded
+     #f4f4f4 — a full-height white column beside the (correctly dark) answers. The
+     expanded item keeps its own white on `a.about` / `.aboutOver` (#ddd). */
+  #accordion li, #accordion li a.about, #accordion.faq-menu li ul li {
+    background-color: #1c2128 !important;
+  }
+  #accordion li a.about:hover, .aboutOver { background-color: #262c33 !important; }
+  /* the "^ Top" back-links: the caret is an <i> the site colours #006666 (1.9:1 on
+     our base) with a #1e2329 hover — the anchor rule never reaches it, an <i> is not
+     an <a>. Same story for the FAQ answer-body carets. */
+  .faq-listing > div i, .faq-listing div i,
+  .faq-listing > div i:hover, .faq-listing div i:hover { color: #6fd8be !important; }
+
+  /* ---------- /software/ + /content/ (the SourceForge-powered shell) ----------
+     The "Business Software" directory and the "Thought Leadership" blog are top-level
+     nav destinations on slashdot.org but a completely different frontend, and the
+     theme never covered them: the page wrapper (#f6f8f8), the article column, every
+     sidebar widget and its header (#fff, the last one !important) all shipped white,
+     and the widget titles — which our own base rule had already lightened — rendered
+     near-white ON that white. */
+  body .off-canvas-content, .off-canvas-content { background-color: #14181d !important; }
+  .side-column-contents, .blog-body { background-color: transparent !important; }
+  .main-content, .l-content-column .main-content, .project-body > .main-content,
+  .main-content-wrapper, .l-black-n-tan .main-content-wrapper,
+  .m-sidebar-widget, .m-wide-widget, .m-wide-projects-widget {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+    border-color: #262c33 !important;
+  }
+  /* the widget title is a bare shrink-to-fit <header>, so a dark fill here would draw a
+     chip around the words rather than a bar — clear it and let the card show through */
+  .m-sidebar-widget header, .m-sidebar-widget .as-header,
+  .m-wide-widget header, .m-wide-widget .as-header {
+    background: transparent !important;
+    color: #e6edf3 !important;
+  }
+  .m-screenshots-display-full, .m-sub-section { background-color: #161b22 !important; }
+  /* current-page breadcrumb crumb is a plain #333 <span> (not a link) */
+  #breadcrumbs .breadcrumb_last, .breadcrumb_last { color: #9aa4ad !important; }
+  /* only the page-title h1 is natively dark (#333). The directory's h3 product names are
+     the site's cyan (#00c2c2 — already 8:1 on dark); the theme's blanket `h3` entry in
+     the light-surface neutralizer had greyed all 25 of them, so put the cyan back. */
+  .off-canvas-content h1 { color: #e6edf3 !important; }
+  .off-canvas-content h3, .projects h3, .result-heading-title h3 { color: #00c2c2 !important; }
+  /* the directory's PRIMARY CTA ("Learn More", 25 of them) is `.sandiego .green.button`,
+     the brand cyan #00c2c2. Our generic grey `.btn/button/a.button` fill is !important
+     at a lower specificity, so it beat the site's plain rule and every primary CTA came
+     out the same grey as a neutral button. Restore a cyan-teal that carries the white
+     label at 5:1 (the native #00c2c2 only reaches 1.9:1 under white). Same for the
+     blog's teal search-submit. */
+  .sandiego .green.button, a.button.green, .button.green,
+  a.button.btn-masthead-cmpn-main, .btn-masthead-cmpn-main {
+    background-color: #0b7c7c !important;
+    border-color: #0e9494 !important;
+    color: #ffffff !important;
+  }
+  .sandiego .green.button:hover, a.button.green:hover, .button.green:hover,
+  a.button.btn-masthead-cmpn-main:hover {
+    background-color: #0e9494 !important;
+  }
+  /* the cyan accent outlines (emphasised sections, the "blue" outline buttons) are the
+     one place the blanket `* { border-color }` reset erased a real signal */
+  section.m-section-emphasized, section.psp-section,
+  .button.blue, a.button.blue, div.button.blue { border-color: #0e9494 !important; }
+  input.search-submit, .m-sidebar-widget input.search-submit {
+    background-color: #0b7c7c !important;
+    border-color: #0e9494 !important;
+    color: #ffffff !important;
+  }
+  /* the product tab strip (About / Reviews / Pricing / …) is a white bar; its SELECTED
+     tab is a pale mint (#dde9e8) that our light label then landed on invisibly */
+  /* every tab also draws its 3px underline as a border-IMAGE (a white gradient on the
+     idle tabs, the brand teal on the selected one). A border-image ignores
+     border-color, so the blanket `*` reset left a bright white rule under the strip
+     and, once cleared, would have left the selected tab with no indicator at all. */
+  li.commercial_nav, ul.dropdown li.commercial_nav {
+    background-color: #1c2128 !important;
+    border-image-source: none !important;
+    border-bottom-color: #262c33 !important;
+  }
+  /* the SELECTED tab's pale mint (#dde9e8) is painted by a (2,4,2) `!important` rule in
+     the cross-origin fsdn sheet, so the class-level selector above never reached it */
+  .sandiego .project-masthead #commercial-project-nav #top_nav_admin ul.dropdown li.selected,
+  li.commercial_nav.selected, ul.dropdown li.commercial_nav.selected {
+    background-color: #14463d !important;
+    border-image-source: none !important;
+    border-bottom-color: #6fd8be !important;
+  }
+  li.commercial_nav.selected a, li.commercial_nav.selected a span { color: #e6edf3 !important; }
+  /* the review sort/filter buttons keep the brand teal (#006665) as TEXT — 1.9:1 on the
+     dark page. Their fill+colour come from a (0,5,0) `!important` Foundation rule
+     (`.sandiego .default.hollow-blue.hollow.button`), so match it. */
+  .sandiego .default.hollow-blue.hollow.button,
+  .sort-drop-down.button, .m-review-filters .sort-drop-down { color: #6fd8be !important; }
+  /* the "hollow" chips (review flags such as "Review was Incentivized", whose label is
+     a ::before) are #333 on transparent — invisible on dark — and their hover state
+     flips to a near-white #e6ecec fill. Same (0,4,0) `!important` origin. */
+  .sandiego .default.hollow.button, .sandiego .default.hollow.button::before {
+    color: #c4cdd6 !important;
+  }
+  .sandiego .default.hollow.button svg { fill: #c4cdd6 !important; }
+  .sandiego .default.hollow.button:hover, .sandiego .default.hollow.button:focus {
+    background: #2d333b !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+  .sandiego .default.hollow.button:hover svg,
+  .sandiego .default.hollow.button:focus svg { fill: #e6edf3 !important; }
+  /* breadcrumb " > " separators are ::before content at #666 (3.1:1) */
+  #breadcrumbs li::before, nav#breadcrumbs ul li::before { color: #8b949e !important; }
+  /* the mobile off-canvas menu keeps the site's own teal panel (#006665) and paints its
+     items #fefefe; the global link colour landed mid-blue on that teal at 2.7:1. Only
+     reachable by opening the hamburger at a narrow viewport. */
+  .off-canvas a, .off-canvas a:link, .off-canvas a:visited,
+  .off-canvas .menu a { color: #fefefe !important; }
+  /* directory pagination: the "…" gap marker is a #0a0a0a ::after (1.1:1, gone) and the
+     "«/»" chevrons are ::after content that took the global link blue onto the teal
+     Prev/Next buttons (2.9:1). Neither is a text node, so no colour audit sees them. */
+  ul.pagination li.ellipsis::after, .pagination li.ellipsis::after {
+    color: #8b949e !important;
+  }
+  .pagination-next a::after, .pagination-previous a::after,
+  .pagination .pagination-next a::after,
+  .pagination .pagination-previous a::after { color: #ffffff !important; }
+  /* the sponsor bar's CTA label is also ::before content, hardcoded #001e2b — on the
+     dark bar it renders at 1.1:1, i.e. an invisible call-to-action */
+  .sticky-cta::before, .sticky-wrapper .sticky-cta::before,
+  .sticky-right .sticky-cta::before { color: #e6edf3 !important; }
+  .m-heat-gradient .axis span, .m-heat-gradient .axis span.active { color: #e6edf3 !important; }
+  /* the directory search box and its typeahead are `<input>` with NO type attribute,
+     so every `input[type=…]` rule above missed them: white field, white placeholder */
+  form.directory-search-box, .directory-search-box,
+  .typeahead__container input, .typeahead__query input {
+    background-color: #0d1117 !important;
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+  }
+  .typeahead__container input::placeholder, .typeahead__query input::placeholder {
+    color: #8b949e !important;
+    opacity: 1 !important;
+  }
 }

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for Syosetu (小説家になろう). Easy-on-the-eyes reading for novel chapters, plus the home, rankings, search and bookmark controls.
-@version      20260711.19.58
+@version      20260712.18.30
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -144,6 +144,12 @@
   .c-dropdown__chips-group li {
     background-color: #1c2128 !important;
   }
+  /* The disc is painted from the WRAPPER's hover, not the icon's own
+     (`.c-dropdown:hover .c-dropdown__icon{background:var(--color-dropdown-icon-bg-hover)}`),
+     so an `.c-dropdown__icon:hover` rule never matches — the kebab still lit up as
+     a solid #eee white disc the moment the pointer entered the control. Key on the
+     wrapper, exactly as the site does. */
+  .c-dropdown:hover .c-dropdown__icon,
   .c-dropdown__icon:hover {
     background-color: #21262d !important;
   }
@@ -278,15 +284,30 @@
   }
 
   /* Narou warm-orange link/title accent (search, novel titles):
-     keep the orange identity, lift for dark legibility */
+     keep the orange identity, lift for dark legibility.
+     The yomou ranking-top page (yomou.syosetu.com/rank/top/) marks its titles
+     as a bare <a> inside .p-ranktop-item__title — a DIFFERENT family from the
+     portal's .c-novel-item, and natively the Narou brand orange #de4900. Without
+     it every ranking title (40+ across 日間/週間/月間…) fell to the generic link
+     blue: a brand-identity flattening chroma can't see (orange→blue, both
+     chromatic). Target the anchor (and the wrapper, for markup that omits it).
+     The paged ranking LIST (yomou.syosetu.com/rank/list/type/…, 50 titles a page,
+     six pages per period) is a THIRD family again — .p-ranklist-item__title
+     wrapping a bare id-only <a> — so neither of the above reached it. */
   .novel_h a,
   .noveltitle a,
-  .c-novel-item__title a {
+  .c-novel-item__title a,
+  .p-ranktop-item__title,
+  .p-ranktop-item__title a,
+  .p-ranklist-item__title,
+  .p-ranklist-item__title a {
     color: #f0954a !important;
   }
   .novel_h a:hover,
   .noveltitle a:hover,
-  .c-novel-item__title a:hover {
+  .c-novel-item__title a:hover,
+  .p-ranktop-item__title a:hover,
+  .p-ranklist-item__title a:hover {
     color: #ffb877 !important;
   }
 
@@ -628,6 +649,25 @@
     background-color: #30363d !important;
     color: #8b949e !important;
     border-color: #30363d !important;
+  }
+  /* The impression/feedback form's 送信[確認] submit is natively a pale-yellow
+     CTA (cream #fffcde fill, gold #fcd27e border) — the site's "confirm" accent,
+     distinct from the blue --primary. The base .c-button rule flattened it to the
+     neutral chip, so the form's primary action stopped reading as one. Keep the
+     yellow identity as a warm gold fill with dark text. The submit is an
+     <input type="submit">, so the generic `input[type="submit"]` chip rule
+     (0,1,1) out-specifies a bare `.c-button--yellow` (0,1,0) — qualify with the
+     base class (0,2,0) so the modifier wins, same trap as .c-under-nav__pdflink. */
+  .c-button.c-button--yellow {
+    background-color: #d6a44a !important;
+    color: #1a1109 !important;
+    border-color: #d6a44a !important;
+  }
+  .c-button.c-button--yellow:hover,
+  .c-button.c-button--yellow:focus,
+  .c-button.c-button--yellow:active {
+    background-color: #c4933b !important;
+    color: #1a1109 !important;
   }
 
   /* Rating stars / point form */
@@ -1329,6 +1369,21 @@
   .c-pr {
     background-color: transparent !important;
   }
+  /* The floating "flexible sticky" ad's close button is an inline SVG whose
+     polygon carries style="fill:#000;stroke:#000" — a pure-black X. It sits on
+     the ad's own light creative natively, but on our dark page it renders as a
+     black-on-dark X floating over the ranking rows: the ad's only dismiss
+     control, unusable. Both audits are blind to it (SVG paint, and only WHITE
+     fills are flagged). Repaint the glyph light and back it with a dark chip so
+     it also reads if a light creative loads behind it. */
+  #flexible-sticky-ov-close-button {
+    background-color: #1c2128 !important;
+  }
+  #flexible-sticky-ov-close-button svg polygon,
+  #flexible-sticky-ov-close-button svg path {
+    fill: #c4cdd6 !important;
+    stroke: #c4cdd6 !important;
+  }
 
   /* ============================================================
      Error / 404 page (syosetu.com/<bad-url>)
@@ -1387,6 +1442,70 @@
   }
   .fc-consent-root .fc-faq-header .fc-faq-icon svg {
     fill: #c4cdd6 !important;
+  }
+  /* The dialog's body copy is painted by the CMP's OWN high-specificity
+     !important rules (e.g. `.fc-consent-root .fc-stacks .fc-stack-name` at
+     0,3,0, `.fc-consent-root .fc-dialog .fc-footer p` at 0,4,0), which
+     out-specify the broad `.fc-dialog span/p/div` lift above — so the purpose
+     titles (#3c4043, ~1.2:1), the "Welcome"/"Manage your data" header text and
+     the footer legal note (#5f6368, ~2:1) and the "Learn more" FAQ toggle
+     stayed dark-on-dark on the "Manage options" preferences screen. Match each
+     selector-for-selector, same as the headline/footer-link above. */
+  .fc-consent-root .fc-dialog .fc-stacks .fc-stack-name,
+  .fc-consent-root .fc-dialog .fc-header .fc-header-text,
+  .fc-consent-root .fc-faq-header .fc-faq-label {
+    color: #c4cdd6 !important;
+  }
+  .fc-consent-root .fc-dialog .fc-footer p {
+    color: #9aa3ad !important;
+  }
+  /* Each TCF preference card is a white-bordered box (#dadce0) — light frames
+     boxing the dark panels. The card body itself is already darkened by the
+     .fc-preference-container entry in the bg block above; only the edge leaked. */
+  .fc-consent-root .fc-preference-container {
+    border-color: #2d333b !important;
+  }
+  /* The "Manage options" TCF preferences screen (.fc-data-preferences-dialog,
+     reached from the consent dialog) is a deeper sub-surface the first-dialog
+     rules never covered: its bare heading "Manage your data" is pure #000 (base
+     rule, not .fc-dialog-headline), each purpose card title is #3c4043 (~1.2:1),
+     and the descriptions / vendor-toggle labels are #5f6368. Match each at or
+     above the CMP's own specificity (the h1 rule stays below the first dialog's
+     0,4,0 headline rule, so that one keeps its brighter #e6edf3). */
+  .fc-consent-root .fc-preferences-container .fc-preference-container .fc-preference-title h2,
+  .fc-consent-root .fc-header h1,
+  .fc-consent-root .fc-dialog .fc-header h1 {
+    color: #c4cdd6 !important;
+  }
+  .fc-consent-root .fc-preference-container .fc-purpose-feature-description,
+  .fc-consent-root .fc-preference-container .fc-preference-slider-label,
+  .fc-consent-root .fc-dialog-content .fc-preference-container .fc-preference-description,
+  .fc-consent-root .fc-dialog-content .fc-preference-container .fc-preference-description p,
+  .fc-consent-root .fc-dialog-content .fc-preference-container .fc-preference-description li,
+  .fc-consent-root .fc-dialog-content .fc-preference-container .fc-preference-description b,
+  .fc-consent-root .fc-data-preferences-dialog .fc-body p {
+    color: #9aa3ad !important;
+  }
+  /* The "How this CMP works" explainer sits in .fc-noneditable-body, outside the
+     preference cards, so the card-scoped rule above misses it. */
+  .fc-consent-root .fc-data-preferences-dialog .fc-noneditable-body p,
+  .fc-consent-root .fc-data-preferences-dialog .fc-noneditable-body li {
+    color: #9aa3ad !important;
+  }
+  /* "View details" links live inside the description and are painted a dark
+     #1967d2 (~3.3:1) by the CMP; lift to the accent blue. The manage-vendors
+     nav button's label carries the same dark blue. */
+  .fc-consent-root .fc-dialog-content .fc-preference-container .fc-preference-description a,
+  .fc-consent-root .fc-navigation-button .fc-navigation-button-label {
+    color: #5fb0e6 !important;
+  }
+  /* The manage-vendors / navigation buttons on the preferences screen ship a
+     bare white fill with black text — darken to the neutral chip (the primary
+     Accept-all / Confirm-choices CTAs keep their brand-blue fill). */
+  .fc-consent-root .fc-data-preferences-dialog .fc-navigation-button {
+    background-color: #21262d !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
   }
   .fc-consent-root .fc-footer-buttons-divider,
   .fc-consent-root .fc-preference-divider {

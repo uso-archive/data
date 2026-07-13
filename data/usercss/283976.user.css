@@ -3,11 +3,11 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260711.00.15
+@version      20260712.18.30
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
-@-moz-document domain("khanacademy.org") {
+@-moz-document regexp("https?://(?!donate\.|blog\.|support\.)([a-z0-9-]+\.)*khanacademy\.org(/.*)?") {
 :root { color-scheme: dark !important; }
 
   /* ====================================================================
@@ -159,6 +159,14 @@
   nav[role="navigation"], header[role="banner"],
   #top-header-container { background-color: #0d1117 !important; }
 
+  /* Global site footer. Khan paints it with the SAME brand navy (#0b2149) it uses
+     on the header strip above — but nothing here reached it, so while the header
+     was darkened the footer kept the raw navy, rendering as the single brightest
+     large surface in the theme (~1.7x the base luminance). Darken it to match the
+     themed header so the brand navy reads consistently dark; its light link text
+     stays legible on the deeper tone. */
+  footer[class] { background-color: #0d1117 !important; }
+
   /* ====================================================================
      "Explore" mega-menu (header dropdown)
      Khan renamed the menu's hook from `data-test-id` to `data-testid`, so
@@ -210,6 +218,13 @@
      on the dark modal — a WCAG fail. Lift links inside dialogs only. */
   [role="dialog"] a { color: #9bd4ff !important; }
 
+  /* NOT a bug, and deliberately left alone: the logged-out "Reach new Levels!" onboarding
+     dialog opens on a lavender (#e4d7ff) illustration band. It is the brightest surface the
+     theme shows, but the mastery bar + star inside it is an OPAQUE raster gif with that
+     lavender baked into its own pixels — darkening the container only recolours the strip
+     below the artwork and leaves a two-tone band that looks worse than the original. Raster
+     art gets left as drawn (same rule the 404 space scene and the login collage follow). */
+
   /* Wonder Blocks notification banner (the logged-out "Log in or Sign up to
      save your future progress!" strip above the header, and its siblings).
      It hardcodes the pale info blue #edf3fe and lives OUTSIDE `#main-content`,
@@ -239,6 +254,18 @@
   #app-shell-root > ._1ipaf6gj button > span:first-child:empty {
     background-color: #c4cdd6 !important;
   }
+
+  /* The home page's donation takeover (`#donate-banner`) is mounted as a SIBLING
+     of `#main-content`, so the content neutralizer never reaches it, and it paints
+     its carrier the full-bleed brand navy (#0b2149) — the same tone the header and
+     footer rules above deliberately darken, here as a 616px slab above the fold and
+     the brightest large surface on the page. Flatten the carrier onto the base
+     surface. The gift form inside keeps its own fills: the amount/frequency options
+     come from the `form fieldset` rules below and the "Give now" CTA from
+     `[data-kind="primary"]`, both `!important`. `:not(span)` for the usual reason —
+     Wonder Blocks icon spans are mask-images whose FILL is their background-color. */
+  #donate-banner { background-color: #14181d !important; }
+  #donate-banner [class]:not(span) { background-color: transparent; }
 
   /* ====================================================================
      Headings + body text
@@ -358,8 +385,15 @@
      `mask-image` SVG whose FILL is the span's own `background-color` (the slate
      mastery tone, white, or `currentColor`). Flattening that to transparent
      stripped every icon to an empty box; excluding `span` keeps the mastery /
-     progress colors intact (no large light-surface span exists to need it). */
-  #main-content [class]:not(span) { background-color: transparent; background-image: none; }
+     progress colors intact (no large light-surface span exists to need it).
+     The `var(--tile-color, transparent)` fallback keeps the mastery-KEY swatches
+     coloured: the course-page legend (Mastered / Proficient / Familiar / Attempted)
+     and every grid tile paint their fill `<div>` with `background-color:
+     var(--tile-color)` — a hardcoded flatten to `transparent` collapsed all four
+     learning states to the same grey square, erasing the colour code. Khan defines
+     `--tile-color` only on these mastery tiles, so every other surface resolves the
+     fallback and still flattens dark exactly as before. */
+  #main-content [class]:not(span) { background-color: var(--tile-color, transparent); background-image: none; }
   /* Re-surface the elements that NATIVELY carry a background, and only those.
      An earlier version painted every `#main-content button[class]`, which is a
      rule about an element TYPE rather than about what the element actually looks
@@ -413,6 +447,24 @@
      floating in an empty outline — legible, but it no longer reads as the same
      "on" control the rest of the app uses. Give the checked box its fill back. */
   #main-content input[type="checkbox"]:checked { background-color: #2563c9 !important; }
+
+  /* Problem-progress dots (`ul.indicatorContainer`, under every article's practice
+     block and along the foot of an exercise): each problem is a
+     `button[aria-label="Problem N"]` holding a ring <div> whose 2px border Khan paints
+     the raw brand blue, plus an inner <div> filled the same blue on the problem you are
+     currently on. TWO of our broad rules between them erased the entire indicator: the
+     blanket `* { border-color }` reset at the end of this file greyed every ring, and the
+     `#main-content [class]` neutralizer flattened the inner disc to transparent — so all
+     nine dots rendered as identical hollow grey circles and nothing on screen said which
+     problem you were on. Restore both cues in the theme's refined Khan blue. The inner
+     disc needs no `!important` (it only has to outrank the neutralizer), the ring does
+     (the border reset is `!important`). */
+  #main-content ul.indicatorContainer button[aria-label] > div {
+    border-color: #5fb0e6 !important;
+  }
+  #main-content ul.indicatorContainer button[aria-label] > div > div {
+    background-color: #5fb0e6;
+  }
 
   /* Wonder Blocks renders a button's leading icon as an EMPTY <span> whose
      `mask-image` is filled by the span's own background-color — which resolves

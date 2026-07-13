@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260711.19.57
+@version      20260712.18.28
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -57,6 +57,13 @@
      a scheduled one. Scope to .cscore--live so ONLY in-progress clocks go red. */
   .cscore--live .cscore_time, .cscore--live .cscore_time.time,
   .cscore--live .cscore_status {
+    color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
+  /* Same live/not-live signal one component over: a one-feed scoreEvent (golf/tennis
+     leaderboards, "Rd 4 - In Progress") paints .scoreEvent__status ESPN live-red
+     #dd0000 while a scheduled/final event leaves it grey. The generic grey rule above
+     lists .scoreEvent__status, flattening BOTH into the same grey — a live tournament
+     then reads exactly like a concluded one. Re-red only the live state. */
+  .scoreEvent--live .scoreEvent__status {
     color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
   /* Legacy video-duration chips paint a translucent WHITE pill with dark #1d1e1f
      text; a bare white label turned them white-on-white. Re-tone the pill dark,
@@ -138,9 +145,16 @@
     color: #c4cdd6 !important; fill: #c4cdd6 !important; }
   .icon-button:hover, .reactions-button:hover { color: #e6edf3 !important; fill: #e6edf3 !important; }
   /* video play-button overlay: keep dark, not a bright leak */
-  .video-play-button, .Poster__Button, .media-wrapper__playbtn,
+  .Poster__Button, .media-wrapper__playbtn,
   .play-button, .VideoControls__PlayButton {
     background-color: rgba(20,24,29,0.7) !important; }
+  /* .video-play-button is NOT the button — it is the full-size transparent overlay
+     that SPANS the whole video thumbnail (300x169 / 149x84); the actual play control
+     is its 32-64px ::before disc. Painting the overlay rgba(20,24,29,.7) laid a 70%
+     dark scrim over every video thumbnail on the feed, so video cards rendered visibly
+     washed-out beside ordinary photo cards. Native is transparent — keep it that way
+     and let the white ::before disc read as the affordance it is (it sits on a photo). */
+  .video-play-button { background-color: transparent !important; }
 
   /* ---- Tables (stats / standings) ---- */
   .Table, .Table2, table, .tablehead, .mpTable > table, .Table__TBODY,
@@ -371,6 +385,12 @@
   .search_results__header { color: #e6edf3 !important; }
   .search_results__cat { color: #9aa4ae !important; }
   .search_results__item:hover, .search_results__link:hover { background-color: #21262d !important; }
+  /* Autocomplete result avatars are the same transparent-cutout-on-a-solid-white-disc
+     component the theme already darks as .headshot — but the list variant is classed
+     .headshot-sm, which that rule never matched, so every player row shipped a glaring
+     white circle on the dark panel. At 30px they also duck the audit's size filter.
+     Slightly above the panel so the disc still reads as an avatar. ---- */
+  .search_results__img, .headshot-sm { background-color: #21262d !important; }
 
   /* ---- Account flyout (li.user > .global-user): white panel + a lighter
        #f1f2f3 "Favourites" pane whose copy is a pale grey → invisible on white
@@ -435,6 +455,11 @@
     color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
   /* Game-note strip ("NBA Finals - Game 5, NY wins series") paints pure black → muted grey. */
   .ScoreCell__GameNote, .ScoreCell__NotesWrapper { color: #9aa4ae !important; }
+  /* Upcoming-fixture DATE in a Gamestrip ScoreCell ("Next Match" on the player/team
+     page) paints near-black #121213 — legible on the site's white card, 1.05:1 on our
+     base, i.e. flat invisible, while the kickoff TIME right below it stays readable.
+     Match the time's muted grey. */
+  .ScoreCell__ScoreDate { color: #9aa4ae !important; }
   .SwitchPlayer, .SwitchPlayer__list, .SwitchPlayer__athletes, [class*="SwitchPlayer"] {
     background-color: #1c2128 !important; border-color: #2d333b !important; }
   .SwitchPlayer__athlete_link:hover { background-color: #21262d !important; }
@@ -473,8 +498,18 @@
   /* ---- Golf scoreEvent metadata (hardcodes #48494a via class) ---- */
   .scoreEvent__concludings { color: #9aa4ae !important; }
 
-  /* ---- Game-strip team-colour header band: tame pure-white team halves (keeps hue) ---- */
-  .game-details.header.sm { filter: brightness(0.5) saturate(1.15) !important; }
+  /* ---- Game-strip team-colour header band. The band is a two-team brand GRADIENT
+       (background-image: linear-gradient(to right, <teamA>, <teamB>)) carrying a white
+       competition label. brightness(0.5) darkened the gradient AND every glyph inside
+       it, and the generic span rule had already greyed the label to #c4cdd6 — together
+       they rendered it #626a6b on a muddied maroon, ~2.9:1, failing AA on a band that
+       is perfectly legible (white-on-brand) natively. A filter cannot spare its own
+       text, so drop it and restore the native white label: the saturated team gradient
+       is exactly the brand colour this theme promises to preserve. ---- */
+  .game-details.header.sm { filter: none !important; }
+  .game-details.header.sm, .game-details.header.sm span,
+  .game-details.header.sm .cscore_notes_game {
+    color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
 
   /* ---- Next-gen "prism" design system (espnDS_v2): gamecast / match / newer layouts.
        Fully token-driven — remap surface tokens (white -> dark) and text tokens
@@ -632,6 +667,12 @@
   .cscore_overview::before, .cscore_overview::after,
   .scoreLabel_content::before, .scoreLabel_content::after {
     background-color: #2d333b !important; }
+  /* Same hairline one row down: every one-feed leaderboard row (golf/tennis scoreEvent)
+     separates its score column from its today/movement column with a 1px #edeef0
+     ::after on the row anchor — a bright white rule the full height of the leaderboard.
+     1px wide, so it slips the audit's size filter, and it is a pseudo, so no element-bg
+     scan can see it at all. ---- */
+  .cscore_link::after { background-color: #2d333b !important; }
 
   /* ---- 404 page ships its own white hero panel + near-white quick-links block
        (with our already-light headline text on top → light-on-light). ---- */
@@ -716,9 +757,34 @@
     background-color: #14181d !important; border-color: #262c33 !important; }
   #global-nav-mobile ul.tier-2 a:hover, #global-nav-mobile ul.tier-3 a:hover {
     background-color: #1c2128 !important; }
+  /* Mobile-nav search reveal (.global-search) collapses to 0×0 at load and expands to a
+     solid #edeef0 white panel when the in-menu search is tapped — closed-state white the
+     load-time scan can't see. Scope to the mobile nav so the transparent desktop
+     .global-search is untouched. ---- */
+  #global-nav-mobile .global-search { background-color: #14181d !important; }
 
   /* ---- Taboola "why this ad" fade / popover panels are solid white and only exist
        once the widget's exclude control is used — invisible to a load-time scan. ---- */
   .trc_exclude_overlay, .trc_popover, .trc_popover_title_wrapper {
     background-color: #1c2128 !important; }
+
+  /* ---- Carousel navigation arrows: the legacy slick arrows (homepage miniCard
+       carousel) AND the next-gen prism .CarouselArrow (gamecast Video-Highlights
+       carousel) each ship a translucent WHITE disc (rgba(255,255,255,.8)) that glares
+       against the dark card / thumbnail. Both are floating buttons that overlay content,
+       so a load-time bg scan sees them but reads them as an intended affordance — like
+       the scores-prev/next arrows the theme already darks. The slick glyph is an
+       ESPNIcons char painted link-blue #0066cc (~2:1 once the disc is dark); the
+       CarouselArrow glyph is already white. Dark the disc, lighten the slick glyph. ---- */
+  .slick-prev, .slick-next, .CarouselArrow, button.CarouselArrow {
+    background-color: rgba(20,24,29,0.7) !important; border-color: #2d333b !important; }
+  .slick-prev::before, .slick-next::before { color: #e6edf3 !important; }
+
+  /* ---- Video-playlist "Now Playing" marker (.MediaList__item__playing): ESPN paints
+       this label native red #dd0000 to flag the currently-playing clip in a video rail;
+       our generic li/span text rule flattened it to grey so it read as ordinary
+       metadata. Restore the red state signal (matching the theme's clr-negative /
+       cscore--live live-red treatment). ---- */
+  .MediaList__item__playing {
+    color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
 }

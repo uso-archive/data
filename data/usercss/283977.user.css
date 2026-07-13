@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for KHInsider's game-music archive: easy on the eyes across album pages, song lists, the audio player, search and comments.
-@version      20260711.00.15
+@version      20260712.18.30
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -304,6 +304,13 @@
     color: #ffffff !important;
     background-color: #1c232c !important;
   }
+  /* While its dropdown is open, XenForo marks the parent nav tab `is-menuOpen` and
+     paints it a translucent accent (rgba(71,167,235,.5)) — a state we never styled,
+     so opening any nav menu lit a bright blue slab on our dark header. Match the
+     selected/hover chip instead. */
+  .p-navEl.is-menuOpen,
+  .p-navEl-splitTrigger.is-menuOpen,
+  .p-navEl.is-menuOpen > .p-navEl-link { background-color: #1c232c !important; }
   /* "Log in / Register" account pill ships a light-blue border */
   .p-navgroup.p-account .p-navgroup-link,
   .p-account a.p-navgroup-link--textual {
@@ -389,13 +396,18 @@
     border-color: #2d333b !important;
   }
   .button:hover { background-color: #2a313a !important; color: #ffffff !important; }
-  .button.button--cta, .button--cta {
+  /* XenForo ships TWO filled action variants and paints them different hues on
+     purpose: `button--primary` is blue (#47a7eb) and `button--cta` is amber
+     (#f2930d), so a page carrying both still reads which action is which. We were
+     painting cta the same blue as primary, collapsing that distinction. Keep the
+     amber, darkened to sit on our surfaces. */
+  .button.button--cta, a.button.button--cta {
     background-image: none !important;
-    background-color: #1f6feb !important;
+    background-color: #b8710a !important;
     color: #ffffff !important;
-    border-color: #1f6feb !important;
+    border-color: #d18410 !important;
   }
-  .button.button--cta:hover { background-color: #3b82f6 !important; }
+  .button.button--cta:hover, a.button.button--cta:hover { background-color: #d18410 !important; }
   /* This XenForo build marks its primary action (Log in, Register, Post) with
      `button--primary` — natively white-on-blue — not `button--cta`. The base
      `.button` rule above carries equal specificity and lands later, so every primary
@@ -414,6 +426,12 @@
     background-color: transparent !important;
     border-color: transparent !important;
   }
+  /* `is-bookmarked` is a STATE, not a style: the skin signals it by turning the
+     bookmark button's glyph amber (#f2930d) and nothing else. Our base `.button`
+     colour is !important and outranks it, so a bookmarked thread looked exactly like
+     an unbookmarked one. Restore the amber. */
+  .button.button--icon--bookmark.is-bookmarked,
+  a.button.button--icon--bookmark.is-bookmarked { color: #e3b341 !important; }
   /* password-strength meter (register): native <meter> track is white */
   meter, .meterBar { background: #161b22 !important; border: 1px solid #2d333b !important; }
   meter::-webkit-meter-bar { background: #161b22 !important; border: none !important; }
@@ -424,6 +442,16 @@
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
+  }
+  /* Every flyout hangs a pointer triangle off its top edge: a 0x0 box whose ONLY
+     opaque side is painted with the skin's accent (#47a7eb), the neighbours staying
+     transparent. Against the light native menu that reads as an accent tip; on our
+     dark menu it was a saturated blue spike. Repaint just the sides that can be
+     opaque, to the menu's own edge colour — never the transparent neighbours, or the
+     triangle fills into a rectangle. */
+  .menu-arrow {
+    border-top-color: #2d333b !important;
+    border-bottom-color: #2d333b !important;
   }
   .menu-header, .menu-footer, .menu-footer-controls, .overlay-title {
     background-image: none !important;
@@ -458,6 +486,23 @@
   .memberProfileBanner {
     background-color: #161b22 !important;
     border-color: #2d333b !important;
+  }
+  /* The user-group badge inside that card ("Staff member") is an identity chip the
+     skin paints as a LIGHT tile with coloured text — #e8f4fc/blue for staff+primary,
+     #fef4e7/brown for accent. Both survived our theme untouched and glared as light
+     pills on the dark card. Keep each badge's hue as the signal, carry it on the text
+     and border, and drop the tile to a dark chip. The saturated variants (red, green,
+     blue, gray…) are already white-on-colour and stay as the site ships them. */
+  .userBanner.userBanner--staff,
+  .userBanner.userBanner--primary {
+    background-color: #16263a !important;
+    color: #79c0ff !important;
+    border-color: #2d4a6b !important;
+  }
+  .userBanner.userBanner--accent {
+    background-color: #2e2312 !important;
+    color: #e3b341 !important;
+    border-color: #5a4520 !important;
   }
   /* ---- Tooltip pointer arrows ----
      Each arrow is a 0x0 box: exactly ONE border side is opaque and draws the
@@ -655,10 +700,12 @@
   .avatar, .avatarWrapper, .contentRow-figure,
   .structItem-iconContainer, .avatar img { background-color: transparent !important; }
   /* Letter avatars: XenForo paints a per-user chip via inline style
-     (background-color + a matched darker/lighter initial). The transparent rule
-     above erases the chip and the broad link colour repaints the initial, leaving
-     a bare blue letter. The inline pair can't be restored — an !important rule of
-     ours always outranks inline — so give them one coherent dark chip instead.
+     (background-color + a matched initial). The transparent rule above erases the
+     chip and the broad link colour repaints the initial, leaving a bare blue letter.
+     We do NOT restore the inline pair: the generated palette is built for a light
+     page and half of it IS light — #ccadeb with a #732eb8 initial sits right next to
+     #1f3d7a with a #7094db one — so honouring it would scatter bright discs down
+     every thread row. One coherent dark chip for all of them instead.
      `a.avatar--default` must stay at least as specific as `.p-body-content a`. */
   .avatar--default, a.avatar--default {
     background-color: #21262d !important;

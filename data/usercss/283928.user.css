@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Depop, easy on the eyes across home, search, categories and product pages, with prices, sale tags and the Depop red kept readable.
-@version      20260710.13.08
+@version      20260712.18.27
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -131,6 +131,17 @@
     background-image: none !important;
     background-color: #30363d !important;
     border-color: #2d333b !important;
+  }
+
+  /* The MOBILE nav drawer's app-download promo card paints the same light
+     linear-gradient (rgb(251,246,241)→rgb(226,232,247)) as the hero toggle,
+     via background-IMAGE over a transparent background-color — so it survives
+     every bg-colour reset and renders a near-white slab in the dark drawer,
+     with its "Buy, sell & discover on the go" label light-on-light. The card
+     only exists once the drawer is opened, so no load-time scan reaches it. */
+  [class*="appDownloadBox"] {
+    background-image: none !important;
+    background-color: #1c2128 !important;
   }
 
   /* "Shop by category" hover mega-menu — rendered OUTSIDE the
@@ -510,6 +521,37 @@
     color: #c4cdd6 !important;
   }
 
+  /* The PDP's buyer-protection shield and shipping truck, and the footer's
+     X / Instagram / TikTok badges, are SVGs whose paths are fill/stroke
+     "currentColor" over a hardcoded dark `color` (#262626 and pure #000).
+     They were legible on the site's white page and render dark-on-dark here —
+     an icon-only failure no element-background scan can see. Their own colour
+     is the single point of repair. */
+  [class*="bannerContainer"] svg,
+  [class*="shippingIcon"],
+  footer [class*="socialLink"] svg,
+  [data-testid="footerV2"] [class*="socialLink"] svg {
+    color: #c4cdd6 !important;
+  }
+
+  /* The TikTok badge is the exception in that row: its path carries a literal
+     fill="black" ATTRIBUTE rather than currentColor, so re-lighting the svg's
+     colour leaves it a black glyph on the black footer. */
+  footer [class*="socialLink"] path[fill="black"],
+  [data-testid="footerV2"] [class*="socialLink"] path[fill="black"] {
+    fill: #c4cdd6 !important;
+  }
+
+  /* The homepage hero's three trust signals (Buy safely / 49M+ / 500K+) paint
+     their glyphs with a `fill` of #43484d — a mid-grey that read fine on the
+     site's white hero and drops to ~1.9:1 on the dark one, leaving each label
+     with a barely-there icon. `fill` beats `color` here, so the icon rules
+     above cannot reach them. */
+  [class*="trustSignal"] svg,
+  [class*="trustSignal"] svg path {
+    fill: #8b949e !important;
+  }
+
   /* ============================================================
      Buttons — Depop renders its design-system buttons as
      <button>/<span>/<a> carrying a "buttonWrapper" module class
@@ -629,11 +671,76 @@
     color: #ffda0a !important;
   }
 
+  /* Depop's design system paints its text ACTIONS in an indigo (#3d37bd):
+     the search bar's "Clear all", the autocomplete's category suggestions
+     ("...in Men's Footwear"), "See similar items", the toast/tips links and
+     the modal dismiss + delete actions. The generic a/button/span text rules
+     above flatten every one of them to the same grey as body copy, so an
+     action reads as inert text. Restore the accent, toned for dark.
+     (sellerWebsite is the profile bio's site link — the site's other blue,
+     #2960af; same treatment.) */
+  [class*="resetAllButton"],
+  [class*="resetAllButton"] *,
+  [class*="dismissModalButton"],
+  [class*="deleteText"],
+  [class*="categorySuggestionText"],
+  [class*="seeSimilarItemsText"],
+  [class*="toastLink"],
+  [class*="tipsLink"],
+  [class*="todoButton"],
+  [class*="ctaWrapper"] a,
+  [class*="sellerWebsite"] {
+    color: #6ea8fe !important;
+  }
+
   /* Depop "Sale" / red accents — tone the raw #e20020 for dark */
   [style*="226, 0, 32"],
   [class*="sale"],
   [class*="Sale"] {
     color: #ff6b7d !important;
+  }
+
+  /* #e20020 is not only the brand accent — it is also Depop's ERROR colour.
+     Every form validation message (login, the price filter's "Minimum price
+     can't be higher than maximum price", offer alerts) is painted with it,
+     and the blanket p/span/label rule repaints them the same grey as body
+     copy: the error then reads as ordinary help text. Restore the alert red. */
+  [class*="errorText"],
+  [class*="errorMessage"],
+  [class*="ErrorMessage"],
+  [class*="errorMessage"] *,
+  [class*="lightTextError"],
+  [class*="zeroLeftWarning"],
+  [class*="offerAlertText"],
+  [class*="offersToReview"],
+  [class*="rejectedOfferTitle"] {
+    color: #ff6b7d !important;
+  }
+
+  /* ...and the input that error points at is outlined in the same red, which
+     the blanket `*` border reset at the top of the file erased — leaving the
+     offending field visually identical to a valid one. */
+  [class*="priceFilterInputError"],
+  [class*="inputContainerError"],
+  [class*="descriptionErrorBorder"],
+  [class*="radioIndicatorError"] {
+    border-color: #ff6b7d !important;
+    outline-color: #ff6b7d !important;
+  }
+
+  /* The seller bio and the listing description render their links in the brand
+     red; the blanket `a` rule greyed them into the surrounding copy. */
+  [class*="shopBio"] a,
+  [class*="description"] a {
+    color: #ff6b7d !important;
+  }
+
+  /* "Free domestic shipping" is the PDP's one positive signal — icon AND label
+     are green (#266d1c). The icon inherits its own colour and stayed green, but
+     the blanket `p` rule greyed the LABEL beside it: a half-erased signal that
+     looks like an ordinary line of metadata. */
+  [class*="shippingMessage"] {
+    color: #56b04a !important;
   }
 
   /* The "50% OFF" discount badge keeps its solid red fill, but the

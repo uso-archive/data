@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Weather Underground. Darkens forecasts, hourly and 10-day pages and data tables while keeping radar, maps and weather icons intact.
-@version      20260711.20.02
+@version      20260712.18.35
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -858,12 +858,32 @@
   .accordion-content {
     background-color: var(--wu-surface) !important;
   }
-  /* The Layers/Save Pref/Share/Settings/Legend rail marks its ACTIVE tab with a
-     3px WU-red left border. The blanket `*` border reset flattens it to the
-     line colour, leaving the open panel with no tab indicator at all. */
-  .sidebar-tab-container .tab-buttons li.active,
-  .tab-buttons .items-list li.active {
+  /* The Layers/Save Pref/Share/Settings/Legend rail gives EACH tab its own
+     identity colour as a 3px left border, keyed by :nth-child (red, orange,
+     amber, green, cyan -- WU's own hexes). The blanket `*` border reset flattens
+     all five to the line colour; the previous fix restored only `li.active` as
+     red, which merely happened to match tab 1 (Layers) and left the other four
+     grey. Restore the whole scale on both the desktop rail and the mobile one.
+     Their #696969 bottom separator stays muted (handled by the `*` reset). */
+  .sidebar-tab-container .items-list li:nth-child(1),
+  .mobile-wundermap-wrapper .items-list li:nth-child(1) {
     border-left-color: #d5202a !important;
+  }
+  .sidebar-tab-container .items-list li:nth-child(2),
+  .mobile-wundermap-wrapper .items-list li:nth-child(2) {
+    border-left-color: #ff8833 !important;
+  }
+  .sidebar-tab-container .items-list li:nth-child(3),
+  .mobile-wundermap-wrapper .items-list li:nth-child(3) {
+    border-left-color: #ffb92f !important;
+  }
+  .sidebar-tab-container .items-list li:nth-child(4),
+  .mobile-wundermap-wrapper .items-list li:nth-child(4) {
+    border-left-color: #5b9f49 !important;
+  }
+  .sidebar-tab-container .items-list li:nth-child(5),
+  .mobile-wundermap-wrapper .items-list li:nth-child(5) {
+    border-left-color: #15aadc !important;
   }
 
   /* ---- station selector ("CHANGE" next to the city name) ---------------- */
@@ -895,6 +915,17 @@
   }
   #stationselector_list #stationselector_table .table-row:hover > * {
     background-color: var(--wu-surface-2) !important;
+  }
+  /* The Nearby-Stations list caps its scroll area with a bottom fade overlay
+     (.scroll-fade in #stationselector_list_footer) painted as a
+     linear-gradient to solid #fff -- a glaring white band over the last rows on
+     the dark list. It is a background-IMAGE (so the bg-colour audits miss it) AND
+     the widget is click-gated (so no load-time scan sees it). Fade to the list
+     surface instead so the scroll cue reads as a soft dark vignette. */
+  #stationselector .scroll-fade,
+  #stationselector_list_footer .scroll-fade,
+  .scroll-fade {
+    background: linear-gradient(rgba(28, 33, 40, 0), var(--wu-surface)) !important;
   }
 
   /* ---- search autocomplete (jQuery UI, not Material) -------------------- */
@@ -1266,5 +1297,178 @@
      the (0,2,4) blanket. */
   .data-module .feels-like-scale .scale-ok {
     background-color: #5b9f49 !important;
+  }
+
+  /* ====================================================================== */
+  /* More colour WU encodes in BORDERS, which our blanket `*` reset ate.     */
+  /* The reset carries `!important`, so it beats every one of WU's own       */
+  /* (non-important) rules below no matter how specific they are -- each of  */
+  /* these reads as a legible dark control, so no contrast/bg audit sees it. */
+  /* ====================================================================== */
+
+  /* ---- (a) /health UV pyramid ------------------------------------------- */
+  /* Each level of the UV pyramid is a CSS-triangle <div class="chunk"> whose
+     VALUE is its border-bottom-color (#D7D7D7 unreached; green -> amber ->
+     orange -> red -> purple as the index climbs) and whose trapezoid shape
+     depends on transparent left/right borders. The `*` reset painted all four
+     sides: every level went uniform grey (the entire UV reading, gone) and the
+     wedges rendered as plain blocks. Restore WU's scale verbatim. */
+  .pyramid .chunk {
+    border-bottom-color: var(--wu-border-2) !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+  }
+  .pyramid .chunk.low {
+    border-bottom-color: #5b9f49 !important;
+  }
+  .pyramid .chunk.moderate {
+    border-bottom-color: #ffb92f !important;
+  }
+  .pyramid .chunk.high {
+    border-bottom-color: #ff8833 !important;
+  }
+  .pyramid .chunk.very-high {
+    border-bottom-color: #d5202a !important;
+  }
+  .pyramid .chunk.extreme {
+    border-bottom-color: #ac54a0 !important;
+  }
+
+  /* ---- (b) calendar day cells ------------------------------------------- */
+  /* WU encodes each cell's DATA KIND on both the cell border and the day
+     number: .history = neutral grey (observed), .today = #ff8833 orange,
+     .forecast = #008fbf blue. The `*` reset plus our own `.date` muted-grey
+     lift flattened all three, so TODAY looked exactly like every other day and
+     observed/forecast were indistinguishable. The date text is a link, so the
+     forecast blue is lifted to the dark-friendly link blue; the orange and the
+     neutral grey read as authored. */
+  .calendar-day.today {
+    border-color: #ff8833 !important;
+  }
+  .calendar-day.today .date {
+    color: #ff8833 !important;
+  }
+  .calendar-day.forecast {
+    border-color: #008fbf !important;
+  }
+  .calendar-day.forecast .date {
+    color: var(--wu-link) !important;
+  }
+  .calendar-day.history {
+    border-color: var(--wu-border-2) !important;
+  }
+  .calendar-day.history .date {
+    color: var(--wu-text-muted) !important;
+  }
+
+  /* ---- (c) header flyout + sidenav menu accents -------------------------- */
+  /* The header nav flyouts mark the hovered item with a 6px coloured left bar
+     (#ff8833, or the item's own wunder-* hue) -- the item's background does not
+     change, so that bar is the ONLY hover affordance, and the `*` reset erased
+     it. Click-gated, so no load-time scan reaches it. */
+  .mat-mdc-menu-panel.menu-wrapper .mat-mdc-menu-item:hover {
+    border-left-color: #ff8833 !important;
+  }
+  /* The mobile sidenav and the desktop feature-menu carry WU's rainbow code on
+     every row (matching the brand strip under the header): Sensor Network red,
+     Maps orange, Severe Weather amber, News green, Mobile Apps cyan, Historical
+     indigo, and violet. Flattened to grey by the same reset. */
+  .sidenav-main-menu-links .mat-mdc-button.wunder-r,
+  .feature-menu .mat-mdc-button.wunder-r,
+  .menu-wrapper .mat-mdc-menu-item:hover.wunder-r {
+    border-left-color: #d5202a !important;
+  }
+  .sidenav-main-menu-links .mat-mdc-button.wunder-o,
+  .feature-menu .mat-mdc-button.wunder-o,
+  .menu-wrapper .mat-mdc-menu-item:hover.wunder-o {
+    border-left-color: #ff8833 !important;
+  }
+  .sidenav-main-menu-links .mat-mdc-button.wunder-y,
+  .feature-menu .mat-mdc-button.wunder-y,
+  .menu-wrapper .mat-mdc-menu-item:hover.wunder-y {
+    border-left-color: #ffb92f !important;
+  }
+  .sidenav-main-menu-links .mat-mdc-button.wunder-g,
+  .feature-menu .mat-mdc-button.wunder-g,
+  .menu-wrapper .mat-mdc-menu-item:hover.wunder-g {
+    border-left-color: #5b9f49 !important;
+  }
+  .sidenav-main-menu-links .mat-mdc-button.wunder-b,
+  .feature-menu .mat-mdc-button.wunder-b,
+  .menu-wrapper .mat-mdc-menu-item:hover.wunder-b {
+    border-left-color: #15aadc !important;
+  }
+  .sidenav-main-menu-links .mat-mdc-button.wunder-i,
+  .sidenav-main-menu-links .mat-mdc-button.more,
+  .feature-menu .mat-mdc-button.wunder-i,
+  .menu-wrapper .mat-mdc-menu-item:hover.wunder-i {
+    border-left-color: #2f7fd6 !important;   /* WU's #0053ae, lifted for dark */
+  }
+  .sidenav-main-menu-links .mat-mdc-button.wunder-v,
+  .feature-menu .mat-mdc-button.wunder-v,
+  .menu-wrapper .mat-mdc-menu-item:hover.wunder-v {
+    border-left-color: #ac54a0 !important;
+  }
+
+  /* ---- (d) Popular Cities bar: hover chip (audit-blind, hover-gated) ----- */
+  /* Hovering a city in the favourites bar paints the chip #e7e7e7 -- WU's own
+     white hover fill, which we never darkened. Our light link text then lands on
+     it at ~1.3:1: the chip you are pointing at is the one you cannot read. */
+  .favs li > a:hover,
+  .favoritesBar .favs li > a:hover {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text) !important;
+  }
+
+  /* ---- (e) blog / news pagination --------------------------------------- */
+  /* The page-number discs are #f7f7f7 (unthemed white) and the CURRENT one is a
+     #15aadc disc whose label WU paints white -- our generic `a` lift dropped it
+     to link-blue on cyan (~1.9:1). The Prev/Next chevrons are inline <svg> with
+     a near-black fill (#1e2023), invisible on dark; only the DISABLED one is
+     grey, so painting both alike would erase the disabled state. */
+  .pagination a.page-number {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text) !important;
+  }
+  .pagination a.page-number.current {
+    background-color: #15aadc !important;
+    color: #ffffff !important;
+  }
+  .pagination .btn a,
+  .pagination .btn svg,
+  .pagination .btn svg path {
+    color: var(--wu-text) !important;
+    fill: var(--wu-text) !important;
+  }
+  .pagination .btn.disable a,
+  .pagination .btn.disable svg,
+  .pagination .btn.disable svg path {
+    color: var(--wu-text-muted) !important;
+    fill: var(--wu-text-muted) !important;
+  }
+
+  /* ---- (f) forecast-tile narrative -------------------------------------- */
+  /* Today/Tonight/Tomorrow wrap their whole tile in an <a class="module-link">,
+     which WU deliberately paints as BODY TEXT (#1e2023) -- the tile is clickable
+     as a whole, not a link to read. Our generic `a` lift turned three paragraphs
+     of prose (and the HIGH/LOW/°F labels) link-blue, making them indistinguish-
+     able from the real "7% Precip." link directly above them. */
+  a.module-link,
+  a.module-link .wu-label,
+  a.module-link .wu-degree {
+    color: var(--wu-text-2) !important;
+  }
+  a.module-link:hover,
+  a.module-link:hover .wu-label {
+    color: var(--wu-text) !important;
+  }
+
+  /* ---- (g) PWS tile info buttons ---------------------------------------- */
+  /* Each dashboard tile header carries a cyan (#15aadc) circled-i tooltip
+     button. Our `.mat-mdc-tooltip-trigger` muted-grey rule (meant for WU's grey
+     caption text) greyed the icons too, so they stopped reading as controls. */
+  i.mat-mdc-tooltip-trigger.material-icons,
+  .module__header .mat-mdc-tooltip-trigger {
+    color: var(--wu-link) !important;
   }
 }

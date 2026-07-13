@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A full dark theme for Thingiverse: browse the feed, model pages, search and profiles in comfortable dark while 3D model previews stay true to color.
-@version      20260711.20.01
+@version      20260712.18.34
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -237,6 +237,22 @@
   [class*="Flag__default"] { background-color: #525b75 !important; }
   [class*="Flag__flagIconWrapper"] { background-color: #ffffff !important; }
 
+  /* Collection cards (profile > Collections, /<user>/collections) carry their
+     whole identity in colour: the site paints the card panel MakerBot-indigo
+     (#5575fe) and stacks four concentric circles on it (#718bfe -> #eaeeff,
+     largest to smallest) to build a radial indigo wash, with the collection
+     title in white on top. Every one of those is a plain `background-color` on
+     a single class, so the neutralizer ate all five — collection cards rendered
+     as bare dark boxes, indistinguishable from ordinary thing cards. Restore
+     the ramp in the same hue, compressed into the dark range so the white title
+     still reads on it. (The featured variant keeps the site's own #5a79ff ring.) */
+  [class*="CollectionCard"] [class*="itemCardContentWrapper"],
+  [class*="collectionCardContentWrapper"] { background-color: #1e2750 !important; }
+  [class*="CollectionCard__circle1"] { background-color: #2a3563 !important; }
+  [class*="CollectionCard__circle2"] { background-color: #313e75 !important; }
+  [class*="CollectionCard__circle3"] { background-color: #3a4988 !important; }
+  [class*="CollectionCard__circle4"] { background-color: #45549e !important; }
+
   [class*="filterSectionIndicator"], [class*="detailSidebarButtonCounter"],
   [class*="indicatorBar"], [class*="Badge__primary"] { background-color: #2563c9 !important; }
   /* Sort-bar "New" pill (marks the Fresh Makes tab): a filled brand-blue badge
@@ -275,6 +291,18 @@
   [class*="Notification__error"] [class*="notificationBorderHighlight"] { background-color: #ff385c !important; }
   [class*="Notification__warning"] [class*="notificationBorderHighlight"] { background-color: #ffc402 !important; }
   [class*="Notification__info"] [class*="notificationBorderHighlight"] { background-color: #5fb0e6 !important; }
+
+  /* Thing-page status banners (Banner__banner): the site paints these as a
+     SOLID status bar — the WIP banner ("Hey! This Thing is still a Work in
+     Progress") is bold amber #ffc402, moderation/error banners red, etc. The
+     neutralizer flattened the fill to transparent, so the whole bar collapsed
+     to bare text on the page and the status identity was lost. Restore each as
+     the dark status tint (matching the Notification treatment) with its own
+     hue for text, so the warning/error/info meaning survives on dark. */
+  [class*="Banner__warning"] { background-color: #2a2410 !important; color: #ffd75c !important; }
+  [class*="Banner__problem"], [class*="Banner__error"] { background-color: #2a1419 !important; color: #ff8fa3 !important; }
+  [class*="Banner__ok"], [class*="Banner__success"] { background-color: #122a25 !important; color: #6fd8c9 !important; }
+  [class*="Banner__info"] { background-color: #18222f !important; color: #9bd4ff !important; }
 
   /* Site-wide alert bars keep their native status colours */
   [class*="SiteWideNotification__ok"] { background-color: #018071 !important; }
@@ -361,6 +389,26 @@
   input, textarea, select {
     background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   input::placeholder, textarea::placeholder { color: #8b949e !important; opacity: 1 !important; }
+  /* The site marks a focused field by swapping its border to the accent; our
+     border-color above is `!important`, so it pinned the focused border to the
+     same grey as the resting one. Give the accent back on focus. Deliberately
+     kept to the plain `:focus`: matching the site's focused WRAPPER div needs a
+     Level-4 pseudo-class the old userstyles.org parser has no precedent for, and
+     the accent focus OUTLINE the site draws on that wrapper survives untouched,
+     so the focused field stays clearly indicated either way. */
+  .tv-input:focus, input.tv-input:focus, textarea.tv-input:focus,
+  input:focus, textarea:focus { border-color: #5fb0e6 !important; }
+
+  /* Segmented radio groups (the search box's Things / Makes / Users /
+     Collections type picker). The site marks the chosen option with a selected
+     FILL plus an accent border and accent label; the neutralizer ate the fill
+     and the blanket `label` colour rule below flattened the label, leaving the
+     border as the only surviving cue. Restore the full selected treatment. */
+  [class*="RadioButtonGroup__radioButtonLabel"]:hover {
+    background-color: #21262d !important; border-color: #4f86c6 !important; }
+  [class*="RadioButtonGroup__radioButtonLabel"][class*="RadioButtonGroup__selected"] {
+    background-color: #1d2a3a !important; color: #9bd4ff !important; border-color: #5fb0e6 !important; }
+  [class*="RadioButtonGroup__selected"] [class*="PageHeaderSearch__typeName"] { color: #9bd4ff !important; }
 
   /* ====================================================================
      Headings + body text (atomic / hashed text classes bypass tokens)
@@ -371,6 +419,16 @@
   /* Homepage hero tagline: the dark-navy "Thingiverse" brand word -> light */
   [class*="HomePageTagline"], [class*="HomePageTagline"] [class*="brand"] {
     color: #e6edf3 !important; }
+  /* The "Supporter of the SOULCRAFTED initiative" chip in the tagline strip is a
+     lone SVG whose pill is a hardcoded near-white path (#F6F7FA, stroked #EEEFF1)
+     with every glyph path fill="black" — natively the pill melts into the white
+     page and only the black wordmark reads. On dark it inverts into a glaring
+     white blob. Flip the pill to the elevated surface and lift the glyphs, so it
+     matches the SoulCrafted chip the footer already renders dark. */
+  [class*="HomePageTagline__badgeIcon"] path[fill="#F6F7FA"] { fill: #1c2128 !important; }
+  [class*="HomePageTagline__badgeIcon"] path[stroke="#EEEFF1"] { stroke: #2d333b !important; }
+  [class*="HomePageTagline__badgeIcon"] path[fill="black"] { fill: #e6edf3 !important; }
+
   /* small muted card labels ("Featured", "Ad", metadata) -> readable grey */
   [class*="itemCardMeta"], [class*="ItemCardMeta"],
   [class*="adCardCaption"], [class*="AdCardCaption"] { color: #9aa4af !important; }

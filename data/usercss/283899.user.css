@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for PyPI with a proper dark code-highlighting palette.
-@version      20260710.13.14
+@version      20260712.18.33
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -54,6 +54,10 @@
   .horizontal-menu__link, .sponsors__name, .sponsors__service, .sponsors__cycle { color: #c4cdd6 !important; }
   a, a span { color: #5fb0e6 !important; }
   a:hover, .horizontal-menu__link:hover { color: #9bd4ff !important; }
+  /* The typography rule above lists strong/abbr/small/em/b/time, which also catches the
+     ones nested INSIDE a link (the GitHub-statistics rows, the FAQ's <abbr>s): those
+     rendered body-grey instead of taking their link's colour. Let them follow the anchor. */
+  a strong, a abbr, a small, a em, a b, a time, a li { color: inherit !important; }
   /* Badge / status-pill text. These pills keep their own semantic background, so the
      text colour has to follow the pill, not the global link blue. The three light
      pills (base .status-badge #fff, --warn/--warning #ffdf76, --neutral #ececec)
@@ -87,6 +91,25 @@
 
   /* ---- Sponsor / ethical callouts (strip leftover blue) ---- */
   .sponsors, .sponsorship, [class*="sponsor"], .ethical-callout, .ethical-sidebar { background-color: transparent !important; }
+  /* The /sponsors/ grid logos are ink-on-white artwork uploaded by each sponsor (mostly
+     transparent PNGs with black lettering): on a dark tile Jane Street, Snowflake and
+     ReversingLabs render black-on-black and simply vanish. No filter fixes them without
+     wrecking the coloured marks, so give each logo back the light plate it was drawn
+     for. The footer strip uses .sponsors__image — white-ink variants — and is untouched. */
+  .sponsor-grid__sponsor-img {
+    background-color: #e6edf3 !important; border-radius: 6px !important; padding: 10px !important; }
+  /* The blanket [class*="sponsor"] transparent above also swallowed the sponsorship
+     package card's own header band (#006dad) and its icon disc, so the card lost the
+     split between header and body entirely. Give them an elevated surface back and keep
+     the card's blue ring, the way the site header keeps its blue trim. */
+  .sponsor-package { border-color: #2f6fb8 !important; }
+  .sponsor-package__header, .sponsor-package__icon { background-color: #1c2128 !important; }
+  /* EthicalAds ships its "Ad by EthicalAds" disclosure at #707070, which passed on the
+     white docs page and drops to ~3:1 on ours. It is the ad-transparency label — keep it
+     readable. Its own sheet is cross-origin (unreadable) and outranks a plain
+     `.ethical-callout a`, so the link needs the extra specificity. */
+  .ethical-callout, .ethical-callout small, .ethical-callout em,
+  div.ethical-callout a[href], .ethical-sidebar div.ethical-callout a { color: #8b949e !important; }
 
   /* ---- Code blocks ---- */
   pre, code, tt, kbd, samp, .docutils.literal,
@@ -199,11 +222,23 @@
   hr { background-color: #2d333b !important; background-image: none !important;
     border-color: #2d333b !important; }
 
+  /* ---- Home "about PyPI" logotype ----
+     logo-large.svg is an <img>, so its inner paths are unreachable: the "python Package
+     Index" wordmark is a hard #3b3b3b that lands at ~1.6:1 on our dark section, while the
+     cubes beside it are white/blue/yellow. Every filter that lifts the wordmark (invert,
+     brightness) wrecks the cubes, so plate the image the way the native white page does,
+     in the theme's muted grey rather than a glaring white. */
+  .about-pypi__logo img, img[src*="logo-large"] {
+    background-color: #c4cdd6 !important; padding: 12px !important; border-radius: 8px !important; }
+
   /* ---- 404 / error pages ---- */
   /* Full-viewport #006dad hero: not "light", so both scanners walk past it. */
   .viewport-section--dark { background-color: #1a1f26 !important; }
   /* The easter-egg heading keeps its yellow plate, so its text must stay dark navy */
   .viewport-section--ee .viewport-section__heading { color: #003d61 !important; }
+  /* The easter-egg video sits in a `border: 9px dashed #fff` film-strip frame. The blanket
+     `*` border reset flattened it to chrome grey on the navy plate, so the frame vanished. */
+  .viewport-section--ee .viewport-section__video-container { border-color: #8b949e !important; }
 
   /* ---- Search result cards ---- */
   /* The card's package glyph is a pure-white cubes.svg painted as a background-image,
