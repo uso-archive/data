@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for Sohu (搜狐).
-@version      20260712.18.33
+@version      20260715.18.34
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -227,6 +227,20 @@
 
   .divide-line {
     background-color: #2d333b !important;
+  }
+
+  /* 搜狐汽车 (auto) vertical article/channel sub-header: SECTION.head-parent
+     ships the site's white; its head-tools-parent / head-tools children are
+     transparent and ride on top (logo + article search + 手机端看车). No base
+     rule reached it. .more-nav-box is that sub-header's hover-only 更多 flyout
+     (white bg, light links) — invisible until hovered. */
+  .head-parent {
+    background-color: #0d1117 !important;
+  }
+
+  .more-nav-box {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
   }
 
   /* primary nav bar (channels) */
@@ -705,6 +719,35 @@
     background-color: transparent !important;
   }
 
+  /* redesigned article right-rail: the author card's "TA的最新文章" recent-
+     articles list (#right-side-bar .new-article-list) and the 热评榜 hot-comment
+     ranking rows (.hot-comment-item, a .feed-c > .item-c pill) ship a white
+     rgb(248,248,248) panel that traps our lifted light text (light-on-light,
+     ~1.1:1). Darken to the elevated surface; text is already lifted. */
+  #right-side-bar .new-article-list,
+  .new-article-list,
+  .hot-comment-item {
+    background-color: #1c2128 !important;
+  }
+
+  /* their rows hardcode dark text (title rgb(51,51,51), comment body
+     rgb(102,102,102)) that goes dark-on-dark once the panel is darkened */
+  .new-article-list a.item .item-title {
+    color: #e6edf3 !important;
+  }
+
+  .hot-comment-item .comment-content-text,
+  .hot-comment-item .comment-text {
+    color: #c8d0d9 !important;
+  }
+
+  /* redesigned header search pill (#search.search-right-nb in #headRight) ships
+     a white rgb(255,255,255) box; the inner input is already dark */
+  #search.search-right-nb,
+  .search-right-nb {
+    background-color: #1c2128 !important;
+  }
+
   /* left action column (#shareInteraction): each like/comment/favorite/share
      control is a rgb(248,248,248) rounded button holding a dark raster glyph,
      and the count/label under it ships near-black (dark-on-dark). Darken the
@@ -738,9 +781,13 @@
     color: #c4cdd6 !important;
   }
 
-  /* "内容举报" report link ships a dim rgb(96,96,96) */
+  /* "内容举报" report link ships a dim rgb(96,96,96). The redesigned
+     article footer moves it out of #articleReport onto a bare
+     `.wrap-c a.report-c > span.report`, so cover that shape too. */
   #articleReport .report,
-  #articleReport .report-c span {
+  #articleReport .report-c span,
+  .report-c .report,
+  .report-c span {
     color: #8b949e !important;
   }
 
@@ -750,6 +797,78 @@
   .article-allsee .title,
   .article-allsee .title span {
     color: #e6edf3 !important;
+  }
+
+  /* ---------- 搜狐汽车 (auto) vertical article template ---------- */
+  /* A distinct Vue shell the legacy #mp-editor / .article and the mpfe
+     redesign rules never reach: the body (.content-main-detail) ships
+     near-black rgb(51,51,51) reading text dark-on-dark, the left tool rail
+     (.content-tools) ships white icon discs / near-black labels, and the
+     comment component (.back-comment-* main + .right-comment-* rail) ships
+     light panels with near-black comment bodies. */
+  .content-main-detail,
+  .content-main-detail p,
+  .content-main-detail span,
+  .content-main-detail strong,
+  .content-main-detail li,
+  .content-main-detail font {
+    color: #c8d0d9 !important;
+  }
+
+  /* tool-rail icons: white discs (.read/.likeArticle/.share) hold a dark raster
+     glyph and the comment/font discs ship transparent with a dark glyph — both
+     wrong. invert(1) flips the disc dark + the glyph light uniformly; the child
+     orange 新功能 badge is re-inverted back to its brand colour. */
+  .content-tools-item--icon {
+    filter: invert(1) !important;
+  }
+
+  .content-tools-item--icon .new-tag {
+    filter: invert(1) !important;
+  }
+
+  .content-tools-item--text {
+    color: #8b949e !important;
+  }
+
+  /* comment component: light panels + near-black comment bodies */
+  .back-comment-publish,
+  .right-comment-layer,
+  .right-comment-head,
+  .right-comment-publish {
+    background-color: #1c2128 !important;
+  }
+
+  .back-comment-item--detail,
+  .right-comment-item--detail {
+    color: #c8d0d9 !important;
+  }
+
+  .back-comment-head--title,
+  .right-comment-head--title {
+    color: #e6edf3 !important;
+  }
+
+  /* 相关推荐 recommended-articles list: titles ship near-black strong.t_clip,
+     source names a dim rgb(85,85,102) span.name */
+  .info-recommend .t_clip {
+    color: #c8d0d9 !important;
+  }
+
+  .info-recommend .name {
+    color: #8b949e !important;
+  }
+
+  /* 热门车推荐 car-model list: model name ships near-black strong (the price
+     keeps its rgb(221,85,51) brand-orange accent) */
+  .model-recommend strong {
+    color: #e6edf3 !important;
+  }
+
+  /* thin rgb(229,229,238) rule between the body and the comment block */
+  .content-box p.line,
+  .content-main p.line {
+    background-color: #262c33 !important;
   }
 
   /* lazy-image placeholders paint a white ::before behind the <img>
@@ -1317,69 +1436,72 @@
   /* ============================================================
      Google Funding Choices consent dialog (.fc-consent-root) — a
      full-screen white CMP sheet shown before ads load on article
-     pages. Its stylesheet loads AFTER ours, so scope every rule from
-     .fc-consent-root to out-specify it; dark the sheet + lift its
-     dark Material text (blue Consent/Manage buttons stay brand blue).
+     pages. Its sheet loads AFTER ours and now scopes its own white
+     surfaces the SAME way we do — `.fc-consent-root .fc-*` !important,
+     up to (0,3,0) on the manage-panel navigation buttons — so a single
+     `.fc-consent-root` prefix ties and loses on order. Triple the root
+     class (0,4,0+) on every rule to out-specify it; dark the sheet +
+     lift its Material text (blue Consent/Manage buttons stay brand blue).
      ============================================================ */
-  .fc-consent-root .fc-dialog,
-  .fc-consent-root .fc-dialog-content,
-  .fc-consent-root .fc-choice-dialog,
-  .fc-consent-root .fc-header,
-  .fc-consent-root .fc-footer {
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog-content,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-choice-dialog,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-header,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-footer {
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
   }
 
-  .fc-consent-root .fc-dialog h1,
-  .fc-consent-root .fc-dialog h2,
-  .fc-consent-root .fc-dialog p,
-  .fc-consent-root .fc-dialog li,
-  .fc-consent-root .fc-dialog span,
-  .fc-consent-root .fc-dialog div,
-  .fc-consent-root .fc-dialog a,
-  .fc-consent-root .fc-dialog-headline,
-  .fc-consent-root .fc-dialog-content {
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog h1,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog h2,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog p,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog li,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog span,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog div,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog a,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog-headline,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog-content {
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
   }
 
-  .fc-consent-root .fc-faq-icon,
-  .fc-consent-root .fc-faq-contents {
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-faq-icon,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-faq-contents {
     background-color: #14181d !important;
   }
 
-  /* The CMP's own sheet ships `.fc-consent-root .fc-faq-header .fc-faq-icon`
-     (0,3,0) !important, which beats the (0,2,0) rule above — the "Learn more"
-     chevron stayed a white disc with a light border. Out-specify it via the
-     .fc-dialog ancestor and lift the chevron glyph with it. */
-  .fc-consent-root .fc-dialog .fc-faq-header .fc-faq-icon {
+  /* The CMP's `.fc-consent-root .fc-faq-header .fc-faq-icon` (0,3,0) ties the
+     tripled-root .fc-faq-icon rule above and wins on order — the "Learn more"
+     chevron stays a white disc with a light border. Out-specify it via the
+     extra .fc-dialog .fc-faq-header ancestors and lift the chevron glyph. */
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog .fc-faq-header .fc-faq-icon {
     background-color: #14181d !important;
     border-color: #2d333b !important;
   }
 
-  .fc-consent-root .fc-dialog .fc-faq-header .fc-faq-icon svg {
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog .fc-faq-header .fc-faq-icon svg {
     fill: #c4cdd6 !important;
   }
 
-  .fc-consent-root .fc-dialog hr,
-  .fc-consent-root .fc-dialog [class*="divider"] {
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog hr,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog [class*="divider"] {
     background-color: #2d333b !important;
     border-color: #2d333b !important;
   }
 
   /* "Manage options" preferences panel: sticky header + per-purpose
      cards + manage-vendors row all ship a literal white surface. */
-  .fc-consent-root .fc-dialog-header,
-  .fc-consent-root .fc-preference-container,
-  .fc-consent-root .fc-navigation-button,
-  .fc-consent-root .fc-manage-vendors,
-  .fc-consent-root [class*="preferences-container"] {
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-dialog-header,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-preference-container,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-navigation-button,
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-manage-vendors,
+  .fc-consent-root.fc-consent-root.fc-consent-root [class*="preferences-container"] {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
 
-  .fc-consent-root .fc-preference-container {
+  .fc-consent-root.fc-consent-root.fc-consent-root .fc-preference-container {
     background-color: #21262d !important;
   }
 

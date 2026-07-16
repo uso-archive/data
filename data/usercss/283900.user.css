@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260712.18.28
+@version      20260715.18.33
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -246,6 +246,14 @@
   .tabs__list__item--active .tabs__link,
   .tabs__list__item--active .Button--unstyled {
     color: #e6edf3 !important; border-bottom-color: #c8102e !important; }
+  /* Segmented filter control (standings "League / Conference / Division"): ESPN paints
+     the ACTIVE segment's label its live-red #dd0000 as the selected-state accent. The
+     generic .AnchorLink white-headline rule flattened it, so all three segments read
+     identical white (the pill outline still hints selection, but the brand accent — the
+     theme's own active-tab convention — is lost). Restore a readable red on the active
+     segment. */
+  a.Button--filter.Button--active, .Button--filter.Button--active {
+    color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
 
   /* ---- Promos / callouts / banners ---- */
   .promo, .scorePromo, .premiumEngagement, .callout, .alert, .notification-bar,
@@ -391,6 +399,15 @@
      white circle on the dark panel. At 30px they also duck the audit's size filter.
      Slightly above the panel so the disc still reads as an avatar. ---- */
   .search_results__img, .headshot-sm { background-color: #21262d !important; }
+  /* Next-gen global-nav search (.Typeahead*, replaces the legacy .search_results): the
+     results panel rides .bg-clr-white so it darks, but the two control icons —
+     .TypeaheadControls__Submit (magnifier) and .TypeaheadControls__Clear (×) — are SVGs
+     hardcoding a WHITE box with a BLACK glyph. Native ESPN's white nav hid the boxes;
+     on our dark search bar they glare as two white squares. Transparent box + light
+     glyph. Audit-blind: the search bar collapses to a toggle until the icon is tapped. */
+  .TypeaheadControls__Submit, .TypeaheadControls__Clear,
+  .TypeaheadControls__Submit *, .TypeaheadControls__Clear * {
+    background-color: transparent !important; fill: #c4cdd6 !important; }
 
   /* ---- Account flyout (li.user > .global-user): white panel + a lighter
        #f1f2f3 "Favourites" pane whose copy is a pale grey → invisible on white
@@ -721,11 +738,22 @@
   a.external::after, li.external > a::after { color: #9aa4ae !important; }
 
   /* ---- One-feed card top rule (.contentItem__teamBorder) carries the TEAM colour
-       inline; when a card has no team ESPN falls back to #cbccce, a light hairline
-       that reads as a glaring white bar across our dark cards. Dark only the
-       fallback so every real team colour survives. ---- */
+       inline; when a card has no team ESPN falls back to a light neutral — either
+       #cbccce OR pure #FFFFFF — a light hairline that reads as a glaring white bar
+       across our dark cards. Dark only the neutral fallbacks so every real team
+       colour survives (no team brands its rule pure white). ---- */
   .contentItem__teamBorder[style*="#cbccce"],
-  .contentItem__teamBorder[style*="#CBCCCE"] { background-color: #2d333b !important; }
+  .contentItem__teamBorder[style*="#CBCCCE"],
+  .contentItem__teamBorder[style*="#ffffff"],
+  .contentItem__teamBorder[style*="#FFFFFF"] { background-color: #2d333b !important; }
+  /* Prism News-card top rule (.ColorBorder) is the next-gen equivalent of
+     .contentItem__teamBorder — same inline team colour, same light neutral fallback
+     (#cbccce / #FFFFFF) when a card has no team. On player/team/news pages this ships
+     a glaring light hairline across every teamless card (audit-blind: 3px slips the
+     size floor). Dark only the neutral fallbacks so real team colours survive. */
+  .ColorBorder[style*="#cbccce"], .ColorBorder[style*="#CBCCCE"],
+  .ColorBorder[style*="#ffffff"], .ColorBorder[style*="#FFFFFF"] {
+    background-color: #2d333b !important; }
 
   /* ---- Gamecast Matchup Predictor: the win-probability percentages and their "%"
        suffix hardcode near-black #101113 (fine on the site's white card) → ~1.4:1
