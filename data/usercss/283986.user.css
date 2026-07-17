@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for OLX Brasil.
-@version      20260712.18.31
+@version      20260716.17.12
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -634,6 +634,12 @@
     color: #c9b6f5 !important;
     border-color: #b794f6 !important;
   }
+  /* Each chip label wraps its text in an inner `<p class="typo-body-small">`; the
+     generic typo rule further down matches that <p> directly and beats the label's
+     inherited colour, so the SELECTED chip's violet tint (and the unselected chip's
+     lifted grey) never reached the text — every chip read the same flat grey. Let
+     the <p> inherit the label colour so the selected state keeps its accent. */
+  [class*="Chips_chipContent"] label p { color: inherit !important; }
 
   /* Narrow viewports replace the filters rail with a sticky "Filtros" bar whose
      CSS-module wrapper ships a literal white surface, and whose chips paint on
@@ -726,9 +732,21 @@
      re-elevate the few stable, distinct cards.
      ============================================================ */
   #adview { background-color: #14181d !important; }
-  #adview [class*="ad__sc-"] {
+  /* Skip elements that carry an inline `background-color: rgb(...)` — on styled
+     components that is only ever a DYNAMIC brand/status colour (the share sheet's
+     Facebook/Whatsapp/X/copy discs), never a static surface (those come from the
+     component's generated class CSS). Neutralizing them to transparent left the
+     white share glyphs floating with no coloured disc behind them. */
+  #adview [class*="ad__sc-"]:not([style*="rgb("]) {
     background-color: transparent !important;
     border-color: #2d333b !important;
+  }
+  /* The seller "online" indicator is an 8px empty `ad__sc` span painted green from
+     its component class (no inline style, so the exclusion above cannot spare it);
+     the neutralizer blanked it. It is the ad page's only empty `ad__sc` span, so
+     restore its status green. */
+  #adview span[class*="ad__sc-"]:empty {
+    background-color: #24a148 !important;
   }
   /* …the neutralizer is scoped `#adview [class*="ad__sc-"]` (specificity
      1-1-0), and OLX hangs its hashed styled-component class on the CTA buttons

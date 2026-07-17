@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260712.18.31
+@version      20260716.17.12
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -426,6 +426,17 @@
   [mountto="body"] div[class*="uw_"] {
     background-color: var(--d-surface) !important;
   }
+  /* The B2B "юридическое лицо" modal (and its siblings) list their benefit
+     bullets ("Регистрация за 1 минуту", "Возврат до 20% НДС" …) in a literal
+     near-black navy (rgb(8,27,43)) hardcoded outside the token system, so on the
+     darkened panel the whole bullet column goes dark-on-dark (invisible) while the
+     blue icons and CTA stay visible. tsBody500 is the bullet body copy; the
+     tsBodyControl "Добавить компанию" CTA (white-on-blue) and the tsHeadline
+     banner title are deliberately NOT matched, so they keep their colour. The
+     modal only mounts on interaction, so a load-time scan never sees it. */
+  [mountto="body"] div[class*="uw_"] span[class*="tsBody500"] {
+    color: var(--d-text-2) !important;
+  }
 
   /* ============================================================
      HEADER / NAV (data-widget="header") + sub-bars
@@ -773,6 +784,26 @@
   [data-widget="webReviewTabs"] div[style*="width"][style*="%"] {
     background-color: var(--d-gold) !important;
   }
+  /* ACTIVE review-tab underline ("Отзывы о товаре" / "Вопросы о товаре"): a 2px bar
+     Ozon slides under the current tab, painted brand-blue via an inline left+width.
+     The same `div { transparent }` reset flattens it away, so the active tab keeps
+     only its bold weight and loses the brand accent. It is the ONLY inline-styled
+     div carrying both `left` and `width` (the gold histogram fills carry width
+     only), so it is reachable without the % the histogram rule keys on. */
+  [data-widget="webReviewTabs"] div[style*="left"][style*="width"] {
+    background-color: var(--d-blue) !important;
+  }
+
+  /* SELLER RICH-CONTENT DESCRIPTION (data-widget="webDescription", built from the
+     "Rich Annotation" RA-* module) hardcodes a near-black navy (rgb(0,26,52)) on its
+     body copy, outside the token system — so the whole product-description paragraph
+     renders dark-on-dark (invisible) on the dark panel. The block's headings and
+     accents are baked into <img> banners, not DOM text, so lifting the RA text to the
+     body scale only touches the paragraph copy (already-light RA text stays light).
+     The block lazy-mounts far down the PDP, so a load-time scan never sees it. */
+  [data-widget="webDescription"] [class*="RA-"] {
+    color: var(--d-text-2) !important;
+  }
 
   /* GALLERY: the stage + thumbnail tiles are white CONTAINERS
      behind/around the photo. Darken the container, not the <img>.
@@ -798,6 +829,12 @@
   .tile-root img {
     background-color: #f3f5f8 !important;
     border-radius: 6px;
+  }
+  /* Gallery media-count label ("+2 видео") under the video thumbnail hardcodes the
+     raw brand blue #005bff (~2.9:1 on the base, below the WCAG floor); the token
+     lift never reaches it. Lift to our refined blue. */
+  [data-widget="webGallery"] div.pdp_s4a {
+    color: var(--d-blue) !important;
   }
 
   /* ============================================================
@@ -1026,6 +1063,16 @@
      uniquely reaches each group's selected swatch without any hashed
      class. Restore the blue ring. */
   [data-widget="webAspects"] div[title] > span {
+    border-color: var(--d-blue) !important;
+  }
+  /* The non-swatch aspect chips (processor model, RAM, SSD …) follow the SAME
+     selected-vs-unselected convention — the current choice is a <div>, the
+     alternatives navigable <a> — but ship NO title, so the swatch rule above
+     misses them. The blanket border softener then flattens the selected chip's
+     brand-blue ring to grey, erasing which option is chosen (chroma flagged the
+     native blue -> grey). pdp_e7 is the chip's border-bearing class; scoping to a
+     <div> parent uniquely reaches the selected one without a rotating hash. */
+  [data-widget="webAspects"] div > span.pdp_e7 {
     border-color: var(--d-blue) !important;
   }
 

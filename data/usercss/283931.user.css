@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for Slashdot, easy-on-the-eyes story feed and threaded comment discussions, with the classic Slashdot green kept intact.
-@version      20260712.18.33
+@version      20260716.17.13
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -361,16 +361,20 @@
   #embbeded_login_modal a { color: #6fd8be !important; }
 
   /* dimmed / abbreviated (low-score) comments — keep them muted but legible
-     (site dims these to #7d7d7d via an id-scoped rule, so match its specificity) */
-  #commentlisting .oneline .commentBody,
-  #commentlisting .oneline .commentBody p,
-  #commentlisting .oneline .commentBody div,
-  .comment.oneline .commentBody, .oneline .commentBody,
-  .oneline .commentBody *, li.comment.oneline .commentBody {
+     (site dims these to #7d7d7d via an id-scoped rule, so match its specificity).
+     Scope every selector to the oneline's OWN wrapper (`> .cw`): a collapsed parent
+     can hold EXPANDED (`li.comment.full`) replies whose `.cw` is under a sibling
+     `<ul>`, so a loose `.oneline .commentBody` descendant leaked down and dimmed a
+     full, black-bodied reply to the same muted grey as a genuine low-score line. */
+  #commentlisting .oneline > .cw .commentBody,
+  #commentlisting .oneline > .cw .commentBody p,
+  #commentlisting .oneline > .cw .commentBody div,
+  .comment.oneline > .cw .commentBody, .oneline > .cw .commentBody,
+  .oneline > .cw .commentBody *, li.comment.oneline > .cw .commentBody {
     color: #9aa4ad !important;
   }
-  #commentlisting .oneline .commentBody a,
-  .oneline .commentBody a { color: #5fb0e6 !important; }
+  #commentlisting .oneline > .cw .commentBody a,
+  .oneline > .cw .commentBody a { color: #5fb0e6 !important; }
 
   /* comment score-selector widget + "You may like" header bar (light-grey #e1e1e1).
      Only the #newa2footerv2 h3's are natively light — a bare `h3` here boxed every
@@ -671,9 +675,12 @@
 
   /* collapsed ("oneline") comments have NO title bar natively — the site sets
      `background:none` on their h4 — so the green title-bar rule above painted a
-     pill behind every "Re:" link. */
-  #comments .oneline .commentTop h4, #comments .oneline .title h4 { background: none !important; }
-  #comments .oneline .commentTop h4 a, #comments .oneline .title h4 a { color: #6fd8be !important; }
+     pill behind every "Re:" link. Pin to the oneline's OWN wrapper (`> .cw`): an
+     EXPANDED reply nested under a collapsed parent keeps its `.cw` beneath a
+     sibling `<ul>`, so a loose descendant here erased that full reply's green
+     Score title bar too. */
+  #comments .oneline > .cw .commentTop h4, #comments .oneline > .cw .title h4 { background: none !important; }
+  #comments .oneline > .cw .commentTop h4 a, #comments .oneline > .cw .title h4 a { color: #6fd8be !important; }
 
   /* sponsored / native-ad story bars ship a brown (#6d4634) title bar instead of the
      editorial green — keep that disclosure distinction rather than flattening it */
@@ -709,6 +716,15 @@
      an <a>. Same story for the FAQ answer-body carets. */
   .faq-listing > div i, .faq-listing div i,
   .faq-listing > div i:hover, .faq-listing div i:hover { color: #6fd8be !important; }
+
+  /* ---------- comment-search results (search.pl?op=…) ---------- */
+  /* the "Search Results" section heading is a bare #3c4040 <h2> — 1.3:1 on our
+     dark results panel (the result-item <h2>s below stay readable because their
+     text lives in a link child; this section header is the one plain-text one).
+     Scoped to the search container so a bare content h2 elsewhere is untouched. */
+  .temp-results-spacing h2, .temp-results-spacing .main-content h2 {
+    color: #e6edf3 !important;
+  }
 
   /* ---------- /software/ + /content/ (the SourceForge-powered shell) ----------
      The "Business Software" directory and the "Thought Leadership" blog are top-level

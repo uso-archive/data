@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260715.18.36
+@version      20260716.17.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -669,7 +669,13 @@
   a:visited,
   .text-blue-500,
   .text-blue-600,
-  .text-blue-700 {
+  .text-blue-700,
+  /* the video-playlist rail marks the active item with brand-blue "Now Playing" /
+     "Next Up" kicker <p>s carrying the named `text-brand-light` utility (#3a61cc).
+     The generic `p` text rule flattened them to body grey, so the active clip read
+     like every other title and lost its accent. #3a61cc is only ~2.9:1 on our base,
+     so restore the theme's link blue (as the subnav/rail active markers do). */
+  .text-brand-light {
     color: var(--wx-link) !important;
   }
   a:hover,
@@ -1026,6 +1032,21 @@
   [class*="LayerDetail--"]:not(a):not(button) {
     color: var(--wx-text) !important;
   }
+  /* ...but the InsightPanel :not(a):not(button) rule above (specificity 0,1,2 thanks to
+     its two :not()s) also swallowed the insight card's two SEMANTIC accents: the
+     alert warning icon is an <svg> that inherits currentColor from the amber
+     `InsightPanel--alertIcon` (#ffb900), and the "Read details" CTA is a <span>
+     (InsightPanel--alertsLink) coloured brand blue -- so the alert lost its amber
+     warning tint (rendered a neutral white circle-i) and the link lost its blue
+     affordance (plain white, inconsistent with the blue "...Alert until..." line right
+     above it). Restore both, scoped under npContainer (0,2,0) to out-rank the broad
+     rule; amber reads on the dark card, blue is the theme link. */
+  [class*="InsightPanel--npContainer"] [class*="InsightPanel--alertIcon"] {
+    color: #ffb900 !important;
+  }
+  [class*="InsightPanel--npContainer"] [class*="InsightPanel--alertsLink"] {
+    color: var(--wx-link) !important;
+  }
 
   /* The radar map's CONTAINER card now ships its white fill via a higher-specificity
      doubled-class Helios rule ([dir] .Wrapper--radarWrapper--<hash>.Wrapper--radarWrapper--<hash>
@@ -1060,7 +1081,14 @@
   [class*="LayerDetail--layerDetailContainer"] [class*="LayerDetail--selectedLayerTypeTitle"] {
     color: var(--wx-link) !important;
   }
-  [class*="LayerDetail--selectedLayerType"] [class*="LayerDetail--layerDetailImage"] {
+  /* the selected layer's thumbnail ring: the expanded list marks it with the blue
+     `layerDetailImage` border, but the COLLAPSED control-panel round thumbnails
+     (Radar / Clouds / Temperatures) mark it with a blue border on a newer
+     `layersIconContainer` element the blanket `* { border-color }` flattens to grey
+     -- so the round thumbnail lost its selection ring. Restore both, scoped under
+     the `selectedLayerType` ancestor so only the active layer is ringed. */
+  [class*="LayerDetail--selectedLayerType"] [class*="LayerDetail--layerDetailImage"],
+  [class*="LayerDetail--selectedLayerType"] [class*="LayerDetail--layersIconContainer"] {
     border-color: var(--wx-link) !important;
   }
   /* the layer thumbnails sit on an #e8e8e8 placeholder that shows through until

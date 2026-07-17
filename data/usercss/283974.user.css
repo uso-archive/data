@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A sleek dark theme for Divar:  easy on the eyes for late-night browsing, with the familiar Divar red kept intact. Homepage, listings and post pages.
-@version      20260712.18.27
+@version      20260716.17.10
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -826,13 +826,18 @@
   }
 
   /* ---- Mapbox GL basemap ----
-     Divar's Mapbox GL map (the large left-hand slab on the map-search view) now
-     honours `color-scheme: dark` and renders a NATIVE dark basemap on its own
-     <canvas> — dark land, blue roads, green parks, red price-cluster pins. So we
-     must NOT touch it: an `invert()` filter would flip that already-dark map back
-     to a bright light slab. Leave the GL canvas alone. (The post-detail STATIC
-     raster map below is a different element that is still served light, so it
-     still needs the filter.) */
+     Divar's Mapbox GL map (the large left-hand slab on the map-search view) draws
+     a LIGHT basemap on its own <canvas> — pale land, blue roads, green parks, and
+     canvas-painted red price-cluster pins — and does NOT honour `color-scheme:
+     dark`, so it stays a glaring white slab welded to the dark UI. A <canvas> is
+     unthemable via CSS, but the same invert+hue-rotate(180) treatment used on the
+     static raster map flips the pale land dark while preserving hues: the double
+     transform cancels on chroma, so the red pins stay red, parks green and roads
+     blue. The pins are painted on the canvas (no DOM markers), so this is the only
+     lever that darkens the land without erasing them. */
+  .mapboxgl-canvas {
+    filter: invert(0.92) hue-rotate(180deg) brightness(0.9) contrast(0.9) !important;
+  }
 
   /* Post-detail location map is NOT the Mapbox canvas — it's a static raster PNG
      served from mapimage.divarcdn.com, so it stays a bright light slab on the dark
