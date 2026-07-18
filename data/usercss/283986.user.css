@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for OLX Brasil.
-@version      20260716.17.12
+@version      20260717.18.07
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -130,7 +130,14 @@
   [class*="mainWrapper_mainContainer"] {
     background-color: #14181d !important;
   }
-  [class*="mainWrapper_mainContainer"] > div > div {
+  /* The card panel churns one nesting level between redesigns: it used to be the
+     `> div > div` child, but a newer build wraps it in an extra styled-component
+     (`sc-*`) so the actual white panel is now `> div > div > div`. Cover both
+     depths — the outer wrapper and the real panel share the same tone, so
+     painting both is harmless, and a bare `> div > div` leaves the deep panel
+     literal white with our lifted light labels ghosting into it. */
+  [class*="mainWrapper_mainContainer"] > div > div,
+  [class*="mainWrapper_mainContainer"] > div > div > div {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
@@ -806,8 +813,12 @@
      transparent, the photo floats over the live ad page — the price box, cards
      and the thumbnail strip all bleed through behind it. It is the ad page's
      ONLY `section[class*="ad__sc-"]` (every other section there is an
-     `olx-adcard`), so re-establish an opaque photo-viewer backdrop from that. */
-  #adview section[class*="ad__sc-"] {
+     `olx-adcard`), so re-establish an opaque photo-viewer backdrop from that.
+     The neutralizer above carries `:not([style*="rgb("])` (specificity 1-2-0),
+     so this restore must repeat that `:not()` to reach 1-2-1 and win — a bare
+     `section[class*="ad__sc-"]` (1-1-1) loses to it and the backdrop reverts to
+     transparent, bleeding the live ad page through the open photo. */
+  #adview section[class*="ad__sc-"]:not([style*="rgb("]) {
     background-color: #0d1117 !important;
   }
   /* …but that neutralizer also blanks the ad page's FIXED top bar (the

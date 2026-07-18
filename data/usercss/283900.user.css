@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260716.17.11
+@version      20260717.18.05
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -408,6 +408,13 @@
   .TypeaheadControls__Submit, .TypeaheadControls__Clear,
   .TypeaheadControls__Submit *, .TypeaheadControls__Clear * {
     background-color: transparent !important; fill: #c4cdd6 !important; }
+  /* The open search field's backdrop is a WHITE .Typeahead__Wrapper::before (306×40),
+     not the input's own bg (which we dark) — the input covers most of it, but the strip
+     to the left of the input, behind the magnifier, and the sliver past its right edge
+     show the white ::before as a glaring box on our dark nav. Native ESPN's white nav hid
+     it. Doubly audit-blind: a pseudo-element (no box bg, no text node) that only exists
+     once the search is opened. Dark it to the field surface. */
+  .Typeahead__Wrapper::before { background-color: #1c2128 !important; }
 
   /* ---- Account flyout (li.user > .global-user): white panel + a lighter
        #f1f2f3 "Favourites" pane whose copy is a pale grey → invisible on white
@@ -443,6 +450,14 @@
 
   /* ---- Misc surfaces that default to white ---- */
   .bg-clr-white, .bg-white, [class*="bg-clr-white"] { background-color: #1c2128 !important; }
+  /* Sport "Teams" index page (Football/NBA/NFL > Teams): the whole team-directory
+     panel is a hardcoded-white .TeamsWrapper (.Wrapper is transparent; the white is
+     on .TeamsWrapper) filling the main column — our already-light team names + section
+     heading then render light-on-white, near-invisible, while the header/scoreboard/
+     sidebar around it stay dark. Not a bg-clr-white class, so the white-surface rule
+     misses it; audit-blind because the SPA route strips the inject on the Teams click,
+     so a load-time scan of the re-injected page is the only way to see it. */
+  .TeamsWrapper { background-color: #1c2128 !important; }
   /* Schedule group header band (team page left rail) hardcodes a near-white
      bg-clr-gray-10 (#f9f9fb) under our already-light title text → light-on-light. */
   .Schedule__Group__Title { background-color: #1c2128 !important; }
@@ -844,5 +859,19 @@
        "Top Videos" rail's equivalent marker (span "Now Playing" inside an anchor, so
        our a span blue rule — not the grey one — flattened it); same native #dd0000. */
   .MediaList__item__playing, .mediaList__phase {
+    color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
+
+  /* ---- Form-guide result badges (.GameResults — "Last Five Matches" table + the
+       head-to-head "Last 5 Matchups" panel on a match report): ESPN paints each W/L/D
+       its outcome colour — win green (#108915), loss red (#b80000), draw grey (#444) —
+       as a form signal. The badge is a span inside an .AnchorLink, so our a / a span blue
+       rule flattened all three to identical link-blue, erasing the signal (a win read the
+       same as a loss). The span carries BOTH .GameResults and its --win/--loss modifier,
+       so a two-class selector clears the `a span` specificity tie. Restore readable-on-dark
+       win-green / loss-red, draw a muted grey. ---- */
+  span.GameResults { color: #9aa4ae !important; -webkit-text-fill-color: #9aa4ae !important; }
+  .GameResults.GameResults--win {
+    color: #4ac76a !important; -webkit-text-fill-color: #4ac76a !important; }
+  .GameResults.GameResults--loss {
     color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
 }

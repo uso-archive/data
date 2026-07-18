@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for TechPowerUp: easy on the eyes across news, reviews, the GPU/CPU spec databases and the forums, with readable tables and code.
-@version      20260716.17.14
+@version      20260717.18.09
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -152,9 +152,17 @@
     color: #c4cdd6 !important;
   }
 
+  /* XenForo auto-focuses the first row when a nav dropdown opens; the site's
+     `.menu-linkRow.is-selected, :hover, :focus` rule then paints it the light
+     style's #e8f4fc highlight, so a light-OS user sees a bright plate at the top
+     of every menu until they move the pointer. Cover :focus + .is-selected too. */
   #menu ul ul a:hover,
+  #menu ul ul a:focus,
   .menu-linkRow:hover,
-  .autoCompleteList a:hover {
+  .menu-linkRow:focus,
+  .menu-linkRow.is-selected,
+  .autoCompleteList a:hover,
+  .autoCompleteList a:focus {
     background-color: #21303f !important;
     color: #ffffff !important;
   }
@@ -1355,12 +1363,24 @@
     color: #e6edf3 !important;
   }
 
-  /* Forum logo is a separate PNG <img> (logo-v25.png) whose "TECH"/"UP"
-     wordmark is BLACK — invisible on the dark header (the news-site
-     `.page-header__logo` SVG filter never reaches it). Invert the same way:
-     black → white, and hue-rotate/saturate bring the red "POWER" back to red. */
-  .p-header-logo img {
-    filter: invert(1) hue-rotate(180deg) saturate(4) brightness(0.92) !important;
+  /* Forum logo is a scheme-dependent <picture>: dark-OS loads logo-white-v25.png
+     (a WHITE "TECH"/"UP" wordmark, already built for a dark bar) and light-OS
+     loads logo-v25.png (a BLACK wordmark, for the native light bar). Our header
+     is ALWAYS dark, so branch on the same prefers-color-scheme the <picture>
+     keys off: leave the white asset untouched, and invert the black one
+     (black → white, hue-rotate/saturate keep the red "POWER" button red).
+     The news-site `.page-header__logo` is a single black-wordmark SVG bg-image
+     and keeps its own always-on invert filter above. */
+  @media (prefers-color-scheme: dark) {
+    .p-header-logo img {
+      filter: none !important;
+    }
+  }
+
+  @media (prefers-color-scheme: light) {
+    .p-header-logo img {
+      filter: invert(1) hue-rotate(180deg) saturate(4) brightness(0.92) !important;
+    }
   }
 
   .p-sectionLinks,

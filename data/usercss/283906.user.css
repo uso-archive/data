@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for OLX that turns the bright marketplace into an easy-on-the-eyes dark interface, perfect for late-night browsing.
-@version      20260716.17.12
+@version      20260717.18.07
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -154,6 +154,17 @@
      legible; only the expand chevron carries the raw literal. Lift the button so
      its inheriting svg reads as a neutral affordance. */
   [data-testid="dropdown-expand-button"] { color: #9aa6b0 !important; }
+  /* Each category row in that tree ([data-testid="dropdown-item"]) shows its ad
+     count in a gold #FFCE32 pill with near-black label — the category-tree
+     equivalent of the offer badges. The badge is the count <span>, the only span
+     preceded by a sibling span (the label is first, so `span + span` hits the
+     count and never the label). Our broad seller-listing span-lift greyed that
+     count to #9aa6b0, which on the gold pill drops to ~1.7:1 and the number is
+     unreadable. Put the near-black label back so it reads on the gold. */
+  #mainContent [data-testid="dropdown-checkmark"] span + span {
+    color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
+  }
 
   /* Selected-tab underline. OLX draws it as an INSET box-shadow in the literal
      near-black #02282c (not a border, not a token), so on dark it disappears
@@ -538,16 +549,19 @@
      depended entirely on the picture behind it (over a bright thumbnail it
      disappeared). Restore the pill on the accent and put the dark label back on
      it, so "featured" keeps both its identity and its legibility. */
-  /* The search/category grid now renders the "Wyróżnione" badge into a
-     separate `listing-ad-badge-portal-root` overlay (positioned over each
-     card photo), NOT inside [data-testid="l-card"] — so the card-scoped rule
-     above never reached it and the blanket `#mainContent div` neutraliser
-     stripped its mint fill, leaving the near-black label floating dark-on-dark
-     on the photo. The portal holds ONLY these featured Tags (delivery/promoted
-     badges carry their own testids), so mint every Tag under it too. */
+  /* The search/category grid renders the "Wyróżnione" badge into a separate
+     badge-portal overlay (positioned over each card photo), NOT inside
+     [data-testid="l-card"] — so the card-scoped rule above never reached it and
+     the blanket `#mainContent div` neutraliser stripped its mint fill, leaving
+     the near-black label floating dark-on-dark on the photo. OLX has renamed
+     the portal root across deploys (`listing-ad-badge-portal-root` →
+     `listing-item-badge-portal-root`), so match the stable `badge-portal`
+     fragment they share rather than either full class. The portal holds ONLY
+     these featured Tags (delivery/promoted badges carry their own testids), so
+     mint every Tag under it too. */
   #mainContent [data-testid="l-card"] [data-nx-name="Tag"],
   #searchmain-container [data-testid="l-card"] [data-nx-name="Tag"],
-  #mainContent [class*="listing-ad-badge-portal"] [data-nx-name="Tag"] {
+  #mainContent [class*="badge-portal"] [data-nx-name="Tag"] {
     background-color: #1fcabf !important;
     border-color: #1fcabf !important;
   }
@@ -555,8 +569,8 @@
   #mainContent [data-testid="l-card"] [data-nx-name="Tag"] *,
   #searchmain-container [data-testid="l-card"] [data-nx-name="Tag"],
   #searchmain-container [data-testid="l-card"] [data-nx-name="Tag"] *,
-  #mainContent [class*="listing-ad-badge-portal"] [data-nx-name="Tag"],
-  #mainContent [class*="listing-ad-badge-portal"] [data-nx-name="Tag"] * {
+  #mainContent [class*="badge-portal"] [data-nx-name="Tag"],
+  #mainContent [class*="badge-portal"] [data-nx-name="Tag"] * {
     color: #07232a !important;
     -webkit-text-fill-color: #07232a !important;
   }
@@ -1390,23 +1404,35 @@
 
      A completely separate, non-React template: no design tokens, no page
      shell ids, just .c-container / .c-wrapper on a literal cream #FFFBEF
-     canvas. None of the theme's anchors reach it, so it shipped as a
-     full-viewport cream page whose heading inherited the light body text
-     colour and became unreadable. Anchor on the stable data-cy hook.
+     canvas. It used to carry a [data-cy="404-page"] hook, but the current
+     template (served e.g. for an unknown category path on olx.ro) has
+     DROPPED that attribute — its DOM is only `body > .c-container >
+     .c-wrapper` — so a [data-cy]-scoped rule matched nothing and the page
+     shipped as a full-viewport cream sheet whose .c-container__title
+     inherited the light body text colour (~1.2:1 on cream, unreadable).
+     These four BEM classes are exclusive to this standalone error template
+     (the React marketplace uses css-* emotion + page-shell ids, never
+     .c-container*), so anchor on the classes directly; keep the legacy
+     data-cy selectors in case a variant still ships them.
      ============================================================ */
   [data-cy="404-page"],
-  [data-cy="404-page"] .c-wrapper {
+  [data-cy="404-page"] .c-wrapper,
+  .c-container,
+  .c-wrapper {
     background-color: #14181d !important;
   }
-  [data-cy="404-page"] .c-container__title {
+  [data-cy="404-page"] .c-container__title,
+  .c-container__title {
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
   }
-  [data-cy="404-page"] .c-container__description {
+  [data-cy="404-page"] .c-container__description,
+  .c-container__description {
     color: #9aa6b0 !important;
     -webkit-text-fill-color: #9aa6b0 !important;
   }
-  [data-cy="404-page"] button.button {
+  [data-cy="404-page"] button.button,
+  .c-container button.button {
     background-color: #1fcabf !important;
     border-color: #1fcabf !important;
     color: #07232a !important;

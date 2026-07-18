@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A cosy Catppuccin Mocha dark theme for BBC News, Sport and the homepage: easy on the eyes, with the BBC logo, photos and live colors kept intact.
-@version      20260712.18.26
+@version      20260717.18.04
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -632,6 +632,36 @@
   [class*="AdditionalLinksContainer"] {
     color: var(--ctp-subtext0) !important;
   }
+  /* "Get in touch" contribution banner (ssrcss, end of many Sport/News stories):
+     a solid-white Content box ("Get in touch / Send us your feedback / Contact
+     form") our text rules had already lightened → light-on-white, and its native
+     brand-yellow #ffd230 "Contact form" CallToActionLink label/icon read light-on-
+     yellow. [class*="-Content "] (note the trailing space) matches ONLY the Emotion
+     component whose label is exactly "Content" — this banner — never ContentWrapper /
+     PromoContent / MetadataContent / CarouselContent (no "-Content " substring in
+     those). Darken the box; put the dark label back on the yellow CTA. */
+  [class*="-Content "] {
+    background-color: var(--ctp-mantle) !important;
+    border-color: var(--ctp-surface0) !important;
+  }
+  /* The visible "Contact form" CTA is a JS-rendered ssrcss `Button` (eoocusk1),
+     NOT the no-JS `CallToActionLink` fallback beside it — our generic `button`
+     rule lightened its label/icon → light-on-yellow. Scoped to this banner (its
+     only button is the yellow CTA), so the 43 transparent ghost `eoocusk1`
+     buttons elsewhere keep their light text. */
+  [class*="-Content "] button,
+  [class*="-Content "] button span,
+  [class*="-Content "] [class*="CallToActionLink"],
+  [class*="-Content "] [class*="CallToActionLink"] span {
+    color: var(--ctp-crust) !important;
+  }
+  [class*="-Content "] button svg,
+  [class*="-Content "] button svg path,
+  [class*="-Content "] [class*="CallToActionLink"] svg,
+  [class*="-Content "] [class*="CallToActionLink"] svg path {
+    color: var(--ctp-crust) !important;
+    fill: var(--ctp-crust) !important;
+  }
 
   /* ============================================================
      LIVE PAGES  (bbc.com/news/live/… and the Sport live streams — ssrcss)
@@ -780,6 +810,12 @@
   [class*="Masthead"],
   [class*="PrimaryNavBarContainer"],
   [class*="MenuContainer-Primar"],
+  /* The News error-page chrome (bbc.com/news/<bad-url>) nests a solid brand-red
+     #b80000 PrimaryListContainer section-nav ("Home | UK | World | Business…")
+     INSIDE the darkened MenuContainer-PrimaryNavBarContainer, so the child
+     repaints the bar red on the dark page. Its links already inherit our light
+     colour, so darkening the bar to mantle is all that's needed. */
+  [class*="PrimaryListContainer"],
   [class*="SecondaryNav"],
   [class*="StyledNav"] {
     background-color: var(--ctp-mantle) !important;
@@ -803,6 +839,19 @@
     color: var(--ctp-yellow) !important;
     fill: var(--ctp-yellow) !important;
   }
+  /* …but the ssrcss Masthead component is shared: Sport ships it brand-yellow,
+     NEWS ships it brand-red (#b80000, on /news/live/* and other ssrcss News
+     pages). The rule above paints the wordmark Sport-yellow regardless, so the
+     NEWS live masthead lost the red News identity the theme keeps everywhere
+     else (Dotcom NewsLogoContainer, LIVE badge, 404 StatusCode). The masthead's
+     LogoLink anchor is href="/news" on News, href="/sport" on Sport — key off
+     that to restore the brand red on the News wordmark only. Higher specificity
+     than the yellow rule (extra attribute), so it wins regardless of order. */
+  [class*="Masthead"] a[href="/news"] svg,
+  [class*="Masthead"] a[href="/news"] svg path {
+    color: var(--ctp-red) !important;
+    fill: var(--ctp-red) !important;
+  }
   [class*="Masthead"] a,
   [class*="PrimaryNavBarContainer"] a,
   [class*="MenuContainer-Primar"] a {
@@ -823,6 +872,17 @@
   }
   #product-navigation-menu [aria-current] a::after {
     background-color: var(--ctp-yellow) !important;
+  }
+  /* …but this product-nav is shared: on the ssrcss NEWS chrome (/news/live/*,
+     modern 404) the active section-nav item is natively the News brand red
+     #b80000, and the yellow rule above painted it Sport-yellow — a brand clash
+     directly under the red NEWS wordmark and beside the red Politics sub-nav
+     underline. The active News anchor is href="/news/…" (Sport is "/sport/…"),
+     so restore the readable Mocha red on News only; Sport keeps its yellow.
+     Higher specificity (extra attribute) wins regardless of order. */
+  #product-navigation-menu [aria-current] a[href^="/news"]::after,
+  #product-navigation-menu a[aria-current][href^="/news"]::after {
+    background-color: var(--ctp-red) !important;
   }
   /* "More" sub-nav toggle ships raw brand yellow. The label + hamburger
      glyph are an <a>, so the generic [role="navigation"] a rule (0,1,1)
