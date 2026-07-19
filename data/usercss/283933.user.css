@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for CSDN: comfortable dark articles, homepage and search, with fully dark code blocks and a readable syntax palette.
-@version      20260717.18.04
+@version      20260718.23.34
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -839,7 +839,10 @@
   .token.keyword,
   .token.atrule,
   .token.important,
-  .token.deleted {
+  .token.deleted,
+  .token.directive,
+  .token.directive-hash,
+  .token.macro {
     color: #ff7b72 !important;
   }
   /* `.token.regex-delimiter` / `-source` / `-flags` and `.token.template-string`
@@ -1009,6 +1012,15 @@
   .profile-intro-name-leve {
     background-color: var(--csdn-elev2) !important;
     color: var(--csdn-text-2) !important;
+  }
+  /* profile blog-column header "RSS订阅" is an <a> with a near-white
+     rgb(248,248,248) pill background — an anchor, so the div/section
+     neutralizer never reached it and it shipped as a bright white pill with
+     link-blue text on the dark page. Darken the surface, keep the blue label. */
+  .blog-second-rss-btn {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-link) !important;
+    border-color: var(--csdn-border) !important;
   }
   /* member/course-card "VIP" pill (p.tag) is a GOLD gradient background-IMAGE
      with dark-brown label text. The bg-image survives our neutralizer, but the
@@ -1237,6 +1249,22 @@
   body div.gitcode-quick-app .csdn-card-content {
     background-image: none !important;
   }
+  /* the promo's "限时领取" claim CTA (div.csdn-card-button) ships a solid blue
+     #2951e0 fill with a white label + arrow; the broad neutralizer stripped the
+     fill to transparent and the `.gitcode-quick-app *` text rule greyed the label,
+     leaving a dead grey-on-dark button. Restore a solid blue CTA. The
+     (0,2,2)/(0,2,3) selectors beat the neutralizer and the greying text rule. */
+  body div.gitcode-quick-app div.csdn-card-button {
+    background-color: #3d63e0 !important;
+    border-color: #3d63e0 !important;
+  }
+  body div.gitcode-quick-app div.csdn-card-button,
+  body div.gitcode-quick-app div.csdn-card-button .csdn-card-button-text {
+    color: #ffffff !important;
+  }
+  body div.gitcode-quick-app div.csdn-card-button svg {
+    stroke: #ffffff !important;
+  }
 
   /* ---------- AI search card ("开发者首选的 AI 搜索引擎") ----------
      The AI-search promo wraps its dark textarea in a .chat-input-main box
@@ -1334,13 +1362,18 @@
   /* ---------- User profile page "skin" background ----------
      Profile pages render a user-chosen "skin" as a full-page light
      background-IMAGE on .skin3-template (e.g. user-skin-White) plus a
-     light .user-profile-head cover banner. With our transparent content
-     containers the light image shows through behind light text and makes
-     the whole profile unreadable — strip the skin image, paint dark. */
+     light cover banner. With our transparent content containers the light
+     image shows through behind light text and makes the whole profile
+     unreadable — strip the skin image, paint dark. The cover photo now
+     rides on .user-profile-head-banner (renamed from .user-profile-head),
+     a background-IMAGE the neutralizer's bg-color reset can't clear — so a
+     bright default building photo bled across the top of every profile
+     until it was named here. */
   .skin3-template,
   .skin-number,
   [class*="user-skin"],
-  .user-profile-head {
+  .user-profile-head,
+  .user-profile-head-banner {
     background-image: none !important;
     background-color: var(--csdn-base) !important;
   }
@@ -1641,6 +1674,17 @@
   span.red-packet-icon-mini > span.num {
     background-color: #3d2124 !important;
     color: var(--csdn-red) !important;
+  }
+  /* bbs feed per-post "频道" tag (div.channel-select-title) is natively a small
+     FILLED pill whose bg is colour-coded per community (gold/coral/green/teal); the
+     broad neutralizer stripped every fill to transparent (it's a 20px-tall <div>,
+     under the audit big() floor), leaving bare grey text with padding that no longer
+     reads as a tag. Re-seat a uniform recessed dark pill — the per-community colours
+     are decorative, so one dark chip matches the theme's other tag treatments.
+     (0,1,2) beats the (0,1,1) neutralizer. */
+  body div.channel-select-title {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-text-2) !important;
   }
 
   /* ---------- 问答 (ask.csdn.net) question-card meta pills ----------

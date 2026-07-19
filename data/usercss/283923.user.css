@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Avito that's easy on the eyes, perfect for late-night browsing.
-@version      20260717.18.04
+@version      20260718.23.33
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -121,10 +121,16 @@
      where NO `index-logo`/`Logo-module` class is present — there the only stable
      hook is the home-link anchor (`a[href="/"]`) wrapping the wordmark svg. The
      `:not([fill])` guard keeps this scoped to the attribute-less wordmark path
-     and never touches the coloured dots (which carry fill attrs). */
+     and never touches the coloured dots (which carry fill attrs). The generic
+     error/maintenance template ("Сайт временно недоступен", 5xx) ships the
+     wordmark as a bare `<svg viewBox="0 0 79 30">` inside build-hashed spans —
+     no class, no home-link, no marker — so none of the hooks above reach it and
+     its single fill-less path renders solid black (invisible on the dark canvas).
+     The wordmark's fixed brand viewBox is the stable hook. */
   [class*="index-logo"] svg path:not([fill]),
   [class*="Logo-module"] svg path:not([fill]),
-  a[href="/"] svg path:not([fill]) {
+  a[href="/"] svg path:not([fill]),
+  svg[viewBox="0 0 79 30"] path:not([fill]) {
     fill: var(--av-text) !important;
   }
 
@@ -386,11 +392,61 @@
     color: #0b1620 !important;
   }
 
+  /* ---- Item-page variant chips (condition / memory / …) ---- */
+  /* The item page's attribute switchers ("Расширенное состояние": Отличное /
+     Хорошее / Удовлетворительное; "Встроенная память": 128 ГБ / 256 ГБ; "Ещё N")
+     are a `[data-marker="multi-items"]` group of `label > input + span` pills.
+     Each pill span is a hard-coded light `#f2f1f0` — a different class from the
+     `style-module-wrapper` segmented filters above, so none of those rules reached
+     it: the broad text rule inked the labels `--av-text-soft` light-grey, leaving
+     light-grey text on a light-grey pill (~1.3:1, effectively invisible) and the
+     checked pill indistinguishable from the rest. Sink the pills to the elevated
+     surface and promote the checked one to the accent, matching the segmented +
+     installment selected states. Scoped to the `multi-items` container so the
+     separate colour-swatch chips (which carry their hue on the pill) are untouched. */
+  [data-marker="multi-items"] label > span {
+    background-color: var(--av-surface) !important;
+    border-color: var(--av-border) !important;
+  }
+  [data-marker="multi-items"] label > span,
+  [data-marker="multi-items"] label > span * {
+    color: var(--av-text) !important;
+  }
+  [data-marker="multi-items"] label input:checked + span {
+    background-color: var(--av-accent) !important;
+    border-color: var(--av-accent) !important;
+  }
+  [data-marker="multi-items"] label input:checked + span,
+  [data-marker="multi-items"] label input:checked + span * {
+    color: #0b1620 !important;
+  }
+
   /* ---- Text ---- */
   /* The site hardcodes near-black text colours; force them light. */
   body, p, span, li, td, th, div, label, dd, dt, time, small, b, strong, em,
   h1, h2, h3, h4, h5, h6 {
     color: var(--av-text-soft) !important;
+  }
+  /* Seller business-hours status ("Закрыто до завтра" when closed) is a bare <p>
+     whose colour arrives as an inline `color: rgb(255, 97, 99)` — Avito's status
+     red. The broad text rule's `!important` beat the inline value and flattened it
+     to body grey, erasing the closed/open signal (a colour audit is blind to it:
+     the rendered grey reads as ordinary metadata). Preserve the red; native #ff6163
+     already clears 4.5:1 on the dark surfaces, so keep the exact hue. Same
+     inline-`[style]` lever the badge/ribbon colours use above. */
+  [style*="color: rgb(255, 97, 99)"], [style*="color:rgb(255, 97, 99)"],
+  [style*="color:#ff6163"], [style*="color:#FF6163"] {
+    color: #ff6163 !important;
+  }
+  /* Discount-percentage label ("−5%", "−10%") on recommendation / search cards
+     is a bare <span data-marker="discount-value"> whose native colour is Avito's
+     discount red `#f71b47` (arriving as an inline `color:` and via a class). The
+     broad span text rule's `!important` flattened it to body grey, erasing the
+     discount signal (a colour audit reads the grey as ordinary price metadata).
+     Native #f71b47 clears 4.5:1 on the dark surfaces, so keep the hue. */
+  [data-marker="discount-value"],
+  [data-marker="discount-value"] * {
+    color: #f71b47 !important;
   }
   /* `[data-marker*="title"]` was too loose: Avito also hangs a bare
      `data-marker="title"` on the top notification banner's "Подробнее" LINK — a
