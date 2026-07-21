@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A cosy Catppuccin Mocha dark theme for BBC News, Sport and the homepage: easy on the eyes, with the BBC logo, photos and live colors kept intact.
-@version      20260718.23.33
+@version      20260721.00.28
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -441,22 +441,43 @@
      The combobox/header use generic component suffixes, so scope them to
      their stable parent wrapper. */
   [class*="BackgroundWrapper"],
-  [class*="HeaderWrapper"], [class*="HeaderWrapper"] div {
+  [class*="HeaderWrapper"], [class*="HeaderWrapper"] div,
+  /* The Scores & Fixtures WIDGET embedded on a live-match / index page (section#Scores)
+     wraps its dark fixture rows in a solid-#fff FixturesWrapper — a glaring white panel
+     that leaves the "Monday 20th…" date heading and "View all fixtures" link light-on-
+     white. The full-page fixtures view hides it under BackgroundWrapper, so a page-level
+     pass never saw it. Drop it onto the base like the other fixture wrappers. */
+  [class*="FixturesWrapper"] {
     background-color: transparent !important;
   }
   /* The fixtures reset above matches PersistentHeaderWrapper too (substring
      over-match): the position:fixed z-1004 live sticky header (LIVE dot,
      "Watch as…" strip, Listen-live) is natively opaque rgb(24,24,24) but got
      flattened to transparent, so the left-rail "Key moments" list bled through
-     and overlapped its text. Re-opaque it to a dark surface (source order
-     wins the equal-specificity tie against the reset). */
-  [class*="PersistentHeaderWrapper"] {
+     and overlapped its text. BBC now nests this fixed header INSIDE a HeaderWrapper
+     ancestor, so the reset's `[class*="HeaderWrapper"] div` branch (0,1,1) out-specifies
+     a bare `[class*="PersistentHeaderWrapper"]` (0,1,0) and re-flattened it to
+     transparent (bleed-through returned). Match the div itself (0,1,1) and the nested
+     form (0,2,1) so we out-specify the reset in both DOM shapes. */
+  div[class*="PersistentHeaderWrapper"],
+  [class*="HeaderWrapper"] div[class*="PersistentHeaderWrapper"] {
     background-color: var(--ctp-mantle) !important;
   }
   [class*="HeadToHeadWrapper"],
   [class*="StyledHeadToHead"] {
     background-color: var(--ctp-surface0) !important;
     border-color: var(--ctp-surface1) !important;
+  }
+  /* Each Scores & Fixtures row carries a 4px left rail: BBC-Sport yellow #ffd230 on
+     a finished match (FT), near-black #181818 (invisible) on the not-yet-played and
+     cancelled ones. The StyledHeadToHead border rule above painted EVERY rail surface1
+     grey — a phantom rail beside upcoming/cancelled rows and a wrong-colour one on the
+     finished ones. The finished-vs-other state is carried only by the row's status text
+     and a volatile Emotion hash — no stable, sanitisation-surviving selector can single
+     out the yellow rows — so clear the rail on all of them (FT is already conveyed by
+     the "FT" label + score). The later longhand out-orders the shorthand above. */
+  [class*="StyledHeadToHeadWrapper"] {
+    border-left-color: transparent !important;
   }
   [class*="ComboboxWrapper"], [class*="ComboboxWrapper"] div,
   /* Team/competition search autocomplete: the open suggestion list ships a
@@ -501,6 +522,18 @@
      on the old light bg, dark-on-dark once we darken the page. */
   [class*="DisclaimerText"] {
     color: var(--ctp-subtext0) !important;
+  }
+  /* Scores & Fixtures ships a SEPARATE full-width disclaimer band ("Please note:
+     All times are UK…") whose WRAPPER is a hardcoded #f8f8f8 box (SportDisclaimerWrapper,
+     not the DisclaimerText above) → a glaring white strip above the footer. Its native
+     text is near-black; darken the box and lift the text + the "Please note:" <strong>. */
+  [class*="SportDisclaimerWrapper"] {
+    background-color: var(--ctp-mantle) !important;
+    color: var(--ctp-subtext0) !important;
+    border-color: var(--ctp-surface0) !important;
+  }
+  [class*="SportDisclaimerWrapper"] strong {
+    color: var(--ctp-subtext1) !important;
   }
 
   /* Image placeholders / loading tiles (light grey) */
@@ -983,6 +1016,71 @@
   [id^="page-settings"] [class*="StyledWrapper"] {
     background-color: var(--ctp-mantle) !important;
     border-color: var(--ctp-surface0) !important;
+  }
+
+  /* ---- BBC Weather LOCATION FORECAST  (bbc.com/weather/<id>, wr-* BEM) ----
+     The masthead rules above cover only the top band; the whole forecast body — the
+     day carousel tiles, the day/Tonight summary, the hourly time-slot table, the astro
+     + environment bars and the map controls — ships solid #fff/#f8f8f8 panels with
+     near-black text authored for the old light page (a page-level pass sees 14 white
+     surfaces + 30 sub-floor tiles here). Every wr- class is stable (not a hash). Darken
+     the panels and lift the values; the coloured weather-type icons paint via explicit
+     fills (not currentColor), so a colour rule leaves them intact, and the compass /
+     back-to-top glyphs — which DO paint near-black — are lifted just below. */
+  #wr-forecast,
+  #wr-forecast .wr-day__content,
+  #wr-forecast [class*="wr-time-slot"],
+  #wr-forecast .wr-see-more,
+  /* the day-summary strip is a separate full-width #fff row only in the mobile layout */
+  #wr-forecast .wr-day-summary,
+  .wr-c-map-controls, .wr-c-map-controls__timeslider,
+  [class*="weathermap__timeslider"] {
+    background-color: var(--ctp-base) !important;
+  }
+  #wr-forecast,
+  #wr-forecast *,
+  .wr-c-astro-data, .wr-c-astro-data *,
+  .wr-c-environmental-data, .wr-c-environmental-data *,
+  .wr-c-weather-watchers-report, .wr-c-weather-watchers-report * {
+    color: var(--ctp-subtext1) !important;
+  }
+  /* Every BBC weather-type glyph (sun/cloud/moon) is a <use> of an SVG symbol whose
+     first shape is a #FFFFFF rounded-tile background (wr-icon-*__svg-background) —
+     invisible on the old white page, a glaring white square behind each icon on ours.
+     Darken the tile to the panel base so only the coloured art shows; the art paints
+     via its own per-shape fills and is untouched. */
+  [class*="wr-icon"][class*="__svg-background"] {
+    fill: var(--ctp-base) !important;
+  }
+  /* The compass wind-direction disc and the back-to-top chevron are near-black symbol
+     art that must stay a visible control, so give those a lighter surface fill. */
+  .wr-icon-wind-direction__svg-circle,
+  [class*="wr-icon-gel"][class*="__svg-background"] {
+    fill: var(--ctp-surface1) !important;
+  }
+  /* The day/hour carousel scroll arrows ship a translucent light-grey #e6e8ea button —
+     a faint pale box on the dark rail. Re-tint to a dark surface (chevron stays light). */
+  [class*="wr-carousel-arrow"] {
+    background-color: var(--ctp-surface0) !important;
+  }
+  /* The written "Latest forecast for <city>" panel below the map is an ssrcss
+     TextBlockContainer shipped solid #fff — our text rule already lightened its copy, so
+     it read light-on-white. Drop it onto the base; the media-and-text StyledContainer
+     around it is already darkened above. */
+  [class*="TextBlockContainer"] {
+    background-color: transparent !important;
+  }
+  /* The current-conditions "Observations" band is a same-document micro-app mounted on
+     #weather-observations (its id carries a hardcoded corePalette=light) — a solid-#fff
+     WeatherObservationsContainer whose own headings/values stay near-black. Darken the
+     band and lift every value; its moon/wind glyphs paint via currentColor so the text
+     colour carries them too. */
+  [id^="weather-observations"] [class*="WeatherObservationsContainer"] {
+    background-color: var(--ctp-base) !important;
+  }
+  [id^="weather-observations"],
+  [id^="weather-observations"] * {
+    color: var(--ctp-subtext1) !important;
   }
 
   /* 404 page ships its own tiny chrome: a white .nav inside .header, with the
