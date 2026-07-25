@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for OLX Brasil.
-@version      20260721.00.30
+@version      20260724.12.45
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -714,13 +714,20 @@
      the SELECTED one is the lavender brand tint (#F0E6FF) with deep-purple copy
      and border — but the blanket `label { background-color: transparent; color }`
      rule above flattened both states to the same borderless dark chip, so a
-     selected filter looked exactly like an unselected one. Restore the pair. */
-  [class*="Chips_chipContent"] label {
+     selected filter looked exactly like an unselected one. Restore the pair.
+     OLX migrated these CSS-module class names from `Chips_chipContent__hash` to
+     `Chips-module-scss-module__hash__chipLabel`, so the old substring matched
+     nothing and both states regressed to flat grey; target the stable `chipLabel`
+     element name (unique to these chips — ButtonChips has no `chipLabel`) so the
+     rule survives either build. */
+  [class*="Chips_chipContent"] label,
+  label[class*="chipLabel"] {
     background-color: #21262d !important;
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
   }
-  [class*="Chips_chipContent"] input:checked + label {
+  [class*="Chips_chipContent"] input:checked + label,
+  input:checked + label[class*="chipLabel"] {
     background-color: #2a2440 !important;
     color: #c9b6f5 !important;
     border-color: #b794f6 !important;
@@ -730,23 +737,33 @@
      inherited colour, so the SELECTED chip's violet tint (and the unselected chip's
      lifted grey) never reached the text — every chip read the same flat grey. Let
      the <p> inherit the label colour so the selected state keeps its accent. */
-  [class*="Chips_chipContent"] label p { color: inherit !important; }
+  [class*="Chips_chipContent"] label p,
+  label[class*="chipLabel"] p { color: inherit !important; }
 
   /* Narrow viewports replace the filters rail with a sticky "Filtros" bar whose
      CSS-module wrapper ships a literal white surface, and whose chips paint on
      an inner `ButtonChips_chipContent` span (white; the CHECKED category chip is
      the lavender brand tint with deep-purple copy). The button itself is
      transparent, so a rule on the button never paints. */
-  [class*="ListingPage_mobileFiltersWrapper"] {
+  /* Same CSS-module rename as the garantia chips: `ListingPage_mobileFiltersWrapper`
+     and `ButtonChips_*` became `…-module-scss-module__hash__mobileFiltersWrapper` /
+     `__chipContent` / `__checked`, so the old substrings matched nothing — the whole
+     bar reverted to a literal white band and the CHECKED category chip to its raw
+     lavender tint. Match the stable element names (compound with the component so
+     the generic `checked`/`chipContent` names can't over-reach). */
+  [class*="ListingPage_mobileFiltersWrapper"],
+  [class*="mobileFiltersWrapper"] {
     background-color: #0d1117 !important;
     border-color: #2d333b !important;
   }
-  [class*="ButtonChips_chipContent"] {
+  [class*="ButtonChips_chipContent"],
+  [class*="ButtonChips"][class*="chipContent"] {
     background-color: #21262d !important;
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
   }
-  [class*="ButtonChips_checked"] {
+  [class*="ButtonChips_checked"],
+  [class*="ButtonChips"][class*="checked"] {
     background-color: #2a2440 !important;
     color: #c9b6f5 !important;
     border-color: #b794f6 !important;
@@ -760,7 +777,8 @@
      holding the category glyph — under the audit's size floor, so it
      slips past as a bright square glaring in the dark filters rail.
      Settle onto the elevated media tone; the colored glyph stays legible. */
-  [class*="SubcategoryFilterHeader_icon"] {
+  [class*="SubcategoryFilterHeader_icon"],
+  [class*="SubcategoryFilterHeader"][class*="icon"] {
     background-color: #21262d !important;
     border-color: #2d333b !important;
   }
@@ -770,8 +788,11 @@
      every root-category link is a `ParentCategoryLink_container` pill shipping a
      literal #EFF1F5 surface — 30+ bright white pills down the dark rail. The
      hashed CSS-module suffix churns, so match on the substring. Its colored 3D
-     category icon and the grey `--grey` label stay legible on the elevated tone. */
-  [class*="ParentCategoryLink_container"] {
+     category icon and the grey `--grey` label stay legible on the elevated tone.
+     The `ParentCategoryLink_container__hash` name migrated to
+     `…-module-scss-module__hash__container`, so match the component + `container`. */
+  [class*="ParentCategoryLink_container"],
+  [class*="ParentCategoryLink"][class*="container"] {
     background-color: #21262d !important;
     border-color: #2d333b !important;
   }
@@ -960,6 +981,18 @@
     --color-secondary-70: #2a2440 !important;
     --color-secondary-120: #c9b6f5 !important;
     --color-secondary-130: #c9b6f5 !important;
+    /* The price-box discount-coupon banner ("R$ 30 OFF / OFF30") paints
+       `background: var(--coupon-bg-color, var(--color-secondary-70))`. The site now
+       DEFINES `--coupon-bg-color` (the lavender #F0E6FF tint), so the
+       `--color-secondary-70` fallback above never resolves and the banner glared as
+       a bright lavender panel in the dark price box. Remap the coupon token itself
+       to the same dark violet chip. Its copy paints from
+       `var(--coupon-text-color, var(--color-secondary-120))` — the site defines the
+       deep-purple #49078F on `--coupon-text-color`, so the secondary-120 fallback
+       (lifted above) never resolves and the text went deep-purple-on-dark-violet.
+       Remap the coupon text token itself to the readable light violet. */
+    --coupon-bg-color: #2a2440 !important;
+    --coupon-text-color: #c9b6f5 !important;
   }
   /* Seller reputation bar: four 70x8 segments whose colours come from INLINE
      `background-color: var(--color-*)`, so no class rule can reach them. The
