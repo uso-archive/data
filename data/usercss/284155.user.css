@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean dark theme for itch.io's homepage, browse, jams, community and profiles that keeps game art, sale ribbons and creators' own page designs untouched.
-@version      20260721.00.29
+@version      20260726.17.01
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -82,6 +82,13 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) a:hover {
     color: #ffa2ad !important;
   }
+  /* Links that ARE a filled pill keep itch's own background, so the blanket accent above puts
+     accent-on-accent: the devlog post-type badge drops 5.25:1 -> 2.09:1, and the keyboard
+     skip link 3.75:1 -> 1.5:1 on itch red. Both are natively white — restore that. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .post_type a,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) a.skip_to_main {
+    color: #ffffff !important;
+  }
 
   /* ==== Header / nav ==== */
   .primary_header {
@@ -123,9 +130,12 @@
   /* Search autocomplete popup: a portal node absent at load (scan-blind), ships pure
      white with #222 rows. Global header chrome — unprefixed so it stays dark on creator
      pages too, where the prefixed heading rule would not reach its .title. */
+  /* The popup has border-width 0 — its edge is a box-shadow spread ring (#cdcdcd), so a
+     border-color override alone leaves a light hairline framing the dark panel. */
   .autocomplete_results_popup {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
+    box-shadow: 0 0 0 1px #2d333b, 0 2px 8px rgba(0, 0, 0, 0.5) !important;
   }
   .autocomplete_results_popup .result_header {
     background-color: #161b22 !important;
@@ -171,6 +181,17 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .game_info_panel_widget {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
+  }
+  /* Hover-only game-cell details flyout. Its #222 panel is itch's own, but the outer ring of
+     its box-shadow is pure white — invisible against itch's white page, a bright halo on ours.
+     Hover-gated, so no load-time scan reaches it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .popup_details_content {
+    box-shadow: 0 0 0 2px #0d1117, 0 0 0 4px #2d333b, 0 10px 10px -10px rgba(0, 0, 0, 0.8) !important;
+  }
+  /* Tab strips (community index, boards) draw their baseline as an inset #dadada shadow,
+     not a border — a near-white hairline the border rules cannot reach. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .page_tabs {
+    box-shadow: inset 0 -1px 0 0 #2d333b !important;
   }
   /* An open filter group in the browse sidebar flips to .active and paints
      var(--itchio_white_back) (#fff) — recolour the open panel to the elevated surface. */
@@ -244,6 +265,29 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .icon-android,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .icon-html5,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .icon-globe { color: #8b949e !important; }
+  /* Line-art .svgicon glyphs stroke/fill currentColor, which itch leaves at its light-page
+     defaults (#434343, and rgba(34,34,34,.7) on the jam-calendar selects). On the dark chrome
+     those land at 1.0–1.7:1. Neither scanner sees it: svgWhiteFills only looks for WHITE paint
+     and darkOnDark only walks text `color`. Glyphs that already inherit a link or heading
+     colour are left alone. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .svgicon.icon_search,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .svgicon.icon_verified,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .svgicon.icon_down_tick2 {
+    color: #8b949e !important;
+  }
+  /* The GitHub mark paints through `fill`, not currentColor, so a `color` rule cannot reach it
+     — it needs the fill set directly (monochrome glyph, safe to recolour wholesale). Setting
+     `color` here instead would flatten the brand red the button passes down and still not
+     repaint the glyph. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .svgicon.icon_github,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .svgicon.icon_github path {
+    fill: #8b949e !important;
+  }
+  /* itch flags a search box holding a query with .is_active and reddens the submit glyph —
+     keep that state cue, in the theme's accent. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .submit_btn.is_active .svgicon {
+    color: #fa7d8c !important;
+  }
   /* Profile: stat blocks, recent-post rows, avatar wrapper */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .stat_value { color: #e6edf3 !important; }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .stat_label,
@@ -496,6 +540,13 @@
     color: #c4cdd6 !important;
   }
   /* NB: .jam_cell bars in the calendar carry per-jam accent colours — never flattened. */
+  /* Their titles are white ON that accent bar; the blanket link rule repaints them brand pink,
+     which drops to ~1.2:1 over the pastel bars (the white "(N joined)" count beside them keeps
+     its colour, so the row reads half-broken). Both scanners are blind here: white has zero
+     chroma so it is never "flattened", and the painted bucket skips `color`. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jam_cell a {
+    color: #ffffff !important;
+  }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jam_calendar_filters,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jam_filtered_jam_calendar_widget > section {
     background-color: #1c2128 !important;
@@ -534,6 +585,23 @@
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
+  /* The search filter rail is an off-canvas fixed drawer below itch's mobile breakpoint and
+     ships #fff there, so its heading and hint text render light-on-white once opened. It sits
+     translated off-screen at load, which is why no load-time scan reaches it. (At desktop
+     width the same element is the static sidebar and is already transparent, so pinning it to
+     the page base changes nothing there.) */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_panel {
+    background-color: #14181d !important;
+    border-color: #2d333b !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_drawer_title {
+    color: #e6edf3 !important;
+  }
+  /* Its close glyph is an icon FONT (::before), so it rides `color`, and itch's #606060 only
+     read well against the white panel the rule above replaces. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_drawer_close {
+    color: #8b949e !important;
+  }
   /* Faceted filter blocks + tag-card image bands ship a light gray_back */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_group,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .tag_cell .header_image {
@@ -561,6 +629,20 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_top_tags,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_top_tags a {
     color: #8b949e !important;
+  }
+
+  /* Below itch's own 650px breakpoint the devlog feed drops the desktop grid and becomes a
+     stacked card list, and only THERE does it paint the strip #f4f4f4 and each post #fff —
+     at desktop width both are transparent, so a desktop-only pass never sees it and our light
+     body text lands white-on-white. Scoped to the same query so desktop is untouched. */
+  @media (max-width: 650px) {
+    body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .blog_post_grid_widget {
+      background-color: transparent !important;
+    }
+    body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .blog_post_grid_widget .blog_post {
+      background-color: #1c2128 !important;
+      border-color: #2d333b !important;
+    }
   }
 
   /* ==== 404 / message pages ==== */
@@ -598,8 +680,13 @@
   /* ==== Large promo / hero sections ==== */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .large_promo_section { background-color: #0d1117 !important; }
   /* Featured-game promo panel ships a 30% white overlay -> washed grey on dark; darken it */
-  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_game_promo_banner_widget,
-  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_mobile_banner_widget {
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_game_promo_banner_widget {
     background-color: rgba(13, 17, 23, 0.55) !important;
+  }
+  /* The mobile variant is a position:fixed bottom bar backed by SOLID black, not a translucent
+     overlay — its gradient fades to transparent at the right, so a translucent fill here lets
+     the grid scroll through it. Must stay opaque. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_mobile_banner_widget {
+    background-color: #0d1117 !important;
   }
 }

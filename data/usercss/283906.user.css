@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for OLX that turns the bright marketplace into an easy-on-the-eyes dark interface, perfect for late-night browsing.
-@version      20260724.12.45
+@version      20260726.17.04
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -408,8 +408,14 @@
     color: #c4cdd6 !important;
     -webkit-text-fill-color: #c4cdd6 !important;
   }
+  /* The sponsored category tiles ([data-testid^="cat-promo-"]) are the LAST few
+     tiles of the same grid as the ordinary [data-testid^="cat-"] ones, and OLX
+     gives them no surface of their own — every tile is transparent on the page.
+     Painting only the promo ones elevated turned the tail of the last row into
+     one unbroken lighter slab (they sit flush against each other), which reads
+     as a stray highlight cutting the grid in half. Match their plain siblings. */
   [data-testid="home-page"] [data-testid^="cat-promo-"] {
-    background-color: #1c2128 !important;
+    background-color: transparent !important;
     border-color: #2d333b !important;
   }
 
@@ -732,6 +738,21 @@
   #inter-box_ad-detail input[type="number"] { border-color: #f2a066 !important; }
   #inter-box_ad-detail .inter-box_spec { border-color: #2d333b !important; }
 
+  /* The one-line loan teaser (`a.creditbox`, served next to the price in the
+     right rail and again inside the photo lightbox) is a sibling of the same ING
+     family. Two things break on dark: its leading calculator glyph is a raster
+     <img> baked on a WHITE tile — invisible on the light card, a glaring white
+     square here — and its headline is a hardcoded #3473FE that lands at ~4.3:1
+     on the page base, under AA. Invert the monochrome tile so the glyph keeps its
+     shape on a dark ground, and lift the blue enough to read while staying
+     recognisably the advertiser's link colour. */
+  .creditbox img { filter: invert(1) !important; }
+  .creditbox strong,
+  .creditbox span strong {
+    color: #8ab4ff !important;
+    -webkit-text-fill-color: #8ab4ff !important;
+  }
+
   /* OLX's SSR ad slots (e.g. #baxter-top on the offer/listing pages) ship a
      full-width house-ad placeholder ("OLX REKLAMA") baked onto a WHITE canvas
      as a background-IMAGE, so the unfilled slot renders as a glaring white
@@ -784,6 +805,44 @@
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
     color: #e6edf3 !important;
+  }
+  /* Filter FIELDS inside that panel. Natively every one of them is a white box
+     on the grey #F2F4F5 filter sheet — that white IS the whole field boundary
+     (OLX draws no border: border-width is 0). Only the category dropdown reads
+     its surface from a token we remap, so it kept a box; the price range inputs
+     and the multi-select heads take their white from a hashed emotion wrapper
+     that the blanket `#mainContent div` neutraliser strips, so "Od"/"Do"/"Stan"
+     rendered as bare labels floating on the panel with nothing to click. Sink
+     them to the page base like the category dropdown so all four fields match. */
+  #mainContent [data-testid="range-from-flyout-toggle"] > div,
+  #mainContent [data-testid="range-to-flyout-toggle"] > div,
+  #mainContent .multi-select-head {
+    background-color: #14181d !important;
+  }
+  /* …and the range <input> itself is transparent natively (the field surface is
+     the wrapper above). The generic input rule fills it #1c2128, which is exactly
+     the filter panel's colour, so the left half of each price field disappeared
+     and only the chevron half read as a box. Let the wrapper carry the surface. */
+  #mainContent [data-testid="range-from-input"],
+  #mainContent [data-testid="range-to-input"] {
+    background-color: transparent !important;
+  }
+  /* Currency switch (olx.ro "Moneda: lei €"). OLX ranks the two by colour alone —
+     the selected currency is the near-black #02282C, the other the dim #406367 —
+     and the filter-panel span lift painted BOTH #c4cdd6, so the active currency
+     became indistinguishable from the inactive one. Both are <span>s inside the
+     filter panel, so the pair has to carry the panel scope as well or the
+     blanket `…[data-testid="listing-filters"] span` lift (1,2,0) out-specifies
+     it and nothing changes. */
+  #mainContent [data-testid="currency-item-selected"],
+  #mainContent [data-testid="listing-filters"] [data-testid="currency-item-selected"] {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  #mainContent [data-testid="currency-item"],
+  #mainContent [data-testid="listing-filters"] [data-testid="currency-item"] {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
   }
   /* The search/category column sits INSIDE a position:relative; z-index:3 wrapper
      (the only stacking layer that paints above OLX's full-bleed "screening"
@@ -1427,6 +1486,17 @@
   [data-testid="terms-conditions-link"],
   a[href*="login"], a[href*="register"],
   [data-testid="link"], a.link { color: #5fd0c6 !important; }
+  /* The legal-blurb lift above sets -webkit-text-fill-color on every
+     `[data-testid="core-layout"] p span`, and the Regulamin link IS such a span —
+     a `color`-only rule cannot beat a text-fill, so the one link in that paragraph
+     rendered the same grey as the prose around it. Set both channels, scoped to
+     the login shell so the header's own sign-in anchors (also `href*="login"`,
+     and deliberately plain white on the dark bar) are not tinted teal. */
+  [data-testid="core-layout"] [data-testid="terms-conditions-link"],
+  [data-testid="core-layout"] p a {
+    color: #5fd0c6 !important;
+    -webkit-text-fill-color: #5fd0c6 !important;
+  }
 
   /* ============================================================
      404 / error page ("Ups, mamy problem")
@@ -1519,6 +1589,140 @@
      against #0d1117. They carry explicit path fills, so neither `color:inherit`
      nor a `fill` override reaches them; invert the already-grey ink instead. */
   #footerContent a svg { filter: grayscale(1) invert(1) !important; }
+
+  /* ============================================================
+     m.olx.<tld> — the MOBILE host
+
+     Phones are redirected to m.olx.<tld>, a separate app shell: its page hangs
+     off a <main> under #hydrate-root and carries NONE of the #mainContent /
+     #footerContent / #searchmain-container ids that every structural rule above
+     anchors on. So the light-shell neutraliser, the card re-opaque and the
+     content-text lifts all missed this host completely, and it shipped as white
+     ad cards with near-white titles, a white bottom tab bar, a white sticky
+     offer header and light content bands. Everything below is anchored on the
+     mobile-only testids (or on stable structure under them), and each rule
+     either has no desktop counterpart or loses there to the id-scoped rule that
+     already covers it — so nothing on the desktop cascade moves.
+     ============================================================ */
+  /* Ad card: the body panel is a literal #FFFFFF and the photo box a literal
+     #ECEEEF placeholder. The card link holds the photo box first and the badge
+     overlay second, so scope the placeholder to the first child (as the desktop
+     l-card rule does) and leave the badges transparent. */
+  [data-testid="ad-card"] > div { background-color: #1c2128 !important; }
+  [data-testid="ad-card"] a > div:first-child { background-color: #21262d !important; }
+  /* Its location / date lines are the dim #406367 that only worked on the white
+     panel; the title link keeps the brighter colour set on it directly. */
+  [data-testid="ad-card"] p,
+  [data-testid="ad-card"] p span {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+  [data-testid="ad-card"] [data-testid="card-title-link"] {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  [data-testid="ad-card"] [data-testid="ad-price"] {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+  /* Bottom tab bar (Szukaj / Obserwujesz / Dodaj / Czat / Konto) — a white
+     fixed bar; it sits outside <main> so nothing above reached it. */
+  [data-testid="bottom-bar-container"],
+  [data-testid="bottom-bar-container"] div {
+    background-color: #0d1117 !important;
+  }
+  /* Home: the search band is a literal #F2F4F5 sheet, and the field's ghost
+     label is a <p> carrying the dim #406367 that reads ~2:1 once the field
+     behind it goes dark. That band is STICKY, so it has to stay opaque — hand it
+     the page base rather than flattening it to transparent, or the cards scroll
+     straight through the search field. */
+  main#homepage > section { background-color: #14181d !important; }
+  [data-testid="search-bar"] p {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+  /* Home category tiles draw each illustration on a #F2F4F5 disc (the desktop
+     tiles use coloured artwork instead), so on dark they became a grid of bright
+     discs. The illustrations are transparent PNGs, so darkening the disc keeps
+     the art. The disc is a stack of three coincident 48x48 divs of which only
+     the middle one is round, so the radius has to be re-stated or the square
+     holder paints a box over the circle. */
+  [data-testid^="cat-button"] div {
+    background-color: #21262d !important;
+    border-radius: 50% !important;
+  }
+  /* Offer page. Its content bands are #F2F4F5 <section>s (some direct children,
+     some one wrapper deeper), so flatten every section under the shell and then
+     put back the two that MUST stay opaque: the fixed top bar (whose white
+     backdrop is its own first child, painted behind the back/share/favourite
+     controls) and the sticky bottom CTA bar. Both are DIRECT children, so the
+     child-combinator rules below out-specify this one. */
+  [data-testid="ad-component"] section { background-color: transparent !important; }
+  [data-testid="ad-component"] > section:first-of-type > div:first-child {
+    background-color: #0d1117 !important;
+  }
+  [data-testid="ad-component"] > section:last-of-type {
+    background-color: #14181d !important;
+  }
+  /* Offer metadata + the description's "Zobacz więcej" toggle ship the dim
+     #406367 / near-black #02282C content colours through -webkit-text-fill. */
+  [data-testid="ad-component"] [data-testid="ad-posted-at"],
+  [data-testid="ad-component"] [data-testid="member-since"],
+  [data-testid="ad-component"] [data-testid="member-since"] span,
+  [data-testid="ad-component"] [data-testid="lastSeenBox"],
+  [data-testid="ad-component"] [data-testid="lastSeenBox"] span,
+  [data-testid="ad-component"] [data-testid="l-card"] p,
+  [data-testid="ad-component"] [data-testid="l-card"] p span {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+  [data-testid="show-more-button-wrapper"] button,
+  [data-testid="show-more-button-wrapper"] button span,
+  [data-testid="ad-component"] h3 + a {
+    color: #5fd0c6 !important;
+    -webkit-text-fill-color: #5fd0c6 !important;
+  }
+  /* Footer meta strip ("ID: …", the report link) — the desktop rule for it is
+     #mainContent-scoped. */
+  [data-testid="ad-footer-bar-section"],
+  [data-testid="ad-footer-bar-section"] span {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+  /* The seller card's verified-ratings note is a Nexus banner filled from the
+     raw #CEDDFF light-blue primitive, and its own utility classes force the
+     secondary foreground onto the text — which we lift to #9aa6b0, so the note
+     ended up pale grey on pale blue (~2:1). Sink the banner instead of fighting
+     the text colour it pins. */
+  [data-testid="seller_card"] div[class*="n-banner"] {
+    background-color: #1b2436 !important;
+  }
+  /* In-content loan teaser: its "Finanse:" prefix carries the near-black
+     #002F34, and the advertiser's headline the same #3473FE as .creditbox. */
+  .link-advert-c,
+  .link-advert-c > div {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+  .link-advert-c a,
+  .link-advert-c a span {
+    color: #8ab4ff !important;
+    -webkit-text-fill-color: #8ab4ff !important;
+  }
+  /* "Kup" — the safe-deal purchase CTA, and the single most important control on
+     the page. It is an <a data-button-variant="primary"> carrying OLX's
+     near-black #02282C fill; the desktop accent rule is #mainContent-scoped, so
+     on mobile the primary action rendered as a dead near-black slab beside two
+     outline buttons. Same accent treatment as its desktop twin. */
+  [data-testid="ad-component"] [data-testid="go-to-delivery-options"] {
+    background-color: #1fcabf !important;
+    border-color: #1fcabf !important;
+  }
+  [data-testid="ad-component"] [data-testid="go-to-delivery-options"],
+  [data-testid="ad-component"] [data-testid="go-to-delivery-options"] span {
+    color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
+  }
 
   /* ============================================================
      Scrollbar polish

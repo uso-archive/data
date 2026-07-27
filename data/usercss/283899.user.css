@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for PyPI with a proper dark code-highlighting palette.
-@version      20260712.18.33
+@version      20260726.17.06
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -69,10 +69,31 @@
   .status-badge--good { background-color: #148024 !important; }
   .status-badge--bad { background-color: #d52d40 !important; }
   .status-badge--warn { background-color: #ffdf76 !important; }
+  /* The `a.status-badge span` selector above is (0,1,2), so a plain
+     `.status-badge--warn span` (0,1,1) LOSES to it and the label on the pale-yellow
+     pill renders white at ~1.6:1 (the pill's ::before icon inherits it too). The
+     modifier needs to out-specify the base, hence the doubled class. */
   .status-badge--warn, .status-badge--warn span,
+  a.status-badge.status-badge--warn, a.status-badge.status-badge--warn span,
   .badge--warning, .badge--warning a, .badge--warning span { color: #3d2f02 !important; }
   .badge--neutral { background-color: #2d333b !important; }
   .badge--neutral, .badge--neutral a, .badge--neutral span { color: #c4cdd6 !important; }
+  /* Every badge/status pill draws a 1px border in its OWN fill colour, which the
+     blanket `*` reset above flattens to chrome grey — each coloured pill ends up
+     ringed in a dark rim that eats a pixel of its fill. Give each variant its
+     border back; the neutral pair follows our repainted surfaces. */
+  .badge { border-color: #006dad !important; }
+  .badge--success { border-color: #148024 !important; }
+  .badge--danger { border-color: #d52d40 !important; }
+  .badge--warning { border-color: #ffdf76 !important; }
+  .badge--neutral { border-color: #2d333b !important; }
+  .status-badge { border-color: #2d333b !important; }
+  .status-badge--good { border-color: #148024 !important; }
+  .status-badge--bad { border-color: #d52d40 !important; }
+  .status-badge--warn { border-color: #ffdf76 !important; }
+  /* Applied search-filter chip: the divider before its remove button is a
+     translucent white rule on the chip's blue fill, not page chrome. */
+  .filter-badge__remove-button { border-left-color: rgba(255, 255, 255, .2) !important; }
   /* Search filter accordion labels: PyPI's #006dad is too dark on dark → theme link blue */
   .accordion__link, .accordion__link.-js-accordion-trigger, [class*="accordion"] a {
     color: #5fb0e6 !important; }
@@ -159,12 +180,28 @@
   /* Classifier tree connectors are ::before/::after borders, which `*` cannot reach,
      so they keep warehouse's #bbb and end up as bright as the labels. */
   .checkbox-tree li::before, .checkbox-tree li::after { border-color: #3d444d !important; }
+  /* Field validation messages (login / register / forgot-password / reset). Warehouse
+     colours the whole list #d52d40 and the "valid" row #148024; the global `li` rule
+     flattened both to body grey, leaving only the tiny ::before glyph to tell a failure
+     from a pass. Those glyphs sit at ~3.3:1 on our base, so lift them along with the
+     text rather than pairing bright text with a dim icon. */
+  .form-errors, .form-errors li, .form-errors li::before,
+  .form-errors li a, .form-errors li a:hover { color: #ff8b96 !important; }
+  .form-errors .form-error--valid, .form-errors .form-error--valid::before { color: #3fb950 !important; }
+  /* Password-strength meter: the filled gauge keeps its own semantic colour, but the
+     TRACK is a bare 1px #d3d3d3 ring that `*` flattens to #262c33 — invisible on the
+     base, so the unfilled remainder vanishes and the bar loses its scale. */
+  .password-strength { background-color: #1c2128 !important; border-color: #3d444d !important; }
 
   /* ---- Buttons ----
      .button is !important, so it also swallows the semantic variants' own colours
      (danger red, warning gold) and the disabled affordance. Restore them after. */
   .button { background-color: #21262d !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   .button--primary { background-color: #2563a8 !important; border-color: #2f6fb8 !important; color: #fff !important; }
+  /* Warehouse's tertiary is the FILLED neutral (#fff on #bbb) against a base button that
+     is transparent, so the two are a pair. Our base fill collapsed them into the same
+     swatch; keep tertiary one step lighter to preserve the distinction. */
+  .button--tertiary { background-color: #2d333b !important; border-color: #444c56 !important; }
   .button--danger { background-color: #d52d40 !important; border-color: #d52d40 !important; color: #fff !important; }
   .button--warning { background-color: #664e04 !important; border-color: #664e04 !important; color: #fff !important; }
   .button--disabled, .button[disabled] {
@@ -186,10 +223,32 @@
   /* ---- Callouts / notifications ---- */
   .callout-block, .notification-bar, .banner, .filter-panel, .statistics-bar {
     background-color: #1a1f26 !important; color: #c4cdd6 !important; border-color: #2d333b !important; }
-  /* ...but keep each callout's semantic ring (the blanket `*` border-color flattens them) */
+  /* ...but keep each callout's semantic ring (the blanket `*` border-color flattens them).
+     The BASE callout is a semantic too: warehouse rings it 2px #006dad, so without this
+     an info callout keeps only its left bar and loses the frame entirely. Variants must
+     stay BELOW this rule — they tie it on specificity and win on source order. */
+  .callout-block { border-color: #2f6fb8 !important; }
   .callout-block--danger { border-color: #d52d40 !important; }
   .callout-block--warning { border-color: #8a6a06 !important; }
   .callout-block--success { border-color: #148024 !important; }
+  /* Warehouse paints the whole body of a semantic callout in its own hue
+     (`--danger` #d52d40, `--warning` #664e04, `--success` #148024). Our `.callout-block`
+     colour plus the global `p, li, …` rule flattened all three to body grey, so a yanked
+     release's reason read exactly like a neutral note — the ring was the only signal
+     left. Re-tuned for dark: the natives are 2-3:1 here. Links stay theme-blue so they
+     still read as links, and `.button` keeps its own colour (it is never a p/li). */
+  .callout-block--danger, .callout-block--danger p, .callout-block--danger li,
+  .callout-block--danger strong, .callout-block--danger em,
+  .callout-block--danger .callout-block__heading { color: #ff8b96 !important; }
+  .callout-block--warning, .callout-block--warning p, .callout-block--warning li,
+  .callout-block--warning strong, .callout-block--warning em,
+  .callout-block--warning .callout-block__heading { color: #e3b341 !important; }
+  .callout-block--success, .callout-block--success p, .callout-block--success li,
+  .callout-block--success strong, .callout-block--success em,
+  .callout-block--success .callout-block__heading { color: #3fb950 !important; }
+  /* The warning callout's left bar keeps warehouse's #664e04 (2.1:1 here) while its ring
+     is already re-tuned above — lift the bar to match instead of leaving it half-done. */
+  .callout-block--warning::before, .callout-block--warning::after { background-color: #8a6a06 !important; }
   /* The neutral callout paints its left/right bars through ::before / ::after, which the
      blanket `*` border rule cannot reach and no background-color rule touches, so they
      keep warehouse's #d3d3d3 and glare as a bright grey slab against the dark card. */

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for CSDN: comfortable dark articles, homepage and search, with fully dark code blocks and a readable syntax palette.
-@version      20260724.12.43
+@version      20260726.16.59
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -317,6 +317,15 @@
     background-color: var(--csdn-elev2) !important;
     color: var(--csdn-text-2) !important;
   }
+  /* the blog.csdn.net/nav/<cat> carousel builds its chips as <a class="nav-item">
+     and marks the SELECTED one by colour alone (near-black #1a1a1a vs #999 for the
+     rest — no pill, unlike the www home <p> chips). The rule above painted every
+     <a> the same body grey, so the only surviving cue was font-weight: the current
+     category read like the eleven others. Mirror the native contrast inverted —
+     muted for the rest, bright for the selected. */
+  .menus-view .menus-item a {
+    color: var(--csdn-muted) !important;
+  }
   .menus-view .menus-item p:hover,
   .menus-view .menus-item a:hover {
     background-color: #30363d !important;
@@ -326,6 +335,17 @@
   .menus-view .menus-item p.active {
     background-color: var(--csdn-text) !important;
     color: var(--csdn-chrome) !important;
+  }
+  .menus-view .menus-item a.active {
+    color: var(--csdn-text) !important;
+  }
+  /* The blog nav chip bar (div.blog-content-navs) is position:fixed at top:48 and
+     natively opaque white, but as a <div class> the broad neutralizer flattens it
+     to transparent — the article feed then scrolls straight through the two chip
+     rows, which is unreadable at any width and total soup at 390px. Re-seat it
+     opaque on the page base; (0,2,1) beats the (0,1,1) neutralizer. */
+  body div.blog-content-navs {
+    background-color: var(--csdn-base) !important;
   }
   /* blog.csdn.net/nav/<category> ships its OWN chip row inside .home_box_nav
      (.home_box_nav_list > a — 推荐 / 付费专栏 / VIP文章): the inactive chips are a
@@ -366,9 +386,35 @@
   .tool-active-list::after {
     background-color: var(--csdn-elev2) !important;
   }
+  /* the bubble's own box needs the surface too: it overlaps the 点赞 hover tooltip
+     beside it, and natively hides it because both are opaque white. Left transparent
+     (a neutralizer casualty) the two labels render on top of each other. */
+  body div.tool-active-list {
+    background-color: var(--csdn-elev2) !important;
+  }
   .tool-active-list .text,
   .tool-active-list .text * {
     color: var(--csdn-text-2) !important;
+  }
+  /* The action-bar hover tooltips (点赞 / 踩 / 收藏 / 评论) are the same speech bubble
+     under a class the rule above never reached: they shipped as a bright white box
+     carrying our lightened (near-white) label — illegible, and a white blob over the
+     article. The panel is the <div> itself (a neutralizer casualty, hence the div
+     prefix); the two pseudos are the arrow and its hit box. */
+  body div.tool-hover-tip {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-text-2) !important;
+  }
+  .tool-hover-tip::before,
+  .tool-hover-tip::after {
+    background-color: var(--csdn-elev2) !important;
+  }
+  /* The share flyout (.tool-QRcode .QRcode — 复制链接 / 分享到QQ / 新浪微博 + the QR
+     panel) is natively an opaque white popover; the broad neutralizer stripped it, so
+     the article text scrolled straight through the open menu. (0,2,0) beats (0,1,1). */
+  .tool-QRcode .QRcode {
+    background-color: var(--csdn-chrome) !important;
+    border-color: var(--csdn-border) !important;
   }
 
   /* ---------- Right-edge floating side toolbar (every page) ----------
@@ -426,6 +472,153 @@
   body div.passport-login-tip-container {
     background-color: var(--csdn-elev) !important;
     border-color: var(--csdn-border) !important;
+  }
+
+  /* ---------- Toolbar promo bubbles / campaign toasts (top-right) ----------
+     CSDN hangs a whole family of light promo cards off the top-right corner of
+     every page. They are all built by JS after load, most of them on a timer or
+     a per-day cookie, so nothing that scans the DOM at load time can see them.
+
+     The write-promo bubble (.csdn-toolbar-creative-mp, "发文得流量券") is
+     rendered into .toolbar-btn-write-popup from /phoenix/web/v1/get-toolbar-bubbles
+     and shown for 5s on at most 3 page views a day (cookie creative_btn_mp). It
+     sits at top:48/right:0 of the 1425px-wide toolbar, so on a 1280 viewport it
+     hangs off the right edge. Its entire surface is ONE raster <img> — a white
+     rounded card with near-black text and an orange 去获得 CTA — so no
+     background rule can reach it. Smart-invert the raster instead: the card goes
+     dark, the text lifts, and the orange CTA + red badge keep their hue. The
+     close cross is a light-grey glyph that already reads on dark, so it is not
+     inverted. */
+  .csdn-toolbar-creative-mp a img,
+  img.csdn-toolbar-creative-mp-arrow {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+  body div.csdn-toolbar-creative-mp {
+    box-shadow: 0 -1px 11px 0 rgba(0, 0, 0, 0.6) !important;
+  }
+
+  /* the pointer notch of every toolbar flyout is a white PNG
+     (toolbar-triangle-white.png), so a correctly-dark flyout still renders a
+     white arrow above itself */
+  .csdn-toolbar-plugin-triangle,
+  #csdn-plugin-vip::before,
+  #csdn-plugin-vip-v2::before {
+    filter: invert(1) !important;
+  }
+
+  /* the 会员 hover popup paints its whole 376px panel with a near-white cream
+     raster and colours its labels for it (#b87100 gold in v1, #000 in v2), so
+     our lifted text lands light-on-light. Drop the raster for a chrome surface
+     and keep v1's gold, brightened to read on it. */
+  #csdn-plugin-vip,
+  #csdn-plugin-vip-v2 {
+    background-image: none !important;
+    background-color: var(--csdn-chrome) !important;
+    border: 1px solid var(--csdn-border) !important;
+    border-radius: 8px !important;
+  }
+  #csdn-plugin-vip .csdn-plugin-vip-header,
+  #csdn-plugin-vip .csdn-plugin-vip-body a,
+  #csdn-plugin-vip .csdn-plugin-vip-body span {
+    color: #e3b341 !important;
+  }
+  #csdn-plugin-vip-v2 .csdn-plugin-vip-header,
+  #csdn-plugin-vip-v2 .csdn-plugin-vip-body a,
+  #csdn-plugin-vip-v2 .csdn-plugin-vip-body span {
+    color: var(--csdn-text-2) !important;
+  }
+  #csdn-plugin-vip-v2 a.csdn-plugin-vip-footer-link {
+    color: var(--csdn-muted) !important;
+  }
+
+  /* toolbar notification toasts (.notification stack, absolute right:24/top:50):
+     a white 338x112 card with #1a1a1a text, so the neutralizer alone leaves
+     near-black text bleeding over the page */
+  body div.notification-item {
+    background-color: var(--csdn-elev) !important;
+    color: var(--csdn-text-2) !important;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.5) !important;
+  }
+  body .notification-title {
+    color: var(--csdn-muted) !important;
+  }
+  body .notification-options {
+    color: var(--csdn-text-2) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  body .notification-options:hover {
+    background-color: var(--csdn-elev2) !important;
+  }
+
+  /* the 消息 coupon bubbles paint a near-white raster and caption it #df760c.
+     Unlike the write promo their caption is real text, so an invert would drag
+     the amber through the filter too — give them a real surface and lift the
+     amber instead. Their peach close chip already reads on dark. */
+  .toolbar-msg-guide,
+  .toolbar-msg-coupon,
+  body div.toolbar-msg-guide a,
+  body div.toolbar-msg-coupon a {
+    color: #f0a63c !important;
+  }
+  /* div-prefixed: the broad neutralizer is (0,1,2) and would otherwise keep the
+     bubble transparent */
+  body div.toolbar-msg-guide,
+  body div.toolbar-msg-coupon {
+    background-image: none !important;
+    background-color: var(--csdn-elev) !important;
+    border: 1px solid var(--csdn-border) !important;
+    border-radius: 8px !important;
+  }
+  /* the live-stream toast carries a rotating streamer AVATAR, which an invert
+     would ruin, so this one gets a real surface instead: drop the white raster
+     from the card and from the avatar plate, and darken the disc behind the
+     photo */
+  #csdn-toolbar .toolbar-msg-live {
+    background-image: none !important;
+    background-color: var(--csdn-elev) !important;
+    border: 1px solid var(--csdn-border) !important;
+    border-radius: 8px !important;
+    color: var(--csdn-text-2) !important;
+  }
+  #csdn-toolbar .toolbar-msg-live .toolbar-msg-live-avatar {
+    background-image: none !important;
+  }
+  #csdn-toolbar .toolbar-msg-live .toolbar-msg-live-avatar > span {
+    background-color: var(--csdn-elev2) !important;
+  }
+
+  /* the 高校 campaign window (position:fixed right:24/top:120) is a near-white
+     raster card wrapping white radio containers and #222226 copy. .cannot-select
+     is the DISABLED submit state (grey where the live one is #fc5531 orange) —
+     it stays grey so the two states keep reading apart. */
+  body div.csdn-highschool-window {
+    background-image: none !important;
+    background-color: var(--csdn-elev) !important;
+    border: 1px solid var(--csdn-border) !important;
+    color: var(--csdn-text-2) !important;
+  }
+  .csdn-highschool-window .highschool-container {
+    background-color: var(--csdn-elev2) !important;
+    border-color: var(--csdn-border) !important;
+  }
+  .csdn-highschool-window .csdn-highschool-account > p,
+  .csdn-highschool-window .csdn-highschool-select > p,
+  .csdn-highschool-window .highschool-name {
+    color: var(--csdn-text) !important;
+  }
+  .csdn-highschool-window .highschool-desc {
+    color: var(--csdn-muted) !important;
+  }
+  .csdn-highschool-window .cannot-select {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-muted) !important;
+  }
+
+  /* the message-list overflow menu is a 100px white box */
+  #csdn-toolbar .more-actions-box {
+    background-color: var(--csdn-chrome) !important;
+    border-color: var(--csdn-border) !important;
+    color: var(--csdn-text-2) !important;
   }
 
   /* article aside 归档 (archive) month tiles: the month label ships a light
@@ -1361,6 +1554,12 @@
     color: var(--csdn-link) !important;
     -webkit-text-fill-color: var(--csdn-link) !important;
   }
+  /* the selected tag also carries a 2px #222226 bottom underline that the site sets
+     at a specificity our `* { border-color }` reset loses to — 1.12:1 on the dark
+     base, i.e. gone. Match the accent the label already uses. */
+  .tag_list_box span.tag_name_item.currentTagName {
+    border-bottom-color: var(--csdn-link) !important;
+  }
   .ask-urgent-list h4 {
     background-color: var(--csdn-elev) !important;
     color: var(--csdn-text) !important;
@@ -1408,6 +1607,29 @@
     color: var(--csdn-text) !important;
   }
 
+  /* profile aside "入选《本周创作者榜》第N名" achievement banner: a 338x48 bar painted
+     by a coral raster background-IMAGE (bg-color transparent, and a url() raster the
+     lightBgImages gradient check never sees), so it shipped as the brightest block on
+     the page — and its natively-WHITE label went link-blue/grey under our blanket
+     rules, ~2:1 on the coral. Drop the raster for a red-tinted chip and put the label
+     back on brand red so the award still reads as an award. */
+  .user-top-list li {
+    background-image: none !important;
+    background-color: rgba(240, 121, 92, 0.14) !important;
+  }
+  .user-top-list li a,
+  .user-top-list li span {
+    color: var(--csdn-red) !important;
+  }
+  /* the "码龄N天" badge beside the profile name is a light-blue rgb(209,221,241) chip
+     (89x16 — under the audit big() floor) that the neutralizer stripped to bare text,
+     so it stopped reading as a badge. Recessed dark pill; div-prefixed because a bare
+     .person-code-age (0,1,0) loses to the `body div[class]` (0,1,1) neutralizer. */
+  body div.person-code-age {
+    background-color: var(--csdn-elev2) !important;
+    color: var(--csdn-text-2) !important;
+  }
+
   /* the "原力等级" achievement / influence card (active state is white) */
   .user-influence-list,
   .user-influence-list.active,
@@ -1442,6 +1664,22 @@
   .login-box .title,
   .passport-main .title {
     color: var(--csdn-text) !important;
+  }
+  /* the guest login dialog's headline carries a brand-red span ("将博客内容转为可运行
+     代码") that the blanket span rule greyed, so the one emphasised line in the sheet
+     read as ordinary copy. Scoped to the title so the generic .highlight class can't
+     leak elsewhere. */
+  .login-box-title .highlight {
+    color: var(--csdn-red) !important;
+  }
+  /* Modal scrims: the scroll-triggered guest login sheet (.passport-login-mark, on
+     every blog page) and Element UI's dialog mask (.v-modal, on download/文库) are
+     natively rgba(0,0,0,.5) but are <div class> nodes, so the broad neutralizer
+     erased them — the dialog floated over a fully-lit page with no backdrop and no
+     visual focus. (0,2,1) beats the (0,1,1) neutralizer. */
+  body div.passport-login-mark,
+  body div.v-modal {
+    background-color: rgba(0, 0, 0, 0.6) !important;
   }
   /* "上次登录/扫码登录更方便" last-login hint pill above the login tabs ships a
      warm cream rgb(254,247,240) bg with pale text — light-on-light (audit-blind:
@@ -1526,6 +1764,14 @@
     background-color: var(--csdn-elev2) !important;
     border-color: var(--csdn-border) !important;
   }
+  /* Element UI switch (so.csdn.net AI-search card "深度思考" toggle): the OFF track is
+     a literal rgb(229,229,229) pill, 24x12 — far under the audit size floor, and a
+     bright spot on the dark card. Only the unchecked track is repainted so the ON
+     state keeps whatever brand colour the site sets. */
+  .el-switch:not(.is-checked) .el-switch__core {
+    background-color: #30363d !important;
+    border-color: #30363d !important;
+  }
 
   /* download.csdn.net sidebar panels paint a light PNG as a background-IMAGE
      behind real DOM copy (bg-color audit-blind): the 会员 promo header
@@ -1536,6 +1782,17 @@
     background-image: none !important;
     background-color: var(--csdn-elev) !important;
     border-color: var(--csdn-border) !important;
+  }
+  /* the 创作灵感 list rows and the "前往需求广场" task link inside those sidebars wrap
+     their label in a <p>/<span>, so the blanket text rules greyed them past the `a`
+     rule: the site paints the row titles link-blue and the task line amber, and both
+     read as inert body copy once flattened. Restore the affordance, amber tuned for
+     the dark panel. */
+  .upload-sidebar div.list a.item p.line {
+    color: var(--csdn-link) !important;
+  }
+  .upload-sidebar a.center-task span.text {
+    color: #e3a75f !important;
   }
   /* resource-card category chips (.header-tag) + the el-card header pill ship
      a pale rgb(247,247,252) bg under pale-blue link text = pale-on-pale */

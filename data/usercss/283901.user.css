@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete, polished dark theme for Chefkoch. Homepage, recipe pages and search/category results all get a calm GitHub-dark treatment while Chefkoch's signature green brand accent stays intact. Easy on the eyes for late-night recipe browsing.
-@version      20260721.00.28
+@version      20260726.16.59
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -272,6 +272,16 @@
   .ds-subscription-card__footer { background-color: #20222a !important; }
   .ds-subscription-card__head *, .ds-subscription-card__body *,
   .ds-subscription-card__footer * { color: #e6edf3 !important; }
+  /* the two tier cards are told apart ONLY by their head colour — brand green
+     is the free tier, aubergine is PLUS. One grey for both erased the tier;
+     both hues clear 4.5:1 against the white wordmark, so keep them. */
+  .ds-subscription-card--ck .ds-subscription-card__head { background-color: #3b8047 !important; }
+  .ds-subscription-card--plus .ds-subscription-card__head { background-color: #734b6d !important; }
+  .ds-subscription-card--pur .ds-subscription-card__head { background-color: #20222a !important; }
+  /* the price interval carries the same tier colour (native #3b8047 / #734b6d,
+     both too dark on the dark card) -> lifted tier accents */
+  .ds-subscription-card .lp-subscription-card__interval { color: #6fd382 !important; }
+  .ds-subscription-card .lp-subscription-card__interval--plus { color: #c99ec2 !important; }
 
   /* newsletter / promo bands painted in the light-green header tint (#e2ece3) */
   .ds-newsletter, .ds-newsletter-box, .newsletter, .newsletter-box,
@@ -709,6 +719,13 @@
      hardcoded to the olive #595852 -> 2.5:1 on the dark page */
   spark-ad::before, spark-ad::after { color: #8b949e !important; }
   ins.adsbygoogle, [id^="google_ads"], [id*="div-gpt-ad"] { background-color: #14181d !important; }
+  /* the DFP CREATIVE frame is content, not chrome: native creatives ship a
+     transparent body with black copy authored for chefkoch's light page, so a
+     dark fill behind them leaves the headline black-on-black. Give the frame
+     the site's own ad surface; the slot around it stays dark. */
+  iframe[id^="google_ads_iframe"], iframe[id*="div-gpt-ad"] {
+    background-color: #f6f7f4 !important;
+  }
   /* mobile sticky "anchor" ad (Google DFP): the collapsible frame + its collapse
      toggle carry an inline WHITE *shorthand* background (background: rgb(255,255,255)),
      which the background-COLOR safety net at the foot of the file does not match, so
@@ -1028,6 +1045,23 @@
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
+  /* the PLUS feature carousel names each feature by its own pastel, fed in as
+     an inline --slider-card-bg; collapsing all five to one grey erased that.
+     Redefining the token keeps each hue, darkened so the light copy reads.
+     (An author !important custom property outranks the element's inline one.) */
+  .promotion-slider-card--wochenplaner { --slider-card-bg: #16323b !important; }
+  .promotion-slider-card--zutatensuche { --slider-card-bg: #3a3316 !important; }
+  .promotion-slider-card--rezeptimport { --slider-card-bg: #3d2617 !important; }
+  .promotion-slider-card--profirezepte { --slider-card-bg: #3b2124 !important; }
+  .promotion-slider-card--werbefreiheit { --slider-card-bg: #26361a !important; }
+  .promotion-slider-card .ds-promotion-card__inner {
+    background-color: var(--slider-card-bg) !important;
+  }
+  /* its image half is natively transparent so the tint runs edge to edge — the
+     generic image-wrap fill would otherwise split the card in two */
+  .promotion-slider-card .ds-promotion-card__image-wrap {
+    background-color: transparent !important;
+  }
 
   /* "Nichts dabei?" white infobox (recipe suggestion pages); its corporate
      green title (#3b8047) also fails contrast once the box goes dark */
@@ -1062,6 +1096,60 @@
      treatment: darken the footer, lift the fine-print, and raise the brand
      green links/buttons (native #3b8047 clears only 3.7:1 on the dark modal).
      ==================================================================== */
+  /* The CMP carries TWO light token layers: the consent SDK's --clr… set on
+     .cmpstyleroot and chefkoch's --ck-consent-… plus --ck-color-… set on
+     :root. Chefkoch does ship a dark variant, but it is gated behind
+     :root:not(.ck-cmp-light) and the class is always present, so both layers
+     must be redefined here. */
+  /* the SDK re-declares its --clr* set on EVERY descendant (`.cmpstyleroot *`)
+     and appends its sheet after ours, so the compound `.cmpbox.cmpstyleroot`
+     is needed to outrank it */
+  .cmpbox.cmpstyleroot, .cmpbox.cmpstyleroot * {
+    --clrBackground: #1c2128 !important;
+    --clrText: #c4cdd6 !important;
+    --clrHeadline: #e6edf3 !important;
+    --clrHighlight: #2d333b !important;
+  }
+  :root {
+    --ck-color-bg-surface: #1c2128 !important;
+    --ck-color-text-secondary: #9aa5af !important;
+    --ck-color-link: #4cae5e !important;
+    --ck-color-link-hover: #6fd382 !important;
+    --ck-color-link-active: #6fd382 !important;
+    --ck-consent-item-active-background: #2d333b !important;
+    --ck-consent-item-active-text: #e6edf3 !important;
+    --ck-consent-item-active-text-contrast: #6fd382 !important;
+  }
+  /* the SELECTED purpose row in "Erweiterte Einstellungen" and the vendor /
+     purpose table headers are hardcoded #d9d9d9 in the SDK sheet (chefkoch's
+     own token rule targets a descendant that never matches), so the token
+     above cannot reach them and their labels read light-on-light */
+  #cmpbox .cmpboxnaviitemactive, #cmpbox td.cmpallvend, #cmpbox th.cmpallvend,
+  #cmpbox td.cmpallprps, #cmpbox th.cmpallprps {
+    background-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+  #cmpbox .cmpboxnaviitemactive .cmpboxnaviitemtxt { color: #e6edf3 !important; }
+  #cmpbox .cmptooltip { background-color: #1c2128 !important; color: #c4cdd6 !important; }
+  /* the FULLSCREEN settings variant (footer "Datenschutz-Einstellungen") is a
+     second SDK layout that hardcodes #3b3b3b / #5f5f5f instead of reading the
+     --clr… tokens, so its headings and body copy land dark-on-dark */
+  .cmpbox.cmpfullscreen { color: #c4cdd6 !important; }
+  #cmpbox .cmpboxhl, #cmpbox .cmpprpshl, #cmpbox .cmpvendhl { color: #e6edf3 !important; }
+  #cmpbox .cmpboxtxt, #cmpbox .cmpprpsdescr, #cmpbox td.cmpvendname,
+  #cmpbox .cmpcookieinfocontent p, #cmpbox .cmpcookiesdescrboxcontent p { color: #c4cdd6 !important; }
+  #cmpbox a.cmpvendurl, #cmpbox a.cmpvendurl:link { color: #4cae5e !important; }
+  /* the primary consent CTA is white-on-#3b8047 natively (4.5:1); our lighter
+     brand green plus the broad text grey dropped its label to 1.7:1 */
+  #cmpbox .cmpboxbtnyescustom, #cmpbox .cmpboxbtnaccept,
+  #cmpbox button.ck-btn-primary, #cmpbox #cmpwelcomebtnyes .cmpboxbtnyes {
+    background-color: #3b8047 !important;
+    background-image: none !important;
+    color: #ffffff !important;
+  }
+  #cmpbox .cmpboxbtnyescustom *, #cmpbox .cmpboxbtnaccept *,
+  #cmpbox button.ck-btn-primary *,
+  #cmpbox #cmpwelcomebtnyes .cmpboxbtnyes * { color: #ffffff !important; }
   #cmpbox .cmpboxbtns {
     background-color: #14181d !important;
     border-color: #262c33 !important;

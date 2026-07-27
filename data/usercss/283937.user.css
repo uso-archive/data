@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Weather Underground. Darkens forecasts, hourly and 10-day pages and data tables while keeping radar, maps and weather icons intact.
-@version      20260721.00.32
+@version      20260726.17.09
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -261,7 +261,6 @@
   .data-module .content .data-point,
   .data-module .content .wx-value,
   .data-module .content .wu-value,
-  .temp .secondary-temp .wu-label,
   .wind-dir .wx-value,
   #stationselector_table .table-row .temp,
   .location-data,
@@ -273,11 +272,37 @@
     color: var(--wu-text) !important;
   }
 
+  /* KNOWN TRADE-OFF: the station-nav readout next to the city name
+     (`.station-nav .station-name .wu-value`) carries an INLINE colour WU
+     computes from its full temperature scale (e.g. `color:#da2f2f` when hot).
+     The lift above erases it. Letting the inline value through instead is
+     unsafe: the cold end of that scale is a dark blue/purple that would be
+     near-invisible on the dark base, and the colour is dynamic so no fixed
+     remap is correct. The same reading is shown, in scale colour, by the
+     conditions circle directly below, so the neutral lift stays. */
+
   /* Brighten the dark teal-blue link/precip accent (#006f9e) for dark. */
   .data-module .content a .data-point,
   .data-module .content a .wx-value,
   .data-module .content a .wu-value {
     color: var(--wu-link) !important;
+  }
+  /* The Material data tables (hourly / 10-day) are NOT wrapped in
+     `.data-module .content`, so the rule above never reached them: every precip
+     link rendered its digits in the plain value white while the unit beside it
+     stayed link blue. Let anything inside a table-cell link inherit the anchor's
+     colour so the whole link reads as one. */
+  td a .wu-value,
+  td a .wu-label,
+  td a .wu-degree,
+  td a .wu-suffix,
+  td a .wx-value,
+  td a .data-point,
+  a.hook .wu-value,
+  a.hook .wu-label,
+  a.hook .wu-degree,
+  a.hook .wu-suffix {
+    color: inherit !important;
   }
 
   /* Header city-conditions readout ("61° Cloudy" by the city name) uses a
@@ -301,7 +326,16 @@
   .feels-like .temp {
     color: #ff9d4d !important;          /* WU orange, nudged lighter for dark */
   }
-  .temp .secondary-temp {
+  /* The forecast tiles read "HIGH 83 | 71 °F": WU paints the high its neutral
+     body colour and the LOW its secondary grey (#8a8a8a). The blanket .wu-value
+     lift above reaches INSIDE .secondary-temp, so the low rendered as bright as
+     the high and the pair read as two identical numbers. The wrapper alone is not
+     enough -- the value/label/degree spans each need the muted colour. */
+  .temp .secondary-temp,
+  .temp .secondary-temp .wu-value,
+  .temp .secondary-temp .wu-label,
+  .temp .secondary-temp .wu-degree,
+  .temp .secondary-temp .wu-suffix {
     color: var(--wu-text-muted) !important;  /* low/secondary temp grey */
   }
   /* 10-day / calendar temperature scale: keep the warm reds/oranges (readable
@@ -359,6 +393,15 @@
   .ui-tabs a,
   .header-tabs a,
   .wundermap_links a {
+    color: var(--wu-link) !important;
+  }
+  /* The city-map RADAR/SATELLITE bar carries BOTH `ui-tabs-nav` and `tab-nav` on
+     its <ul>, so the /health pollen-tab rule further down (`.tab-nav li a`, at
+     (0,2,1)) out-specifies the (0,1,1) prelude above and painted the unselected
+     tab plain body grey -- the "this is a tab you can click" cue, gone. Re-claim
+     it at (0,3,1); the selected tab keeps its own white + underline treatment. */
+  .ui-tabs .tab-nav li:not(.ui-state-active) a:not(.selected),
+  .header-tabs .tab-nav li:not(.ui-state-active) a:not(.selected) {
     color: var(--wu-link) !important;
   }
   .ui-tabs a.selected,
@@ -655,6 +698,13 @@
   .legend-def.pressure .legend-key {
     background-color: var(--wu-text-2) !important;
   }
+  /* "Chance of Snow" is the one series whose key is a pink fill INSIDE a 2px
+     #15aadc ring (it pairs with the cyan "Chance of Precip."). The blanket `*`
+     border reset flattened that ring, so the two related series stopped reading
+     as a pair. The fill is untouched. */
+  .legend-def.snowchance .legend-key {
+    border-color: #15aadc !important;
+  }
 
   /* ---- (3) dashboard tiles (Precip / Pollen / Air Quality / UV) --------- */
   /* Each lib-*-tile body is a div#*BarChart wrapping an inline-styled white
@@ -897,6 +947,26 @@
     background-color: var(--wu-surface-2) !important;
     color: var(--wu-text) !important;
   }
+  /* Every ROW of that panel is a <label.layerTitle> carrying its own WU grey
+     (#3d3d3d top level, #2f2f2f for the nested layer-type options) -- so the
+     rules above darkened the container while all the rows stayed mid-grey and
+     the whole flyout read washed-out against the theme. Neither scan sees it:
+     the greys are neither near-white nor chromatic. Keep WU's two-level
+     hierarchy (nested rows darker than their parent). The rail itself
+     (lib-wm-sidebar) and its in-panel ad box (#696969) are the same grey. */
+  .map-accordion .layerTitle,
+  .menu-content .layerTitle {
+    background-color: var(--wu-surface) !important;
+  }
+  .accordion-content .layerTitle {
+    background-color: var(--wu-surface-2) !important;
+  }
+  lib-wm-sidebar {
+    background-color: var(--wu-chrome) !important;
+  }
+  .pane-wu-fullscreenweather-ad-box-atf {
+    background-color: var(--wu-chrome) !important;
+  }
   /* The rail's flyout wrapper (.tab-content.legend in .sidebar-tab-container) is a
      #f7f7f7 panel. The Layers pane (wm-layers) is opaque dark and covers it, but the
      Legend pane (wxstn-legend/.legends_panel) is transparent, so the white leaks
@@ -1080,6 +1150,26 @@
   .dropdown-pane {
     background-color: var(--wu-surface) !important;
     color: var(--wu-text-2) !important;
+  }
+  /* The °F/°C segmented toggle (header gear pane AND the wundermap Settings
+     pane) marks the ACTIVE unit with nothing but a 3px border -- #bdbdbd on the
+     selected half, #ffffff on the other. The blanket `*` reset flattened both to
+     one line colour, so neither pane showed which unit was in use. On the
+     wundermap WU also keeps a white fill on both halves with its own
+     `!important`, so the `.button` white label rule left the °F/°C glyphs
+     invisible on white. Both panes are click-gated: no load-time scan sees
+     either. Give the toggle an explicit dark/selected pair. */
+  #wuSettings-quick .button-group .button,
+  .button-group.unit_settings .button {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text) !important;
+    border-color: var(--wu-border-2) !important;
+  }
+  #wuSettings-quick .button-group .button.selected,
+  .button-group.unit_settings .button.selected {
+    background-color: #15aadc !important;
+    color: #ffffff !important;
+    border-color: #15aadc !important;
   }
 
   /* ---- sponsored "You May Like" widget (Taboola) ------------------------ */

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A full dark theme for Thingiverse: browse the feed, model pages, search and profiles in comfortable dark while 3D model previews stay true to color.
-@version      20260717.18.10
+@version      20260726.17.08
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -134,9 +134,14 @@
      `currentColor`. Our light body `color` makes that default border glow as
      two white boxes at the top of every page (native they inherit the site's
      dark-navy text, so they hide against white). Mute the border to the page
-     background — the site's own consent DIALOG is left untouched. */
+     background — the site's own consent DIALOG is left untouched. The `inset` style
+     must be flattened to `solid` as well: its bevel derives its own light shades and
+     stays visible as three outlined boxes however dark we colour it. (Cookiebot's SDK
+     display:nones these iframes once it boots; until then they lay out at the default
+     size on every page load.) */
   iframe.CybotCookiebotHiddenIframe,
-  iframe.CybotCookiebotOffscreenIframe { border-color: #14181d !important; }
+  iframe.CybotCookiebotOffscreenIframe {
+    border-color: #14181d !important; border-style: solid !important; }
 
   /* ====================================================================
      Content-area neutralizer — Thingiverse's React shell renders most
@@ -167,14 +172,20 @@
   [class*="SearchSort__searchSortWrapper"] {
     background-color: #14181d !important; }
 
-  /* Home promo banner carousel: each 1268px slide centers a narrower (~970px)
-     promo image and paints its own slide background via an INLINE
-     `background-color:#fefefe`, so bright white side-bands frame the image on
-     the dark page. Inline styles beat the transparent neutralizer, so pin the
-     slide (and its container) to the dark page background — the promo <img>
-     keeps its true color, only the letterbox sides go dark. */
-  [class*="homeBannerSlide"], [class*="HomePageBanner__homeBanner"] {
-    background-color: #14181d !important; }
+  /* Home promo banner carousel: each 1268px slide centers a narrower (~970px) promo
+     image and carries an INLINE `background-color` that marketing matches to that
+     image's own artwork (#3c78d6 blue, #f1c232 gold, #cc4125 red, #999 grey), so the
+     band either side of the image continues the promo edge-to-edge. Only the CONTAINER
+     may go dark — it shows above and below the slide. The `--` is load-bearing: a bare
+     `[class*="HomePageBanner__homeBanner"]` also matches `homeBannerSlide` (substring),
+     which is what cut two dark letterbox bars into every banner. */
+  [class*="HomePageBanner__homeBanner--"] { background-color: #14181d !important; }
+  /* The banner's pager dots are plain white at opacity .3/1 over a dark box-shadow,
+     drawn to read on that coloured artwork — the dark fill the generic carousel rule
+     below gives them turned the whole pager into dark blobs on the promo. */
+  [class*="HomePageBanner__homeBanner--"] .carousel .control-dots .dot,
+  [class*="HomePageBanner__homeBanner--"] .carousel .control-dots .dot.selected {
+    background-color: #ffffff !important; }
 
   /* ====================================================================
      Card / panel surfaces — Thingiverse wraps the model-page gallery,
@@ -383,8 +394,18 @@
     background-color: #2d333b !important; color: #8b949e !important; border-color: #2d333b !important; }
   .tv-button[disabled] * { color: #8b949e !important; }
   .tv-button--ghost[disabled], .tv-button--ghostNeutral[disabled],
-  .tv-button--secondary[disabled], .tv-button--outlineDanger[disabled] {
-    background-color: transparent !important; border-color: #2d333b !important; }
+  .tv-button--secondary[disabled], .tv-button--outlineDanger[disabled],
+  .tv-button--outlineNeutral[disabled] {
+    background-color: transparent !important; }
+  /* The site draws `border-color: transparent` on every disabled variant that has no
+     fill, so a disabled control loses its outline entirely. Giving them a visible
+     muted border instead boxed the DISABLED pagination arrows while the ENABLED ones
+     stayed bare — the dead control read as the actionable one. `--secondary` is the
+     one exception: the site keeps `--tv-neutral-subtle` on it. */
+  .tv-button--ghost[disabled], .tv-button--ghostNeutral[disabled],
+  .tv-button--outlineDanger[disabled], .tv-button--outlineNeutral[disabled] {
+    border-color: transparent !important; }
+  .tv-button--secondary[disabled] { border-color: #262c33 !important; }
 
   /* ====================================================================
      Inputs — stable `tv-input` class (search box, email fields, filters)

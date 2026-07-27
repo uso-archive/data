@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260718.23.36
+@version      20260726.17.05
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -171,7 +171,15 @@
     --graphicActivePremium: var(--d-text) !important;
     --graphicSecondary: var(--d-text-3) !important;
     --graphicTertiary: var(--d-text-4) !important;
-    --graphicQuaternary: var(--d-text-4) !important;
+    /* --graphicQuaternary is NOT a glyph colour on this site despite the name:
+       every one of its uses is a SURFACE or a hairline — the review media-viewer
+       letterbox stage, the PDP video stage, 1px separator pseudos, and a couple of
+       borders/inset shadows. Natively it is rgba(0,26,52,.2), a 20%-alpha tint that
+       reads as "barely there" on white. Lifting it to the opaque --d-text-4 turned
+       the media-viewer stage into a solid mid-grey slab around every review photo
+       and video. Mirror the native alpha with a light tint instead, so it stays a
+       veil in every role. */
+    --graphicQuaternary: rgba(206, 219, 235, 0.2) !important;
     --graphicTabbarIconPrimary: var(--d-text) !important;
     --graphicTabbarIconSecondary: var(--d-text-4) !important;
     --graphicOxford: var(--d-text-3) !important;
@@ -345,12 +353,22 @@
   .vue-portal-target a:hover {
     color: var(--d-blue) !important;
   }
-  .vue-portal-target svg {
+  /* Both rules below are scoped, because .vue-portal-target is a SHARED mount point:
+     Ozon also portals the review media viewer (a separate `*_24` bundle) into it. An
+     unscoped `.vue-portal-target svg` greyed that viewer's gold rating stars to the
+     muted rail colour, and an unscoped `button svg` painted its close-X, prev/next
+     arrows, play button and share glyph brand-blue — all invented colours on a surface
+     that only exists after a click, so no load-time scan sees it.
+     Every rail glyph the grey lift was written for sits inside an <a>; every flyout
+     toggle carries the site bundle's own `uw_` class prefix, which the viewer's
+     bundle does not. Specificity is deliberately kept BELOW the a[isload] and
+     [data-widget="modalLayout"] rules further down, so those still win. */
+  .vue-portal-target a svg {
     color: var(--d-text-4) !important;
   }
-  .vue-portal-target button,
-  .vue-portal-target button span,
-  .vue-portal-target button svg {
+  .vue-portal-target button[class*="uw_"],
+  .vue-portal-target button[class*="uw_"] span,
+  .vue-portal-target button[class*="uw_"] svg {
     color: var(--d-blue) !important;
   }
   .vue-portal-target a[isload="true"],
@@ -595,7 +613,17 @@
      also matched the flyout's full-viewport SCRIM (a position:fixed
      z-501 sibling that lives OUTSIDE the wrapper and is natively a
      translucent rgba(3,8,13,.32) dim). Painting that opaque blanked the
-     whole page behind the suggest panel. The scrim keeps its own dim. */
+     whole page behind the suggest panel. The scrim keeps its own dim.
+
+     KNOWN LIMIT: this neutraliser, together with the widget-wide
+     `[data-widget="searchBarDesktop"] div { transparent }` above, also flattens the
+     SEARCH-SCOPE CHIP ("Ozon fresh ✕" — the pill shown when a query is restricted to
+     a store or category), whose applied state is natively a solid #005bff fill. Idle
+     it is only rgba(0,48,120,.04), so idle-vs-flat is a non-difference; applied loses
+     its brand fill. Active and idle differ ONLY by a content-hashed modifier class,
+     and an !important background cannot be handed back to the site once declared, so
+     restoring it would mean betting on a hash that rotates every build. Left as is:
+     the applied scope is still carried by the label plus its ✕ remove button. */
   .search-bar-wrapper div[class*="search_"] {
     background-color: var(--d-bg) !important;
   }
@@ -821,6 +849,20 @@
   [data-widget="webListPhotos"] div:not([style*="background"]) {
     background-color: transparent !important;
   }
+  /* GALLERY "Похожие" PILL — the visual-search affordance Ozon floats over the main
+     product photo. Natively a solid WHITE pill with rgba(0,26,51,.6) navy text; the
+     inline-guarded gallery reset above strips the plate (it carries no inline
+     background) while the token remap lifts the label to light — leaving pale grey
+     text with no plate directly on a LIGHT product photo, effectively invisible.
+     It is the only tsBodyControl500Medium in the widget, so it is reachable without a
+     rotating pdp_ hash. Give it back an opaque plate, inverted for dark.
+     The webPdpGrid ancestor is in the selector for SPECIFICITY, not scoping: the
+     grid-wide `div[class*="pdp_"]:not([style*="background"])` neutraliser above also
+     matches this pill, and a webGallery-only selector merely TIES with it. */
+  [data-widget="webPdpGrid"] [data-widget="webGallery"] div[class*="pdp_"][class*="tsBodyControl500Medium"] {
+    background-color: var(--d-surface) !important;
+    color: var(--d-text) !important;
+  }
   /* product photos sit on white in the source; give the photo
      frame a soft light mat so cut-out PNGs stay legible, but the
      surrounding stage/thumbnail strip stays dark */
@@ -1019,6 +1061,16 @@
   [style*="clearDarkKey600"][style*="var(--layerFloor1)"] {
     color: #ffffff !important;
   }
+  /* The PLAY TRIANGLE + ring on those same review-video thumbnails is the second
+     --layerFloor1-as-a-glyph use, and it is NOT inline: a class rule does
+     `color: var(--layerFlooor1)`-style white on the overlay button. The timecode rule
+     above only matched the inline pattern, so the pill next to it went white while the
+     play glyph stayed dark-on-video — a half-applied fix that shipped. Both live in the
+     same overlay button, which carries a stable aria-label; the button only ever sits on
+     top of a photo or video still, so white is right in every instance. */
+  button[aria-label="Открыть галерею"] svg {
+    color: #ffffff !important;
+  }
 
   /* "Новинка" marketing chip — Ozon ships it as an INLINE pale-green plate with
      green text (`background:#E4FDEC; color:#10C44C`). The inline guard on the
@@ -1029,6 +1081,16 @@
   [data-widget="webMarketingLabels"] div[style*="#E4FDEC"] {
     background: var(--bgOpaquePositiveSecondary) !important;
     color: var(--d-green) !important;
+  }
+  /* "Доберите до скидки" marketing chip — the same LIGHT-inline-plate shape as
+     "Новинка" above, but hardcoded as literals (`background:#F2F1FC; color:#5B51DE`)
+     instead of going through --bgOpaqueMarketingSecondary, so the token inversion never
+     reached it. It sits directly beside the "Скидка от 2 ед" chip, which DOES use the
+     token and is correctly dark — the pair shipped half-inverted, one dark pill and one
+     pale-lilac tile glaring over the dark gallery. Invert it to match its sibling. */
+  [data-widget="webMarketingLabels"] div[style*="#F2F1FC"] {
+    background: var(--bgOpaqueMarketingSecondary) !important;
+    color: var(--textMarketing) !important;
   }
   /* "250 баллов за отзыв" points pill — Ozon ships it with an INLINE
      `background: var(--bgOpaqueMarketingSecondary); color: #5B51DE`. We invert the

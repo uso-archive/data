@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Stack Overflow and the whole Stack Exchange network: easy-on-the-eyes questions, answers, code blocks, comments and sidebar.
-@version      20260724.12.46
+@version      20260726.17.06
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -22,9 +22,22 @@
      Colors are compiled literal hex on stable Stacks classes
      (.s-prose, .s-card, .s-input, .s-tag, .s-code-block,
      .s-sidebarwidget, #sidebar, #left-sidebar, .comment, .vote,
-     .accepted-answer, .hljs-* syntax tokens). No design tokens
-     are exposed on :root, so we override per-component. No
-     hashed/obfuscated class names are used.
+     .accepted-answer, .hljs-* syntax tokens). No hashed/obfuscated
+     class names are used.
+
+     Stacks DOES expose custom properties, in two layers, and both
+     matter here:
+       - a global palette on :root (--black-050 … --black-600,
+         --bc-light, --white). We deliberately do NOT remap these —
+         the same token paints text and surfaces, so flipping one
+         would invert unrelated components. Class-level rules instead.
+       - per-component tokens on the component itself (--_bl-* on
+         .s-block-link, --_av-* on .s-avatar, --_se-arrow-bc on
+         .s-select, --_me-* on .s-menu). These take a raw token and
+         are NOT reachable by any .fc- or .bg- utility remap, so a
+         component whose colour is only defined this way must be fixed
+         by redefining ITS token — that also preserves the geometry the
+         token feeds (triangle sides, avatar radius, selected accent).
 
      Palette (GitHub-dark family):
        base bg        #14181d
@@ -359,6 +372,17 @@
     color: #e6edf3 !important;
   }
 
+  /* The wrapper's up/down caret is a pair of CSS triangles drawn by
+     `.s-select:before/:after` from `--_se-arrow-bc: var(--bc-dark) transparent`
+     — a two-value border-color shorthand (opaque top/bottom, transparent
+     sides) that resolves to #0c0d0e, 1.3:1 on the darkened control, so the
+     control looks like it has no caret at all. Redefine the token keeping the
+     two-value form: a flat colour would fill the transparent sides and turn
+     each triangle into a solid rectangle. */
+  .s-select {
+    --_se-arrow-bc: #9198a1 transparent !important;
+  }
+
   .s-input:focus,
   .s-textarea:focus,
   input:focus,
@@ -470,11 +494,36 @@
      (.bc-purple-200 = #dfe1fb). That pale ring is invisible on SE's
      white page but reads as a glaring WHITE HALO on dark. Keep the
      purple disc + white glyph (the brand identity) and only retone
-     the ring to a dark, harmonized purple so the halo disappears. */
+     the ring to a dark, harmonized purple so the halo disappears.
+     The disc FILL is pinned to the same #555bce it already computes to on the
+     light site: a no-op there, and it keeps the white glyph legible for a
+     reader who also has SE's own account-level dark mode on, where
+     var(--purple-400) flips to a pale lavender #bdc1fe. */
   .nav-links--link .bg-purple-400.bar-circle,
   .nav-links--link div.bg-purple-400,
   .left-sidebar .nav-links--link .bg-purple-400 {
+    background-color: #555bce !important;
     border-color: #3b3f73 !important;
+  }
+
+  /* Nav item GLYPHS (Home / Questions / Unanswered / Tags / Users /
+     Companies, desktop rail and mobile drawer alike). SE paints them via
+     `.nav-links--link.-link__with-icon .svg-icon { color: var(--black-500) }`
+     — a raw token, not an `.fc-black-*` utility, so the utility remap above
+     never reaches them: they render #3b4045 at 1.7:1, and the SELECTED item
+     takes var(--black-600) #0c0d0e at 1.1:1 (invisible). The glyph is an
+     inheriting `fill:currentColor` path, so setting `color` is enough.
+     `:not(.fc-white)` spares the white glyphs on the purple brand discs. */
+  .nav-links--link .svg-icon:not(.fc-white),
+  .nav-links--link.-link__with-icon .svg-icon:not(.fc-white),
+  .left-sidebar .nav-links--link .svg-icon:not(.fc-white) {
+    color: #9198a1 !important;
+  }
+
+  .nav-links--link:hover .svg-icon:not(.fc-white),
+  .nav-links--link[aria-current="page"] .svg-icon:not(.fc-white),
+  .left-sidebar .nav-links--link[aria-current="page"] .svg-icon:not(.fc-white) {
+    color: #e6edf3 !important;
   }
 
   /* ============================================================
@@ -558,6 +607,19 @@
   .s-card hr {
     background-color: #262c33 !important;
     border-color: #262c33 !important;
+  }
+
+  /* Section rules drawn as a BORDER instead of an <hr>: `.s-page-title`
+     underlines its heading with #d6d9dc and each help-center category <h3>
+     with #e3e6e8. Both are light-theme greys SE never re-tones, so the Help
+     Center ships a bright rule under "Help center" and under every category
+     ("Asking", "Our model", "Reputation & Moderation", …). */
+  .s-page-title,
+  div.s-page-title,
+  .help-category-box h3,
+  .help-center-index h3,
+  .help-category-box > h3 {
+    border-color: #2d333b !important;
   }
 
   /* Accepted answer highlight */
@@ -759,6 +821,17 @@
   .hljs-emphasis { font-style: italic; }
   .hljs-strong { font-weight: bold; color: #e6edf3 !important; }
   .hljs-doctag, .hljs-params { color: #c4cdd6 !important; }
+  /* Tokens the palette above did not name. SE's own rules for these are more
+     specific than `.hljs` (`pre.s-code-block>code .hljs-subst`, 0,2,2), so an
+     unlisted token silently keeps its LIGHT-theme colour: `--highlight-color`
+     #0c0d0e (1.3:1 — a Python f-string's `{n}` vanishes), `--highlight-*`
+     punctuation #3b4045, keyword #01508f, variable #5a7a0d, namespace #b84b01.
+     Grouped with the palette entry each one shares its meaning with. */
+  .hljs-subst { color: #d9e0e7 !important; }
+  .hljs-code { color: #c4cdd6 !important; }
+  .hljs-link, .hljs-meta-string { color: #a5d6ff !important; }
+  .hljs-meta-keyword, .hljs-selector-class { color: #ff7b72 !important; }
+  .hljs-selector-id { color: #79c0ff !important; }
 
   /* Stacks prettify-style spans (older code) */
   .prettyprint .pln { color: #d9e0e7 !important; }
@@ -879,19 +952,18 @@
     color: #8cc6f0 !important;
   }
 
-  /* Linked/Related sidebar vote-count pills: `.answer-votes.default` is a
-     SIZE class (default/large/extra-large), NOT a state. The plain no-accept
-     pill keeps SE's white #f1f2f3 fill with near-black #3b4045 text — a
-     glaring light pill on dark, short enough (38x21) to slip the audit height
-     filter — so we darken it. But an ACCEPTED (green) or ANSWERED (blue) pill
-     that happens to be default-sized ALSO carries `.default`, and this rule's
-     `#sidebar .answer-votes.default` (1,2,0) out-specifies the state rules
-     below (`#sidebar .answered-accepted` 1,1,0) — flattening the accepted
-     green "63"/"22" Linked pills to identical grey (a lost signal). Exclude
-     the two state classes so only the genuine plain white pill is darkened. */
-  .answer-votes.default:not(.answered):not(.answered-accepted),
-  #sidebar .answer-votes.default:not(.answered):not(.answered-accepted),
-  .module .answer-votes.default:not(.answered):not(.answered-accepted) {
+  /* Linked/Related sidebar vote-count pills. `default`/`large`/`extra-large`
+     are SIZE classes, NOT states: match on the STATE only, never the size, or
+     the same white pill comes back one size up (a `.large` "236" shipped
+     glaring white while the `.default` siblings beside it were correct). The
+     plain no-accept pill keeps SE's white #f1f2f3 fill with near-black
+     #3b4045 text, and it is short (38x21) so it slips the audit height
+     filter — darken it. An ACCEPTED (green) or ANSWERED (blue) pill must keep
+     its fill, and these selectors would out-specify the state rules below, so
+     exclude the two state classes explicitly. */
+  .answer-votes:not(.answered):not(.answered-accepted),
+  #sidebar .answer-votes:not(.answered):not(.answered-accepted),
+  .module .answer-votes:not(.answered):not(.answered-accepted) {
     background-color: #20262d !important;
     color: #9198a1 !important;
   }
@@ -1313,6 +1385,17 @@
     color: #c4cdd6 !important;
   }
 
+  /* Avatar TILES. `.s-avatar` fills its box from `--_av-bg: var(--_white-static)`
+     — pure white. A gravatar covers the box exactly so the fill never shows,
+     but SE's default avatar (`Content/Img/user.svg`) is a #6a737c silhouette
+     on a TRANSPARENT canvas: every user without a gravatar, plus deleted and
+     anonymous users, renders a solid white rounded square. Retone the token
+     (not `background-color`) so the rounded-corner geometry and the size
+     modifiers 16/24/32/48/64/96/128 all keep working. */
+  .s-avatar {
+    --_av-bg: #262c33 !important;
+  }
+
   /* In the legacy signature block the display name is a BARE <a> (no class)
      inside .user-details — a different element from the Stacks
      `.s-user-card--link` restored above, and it was being painted the same
@@ -1632,6 +1715,71 @@
 
   #topbar-help-dialog .modal-content ul li:last-child {
     background-color: #20262d !important;
+  }
+
+  /* The topbar dropdown rows' SECONDARY line (`.item-summary` — "Start here
+     for a quick overview of the site" under Tour, and the sibling blurbs
+     under Help Center / Meta / About Us). SE paints it from the raw
+     var(--black-500) token, not an `.fc-black-*` utility, so it stays
+     #3b4045 at 1.46:1 on the dark pane — the whole explanatory half of the
+     help menu is unreadable. Only reachable with the dropdown OPEN. */
+  .item-summary,
+  .topbar-dialog .item-summary,
+  #topbar-help-dialog .item-summary {
+    color: #9198a1 !important;
+  }
+
+  /* Site-switcher community blurbs ("For 3D printing enthusiasts"). Unclassed
+     <p class="site-desc"> on SE's #636b74 — 2.82:1 on the switcher pane. */
+  .site-desc,
+  p.site-desc,
+  .siteSwitcher-dialog .site-desc {
+    color: #9198a1 !important;
+  }
+
+  /* ============================================================
+     Stacks `.s-menu` dropdown menus (`.s-block-link` rows)
+     ------------------------------------------------------------
+     The component every network flyout is built from: the questions-list
+     "More" sort popover, the user-page "Profiles" flyout, post action menus.
+     It is driven ENTIRELY by component custom properties, so class-level
+     colour rules never reach it:
+       --_bl-fc        row label      var(--black-500)  #3b4045 -> 1.5:1
+       --_bl-bg        .is-selected   var(--black-150)  #f1f2f3 -> a full
+                                       WHITE row with #0c0d0e text
+       --_me-divider-bg  separator    var(--bc-light)   #e3e6e8 -> a bright bar
+     Redefining the tokens keeps the component's own shape, hover behaviour
+     and the `__right.is-selected` accent bar intact. These nodes only exist
+     while the menu is OPEN, so no load-time scan can see them.
+     ============================================================ */
+  .s-block-link {
+    --_bl-fc: #c4cdd6 !important;
+    --_bl-fc-hover: #e6edf3 !important;
+    --_bl-fc-visited: #c4cdd6 !important;
+  }
+
+  .s-block-link:hover {
+    --_bl-bg: #222831 !important;
+  }
+
+  .s-block-link.is-selected {
+    --_bl-bg: #2d333b !important;
+    --_bl-fc: #e6edf3 !important;
+  }
+
+  /* `__danger` ("Delete", destructive menu items) is a SEMANTIC variant that
+     sets --_bl-fc to var(--red-400). The blanket !important above would
+     out-rank it and flatten the destructive red, so restore it (lifted for
+     dark) rather than letting the neutral label win. */
+  .s-block-link.s-block-link__danger {
+    --_bl-fc: #f85149 !important;
+    --_bl-fc-hover: #ff7b72 !important;
+    --_bl-fc-visited: #f85149 !important;
+  }
+
+  .s-menu {
+    --_me-divider-bg: #2d333b !important;
+    --_me-label-btc: #2d333b !important;
   }
 
   /* autocomplete / search suggestions dropdown */

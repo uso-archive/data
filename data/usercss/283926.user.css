@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for DaFont. Browse fonts late at night without the  glare: the homepage, font categories, search, font pages and author pages all get an  easy-on-the-eyes dark look.
-@version      20260721.00.29
+@version      20260726.17.00
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -199,9 +199,19 @@
      bars) — it marks external author links on the plain page. Measured mean luminance
      0/255, so on dark it is an invisible glyph. Do NOT invert out3.gif: that one is
      already white. */
+  /* The forum adds five more of the same kind: the previous-page arrow (the twin of
+     page_suivante, measured mean luminance 41), the skip-to-topic chevrons (42), the
+     post "Quote" speech bubble (0) and the "Back to the list" arrow (0). Leaving them
+     out shipped a bright white NEXT arrow beside a near-invisible PREVIOUS one. */
   img[src*="/img/dropdown.gif"],
   img[src*="/img/page_suivante.gif"],
+  img[src*="/img/page_precedente.gif"],
   img[src*="/img/theme_suivant.gif"],
+  img[src*="/img/skip_next.gif"],
+  img[src*="/img/skip_previous.gif"],
+  img[src*="/img/quote.gif"],
+  img[src*="/img/quote.png"],
+  img[src*="/img/goto.gif"],
   img[src*="/img/out3_black.gif"] {
     filter: invert(1) !important;
   }
@@ -279,6 +289,10 @@
     border-color: #2d333b !important;
   }
   .date, .hmessage .date { color: #c4cdd6 !important; }
+  /* A normal poster's name is an <a> and picks up the link colour, but a DELETED
+     account renders as a bare text node under DaFont's base `div {color:#000}` —
+     pure black on the elevated .hmessage bar. Colour the wrapper and the name span. */
+  div.user, .username { color: #c4cdd6 !important; }
   /* Forum post message body (.body) carries the actual post text as classless
      nodes under DaFont's base `color:#000` — black-on-dark unless remapped. */
   .body, .body p, .body div { color: #c4cdd6 !important; }
@@ -351,9 +365,35 @@
      #eee = no reply, #fff5af = has replies, #cfb = answered. Keep all three
      distinguishable — collapsing #fff5af into the neutral surface silently drops
      the "has replies" state the yellow legend swatch still promises. */
-  .thumb_text { background: #1c2128 !important; color: #c4cdd6 !important; }
-  .thumb_text[style*="#fff5af"] { background: #3a2f0c !important; }
-  .thumb_text[style*="#cfb"] { background: #16361f !important; }
+  /* background-COLOR, not the `background` shorthand: a fourth state ("probably not a
+     font") is drawn as `#eee` plus a `stripes_alt.png` diagonal hatch, and the
+     shorthand would reset that background-image away along with the colour. */
+  .thumb_text { background-color: #1c2128 !important; color: #c4cdd6 !important; }
+  .thumb_text[style*="#fff5af"] { background-color: #3a2f0c !important; }
+  .thumb_text[style*="#cfb"] { background-color: #16361f !important; }
+
+  /* ---- Inline #e9e9e9 panels (comment zebra rows + "not a font" callout) ---- */
+  /* `font-comment.php` zebra-stripes its comment list with an inline
+     `background:#e9e9e9` on every other row — 87 of them on a busy font — and the
+     forum thread page uses the same colour for the "This is most probably not a font"
+     callout. Our remapped light body text lands on both at ~1.4:1. Match the
+     background-COLOR only: the callout layers a `stripes_alt.png` hatch on top that
+     marks the state, and the `background` shorthand would erase it. */
+  div[style*="background:#e9e9e9"] {
+    background-color: #1c2128 !important;
+  }
+  /* The "author of <font>" badge on a comment keeps DaFont's yellow `background:#ff0`,
+     but our `.dfsmall b` rule repaints its text light grey — 1.9:1 on that yellow.
+     Same shape as the div.notif banner below: keep the yellow, darken the text. */
+  span[style*="background:#ff0"] { color: #14181d !important; }
+
+  /* ---- Hover affordances our own resets flattened ---- */
+  /* `a.post_button:hover` (forum "New Topic" / "Reply") is `border:2px solid #c00`;
+     the blanket border reset repaints it grey, leaving only a 1px→2px thickening. */
+  a.post_button:hover { border-color: #b3322f !important; }
+  /* `.metacat:hover {background:#d11}` brightens the category header bars; our own
+     `.metacat` background rule outranks it, so the bars stop reacting to hover. */
+  .metacat:hover { background-color: #c93b38 !important; }
 
   /* ---- Secondary / muted text ---- */
   .light { color: #8b949e !important; }
@@ -420,6 +460,14 @@
      from DaFont's own base11.css rather than a live element. */
   div.notif b { color: #b00 !important; }
   .pselect { color: #e86a64 !important; }
+  /* `.settings {background:#e9e9e9}` is the account-preferences table (its class rule
+     is not an inline style, so the #e9e9e9 panel rule above cannot reach it), and the
+     forum's read-state chips `span.newflag_index {background:#e9e9e9}` /
+     `span.no_index_read a {background:#ccc}` only render once a read cookie exists. */
+  .settings { background-color: #1c2128 !important; }
+  .settingshead { background-color: #b3322f !important; color: #ffffff !important; }
+  span.newflag_index { background-color: #21262d !important; color: #e86a64 !important; }
+  span.no_index_read a { background-color: #21262d !important; }
 
   /* Forum breadcrumb separator: DaFont's base `div { color:#000 }` leaves this
      arrow glyph pure black — 1.18:1 on the dark page. It carries no own colour

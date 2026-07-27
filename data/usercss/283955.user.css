@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for ImgBB. Comfortable dark backgrounds across the upload page, image viewer, embed-code panel and albums, with brand blue kept readable.
-@version      20260724.12.44
+@version      20260726.17.01
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -290,6 +290,18 @@
     color: #e6edf3 !important;
   }
 
+  /* On listing and album pages the sort-tab header pins to the top of the
+     viewport (position: sticky) and the site gives it a near-opaque surface.
+     The transparent rule above matches it too, so thumbnails scrolled straight
+     through the tabs and the labels sat on top of the photos. A sticky bar is
+     in flow at offset 0 and looks perfect there — it only breaks once scrolled.
+     Below the phablet breakpoint the tab <ul> itself carries that surface. */
+  .header.follow-scroll,
+  .follow-scroll-wrapper.position-fixed,
+  .header ul.content-tabs {
+    background-color: #14181d !important;
+  }
+
   .header .header-content-title,
   .header h1,
   .header h2 {
@@ -526,12 +538,26 @@
 
   /* ---------- Image listing / thumbnail grid (albums, related) ---------- */
   .list-item,
-  .list-item-desc,
   .pad-image-listing,
   .image-container,
   .image-container-main {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
+  }
+
+  /* The caption is an absolutely-positioned overlay the site keeps TRANSPARENT,
+     leaning on a text-shadow to stay legible over the photo. Given the tile
+     surface colour it became an opaque band that cropped the bottom of every
+     thumbnail — and over a photo the label has to stay white, not the link-blue
+     the generic `a` colour left it. */
+  .list-item-desc {
+    background-color: transparent !important;
+  }
+
+  .list-item-desc,
+  .list-item-desc a,
+  .list-item-desc-title-link {
+    color: #ffffff !important;
   }
 
   .list-item-image,
@@ -782,6 +808,22 @@
     color: #ffffff !important;
   }
 
+  /* The share sheet's brand chips are the same shape but a different class, and
+     they were missed: the site paints their glyph #fff over the brand fill, our
+     `a` colour beat that rule, and `.btn-icon { color: inherit }` then carried
+     link-blue into every glyph — on the light-blue Twitter chip the bird all
+     but disappeared. Only exists once "Share" is clicked. */
+  .btn-social,
+  .btn-social .btn-icon {
+    color: #ffffff !important;
+  }
+
+  /* Mail is the one chip the site puts on a light grey fill, with a dark glyph. */
+  .btn-social.btn-mail,
+  .btn-social.btn-mail .btn-icon {
+    color: #333333 !important;
+  }
+
   /* Viewer action links: Edit is link-blue, Delete is destructive red, Approve is
      green. All three were flattened to the same grey, so "Delete" read exactly
      like "Edit" right next to it. */
@@ -855,5 +897,27 @@
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
+  }
+
+  /* ImgBB's two notice surfaces — the inline privacy panel (.highlight, #f9e79f)
+     and the toast (.growl, #fff5b3) — are pale-yellow fields the site pairs with
+     its own dark body text. The generic paragraph/span colour repainted that
+     text our light grey and left it on the yellow, at roughly 1.6:1. Re-surface
+     both in a dark amber so they still read as a notice rather than a panel. */
+  .highlight,
+  .growl {
+    background-color: #33291a !important;
+    color: #e6edf3 !important;
+  }
+
+  .highlight *,
+  .growl * {
+    color: #e6edf3 !important;
+  }
+
+  /* The toast's whole left edge is its severity accent; the blanket border reset
+     at the top flattened it to the page line colour. */
+  .growl {
+    border-left-color: #f39c12 !important;
   }
 }

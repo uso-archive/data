@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260724.12.46
+@version      20260726.17.08
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -694,6 +694,35 @@
   a:focus {
     color: var(--wx-link-hover) !important;
   }
+  /* article bodies wrap their in-text cross-links in <strong> ("(MORE: <headline>)").
+     `b, strong` and `a` are both (0,0,1) !important, but the anchor rule colours the
+     <a> while `b, strong` matches the CHILD directly -- a matched rule always beats an
+     inherited value, so every bolded link lost its accent and read as plain bold prose
+     while the plain-text links beside it stayed blue. Inherit the anchor's colour so a
+     bolded link looks like a link, including where the anchor is white-on-a-fill. */
+  a strong,
+  a b {
+    color: inherit !important;
+  }
+  /* weather.com's solid brand CTAs ("See Details", ...) are `bg-brand-400`/`-300`
+     (#0d142a / #204794 -- dark navies we deliberately leave alone) labelled with
+     `text-primary-foreground`, i.e. near-white. The `a` rule above repainted that
+     label link-blue, so a filled primary button read like an inline text link. The
+     paler brand tints (50/100/200) are handled far above as light surfaces; these
+     two saturated ones keep the site's white label. */
+  .bg-brand-300,
+  .bg-brand-400 {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+  /* `text-brand-dark` / `text-brand-400` resolve to #0d142a -- the design system's
+     ink colour, not an accent. It currently only lands on <button>s (which take
+     `button { color: inherit }`), but on any other element it would render at
+     ~1.05:1 on our cards. Pin it light. */
+  .text-brand-dark,
+  .text-brand-400 {
+    color: var(--wx-text) !important;
+  }
 
   /* ---- restore the site's own `text-white` ------------------------------- */
   /* weather.com marks every piece of text that sits ON a saturated fill with
@@ -767,12 +796,32 @@
      our surface rule matches), and we never mapped bg-gray-200 at all -- so on
      hover the disc flashed a bright grey #cdcdcd circle on the dark card. Match
      the variant classes by substring + scope to the forecast so the toggle reads
-     as a subtle elevated dark disc (the temperature range bar is untouched). */
-  [data-testid="daily-forecast"] [class*="bg-gray-100"],
-  [data-testid="daily-forecast"] [class*="bg-gray-200"],
-  [data-testid="daily-forecast"] [class*="bg-neutral-100"],
-  [data-testid="daily-forecast"] [class*="bg-neutral-200"] {
+     as a subtle elevated dark disc (the temperature range bar is untouched).
+     The variant class sits in the class list in EVERY state while the site only
+     PAINTS it on hover / while open, so these must be state-scoped: matched
+     unconditionally they fill all ten rows and their chevron discs permanently,
+     which both departs from the site's transparent rows and makes :hover a no-op
+     (the row already carried the exact colour hover resolves to). */
+  [data-testid="daily-forecast"] button:hover [class*="bg-gray-100"],
+  [data-testid="daily-forecast"] button:hover [class*="bg-gray-200"],
+  [data-testid="daily-forecast"] button:hover [class*="bg-neutral-100"],
+  [data-testid="daily-forecast"] button:hover [class*="bg-neutral-200"],
+  [data-testid="daily-forecast"] [aria-expanded="true"] [class*="bg-gray-100"],
+  [data-testid="daily-forecast"] [aria-expanded="true"] [class*="bg-gray-200"],
+  [data-testid="daily-forecast"] [aria-expanded="true"] [class*="bg-neutral-100"],
+  [data-testid="daily-forecast"] [aria-expanded="true"] [class*="bg-neutral-200"] {
     background-color: var(--wx-surface-2) !important;
+  }
+  /* the Hourly page's Precipitation column draws each row's bar as a div whose
+     EMPTY TRACK is an INLINE `background-color: rgb(245,245,245)` carrying no
+     class at all -- so neither .bg-gray-100 nor any other utility rule reaches
+     it, and the whole column renders as a stack of bright white pills down the
+     dark table. It only exists once the Precipitation tab is opened, so a
+     load-time scan never sees it. The FILLED portion of a rainy hour is a
+     separate inline saturated blue and is data: only the #f5f5f5 track is
+     remapped, to a subtle dark track the way it reads on the site's white card. */
+  [style*="background-color: rgb(245, 245, 245)"] {
+    background-color: var(--wx-border) !important;
   }
   /* the EXPANDED 10-day row marks its day-name (Tonight / Fri 24 / ...) with brand
      blue via a `group-data-[state=open]:text-blue-500` variant, to signal which row is
@@ -975,6 +1024,17 @@
     background-color: var(--wx-chrome) !important;
     color: var(--wx-text-2) !important;
   }
+  /* ...but `header` / `footer` are BARE TAG selectors, and the SPA also uses those
+     tags for a card's own title row and its source/attribution strip (the AQI
+     card's "All Pollutants" heading and its "Air Quality Index" credit line).
+     Those are transparent on the site; taking the page-chrome fill painted a
+     near-black band straight across the middle of an elevated card. The page's
+     real header/footer are direct children of <main>, never inside a <section>,
+     so scoping the reset to section descendants can't reach them. */
+  section header,
+  section footer {
+    background-color: transparent !important;
+  }
   footer a,
   [data-testid="footer"] a {
     color: var(--wx-text-2) !important;
@@ -1121,6 +1181,31 @@
   [class*="LayerDetail--thumbnailPlaceholder"] {
     background-color: var(--wx-surface-2) !important;
   }
+  /* the legacy Toggle (Map Options -> "Radar Timeline Autoplay", and every
+     per-layer LayerOption switch) encodes its state ONLY in the track fill, with
+     identical class names in both states: OFF is a light #b1b1b0, ON is a
+     near-black #252422 -- both read fine on the site's white panel, but on our
+     dark panel the ON fill sinks into the surface while the OFF fill glares, so
+     the control reads exactly BACKWARDS. The white knob's checkmark inherits our
+     lifted light text and disappears into the knob on top of that. Repaint ON
+     with the theme accent, give OFF a visible-but-quiet track, and put the
+     checkmark back to a dark glyph on the white knob.
+     `:checked` lives on a visually-hidden input that PRECEDES the track label, so
+     match forward with adjacent siblings (CSS2 only -- no `~`); the label text is
+     optional, hence both forms. */
+  [class*="Toggle--track"] [class*="Toggle--switchWrap"] {
+    background-color: var(--wx-border-2) !important;
+  }
+  [class*="Toggle--checkbox"]:checked + [class*="Toggle--track"] [class*="Toggle--switchWrap"],
+  [class*="Toggle--checkbox"]:checked + [class*="Toggle--labelText"] + [class*="Toggle--track"] [class*="Toggle--switchWrap"] {
+    background-color: var(--wx-link) !important;
+  }
+  [class*="Toggle--switch"] svg,
+  [class*="Toggle--switch"] svg path {
+    color: var(--wx-chrome) !important;
+    fill: var(--wx-chrome) !important;
+  }
+
   /* the Map Options tabs ("Layers and Styles" / "Specialty Maps") mark the
      active tab with a 2px black border-bottom; the `*` rule painted it the
      subtle border grey (1.15:1) and the active tab lost its underline. */

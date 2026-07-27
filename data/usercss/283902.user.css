@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260721.00.29
+@version      20260726.17.01
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -72,7 +72,8 @@
      MODERN (React / styled-components) shell
      ==================================================================== */
 
-  /* ---- Sticky top nav: the bright-red header bar -> dark with red accent ---- */
+  /* ---- Sticky top nav: the site's brand bar (yellow on most pages, brand red on
+     song pages) -> dark with a red accent ---- */
   [class*="StickyNav-desktop__Container"],
   [class*="StickyNav__Container"],
   [class*="StickyNav-mobile__Container"],
@@ -292,6 +293,18 @@
   [class*="MetadataQuestionTemplate__Title"],
   [class*="QuestionList__Table"] {
     background-color: #1c2128 !important; color: #e6edf3 !important; }
+  /* Q&A question rows are brand-red on the live site and their expand/collapse glyph keeps
+     that red, so flattening the title to plain light text leaves a red glyph beside a grey
+     heading and drops the cue that the row opens. Restore the red, lifted to clear 4.5:1 on
+     the card. Anchored with [class^=] because the substring above also matches
+     "MetadataQuestionTemplate__Title", which the site paints black and must stay light. */
+  [class^="QuestionTemplate__Title"],
+  [class^="QuestionTemplate__Title"] *,
+  [class^="QuestionTemplate__Container"] [class*="ExpandButton"],
+  [class^="QuestionTemplate__Container"] [class*="ExpandButton"] svg,
+  [class^="QuestionTemplate__Container"] [class*="ExpandButton"] path {
+    color: #f26659 !important; fill: #f26659 !important;
+    -webkit-text-fill-color: #f26659 !important; }
   [class*="QuestionTemplate__Container"],
   [class*="MetadataQuestionTemplate__Container"],
   [class*="Answer__Container"],
@@ -401,6 +414,17 @@
     color: #9aa7f0 !important; -webkit-text-fill-color: #9aa7f0 !important; }
   [class*="ArtistTooltip__Verified"] {
     color: #ffff64 !important; -webkit-text-fill-color: #ffff64 !important; }
+  /* The ⓘ lyrics-metadata popup is a Radix popover ("TooltipContent" with its own
+     "TooltipArrow" div), NOT the "TooltipShadow" panel the artist card uses: it ships a
+     pure-white card with a white arrow and black line rows, so our lifted light text
+     lands on white and the whole popup reads blank. It only exists while the ⓘ is
+     hovered, so no load-time scan sees it. Darken panel + arrow and lift the rows. */
+  [class*="TooltipContent"] {
+    background-color: #1c2128 !important; background-image: none !important;
+    border-color: #2d333b !important; }
+  [class*="TooltipArrow"] { background-color: #1c2128 !important; }
+  [class*="InfoTooltip__InfoTooltipLine"],
+  [class*="InfoTooltip__LineText"] { color: #c4cdd6 !important; }
 
   /* ====================================================================
      Homepage modules
@@ -481,6 +505,11 @@
     background-color: #1c2128 !important; }
   .mini_card:hover, .mini_article_card:hover, .song_card:hover { background-color: #21262d !important; }
   .full_width_container { background-color: transparent !important; }
+  /* Album-tracklist / chart rows draw their divider on a full-bleed ::before carrying a
+     near-white border. The blanket border reset at the top of the file is `*`, which does
+     NOT match pseudo-elements, so that line survives and paints a bright bar across the
+     whole left gutter beside every dark row divider. */
+  .chart_row::before, .chart_row::after { border-color: #262c33 !important; }
   /* legacy 404 / error page: the render_404 panel keeps a pure-white background while
      our typography rules already lift its headline + copy to light -> light-on-white =
      invisible title. Darken the panel so the error text reads. */
@@ -607,6 +636,11 @@
   .square_button--facebook, .square_button--twitter, .square_button--google,
   .square_button--instagram, .square_button--spotify, .square_button--apple, .square_button--email {
     color: #ffffff !important; }
+  /* the "--purple" variant is an accent icon button (the annotation/contribution expand
+     caret): the site carries the periwinkle in its glyph, which the neutral .square_button
+     rule above flattens to the same light grey as every other button */
+  .square_button.square_button--purple,
+  .square_button.square_button--purple * { color: #9aa7f0 !important; fill: #9aa7f0 !important; }
   .square_button--facebook *, .square_button--twitter *, .square_button--google *,
   .square_button--instagram *, .square_button--spotify *, .square_button--apple *,
   .square_button--email * { color: #ffffff !important; }

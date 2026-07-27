@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A cosy Catppuccin Mocha dark theme for BBC News, Sport and the homepage: easy on the eyes, with the BBC logo, photos and live colors kept intact.
-@version      20260724.12.43
+@version      20260726.16.59
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -229,12 +229,20 @@
   /* Search-results pagination: each page tile is a 44×44 anchor with a
      hardcoded #f6f6f6 fill (under the audit's 120×40 big() filter, so the
      lightSurfaces scan never flags it) — our light link colour on it left the
-     page numbers white-on-white. Dark tile, light number; keep the "current
-     page" tile inverted so it still reads as selected. */
+     page numbers white-on-white. Dark tile, light number.
+     KNOWN GAP: BBC marks the CURRENT page by giving that one tile a black fill, and the
+     only thing that distinguishes it from its neighbours is the styled-components hash
+     (its href, title and data-testid are identical to every other page tile), so the
+     "you are here" cue cannot be restored with a stable selector. The disabled
+     prev/next arrows DO carry href="#", so those keep their dimmed state. */
   [class*="PaginationAnchorStyled"] {
     background-color: var(--ctp-surface0) !important;
     color: var(--ctp-text) !important;
     border-color: var(--ctp-surface1) !important;
+  }
+  [class*="PaginationAnchorStyled"][href="#"] {
+    color: var(--ctp-overlay1) !important;
+    border-color: var(--ctp-surface0) !important;
   }
   [class*="PaginationAnchorStyled"]:hover {
     background-color: var(--ctp-surface1) !important;
@@ -563,6 +571,14 @@
     color: var(--ctp-text) !important;
     border-color: var(--ctp-overlay1) !important;
   }
+  /* The "My Sport" band's artwork (the scattered Football/Cricket/Formula 1 tiles) is a
+     background-IMAGE of black outlines on transparent — crisp on BBC's native #f0f0f0
+     band, all but invisible once the band is a dark surface. No colour rule can reach a
+     raster, so invert the artwork; the element is decorative and carries no text of its
+     own, and the band's "Discover more" link is a sibling, so no click target is covered. */
+  [class*="ColouredContainer"] [class*="StyledImage"] {
+    filter: invert(1) !important;
+  }
   [class*="StyledParticipant"],
   [class*="PromoHeadline"],
   [class*="PromoBody"],
@@ -789,12 +805,20 @@
     color: var(--ctp-crust) !important;
     fill: var(--ctp-crust) !important;
   }
-  /* Live-match commentary timeline: the minute markers (StyledPeriod) and the
-     connecting VerticalLine ship BBC-Sport live teal #00ccc7; our generic text
-     rule + blanket `* { border-color }` flattened both to grey, dropping the
-     live cue. Restore the readable Mocha teal (matching the LivePulse). */
+  /* The in-play minute marker (StyledPeriod: "44'", "HT") ships BBC-Sport live teal
+     #00ccc7 and our generic text rule flattened it to grey, dropping the live cue on
+     every Scores & Fixtures row. Restore the readable Mocha teal (matching the LivePulse).
+     NB: the same component also renders the plain past DATE ("29 JAN 2025") in a match
+     page's head-to-head history, where BBC paints it near-black — those dates pick up the
+     teal too. Nothing in the DOM distinguishes the two (the state lives only in a volatile
+     Emotion hash), and the live minute marker is by far the commoner use. */
   [class*="StyledPeriod"] { color: var(--ctp-teal) !important; }
-  [class*="VerticalLine"] { border-color: var(--ctp-teal) !important; }
+  /* VerticalLine is NOT a live indicator: it is the hairline between the two halves of a
+     score ("0 | 0") and between the last-5 and latest cells of a league-table form guide.
+     BBC paints it teal only while a match is actually in play and #c8c8c8 otherwise, so a
+     blanket teal drew a live cue beside cancelled, postponed and not-yet-played matches
+     and down every form guide. A neutral surface line matches the native resting state. */
+  [class*="VerticalLine"] { border-color: var(--ctp-surface1) !important; }
 
   /* ---- Live MATCH page (ssrcss) ----
      A distinct surface from the live news stream above. Three solid light
@@ -847,6 +871,124 @@
      generic heading rule turned it light-on-yellow (~1.4:1). */
   [class*="PlayerOfTheMatchWrapper"] h2 {
     color: var(--ctp-crust) !important;
+  }
+
+  /* ---- Live-match LINE-UPS tab (ssrcss) ----
+     A whole tab the theme never covered: the team panels, the formation pitch, the
+     starting-XI / substitutes lists and the Match Officials card all ship solid
+     #fff/#f8f8f8, and our generic heading + p/li rules had already lightened their text
+     → light-on-white across the entire tab. It is only rendered once you open the
+     Line-ups tab of a match page, so no front-page scan ever sees it. The shirt-number
+     discs carry each team's kit colour as an inline fill and are left alone. */
+  [class*="TeamNameContainer"],
+  [class*="TeamDetails"],
+  [class*="FormationDividerContainer"],
+  [class*="FormationContainer"],
+  [class*="PlayerList"],
+  [class*="SubstitutesSection"],
+  [class*="MatchLineupsContainer"] [class*="-Card "] {
+    background-color: var(--ctp-mantle) !important;
+  }
+  /* Hairline between formation and list ships #d8d8d8 — a bright rule on the dark panel. */
+  [class*="FormationDivider"] {
+    background-color: var(--ctp-surface0) !important;
+  }
+  /* The panel's own copy (Manager / Formation labels, Match Officials, player names in
+     the pitch diagram) inherits a near-black #181818 from the container. */
+  [class*="MatchLineupsContainer"],
+  [class*="TeamDetailsLabel"],
+  [class*="MatchOfficial"],
+  [class*="OfficialsHeading"],
+  [class*="PlayerNameContainer"],
+  [class*="PlayerListItem"] {
+    color: var(--ctp-subtext1) !important;
+  }
+  /* The pitch is an inline <svg> that paints its own #F8F8F8 surface and #606060
+     markings. Attribute-matched so the two `fill="#fff"` <mask> paths — which MUST stay
+     white or the mask stops working — are untouched. `-Pitch` matches only the svg
+     component (FormationPitchContainer has no "-Pitch" substring). */
+  [class*="-Pitch"] path[fill="#F8F8F8"] {
+    fill: var(--ctp-mantle) !important;
+  }
+  [class*="-Pitch"] path[stroke="#F8F8F8"] {
+    stroke: var(--ctp-mantle) !important;
+  }
+  [class*="-Pitch"] path[fill="#606060"],
+  [class*="-Pitch"] ellipse[fill="#606060"] {
+    fill: var(--ctp-overlay1) !important;
+  }
+  [class*="-Pitch"] path[stroke="#606060"],
+  [class*="-Pitch"] ellipse[stroke="#606060"] {
+    stroke: var(--ctp-overlay1) !important;
+  }
+
+  /* ---- Live-match MATCH STATS tab (ssrcss) ----
+     Same story as Line-ups: a solid #fff wrapper with #f8f8f8 chart panels, our lightened
+     headings on top of it. BBC keys the two teams by colour — home #ffd230, away #181818 —
+     so once the panel is dark the away team's donut half, stat bars and legend swatch all
+     disappear. The away side is always the SECOND of its sibling pair, which is a stable
+     structural fact (its Emotion hash is not), so lift just those to a light neutral and
+     leave the home yellow untouched. */
+  [class*="MatchStatsWrapper"],
+  [class*="DonutTitleContainer"],
+  [class*="MatchStatsWrapper"] h3,
+  [class*="MatchStatsWrapper"] [class*="-Wrapper "] {
+    background-color: var(--ctp-mantle) !important;
+  }
+  /* Every label in here (team names, stat titles, per-team values, the donut legend)
+     carries its own hardcoded #181818 or #606060, so the wrapper colour alone does not
+     reach them. The swatches and bars are background-only, so a text rule cannot touch. */
+  [class*="MatchStatsWrapper"],
+  [class*="MatchStatsWrapper"] div,
+  [class*="MatchStatsWrapper"] span,
+  [class*="MatchStatsWrapper"] p {
+    color: var(--ctp-subtext1) !important;
+  }
+  /* Stat-bar track (#f8f8f8) and the away team's half of every bar/legend/donut. */
+  [class*="TeamBar"] {
+    background-color: var(--ctp-surface0) !important;
+  }
+  [class*="TeamBar"] + [class*="TeamBar"] > [class*="ChartBar"],
+  [class*="TeamName"] + [class*="KeyColourBox"],
+  [class*="KeyWrapper"] + [class*="KeyWrapper"] [class*="KeyColourBox"] {
+    background-color: var(--ctp-subtext1) !important;
+  }
+  [class*="SvgWrapper"] path[fill="#181818"] {
+    fill: var(--ctp-subtext1) !important;
+  }
+
+  /* ---- League TABLES (bbc.com/sport/football/tables and every embedded standings
+     table). Another uncovered surface: the head row is #f8f8f8 and every cell is #fff,
+     while our light link colour had already painted the team names — so the table read
+     light-on-white with near-black numbers beside them. Cells drop onto the base, the
+     head row becomes a mantle band. The form-guide W/D/L pills keep their native
+     green/red/grey fills and white letters. */
+  [class*="OuterTableWrapper"],
+  [class*="TableWrapper"],
+  [class*="-Table "],
+  [class*="CellsRow"],
+  [class*="TableCell"] {
+    background-color: transparent !important;
+  }
+  [class*="HeadingRow"],
+  [class*="TableHeading"] {
+    background-color: var(--ctp-mantle) !important;
+  }
+  /* Cells ship #606060 values and #181818 rank/points — both dark-on-dark once darkened. */
+  [class*="TableCell"],
+  [class*="TableHeading"],
+  [class*="TableHeading"] [class*="-Element "] {
+    color: var(--ctp-subtext1) !important;
+  }
+  [class*="-Rank "],
+  [class*="-Points "] {
+    color: var(--ctp-text) !important;
+  }
+  /* The "Key" legend and "Last Updated" strip under each table are separate #f8f8f8/#fff
+     boxes outside the table element, so the cell reset above never reached them. */
+  [class*="StyledKey"] {
+    background-color: var(--ctp-mantle) !important;
+    border-color: var(--ctp-surface0) !important;
   }
 
   /* Sport masthead + primary nav bar ship a huge brand-yellow fill that
@@ -983,15 +1125,34 @@
     color: var(--ctp-text) !important;
     border-color: var(--ctp-surface1) !important;
   }
-  /* Legacy #bbccookies consent prompt (first-visit, logged-out). BBC ships it
-     as a natively dark-grey bar whose ONLY accent is amber #f6a21d on the two
-     action buttons ("Yes, I agree" / "No, take me to settings") — the cue that
-     marks them the clickable controls. Our generic a/button rules flattened them
-     to plain light text, so the actions read as ordinary bold copy. The bar is
-     already dark, so just restore the accent (as Mocha yellow) on the buttons. */
+  /* Legacy #bbccookies consent prompt (first-visit, logged-out). The bar itself is
+     natively dark, but its inline "cookies" link is amber #f6a21d and our blanket `a`
+     colour left it indistinguishable from the copy around it (BBC draws no underline),
+     so the only in-sentence link on the page reads as plain text. Restore the accent. */
+  #bbccookies a,
+  #bbccookies-prompt a {
+    color: var(--ctp-yellow) !important;
+  }
+  /* BBC serves TWO shapes of this bar and .banner-button means something different in
+     each: on "Let us know you agree to cookies" the actions are unfilled amber text,
+     on "Cookies on the BBC website" they are solid BBC-blue #0071f1 pills. Tinting the
+     label amber suits the first and puts ~3.5:1 amber-on-blue on the second. Give both
+     the same dark pill so the actions read as buttons either way. Higher specificity
+     than the link rule above, so it wins on the anchor-flavoured variants too. */
   #bbccookies .banner-button,
   #bbccookies-prompt .banner-button {
+    background-color: var(--ctp-surface1) !important;
     color: var(--ctp-yellow) !important;
+    border-color: var(--ctp-overlay1) !important;
+  }
+  /* The ssrcss ConsentBanner (the same prompt on Sport/ssrcss pages) is a third shape:
+     an already-dark section whose accept/reject actions are solid BBC-blue #0071f1 with
+     white labels. Our generic `button` colour dimmed those labels to ~3:1 on the blue.
+     Use the theme's own primary-button treatment — light Mocha blue, dark label. */
+  [class*="ConsentBanner"] button {
+    background-color: var(--ctp-blue) !important;
+    color: var(--ctp-crust) !important;
+    border-color: var(--ctp-blue) !important;
   }
 
   /* BBC Weather (wr- plus ssrcss hybrid): ad rail, the video "media and text"
@@ -1042,10 +1203,45 @@
   #wr-forecast [class*="wr-time-slot"],
   #wr-forecast .wr-see-more,
   /* the day-summary strip is a separate full-width #fff row only in the mobile layout */
-  #wr-forecast .wr-day-summary,
-  .wr-c-map-controls, .wr-c-map-controls__timeslider,
-  [class*="weathermap__timeslider"] {
+  #wr-forecast .wr-day-summary {
     background-color: var(--ctp-base) !important;
+  }
+  /* `.wr-c-map-controls` is a full-size TRANSPARENT overlay layer stretched across the
+     whole rain/pressure map (1248x418), not a bar: giving it an opaque background hides
+     the map entirely. Same for `.wr-c-map-controls__timeslider` and most
+     `weathermap__timeslider*` nodes — natively every one is transparent. Only the
+     timeline STRIP is a real surface (#fff), so darken exactly that. */
+  .weathermap__timeslider__timeline-wrapper {
+    background-color: var(--ctp-mantle) !important;
+  }
+  /* The timeslider's forecast tabs encode selection by fill: the active one is #fff with
+     BBC-blue #149edc text, the others mid-grey #545658 with white text. A blanket dark
+     fill made all three identical — no "you are here". Keep the active tab a lighter
+     surface with the Mocha sky accent. */
+  .weathermap__timeslider__tab {
+    background-color: var(--ctp-surface0) !important;
+    color: var(--ctp-subtext0) !important;
+  }
+  .weathermap__timeslider__tab--active {
+    background-color: var(--ctp-surface1) !important;
+    color: var(--ctp-sky) !important;
+  }
+  /* The scrub track is a near-white 1016x16 strip — invisible on BBC's white bar, a
+     glaring band on ours. The handle keeps its light fill (it IS the grab affordance)
+     and its brand-blue ring, which the blanket `* { border-color }` reset had flattened. */
+  .weathermap__timeslider__slider {
+    background-color: var(--ctp-surface0) !important;
+  }
+  .weathermap__timeslider__slider__handle {
+    border-color: var(--ctp-sky) !important;
+  }
+  /* The step arrows are brand blue when usable and #e6e8ea when there is no further
+     timeslot — on a dark bar that leaves the DISABLED arrow the brightest thing in the
+     widget. Dim it back below the enabled one. */
+  .weathermap__timeslider__prev[disabled],
+  .weathermap__timeslider__next[disabled] {
+    background-color: var(--ctp-surface0) !important;
+    color: var(--ctp-overlay1) !important;
   }
   /* The map timeslider's day-divider labels ("Fri"/"Sat") ship near-black
      #545658 — dark-on-dark over the darkened control bar. This widget is not
@@ -1075,8 +1271,8 @@
   [class*="wr-icon-gel"][class*="__svg-background"] {
     fill: var(--ctp-surface1) !important;
   }
-  /* The day/hour carousel scroll arrows ship a translucent light-grey #e6e8ea button —
-     a faint pale box on the dark rail. Re-tint to a dark surface (chevron stays light). */
+  /* The day/hour carousel scroll arrows are a solid brand-blue #149edc button. Re-tint to
+     a dark surface tile so the rail stays monochrome and the light chevron reads. */
   [class*="wr-carousel-arrow"] {
     background-color: var(--ctp-surface0) !important;
   }
@@ -1114,6 +1310,26 @@
      block, below the 3:1 floor even for large bold text. */
   h1 span.StatusCode {
     color: var(--ctp-red) !important;
+  }
+  /* The site-wide "Sorry, we couldn't find that page" 404 (bbc.com/<bad-url>, distinct
+     from the News one above) keeps two light slabs the theme never covered: a #e4e4e4
+     search box + submit tile, and a mid-grey #4c4c4c footer band that is a div.footer,
+     not a <footer>, so the footer rule never reached it. The purple error banner above
+     them is BBC's own error colour and stays. */
+  form.search-container,
+  form.search-container button {
+    background-color: var(--ctp-surface0) !important;
+    color: var(--ctp-text) !important;
+    border-color: var(--ctp-surface1) !important;
+  }
+  /* Its magnifier is a black base64 PNG background-image, so no fill/color rule reaches
+     it — invert the bitmap the way the News 404 logo is handled. */
+  form.search-container button .search-icon {
+    filter: invert(1) !important;
+  }
+  #foot.footer {
+    background-color: var(--ctp-crust) !important;
+    color: var(--ctp-subtext0) !important;
   }
 
   /* ============================================================

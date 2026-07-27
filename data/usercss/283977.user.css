@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for KHInsider's game-music archive: easy on the eyes across album pages, song lists, the audio player, search and comments.
-@version      20260718.23.35
+@version      20260726.17.03
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -145,6 +145,19 @@
   #pageContent .pagination span.pagenav { color: #ffffff !important; }
   #pageContent .pagination a:hover { color: #ffffff !important; }
 
+  /* ---- Rules / dividers ----
+     The change-log page separates entries with a bare <hr> (UA `border-style:inset`
+     at a fixed mid-grey) and splits its Previous/New columns with the site's own
+     `border-right: 1px black`. On the native light page one is a soft divider and
+     the other a visible edge; on ours the <hr> glares near-white and the black
+     column rule disappears. Give both the same muted line colour. */
+  #pageContent hr {
+    border: none !important;
+    border-top: 1px solid #2d333b !important;
+    background-color: transparent !important;
+  }
+  #editAlbumInfoTable td { border-color: #2d333b !important; }
+
   /* ---- Album art ----
      These ship `border: solid 1px` with no colour, so the border takes
      currentColor — i.e. our blue link colour — framing every thumbnail. */
@@ -219,6 +232,11 @@
      text, erasing the signal. Restore both with dark-friendly hues. */
   #pageContent .comment_meta span.status[style*="color:red"] { color: #ff7b72 !important; }
   #pageContent .comment_meta span.status[style*="color:green"] { color: #3fb950 !important; }
+  /* The comment header block carries `text-shadow: 0 1px 0 #ffffff`, a bevel meant for
+     the light page. It survives any colour override — no colour audit reads text-shadow
+     — and draws a solid white halo under every username, timestamp and status word. */
+  #pageContent .comment_userinfo,
+  #pageContent .comment_userinfo * { text-shadow: none !important; }
   /* speech-bubble pointer is a white raster triangle — tint it to the bubble color */
   .comment_graphic { filter: brightness(0.14) !important; }
   /* Commenters with no avatar get an opaque raster placeholder: a #c5c5c5 tile
@@ -362,6 +380,58 @@
     color: #aab4bf !important;
     border-color: #2d333b !important;
   }
+  /* ---- dataList tables (Help > Cookie usage / Smilies / BB codes / Trophies) ----
+     A whole component the archive rules never reach: the `--min` / `--alt` / `--action`
+     key column and the footer sit on #f5f5f5, the `--subSection` band on #e8f4fc, the
+     row rules are #e5e5e5, and both header and subSection labels keep the skin's
+     #1474b8 blue — dark-on-dark once the surface behind them is ours. The row hover is
+     a translucent LIGHT wash, so it needs replacing rather than merely darkening. */
+  .dataList, .dataList--separated,
+  .dataList--separatedTop, .dataList--separatedBottom { border-color: #2d333b !important; }
+  .dataList-cell { border-color: #2d333b !important; color: #c4cdd6 !important; }
+  .dataList-cell.dataList-cell--alt,
+  .dataList-cell.dataList-cell--action,
+  .dataList-cell.dataList-cell--min,
+  .dataList-cell.dataList-cell--attachment,
+  .dataList-row--footer .dataList-cell { background-color: #161b22 !important; }
+  .dataList-row--footer .dataList-cell { color: #aab4bf !important; }
+  .dataList-row--header .dataList-cell,
+  .dataList-row--subSection .dataList-cell {
+    background-color: #1a2029 !important;
+    color: #9bd4ff !important;
+  }
+  .dataList-cell.dataList-cell--hint { color: #8b949e !important; }
+  /* BB-code help: each entry demos its markup in a pair of #f5f5f5 panels, and the
+     heading marks the placeholder tokens ([COLOR=color]) with a #141414 highlight span
+     that vanishes on our surface. The demo OUTPUT panel renders real bbcode, so its
+     text keeps whatever colour the example sets — only the panel is retinted. */
+  .bbCodeDemoBlock-item > dd {
+    background-color: #161b22 !important;
+    border-color: #2d333b !important;
+    color: #c9d1d9 !important;
+  }
+  .bbCodeDemoBlock-item > dt { color: #8b949e !important; }
+  .block-textHeader .block-textHeader-highlight { color: #e6edf3 !important; }
+  /* the smilie help page lists each shortcut as a #f5f5f5 code chip */
+  .smilieText {
+    background-color: #161b22 !important;
+    color: #c9d1d9 !important;
+    border-color: #2d333b !important;
+  }
+  .dataList-row:hover { background-color: #1c232c !important; }
+
+  /* Sidebar nav rows in a block (the Help section index). XenForo marks the current
+     page — and any hovered row — with a #e8f4fc tile plus a blue left stripe; on our
+     dark block that tile reads as a lit bar carrying pale blue text. Keep the stripe as
+     the "you are here" signal and drop the tile to a dark chip. */
+  .blockLink.is-selected, .blockLink:hover,
+  .blockLinkSplitToggle.is-selected, .blockLinkSplitToggle:hover {
+    background-color: #232a33 !important;
+    color: #ffffff !important;
+    border-color: #2d333b !important;
+  }
+  .blockLink.is-selected { border-left-color: #47a7eb !important; }
+  .blockLink-desc { color: #8b949e !important; }
   .structItem { border-color: #262c33 !important; }
   .structItem--thread:hover, .structItem.is-selected { background-color: #1c232c !important; }
   .structItem-minor, .structItem-parts,
@@ -474,11 +544,19 @@
   }
   /* menu link rows keep XenForo's default #141414 text -> dark-on-dark on the
      dark flyout; force a legible light color (and text-fill) */
-  .menu-row, .menu-linkRow, .menu-row > a, .menu-linkRow > a {
+  /* `a.menu-linkRow` matches our own `.p-body-content a` specificity: a menu rendered
+     inline in the page body (the style chooser) otherwise took the brand-blue link
+     colour while the text-fill below still painted the muted tone. */
+  .menu-row, .menu-linkRow, a.menu-linkRow, .menu-row > a, .menu-linkRow > a {
     color: #c4d3e8 !important;
     -webkit-text-fill-color: #c4d3e8 !important;
     border-color: #2d333b !important;
   }
+  /* Every flyout row carries `border-left: 3px solid transparent` that XenForo turns
+     blue on the hovered/current row. The blanket border colour above painted all four
+     sides, so each row grew a grey stripe AND the current row lost its accent — every
+     row in an open menu looked identical. Put the channel back. */
+  .menu-linkRow { border-left-color: transparent !important; }
   /* hover AND keyboard/split-trigger focus + selected states — XenForo paints the
      highlighted row a light #e8f4fc, so the focused first row was light-on-light */
   .menu-row:hover, .menu-linkRow:hover,
@@ -490,6 +568,7 @@
     background-color: #232a33 !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
+    border-left-color: #47a7eb !important;
   }
   /* Member card (hover a username): XenForo paints the header band #e8f4fc and lets
      its text inherit. Inside our dark tooltip the band stays light while the username
@@ -654,6 +733,70 @@
     color: #c9d1d9 !important;
     border-color: #2d333b !important;
   }
+  /* The bbcode block WRAPPER is #f5f5f5 and only its quote/code CONTENT was themed
+     above, so a code block showed a light frame around a dark body. Its left stripe is
+     the skin's amber code marker (blue for --feature) and stays. */
+  .bbCodeBlock {
+    background-color: #181d24 !important;
+    border-top-color: #2d333b !important;
+    border-right-color: #2d333b !important;
+    border-bottom-color: #2d333b !important;
+  }
+  /* a long code block masks its clipped tail with a fade to #f5f5f5 */
+  .bbCodeBlock-expandLink {
+    background-image: linear-gradient(rgba(13, 17, 23, 0) 0%, #0d1117 80%) !important;
+  }
+  /* link-unfurl card: light #e8f4fc tile carrying #141414 text */
+  .bbCodeBlock--unfurl {
+    background-color: #16263a !important;
+    color: #c9d1d9 !important;
+  }
+  /* [TABLE] renders white cells with a light-blue header band */
+  .bbTable > table > thead > tr > th,
+  .bbTable > table > tbody > tr > th {
+    background-color: #1a2029 !important;
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+    border-bottom-color: #47a7eb !important;
+  }
+  .bbTable > table > thead > tr > td,
+  .bbTable > table > tbody > tr > td {
+    background-color: #161b22 !important;
+    color: #c9d1d9 !important;
+    border-color: #2d333b !important;
+  }
+  /* ---- Prism syntax highlighting ----
+     Every token hue is picked for a white code background — #708 keyword, #05a
+     variable, #a11 string, #a50 comment — and lands dark-on-dark on ours. Remap each
+     token to the same hue family lifted for a dark backdrop, so a [CODE] block still
+     reads as the language it is. */
+  .bbCodeCode .prism-token.prism-comment,
+  .bbCodeCode .prism-token.prism-prolog,
+  .bbCodeCode .prism-token.prism-doctype,
+  .bbCodeCode .prism-token.prism-cdata { color: #d29922 !important; }
+  .bbCodeCode .prism-token.prism-symbol,
+  .bbCodeCode .prism-token.prism-atrule,
+  .bbCodeCode .prism-token.prism-keyword { color: #d2a8ff !important; }
+  .bbCodeCode .prism-token.prism-boolean { color: #bc8cff !important; }
+  .bbCodeCode .prism-token.prism-constant,
+  .bbCodeCode .prism-token.prism-selector,
+  .bbCodeCode .prism-token.prism-function,
+  .bbCodeCode .prism-token.prism-regex,
+  .bbCodeCode .prism-token.prism-important,
+  .bbCodeCode .prism-token.prism-variable,
+  .bbCodeCode .prism-token.prism-package,
+  .bbCodeCode .prism-token.prism-italic,
+  .bbCodeCode .prism-token.prism-attr-name,
+  .bbCodeCode .prism-token.prism-char,
+  .bbCodeCode .prism-token.prism-builtin,
+  .bbCodeCode .prism-token.prism-class-name,
+  .bbCodeCode .prism-token.prism-bold { color: #79c0ff !important; }
+  .bbCodeCode .prism-token.prism-tag,
+  .bbCodeCode .prism-token.prism-inserted,
+  .bbCodeCode .prism-token.prism-number { color: #7ee787 !important; }
+  .bbCodeCode .prism-token.prism-string,
+  .bbCodeCode .prism-token.prism-attr-value { color: #ffa198 !important; }
+  .bbCodeCode .prism-token.prism-deleted { color: #ff7b72 !important; }
 
   /* ---- Pagination ----
      XenForo pages the list with a light default palette: the page <li>
@@ -696,7 +839,11 @@
     background-image: none !important;
     border-color: #2d333b !important;
   }
-  .tabs-tab, .tabs-tab a { color: #c4d3e8 !important; }
+  /* Each tab IS the anchor, so `.tabs-tab` (0,1,0) lost to our own `.p-body-content a`
+     (0,1,1) and every tab rendered the active accent — the strip signalled its current
+     page by the underline alone. `.is-active` already outranks both; only the resting
+     state needs the extra type selector. */
+  a.tabs-tab, .tabs-tab a { color: #c4d3e8 !important; }
   .tabs-tab.is-active, .tabs-tab.is-active a { color: #5fb0e6 !important; }
   .tabs-tab:hover { color: #9bd4ff !important; }
 

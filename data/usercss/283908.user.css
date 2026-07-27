@@ -3,11 +3,11 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Vinted with the homepage, catalog and search, item pages and seller profiles in a comfortable dark look that's easy on the eyes for late-night browsing.  Works on every country version of Vinted (vinted.fr, .de, .com, .co.uk, .es, .it, .nl, .be, .pl and more).   Prices, ratings and Vinted's teal stay clear and recognizable.
-@version      20260718.23.38
+@version      20260726.17.08
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
-@-moz-document domain("vinted.fr"), domain("vinted.de"), domain("vinted.com"), domain("vinted.co.uk"), domain("vinted.es"), domain("vinted.it"), domain("vinted.nl"), domain("vinted.be"), domain("vinted.pl"), domain("vinted.cz"), domain("vinted.sk"), domain("vinted.at"), domain("vinted.lt"), domain("vinted.lu"), domain("vinted.pt"), domain("vinted.ro"), domain("vinted.hu"), domain("vinted.se"), domain("vinted.fi"), domain("vinted.dk"), domain("vinted.gr"), domain("vinted.hr"), domain("vinted.ie"), domain("vinted.si"), domain("vinted.ee"), domain("vinted.lv"), domain("vinted.bg") {
+@-moz-document domain("vinted.fr"), domain("vinted.de"), domain("vinted.com"), domain("vinted.co.uk"), domain("vinted.es"), domain("vinted.it"), domain("vinted.nl"), domain("vinted.be"), domain("vinted.pl"), domain("vinted.cz"), domain("vinted.sk"), domain("vinted.at"), domain("vinted.lt"), domain("vinted.lu"), domain("vinted.pt"), domain("vinted.ro"), domain("vinted.hu"), domain("vinted.se"), domain("vinted.fi"), domain("vinted.dk"), domain("vinted.gr"), domain("vinted.hr"), domain("vinted.ie"), domain("vinted.si"), domain("vinted.ee"), domain("vinted.lv"), domain("vinted.bg"), domain("vinted.com.au") {
 /* ============================================================
      Vinted Dark
      Vinted's UI is built on a design-token system: CSS custom
@@ -77,6 +77,62 @@
     /* ---- Overlay / shadow ---- */
     --background-passive-neutral-overlay: 6, 8, 10;
     --shadow: 0, 0, 0;
+
+    /* ---- Semantic ramps, taken from Vinted's own [data-theme=dark] block ----
+       web_ui ships a full dark palette under `[data-theme=dark]`, which the web
+       app never activates. Each of these tokens is a light-tint BACKGROUND
+       paired with a dark-tint FOREGROUND (Badge__light: bg --X-light, color
+       --X-dark; InfoBanner__success: bg --X-extra-light), so the pair has to
+       flip together — a half-flip leaves light-on-light. Values are Vinted's,
+       verbatim, so the hues stay the brand's.
+       NOT flipped: every `*-inverse*` and `*-prominent` SURFACE token. Those
+       mean "on an inverted surface", and Vinted's dark theme inverts them to
+       WHITE because its prominent surfaces go light. Ours stay dark, so their
+       light-theme values are already correct and flipping them would paint a
+       white panel. */
+    --muted-default:     168, 178, 179;
+    --amplified-default: 240, 242, 242;
+
+    --success-default:     51, 172, 120;
+    --success-medium:      40, 134, 90;
+    --success-extra-light: 23, 47, 32;
+    --success-light:       23, 80, 56;
+    --success-dark:        192, 238, 208;
+    --success-extra-dark:  235, 252, 239;
+
+    /* Vinted's "warning" is its RED; --warning-default is identical in both
+       themes (it carries white text as a fill) so only the tints flip. */
+    --warning-medium:      153, 63, 81;
+    --warning-extra-light:  13, 3, 3;
+    --warning-light:       92, 48, 59;
+    --warning-dark:        253, 220, 220;
+    --warning-extra-dark:  255, 244, 244;
+
+    /* "expose" is the amber/attention ramp; --expose-default stays too. */
+    --expose-medium:      189, 143, 79;
+    --expose-extra-light:  81, 61, 22;
+    --expose-light:       110, 81, 54;
+    --expose-dark:        255, 238, 203;
+    --expose-extra-dark:  255, 245, 229;
+
+    --foreground-action-success-prominent-high-idle: 192, 238, 208;
+    --foreground-action-error-prominent-high-idle:   253, 220, 220;
+    --foreground-action-warning-prominent-high-idle: 255, 238, 203;
+
+    /* Disabled foreground must READ disabled: the light-theme 182,190,191 is
+       brighter than our body text, so a disabled control looked enabled. */
+    --foreground-passive-prominent-disabled: 102, 114, 115;
+    --stroke-action-neutral-subtle-idle:     102, 114, 115;
+    /* Near-white stroke tokens — harmless as borders (the blanket border rule
+       covers those) but they also back a few surfaces. */
+    --stroke-passive-neutral-subtle: 42, 50, 51;
+    --stroke-passive-disabled:       42, 50, 51;
+    /* Focus / selected rings: the raw brand teal is too dark to read as a ring
+       on our surfaces; Vinted's dark theme uses the pale teal. */
+    --stroke-action-neutral-subtle-focused:  201, 240, 238;
+    --stroke-action-neutral-subtle-active:   201, 240, 238;
+    --stroke-action-neutral-subtle-selected: 201, 240, 238;
+    --stroke-action-primary-prominent-high-idle: 201, 240, 238;
   }
 
   /* ---- Base surfaces ---- */
@@ -132,17 +188,23 @@
   /* ============================================================
      Header / global nav
      ============================================================ */
-  .l-header, .l-header__main, header.l-header, .js-header,
-  .l-header__wrapper { background-color: #0d1117 !important; }
+  /* The header ships as a CSS module now, so its classes are hashed
+     (`Header-module-scss-module__<hash>__l-header__main`). Every exact
+     `.l-header*` selector is dead against it — match on the `__l-header`
+     substring, which covers the header AND error-page header modules. Do NOT
+     drop to `l-header`: that also matches `.modal-header`. */
+  .l-header, [class*="__l-header"], .js-header { background-color: #0d1117 !important; }
   /* The logo is a web_ui Image; the item-photo placeholder fill below would
      otherwise paint a light box behind it on the darker header. */
-  .l-header__logo-container [class*="Image__image"],
-  .l-header__logo [class*="Image__image"],
-  [class*="l-header__logo"] [class*="Image__image"] { background-color: transparent !important; }
-  .l-header__main { border-bottom: 1px solid #262c33 !important; }
+  [class*="__l-header__logo"] [class*="Image__image"] { background-color: transparent !important; }
+  [class*="__l-header__main"] { border-bottom: 1px solid #262c33 !important; }
   .nav-links, .header-nav, [data-testid="nav-tabs"] { background-color: #0d1117 !important; }
+  /* The Button variants must stay excluded from the header-link colour: an
+     outlined/flat button draws its ring AND label from `color`, so a bare link
+     rule would repaint the teal sign-in CTA white. */
   .nav-links a, .header-nav a, [data-testid="nav-tabs"] a,
-  .l-header a:not(.web_ui__Button__primary):not([class*="Button__filled"]) { color: #e6edf3 !important; }
+  [class*="__l-header"] a:not([class*="Button__filled"]):not([class*="Button__primary"]) {
+    color: #e6edf3 !important; }
   .nav-links a:hover, .header-nav a:hover { color: #9bd4ff !important; }
 
   /* Category nav bar under the header */
@@ -150,11 +212,10 @@
   [class*="HorizontalScroll"] { background-color: #0d1117 !important; }
   /* The category row is a web_ui Tabs bar, whose surface reads the white
      token (level-6). We map that to the elevated #1c2128, so inside the
-     darker header the bar rendered as a lighter floating box with the
-     header showing through as slivers at both ends. Pin it to the header
-     surface. Tabs elsewhere (profile, item page) stay elevated. */
-  .l-header .web_ui__Tabs__tabs,
-  .l-header [class*="Tabs__tabs"] { background-color: #0d1117 !important; }
+     darker header the bar renders as a lighter floating box with the header
+     showing through as slivers at both ends. Pin it to the header surface.
+     Tabs elsewhere (profile, item page) stay elevated. */
+  [class*="__l-header"] [class*="Tabs__tabs"] { background-color: #0d1117 !important; }
 
   /* Dropdowns / flyouts / menus */
   .web_ui__Menu__menu, .web_ui__Dropdown__dropdown, .dropdown-menu,
@@ -197,14 +258,16 @@
      Cell rule above flattened the fill to #1c2128 and our level-6 remap
      darkened the label to the same #1c2128 — the banner went invisible
      dark-on-dark. Re-assert a dark-legible status fill and force the label
-     light (these variants are solid banners, so every child reads white). */
+     light (these variants are solid banners, so every child reads white).
+     web_ui's variant names are not the usual ones: `warning` is the RED
+     (error) fill and `expose` is the amber one — there is no Cell__error or
+     Cell__danger class at all. */
   [class*="Cell__success"] { background-color: #218056 !important; }
-  [class*="Cell__error"], [class*="Cell__danger"] { background-color: #a5343f !important; }
-  [class*="Cell__warning"] { background-color: #8a6a1e !important; }
+  [class*="Cell__warning"] { background-color: #a5343f !important; }
+  [class*="Cell__expose"]  { background-color: #8a6a1e !important; }
   [class*="Cell__success"], [class*="Cell__success"] *,
-  [class*="Cell__error"], [class*="Cell__error"] *,
-  [class*="Cell__danger"], [class*="Cell__danger"] *,
-  [class*="Cell__warning"], [class*="Cell__warning"] * {
+  [class*="Cell__warning"], [class*="Cell__warning"] *,
+  [class*="Cell__expose"], [class*="Cell__expose"] * {
     color: #ffffff !important; fill: #ffffff !important; }
 
   /* web_ui Text colours are baked as literal light-theme hex inside
@@ -230,6 +293,18 @@
      teal shield next to grey text. Restore the lifted link teal. Declared
      after subtitle/caption so it wins the source-order tie on dual-class spans. */
   .web_ui__Text__primary, [class*="Text__primary"] { color: #4db8c4 !important; }
+  /* Status TEXT variants (and their Icon twins) are painted from the semantic
+     tokens. --warning-default has to stay Vinted's red because it doubles as a
+     solid banner fill under white text, but that red only reaches 3.5:1 as
+     text on our surfaces — lift the text/glyph uses on their own. A span that
+     also carries Text__body/caption would otherwise be flattened to grey, so
+     these are declared after those rules to win the source-order tie. */
+  [class*="Text__success"], [class*="Icon__success-default"] svg,
+  [class*="Text__highlight-success"] > b {
+    color: #57c98a !important; fill: #57c98a !important; }
+  [class*="Text__warning"], [class*="Icon__warning-default"] svg,
+  [class*="Text__highlight-warning"] > b, [class*="Cell__validation"] {
+    color: #f2707a !important; fill: #f2707a !important; }
 
   /* Ghost / outlined / tertiary buttons render teal text on a dark
      surface — lift it for AA. Filled CTAs keep white-on-teal. */
@@ -380,25 +455,21 @@
     background-color: transparent !important; }
   [data-testid="profile-username"] { color: #e6edf3 !important; }
   /* The profile header is not a card: the site lays the username row, the
-     seller-badge row and the "about" block out as bare web_ui Cells on a
-     page-wide white <main>. Our elevated-surface rules turned each Cell into
-     an island, and the badge row — whose two cells do NOT span the full
-     width — punched base-coloured holes straight through the header. Native
-     renders one flat surface; do the same. Scoped by the header's own
-     `.u-flex-grow >` parent, so the review cards and item cards inside
-     `.profile__items-wrapper` keep their elevation. */
-  .profile .u-flex-grow > [class*="Cell__cell"],
-  .profile [class*="u-background-white"],
-  .profile [class*="u-background-white"] > [class*="Cell__cell"],
-  .profile [class*="Item__item"] [class*="Cell__cell"] {
+     seller-badge row and the "about" block out as bare web_ui Cells inside one
+     `.u-flex-grow` column. Native paints them all white on a white <main>, so
+     the header reads as a single flat surface; our elevated-Cell rule turns
+     each one into an island, and the badge row — whose cell spans only ~300px
+     of the 992px column — punches a base-coloured hole across the header.
+     Elevate the column itself and flatten the Cells inside it.
+     The `:not()` guards pin this to the header column: the item cards in the
+     grid below reuse `.u-flex-grow` with `u-fill-width` / `u-min-width-none`,
+     and the "N articles / sort" row adds `u-flexbox`. Excluding them keeps
+     each card's elevation AND its `u-background-white` favourite pill. */
+  [class*="__profile"] .u-flex-grow:not(.u-fill-width):not(.u-min-width-none):not(.u-flexbox) {
+    background-color: #1c2128 !important; }
+  [class*="__profile"] .u-flex-grow:not(.u-fill-width):not(.u-min-width-none):not(.u-flexbox) [class*="Cell__cell"],
+  [class*="__profile"] .u-flex-grow:not(.u-fill-width):not(.u-min-width-none):not(.u-flexbox) [class*="u-background-white"] {
     background-color: transparent !important; }
-  /* Each item card's favourite button is a `u-background-white` pill, so the
-     flatten above (specificity 0,2,0) strips it to transparent and the light
-     heart floats bare on the photo. Re-assert the dark pill on the profile
-     grid — ties the flatten's specificity but wins on source order, and the
-     --favourite testid never appears in the header. */
-  .profile [data-testid$="--favourite"] {
-    background-color: rgba(13, 17, 23, 0.55) !important; }
 
   /* ============================================================
      Footer
@@ -406,6 +477,11 @@
   .main-footer, .l-footer, footer, .main-footer__content {
     background-color: #0d1117 !important; }
   .main-footer a, .l-footer a, footer a { color: #c4cdd6 !important; }
+  /* The privacy row mixes <a> links with a <button> ("cookie settings") that
+     carries the SAME link class; natively both read one token, so an
+     `a`-only rule left one item of the row visibly dimmer. Match the class. */
+  footer [class*="main-footer__links-section-link"],
+  footer [class*="main-footer__privacy-section-link"] { color: #c4cdd6 !important; }
   .main-footer a:hover, footer a:hover { color: #9bd4ff !important; }
 
   /* ============================================================
@@ -472,6 +548,14 @@
      header row that goes light-on-light under our text colours. */
   .table-wrapper thead tr, .user-created-content thead tr {
     background-color: #2f3742 !important; }
+
+  /* The no-photo avatar is an external <img> SVG: a full-bleed #EDF2F2 square
+     with a #B6BEBF silhouette, so it renders as a glaring near-white disc on
+     every profile, review row and item sidebar of a member without a picture.
+     CSS cannot reach inside an <img>, so invert it; hue-rotate keeps the
+     result neutral instead of the warm cast a bare invert leaves. */
+  img[src*="user-empty-state"] {
+    filter: invert(1) hue-rotate(180deg) !important; }
 
   /* The 404/error mascot is a <video> with white baked into its frames, so
      no background rule can reach it. Invert it (hue-rotate restores the

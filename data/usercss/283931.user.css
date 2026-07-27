@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for Slashdot, easy-on-the-eyes story feed and threaded comment discussions, with the classic Slashdot green kept intact.
-@version      20260717.18.09
+@version      20260726.17.06
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -252,6 +252,14 @@
   #slashboxes header, #slashboxes header *, .block > header,
   .block > header * { color: #e6edf3 !important; }
   #slashboxes header a, .block > header a { color: #9bd4ff !important; }
+  /* a sponsored (Nativo) sidebar block nests a real story-title bar inside the block
+     header, and the link rule above — (1,0,2) — outranks `h2.story a` (0,1,2), so that
+     title landed link-blue on the brown ad bar while the identical bar in the main
+     column stayed near-white. Match the header scope. */
+  #slashboxes header h2.story a, .block > header h2.story a,
+  #slashboxes header h2.story span, .block > header h2.story span {
+    color: #e6edf3 !important;
+  }
 
   /* user profile bio card (#user_bio renders on #e6e6e6 → bio text would land on light) */
   article#user_bio, #user_bio {
@@ -360,6 +368,26 @@
   }
   #embbeded_login_modal a { color: #6fd8be !important; }
 
+  /* box-shadows the site drew for a white page read as a bright HALO on dark, and no
+     colour/background audit sees a shadow at all: the selected "Comments Filter" tab
+     carries `0 -1px 2px #ccc`, the comment Share popover `1px 1px 4px #bbb`, and this
+     Login popover a 15px #666 glow around the whole panel. */
+  ul.besttabslist li.active { box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.6) !important; }
+  .comment_share, .comment_share.sharethis-0 {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
+  }
+  #embbeded_login_modal { box-shadow: 0 1px 15px rgba(0, 0, 0, 0.7) !important; }
+  /* #modal_box's header strip is two hardcoded pure-white spans (`.fadeout` +
+     `.fadeoutfade`) carrying a white 11px glow, and `#modal-p > .pref` /
+     `#modal_box_content .pref` come from the same site rule. The panel itself was
+     already dark, so the strip shipped as a full-width WHITE band across its top.
+     The nodes live in the DOM but stay display:none until a modal opens. */
+  #modal_box .fadeout, #modal_box .fadeoutfade,
+  #modal-p > .pref, #modal_box_content .pref {
+    background: #1c2128 !important;
+    box-shadow: none !important;
+  }
+
   /* dimmed / abbreviated (low-score) comments — keep them muted but legible
      (site dims these to #7d7d7d via an id-scoped rule, so match its specificity).
      Scope every selector to the oneline's OWN wrapper (`> .cw`): a collapsed parent
@@ -399,6 +427,13 @@
   }
   .tag-menu::before { border-bottom-color: #2d333b !important; }
   .tag-menu::after { border-bottom-color: #1c2128 !important; }
+  /* a tag chip and a moderation-reason item keep a light #d4e3e3 HOVER fill (the reasons
+     menu declares it `!important`), which our light link colour then sits on at ~1.5:1.
+     A hover state is invisible to every load-time scan. */
+  .tag-bar .tag:hover, .details .reasons-menu a:hover {
+    background-color: #2d333b !important;
+    color: #9bd4ff !important;
+  }
 
   /* ---------- generic light-surface neutralizer ---------- */
   /* native-ad / newsletter / "you may like" / comment-filter sections render
@@ -482,14 +517,22 @@
      deliberate neutral-button choice) swallowed the ones carrying no Bootstrap
      modifier: the comment "Post" reply CTA (.btn.first) and "Load All Comments"
      (#d2loadall) came out the same grey as any neutral button, erasing the primary
-     hierarchy the masthead's green "Submit" (.btn-success) keeps. Restore the theme's
-     brand-primary teal on these primary CTAs (placed before the Bootstrap variants so
-     a semantic .btn-danger/.btn-success still wins any tie). */
+     hierarchy the masthead's green "Submit" (.btn-success) keeps. Restore a brand-primary
+     teal on these primary CTAs (placed before the Bootstrap variants so a semantic
+     .btn-danger/.btn-success still wins any tie).
+     CONSTRAINT: these two sit ON the comment bar, whose own native gradient runs
+     #006666 -> #004242, so the fill must stay LIGHTER than #006666 or the button has no
+     edge against the bar at all. The id selectors here also outrank the generic
+     `.btn:hover`, so the hover state has to be restated. */
   a.btn.first, input.btn.first, button.btn.first, .btn.first,
   #d2loadall, a#d2loadall, #d2reply, a#d2reply {
-    background-color: #006666 !important;
-    border-color: #025c5c !important;
+    background-color: #0b7c7c !important;
+    border-color: #0e9494 !important;
     color: #ffffff !important;
+  }
+  a.btn.first:hover, input.btn.first:hover, button.btn.first:hover, .btn.first:hover,
+  #d2loadall:hover, a#d2loadall:hover, #d2reply:hover, a#d2reply:hover {
+    background-color: #0e9494 !important;
   }
   /* …and keep their FILL too. The generic `.btn` rule above is !important at the
      same (0,1,0) specificity, so it swallowed every Bootstrap modifier: the green
@@ -835,6 +878,29 @@
      reachable by opening the hamburger at a narrow viewport. */
   .off-canvas a, .off-canvas a:link, .off-canvas a:visited,
   .off-canvas .menu a { color: #fefefe !important; }
+  /* the mobile hamburger is a natively TRANSPARENT <button>, so the generic button fill
+     drew a dark chip around its bars on the teal title bar. Narrow viewport only. */
+  button.menu-icon, .title-bar-right button.menu-icon {
+    background: transparent !important;
+    border: 0 !important;
+  }
+  /* Foundation's dropdown panel is a `ul.menu`, so the transparent `.menu` rule written
+     for the classic header dropdown blanked it too: the directory's open Sort menu
+     ("Sponsored / Highest Rated / Most Reviews") had NO background and its items
+     overlapped the listing behind them. It is natively #fefefe on #cacaca. Only exists
+     once the menu is clicked open, so no load-time scan reaches it. */
+  ul.menu.is-dropdown-submenu, .dropdown.menu .is-dropdown-submenu {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  /* that menu's caret is a pair of real-element border triangles (transparent sides,
+     coloured top), so the blanket `* { border-color }` reset filled all four sides and it
+     rendered as a solid box. `.over-triangle` exists only to notch `.triangle` against a
+     white page — drop it and keep one solid light caret. */
+  div.triangle, .sort-by .triangle {
+    border-color: #c4cdd6 transparent transparent !important;
+  }
+  div.over-triangle, .sort-by .over-triangle { border-color: transparent !important; }
   /* directory pagination: the "…" gap marker is a #0a0a0a ::after (1.1:1, gone) and the
      "«/»" chevrons are ::after content that took the global link blue onto the teal
      Prev/Next buttons (2.9:1). Neither is a text node, so no colour audit sees them. */

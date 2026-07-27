@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for Syosetu (小説家になろう). Easy-on-the-eyes reading for novel chapters, plus the home, rankings, search and bookmark controls.
-@version      20260717.18.06
+@version      20260726.17.03
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -483,6 +483,20 @@
   .subtitle a:hover {
     color: #9bd4ff !important;
   }
+  /* An episode row carries NO divider natively — its bottom border is the row's
+     only state channel: --color-custom-epilist-underline-hover on :hover and
+     --color-custom-epilist-underline-favorited on the favourited episode
+     (.p-eplist__sublist--underline). The blanket `* { border-color }` reset at the
+     top painted all three states the same divider grey, so on a 100+ row index the
+     pointer gave no feedback and a favourited episode looked like every other row.
+     Amber marks the favourite (the network's "selected" tone everywhere else);
+     hover stays accent blue and, being last, still wins on a favourited row. */
+  .p-eplist__sublist--underline {
+    border-bottom-color: #e6c9a8 !important;
+  }
+  .p-eplist__sublist:hover {
+    border-bottom-color: #5fb0e6 !important;
+  }
 
   /* ============================================================
      Pager / chapter prev-next navigation
@@ -537,6 +551,16 @@
   }
   .p-adjust-layout__title {
     color: #e6edf3 !important;
+  }
+  /* The 挿絵 (illustration) on/off control inside 表示調整 is an <img> — a raster
+     GIF of the whole button, so no colour rule can reach it and both audits walk
+     past it. Its OFF state (novelview_off.gif, "挿絵を表示") is a solid WHITE pill
+     that glares on the dark panel; the ON state is already a mid-grey pressed chip
+     that reads fine, so invert ONLY the off variant. hue-rotate keeps the pill's
+     pale-blue edge blue instead of the brown a bare inversion produces, and 0.92
+     lands the fill on the page base rather than pure black. */
+  img.js-adjust-layout-illustflag[src*="novelview_off"] {
+    filter: invert(0.92) hue-rotate(180deg);
   }
   /* The layout on/off switch chips carry their own light fill (incl.
      the inner <span> that renders the toggle label) */
@@ -918,6 +942,15 @@
     color: #5fb0e6 !important;
     border-color: transparent !important;
   }
+  /* Every item in that row ends with an icon-font chevron. On the mobile sheet the
+     pseudo carries its own #0033cc (~2:1 on dark) while the label beside it lifts
+     to the accent blue, so the arrow reads as a near-invisible navy smudge; it is
+     not a text node, so only the pseudo-text pass sees it. `inherit` pins the
+     chevron to whatever its own item resolves to on either frontend — on desktop
+     that is already the value it has, so nothing there changes. */
+  .c-under-nav__item::after {
+    color: inherit !important;
+  }
 
   /* Search builder legacy tables / labels / keyword tags. This older
      markup uses bare <th>/<span>/<label> at #333 inside white
@@ -1146,7 +1179,8 @@
      a bright chip glaring on the dark result row (audit-blind: short +
      inline). Darken the pill and lift its label. */
   .searchkekka_box span[style*="d7e9ef"],
-  #main_search span[style*="d7e9ef"] {
+  #main_search span[style*="d7e9ef"],
+  #accordion span[style*="d7e9ef"] {
     background: #21262d !important;
     color: #c4cdd6 !important;
   }
@@ -1446,6 +1480,107 @@
   }
   .p-error-panel__support-text {
     color: #c4cdd6 !important;
+  }
+
+  /* ============================================================
+     Mobile (SP) frontend
+     The network serves a separate stylesheet family to phone user agents
+     (base_narou-sp.css / p_novel-sp.css / p_index-sp.css). It reuses most of the
+     desktop component classes, so the rules above already carry it — but a handful
+     of surfaces exist ONLY there, painted from SP-only tokens, and each renders as
+     a full-width bright band across an otherwise dark page. None of these elements
+     is present in the desktop DOM, so the plain selectors below cannot reach it;
+     the two that ARE shared are remapped through their token instead (see :root
+     block at the end of this section).
+     ============================================================ */
+  /* The reader / 作品情報 / 感想一覧 secondary menu row (作品情報・感想・レビュー) sits
+     under the sticky header at --color-bg-menu-sp #f6f6f6 — a white strip carrying
+     our light labels. */
+  .c-menu__second {
+    background-color: #161b22 !important;
+  }
+  /* The chapter's 感想を書く disclosure bar (--color-impression-toggle-sp #fcfcfc)
+     is a full-width near-white band; its label inherits our light body colour and
+     disappears into it. */
+  .c-novel-feedback-form__open-imp {
+    background-color: #161b22 !important;
+    color: #c4cdd6 !important;
+  }
+  /* The bookmark bar's ▼感想を書く chip is a pale-blue --color-bg-to-impr-button
+     #edf2ff pill whose blue label reads ~2:1 on it. */
+  .p-bookmark-bar__bkm-link--sp-honbun {
+    background-color: #21262d !important;
+    color: #9bd4ff !important;
+  }
+  /* The drawer's 閉じる bar and the footer's ページトップへ bar are both a solid
+     brand-cyan #18b7cd strip — the two brightest things on any SP page — with a
+     link on them that our accent blue leaves at ~2:1. */
+  .p-drawer-nav__close a,
+  .p-footer__pagetop a {
+    background-color: #21262d !important;
+    color: #9bd4ff !important;
+  }
+  /* yomou's ランキング一覧 drawer trigger is a light --color-ui-bg--tapable #e2e6ea
+     bar; keep the Narou orange label but lift it for the dark chip. */
+  .c-control__bar {
+    background-color: #21262d !important;
+    color: #f0954a !important;
+  }
+  /* The legacy SP search builder stacks four pale-blue #c8dfee condition toggles
+     (ジャンル選択 / 詳細条件設定 / 検索ワードを選択 / 除外ワードを選択) and two pure-white
+     #fff link-section headings (検索 / 一覧). The 履歴から検索 sibling is already the
+     neutral chip via the generic button rule — match it. */
+  .search_toggle.list_menu {
+    background-color: #21262d !important;
+    color: #c4cdd6 !important;
+  }
+  h3.menu_list {
+    background-color: #1c2128 !important;
+    color: #e6c9a8 !important;
+  }
+  /* The SP search RESULTS are a fourth result family (#accordion .smpnovel_list
+     accordions, plus a #trad > .section header and a .page_bar pager). Every one of
+     them declares the legacy #333 on itself, so the `#trad` lift further up never
+     reaches them: the searched keyword, the result count, every 作者 / 連載中 /
+     ジャンル line, the synopsis, the Nコード/キーワード block and the current-page
+     marker all rendered as a near-invisible smudge, with only the orange titles and
+     blue links showing. Titles and links carry their own colour and stay as they are. */
+  #trad > .section,
+  #trad > .page_bar {
+    color: #c4cdd6 !important;
+  }
+  #trad > .section > p.bb {
+    color: #e6c9a8 !important;
+  }
+  #trad > .page_bar b {
+    color: #e6edf3 !important;
+  }
+  #trad > .attenstion_koushin,
+  #accordion .accordion_head,
+  #accordion .smpnovel_ex,
+  #accordion .smpnovel_list p {
+    color: #9aa3ad !important;
+  }
+  /* Each expanded card's この作品を読む CTA keeps a mid-teal gradient that leaves our
+     accent-blue label at ~2.3:1 — give it the same elevated chip the desktop
+     この作品を読む button gets. The fill is a `background:` gradient, so a
+     background-COLOR override alone paints behind it and changes nothing. */
+  #accordion .read_button {
+    background: #21262d !important;
+    background-image: none !important;
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+  }
+  /* Two SP surfaces share a class with a desktop element that is styled
+     differently, so a plain selector would repaint the desktop one too: the drawer
+     section headings (.c-navlist__headline — bare text in the desktop footer, an
+     #eef5f6 band in the SP drawer) and the 表示調整 section headers
+     (.p-adjust-layout__title — bare on desktop, an #eef3ff band on SP). Both bands
+     are painted from a token no desktop rule consumes, so remap the token: the fix
+     lands on SP only. */
+  :root {
+    --color-ui-c-drawer-headline-bg: #21262d !important;
+    --color-adjust-layout-bg-title: #21262d !important;
   }
 
   /* ============================================================

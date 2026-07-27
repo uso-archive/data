@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for OLX Brasil.
-@version      20260724.12.45
+@version      20260726.17.05
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -74,11 +74,16 @@
     background-color: #0d1117 !important;
     border-color: #2d333b !important;
   }
-  /* The tab bar marks the current tab by painting only its icon
-     (`svg.olx-navbar--active`) the raw OLX purple. Against the dark bar that
-     lands at ~2:1 — the ACTIVE tab ends up the dimmest glyph in the row, while
-     every inactive one is near-white. Lift it to the readable violet. */
-  .olx-navbar--active { color: #b794f6 !important; }
+  /* The tab bar marks the current tab by painting its icon (`svg.olx-navbar--active`)
+     AND its label (`span.typo-caption.olx-navbar--active`) the raw OLX purple. Against
+     the dark bar that lands at ~2:1 — the ACTIVE tab ends up the dimmest glyph in the
+     row, while every inactive one is near-white. Lift it to the readable violet. The
+     compound selector is required for the LABEL: the `[class*="typo-caption"]` utility
+     rule further down ties this one at 0-1-0 and wins on source order, so the active
+     caption rendered the same grey as every inactive one and the "you are here" signal
+     survived only on the icon. */
+  .olx-navbar--active,
+  [class*="typo-"].olx-navbar--active { color: #b794f6 !important; }
   /* Navbar dropdown panels */
   .olx-navbar__dropdown,
   [class*="navbar__dropdown"],
@@ -366,13 +371,23 @@
   .olx-core-button--tertiary:hover { background-color: #3a2a14 !important; }
   /* Neutral / outline buttons (white) -> elevated dark */
   .olx-core-button--neutral,
-  button.olx-core-button--neutral,
-  .olx-core-button--link {
+  button.olx-core-button--neutral {
     background-color: #21262d !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
   }
-  a.olx-core-button--link { background-color: transparent !important; color: #f6b35e !important; }
+  /* `--link` is the TEXT-only variant (`--button-link-background-color-default:
+     transparent`, brand-purple label): pagination numbers, the SEO footer's "Mostrar
+     mais", the autos filter rail's "Todas as marcas" jump. Grouping it with `--neutral`
+     gave it a filled grey pill, so it read as a button instead of a link — and only the
+     ANCHOR form was corrected, leaving every `<button class="…--link">` a grey pill.
+     Match the variant itself. `.olx-core-button.olx-core-button--disabled` (0-2-0) still
+     wins for pagination's current-page chip. */
+  .olx-core-button--link {
+    background-color: transparent !important;
+    color: #f6b35e !important;
+    border-color: transparent !important;
+  }
 
   /* The auth app and the results view-switcher reuse `--primary` on buttons
      that are NOT orange CTAs, so the blanket primary rule above repaints them:
@@ -545,6 +560,24 @@
     background-color: #21262d !important;
     color: #c4cdd6 !important;
   }
+  /* The card's photo-carousel arrows (revealed on card hover, so a load-time scan never
+     sees them) are a 32px disc painted by a `::after` from `var(--color-neutral-70)`
+     (#fff) — a bright white FAB floating on the photo right beside the favourite heart
+     we already darkened. Its chevron is baked into a `background-image` data URI as a
+     literal #1a1d23, so darkening the disc alone would leave the glyph invisible: remap
+     the disc + hover tokens AND swap the glyph for a light one. The site's own
+     `[data-direction="prev"]::after { transform: rotate(180deg) }` still flips it, so a
+     single right-pointing chevron serves both directions. */
+  .olx-adcard__carousel--prev-next {
+    --color-neutral-70: #21262d;
+    --color-neutral-80: #2d333b;
+  }
+  .olx-adcard__carousel--prev-next::after {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none'%3E%3Cpath fill='%23c4cdd6' d='M5.23 13.604a.5.5 0 0 1 0-.707l4.48-4.48-4.48-4.48a.5.5 0 0 1 .707-.707l4.833 4.833a.5.5 0 0 1 0 .707l-4.833 4.833a.5.5 0 0 1-.707 0z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% !important;
+  }
+
   /* The heart itself is an SVG painted `fill="var(--color-neutral-70)"` (#fff)
      with `stroke="var(--color-neutral-130)"` (near-black): on the native white
      circle that reads as an OUTLINE heart, but on our dark circle it becomes a
@@ -940,8 +973,12 @@
   /* …but that neutralizer also blanks the ad page's FIXED top bar (the
      Fotos/Descrição/Detalhes tabs + Comprar/Chat actions), which ships a
      literal white bg — content then scrolls straight through it. It is
-     #adview's own fixed child; re-establish an opaque surface. */
-  #adview > div[class*="anz3cs"] {
+     #adview's own fixed child; re-establish an opaque surface. The `:not()` has to be
+     repeated here for the same reason the lightbox restore repeats it: the neutralizer
+     is 1-2-0, so a bare `#adview > div[class*="anz3cs"]` (1-1-1) LOSES and the bar goes
+     transparent again — the ad photos, the price and the verified-badge list all scroll
+     visibly through the tab strip. */
+  #adview > div[class*="anz3cs"]:not([style*="rgb("]) {
     background-color: #0d1117 !important;
     border-bottom: 1px solid #2d333b !important;
   }
@@ -994,6 +1031,25 @@
     --coupon-bg-color: #2a2440 !important;
     --coupon-text-color: #c9b6f5 !important;
   }
+  /* The price box's action links ("Simular empréstimo", "Mais opções de parcelamento")
+     put their glyph in an inline `<path fill="var(--color-secondary-100)">` — the raw
+     brand purple, ~2.3:1 on the dark card, while the label right beside it is already
+     lifted to the readable violet. Remap the token on the link so ONLY its own icon
+     lifts: the same token feeds the ad page's `--spots-*` illustrations (the location
+     building, the account-level spot), whose hues must stay. */
+  #adview a.olx-link--main,
+  #adview a.olx-core-link--main { --color-secondary-100: #b794f6; }
+  /* Seller "Nível de conta" medal — a two-layer SVG whose body paints
+     `var(--color-secondary-70)` and whose outline `var(--color-secondary-100)`. The
+     `#adview` secondary flip below exists for the coupon banner's lavender SURFACE, and
+     it drags the medal's body down to the dark chip tone, so the level marker all but
+     vanishes against the purple bar it sits on. Put the lavender back on the medal only;
+     the label is ASCII-matched so the accented í can't break the selector. */
+  #adview button[aria-label*="vel do vendedor"] {
+    --color-secondary-70: #c9b6f5 !important;
+    --color-secondary-100: #7c3aed !important;
+  }
+
   /* Seller reputation bar: four 70x8 segments whose colours come from INLINE
      `background-color: var(--color-*)`, so no class rule can reach them. The
      achieved tiers use --color-secondary-80/-100 (the purples, keep them) and
@@ -1029,6 +1085,36 @@
   [class*="typo-overline"] {
     color: #9aa6b0 !important;
   }
+  /* `text-neutral-70` is olx-ui's WHITE-text utility, reserved for copy that sits on a
+     coloured brand surface — the mobile listing's "Veja anúncios com Entrega" banner
+     paints it on `bg-secondary-100` (#6E0AD6). The typo-scale rules above match those
+     same elements on their `typo-body-small` / `typo-caption` class and greyed the copy
+     to #9aa6b0, which is 3.2:1 on that purple. The compound selector out-specifies the
+     typo rules rather than relying on source order — and it must stay compound: the
+     ad-card "Destaque" badge carries `text-neutral-70` too (it is white on the native
+     purple chip) but no `typo-*` class, so a bare `.text-neutral-70` would beat the
+     badge rules on source order and repaint that copy white, losing the violet the
+     dark chip is built around. */
+  [class*="typo-"].text-neutral-70 { color: #ffffff !important; }
+
+  /* olx-ui writes its icon colour into the SVG MARKUP — `<svg
+     color="var(--color-neutral-130)">` with `<path fill="var(--color-neutral-130)">` — so
+     the glyph resolves to the palette's near-black ink (#1A1D23) and disappears on dark.
+     No `color` rule reaches an SVG fill and no colour audit sees it (there is no text
+     node). Hit list: every search-autocomplete suggestion's magnifier, the ad page's
+     "Na OLX desde" calendar and location pin, the identity-validation alert's close X.
+     The token canNOT be lifted at the root: the site also uses `--color-neutral-130` as a
+     deliberately DARK surface (`.olx-arrow-button` disc, `.olx-media-counter` photo-count
+     pill, `.olx-image-carousel__content-overlay`), which a light value would flip white.
+     Repaint the fill itself instead. */
+  svg[color="var(--color-neutral-130)"],
+  path[fill="var(--color-neutral-130)"] {
+    fill: #c4cdd6 !important;
+    color: #c4cdd6 !important;
+  }
+  /* …`.olx-icon-action` brightens the same token on hover; keep that lift. */
+  .olx-icon-action:hover path[fill="var(--color-neutral-130)"] { fill: #e6edf3 !important; }
+
   /* OLX secondary accent is a saturated purple (#6E0AD6) that fails
      contrast on dark — lift to a lighter, readable violet, same hue. */
   .text-secondary-100, .text-secondary-110, .text-secondary-90,

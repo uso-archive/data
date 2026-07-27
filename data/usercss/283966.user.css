@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Pikabu.
-@version      20260724.12.45
+@version      20260726.17.05
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -133,6 +133,68 @@
     --c-selectBtn-bgDefault: var(--pk-surface-2);
     --c-selectBtn-bgHover: var(--pk-surface);
     --c-selectBtn-stroke: var(--pk-border);
+
+    /* Pressed state of the SelectBtn family (topic chips at the top of the feed) and
+       the label colour they share. Both keep Pikabu's light defaults (#f2f3f7 pill /
+       #292a2e near-black label), so pressing a chip flashes a white slab. */
+    --c-selectBtn-bgClick: var(--pk-border);
+    --c-selectBtn-text: var(--pk-text);
+
+    /* Header nav hover/press (Горячее / Лучшее / Свежее / …). Pikabu paints the pill
+       from these two tokens, which stay #f2f3f7 / #ebedf2 — so hovering any main nav
+       item drops a solid near-white block behind our light label. */
+    --c-navigation-horizontal-hover: var(--pk-surface);
+    --c-navigation-horizontal-click: var(--pk-border);
+
+    /* Label/icon on a filled PRIMARY button (.pkb-normal-btn — login modal actions,
+       "Больше видео", the games-carousel "Играть", the footer app CTA). Pikabu keeps it
+       #fcfdff, which lands ~1.9:1 on this theme's lightened brand green. Flip it dark,
+       exactly as --color-bright-900 above. */
+    --c-btn-primary-textIcon: var(--pk-bg);
+
+    /* Collapse / power-rating toggles (the small +/− square in the feed rail and the
+       comment collapse button) paint their hover+press fill from these; both stay light. */
+    --collapse-hover: var(--pk-border);
+    --collapse-click: #39414b;
+
+    /* Reaction pill press state and the reaction-picker popover states — all light
+       greys natively, so pressing a reaction flashes a bright slab. The "donated"
+       pill's own fill matches the .emotion-btn_donated rule further down. */
+    --reaction-click: var(--pk-border);
+    --reaction-popover-hover: var(--pk-border);
+    --reaction-popover-click: #39414b;
+    --reaction-popover-active: #39414b;
+    --reaction-donat-default: #2a2318;
+
+    /* Truncation fade for LONG COMMENTS (.comment__show-all::before) and a community's
+       collapsed description (.community-info-block__read-more::before). All three fades
+       on the site (post body included) read these two tokens; only the post-body one had
+       been pinned, so the other two still dissolved into a near-white band. */
+    --story-readMore-gradientA: var(--pk-surface);
+    --story-readMore-gradientB: rgba(28, 33, 40, 0);
+
+    /* ---- Pale semantic tints ----
+       Pikabu's "200"/"100" ramp ends are near-white washes used as SURFACES: green for
+       highlights and hover rows, red for danger sections, amber for warnings/notices,
+       blue for company-blog badges, and the two debate-position captions. None of them
+       were remapped, so each shipped as a glaring light island on the dark canvas.
+       Dark-tune every one while keeping its hue, so the signal survives. */
+    --color-primary-100: #2a3a20;
+    --color-primary-200: #2f4025;
+    --color-danger-200: #2e1c1a;
+    --color-warning-200: #2e2716;
+    --color-blue-200: #16283a;
+    --color-debate-light-first: #33201e;
+    --color-debate-light-second: #1e2740;
+    /* the caption labels that sit ON those two debate tints are Pikabu's saturated
+       mid-tones, which fall under 3:1 on them — lift both */
+    --color-debate-first: #ef6a5d;
+    --color-debate-second: #8b96e8;
+
+    /* Gamification button hover/press. Its default fill is pinned neutral further down,
+       so keep these two on the same neutral ramp instead of Pikabu's pale orange. */
+    --gamification-btn-hover: var(--pk-surface);
+    --gamification-btn-click: var(--pk-border);
 
     /* ---- Tags / chips / quotes / tooltips / menus ---- */
     --c-tag-bgDefault: var(--pk-surface-2);
@@ -264,6 +326,17 @@
      inside already read on it. */
   .app__sidebar { background-color: var(--pk-bg) !important; }
 
+  /* The four Pikabu-project cards inside that drawer (Промокоды / Курсы / Работа / Игры).
+     Each wordmark is an SVG painted with `currentColor`, and the card hardcodes
+     `color: #222326` (Pikabu only lifts it under :root[data-theme-dark]) — so all four
+     wordmarks render near-black on the dark drawer. The card fill reads --s-colorBg-tonned,
+     which this theme maps to the base canvas, leaving the cards shapeless too: give them
+     the elevated surface so the tiles read as tiles. */
+  .sidebar-products-temp__card {
+    background-color: var(--pk-surface) !important;
+    color: var(--pk-text) !important;
+  }
+
   /* ===== Main columns / feed wrappers (transparent over base) ===== */
   .app,
   .layout,
@@ -302,15 +375,6 @@
      Keep the inner text block transparent so the author's colour shows through. */
   [class*="story_primary"] .story-block,
   [class*="story_primary"] .story-block_type_text { background-color: transparent !important; }
-
-  /* Truncated-body "read more" fade. Long posts + long comments collapse behind
-     `.story__read-more`, whose ::before paints a `linear-gradient(#fcfdff0, #fcfdff)`
-     fade so the last line dissolves into the card. The palette flip never touched the
-     literal near-white, so it shipped as a glaring light band over the final line of
-     every truncated comment / post. Re-aim the fade at our card surface. */
-  .story__read-more::before {
-    background-image: linear-gradient(rgba(28, 33, 40, 0), var(--pk-surface)) !important;
-  }
 
   /* Rating block on the story card */
   .story__rating-block { background-color: var(--pk-surface-2) !important; }
@@ -545,10 +609,27 @@
   a.header__app-link,
   .header__app-link { border-color: var(--pk-green-deep) !important; }
 
-  /* "Post boost active" badge (green rocket pill on hot posts). It ships a green
-     ring around the green-tinted pill; our universal `* { border-color }` reset
-     flattened the ring to grey. Restore the green border to complete the signal. */
-  .story-boost-badge { border-color: var(--pk-green-deep) !important; }
+  /* "Post boost active" badge (rocket pill beside a boosted post's title). It carries its
+     identity in three COMPONENT-LOCAL properties declared on the element itself, whose
+     light defaults are a near-white #f9fff5 pill with a pale-green ring and label — a
+     :root flip cannot reach them, and a colour-only border override left the pill white.
+     Drive all three from Pikabu's own dark-theme values, which never apply here. */
+  .story-boost-badge {
+    --story-boost-badge-bg: #26331c !important;
+    --story-boost-badge-stroke: #598039 !important;
+    --story-boost-badge-content: #8fd35c !important;
+    background-color: var(--story-boost-badge-bg) !important;
+    border-color: var(--story-boost-badge-stroke) !important;
+    color: var(--story-boost-badge-content) !important;
+  }
+
+  /* Full-page loading skeleton on the mobile layout. Its shimmer gradient reads two
+     component-local properties that stay near-white (#f7f8fc / #ebedf2), so every route
+     change flashed a screenful of bright bars. */
+  .loader-skeleton {
+    --skeleton-mainGradA: #333b45 !important;
+    --skeleton-mainGradB: #262c34 !important;
+  }
 
   /* ===== Sidebar widgets / community blocks ===== */
   .sidebar-block,
@@ -682,12 +763,24 @@
     background-color: var(--pk-header) !important;
     color: var(--pk-text-muted) !important;
   }
+  /* Scoped to the footer BLOCK itself. A `[class*="footer"] a` form also matches every
+     `…__footer` sub-block on the site — the games-carousel card footer (whose filled
+     brand-green "Играть" CTA it flattened to #c4cdd6, ~1.1:1 on the green) and the mobile
+     drawer's `footer__email` newsletter (whose green consent links it greyed out). */
   .footer a,
   .footer a span,
   .page-footer a,
-  [class*="footer"] a,
+  .b-footer a,
   [class*="footer__link"],
   [class*="footer-link"] { color: var(--pk-text-soft) !important; }
+  /* The footer's own app-download CTA is a filled green button, so it must keep the dark
+     label every other filled green button on this theme carries. */
+  .footer a.pkb-normal-btn,
+  .footer a.button_success,
+  .page-footer a.pkb-normal-btn {
+    color: var(--pk-bg) !important;
+    -webkit-text-fill-color: var(--pk-bg) !important;
+  }
 
   /* ===== Code / quotes inside posts ===== */
   pre, code, .b-story-block__code {
@@ -822,4 +915,85 @@
     border-color: var(--pk-green-deep) !important;
   }
   .pkb-highlight-block a { color: var(--pk-green) !important; }
+
+  /* ===== Remaining literal light fills =====
+     Every rule below paints a near-white / pale surface with a LITERAL colour, so the
+     :root palette flip cannot reach it. Pikabu darkens most of them only under
+     :root[data-theme-dark], which never applies to this theme. */
+
+  /* Fundraising "support" icon button on a post, and the profile "goal of the day" card
+     (the sibling of .daily-goal-badge above, which was fixed while this one was not). */
+  .pkb-donation-btn { background-color: #1d2615 !important; }
+  .pkb-donation-btn:hover { background-color: #26331c !important; }
+  .gamification-daily-goal { background-color: #3a4d2a !important; }
+  /* mobile header gamification pill */
+  .mini-gamification-profile { background-color: #261306 !important; }
+
+  /* "Промо" label on a sponsored post: pale-lilac pill + a dark purple label. Keep the
+     purple identity, inverted for dark. */
+  .story__promo .story-label {
+    background-color: #2a1c33 !important;
+    color: #b98be0 !important;
+  }
+
+  /* Placeholder card shown in place of a removed / unavailable post. */
+  .story__gag_relative { background-color: var(--pk-surface) !important; }
+
+  /* Author "info / warning / note" callout blocks inside a long-form post. Cream fill
+     plus `color: #212121 !important` (#454648 on the mobile layout), so darkening the
+     fill alone would leave the text unreadable. The mobile sheet nests the same block
+     one level deeper, hence the second selector — it must match the site's own
+     specificity to win the !important tie. */
+  .aflm .story-block_type_text div[data-content],
+  .aflm .story__content-inner .story-block_type_text div[data-content] {
+    background-color: var(--pk-surface-2) !important;
+    color: var(--pk-text-soft) !important;
+  }
+  .aflm .story-block_type_text div[data-content] h1,
+  .aflm .story-block_type_text div[data-content] h2,
+  .aflm .story-block_type_text div[data-content] h3,
+  .aflm .story__content-inner .story-block_type_text div[data-content] h1,
+  .aflm .story__content-inner .story-block_type_text div[data-content] h2,
+  .aflm .story__content-inner .story-block_type_text div[data-content] h3 {
+    color: var(--pk-text) !important;
+  }
+
+  /* Power-rating (super +/−) picker buttons: hover/press flash a light grey. */
+  .power-rating-modal__btn:hover,
+  .power-rating-modal__btn:active { background-color: var(--pk-border) !important; }
+
+  /* Chip lists in the search filters (tag / author / community pickers) and the sidebar
+     block dismiss control: the small action inside each chip turns pure white on hover. */
+  .items-list__item a:hover,
+  .company-blog-search-panel__item a:hover,
+  .stories-search-item a:hover,
+  .items-list__close:hover { background-color: var(--pk-border) !important; }
+  .items-list__more:hover { background-color: var(--pk-surface) !important; }
+
+  /* The "..." story menu keeps a pure-white fill on the item that opened it. */
+  .context-menu__item.story__dots_active { background-color: var(--pk-border) !important; }
+
+  /* Counter pill in the vertical menus (profile tabs) — a light-grey slab among dark
+     chrome. The `_current` variant keeps its brand-green fill. */
+  .menu__counter {
+    background-color: var(--pk-border) !important;
+    color: var(--pk-text) !important;
+  }
+
+  /* Floating "jump to comments" pill pinned to the bottom of a mobile post: a white
+     capsule carrying a --color-black-700 label, which this theme lifts light — so the
+     label vanishes on it. */
+  .ex-scroller__body { background-color: var(--pk-surface) !important; }
+
+  /* Logo/promo <img> holders that keep a white plate behind a transparent PNG. Darken
+     the CONTAINER only; the artwork is untouched. */
+  .sidebar__community-info img,
+  .profile__promocode img { background-color: var(--pk-surface-2) !important; }
+
+  /* Labels sitting on the dark-tuned semantic tints above: Pikabu's saturated mid-tones
+     fall under the WCAG floor on them, so lift the red and blue ones. (The green and
+     amber labels already clear it.) */
+  .pkb-badge_highlight { color: var(--pk-green) !important; }
+  .pkb-profile-rating-counter_red { color: #ef6a5d !important; }
+  .company-blog-badge { color: #45b6dd !important; }
 }

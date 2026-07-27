@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Neoseeker, easy-on-the-eyes walkthroughs, guides, cheats and FAQs, plus the home, game hubs, wikis, search and forums.
-@version      20260724.12.44
+@version      20260726.17.04
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -229,10 +229,13 @@
   }
 
   /* The bare `.navbar-inner` above is meant for the brand-blue HEADER bar
-     (natively #509ac6). It also caught the FOOTER bar, which the site paints
-     near-black #1b1b1b — turning it blue put our accent-blue links on blue at
-     2.4:1 ("Walkthroughs: …" strip, on every www page). Restore the site's
-     dark footer; the links then read ~7:1. */
+     (natively #509ac6). Every OTHER `.navbar-inverse` bar is painted near-black
+     #1b1b1b by the site — the page footer strip ("Walkthroughs: …", on every www
+     page) and the search page's "search for keywords:" toolbar. Turning those
+     brand-blue put our accent-blue links on blue at 2.4:1 and flew a second
+     header-coloured band mid-page. Restore the site's dark tone; the links then
+     read ~7:1. `#header-navbar`/`#memberbar` keep the blue by ID specificity. */
+  .navbar-inverse .navbar-inner,
   #footer-navbar .navbar-inner {
     background-color: var(--neo-head) !important;
     background-image: none !important;
@@ -247,6 +250,30 @@
 
   .navbar .nav > li > a:hover,
   .navbar .nav > li.active > a {
+    background-color: rgba(0, 0, 0, 0.25) !important;
+    color: #ffffff !important;
+  }
+
+  /* The site's active/hover wash above is `rgba(0,0,0,0.25)`, which reads on the
+     brand-blue bar but is a 3-unit shift on the bars we keep near-black — the
+     profile's current tab in the Profile/Blog/Gallery/… strip (`#user_links`,
+     a `navbar-inverse`) then shows NO indicator at all. Give those the accent
+     chip the rest of the theme's tabs use; `#header-navbar` re-asserts the wash
+     by ID because a blue chip would vanish on its blue bar. */
+  .navbar-inverse .nav > li.active > a,
+  #memberbar .nav > li.active > a {
+    background-color: var(--neo-blue) !important;
+    color: #ffffff !important;
+  }
+
+  .navbar-inverse .nav > li > a:hover,
+  #memberbar .nav > li > a:hover {
+    background-color: var(--neo-elev2) !important;
+    color: #ffffff !important;
+  }
+
+  #header-navbar .nav > li.active > a,
+  #header-navbar .nav > li > a:hover {
     background-color: rgba(0, 0, 0, 0.25) !important;
     color: #ffffff !important;
   }
@@ -623,6 +650,15 @@
     color: #6fbf73 !important;
   }
 
+  /* The 404 page prints the missing path in red (`span.location`, #ba0000) to
+     single it out of the sentence — the generic `span` text rule flattened it to
+     plain body grey, so "The document (/foo) you were searching for…" lost its
+     only emphasis. #ba0000 is 2.1:1 on our base, so remap to the theme's red. */
+  span.location,
+  #error span.location {
+    color: #f08b80 !important;
+  }
+
   /* The game-hub / news feed marks a live-blogged story with an ORANGE
      `span.news_update` ("Update — Show's over, folks", #f89406). Our generic
      `span` text rule greyed it, so the marker read as ordinary bold body copy.
@@ -693,6 +729,24 @@
   .label a,
   .label a:link,
   .label a:visited {
+    color: #ffffff !important;
+  }
+
+  /* Review score chips. The site fills them by band (`rating-good` translucent
+     green, `rating-decent` amber, `rating-bad` red) and prints the digits WHITE.
+     The large ones are `<div>`s and kept it; the small ones beside them are
+     `<span>`s, so the generic `span` text rule greyed those to #c4cdd6 (~3.6:1 on
+     the green fill) — the same score line rendered white in the summary circle
+     and grey in every teaser next to it. Put the white back on the filled chips
+     only: a BARE `.rating` is a transparent thumbs-up counter whose accent-blue
+     link colour must survive. */
+  .rating.rating-good,
+  .rating.rating-decent,
+  .rating.rating-bad,
+  .meta-review-score,
+  .meta-review-score.rating-good,
+  .meta-review-score.rating-decent,
+  .meta-review-score.rating-bad {
     color: #ffffff !important;
   }
 
@@ -1313,6 +1367,22 @@
     color: #e6edf3 !important;
   }
 
+  /* The NeoLove bar labels its value with an `i.icon-heart.text-important`. Our
+     `.text-important` remap (salmon #f08b80, tuned for the dark page) lands it on
+     the green bar fill above at 2.66:1 — two of our own remaps colliding. Lift the
+     heart so it keeps the warm hue and reads (~5:1). */
+  .percentage_bar .text-important,
+  .percentage_bar i.icon-heart {
+    color: #ffdad6 !important;
+  }
+
+  /* The rank-change arrows are the site's own #5bb75b / #da4f49. The green passes
+     on both row tints; the red is 3.58:1 on the alternating `entry_alt` row. Use
+     the theme's red, which keeps the down-signal and reads ~5.5:1. */
+  #community .rank i.icon-arrow-down {
+    color: #f08b80 !important;
+  }
+
   #stats_total_member,
   #stats_total_online_member,
   #stats_total_online_guests,
@@ -1902,6 +1972,75 @@
   #mw-content-text .section-info .section-header center,
   #mw-content-text .section-info .section-header * {
     color: var(--neo-text) !important;
+  }
+
+  /* ---- Google Programmable Search (forum search results) ----
+     `/forums/search.php` renders its whole result list through an embedded
+     Google CSE (`div#___gcse_0`) in the MAIN document, under Google's own
+     `gsc-`/`gs-` class vocabulary that none of the card/section selectors reach.
+     It shipped a full-width WHITE panel with ten white result cards, near-black
+     `.gs-visibleUrl` / `.gs-snippet` text and a white pager — the single
+     brightest surface left in the theme. `!important` beats the CSE's own
+     (un-important) injected stylesheet. */
+  .gsc-control-cse {
+    background-color: transparent !important;
+    border-color: var(--neo-border) !important;
+  }
+
+  .gsc-webResult.gsc-result,
+  .gsc-input-box,
+  .gsc-tabHeader,
+  .gsc-cursor-page,
+  .gssb_c,
+  .gssb_e {
+    background-color: var(--neo-elev) !important;
+    border-color: var(--neo-border) !important;
+  }
+
+  .gsc-webResult.gsc-result:hover {
+    background-color: var(--neo-elev2) !important;
+    border-color: var(--neo-border) !important;
+  }
+
+  .gsc-input-box {
+    background-color: #0f141a !important;
+  }
+
+  .gs-snippet,
+  .gsc-cursor,
+  .gsc-cursor-page,
+  .gsc-tabHeader,
+  .gsst_b,
+  .gs-per-result-labels {
+    color: var(--neo-text-2) !important;
+  }
+
+  .gs-visibleUrl,
+  .gsc-result-info,
+  .gcsc-more-maybe-branding-root {
+    color: var(--neo-muted) !important;
+  }
+
+  /* `.gs-title` and the "Search … on Google" footer keep Google's #1a0dab /
+     #1558d6 link blues, which are 1.5:1 dark-on-dark here. The footer prints them
+     on plain `<span>`s inside the anchor, so name the descendants too. */
+  .gs-title,
+  div.gs-title,
+  .gcsc-find-more-on-google,
+  .gcsc-find-more-on-google-text,
+  .gcsc-find-more-on-google-query,
+  .gcsc-find-more-on-google-root {
+    color: var(--neo-link) !important;
+  }
+
+  /* current tab / current results page: the CSE marks both with a bare colour
+     swap our light text erases, so give them the same accent chip the site's own
+     pagination gets. */
+  .gsc-tabHeader.gsc-tabhActive,
+  .gsc-cursor-page.gsc-cursor-current-page {
+    background-color: var(--neo-blue) !important;
+    border-color: var(--neo-border) !important;
+    color: #ffffff !important;
   }
 
   /* ---- Footer ----------------------------------------------- */
