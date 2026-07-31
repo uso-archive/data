@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for DaFont. Browse fonts late at night without the  glare: the homepage, font categories, search, font pages and author pages all get an  easy-on-the-eyes dark look.
-@version      20260726.17.00
+@version      20260730.14.12
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -168,6 +168,21 @@
   div[style*="border-left:5px solid #ddd"] {
     background: #1c2128 !important;
   }
+  /* Option-bar <select> caret: DaFont hides the native arrow (`-webkit/-moz-appearance:
+     none` on `.perso select`) and draws its own as a background raster — `/img/dropdown.gif`,
+     a PURE-BLACK 9x5 triangle (measured mean luminance 0, i.e. 1.3:1 on our dark control),
+     swapped on :hover for `/img/dropdown_hover2.png`, a fully opaque 17x20 LIGHT tile
+     (mean 208) that glares at the field's edge. Both are background-IMAGES sitting on a
+     correctly dark background-color, so every colour scan reads the select as clean.
+     Redraw the same caret in CSS, in both states. */
+  .perso select, .perso select:hover {
+    background-image:
+      linear-gradient(45deg, transparent 50%, #c4cdd6 50%),
+      linear-gradient(135deg, #c4cdd6 50%, transparent 50%) !important;
+    background-position: right 8px top 50%, right 4px top 50% !important;
+    background-size: 4px 4px !important;
+    background-repeat: no-repeat !important;
+  }
   /* Listing option-bar checkbox pill ("Show variants") — DaFont wraps it in a
      hardcoded light-grey (#ebebeb) .form_elt_bg box. Left alone it glares on the
      dark bar AND our light `label` color turns the caption light-on-light. Raise
@@ -202,7 +217,9 @@
   /* The forum adds five more of the same kind: the previous-page arrow (the twin of
      page_suivante, measured mean luminance 41), the skip-to-topic chevrons (42), the
      post "Quote" speech bubble (0) and the "Back to the list" arrow (0). Leaving them
-     out shipped a bright white NEXT arrow beside a near-invisible PREVIOUS one. */
+     out shipped a bright white NEXT arrow beside a near-invisible PREVIOUS one.
+     copy.png (0) is the glyph-browser "Copy glyph" icon, which sits on our own dark
+     button rather than the light UA one it was drawn for. */
   img[src*="/img/dropdown.gif"],
   img[src*="/img/page_suivante.gif"],
   img[src*="/img/page_precedente.gif"],
@@ -212,8 +229,58 @@
   img[src*="/img/quote.gif"],
   img[src*="/img/quote.png"],
   img[src*="/img/goto.gif"],
+  img[src*="/img/copy.png"],
   img[src*="/img/out3_black.gif"] {
     filter: invert(1) !important;
+  }
+
+  /* ---- Glyph browser (`<font>.charmap` — the "View all glyphs (N)" page) ---- */
+  /* A page served by its own stylesheet (`charmap.css`) and left entirely unthemed.
+     Every glyph is a <canvas> painted with a PURE-BLACK outline on a transparent
+     bitmap (measured mean luminance 0), so all N cells render as invisible black-on-
+     dark shapes. Canvas art is pixels: no colour scan can see it. Invert it like the
+     preview/charmap rasters above — `invert()` leaves alpha alone, so the transparent
+     cell background is untouched and only the glyph flips to light. */
+  .item canvas, #glyph-display canvas {
+    filter: invert(0.92) !important;
+  }
+  /* Cell hover and the open ("selected") cell are both `#f8f9f9` — a solid white tile
+     on the dark grid, and both are states no load-time scan ever reaches. DaFont
+     paints the two identically, so keep them identical here too. */
+  .item:hover, .item.selected {
+    background-color: #21262d !important;
+  }
+  /* Clicking a glyph opens `#glyph-full`: a full-width 230px `background-color:white`
+     bottom sheet (the `div.sticky2{background:yellow}` on the same element loses on
+     specificity). It carries a LIGHT `#CCC` drop shadow as its only separator, and its
+     text is classless divs under DaFont's base `div {color:#000}`. */
+  #glyph-full {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+    border-top: 1px solid #2d333b !important;
+    box-shadow: 0 -5px 10px -6px #000 !important;
+  }
+  #glyph-full div, #glyph-full span { color: #c4cdd6 !important; }
+  /* The sheet's ✖ close button carries a JS-written inline `background:rgb(255,255,255)`
+     — invisible on the white panel it was drawn for, a grey slab under our own light ✖
+     on dark. The safety net at the end of this sheet matches the literal `#fff`, not the
+     rgb() form the DOM ends up with, so it never reaches this one. */
+  #glyph-hide { background: transparent !important; }
+  /* The "Copied!" confirmation is `color:grey` — 4.1:1 on that sheet. */
+  #infoGlyph_copy { color: #8b949e !important; }
+  /* Page pills (only built for fonts over 3000 glyphs) are bare <div>s, so the base
+     `div {color:#000}` leaves them black on dark, and the blanket border reset above
+     greys out the `1px solid #c00` ring that is their whole hover affordance. */
+  .charmapPage_button { color: #c4cdd6 !important; }
+  .charmapPage_button:hover {
+    color: #e6edf3 !important;
+    border-color: #b3322f !important;
+  }
+  /* The font-parsing spinner is a `#f3f3f3` ring with a `#444` head — the border reset
+     paints both `#2d333b`, leaving it spinning with nothing to see. */
+  #loader {
+    border-color: #2d333b !important;
+    border-top-color: #8b949e !important;
   }
 
   /* ---- Download box + button ---- */

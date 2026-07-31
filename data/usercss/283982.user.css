@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260726.17.05
+@version      20260730.14.16
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -498,6 +498,26 @@
     background-color: var(--d-header) !important;
   }
 
+  /* HEADER CAMPAIGN BANNER — seasonal widgets (the Black-Friday counter, …)
+     hang their artwork on a header-width div as an INLINE background-image
+     PNG, and the top band of that artwork is white padding drawn to melt into
+     the white header. The main-nav row sits over that band but is inset 24px
+     inside the header, so once we darken the bar the padding surfaces as two
+     ~24x25 white blocks flanking the row. It is raster paint: nothing
+     hit-tests there and no element-background audit can see it.
+
+     Redraw the band in the header colour with an inset shadow — inset shadows
+     paint over the background image and under the content, so the banner text
+     and CTA are untouched. 25px is exactly where the nav row ends, so the
+     band's bottom edge lands on the row's, with no dark line across the art.
+
+     Keyed on the inline background-image rather than the campaign's hashed
+     class, so it survives the artwork rotating; a campaign that ships a dark
+     background keeps its own art everywhere the header does not overlap. */
+  [data-widget="header"] > div[style*="background-image"] {
+    box-shadow: inset 0 25px 0 var(--d-header) !important;
+  }
+
   /* MAIN-NAV ROW (data-widget="horizontalMenu") — Ozon renders each
      item's colour as an INLINE style, server-driven per item: the
      ordinary entries get `color:rgba(0, 26, 51, 0.6)` (dark navy,
@@ -506,7 +526,15 @@
      blanket `[data-widget="horizontalMenu"] a { color }` would erase
      the teal along with the navy.
 
-     Match the navy inline value literally, so only those items lift.
+     Match the navy inline value literally, so only those items lift — in BOTH
+     serialisations. Ozon's server-rendered markup ships the value minified
+     (`color:rgba(0, 26, 51, 0.6)`), but as soon as Vue re-renders the header
+     client-side (apply a filter on a category page and it happens immediately)
+     it re-writes the same declaration through the CSSOM, which serialises with
+     a space after the colon. A single-form attribute-substring match therefore
+     stops matching mid-session and the ENTIRE main-nav row drops back to navy
+     on the near-black bar — invisible. Both literals are needed.
+
      The glyphs then need `color: inherit` — Ozon paints them
      `fill: currentColor` but pins that currentColor with its OWN
      literal navy class rule, so they do not follow the item's colour
@@ -514,7 +542,8 @@
      every `… a svg` rule structurally missed, leaving its briefcase
      dark-on-dark) AND leaves the Ozon-fresh leaf teal, because it
      inherits that item's teal. No brand special-case needed. */
-  [data-widget="horizontalMenu"] [style*="color:rgba(0, 26, 51, 0.6)"] {
+  [data-widget="horizontalMenu"] [style*="color:rgba(0, 26, 51, 0.6)"],
+  [data-widget="horizontalMenu"] [style*="color: rgba(0, 26, 51, 0.6)"] {
     color: var(--d-text) !important;
   }
   [data-widget="horizontalMenu"] a svg,
@@ -544,9 +573,17 @@
     background-color: var(--d-surface) !important;
     border-color: var(--d-border) !important;
   }
+  /* The row's overflow toggle ("Еще") is a <button>, not an <a>, and the site pins
+     it at a literal rgb(7,7,7) outside the token system. Its LABEL is a <span> and
+     so was already lifted — but the chevron beside it is `fill="currentColor"`, so
+     it kept inheriting the button's near-black and rendered as an all-but-invisible
+     glyph on the bar. The label reading fine is exactly what hides this: nothing
+     looks broken until you crop the 24px chevron. Lift the button itself and the
+     glyph follows. */
   [data-widget="horizontalCategoryMenu"] a,
   [data-widget="horizontalCategoryMenu"] li,
-  [data-widget="horizontalCategoryMenu"] span {
+  [data-widget="horizontalCategoryMenu"] span,
+  [data-widget="horizontalCategoryMenu"] button {
     color: var(--d-text-2) !important;
   }
   [data-widget="horizontalCategoryMenu"] a:hover,
@@ -554,6 +591,25 @@
   [data-widget="horizontalCategoryMenu"] li:hover,
   [data-widget="horizontalCategoryMenu"] a[aria-current],
   [data-widget="horizontalCategoryMenu"] a[aria-current] span {
+    color: var(--d-text) !important;
+  }
+
+  /* ------------------------------------------------------------
+     CATEGORY TILE ROWS (data-widget="objectLine") — the illustrated
+     shortcut tiles on the Ozon Fresh landing ("Продукты Ozon fresh",
+     "Готовая еда", "Овощи, фрукты, зелень" …) and the same widget wherever
+     else it appears. The tile art is a CDN jpeg with its own light ground,
+     but the CAPTION under it sits on the page canvas and is painted a literal
+     rgb(7,7,7) by the tile component — outside the token system, so the
+     :root remap never reaches it. Thirty-five captions render near-black on
+     near-black: the row reads as a strip of pictures with no labels at all.
+
+     Scoped to the caption's typography class rather than a blanket on the
+     anchor: every other div inside these tiles is an empty wrapper inheriting
+     the action blue, and repainting those would strip currentColor from any
+     glyph they carry. Measured live, this selector matches the 35 captions and
+     nothing that was carrying a colour of its own. ------------------------ */
+  [data-widget="objectLine"] a [class*="tsBody"] {
     color: var(--d-text) !important;
   }
 
@@ -643,6 +699,19 @@
   input[role="combobox"][name="filter"] {
     background-color: transparent !important;
   }
+  /* SEARCH-RESULTS SORT CONTROL ("Популярные" / "Сначала дешёвые" …). The
+     control is a readonly text <input> that fills the full height of a 230px
+     shell the site outlines with its own 1px inset ring
+     (rgba(204,214,228,.6) — native, not ours) and leaves the last 44px for the
+     chevron. The input is natively TRANSPARENT; our generic text-input
+     background paints it opaque, which covers the ring's left, top and bottom
+     edges and renders the control as a half-drawn outline hugging the chevron.
+     Element-background audits pass — every colour involved is a legitimate
+     dark — and only the pixels show it. The shell already carries the elevated
+     surface, so hand the input its native transparency back. */
+  [data-widget="searchResultsSort"] input {
+    background-color: transparent !important;
+  }
 
   /* ============================================================
      PRODUCT TILES / CARDS  (.tile-root, tileGridDesktop)
@@ -658,19 +727,31 @@
   [data-widget="tileGridDesktop"] .tile-root {
     background-color: var(--d-surface) !important;
     border-color: var(--d-border) !important;
+  }
 
-    /* DISCOUNT pill + its scroll-fade. Ozon renders the "−NN%" badge
-       with an INLINE `background: var(--bgLightKey)` and prepends a
-       6px fade div carrying an inline
-       `background: linear-gradient(to right, transparent, var(--bgLightKey))`
-       that masks the strikethrough price as it scrolls under the badge.
-       --bgLightKey is literal #fff, so on dark the badge sat on a white
-       pill and the fade rendered as a bright bar across the price row.
-       A `background-color: transparent` override cannot clear the fade
-       (it is a background-IMAGE) — element-bg audits pass clean while
-       the bar glares. Rebinding the token on the card makes BOTH the
-       pill and its gradient resolve to the card surface, and leaves the
-       pink --textAccent badge text reading on dark. */
+  /* DISCOUNT pill + its scroll-fade, and the cart line-item image plate. Ozon
+     renders the "−NN%" badge with an INLINE `background: var(--bgLightKey)` and
+     prepends a 6px fade div carrying an inline
+     `background: linear-gradient(to right, transparent, var(--bgLightKey))`
+     that masks the strikethrough price as it scrolls under the badge.
+     --bgLightKey is literal #fff, so on dark the badge sat on a white pill and
+     the fade rendered as a bright bar across the price row. A
+     `background-color: transparent` override cannot clear the fade (it is a
+     background-IMAGE) — element-bg audits pass clean while the bar glares.
+
+     Keyed on the INLINE DECLARATION, not on a container. The same badge+fade
+     pair ships in every product surface — tile grids, PDP shelves, AND the cart
+     line items, which are not .tile-root — so a card-scoped rebind covers only
+     the one component it was written against and the cart shipped two white bars
+     per price row. Both serialisations carry the identical `var(--bgLightKey)`
+     substring, so one match covers server-rendered and CSSOM-rewritten markup.
+
+     The token must NOT be rebound at :root: the shared button component also
+     reads it as `--hover-background-color`, where it is a 10%-opacity WHITE veil
+     that LIGHTENS a button on hover (Каталог, tile CTAs, review-helpful votes,
+     the cookie bubble …). A dark value there is a 10% veil of the surface colour
+     over the surface colour, i.e. no hover feedback at all, site-wide. */
+  [style*="var(--bgLightKey)"] {
     --bgLightKey: var(--d-surface) !important;
   }
   .tile-root span,
@@ -765,19 +846,24 @@
     margin: -2px -8px;
   }
 
-  /* PDP title truncation "…ещё" pill (span.pdp_h5b) + its sibling rating
-     background both ship `background: var(--graphicLightKey)` = literal #fff,
-     so they render a WHITE box on the dark title. --graphicLightKey is NOT
-     remapped at :root on purpose: it is a CONTEXT-named "light key" the site
-     also uses as `color:`/`--icon-color`/`--loader-color` for WHITE text and
-     glyphs on dark/coloured grounds (the .b5_7_0-a5 story labels, loaders,
-     icons). A :root lift would flip all of those dark-on-dark. So rebind only
-     the two BACKGROUND uses here to the page canvas — an opaque pill that
-     masks the clamped text edge and blends seamlessly, matching the native
-     white-on-white (invisible) pill. */
-  span.pdp_h5b,
-  .pdp_ar3 .pdp_r4a .pdp_ar5.pdp_a5r {
-    background: var(--d-bg) !important;
+  /* PDP title truncation "…ещё" pill ships `background: var(--graphicLightKey)`
+     = literal #fff, so it renders a WHITE box on the dark product title.
+     --graphicLightKey is NOT remapped at :root on purpose: it is a CONTEXT-named
+     "light key" the site also uses as `color:`/`--icon-color`/`--loader-color`
+     for WHITE text and glyphs on dark/coloured grounds (the .b5_7_0-a5 story
+     labels, loaders, icons). A :root lift would flip all of those dark-on-dark.
+     So rebind the token inside the heading widget only, where its single use is
+     this pill's background: an opaque pill that masks the clamped text edge and
+     blends into the canvas, matching the native white-on-white (invisible) pill.
+
+     Rebinding the TOKEN rather than naming the pill matters: the pill used to be
+     reachable as `span.pdp_h5b`, but Ozon has since moved the white background
+     one level in, onto an inner `span.pdp_b6h` while `pdp_h5b` became a plain
+     DIV wrapper — so the class-keyed rule silently stopped matching and the
+     white box came back on every truncated-title product page. The token is the
+     one handle in this component that does not rotate with the build. */
+  [data-widget="webProductHeading"] {
+    --graphicLightKey: var(--d-bg) !important;
   }
 
   /* MAIN CTA BUTTON (В корзину) — a genuine brand-coloured button; keep
@@ -792,16 +878,68 @@
 
   /* Review tiles (pinnedReview / webReviewGallery / bigPromoPDP) ship a
      white card surface; drop it so they sit on the page canvas. Their
-     text is token-coloured and needs no override. */
+     text is token-coloured and needs no override.
+
+     Same INLINE-BACKGROUND guard as the PDP grid and gallery resets, and for the
+     same reason. webReviewTabs is not just the review cards: Ozon nests a whole
+     product shelf (skuGrid of .tile-root tiles) inside it, and every tile badge
+     paints its fill with an inline `background: rgb(...)` — the pink
+     "Распродажа", the violet "N баллов за отзыв", the black "Вау-цены". The
+     unguarded reset outranked those inline declarations and left ten pills as
+     bare white labels floating on the tile, while the IDENTICAL tiles in the
+     shelf above them (outside the review widget) kept their pink. Flattened
+     brand fills pass every contrast and DOM check — only a native-vs-themed
+     colour diff sees them. Never flatten a background Ozon asked for inline. */
   [data-widget="pinnedReview"],
-  [data-widget="pinnedReview"] div,
+  [data-widget="pinnedReview"] div:not([style*="background"]),
   [data-widget="webReviewGallery"],
-  [data-widget="webReviewGallery"] div,
-  [data-widget="webReviewProductScore"] div,
-  [data-widget="webReviewTabs"] div,
+  [data-widget="webReviewGallery"] div:not([style*="background"]),
+  [data-widget="webReviewProductScore"] div:not([style*="background"]),
+  [data-widget="webReviewTabs"] div:not([style*="background"]),
   [data-widget="bigPromoPDP"],
-  [data-widget="bigPromoPDP"] div {
+  [data-widget="bigPromoPDP"] div:not([style*="background"]) {
     background-color: transparent !important;
+  }
+  /* PINNED-REVIEW CLAMP FADE — the pinned review card clamps its body copy and
+     fades the last two lines out under a 50px-tall ::after carrying
+     `linear-gradient(0deg, rgb(235,239,245), transparent)`. The stop is a
+     hardcoded near-white literal, outside the token system, so nothing above
+     reaches it: on dark it washes the bottom third of the card pale grey and
+     takes the final lines of the review with it. It is a background-IMAGE on a
+     PSEUDO, so both the element-bg reset above and any element walk pass clean.
+     Measured live, this is the ONLY rendered pseudo anywhere in the widget, so
+     re-aiming the widget's ::after gradient hits the fade and nothing else. The
+     card is transparent on the page canvas, so the fade ends at the base. */
+  [data-widget="pinnedReview"] *::after {
+    background-image: linear-gradient(
+      0deg,
+      var(--d-bg),
+      rgba(20, 24, 29, 0)
+    ) !important;
+  }
+  /* "+N" MORE-PHOTOS OVERLAY on the last thumbnail of a review's photo strip.
+     Natively an rgba(255,255,255,.8) veil over the whole tile carrying a big blue
+     count — "there are N more photos here". It carries no inline background, so
+     the reset above (correctly) clears it, leaving the count as bare #005bff text
+     directly on the photo: ~2.9:1, no plate, and the "more" affordance gone. Give
+     it the dark-side equivalent — a near-black veil with a white count — mirroring
+     what the video-timecode scrim does two rules down. `:not([style])` keeps the
+     inline-styled timecode pill in the same button family untouched. */
+  [data-widget="webListReviews"] button[aria-label="Открыть галерею"] > div:not([style]) {
+    background-color: rgba(7, 7, 7, 0.64) !important;
+    color: #ffffff !important;
+  }
+  /* REVIEW-LIST ACTION TEXT that is not an <a>: the "Читать полностью" expander on
+     every clamped review, and the "+N" photo count, both colour themselves with
+     `color: var(--bgActionPrimary)` — a token NAMED for the blue CTA fill but
+     reused here as text. It stays the raw #005bff, ~2.9:1 on the base, sitting
+     right beside the review's own links which the rule above lifts to #2e78ff:
+     the same widget shipping two different blues, one of them below the WCAG
+     floor. --bgActionPrimary cannot be lifted at :root (17 of its uses are button
+     FILLS, where white-on-#2e78ff drops to 3.4:1), so rebind it inside this widget
+     only — measured live, it repaints exactly these text uses and no fill. */
+  [data-widget="webListReviews"] {
+    --bgActionPrimary: var(--d-blue) !important;
   }
   /* REVIEW RATING HISTOGRAM ("5 звёзд … 1 звезда" bars): the webReviewTabs
      `div { transparent }` reset above flattens BOTH the grey track and the gold
@@ -1077,8 +1215,15 @@
      gallery reset above (correctly) stops flattening inline fills, but this one
      is a LIGHT plate: kept as-is it glares as a white-green tile on the dark PDP.
      Invert it instead of erasing it — the theme's own positive-secondary tint with
-     the green lifted to our scale keeps the "new" signal and reads at ~7:1. */
-  [data-widget="webMarketingLabels"] div[style*="#E4FDEC"] {
+     the green lifted to our scale keeps the "new" signal and reads at ~7:1.
+
+     Both hex literals are matched in their rgb() form too, for the same reason the
+     horizontal-menu navy is: Ozon's server-rendered markup carries the author's
+     hex, but a client-side re-render re-writes the declaration through the CSSOM,
+     which serialises every colour as rgb(). A hex-only attribute-substring match
+     silently stops matching the moment the component re-renders. */
+  [data-widget="webMarketingLabels"] div[style*="#E4FDEC"],
+  [data-widget="webMarketingLabels"] div[style*="rgb(228, 253, 236)"] {
     background: var(--bgOpaquePositiveSecondary) !important;
     color: var(--d-green) !important;
   }
@@ -1088,7 +1233,8 @@
      reached it. It sits directly beside the "Скидка от 2 ед" chip, which DOES use the
      token and is correctly dark — the pair shipped half-inverted, one dark pill and one
      pale-lilac tile glaring over the dark gallery. Invert it to match its sibling. */
-  [data-widget="webMarketingLabels"] div[style*="#F2F1FC"] {
+  [data-widget="webMarketingLabels"] div[style*="#F2F1FC"],
+  [data-widget="webMarketingLabels"] div[style*="rgb(242, 241, 252)"] {
     background: var(--bgOpaqueMarketingSecondary) !important;
     color: var(--textMarketing) !important;
   }

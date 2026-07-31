@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260726.17.08
+@version      20260730.14.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -418,12 +418,18 @@
      a different hook from the LEGACY header's LocationsUpsell card handled far
      below. Our text rules lift its title/subtitle to light, so on the pale-blue
      fill it rendered light-on-light (~1.5:1) and the CTA nearly vanished on the
-     otherwise-dark dropdown. Darken the LIGHT brand tints (50/100/200) to the
-     elevated surface so the lifted copy reads; the SATURATED brand blues
-     (bg-brand-400+) are real CTAs and are left untouched. */
+     otherwise-dark dropdown. Darken the PALE brand tints to the elevated surface so the
+     lifted copy reads; the SATURATED brand blues are real fills and are left untouched.
+     The pale tints are --color-brand-50 / -100 (#cbdef0) plus the alpha variants Tailwind
+     compiles from them: `bg-brand-100/30` is a 30% veil whose class TOKEN is literally
+     `bg-brand-100/30`, so the plain `.bg-brand-100` class selector does not match it --
+     hence the substring form. --color-brand-200 is NOT a tint: it is #679ced, the same
+     mid-blue weather.com fills the Hourly wind-gust pills with (under white text), so
+     collapsing it to grey erased a real fill; it now keeps its own colour like -300/-400
+     do, and whichever label utility the site puts on it stays readable. */
   .bg-brand-50,
   .bg-brand-100,
-  .bg-brand-200 {
+  [class*="bg-brand-100/"] {
     background-color: var(--wx-surface-2) !important;
   }
   /* translucent white veils used as gradient/scrim fills over photos */
@@ -722,6 +728,33 @@
   .text-brand-dark,
   .text-brand-400 {
     color: var(--wx-text) !important;
+  }
+  /* the design system's ACCENT is a third brand token, --color-brand-active (#1b4de4),
+     and the mobile header's language/units control ("globe US | °F v") is the one place
+     that paints with all three of its hooks at once: `text-brand-active` on the <button>,
+     `border-l-brand-active` on the hairline before °F, `fill-brand-active` on the globe.
+     Two of the three were flattened, so the control rendered half-blue, half-grey:
+     - our own `button { color: inherit }` is UNLAYERED, and an unlayered normal
+       declaration outranks a declaration inside Tailwind's utilities cascade layer no
+       matter the specificity -- so the button, and the "US"/"°F" spans inheriting from
+       it, took the
+       page's body grey, while the globe and chevron <svg>s (not buttons) kept the blue.
+     - the hairline took the blanket `* { border-color }` grey.
+     Restore all three together with the theme's link blue -- #1b4de4 itself is only
+     2.4:1 on the dark chrome. At >=768px the site swaps in neutral `md:` variants
+     (`md:text-gray-900` / `md:border-l-gray-900`) whose class tokens are present in the
+     list at EVERY width, so only the breakpoint can distinguish them: scope the accent to
+     the widths where blue is what weather.com actually paints. */
+  @media (max-width: 767px) {
+    [class*="text-brand-active"] {
+      color: var(--wx-link) !important;
+    }
+    [class*="border-l-brand-active"] {
+      border-left-color: var(--wx-link) !important;
+    }
+    [class*="fill-brand-active"] {
+      fill: var(--wx-link) !important;
+    }
   }
 
   /* ---- restore the site's own `text-white` ------------------------------- */
@@ -1085,6 +1118,78 @@
     border-color: transparent !important;
     border-bottom-color: var(--wx-surface) !important;
   }
+  /* ...but the caret the eye actually sees is the arrow's `::after` -- a second, 10px
+     triangle stacked on top of the 11px shadow one above, whose border-bottom-color is
+     #fff. `*` does not match pseudo-elements and neither does the rule above, so the
+     popover still pointed at its card with a white spike. Only one of top/bottom ever
+     has a non-zero width (the `trc_bottom` / `trc_top` variants zero the other), so
+     pinning both covers either direction without filling the box.
+     The popover's remaining chrome is light too: `trc_popover_title_wrapper` ships a
+     #f7f7f7 bar with a #ebebeb rule, and Taboola sets `color: #000` on
+     `popupContentWrapper` / `trc_popover_content_wrapper`, which are matched CHILDREN --
+     a matched rule beats the colour inherited from the popover, so the body copy stayed
+     black on our dark panel. The whole widget is `visibility: hidden` until a
+     recommendation card is hovered, so no load-time scan sees any of it. */
+  .trc_popover_arrow::after {
+    border-top-color: var(--wx-surface) !important;
+    border-bottom-color: var(--wx-surface) !important;
+  }
+  .trc_popover_title_wrapper {
+    background-color: var(--wx-surface-2) !important;
+    border-bottom-color: var(--wx-border) !important;
+  }
+  .trc_popover_title_wrapper,
+  .trc_popover_title,
+  .popupContentWrapper,
+  .trc_popover_content_wrapper,
+  .trc_popover_content {
+    color: var(--wx-text) !important;
+  }
+  /* Taboola paints a LOADING SKELETON before the feed arrives: `tbl-placeholder-card` is
+     a 125px #f6f7f9 slab, its `::before` tiles a light shimmer GIF over the same #f6f7f9,
+     and each `tbl-masker` is a #fff box that masks the slab down to the row shape THROUGH
+     ITS BORDER (`border-left: 24px solid #fff`). The spinner is display:none once the feed
+     loads, so a scan of a settled page reports clean -- but a stack of near-white cards
+     flashes below the content on every page load, and our blanket `* { border-color }` had
+     already turned the masker's white border grey, drawing a bar across each white slab.
+     Take the slab, the shimmer image and the masker's fill AND border in one pass: a
+     masker whose fill and border disagree is exactly the seam the border reset produced. */
+  .tbl-placeholder-card {
+    background-color: var(--wx-surface-2) !important;
+  }
+  .tbl-placeholder-card::before {
+    background-color: var(--wx-surface-2) !important;
+    background-image: none !important;
+  }
+  .tbl-masker {
+    background-color: var(--wx-surface-2) !important;
+    border-color: var(--wx-surface-2) !important;
+  }
+  /* the same feed's video-ad and story-widget card variants (thumbs-feed-01-*,
+     above-the-feed-premium-*, banner-on-product-*) ship four more light surfaces that
+     only exist once a card starts playing or renders its reel, so they never appear in a
+     settled DOM: `tbl-editorial-video-container` is a full-cover #fff panel parked at
+     opacity:0 and faded IN while the ad plays; `tbl-vignette-background-screen` is a #fff
+     scrim at .8; and the two `tbl-text-under-*-background` plates are #ebebeb backings
+     behind the title/branding lines -- which our `.video-title` / `.trc_el` rules already
+     lift to light, so they land light-on-light. `tbl-ui-line` is the #333 divider drawn ON
+     those plates, so it has to be lifted in the same pass or it vanishes into its new dark
+     backing. The white `.video-cta-button` pill is deliberately left alone: it sits over
+     the video thumbnail, not over our card, and Taboola pins `color: black !important` on
+     its label, so it still reads. */
+  [class*="tbl-editorial-video-container"] {
+    background-color: var(--wx-surface) !important;
+  }
+  [class*="tbl-vignette-background-screen"] {
+    background-color: var(--wx-base) !important;
+  }
+  [class*="tbl-text-under-title-background"],
+  [class*="tbl-text-under-branding-background"] {
+    background-color: var(--wx-surface-2) !important;
+  }
+  [class*="tbl-ui-line"] {
+    background-color: var(--wx-border-2) !important;
+  }
 
   /* ---- interactive radar map: floating control / insight panels --------- */
   /* The radar map's two floating cards -- the location/alert "insight" card
@@ -1129,6 +1234,24 @@
     color: #ffb900 !important;
   }
   [class*="InsightPanel--npContainer"] [class*="InsightPanel--alertsLink"] {
+    color: var(--wx-link) !important;
+  }
+  /* ...that link's own chevron is an `<svg class="InsightPanel--arrow...">`, which the
+     same broad rule matches DIRECTLY -- and a matched rule beats a colour inherited from
+     the link -- so "Read details" read blue while its arrow stayed plain light. The
+     wrapping `<span class="Icon--iconWrapper">` carries no InsightPanel class and so
+     inherits correctly; only the svg needs re-pointing (its <path> is currentColor). */
+  [class*="InsightPanel--npContainer"] [class*="InsightPanel--alertsLink"] [class*="InsightPanel--arrow"] {
+    color: var(--wx-link) !important;
+  }
+  /* the premium map layers ("24-Hour Future Radar", ...) label their unlock CTA with
+     `LayerDetail--goPremium` in the brand navy #204794 -- 2.0:1 on the dark panel, so it
+     cannot stay -- and the broad ControlPanel/LayerDetail text rule flattened it to plain
+     light, which left the only sign-in affordance in the layer list reading as body copy.
+     Give it the link accent instead of the generic lift -- via its `textBlock` parent,
+     because that broad rule carries two `:not()`s and so sits at (0,1,2): a single-class
+     override loses the tie and never paints. */
+  [class*="LayerDetail--textBlock"] [class*="LayerDetail--goPremium"] {
     color: var(--wx-link) !important;
   }
 

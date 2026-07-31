@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Weather Underground. Darkens forecasts, hourly and 10-day pages and data tables while keeping radar, maps and weather icons intact.
-@version      20260726.17.09
+@version      20260730.14.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -1010,6 +1010,44 @@
   .mobile-wundermap-wrapper .items-list li:nth-child(5) {
     border-left-color: #15aadc !important;
   }
+  /* Below the desktop breakpoint the whole rail collapses into
+     `.mobile-wundermap-wrapper`, a component none of the desktop wundermap
+     selectors above reach. Two separate faults, both mobile-only:
+
+     (a) its collapsed header `.menu-title` is a #f7f7f7 bar floating over the
+         map -- a full-width white slab. Its label, the "..." `::before` and the
+         open/close caret `::after` (a CSS triangle whose colour lives in
+         border-color, so the blanket `*` reset never touched it) are all WU's
+         dim teal #006f9e, ~2.9:1 once the bar is dark. */
+  .mobile-wundermap-wrapper .menu-title {
+    background: var(--wu-surface) !important;
+    color: var(--wu-link) !important;
+  }
+  .mobile-wundermap-wrapper .menu-title::before {
+    color: var(--wu-link) !important;
+  }
+  .mobile-wundermap-wrapper .menu-title::after {
+    border-top-color: var(--wu-link) !important;
+    border-bottom-color: var(--wu-link) !important;
+  }
+  /* (b) every layer row in the open panel keeps the near-black text WU wrote for
+         its light mobile panel (`.layerTitle` #1e2023, `.selected` #4c4c4c) --
+         and its inner .layerName / .opacity-title / .slideroutput inherit it. We
+         darkened the panel and never lifted them, so "Weather Stations",
+         "Temperature / Wind" and every checkbox label render at ~1.1:1: the
+         panel looks like a column of unlabelled checkboxes. The DESKTOP panel is
+         natively light (#fff/#ddd), so this stays scoped to the mobile wrapper. */
+  .mobile-wundermap-wrapper .layerTitle,
+  .mobile-wundermap-wrapper .layerName,
+  .mobile-wundermap-wrapper .opacity-title,
+  .mobile-wundermap-wrapper .slideroutput,
+  .mobile-wundermap-wrapper .layerTitle input {
+    color: var(--wu-text-2) !important;
+  }
+  .mobile-wundermap-wrapper .layerTitle.selected,
+  .mobile-wundermap-wrapper .layerTitle.selected .layerName {
+    color: var(--wu-text) !important;
+  }
 
   /* ---- station selector ("CHANGE" next to the city name) ---------------- */
   /* Click-gated, so no load-time scan sees it. Each row paints #fff on THREE
@@ -1076,6 +1114,27 @@
     background-color: var(--wu-surface-2) !important;
     color: var(--wu-text) !important;
   }
+  /* WU paints the hover fill on the ROW ANCHOR, not the <li>: `.ui-autocomplete
+     a:hover / .mimic-a:hover / a.ui-state-hover / a.ui-state-focus` all set
+     #f7f7f7. Darkening the li leaves that white strip on top of it, so the
+     result-row you are pointing at is a white band carrying our light link text
+     (~1.5:1) -- the one row you cannot read. Hover-gated, so no load-time scan
+     reaches it. The same anchors back the favourites-list/-mobile panels, which
+     share WU's rule; cover the whole family. */
+  .ui-autocomplete li:hover > a,
+  .ui-autocomplete li:hover > .mimic-a,
+  .ui-autocomplete a:hover,
+  .ui-autocomplete .mimic-a:hover,
+  .ui-autocomplete a.ui-state-hover,
+  .ui-autocomplete a.ui-state-focus,
+  .ui-autocomplete .mimic-a.ui-state-hover,
+  .ui-autocomplete .mimic-a.ui-state-focus,
+  .favorites-list ul a:hover,
+  .favorites-list ul .mimic-a:hover,
+  .favorites-mobile ul a:hover,
+  .favorites-mobile ul .mimic-a:hover {
+    background-color: var(--wu-surface-2) !important;
+  }
   .ui-autocomplete .ui-autocomplete-category {
     color: var(--wu-text-muted) !important;
     background-color: var(--wu-chrome) !important;
@@ -1124,6 +1183,15 @@
     background-color: var(--wu-surface-2) !important;
     color: var(--wu-text) !important;
   }
+  /* On mobile the "you are here" marker is a 3px TOP border on the selected
+     anchor (`.tab-layout .subnav-mobile a.selected { border-top-color }`), the
+     counterpart of the desktop tab's coloured `::after` bar. The blanket `*`
+     reset flattens it to the generic line colour, so the bar goes dead. Match
+     the accent the desktop underline already uses. */
+  #subnav-mobile li.selected > a.selected,
+  #subnav-mobile a.selected {
+    border-top-color: var(--wu-link) !important;
+  }
   /* the overflow scroll chevrons that cap the bar are their own #fff chips */
   .subnav-arrow,
   .subnav-arrow-left,
@@ -1151,22 +1219,31 @@
     background-color: var(--wu-surface) !important;
     color: var(--wu-text-2) !important;
   }
-  /* The °F/°C segmented toggle (header gear pane AND the wundermap Settings
-     pane) marks the ACTIVE unit with nothing but a 3px border -- #bdbdbd on the
-     selected half, #ffffff on the other. The blanket `*` reset flattened both to
-     one line colour, so neither pane showed which unit was in use. On the
+  /* The °F/°C segmented toggle marks the ACTIVE unit with nothing but a 3px
+     border, and WU ships it in THREE places that each need the same treatment:
+     the header gear pane and the wundermap Settings pane (both `.button-group`,
+     #bdbdbd on the selected half and #ffffff on the other) and the mobile
+     sidenav's `.button-group-dark`, where selected is a recessed #333 with a
+     #19aadb label and unselected a raised #696969 with a white one. The blanket
+     `*` reset flattens every one of those borders to a single line colour and
+     the generic `.button` brand rule then fills BOTH halves the same cyan, so
+     none of the three panes showed which unit was in use -- on the mobile one
+     the only surviving cue was a cyan focus ring on a cyan button. On the
      wundermap WU also keeps a white fill on both halves with its own
      `!important`, so the `.button` white label rule left the °F/°C glyphs
-     invisible on white. Both panes are click-gated: no load-time scan sees
-     either. Give the toggle an explicit dark/selected pair. */
+     invisible on white. All three are click-gated: no load-time scan sees any of
+     them. Give the toggle one explicit dark/selected pair everywhere. */
   #wuSettings-quick .button-group .button,
-  .button-group.unit_settings .button {
+  .button-group.unit_settings .button,
+  .button-group-dark .button {
     background-color: var(--wu-surface-2) !important;
     color: var(--wu-text) !important;
     border-color: var(--wu-border-2) !important;
   }
   #wuSettings-quick .button-group .button.selected,
-  .button-group.unit_settings .button.selected {
+  .button-group.unit_settings .button.selected,
+  .button-group-dark .button.selected,
+  .button-group-dark .button.active {
     background-color: #15aadc !important;
     color: #ffffff !important;
     border-color: #15aadc !important;
@@ -1273,11 +1350,25 @@
   /* ---- PWS dashboard gauge discs (audit-blind) -------------------------- */
   /* (a) PRESSURE dial: .pressure-dial paints the barometer face as a WHITE
      raster background-IMAGE (url(), not a bg-color or gradient) with black
-     ticks/numbers + a black needle <img.pressure-marker> child. The bg audit
-     (color only) and the gradient/lightBgImages check both miss a url() image.
-     Invert the whole dial subtree: white face -> dark, black ticks/numbers and
-     the needle -> light, so the gauge reads on dark with no recolor needed. */
+     ticks/numbers. The bg audit (color only) and the gradient/lightBgImages
+     check both miss a url() image. Invert the face: white -> dark, black
+     ticks/numbers -> light, so the gauge reads on dark with no recolor needed. */
   .pressure-dial {
+    filter: invert(1) !important;
+  }
+  /* Every PWS gauge NEEDLE is a separate <img> SVG that is a SIBLING of the dial
+     it points at, never a child, so the dial's own filter can never reach it --
+     and each one is a single solid shape drawn for a white page:
+     Pressure-Dial-Marker.svg is `fill="#000000"` (invisible once the barometer
+     face is inverted to near-black: the dial shipped with NO needle at all, the
+     whole reading gone) and Wind-Marker.svg is `fill="#4A4A4A"` (~1.8:1 on the
+     tile -- the wind-direction wedge reads as a smudge). Inverting each marker
+     turns them light without touching the shape or the rotation the wrapper
+     applies. Both are raster <img>, so no fill/stroke override can reach them
+     and no DOM scan can see them. */
+  .pressure-dial__container .pressure-marker,
+  img.pressure-marker,
+  .wind-dial__container .arrow-wrapper img {
     filter: invert(1) !important;
   }
   /* (b) SOLAR RADIATION gauge: an inline <svg> whose outer disc is

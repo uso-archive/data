@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A full dark theme for Thingiverse: browse the feed, model pages, search and profiles in comfortable dark while 3D model previews stay true to color.
-@version      20260726.17.08
+@version      20260730.14.17
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -116,6 +116,14 @@
     --tv-content-positive-dark: #6fd8c9 !important;
     --tv-content-warning-dark: #ffd75c !important;
     --tv-content-highlight-dark: #c4a2ff !important;
+    /* Same trap one alias over: `--tv-content-*` resolve to the `*-main` ramp,
+       and three of those four (#ff385c red, #01b49f teal, #ffc402 amber) already
+       read on dark — but `--tv-content-highlight` is --tv-highlight-main #6200ee,
+       a deep purple drawn for the white page. It inks `.text-color--highlight`
+       and the IconBadge highlight glyph, both of which sit on dark now (1.6:1).
+       Lift the TEXT alias only: #6200ee stays the SURFACE hue on the AI card
+       badge and the AI corner flag. */
+    --tv-content-highlight: #c4a2ff !important;
 
     /* Toastify (in-app toasts) */
     --toastify-color-light: #1c2128 !important;
@@ -142,6 +150,32 @@
   iframe.CybotCookiebotHiddenIframe,
   iframe.CybotCookiebotOffscreenIframe {
     border-color: #14181d !important; border-style: solid !important; }
+
+  /* Cookiebot's consent DIALOG keeps its own WHITE panel (a third-party CMP we
+     deliberately don't retheme) — but our page-wide ink rules reach inside it and
+     paint light-on-white. The whole family: `p/li/dd/dt/td/th/label/time/small`
+     and `h1-h6` repaint its copy in the page greys (every Details-tab cookie card
+     is an <li>, so its heading AND description wash out); `[role="tab"]` greys the
+     Consent/Details/Ad Settings/About nav and `[role="tab"][aria-selected="true"]`
+     paints the CURRENT tab #ffffff, erasing it; `[class*="footer"]` drops a
+     #0d1117 block into each cookie-declaration card. Restore the CMP's own
+     near-black ink and its MakerBot-blue link/active-tab accent. (Its checkboxes
+     are 0x0 behind styled sliders, so the `input` rule below never shows.) */
+  #CybotCookiebotDialog, #CybotCookiebotDialog h1, #CybotCookiebotDialog h2,
+  #CybotCookiebotDialog h3, #CybotCookiebotDialog h4, #CybotCookiebotDialog h5,
+  #CybotCookiebotDialog h6, #CybotCookiebotDialog p, #CybotCookiebotDialog li,
+  #CybotCookiebotDialog dd, #CybotCookiebotDialog dt, #CybotCookiebotDialog td,
+  #CybotCookiebotDialog th, #CybotCookiebotDialog caption,
+  #CybotCookiebotDialog figcaption, #CybotCookiebotDialog blockquote,
+  #CybotCookiebotDialog label, #CybotCookiebotDialog time,
+  #CybotCookiebotDialog small, #CybotCookiebotDialog [role="tab"],
+  #CybotCookiebotDialog [role="tab"]:hover { color: #141414 !important; }
+  #CybotCookiebotDialog a,
+  #CybotCookiebotDialog [role="tab"][aria-selected="true"] {
+    color: #2b52fe !important; border-bottom-color: #2b52fe !important; }
+  #CybotCookiebotDialog [class*="Footer"], #CybotCookiebotDialog [class*="footer"] {
+    background-color: transparent !important; border-color: #d6d6d6 !important;
+    color: #141414 !important; }
 
   /* ====================================================================
      Content-area neutralizer — Thingiverse's React shell renders most
@@ -311,6 +345,34 @@
   [class*="Notification__error"] [class*="notificationBorderHighlight"] { background-color: #ff385c !important; }
   [class*="Notification__warning"] [class*="notificationBorderHighlight"] { background-color: #ffc402 !important; }
   [class*="Notification__info"] [class*="notificationBorderHighlight"] { background-color: #5fb0e6 !important; }
+  /* The NEUTRAL variant is the same two-part shape as the four above — an elevated
+     panel plus an edge stripe, each a single-class `background-color` the
+     neutralizer eats — so it rendered as bare text on the page while its coloured
+     siblings kept their panels. */
+  [class*="Notification__neutral"] { background-color: #1c2128 !important; }
+  [class*="Notification__neutral"] [class*="notificationBorderHighlight"] {
+    background-color: #2d333b !important; }
+
+  /* IconBadge: a status-tinted disc under a status-coloured glyph, one tint per
+     variant, every one a single-class `background-color`. The neutralizer left all
+     five as bare glyphs with no badge behind them. Same tints as the Notification
+     panels so the two components keep reading as the same status. */
+  [class*="IconBadge__success"] { background-color: #122a25 !important; }
+  [class*="IconBadge__error"] { background-color: #2a1419 !important; }
+  [class*="IconBadge__warning"] { background-color: #2a2410 !important; }
+  [class*="IconBadge__info"] { background-color: #18222f !important; }
+  [class*="IconBadge__highlight"] { background-color: #221833 !important; }
+
+  /* Inline text highlight (matched search terms): the tint IS the highlight, so
+     flattening it erases the marking entirely. */
+  .tv-text-highlight { background-color: #18222f !important; }
+
+  /* Magic-link "check your inbox" step (/login -> Send link). The green "link
+     sent" confirmation tint and the decorative icon disc (native #eaeeff) are
+     both single-class fills the neutralizer flattens, so the confirmation lost
+     its positive colour and the disc vanished. */
+  [class*="CheckInboxView__linkSentBanner"] { background-color: #122a25 !important; }
+  [class*="CheckInboxView__iconCircle"] { background-color: #1e2750 !important; }
 
   /* Thing-page status banners (Banner__banner): the site paints these as a
      SOLID status bar — the WIP banner ("Hey! This Thing is still a Work in
@@ -512,6 +574,21 @@
      out-specify it. */
   [role="option"][class*="react-select__option--is-selected"] {
     background-color: #2563c9 !important; color: #ffffff !important; }
+  /* `--tv-border-disabled` resolves to `--tv-neutral-muted`, which the ramp above
+     lifts to a light grey for MUTED TEXT — but the site also spends it as the
+     react-select DISABLED control's border. Natively both controls are faint on
+     white (disabled #afb4c0 ~2:1, enabled #eeeff1 ~1.1:1); on dark the light grey
+     gave the dead control a 5.4:1 outline next to a 1.3:1 live one, so the
+     unusable picker read as the actionable one. Keep the native relationship. */
+  .react-select__control--is-disabled { border-color: #3f4854 !important; }
+
+  /* Dropdown panels float over the elevated card surface and land on the same
+     #1c2128, so the site's `0 2px 20px rgba(0,0,0,.15)` — the only thing that
+     separates them on white — contributes nothing and the open menu reads as part
+     of the card. A hairline ring restores the layer edge without the 2px reflow a
+     real border would cause (the panel's own border-width is 0). */
+  [class*="Dropdown__dropdownContent"] {
+    box-shadow: 0 0 0 1px #3a424c, 0 4px 16px rgba(0, 0, 0, 0.6) !important; }
 
   /* Tooltips. `.tv-tooltip` (footer, share modal) is lowercase, so the
      `[class*="Tooltip"]` selector above never matched it: it kept painting

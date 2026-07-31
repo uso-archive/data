@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Depop, easy on the eyes across home, search, categories and product pages, with prices, sale tags and the Depop red kept readable.
-@version      20260726.17.00
+@version      20260730.14.12
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -151,13 +151,19 @@
     border-color: #2d333b !important;
   }
 
-  /* The MOBILE nav drawer's app-download promo card paints the same light
+  /* The MOBILE nav drawer's app-download promo paints the same light
      linear-gradient (rgb(251,246,241)→rgb(226,232,247)) as the hero toggle,
      via background-IMAGE over a transparent background-color — so it survives
      every bg-colour reset and renders a near-white slab in the dark drawer,
      with its "Buy, sell & discover on the go" label light-on-light. The card
-     only exists once the drawer is opened, so no load-time scan reaches it. */
-  [class*="appDownloadBox"] {
+     only exists once the drawer is opened, so no load-time scan reaches it.
+     appDownloadBox is the <a> wrapper; the gradient sits on an inner card div,
+     and the label/badge boxes inside it are *Container elements that the
+     header-container rule above would otherwise paint a second, darker tone —
+     cover all three so the promo reads as one flat surface. */
+  [class*="appDownloadBox"],
+  [class*="appDownloadBox"] [class*="card"],
+  [class*="appDownloadBox"] [class*="Container"] {
     background-image: none !important;
     background-color: #1c2128 !important;
   }
@@ -229,6 +235,29 @@
   input[type="checkbox"]:disabled::before {
     background-color: #30363d !important;
     border-color: #30363d !important;
+  }
+
+  /* The style-quiz modal's answer radios are 24px <span>s the site fills solid
+     white with a #262626 inner dot for the selected one — on its white modal an
+     unselected radio reads as an empty ring, the selected one as a filled dot.
+     Left alone on dark, that inverts: every unselected radio is a glaring white
+     disc and the SELECTED one is the only dimmed circle. Too small (24px) for a
+     size-filtered surface scan and portaled outside <main>, so nothing but a
+     rendered pixel shows it. Keep the empty/full reading: dark disc + grey ring
+     unselected, light dot inside an accented ring when selected. Must stay
+     ABOVE the radioIndicatorError rule further down, which only overrides the
+     border and would otherwise lose the tie on equal specificity. */
+  [class*="radioIndicator"] {
+    background-color: #1c2128 !important;
+    border-color: #4a525b !important;
+  }
+
+  [class*="radioIndicatorSelected"] {
+    border-color: #e6edf3 !important;
+  }
+
+  [class*="radioIndicatorSelected"]::after {
+    background-color: #e6edf3 !important;
   }
 
   [data-testid="searchBar__input"] {
@@ -462,6 +491,16 @@
     border-color: #262c33 !important;
   }
 
+  /* The profile's Shop/Likes tab strip draws its sliding active-tab indicator as
+     an <hr> filled #262626 — near-black ink on the white page, the strongest
+     mark in the component. The divider rule above catches it by tag and leaves
+     it the exact colour of the full-width rule it sits on, so no tab looks
+     selected. Both colours are achromatic, so the chroma diff is blind to it. */
+  hr[class*="tabHighlight"] {
+    background-color: #e6edf3 !important;
+    border-color: #e6edf3 !important;
+  }
+
   [class*="divider"]::before,
   [class*="divider"]::after {
     border-color: #262c33 !important;
@@ -554,13 +593,15 @@
     background-image: linear-gradient(90deg, rgba(20, 24, 29, 0), rgb(20, 24, 29) 30%) !important;
   }
 
-  /* Size / condition / brand meta segments */
-  [data-testid^="segment--"],
-  [data-testid="productCard__sizeAttr"] {
-    background-color: #1c2128 !important;
-    color: #c4cdd6 !important;
-    border-color: #2d333b !important;
-  }
+  /* NO surface rule for [data-testid^="segment--"] or
+     [data-testid="productCard__sizeAttr"]. Both testids now mark plain
+     transparent text nodes, not pills: segment--* is a full-width (1248x735)
+     PDP recommendation carousel section ("You might also like", "Items from
+     Nike"...) and productCard__sizeAttr is the bare size line under every grid
+     card. Giving either an elevated fill paints four page-wide grey bands down
+     the PDP plus a grey bar behind every card's size. The PDP's own meta line
+     is [data-testid="productPrimaryAttributes"] (coloured below); the size line
+     inherits the p/span text colour. */
 
   /* Seller card / avatar block */
   [data-testid="avatar"] {
@@ -631,6 +672,15 @@
   [class*="trustSignal"] svg,
   [class*="trustSignal"] svg path {
     fill: #8b949e !important;
+  }
+
+  /* ...and the third signal ("Buy safely / Depop Protection") is a link the site
+     fills rgba(255,255,255,0.3) — invisible over its own white hero, a mid-grey
+     slab over the dark one. Translucent white never trips a near-white surface
+     scan, which reads the alpha-less channels only. Give it a real elevated
+     card so it still reads as the one tappable signal of the three. */
+  a[class*="trustSignalLink"] {
+    background-color: #1c2128 !important;
   }
 
   /* ============================================================

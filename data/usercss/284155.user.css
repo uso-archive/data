@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean dark theme for itch.io's homepage, browse, jams, community and profiles that keeps game art, sale ribbons and creators' own page designs untouched.
-@version      20260726.17.01
+@version      20260730.14.14
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -155,6 +155,18 @@
     background-color: #21262d !important;
   }
   .autocomplete_results_popup .result_icon { background-color: #1a1f26 !important; }
+  /* The hovered / keyboard-selected row is the <a> INSIDE the li, not the li the
+     .autocomplete_result rules above match: itch fills it var(--itchio_light_highlight)
+     (#FFF0F0) and rings .selected with a pure-white 3px spread, so the row turns
+     near-white under our light title text. Keyboard/hover-gated, so scan-blind. */
+  .autocomplete_results_popup li > a:hover,
+  .autocomplete_results_popup li > a:focus,
+  .autocomplete_results_popup li > a.selected {
+    background-color: #21262d !important;
+  }
+  .autocomplete_results_popup li > a.selected {
+    box-shadow: 0 0 0 2px rgba(250, 125, 140, 0.55), 0 0 0 3px #1c2128 !important;
+  }
   /* Jam/bundle result state badge in the autocomplete popup (and apex jam listings): the
      "Ended" (state_finished) variant ships a light var(--itchio_gray_back) pill with dark
      text — darken it. The purple default and blue "Upcoming" (state_before) are semantic. */
@@ -202,6 +214,54 @@
   /* Filter-row links paint a light grey (#666) hover bar natively — dark elevated instead */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget a:hover {
     background-color: #21262d !important;
+  }
+  /* The applied filter's row keeps itch's link-red glyph as its "this filter is on" cue;
+     the monochrome-glyph rule below greys it while the star on the neighbouring row (no
+     rule) stays accent, so the column reads half-selected. Hand the glyph back to the row. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget li.active .icon,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget li.active .svgicon {
+    color: inherit !important;
+  }
+  /* Selected-tag info card in the browse sidebar ships a full white var(--itchio_white_back)
+     panel with #434343 body copy — a big white card mid-column on every tag-filtered page. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .filter_tags .filter_tag {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .filter_tags,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .filter_tags .tag_description,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .filter_tags .tag_description p {
+    color: #c4cdd6 !important;
+  }
+  /* Its heading and tag glyph are itch link-red, tuned for the white card — 3.2:1 once dark */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .filter_tags h3 > .text,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .filter_tags h3 > .icon,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .filter_tags h3 > .svgicon {
+    color: #fa7d8c !important;
+  }
+  /* Picker popups (browse "Games" type picker, profile "More" menu): the hovered row ships
+     var(--itchio_light_highlight) #FFF0F0, so it flashes near-white under pale link text. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .filter_picker_widget .filter_options .filter_option:hover {
+    background-color: #21262d !important;
+    color: #ffa2ad !important;
+  }
+  /* The picker's own closed-state label ships itch's #434343 — dark-on-dark on our chrome
+     (the sale-explorer "Sort / Most popular" and "Discount / Any" controls). */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .filter_picker_widget .value_label {
+    color: #c4cdd6 !important;
+  }
+  /* Sale-explorer toggle chips ("In bundle", "Staff picks") signal ON purely through a
+     #FF2449 border; the blanket reset greys it and on/off become indistinguishable. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .toggle_btn.active {
+    border-color: #fa7d8c !important;
+  }
+  /* Controls-bar divider is a 1px background, not a border, so the border reset misses it */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .control_sep {
+    background-color: #2d333b !important;
+  }
+  /* selectize "Filter with <term>…" affordance ships rgba(48,48,48,.5) — invisible on dark */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .selectize-dropdown .create {
+    color: #8b949e !important;
   }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .divider {
     background-color: #2d333b !important;
@@ -328,6 +388,19 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .button.outline:hover {
     background-color: #21262d !important;
     color: #ffa2ad !important;
+  }
+  /* More links that BECOME a filled itch-red pill on hover/selection: the blanket accent
+     rule leaves accent-on-accent (~1.9:1) where itch ships white. Same class as .post_type a. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .tag_segmented_btn > a:hover,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_chip {
+    color: #ffffff !important;
+  }
+  /* The negated facet chip is the inverse: itch fills it var(--itchio_white_back) (#fff)
+     and writes the red on top. Flip to a dark outlined chip, red text kept. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_chip.exclude {
+    background-color: #1c2128 !important;
+    color: #fa7d8c !important;
+    border-color: rgba(250, 125, 140, 0.5) !important;
   }
 
   /* ==== Price / sale tags (keep sale blue as a semantic signal) ==== */
@@ -464,6 +537,13 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .post_body a,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .post_body a *,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .topic_posts_footer a { color: #fa7d8c !important; }
+  /* A .button INSIDE those regions (the logged-out "Log in to reply" CTA) matches the
+     region link rule at equal specificity, and that rule is later in the file, so the
+     button's white label loses to the accent and reads ~1.5:1 on its red fill. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .topic_posts_footer a.button,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .post_body a.button {
+    color: #ffffff !important;
+  }
   /* Inline formatting (<u>/<b>/<em>) wrapping a link inside post text: the broad
      .post_body * rule steamrolls the anchor's colour onto its own children, greying a
      brand-red link — restore link colour on link descendants above. */
@@ -490,6 +570,17 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .sub_header .page_label,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .topic_pager,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .topic_date { color: #8b949e !important; }
+  /* Restricted-topic notice ships itch's salmon #fb9175 under white text — a full-width bright
+     band across the dark thread. Keep it reading as a warning, at a dark-fit value. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .visibility_message {
+    background-color: #3a1f16 !important;
+    color: #f5b7a3 !important;
+  }
+  /* Its auto-closed sibling in the same widget ships var(--itchio_gray_back) #f4f4f4 */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .autoclosed_message {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
 
   /* ==== Game jams ==== */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jams_page { background-color: transparent !important; }
@@ -515,8 +606,12 @@
   }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jam_header_widget .jam_title_header,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jam_header_widget .stat_box .stat_value { color: #e6edf3 !important; }
-  /* Active jam-page tab underline: the blanket border rule greys the native accent, erasing
-     the selected-tab indicator — restore it to brand accent. */
+  /* Jam-page tab strip. Every tab carries `border-bottom: 4px solid transparent` as a
+     spacer, so the blanket border reset paints a grey stub under EVERY tab and the active
+     tab stops reading as selected — clear the spacer, keep the accent on active/hover. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .header_tabs .header_tab { border-bottom-color: transparent !important; }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .header_tabs .header_tab.active,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .header_tabs .header_tab:hover,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .header_tab.active { border-bottom-color: #fa7d8c !important; }
   /* Author status pills on forum posts: the neutral non-admin flag (e.g. "Submitted") ships
      a light grey pill; keep the admin flag's distinct blue-grey. */
@@ -602,6 +697,19 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_drawer_close {
     color: #8b949e !important;
   }
+  /* Opening the mobile filter drawer flips the page to .filters_shown (.sidebar_open on the
+     browse-column layout) and itch dims the results behind it with a full-size ::after filled
+     var(--itchio_white_back) at opacity .8 — a white shroud across the entire grid on dark.
+     Keep the dimming, invert it to a dark scrim. `content` is `none` while the drawer is
+     closed and the state only exists below 650px, so no load-time scan reaches it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_base_page.filters_shown .grid_column_outer::after,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_columns.sidebar_open .primary_column::after {
+    background-color: #05080c !important;
+  }
+  /* The shrouded column itself is repainted white in that same open state */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_columns.sidebar_open .primary_column {
+    background-color: transparent !important;
+  }
   /* Faceted filter blocks + tag-card image bands ship a light gray_back */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_group,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .tag_cell .header_image {
@@ -629,6 +737,39 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_top_tags,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_top_tags a {
     color: #8b949e !important;
+  }
+  /* Rating count beside the stars in every game grid ships itch's #606060 (~2.2:1 here) */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .game_rating,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .rating_count {
+    color: #8b949e !important;
+  }
+
+  /* ==== Sale / promotion pages (itch.io/s/<id>/<slug>, itch.io/sale-explorer) ==== */
+  /* The sale hero splits into a dark details half and a var(--itchio_white_back) product
+     half; the buy row is the same white. Both carry our light text -> white-on-white. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .game_column,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .promotion_buy_row {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  /* Host byline, discount rate and end date all ship #606060 on the dark half */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .promotion_host,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .promotion_meta,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .sale_rate,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .percent_off,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .promotion_dates,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .date_format {
+    color: #8b949e !important;
+  }
+  /* Countdown digits are the loudest thing in the buy row natively and ship #606060 */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .countdown .block_value {
+    color: #e6edf3 !important;
+  }
+  /* "More from this sale" banner fills var(--itchio_target_bg) #D7FCAF; keep the green
+     read as a positive tint but at a dark-fit value. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .sale_explorer_page .similar_banner {
+    background-color: #1b2a17 !important;
+    border-color: #2d333b !important;
   }
 
   /* Below itch's own 650px breakpoint the devlog feed drops the desktop grid and becomes a
@@ -658,6 +799,140 @@
      renders them black-on-dark. Restore a light backing so the art reads as designed. */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .not_found_page .image_wrapper {
     background-color: #e9ebee !important;
+  }
+
+  /* ==== Lightbox dialogs (login prompt, share sheet, image viewer) ==== */
+  /* itch mounts these as real <dialog> nodes that only exist once opened, so no load-time
+     scan reaches them. Native is var(--itchio_white_back) ringed by #dadada/white, which
+     leaves our light heading colour writing white-on-white. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) dialog {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+    box-shadow: 0 0 0 2px #2d333b, 0 0 20px rgba(0, 0, 0, 0.6) !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) dialog p,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) dialog li {
+    color: #c4cdd6 !important;
+  }
+  /* Its backdrop is a separate #lightbox_shroud div filled var(--itchio_ui_bg) #40434E at
+     0.8 — lighter than our page, so opening a dialog WASHES the page instead of dimming it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) #lightbox_shroud {
+    background-color: #05080c !important;
+  }
+
+  /* ==== Documentation (itch.io/docs/…) ==== */
+  /* Whole page type: the article shell and its content column are var(--itchio_white_back)
+     and the nav band is painted by an inset 50vw box-shadow (no element to catch it), so
+     every heading we lightened rendered white-on-white. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page {
+    background-color: #14181d !important;
+    box-shadow: inset 50vw 0 0 #1a1f26 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .content_column {
+    background-color: #14181d !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .nav_column .column_header,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .social_nag {
+    color: #8b949e !important;
+  }
+  /* Every sidebar entry carries a transparent 1px underline as a spacer and the CURRENT
+     article colours it #da2c49 — the blanket border reset paints all 39 the same grey, so
+     the whole rail underlines and the "you are here" mark disappears. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .nav_column .tab_btn a {
+    border-bottom-color: transparent !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .nav_column .tab_btn.selected a {
+    color: #fa7d8c !important;
+    border-bottom-color: #fa7d8c !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .mobile_menu,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .recover_form,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .text_content blockquote,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .text_content code,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .text_content .navigation h3 {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+  /* <pre> already ships its own dark block; its inner <code> must stay see-through */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .text_content pre > code {
+    background-color: transparent !important;
+  }
+  /* API reference endpoint headers bleed their fill past the box with a 10px #F4F4F4 spread */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .text_content h3 code {
+    box-shadow: 0 0 0 10px #1c2128 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .text_content p img.showcase {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6) !important;
+  }
+  /* Anchor-target heading highlight ships #D7FCAF, painted as fill AND a 10px spread */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page h2.highlight {
+    background-color: #22331a !important;
+    box-shadow: 0 0 0 10px #22331a !important;
+  }
+  /* The app manual under /docs/itch/ is a separate honkit build with its own stylesheet:
+     white body, #fafafa summary rail, and #333/#000 copy that goes dark-on-dark once we
+     darken them. body carries .book_layout_widget (never a creator layout). */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book-summary {
+    background-color: #1a1f26 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book-body {
+    background-color: #14181d !important;
+    color: #c4cdd6 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .markdown-section {
+    color: #c4cdd6 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) #book-search-input {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) #book-search-input input {
+    color: #e6edf3 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book-body code,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book-body pre {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+  }
+  /* "Return to app" sits on itch's #BB4F4F band and is natively white with a white hairline;
+     the blanket accent + border reset drop it to 1.9:1 inside a near-black outline. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book_page_header .return_link {
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
+  }
+  /* honkit's font/theme picker: a #fafafa flyout whose generic .button class our brand-red
+     button rule hijacks into a grid of red blocks. Click-gated, so no load-time scan sees it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book_page .dropdown-menu {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book_page .dropdown-menu .button {
+    background-color: transparent !important;
+    color: #c4cdd6 !important;
+    /* itch's .button pairs its red fill with a red text-shadow; without the fill it halos */
+    text-shadow: none !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book_page .dropdown-menu .button:hover {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+  }
+  /* Its pointer is a pair of CSS triangles; the blanket border reset fills the transparent
+     sides, so the caret renders as a solid rectangle above the flyout. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book_page .dropdown-caret .caret-outer,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book_page .dropdown-caret .caret-inner {
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book_page .dropdown-caret .caret-outer {
+    border-bottom-color: #2d333b !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book_page .dropdown-caret .caret-inner {
+    border-bottom-color: #1c2128 !important;
   }
 
   /* ==== Footer ==== */

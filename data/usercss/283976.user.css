@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260726.17.03
+@version      20260730.14.14
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -23,8 +23,17 @@
      is — so a `:root`-only override silently resolved back to Khan's light
      values for every element in the document (e.g. tooltip tails still drew
      with `--…-background-base-default: #fff`).
+
+     `[data-wb-theme]` is the same trap one level deeper. Khan's newer app
+     shell wraps the whole page (header + `#main-content`) in
+     `<div data-wb-theme="thunderblocks">` and re-declares the ENTIRE light
+     palette there, so on every page carrying that wrapper the block below
+     resolved back to Khan's light values — `#main-content` read
+     `--…-background-base-default: #fff`. The theme still looked dark only
+     because its explicit rules paint those surfaces anyway; every
+     token-only detail (the header logo's mark, tooltip chrome) went light.
      ==================================================================== */
-  :root, body {
+  :root, body, [data-wb-theme] {
     /* Surfaces */
     --wb-semanticColor-core-background-base-default: #14181d !important;
     --wb-semanticColor-core-background-base-subtle: #1c2128 !important;
@@ -159,6 +168,19 @@
   nav[role="navigation"], header[role="banner"],
   #top-header-container { background-color: #0d1117 !important; }
 
+  /* Header wordmark, monochrome variant. Khan draws the hexagon mark with
+     `fill="var(--wb-semanticColor-core-foreground-neutral-strong)"` (its ink)
+     and knocks the leaf out of it in a hardcoded `#ffffff`. The token block
+     correctly flips the ink to near-white for dark, which leaves a white leaf
+     on a white hexagon — the mark reads as a solid light blob. Knock the leaf
+     out in the header colour instead, so the mark is the exact lightness
+     inversion Khan's own artwork implies. Only this variant matches: the
+     classic logo fills its hexagon with the literal brand green (#14bf96) and
+     its white leaf has no `neutral-strong` sibling before it. */
+  [aria-label="Khan Academy"] path[fill*="neutral-strong"] + path[fill="#ffffff"] {
+    fill: #0d1117 !important;
+  }
+
   /* Global site footer. Khan paints it with the SAME brand navy (#0b2149) it uses
      on the header strip above — but nothing here reached it, so while the header
      was darkened the footer kept the raw navy, rendering as the single brightest
@@ -242,8 +264,19 @@
      It hardcodes the pale info blue #edf3fe and lives OUTSIDE `#main-content`,
      so neither the token remaps nor the content neutralizer reach it — the
      banner reads as near-white text on near-white. Scoped to the component's
-     stable ARIA contract rather than its hashed class. */
-  [role="status"][aria-label="Notification Banner"] { background-color: #18222f !important; }
+     stable ARIA contract rather than its hashed class.
+     The banner's other cue is a 6px left rule that Khan paints the brand blue
+     to mark the strip as informational; the blanket `* { border-color }` reset
+     at the end of this file drops it to the generic divider grey, so the accent
+     disappears into the tint. Restore it on the left edge ONLY — at narrow
+     widths Khan drops the accent and gives the banner a 1px border that is
+     TRANSPARENT on all four sides, which the same blanket reset turns into a
+     grey box the site never draws. */
+  [role="status"][aria-label="Notification Banner"] {
+    background-color: #18222f !important;
+    border-color: transparent !important;
+    border-left-color: #5fb0e6 !important;
+  }
   [role="status"][aria-label="Notification Banner"] a { color: #9bd4ff !important; }
 
   /* The logged-out "Turn learning into progress." sign-up promo. On content
@@ -299,8 +332,14 @@
      rgb(21,21,33) — with a matching `-webkit-text-fill-color`, so `color` alone
      would not stick — rendering ~1.05:1 (invisible) on the dark hero. No rule
      reached a bare <b>. Body bold is emphasis text that reads light on dark
-     everywhere; coloured inline terms keep their hue through the more specific
-     `mathcolor` / link rules. */
+     everywhere.
+
+     `-webkit-text-fill-color` INHERITS and overrides `color` on every
+     descendant, so this rule reaches into anything nested inside a bold run.
+     Khan bolds most exercise prompts, and those prompts colour-code their key
+     term — every rule that recolours such a term therefore has to set the fill
+     alongside `color` or it silently renders this ink instead (the `mathcolor`
+     and inline-`color` math remaps further down all pair the two). */
   b, strong { color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
   /* Home "Get started as a…" audience tablist (Teachers / Students / Families):
      Khan hardcodes every tab label to the same light-page ink (+ text-fill), so
@@ -487,6 +526,16 @@
   #main-content ._1hupj7i9 { border-color: #d77d0f !important; }  /* Familiar outline */
   #main-content ._88nb8z9 { border-color: #c66024 !important; }   /* Attempted outline */
 
+  /* The "Level N … 0 /1 skill" bar above every article, video and exercise
+     marks how far along the level you are with a 14px knob Khan fills its
+     mastery purple (#9059ff); the track behind it is an unfilled outline. The
+     `#main-content [class]` neutralizer flattens the knob to transparent, so
+     the bar rendered as a hollow grey ring on a hollow grey rail with no
+     indication of progress at all. Only the knob carries the colour, so
+     re-asserting it here leaves the empty track alone. Hashed class, so
+     degrade-safe: a re-hash simply returns to today's grey ring. */
+  #main-content ._6cduun3 { background-color: #9059ff !important; }
+
   /* …but the neutralizer strips the background off Wonder Blocks' PRIMARY
      call-to-action (login submit, "Continue", the unit page's "Start" and
      "Practice"), flattening the Khan blue into bare text on the dark page. Khan
@@ -560,6 +609,17 @@
      16px box and skips it. `:empty` is what distinguishes an icon span from a
      label span, so painting it is safe: a non-icon empty span has no size. */
   #main-content button > span:first-child:empty { background-color: #c4cdd6 !important; }
+  /* …but an icon-ONLY `tertiary` button is a link rendered as a glyph (the
+     exercise footer's "Start over" and "Draw on exercise"), and Khan paints
+     both its label and its glyph the brand blue. The muted grey above is the
+     neutral icon tone, so those buttons shipped with a grey glyph under the
+     blue link colour the rule 40 lines up already gives the same component.
+     `:first-child:last-child` is what marks an icon-only button — a tertiary
+     that also has a label (Share link, Microsoft Teams) keeps the neutral
+     glyph. Needs `#main-content` to outrank the id in the rule above. */
+  #main-content button[data-kind="tertiary"] > span:first-child:last-child:empty {
+    background-color: #5fb0e6 !important;
+  }
 
   /* Lesson-list content-type icons (video / article / exercise / challenge) are
      inline <svg> whose paths hardcode Khan's near-black ink (`fill="#21242c"`,
@@ -599,12 +659,56 @@
   nav[aria-labelledby="course-list-section-heading"] img {
     filter: invert(1) hue-rotate(180deg) !important;
   }
+  /* …except two of the thirteen, which are NOT white squares at all: the
+     Science flask and the ELA speech bubble ship with a transparent
+     background, so there is nothing to knock out and the inversion only
+     mangles the glyph — the flask's yellow (#e8b839) came out a muddy brown
+     (#8f5000) and stopped reading as Khan's science colour. Left as authored
+     they sit on the dark chip exactly as intended. Matched on the filename
+     stem, which is stable across the CDN's content hash. */
+  nav[aria-labelledby="course-list-section-heading"] img[src*="flask"],
+  nav[aria-labelledby="course-list-section-heading"] img[src*="message_bubble"] {
+    filter: none !important;
+  }
   /*  2. The logged-out home hero (one responsive asset, whose every srcset entry shares
      the `lohp_hero_graphic_mobile` stem). Its cream "graph paper" ramp is the largest
      bright shape above the fold, and at narrow widths it extends BEHIND the "Get
      started as a…" heading and the top of the Student card — invisible on Khan's white
      page, a solid white slab here, with the heading (now near-white) lost inside it. */
   img[src*="hp_hero_graphic_mobile"] {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+
+  /* Article and exercise diagrams. Khan authors them outside the DOM — as
+     standalone files on its content CDN, dropped in as `<img>` — so no rule in
+     this sheet can reach their internals, and every one is drawn for the white
+     page: a fully transparent backdrop with `stroke="#000000"` axes, arrowheads
+     and labels. On the dark surface a whole graph renders as pure black on
+     near-black and effectively disappears; an exercise whose answer choices are
+     figures stops being answerable, not merely dim. Flip the lightness and put
+     each hue back where it started, exactly as the two raster illustrations
+     above get: the black line work becomes near-white and any coloured data
+     series keeps its meaning.
+
+     Matched on the CDN BUCKET as a substring, which covers both the
+     `cdn.kastatic.org/<bucket>/` and the legacy `<bucket>.s3.amazonaws.com/`
+     form of every asset URL. The two buckets that hold only line art:
+       - `ka-perseus-graphie` — the graphie editor's output, `.svg` and `.png`
+         alike, so no extension filter. Sampled across math, geometry and
+         physics: every `.png` measures 96-100% transparent with zero white
+         pixels, every `.svg` is pure vector with no embedded raster.
+       - `ka-content-images` — `.svg` only; that bucket also carries uploaded
+         article photos, and photographs are never SVG.
+
+     Deliberately NOT covered, and each would be damaged by inverting:
+     `ka-perseus-images` holds opaque uploaded figures and photographs (sampled:
+     0% transparent, 52-88% white) which render bright, not invisible; and Khan's
+     own product art under `/images/` is genuinely coloured — the home page's
+     "Every skill counts" bar chart, and the learner avatars in the Q&A thread
+     under every article, which are `/images/avatars/svg/*.svg` and are the
+     reason this cannot simply widen to all SVGs. */
+  #main-content img[src*="ka-perseus-graphie"],
+  #main-content img[src*="ka-content-images"][src$=".svg"] {
     filter: invert(1) hue-rotate(180deg) !important;
   }
 
@@ -793,25 +897,25 @@
      each to a lighter shade of the SAME hue so the pedagogical meaning (this
      term is "the red one", that one "the blue one") is preserved while staying
      legible on dark. Targets the `mathcolor` carrier and its descendants. */
-  [mathcolor="#5D5F66"], [mathcolor="#5D5F66"] * { color: #9aa4af !important; }
-  [mathcolor="#D92916"], [mathcolor="#D92916"] * { color: #ff7b72 !important; }
-  [mathcolor="#3D7586"], [mathcolor="#3D7586"] * { color: #6cb6d9 !important; }
-  [mathcolor="#0C7F99"], [mathcolor="#0C7F99"] * { color: #6cb6d9 !important; }
-  [mathcolor="#11ACCD"], [mathcolor="#11ACCD"] * { color: #79c0ff !important; }
-  [mathcolor="#208170"], [mathcolor="#208170"] * { color: #7ee787 !important; }
-  [mathcolor="#0D923F"], [mathcolor="#0D923F"] * { color: #7ee787 !important; }
-  [mathcolor="#7854AB"], [mathcolor="#7854AB"] * { color: #d2a8ff !important; }
-  [mathcolor="#9D38BD"], [mathcolor="#9D38BD"] * { color: #d2a8ff !important; }
-  [mathcolor="#CA337C"], [mathcolor="#CA337C"] * { color: #ff8ac4 !important; }
-  [mathcolor="#E07D10"], [mathcolor="#E07D10"] * { color: #f0a868 !important; }
+  [mathcolor="#5D5F66"], [mathcolor="#5D5F66"] * { color: #9aa4af !important; -webkit-text-fill-color: #9aa4af !important; }
+  [mathcolor="#D92916"], [mathcolor="#D92916"] * { color: #ff7b72 !important; -webkit-text-fill-color: #ff7b72 !important; }
+  [mathcolor="#3D7586"], [mathcolor="#3D7586"] * { color: #6cb6d9 !important; -webkit-text-fill-color: #6cb6d9 !important; }
+  [mathcolor="#0C7F99"], [mathcolor="#0C7F99"] * { color: #6cb6d9 !important; -webkit-text-fill-color: #6cb6d9 !important; }
+  [mathcolor="#11ACCD"], [mathcolor="#11ACCD"] * { color: #79c0ff !important; -webkit-text-fill-color: #79c0ff !important; }
+  [mathcolor="#208170"], [mathcolor="#208170"] * { color: #7ee787 !important; -webkit-text-fill-color: #7ee787 !important; }
+  [mathcolor="#0D923F"], [mathcolor="#0D923F"] * { color: #7ee787 !important; -webkit-text-fill-color: #7ee787 !important; }
+  [mathcolor="#7854AB"], [mathcolor="#7854AB"] * { color: #d2a8ff !important; -webkit-text-fill-color: #d2a8ff !important; }
+  [mathcolor="#9D38BD"], [mathcolor="#9D38BD"] * { color: #d2a8ff !important; -webkit-text-fill-color: #d2a8ff !important; }
+  [mathcolor="#CA337C"], [mathcolor="#CA337C"] * { color: #ff8ac4 !important; -webkit-text-fill-color: #ff8ac4 !important; }
+  [mathcolor="#E07D10"], [mathcolor="#E07D10"] * { color: #f0a868 !important; -webkit-text-fill-color: #f0a868 !important; }
   /* The order-of-operations / PEMDAS colour-coding uses a second palette the block
      above did not cover: a deep purple (#594094 "Grouping", #8351E8 "Exponents") and a
      dark olive-gold (#946700 addition/subtraction). Left raw they land ~2.2:1 (purple)
      and ~2.8:1 (gold) on the dark page — the colour-coded letters and their matching
      math read dark-on-dark. Lift each to the same light shade its hue already uses. */
   [mathcolor="#594094"], [mathcolor="#594094"] *,
-  [mathcolor="#8351E8"], [mathcolor="#8351E8"] * { color: #d2a8ff !important; }
-  [mathcolor="#946700"], [mathcolor="#946700"] * { color: #e3b341 !important; }
+  [mathcolor="#8351E8"], [mathcolor="#8351E8"] * { color: #d2a8ff !important; -webkit-text-fill-color: #d2a8ff !important; }
+  [mathcolor="#946700"], [mathcolor="#946700"] * { color: #e3b341 !important; -webkit-text-fill-color: #e3b341 !important; }
   /* Articles render their math through MathJax v3, which carries a highlight
      colour as an INLINE `color` on an <mjx-mstyle> and paints the glyphs in
      `mjx-c::before` pseudo-elements that inherit it — so neither the `mathcolor`
@@ -823,24 +927,24 @@
      the blue variable term dimmer than the mathcolor path renders it). Remap each
      inline value to the same light shade its `mathcolor` sibling uses so the
      pedagogical colour pairing holds and the annotation stays legible. */
-  #main-content [style*="color: rgb(93, 95, 102)"] { color: #9aa4af !important; }
-  #main-content [style*="color: rgb(217, 41, 22)"] { color: #ff7b72 !important; }
-  #main-content [style*="color: rgb(61, 117, 134)"] { color: #6cb6d9 !important; }
-  #main-content [style*="color: rgb(12, 127, 153)"] { color: #6cb6d9 !important; }
-  #main-content [style*="color: rgb(17, 172, 205)"] { color: #79c0ff !important; }
-  #main-content [style*="color: rgb(32, 129, 112)"] { color: #7ee787 !important; }
-  #main-content [style*="color: rgb(13, 146, 63)"] { color: #7ee787 !important; }
-  #main-content [style*="color: rgb(131, 81, 232)"] { color: #d2a8ff !important; }
-  #main-content [style*="color: rgb(120, 84, 171)"] { color: #d2a8ff !important; }
-  #main-content [style*="color: rgb(157, 56, 189)"] { color: #d2a8ff !important; }
-  #main-content [style*="color: rgb(202, 51, 124)"] { color: #ff8ac4 !important; }
-  #main-content [style*="color: rgb(224, 125, 16)"] { color: #f0a868 !important; }
-  #main-content [style*="color: rgb(68, 122, 83)"] { color: #7ee787 !important; }
-  #main-content [style*="color: rgb(178, 80, 113)"] { color: #ff8ac4 !important; }
+  #main-content [style*="color: rgb(93, 95, 102)"] { color: #9aa4af !important; -webkit-text-fill-color: #9aa4af !important; }
+  #main-content [style*="color: rgb(217, 41, 22)"] { color: #ff7b72 !important; -webkit-text-fill-color: #ff7b72 !important; }
+  #main-content [style*="color: rgb(61, 117, 134)"] { color: #6cb6d9 !important; -webkit-text-fill-color: #6cb6d9 !important; }
+  #main-content [style*="color: rgb(12, 127, 153)"] { color: #6cb6d9 !important; -webkit-text-fill-color: #6cb6d9 !important; }
+  #main-content [style*="color: rgb(17, 172, 205)"] { color: #79c0ff !important; -webkit-text-fill-color: #79c0ff !important; }
+  #main-content [style*="color: rgb(32, 129, 112)"] { color: #7ee787 !important; -webkit-text-fill-color: #7ee787 !important; }
+  #main-content [style*="color: rgb(13, 146, 63)"] { color: #7ee787 !important; -webkit-text-fill-color: #7ee787 !important; }
+  #main-content [style*="color: rgb(131, 81, 232)"] { color: #d2a8ff !important; -webkit-text-fill-color: #d2a8ff !important; }
+  #main-content [style*="color: rgb(120, 84, 171)"] { color: #d2a8ff !important; -webkit-text-fill-color: #d2a8ff !important; }
+  #main-content [style*="color: rgb(157, 56, 189)"] { color: #d2a8ff !important; -webkit-text-fill-color: #d2a8ff !important; }
+  #main-content [style*="color: rgb(202, 51, 124)"] { color: #ff8ac4 !important; -webkit-text-fill-color: #ff8ac4 !important; }
+  #main-content [style*="color: rgb(224, 125, 16)"] { color: #f0a868 !important; -webkit-text-fill-color: #f0a868 !important; }
+  #main-content [style*="color: rgb(68, 122, 83)"] { color: #7ee787 !important; -webkit-text-fill-color: #7ee787 !important; }
+  #main-content [style*="color: rgb(178, 80, 113)"] { color: #ff8ac4 !important; -webkit-text-fill-color: #ff8ac4 !important; }
   /* Inline-style twins of the PEMDAS colour-coding above (MathJax emits the same deep
      purple #594094 and olive-gold #946700 as inline `color` on its <mjx-mstyle>). */
-  #main-content [style*="color: rgb(89, 64, 148)"] { color: #d2a8ff !important; }
-  #main-content [style*="color: rgb(148, 103, 0)"] { color: #e3b341 !important; }
+  #main-content [style*="color: rgb(89, 64, 148)"] { color: #d2a8ff !important; -webkit-text-fill-color: #d2a8ff !important; }
+  #main-content [style*="color: rgb(148, 103, 0)"] { color: #e3b341 !important; -webkit-text-fill-color: #e3b341 !important; }
 
   /* The "Level N … 0 /1 skill" mastery bar (shown above every article, video and
      exercise) puts its numerator in a <b>, which Khan hardcodes to the light-page
@@ -853,8 +957,8 @@
      colour the multiple-choice math on practice pages) hardcode dark values
      built for the white page and land ~3.5:1 on the dark surface. Lift each
      to the lighter same-hue shade already used for the worked-example set. */
-  [mathcolor="#447A53"], [mathcolor="#447A53"] * { color: #7ee787 !important; }
-  [mathcolor="#B25071"], [mathcolor="#B25071"] * { color: #ff8ac4 !important; }
+  [mathcolor="#447A53"], [mathcolor="#447A53"] * { color: #7ee787 !important; -webkit-text-fill-color: #7ee787 !important; }
+  [mathcolor="#B25071"], [mathcolor="#B25071"] * { color: #ff8ac4 !important; -webkit-text-fill-color: #ff8ac4 !important; }
 
   /* Article content tables: Khan renders some data/function tables with
      hardcoded pale cells (rgb(247,248,250)) on classless <td>/<th>, which the
@@ -971,4 +1075,8 @@
   ::-webkit-scrollbar-track { background: #14181d; }
   ::-webkit-scrollbar-thumb { background: #2d333b; border-radius: 6px; }
   ::-webkit-scrollbar-thumb:hover { background: #3a424c; }
+  /* The corner is a separate pseudo from the track: any element scrollable on
+     BOTH axes (Perseus renders its question column that way at narrow widths)
+     leaves a default-white square where the two bars meet. */
+  ::-webkit-scrollbar-corner { background: #14181d; }
 }

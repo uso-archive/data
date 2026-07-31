@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A polished dark look across the whole site: the home page, video pages and their comment lists, the rankings, search results and user profiles.
-@version      20260726.17.04
+@version      20260730.14.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -572,8 +572,57 @@
     background-color: #262c33 !important;
     background-image: none !important;
   }
-  /* Empty thumbnail wells / skeletons */
-  .NC-VideoCardSkeleton-barContainer, [class*="Skeleton"] { background-color: #262c33 !important; }
+  /* Empty thumbnail wells / skeletons.
+     Every loading state on the legacy pages is a light container (#fff) filled with
+     #eee / #f5f5f5 bars, and most of those bars carry no "Skeleton" class of their own:
+     they are bare children (`.NC-VideoMediaObjectSkeleton > figure`, `.NC-ShortVideoCard
+     Skeleton > figure`, `.NC-MylistMediaObjectSkeleton-body > h1`, `.NC-MylistMediaObject
+     Skeleton-thumbnails > figure`) or a differently-named child (`.AuroraVisionCard
+     Skeleton .AuroraVisionCard-uploaderIcon`). Matching the container AND every
+     descendant covers the whole family in one rule instead of chasing components one at
+     a time. It can never repaint real artwork: a skeleton container holds no content and
+     loses its class the moment its data lands — measured with the API stalled and then
+     released on home, the profile top, a user's video tab, mylist index, a mylist, a series,
+     the watch page and search: zero img/video/anchor descendants under any
+     `[class*="Skeleton"]` node. Attribute matching is case-sensitive, so the site's
+     lowercase `-skeleton` ad-slot placeholders (#fff / #f3f3f3) need their own arm; that
+     arm stays off descendants because a real creative loads inside those slots.
+     background-image goes with it — several skeleton wells carry the site's near-white
+     "no thumbnail" SVG, which paints over any background-colour. */
+  .NC-VideoCardSkeleton-barContainer,
+  [class*="Skeleton"] {
+    background-color: #262c33 !important;
+    background-image: none !important;
+  }
+  [class*="Skeleton"] * {
+    background-color: #262c33 !important;
+    background-image: none !important;
+  }
+  /* The bars themselves are always leaf nodes — a bare <figure>/<h1>/<div> with nothing
+     inside. Lifting only those one step keeps the site's #fff panel / #eee bar pair, so a
+     loading list still reads as a skeleton instead of one featureless slab, while every
+     wrapper in between stays on the well colour. */
+  [class*="Skeleton"] *:empty { background-color: #2d333b !important; }
+  [class*="-skeleton"] { background-color: #262c33 !important; }
+  /* The home feed's section separators are 1px dotted/dashed borders declared on
+     ::before / ::after, and the `.BaseLayout *` reset above cannot reach them — a `*`
+     selector never matches a pseudo-element. They kept the site's #ddd / #999 and drew
+     bright dotted rules the full width of the dark feed, between every digest row. The
+     ::after arm also covers the skeleton copy (.ContentsDigestFrameSkeleton carries
+     .ContentsDigestFrame too). Listed one by one on purpose: a blanket pseudo-border
+     reset would also flatten the orange .Tabs-tab.is-active::after accent and the modern
+     header's border-triangle carets, which are art, not chrome. */
+  .ContentsDigestFrame::before, .ContentsDigestFrame::after,
+  .ChannelContainer::before, .EnhancedContainer::before,
+  .TextListFrame-item::before, .CrossSearch-pullDownService::before {
+    border-color: #2d333b !important;
+  }
+  /* Two home sections render a bare white shell while their data is in flight and unmount
+     if it never arrives, so no loaded-page scan sees them: a 1216x98 event-articles strip
+     and a 1216x114 sponsor strip, both pure #fff bands across the dark feed. */
+  .PublishedEventArticlesContainer, .SponsorsContainer {
+    background-color: #1c2128 !important;
+  }
   /* The home "content digest" skeleton thumbnails (ContentItemSkeleton, shown while a
      ranking/digest row's real cards build) AND the digest content-thumbnail wrapper both
      carry the site's #f5f5f5 "no thumbnail" SVG as a background-IMAGE, which paints OVER
@@ -584,6 +633,16 @@
   .ContentItemSkeleton-thumbnail, .ContentsDigestFrame-contentThumbnail {
     background-image: none !important;
   }
+  /* The same placeholder also sits one level deeper, on `.Thumbnail-image` itself, which
+     neither wrapper above reaches: the site declares the #f4f3f4 "no thumbnail" JPG as
+     that element's own background-image and sets the REAL artwork as an INLINE
+     `style="background-image:url(…)"` once it lazy-loads. So every card in every digest
+     row flashes a near-white 189x106 tile on the way in, and a card with no artwork keeps
+     it. Keying on the absence of the inline style removes ONLY the placeholder — an
+     element that has artwork always carries the attribute, so this can never hide a real
+     thumbnail (measured on the home page: 24 placeholder elements, none with a style
+     attribute; 75 real ones, all with it). */
+  .Thumbnail-image:not([style]) { background-image: none !important; }
   /* ...-hoverMenuPositioner is a natively transparent 32x21 anchor for the
      three-point menu, sitting on the thumbnail's top-right corner. Its class
      contains "VideoCard", so the arm above paints it opaque and stamps a black
@@ -639,6 +698,13 @@
   }
   .ContentsPickupContainer, .ContentsPickupContainer-waku,
   .ContentsPickupContainer-wakuItems { background-color: transparent !important; }
+  /* Each stage section heading ("ニコニコ運営のおすすめ", "ピックアップ生放送番組"…) is
+     "sticker" type: a near-black #252525 label wearing a 4px #fafafa `-webkit-text-stroke`
+     so it lifts off the light faceted stage artwork. Our text pass flips the FILL light but
+     no property reaches the stroke, so fill and outline end up the same tone and the
+     letterforms render hollow. A stroke is invisible to every background/colour audit.
+     Flip it to the page base so it reads as an outline again. */
+  .ContentsPickupContainer-wakuTitleText { -webkit-text-stroke-color: #14181d !important; }
   .StageRecommendLiveCard, .StageRequestedContentCard, .StageEventContentCard {
     background-color: #1c2128 !important;
   }
@@ -741,6 +807,77 @@
   .OtherMypageLinks-link:hover, .NC-ThreePointMenu-menu > :hover {
     background-color: #262c33 !important; color: #e6edf3 !important;
   }
+
+  /* ---- User page: 実績 (achievement) tab ----
+     A whole profile tab that shipped light: the list well is #f4f4f4 and every
+     achievement card is #fff, so our body-text pass put light-grey titles on white and
+     the entire tab read as a bright slab of unreadable rows. Nothing here is chromatic
+     natively (card #fff / text #333 / date #666 / well #f4f4f4), so the mapping is the
+     usual one — well to the page base, cards to the elevated surface — plus the #666
+     date lifted to the standard meta grey. */
+  .AchievementContainer-contents { background-color: #14181d !important; }
+  .AchievementItem { background-color: #1c2128 !important; }
+  .AchievementItem-link { background-color: #262c33 !important; }
+  .AchievementItem-achievedAt { color: #8b949e !important; }
+  .AchievementSortSelectbox-sortSelectboxItem:hover { background-color: #262c33 !important; }
+
+  /* ---- User page: フォロー / フォロワー tab ----
+     Same shape, same miss: `.UserItem-content` is a #fff card (and `.ChannelItem-content`
+     is its channel-list twin in the same stylesheet), so all 20 rows rendered as white
+     tiles carrying our light nickname and description. The header's "N フォロー中" count
+     is the site's #555 — darker than the grey beside it, i.e. dark-on-dark once the page
+     is repainted. Give the cards the elevated surface and restore a title/meta hierarchy
+     (nickname primary, description + follower count meta). */
+  .UserItem-content, .ChannelItem-content { background-color: #1c2128 !important; }
+  .ChannelItem-joiningBadge { background-color: #262c33 !important; }
+  .UserItem-nickname { color: #e6edf3 !important; }
+  /* The row's two nickname STATES are the only affordance it has: the site turns the name
+     #0080ff on hover and #999 once visited, both through plain (non-important) rules that
+     the !important above would swallow — chroma reported the hover blue as flattened the
+     moment the pointer rested on a row. Restore them, hover lifted to the theme accent. */
+  .UserItem:hover .UserItem-nickname { color: #5fb0e6 !important; }
+  .UserItem-link:visited:not(:hover) .UserItem-nickname { color: #8b949e !important; }
+  .UserItem-description, .UserItem-followerCount,
+  .FolloweeContainer-header, .FolloweeContainer-header span,
+  .FollowerContainer-header, .FollowerContainer-header span {
+    color: #8b949e !important;
+  }
+  /* Both list components mark hover with a light `box-shadow: 0 0 8px #e9e9e9` glow that
+     no background or colour scan can see — on dark it haloes the hovered row white. */
+  .UserItem:hover, .AchievementItem:hover { box-shadow: 0 0 8px #0d1117 !important; }
+  /* The follow list's loading rows are a plain `<li>` (and a plain `<figure>` / `<h1>`
+     inside) painted #fff / #eee by a `.FollowOwnerItemSkeletonList > li` rule — the
+     descendants carry no class, so the theme's `[class*="Skeleton"]` arm, which reaches
+     every classed skeleton bar, cannot reach them. Same shape in the profile's left
+     menu skeleton. */
+  .FollowOwnerItemSkeletonList > li,
+  .MainMenuContainerSkeleton-menuList > li { background-color: #1c2128 !important; }
+  .FollowOwnerItemSkeletonList > li > figure,
+  .FollowOwnerItemSkeletonList-body > h1 { background-color: #262c33 !important; }
+
+  /* ---- Legacy modals (closed at audit time) ----
+     The share sheet behind the ⤴ glyph on every profile / mylist / series page
+     (.NC-ShareModal-modal) and the generic .ModalContent shell used by the achievement
+     detail dialog both hardcode a #fff panel that no token reaches. Our text pass then
+     lands light labels on white, so the opened sheet read as a blank white box: on the
+     share sheet the "共有" title and both field labels vanished, and the achievement
+     dialog lost its whole body. Repaint the panels to the elevated surface — the fields
+     inside are already dark and their #bbb close glyph clears AA there. */
+  .NC-ShareModal-modal, .ModalContent, .ModalContent-header,
+  .ModalContent-body, .ModalContent-footer,
+  .Dialog-content, .NC-Dialog-content {
+    background-color: #1c2128 !important;
+  }
+  .ModalActionButton { background-color: #2d333b !important; }
+  .NC-CopyForm-copy:hover { background-color: #262c33 !important; }
+
+  /* The ⋮ overflow glyph has two variants and the site picks by SURFACE, not by theme:
+     the default is a #a7a7a7 SVG for dark chrome, `_dark` a #505050 one for its white
+     panels (profile header menu, every achievement row). We darken those panels, so the
+     `_dark` glyph is left at ~1.8:1. It is a data-URI background-image, so its fill is
+     not addressable — invert the single-colour layer instead, which lands it at #afafaf
+     on the repainted surface. */
+  .NC-ThreePointMenu_dark .NC-ThreePointMenu-button { filter: invert(1) !important; }
 
   /* Footer language picker. The .FooterContainer transparent-neutraliser blanked the
      candidate list's own background, so the opened flyout had NO surface at all and

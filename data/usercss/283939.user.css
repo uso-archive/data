@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for TechPowerUp: easy on the eyes across news, reviews, the GPU/CPU spec databases and the forums, with readable tables and code.
-@version      20260726.17.08
+@version      20260730.14.17
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -884,6 +884,21 @@
     color: #8b949e !important;
   }
 
+  /* The DESKTOP generation header paints its #e8e8e8 band as a background-IMAGE
+     (`linear-gradient(to right, transparent 7px, #e8e8e8 7px)` — the 7px transparent
+     lead-in is the gap the row's vendor colour stripe shows through), so the
+     background-COLOR rule above never clears it and the band renders white with our
+     near-white heading text on it. Rebuild the same gradient in the button tone and
+     keep the stripe gap. Two classes so this also outranks `table.items-desktop-table
+     th` (0,1,2) above, which is what actually paints these cells today. */
+  .items .generation-header,
+  .items-desktop-table .generation-header,
+  .processors .generation-header {
+    background-color: transparent !important;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0) 7px, #21262d 7px) !important;
+    color: #8b949e !important;
+  }
+
   /* "Recent changes" / sidebar info widgets on spec pages (light inner box) */
   aside.changes,
   aside.changes > div,
@@ -1497,6 +1512,47 @@
     color: #e6edf3 !important;
   }
 
+  /* XenForo paints its heading BANDS with a `linear-gradient(0deg, #e8f4fc, #fff)`
+     background-IMAGE, so the background-COLOR reads transparent and no colour-only
+     override clears them. `.overlay-title` is handled further down; the same gradient
+     also carries the thread-list "Filters" bar and every popup menu's header and tab
+     strip — all of which shipped as white bands with our near-white heading text.
+     `.filterBar-menuTrigger` keeps a pale plate of its own while its menu is open. */
+  .block-filterBar,
+  .menu-header,
+  .menu-tabHeader {
+    background-color: #161d27 !important;
+    background-image: none !important;
+    color: #e6edf3 !important;
+    border-color: #262c33 !important;
+  }
+
+  .filterBar-filterToggle,
+  .filterBar-menuTrigger.is-menuOpen,
+  .filterBar-menuTrigger:hover {
+    background-color: #21303f !important;
+    color: #ffffff !important;
+  }
+
+  /* The remaining members of the same --xf-contentHighlightBg family: hover and
+     selected states that no rule above claims, so each still flashes the light
+     style's #e8f4fc plate. The menu/autocomplete rows also re-assert the dark
+     --xf-textColor ink the site pins on them. */
+  .menu-row--highlighted,
+  .menu-row--clickable:hover,
+  .autoCompleteList > li.is-selected {
+    background-color: #21303f !important;
+    color: #ffffff !important;
+  }
+
+  .formRow-linkList > li > a:hover,
+  .actionBar-action--mq.is-selected,
+  .actionBar-action--view:hover,
+  .blockLinkSplitToggle:hover,
+  .blockLinkSplitToggle.is-selected {
+    background-color: #21303f !important;
+  }
+
   /* Notable-members page (/forums/members/): the column footers
      (.memberOverviewBlock-seeMore) ship a #f5f5f5 plate and the selected sidebar
      nav row is XenForo's #e8f4fc `.blockLink.is-selected` highlight (the light
@@ -1648,15 +1704,69 @@
     color: #c4cdd6 !important;
   }
 
-  /* The "Staff member" user banner under a username is XenForo's class-based
-     `.userBanner--staff`, shipping the light style's pale #e8f4fc plate with
-     dark-blue ink — a bright unthemed speck on the dark post for a light-OS
-     user. Retint to a dark-blue info plate; custom Patreon "Supporter" banners
-     set their gold identity INLINE and are deliberately left untouched. */
-  .userBanner--staff {
+  /* User banners under a username are `<a>` (or `<span>`) elements, so the blanket
+     `a:link` (0,1,1) and `span` (0,0,1) colour rules above beat every banner's own
+     ink — both the class variants' (XenForo sets those WITHOUT !important) and the
+     custom ones' (a usergroup sets plate + ink INLINE). TPU's gold Patreon
+     "Supporter" banner therefore rendered link-blue on pale gold at ~1.6:1.
+     Each XenForo colour variant gets the tint its `.label--*` twin already has, at
+     two classes so it outranks `a:link`. A CUSTOM banner keeps its inline identity
+     plate and takes a dark ink that reads on it — which assumes the pale plate TPU
+     ships; its inline border-color is greyed by the blanket `*` reset, so follow the
+     ink instead. Both custom rules are (0,1,1), i.e. they tie `a:link` and win only
+     because this block is later in the sheet. */
+  a.userBanner,
+  span.userBanner {
+    color: #3d2f05 !important;
+    border-color: currentColor !important;
+  }
+
+  .userBanner.userBanner--staff,
+  .userBanner.userBanner--primary,
+  .userBanner.userBanner--accent,
+  .userBanner.userBanner--blue,
+  .userBanner.userBanner--royalBlue,
+  .userBanner.userBanner--skyBlue {
     background-color: #16242e !important;
     border-color: #2970a3 !important;
     color: #79c0ff !important;
+  }
+
+  .userBanner.userBanner--green,
+  .userBanner.userBanner--olive,
+  .userBanner.userBanner--lightGreen {
+    background-color: #182a1a !important;
+    border-color: #2a5c2d !important;
+    color: #7ee787 !important;
+  }
+
+  .userBanner.userBanner--red,
+  .userBanner.userBanner--pink,
+  .userBanner.userBanner--hotPink {
+    background-color: #2d1a1a !important;
+    border-color: #7d2a2c !important;
+    color: #ff7b72 !important;
+  }
+
+  .userBanner.userBanner--orange,
+  .userBanner.userBanner--yellow {
+    background-color: #2b2412 !important;
+    border-color: #6b5a12 !important;
+    color: #e3c46a !important;
+  }
+
+  .userBanner.userBanner--purple,
+  .userBanner.userBanner--deepPurple {
+    background-color: #2a1e33 !important;
+    border-color: #4c3a5e !important;
+    color: #d2a8ff !important;
+  }
+
+  .userBanner.userBanner--gray,
+  .userBanner.userBanner--silver {
+    background-color: #21262d !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
   }
 
   .message-userTitle,

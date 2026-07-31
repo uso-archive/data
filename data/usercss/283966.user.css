@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Pikabu.
-@version      20260726.17.05
+@version      20260730.14.16
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -30,7 +30,8 @@
     --pk-text-muted: #8b949e;    /* muted / hints / placeholder */
     --pk-green: #8fd35c;          /* refined Pikabu green (brand) */
     --pk-green-hover: #a4e072;
-    --pk-green-deep: #6fae44;
+    --pk-green-deep: #6fae44;    /* green RINGS and outlines (never under white text) */
+    --pk-green-shade: #598039;   /* green FILLS that carry a white label — 4.6:1 */
 
     /* ---- Flip the "bright"/"blackjack"/"black" greyscale ramps ----
        Pikabu's neutral ramps run light→dark; we re-map the light end of each to
@@ -231,12 +232,152 @@
     --c-pagination-hoverBg: var(--pk-surface);
     --c-pagination-clickBg: var(--pk-border);
     --c-pagination-content: var(--pk-text-soft);
+    /* The CURRENT page pill keeps --c-pagination-activeContent: #fcfdff, a white label,
+       on a brand-green fill. Only the four inactive-state tokens above had been
+       remapped, so the active pill still landed ~2:1. Use the deeper green Pikabu
+       itself picks in its own dark theme, which carries the white label at 4.6:1. */
+    --c-pagination-activeDefaultBg: var(--pk-green-shade);
+    --c-pagination-activeHoverBg: #67993d;
+    --c-pagination-activeClickBg: #6fa642;
+
+    /* Switch toggles (search-filter sidebar: "[мое]", "Скрыть просмотренные"). The
+       control draws its whole visual through pseudo-elements — ::before is the track,
+       ::after the knob — so no element-bg scan sees it, and at 40x24 it also sits under
+       the scanner's chip threshold. Both stayed on Pikabu's light defaults (#ced1d9
+       track / #fcfdff knob), rendering as two bright pills on the dark sidebar. The
+       whole component is token-driven, so remapping here needs no hashed class name.
+       The ON state keeps the brand green; the knob goes dark so it reads on both. */
+    --c-switch-mainDefault: #5e6066;
+    --c-switch-mainHover: #6b7480;
+    --c-switch-mainClick: #7d8893;
+    --c-switch-toggle: var(--pk-bg);
+    --c-switch-activeDefault: var(--pk-green);
+    --c-switch-activeHover: var(--pk-green-hover);
+    --c-switch-activeClick: var(--pk-green-deep);
+
+    /* Date-range picker ("Выбрать дату" in the search filters). Every glyph in the
+       sheet — both month titles and all ~70 day numbers — reads --c-calendar-content,
+       a near-black #292a2e, so the whole popup rendered dark-on-dark; only the selected
+       range was legible. The panel is portaled in on click, so no load-time scan sees
+       it. --c-calendar-choose is the pale-green #eaffd9 band painted between the two
+       ends of a range, and the two hover overlays are dark-on-dark films. */
+    --c-calendar-content: var(--pk-text-soft);
+    --c-calendar-choose: #1d2615;
+    --c-calendar-bgHover: rgba(255, 255, 255, 0.08);
+    --c-calendar-bgClick: rgba(255, 255, 255, 0.16);
+    --c-calendar-activeBgDefault: var(--pk-green-shade);
+    --c-calendar-activeBgHover: #67993d;
+    --c-calendar-activeBgClick: #6fa642;
+
+    /* Range slider (search "Рейтинг"). The track is one gradient: brand green up to the
+       handle, --c-slider-lineBg beyond it. That empty half stayed #ebedf2, so narrowing
+       the range exposed a near-white bar. At the default full-width setting the whole
+       track is green, which is why it never showed up in a screenshot. */
+    --c-slider-lineBg: var(--pk-border);
+    --c-slider-active: var(--pk-green);
+    --c-slider-stokeHover: #26331c;
+    --c-slider-stokeClick: #3a4d2a;
+
+    /* Custom scrollbars (the ui-kit paints ::-webkit-scrollbar-thumb from these). The
+       thumb stayed #dcdee5 — a 20px near-white bar down the side of every scrollable
+       panel, e.g. the tag-suggestion list. Not a native scrollbar, so `color-scheme:
+       dark` does not reach it. */
+    --c-scrollbar-default: #45474d;
+    --c-scrollbar-hover: #5e6066;
+    --c-scrollbar-click: #757880;
+
+    /* Checkbox / radio. Both draw an UNCHECKED box as a solid #fcfdff fill with a
+       #ced1d9 ring — a white square/disc on the dark canvas. The checked fill carries a
+       white tick/dot, so it needs the deeper green for the mark to read. */
+    --c-checkbox-mainBgDefault: #5e6066;
+    --c-checkbox-mainBgHover: #757880;
+    --c-checkbox-mainBgClick: #909299;
+    --c-checkbox-mainStroke: #37393d;
+    --c-checkbox-activeDefault: var(--pk-green-shade);
+    --c-checkbox-activeHover: #67993d;
+    --c-checkbox-activeClick: #6fa642;
+    --c-radio-mainBgDefault: #5e6066;
+    --c-radio-mainBgHover: #757880;
+    --c-radio-mainBgClick: #909299;
+    --c-radio-mainStroke: #37393d;
+    --c-radio-activeDefault: var(--pk-green-shade);
+    --c-radio-activeHover: #67993d;
+    --c-radio-activeClick: #6fa642;
+
+    /* Inactive carousel bullets (#ebedf2 = a row of white dots under a carousel). The
+       ACTIVE bullet is left alone — it is the "you are here" marker. */
+    --c-carouselBullets-medium-normal: #45474d;
+    --c-carouselBullets-small-normal: #757880;
+
+    /* Tab component. Its label tokens are Pikabu's near-blacks, and the "rounded"
+       variant fills itself #fcfdff under a white --c-tab-roundedText label. */
+    --c-tab-default: var(--pk-text-soft);
+    --c-tab-hover: var(--pk-text);
+    --c-tab-click: #ffffff;
+    --c-tab-active: var(--pk-green);
+    --c-tab-roundedBg: var(--pk-surface);
+
+    /* VERTICAL navigation (profile side tabs). Only the `-horizontal-` half of this
+       family had been remapped, so the vertical one kept a near-black label and a
+       near-white hover/current fill. */
+    --c-navigation-text: var(--pk-text-soft);
+    --c-navigation-horizontal-textMainDefault: var(--pk-text-soft);
+    --c-navigation-hover: var(--pk-surface);
+    --c-navigation-active: var(--pk-surface);
+    --c-navigation-click: var(--pk-border);
+
+    /* Ghost ("text") button hover/press fills: pale-green and pale-pink washes that
+       flash a light slab under the cursor. Only the label colours had been handled. */
+    --c-btn-primaryText-bgHover: #26331c;
+    --c-btn-primaryText-bgClick: #1d2615;
+    --c-btn-negativeText-bgHover: #2e1c1a;
+    --c-btn-negativeText-bgClick: #3d211d;
+
+    /* Remaining light control fills: tag press state, tertiary icon-button press,
+       split-button neutral half, and the disabled small icon button. */
+    --c-tag-bgClick: var(--pk-border);
+    --c-tag-bgContrastClick: var(--pk-border);
+    --c-tag-textContrast: var(--pk-text-soft);
+    --c-btnIcon-tertiary-bgClick: var(--pk-border);
+    --c-btnSplit-secondary-bgDefault: #5e6066;
+    --c-btnIconSmall-disabled: #5e6066;
+
+    /* Text tokens still on Pikabu's near-blacks. --c-link-secondary-default was lifted
+       previously but its hover/click siblings were not, so hovering a secondary link
+       (topic names on /themes, footer links) drove it BACK to near-black. */
+    --c-link-secondary-hover: var(--pk-text);
+    --c-link-secondary-click: var(--pk-text);
+    --c-input-textFilled: var(--pk-text);
+    --c-select-main-textSelected: var(--pk-text);
+    --c-quote-text: var(--pk-text-soft);
+    /* disabled tones: #ced1d9 reads brighter than the ENABLED text on dark, i.e. the
+       control looks more active when it is disabled — invert that relationship */
+    --c-input-textDisabled: #5e6066;
+    --c-input-iconDisabled: #5e6066;
+    --c-select-main-textDisabled: #5e6066;
+    --c-select-main-iconDisabled: #5e6066;
+    --c-textarea-textDisabled: #5e6066;
 
     /* ---- Alerts / captcha / collapse ---- */
     --c-alert-baseBg: var(--pk-surface-2);
     --c-alert-baseStroke: var(--pk-border);
+    /* The three SEMANTIC alert variants were never remapped — only `base` was — so an
+       accent / error / warning alert shipped as a near-white island. Dark-tune each
+       while keeping its hue so the severity still reads. */
+    --c-alert-accentBg: #1d2615;
+    --c-alert-accentStroke: #3a4d2a;
+    --c-alert-errorBg: #2e1c1a;
+    --c-alert-errorStroke: #66120a;
+    --c-alert-warningBg: #2e2716;
+    --c-alert-warningStroke: #4f4522;
     --c-captcha-block-bg: var(--pk-surface-2);
     --c-captcha-block-stroke: var(--pk-border);
+    /* the captcha's own answer buttons are a separate family from the block above */
+    --c-captcha-test-btn-default: var(--pk-surface-2);
+    --c-captcha-test-btn-hover: var(--pk-surface);
+    --c-captcha-test-btn-click: var(--pk-border);
+    --c-captcha-test-btn-stroke: var(--pk-border);
+    --c-captcha-test-text: var(--pk-text-soft);
     --collapse-stroke: var(--pk-border);
     --c-bottomSheet-line: var(--pk-border);
 
@@ -511,9 +652,13 @@
      painted the selected tab too and it read as unselected. Restore the green pill. */
   [class*="TabItem__tab"][data-tab-active],
   [class*="TabItem__tab"][data-tab-active] span { color: #ffffff !important; font-weight: 600 !important; }
+  /* The fill must be the SHADE green, not the ring green: --pk-green-deep under this
+     white label measures 2.7:1, which made the selected tab's own name the faintest
+     text on the row — dimmer than the unselected tabs beside it and than the counter
+     nested inside it. --pk-green-shade carries white at 4.6:1. */
   [class*="TabItem__tab"][data-tab-active]::before {
-    background-color: var(--pk-green-deep) !important;
-    border-color: var(--pk-green-deep) !important;
+    background-color: var(--pk-green-shade) !important;
+    border-color: var(--pk-green-shade) !important;
   }
   /* Counter pills nested in a tab must not inherit the tab's label colour: the filled
      "primary" counter sits on brand green, where a light label lands at ~1.1:1. The
@@ -532,12 +677,13 @@
     border-color: var(--pk-border) !important;
   }
   [class*="SelectBtn__button"]:hover { background-color: var(--pk-surface) !important; color: var(--pk-text) !important; }
-  /* active segmented button keeps the brand green pill with white label */
+  /* active segmented button keeps the brand green pill with white label — on the SHADE
+     green, which is the only one of our greens that carries white text above 4.5:1 */
   [class*="SelectBtn__button_active"],
   [class*="SelectBtn__button_active"] span {
-    background-color: var(--pk-green-deep) !important;
+    background-color: var(--pk-green-shade) !important;
     color: #ffffff !important;
-    border-color: var(--pk-green-deep) !important;
+    border-color: var(--pk-green-shade) !important;
   }
 
   /* Comment-sort + generic sorting controls (Лучшие / Новые / Старые …) */
@@ -603,11 +749,18 @@
   }
 
   /* Mobile "download the app" button (`.header__app-link`, the green "Добавить" CTA
-     in the drawer header). Pikabu gives it a brand-green outline; our universal
-     `* { border-color }` reset flattened the ring to grey, leaving a mismatched
-     outline around the green label. Restore the green border. */
+     in the drawer header). Pikabu gives it a brand-green outline AND a brand-green
+     label; our universal `* { border-color }` reset flattened the ring, and the
+     `.header a` label rule flattened the text. Only the ring had been restored, so the
+     button shipped as a green outline wrapped around a grey label — and around a grey
+     Apple glyph too, since that SVG paints from `currentColor`. Restore both. */
   a.header__app-link,
-  .header__app-link { border-color: var(--pk-green-deep) !important; }
+  .header__app-link,
+  .header a.header__app-link,
+  .header a.header__app-link span {
+    border-color: var(--pk-green-deep) !important;
+    color: var(--pk-green) !important;
+  }
 
   /* "Post boost active" badge (rocket pill beside a boosted post's title). It carries its
      identity in three COMPONENT-LOCAL properties declared on the element itself, whose
@@ -874,6 +1027,19 @@
   .popup_warning .popup__container {
     background-color: var(--pk-surface) !important;
     --color-bright-900: #e9e9e9;
+  }
+
+  /* Every balloon popup (the story "..." overflow menu, share menu, community picker)
+     lands on --pk-surface — the SAME fill as the story card it opens over — and Pikabu
+     separates the two with `box-shadow: 0 4px 20px rgba(0,0,0,.08)`, a halo that only
+     exists against a light page. On dark the panel has no edge at all: the menu items
+     read as loose text floating on the post. Give the panel a real rim.
+     `popup_modal` is excluded on purpose: on the auth/registration modal the container
+     is a TRANSPARENT wrapper around a detached notice pill plus the card below it, so a
+     rim there would trace a rectangle through empty space between the two. */
+  .popup:not(.popup_modal) .popup__container {
+    border: 1px solid var(--pk-border) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
   }
 
   /* Header ad-slot containers default to a literal white background; before an ad

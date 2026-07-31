@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Avito that's easy on the eyes, perfect for late-night browsing.
-@version      20260726.16.58
+@version      20260730.14.12
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -186,15 +186,29 @@
     color: var(--av-accent) !important;
   }
   [style*="color:#CCECFF"], [style*="color:#ccecff"],
-  [style*="color:#CFEDFF"], [style*="color:#cfedff"] {
+  [style*="color:#CFEDFF"], [style*="color:#cfedff"],
+  [style*="color: rgb(204, 236, 255)"], [style*="color:rgb(204, 236, 255)"],
+  [style*="color: rgb(207, 237, 255)"], [style*="color:rgb(207, 237, 255)"] {
     color: #1d2c3a !important;
   }
-  /* The NEUTRAL ribbon ("Скидка на доставку", "14 дней на возврат"): body is an
-     inline `background-color:#EBEAE8`, cap is an inline `color:#EBEAE8` on an
-     SVG path filled with `currentColor`. The div-neutraliser wiped the body and
-     the broad text rule repainted the cap `--av-text-soft`, leaving two pale
+  /* The DISCOUNT ribbon ("Скидка"): body is an inline `background-color:#E50965`
+     (Avito's discount crimson), cap is an inline `color:#E50965` on an SVG path
+     filled with `currentColor`. Neither form was covered, so the div-neutraliser
+     wiped the pill body and the broad text rule greyed both caps — the badge read
+     as bare text between two pale wedges, straight on the listing photo. Refined
+     to #c41f66 (5.6:1 against the white label), matching how the other saturated
+     brand fills are toned down. */
+  [style*="color:#E50965"], [style*="color:#e50965"],
+  [style*="color: rgb(229, 9, 101)"], [style*="color:rgb(229, 9, 101)"] {
+    color: #c41f66 !important;
+  }
+  /* The NEUTRAL ribbon ("Скидка на доставку", "14 дней на возврат", "Рассрочка"):
+     body is an inline `background-color:#EBEAE8`, cap is an inline `color:#EBEAE8`
+     on an SVG path filled with `currentColor`. The div-neutraliser wiped the body
+     and the broad text rule repainted the cap `--av-text-soft`, leaving two pale
      wedges floating on either side of a bodiless label. */
-  [style*="color:#EBEAE8"], [style*="color:#ebeae8"] {
+  [style*="color:#EBEAE8"], [style*="color:#ebeae8"],
+  [style*="color: rgb(235, 234, 232)"], [style*="color:rgb(235, 234, 232)"] {
     color: var(--av-surface) !important;
   }
 
@@ -240,9 +254,22 @@
   [style*="background-color:#00aaff"], [style*="background-color:#00AAFF"] {
     background-color: var(--av-accent) !important; color: #0b1620 !important;
   }
+  /* Discount ribbon body (crimson) — same ordering constraint as the neutral one
+     below: "background-color:#E50965" CONTAINS "color:#E50965", so the cap rule
+     must come first and this must re-override the label. */
+  [style*="background-color:#E50965"], [style*="background-color:#e50965"],
+  [style*="background-color: rgb(229, 9, 101)"],
+  [style*="background-color:rgb(229, 9, 101)"] {
+    background-color: #c41f66 !important; color: #fff !important;
+  }
   /* Neutral ribbon body — must come after the `color:#EBEAE8` cap rule above,
-     because "background-color:#EBEAE8" CONTAINS the substring "color:#EBEAE8". */
-  [style*="background-color:#EBEAE8"], [style*="background-color:#ebeae8"] {
+     because "background-color:#EBEAE8" CONTAINS the substring "color:#EBEAE8".
+     Avito emits the inline value as raw hex on a server-rendered page and as
+     `rgb(...)` once React re-renders the list client-side (any filter change,
+     category click or sort), so both spellings must be listed. */
+  [style*="background-color:#EBEAE8"], [style*="background-color:#ebeae8"],
+  [style*="background-color: rgb(235, 234, 232)"],
+  [style*="background-color:rgb(235, 234, 232)"] {
     background-color: var(--av-surface) !important;
     color: var(--av-text-soft) !important;
   }
@@ -408,13 +435,19 @@
      white). The marker was `delivery-item-button-request`; Avito re-split it into
      `-header` / `-main` / `-cart`, so match the whole `delivery-item-button` family
      by prefix (the plain-text `delivery/landing` link has no `-button` and is
-     unaffected). */
-  [data-marker^="delivery-item-button"] {
+     unaffected). The fullscreen photo lightbox ships the same purple CTA under a
+     marker outside that family — `gallery-delivery-button` — so it fell through to
+     the generic dark button rule and the gallery's only buy action read as an
+     anonymous grey pill; the `$=` arm covers it and any future `<surface>-delivery-button`. */
+  [data-marker^="delivery-item-button"],
+  [data-marker$="-delivery-button"] {
     background-color: #7d5bc4 !important;
     border-color: #7d5bc4 !important;
   }
   [data-marker^="delivery-item-button"],
-  [data-marker^="delivery-item-button"] * {
+  [data-marker^="delivery-item-button"] *,
+  [data-marker$="-delivery-button"],
+  [data-marker$="-delivery-button"] * {
     color: #fff !important;
   }
 
@@ -457,6 +490,19 @@
     border-color: var(--av-accent) !important;
     color: #0b1620 !important;
   }
+  /* Payment-schedule bar under the same block: the paid segment is green and the
+     four upcoming ones are inline `background: rgb(214, 214, 214)` SPANs — a
+     subtle track on Avito's white buy-box, but four glaring 53×4 white bars on
+     the dark one, louder than the green segment they are supposed to sit behind.
+     They are SPANs (outside the div-neutraliser) under pure-hash classes, so the
+     inline value is the only stable hook. Sink them to the line colour so the
+     green "paid" segment reads as the filled part again. Written against
+     `background`, not `background-color`: Avito uses the shorthand here. */
+  [style*="background: rgb(214, 214, 214)"],
+  [style*="background:rgb(214, 214, 214)"],
+  [style*="background:#D6D6D6"], [style*="background:#d6d6d6"] {
+    background-color: var(--av-border) !important;
+  }
 
   /* ---- Item-page variant chips (condition / memory / …) ---- */
   /* The item page's attribute switchers ("Расширенное состояние": Отличное /
@@ -484,6 +530,52 @@
   }
   [data-marker="multi-items"] label input:checked + span,
   [data-marker="multi-items"] label input:checked + span * {
+    color: #0b1620 !important;
+  }
+
+  /* ---- Model / catalog page (…/catalog/<brand>/<model>/…/specs-…) ---- */
+  /* Reached from an item page's "Все характеристики" link. Its modification
+     switcher ("Состояние", "Объём памяти", …) is the multi-items pill pattern
+     under a DIFFERENT hook — `label > input[type=checkbox] + span` inside
+     `model-card/modification-form`, with no `multi-items` marker — so none of the
+     rules above reached it: every unselected pill stayed a hard `#f2f1f0` white
+     with the broad text rule's light-grey label on top (~1.5:1, unreadable), and
+     the checked pill's native `#141414` made it read as the DIMMEST of the group,
+     inverting the indicator. Same treatment as every other switcher in the theme. */
+  [data-marker="model-card/modification-form"] label > span {
+    background-color: var(--av-surface) !important;
+    border-color: var(--av-border) !important;
+  }
+  [data-marker="model-card/modification-form"] label > span,
+  [data-marker="model-card/modification-form"] label > span * {
+    color: var(--av-text) !important;
+  }
+  [data-marker="model-card/modification-form"] label input:checked + span {
+    background-color: var(--av-accent) !important;
+    border-color: var(--av-accent) !important;
+  }
+  [data-marker="model-card/modification-form"] label input:checked + span,
+  [data-marker="model-card/modification-form"] label input:checked + span * {
+    color: #0b1620 !important;
+  }
+  /* The same page's two CTAs are anchors under pure-hash classes, so neither the
+     `styles-module-root` nor the `-button` arms above reach them: the secondary
+     "Ещё N объявлений" kept its native `#f2f1f0` fill (a bright white 169×44 slab)
+     and the primary "Показать N объявлений" — natively a solid `#141414` pill —
+     lost its fill entirely and rendered as bare text. */
+  [data-marker="model-card/mini-serp-2/button"] {
+    background-color: var(--av-surface) !important;
+    border-color: var(--av-border) !important;
+  }
+  /* `a[data-marker$="-button"]` (the text-link un-painter above) also matches
+     `model-card/ui-button` at (0,1,1), so this arm must carry the `a` type too —
+     the tie then breaks on source order. */
+  a[data-marker="model-card/ui-button"] {
+    background-color: var(--av-accent) !important;
+    border-color: var(--av-accent) !important;
+  }
+  [data-marker="model-card/ui-button"],
+  [data-marker="model-card/ui-button"] * {
     color: #0b1620 !important;
   }
 
@@ -521,6 +613,17 @@
   [style*="color: rgb(255, 97, 99)"], [style*="color:rgb(255, 97, 99)"],
   [style*="color:#ff6163"], [style*="color:#FF6163"] {
     color: #ff6163 !important;
+  }
+  /* SEO geo-links tab strip at the foot of a results page. Two tabs mark the
+     current one with a bold black `<strong>` and the other with an inline
+     `color: rgb(0, 153, 247)` on a bare SPAN — the link blue is the ONLY thing
+     saying the second tab is clickable. The broad span rule flattened it to body
+     grey, so both tabs rendered identically and the affordance was gone. Same
+     inline-`[style]` lever the badge colours use; the theme accent replaces the
+     native blue for the same reason `a` does. */
+  [style*="color: rgb(0, 153, 247)"], [style*="color:rgb(0, 153, 247)"],
+  [style*="color:#0099f7"], [style*="color:#0099F7"] {
+    color: var(--av-accent) !important;
   }
   /* Discount-percentage label ("−5%", "−10%") on recommendation / search cards
      is a bare <span data-marker="discount-value"> whose native colour is Avito's
@@ -592,9 +695,12 @@
   [style*="background-color: rgb(2, 209, 92)"] *,
   [style*="background-color: rgb(150, 94, 235)"],
   [style*="background-color: rgb(150, 94, 235)"] *,
+  [style*="background-color: rgb(229, 9, 101)"],
+  [style*="background-color: rgb(229, 9, 101)"] *,
   [style*="background-color:#FF4053"], [style*="background-color:#FF4053"] *,
   [style*="background-color:#02D15C"], [style*="background-color:#02D15C"] *,
-  [style*="background-color:#965EEB"], [style*="background-color:#965EEB"] * {
+  [style*="background-color:#965EEB"], [style*="background-color:#965EEB"] *,
+  [style*="background-color:#E50965"], [style*="background-color:#E50965"] * {
     color: #fff !important;
   }
   [style*="background-color: rgb(0, 170, 255)"],
@@ -985,9 +1091,16 @@
      invisible to element-bg scans — and flash bright on every hover. Repaint
      them to the dark elevated surface and drop the light halo shadow. Classes
      are hashed, so hook the stable `iva-item-` prefixes. */
+  /* The model/catalog page's offer rows ship the same hover panel under pure-hash
+     classes, so the `iva-item-` arms miss it and the whole row went white with
+     near-invisible light-grey text on it. Every card that carries the panel is a
+     `[data-marker="item"]`, on both surfaces — the marker is the durable hook.
+     The pseudo only exists on hover, so painting it unconditionally cannot show a
+     surface on a resting card. */
   [class*="iva-item-redesign"]:hover::before,
   [class*="iva-item-redesign"]:hover [class*="iva-item-actions"]::before,
-  [class*="iva-item-actions"]::before {
+  [class*="iva-item-actions"]::before,
+  [data-marker="item"]::before {
     background-color: var(--av-surface) !important;
     box-shadow: none !important;
   }

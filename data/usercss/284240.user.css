@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark mode for the SCP Foundation Wiki: articles, sidebar, tables, tabs, ratings, forums and search all get a comfortable night palette.
-@version      20260727.15.18
+@version      20260730.14.40
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -12,8 +12,53 @@
      BASE
      ============================================================ */
 
+  /* Headings and links state a colour directly on the element, so they cannot
+     reach an author's callout box by inheritance the way body ink does. They
+     read these instead, and a light author box rebinds them for its subtree. */
   :root {
     color-scheme: dark;
+    --scp-title: #e05f6b;
+    --scp-heading: #e6edf3;
+    --scp-link: #e8626e;
+    --scp-link-visited: #cf90a8;
+    --scp-link-hover: #ff8f97;
+    --scp-lift-black: #c4cdd6;
+    --scp-lift-blue: #79c0ff;
+    --scp-lift-green: #7ee787;
+    --scp-lift-purple: #d2a8ff;
+    --scp-lift-maroon: #ff9492;
+    --scp-lift-red: #ff453a;
+    --scp-lift-brown: #d4a373;
+    --scp-lift-teal: #56d4dd;
+  }
+
+  /* Black Highlighter declares its whole palette on :root and feeds the site
+     CHROME from it — the sidebar, the page-options button row, the Site tools
+     flyout, modals, hover-blocks, the footnote footer and the editor menus all
+     read these. The article body is remapped separately on #page-content, which
+     never reaches any of them.
+     Only tokens that exclusively mean "a surface" or "body ink" are remapped.
+     --swatch-background and --white-monochrome stay light on purpose: BH also
+     uses them as knocked-out text ON its crimson fills (the history page's
+     first column, the tag editor, form focus rows), and a dark value there is
+     unreadable on the crimson. */
+  :root {
+    --swatch-text-general: 196, 205, 214;
+    --swatch-text-tertiary-color: 196, 205, 214;
+    --swatch-menutxt-general-color: 196, 205, 214;
+    --swatch-menubg-color: 20, 24, 29;
+    --swatch-secondary-color: 34, 40, 47;
+    --swatch-border-color: 45, 51, 59;
+    --rating-module-bg-color: 26, 31, 38;
+    --pager-text: 196, 205, 214;
+
+    /* Themes derived from Black Highlighter (a large share of post-2020
+       articles ship one) name these two directly on :root instead of letting
+       them fall out of --swatch-secondary-color, which bypasses the remap
+       above. They are the page-options button row. Sigma-9 never reads them,
+       so its bare-text bar is untouched. */
+    --ui-button-bg: 34, 40, 47;
+    --ui-button-txt: 196, 205, 214;
   }
 
   html,
@@ -58,7 +103,7 @@
   #page-title,
   h1,
   .meta-title {
-    color: #e05f6b !important;
+    color: var(--scp-title) !important;
     border-color: #2d333b !important;
   }
 
@@ -67,18 +112,86 @@
   h4,
   h5,
   h6 {
-    color: #e6edf3;
+    color: var(--scp-heading);
   }
 
+  /* Declared on the article root ONLY, so the ink reaches the text by
+     inheritance. A copy of this on p/li/dd/dt/td is a direct declaration and
+     beats any colour an author put on a wrapping callout box, however specific
+     or inline that wrapper's colour was — which erases the author's ink while
+     leaving their light paper behind. */
   #page-content,
-  #page-content p,
-  #page-content li,
-  #page-content dd,
-  #page-content dt,
-  #page-content td,
   .thread-container .post .content,
   .forum-thread-box .description-block {
     color: #c4cdd6;
+  }
+
+  /* Black Highlighter — the modern site theme, used by most post-2020 articles
+     — paints article surfaces from this token layer. Remapping the tokens
+     instead of the components covers every widget they feed (content tables,
+     the author card behind the byline, callouts) including the ones that only
+     exist on hover. Scoped to the article body: the header, sidebar and top
+     menu are painted by their own rules and must not follow. */
+  #page-content {
+    --swatch-background: 26, 31, 38;
+    --swatch-text-general: 196, 205, 214;
+    --swatch-border-color: 45, 51, 59;
+    --tables-body-bg: 26, 31, 38;
+    --tables-body-txt: 196, 205, 214;
+    --tables-border: 45, 51, 59;
+    --tables-header-bg: 34, 40, 47;
+    --tables-header-txt: 230, 237, 243;
+  }
+
+  /* Authors build callout boxes as [[div style="background:#f2f2c2"]] and let
+     the site's near-black body ink carry the words — the wrapper names a paper
+     colour and no ink. That paper survives the theme, so the box has to hand
+     the ink back. Matched on the VALUE (an inline background alongside a light
+     hex or `white`), never on a class: the classes are page-local and differ
+     per article.
+     Deliberately NOT !important — an author who did name their own colour
+     still wins, so this can never read worse than the unstyled site.
+     A dark box carrying a pale border hex matches too. That is survivable and
+     deliberately not filtered: such a box has to name its own light ink to
+     work on the site's white page, that inline ink beats everything here, and
+     the boxes seen doing it hold no text of their own. Filtering it needs a
+     `color:`-bearing :not(), which also drops the light boxes that DO name
+     their ink — and those still need the rebinds below for their headings and
+     links. */
+  #page-content [style*="background"][style*="#c"],
+  #page-content [style*="background"][style*="#d"],
+  #page-content [style*="background"][style*="#e"],
+  #page-content [style*="background"][style*="#f"],
+  #page-content [style*="background"][style*="#C"],
+  #page-content [style*="background"][style*="#D"],
+  #page-content [style*="background"][style*="#E"],
+  #page-content [style*="background"][style*="#F"],
+  #page-content [style*="background"][style*="white"] {
+    color: #1b1815;
+    --scp-title: #7a1d24;
+    --scp-heading: #1b1815;
+    --scp-link: #a4161a;
+    --scp-link-visited: #6d3550;
+    --scp-link-hover: #d21414;
+    /* Black Highlighter's own light values are the right ones on paper, so the
+       remap above is handed back for anything the box contains — an ACS bar or
+       a content table nested in a callout follows the paper, not the page. */
+    --swatch-background: 252, 252, 252;
+    --swatch-text-general: 27, 24, 21;
+    --swatch-border-color: 160, 160, 160;
+    --tables-body-bg: 252, 252, 252;
+    --tables-body-txt: 27, 24, 21;
+    --tables-border: 160, 160, 160;
+    /* Same for the ##blue|…## inline palette: on paper the author's own dark
+       end reads, and the lifted end does not. */
+    --scp-lift-black: #1b1815;
+    --scp-lift-blue: #0000cd;
+    --scp-lift-green: #046307;
+    --scp-lift-purple: #800080;
+    --scp-lift-maroon: #800000;
+    --scp-lift-red: #c30000;
+    --scp-lift-brown: #6b4423;
+    --scp-lift-teal: #006a6a;
   }
 
   hr {
@@ -95,17 +208,35 @@
   #interwiki a,
   #side-bar a,
   #page-content a {
-    color: #e8626e;
+    color: var(--scp-link);
   }
 
   a:visited,
   #page-content a:visited {
-    color: #cf90a8;
+    color: var(--scp-link-visited);
   }
 
   a:hover,
   #page-content a:hover {
-    color: #ff8f97;
+    color: var(--scp-link-hover);
+  }
+
+  /* Article themes reach the body links from their own page-scoped rules, which
+     out-specify a single-id selector — on the themes that pitch their links
+     near-black for a light page, that leaves them invisible here. Two ids win
+     on the id count alone, so no !important is needed and an author's inline
+     colour (and the ##name|text## lifts further down) still take precedence.
+     Every other article-link rule is doubled to the same weight below. */
+  #main-content #page-content a {
+    color: var(--scp-link);
+  }
+
+  #main-content #page-content a:visited {
+    color: var(--scp-link-visited);
+  }
+
+  #main-content #page-content a:hover {
+    color: var(--scp-link-hover);
   }
 
   /* Wikidot paints a light hover fill on every link. Kept at low specificity
@@ -115,17 +246,25 @@
   }
 
   a.newpage,
-  a.newpage:visited {
+  a.newpage:visited,
+  #main-content #page-content a.newpage,
+  #main-content #page-content a.newpage:visited {
     color: #e8944a;
   }
 
   #page-content a.collapsible-block-link {
-    color: #e8626e;
+    color: var(--scp-link);
+  }
+
+  /* The author-info rail (a shared component) is drawn by article themes with a
+     light pill behind its links, which the crimson ink above cannot sit on. */
+  #page-content .info-container a {
+    background-color: transparent !important;
   }
 
   /* The front page colour-codes links by content type (SCP / Tale / GoI /
      Artwork) through --link-color; hand those back after the broad rule. */
-  #page-content a.core-link,
+  #main-content #page-content a.core-link,
   #page-content .masthead .line.middle {
     color: var(--link-color);
   }
@@ -138,16 +277,20 @@
     color: #eee;
   }
 
-  #header h2 span {
-    color: #f0f0c0;
-  }
+  /* Sigma-9 already paints the tagline #f0f0c0, and Black Highlighter HIDES this
+     span with `color: transparent` while drawing its own copy from a ::before —
+     so a colour here does not improve Sigma and un-hides a second tagline on
+     every Black Highlighter page. Deliberately left unstyled. */
 
+  /* Article themes derived from Black Highlighter repaint the masthead from
+     their own palette, so the chrome states its ink rather than relying on the
+     cascade order. */
   #login-status {
-    color: #9aa4ae;
+    color: #9aa4ae !important;
   }
 
   #login-status a {
-    color: #dde3e9;
+    color: #dde3e9 !important;
   }
 
   /* "Sign in" carries .btn-primary but renders as bare text on the masthead. */
@@ -160,7 +303,7 @@
 
   #login-status ul a,
   #account-options li a {
-    color: #e8626e;
+    color: #e8626e !important;
   }
 
   #account-options {
@@ -181,10 +324,13 @@
   }
 
   #top-bar a {
-    color: #eaeaea;
+    color: #eaeaea !important;
   }
 
+  /* The dropdown panel carries its own fill on Black Highlighter — the anchor
+     fills below only cover the rows, not the gaps between them. */
   #top-bar ul li ul {
+    background-color: #1c2128 !important;
     border-color: #3a4048 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, .7);
   }
@@ -260,6 +406,15 @@
      SIDE BAR
      ============================================================ */
 
+  /* Articles that ship their own theme paint #side-bar directly rather than
+     through Black Highlighter's token, so the token rebind above cannot reach
+     them. Sigma-9 leaves this element unpainted, so stating it costs nothing
+     there. The border is drawn in currentColor by several of those themes. */
+  #side-bar {
+    background-color: #14181d !important;
+    border-color: #2d333b !important;
+  }
+
   #side-bar .side-block,
   #interwiki .side-block {
     background-color: #1c2128 !important;
@@ -274,6 +429,15 @@
 
   #side-bar .side-block.resources {
     background-color: #17251d !important;
+  }
+
+  /* Black Highlighter puts the sidebar block heading's colour on a <p> INSIDE
+     .heading, so the rule below — which paints .heading itself — is an
+     inherited value the <p> overrides. Its token has to be rebound too. */
+  #side-bar,
+  #interwiki {
+    --sideblock-heading-text-color: 224, 123, 131;
+    --sidebar-links-text: 196, 205, 214;
   }
 
   #side-bar .heading,
@@ -318,10 +482,11 @@
      TABLES
      ============================================================ */
 
+  /* No ink here: td would beat an author box's inherited colour the same way
+     the page-content copy did. The cell text inherits; th states its own. */
   table.wiki-content-table td,
   table.wiki-content-table th {
     border-color: #2d333b !important;
-    color: #c4cdd6;
   }
 
   table.wiki-content-table th {
@@ -405,7 +570,10 @@
     color: #8b949e !important;
   }
 
-  /* Footnote / bibliography rails */
+  /* Footnote / bibliography rails. The footer is a filled panel under Black
+     Highlighter and under the article themes derived from it, and those themes
+     name its fill directly instead of through the token, so it is stated here
+     rather than inherited. */
   .footnotes-footer,
   .bibitems,
   .footnote-footer,
@@ -413,6 +581,31 @@
   .reference .r-content {
     border-color: #2d333b !important;
     color: #c4cdd6;
+  }
+
+  #page-content .footnotes-footer {
+    background-color: #1a1f26 !important;
+
+    /* Black Highlighter draws the back-reference digit from --link-color, which
+       article themes pitch near-black for a light panel. */
+    --footnotes-footer-num-color: 232, 98, 110;
+    --footnotes-footer-num-hover-color: 255, 143, 151;
+  }
+
+  /* That digit is drawn by a ::before and the anchor's own text is hidden with
+     `color: transparent`, so a link colour here prints a second digit under it. */
+  #main-content #page-content .footnotes-footer a[href*="javascript"] {
+    color: transparent;
+  }
+
+  /* The inline footnote popup. It is white-on-transparent and only
+     `visibility: hidden` until hovered, so a load-time surface scan sees a
+     white box that never moves; it is the article ink that has to be readable
+     inside it. */
+  #page-content .fncon {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
   }
 
   div.wiki-note,
@@ -529,6 +722,18 @@
     border-top-color: #2d333b !important;
   }
 
+  /* Tag list and the prev/next wikiwalk rail are furniture, not author prose,
+     so their link colour is pinned against article themes that darken it. */
+  #main-content .page-tags span a,
+  #page-content .footer-wikiwalk-nav a {
+    color: #e8626e !important;
+  }
+
+  #main-content .page-tags span a:hover,
+  #page-content .footer-wikiwalk-nav a:hover {
+    color: #ff8f97 !important;
+  }
+
   /* Wikidot writes the tag cloud's frequency gradient as inline per-tag
      colours, and the whole range — periwinkle through crimson — falls below
      AA on a dark page. Font size encodes the same frequency, so the tags take
@@ -564,7 +769,7 @@
   #page-content strong[style*="color: black"],
   #page-content em[style*="color:black"],
   #page-content em[style*="color: black"] {
-    color: #c4cdd6 !important;
+    color: var(--scp-lift-black) !important;
   }
 
   #page-content span[style*="color:blue"],
@@ -581,7 +786,7 @@
   #page-content strong[style*="color: blue"],
   #page-content em[style*="color:blue"],
   #page-content em[style*="color: blue"] {
-    color: #79c0ff !important;
+    color: var(--scp-lift-blue) !important;
   }
 
   #page-content span[style*="color:green"],
@@ -594,7 +799,7 @@
   #page-content strong[style*="color: green"],
   #page-content em[style*="color:green"],
   #page-content em[style*="color: green"] {
-    color: #7ee787 !important;
+    color: var(--scp-lift-green) !important;
   }
 
   #page-content span[style*="color:purple"],
@@ -609,7 +814,7 @@
   #page-content strong[style*="color: purple"],
   #page-content em[style*="color:purple"],
   #page-content em[style*="color: purple"] {
-    color: #d2a8ff !important;
+    color: var(--scp-lift-purple) !important;
   }
 
   #page-content span[style*="color:maroon"],
@@ -624,7 +829,7 @@
   #page-content strong[style*="color: maroon"],
   #page-content em[style*="color:maroon"],
   #page-content em[style*="color: maroon"] {
-    color: #ff9492 !important;
+    color: var(--scp-lift-maroon) !important;
   }
 
   /* Pure red lands at 4.46:1 — a hair under AA. Softened just enough to pass
@@ -639,7 +844,7 @@
   #page-content strong[style*="color: red"],
   #page-content em[style*="color:red"],
   #page-content em[style*="color: red"] {
-    color: #ff453a !important;
+    color: var(--scp-lift-red) !important;
   }
 
   #page-content span[style*="color:brown"],
@@ -648,7 +853,7 @@
   #page-content a[style*="color: brown"],
   #page-content strong[style*="color:brown"],
   #page-content strong[style*="color: brown"] {
-    color: #d4a373 !important;
+    color: var(--scp-lift-brown) !important;
   }
 
   #page-content span[style*="color:teal"],
@@ -659,7 +864,7 @@
   #page-content a[style*="color: teal"],
   #page-content strong[style*="color:teal"],
   #page-content strong[style*="color: teal"] {
-    color: #56d4dd !important;
+    color: var(--scp-lift-teal) !important;
   }
 
   /* Redacted / blackout spans keep working on dark */
@@ -717,6 +922,42 @@
   .page-rate-widget-box .cancel a:hover {
     background-color: #7d4444 !important;
     color: #fff6f0 !important;
+  }
+
+  /* Articles with a credit module wrap the widget in a second maroon strip that
+     carries the "i" button; it has to track .rate-points, which is darker than
+     the maroon the site ships. */
+  .rate-box-with-credit-button {
+    background-color: #5a2f2f !important;
+    border-color: #5a2f2f !important;
+  }
+
+  /* The site paints this button white precisely because it sits on the maroon;
+     the page-wide link colour drops it to ~3:1 there. */
+  .creditButton a {
+    color: #f0e2e2 !important;
+
+    /* only the left side is drawn — it is the widget's separator, and pinning
+       it stops the other three inheriting the new text colour */
+    border-color: #996666 !important;
+  }
+
+  .creditButton a:hover {
+    color: #fff !important;
+  }
+
+  /* The credit panel itself, opened by that button. Its surface is a
+     background-IMAGE — a grey title strip above a white body — so a
+     background-color alone never reaches it. */
+  #u-credit-view .modalbox {
+    background-color: #1c2128 !important;
+    background-image: linear-gradient(#22282f 51px, #1c2128 51px, #1c2128) !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  #u-credit-view .fader {
+    background-color: rgba(0, 0, 0, .7) !important;
   }
 
   /* ============================================================
@@ -1096,6 +1337,26 @@
   }
 
   /* ============================================================
+     SITE TOOLS / CHANGE LISTS
+     ============================================================ */
+
+  /* The Site tools flyout's panel is a ::before, so a background-color on the
+     box itself never reaches it. */
+  #site-tools-box::before {
+    background-color: #1c2128 !important;
+  }
+
+  /* Recent Changes highlights the row under the cursor with a near-white fill,
+     which the row's own light ink then sits on. Only reachable on hover. */
+  #site-changes-list .changes-list-item:hover {
+    background-color: #1c2128 !important;
+  }
+
+  #site-changes-list .changes-list-item .comments {
+    color: #8b949e !important;
+  }
+
+  /* ============================================================
      FORUM
      ============================================================ */
 
@@ -1173,6 +1434,192 @@
     background-color: #262c33 !important;
     border-color: #3a4048 !important;
     color: #ff8f97 !important;
+  }
+
+  /* ============================================================
+     CONSENT MANAGER (NitroPay)
+
+     A white modal on every first visit, plus the privacy dashboard behind
+     "Advanced Settings". Recoloured only — the banner's emphasis hierarchy is
+     left as the site ships it, so neither choice gains or loses prominence.
+     The banner and the dashboard hang off two SEPARATE roots (#ncmp__tool and
+     #ncmp__modal), hence the scoping by the vendor's own class prefix.
+     ============================================================ */
+
+  .ncmp__banner,
+  .ncmp__modal {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* Only the page scrim. .ncmp__vendor-shadow covers the whole dashboard and is
+     transparent until the vendor drawer opens — painting it dims the panel. */
+  .ncmp__shadow {
+    background-color: rgba(0, 0, 0, .7) !important;
+  }
+
+  .ncmp__banner h1,
+  .ncmp__banner h2,
+  .ncmp__banner h3,
+  .ncmp__banner strong,
+  .ncmp__modal h1,
+  .ncmp__modal h2,
+  .ncmp__modal h3,
+  .ncmp__modal strong,
+  .ncmp__banner-emphasis,
+  .ncmp__section-title {
+    background-color: transparent !important;
+    color: #e6edf3 !important;
+  }
+
+  .ncmp__banner p,
+  .ncmp__modal p,
+  .ncmp__section-details,
+  .ncmp__list-info,
+  .ncmp__vendor-consent,
+  .ncmp__toggle-on,
+  .ncmp__toggle-off,
+  .ncmp__toggle-purposes-on,
+  .ncmp__description-legal,
+  .ncmp__description-legal span,
+  .ncmp__section-body li,
+  .ncmp__section-body span {
+    color: #c4cdd6 !important;
+  }
+
+  .ncmp__branding,
+  .ncmp__branding-logo,
+  .ncmp__branding-version,
+  .ncmp__branding-version span,
+  .ncmp__toggle-purposes-off {
+    color: #8b949e !important;
+  }
+
+  /* These carry a border in currentColor, so a link colour alone would draw a
+     bright hairline under every one of them. */
+  .ncmp__list-action a,
+  .ncmp__branding-version a {
+    border-color: #7d3030 !important;
+  }
+
+  .ncmp__btn {
+    background-color: #8a2f2f !important;
+    border-color: #8a2f2f !important;
+    color: #fff !important;
+  }
+
+  .ncmp__btn:hover {
+    background-color: #a03636 !important;
+    color: #fff !important;
+  }
+
+  .ncmp__btn.ncmp__btn-border,
+  .ncmp__btn.ncmp__btn-danger {
+    background-color: transparent !important;
+    border-color: #c98a8a !important;
+    color: #e8949a !important;
+  }
+
+  .ncmp__btn.ncmp__btn-border:hover,
+  .ncmp__btn.ncmp__btn-danger:hover {
+    background-color: #33272a !important;
+    color: #ffd5d8 !important;
+  }
+
+  .ncmp__section-body {
+    background-color: #171b21 !important;
+  }
+
+  .ncmp__list-item,
+  .ncmp__vendor-info {
+    background-color: #22282f !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* Vendor tables: the registered-vendor lists and the per-vendor drawer. The
+     site stripes every second row light and fills the drawer's rows near-white. */
+  .ncmp__section table tr th {
+    background-color: #22282f !important;
+    color: #e6edf3 !important;
+  }
+
+  .ncmp__section table tr td,
+  .ncmp__vendor-section table tr td {
+    background-color: transparent !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .ncmp__section table tr:nth-child(2n) td {
+    background-color: #1f242b !important;
+  }
+
+  /* An amber note block — kept amber, pitched for a dark panel */
+  .ncmp__illustrations {
+    background-color: #2a2313 !important;
+    border-color: #6d5a2a !important;
+    color: #e0c07a !important;
+  }
+
+  /* The consent switches encode state by track colour — filled on, grey off. */
+  .ncmp__toggle label,
+  .ncmp__toggle-purpose label {
+    background-color: #4a5058 !important;
+  }
+
+  .ncmp__toggle input:checked + label,
+  .ncmp__toggle-purpose input:checked + label {
+    background-color: #8a2f2f !important;
+  }
+
+  .ncmp__toggle label::before,
+  .ncmp__toggle-purpose label::before {
+    background-color: #e6edf3 !important;
+  }
+
+  .ncmp__language-picker,
+  .ncmp__language-picker span,
+  .ncmp__language-list,
+  .ncmp__banner a,
+  .ncmp__modal a {
+    color: #e8626e !important;
+  }
+
+  .ncmp__language-list {
+    background-color: #22282f !important;
+    border-color: #3a4048 !important;
+  }
+
+  /* The settings rail keeps its own fill, pitched down for a dark panel. It
+     comes after the link rule above so its items stay legible on the rail
+     rather than taking the page link colour. */
+  .ncmp__nav {
+    background-color: #3d2020 !important;
+  }
+
+  .ncmp__nav-top {
+    background-color: #4a2828 !important;
+  }
+
+  .ncmp__nav-header {
+    background-color: #2e1818 !important;
+    border-color: #6d3436 !important;
+    color: #f0e2e2 !important;
+  }
+
+  .ncmp__nav-item,
+  .ncmp__nav a,
+  .ncmp__nav em {
+    color: #f0e2e2 !important;
+    border-color: #6d3436 !important;
+  }
+
+  /* "You are here" in the rail. The vendor paints this one !important from a
+     five-class chain, so the override has to out-specify it; the doubled class
+     is what buys that. */
+  #ncmp__modal .ncmp__modal .ncmp__modal-content .ncmp__nav ul li.ncmp__nav-item.ncmp__nav-item-active.ncmp__nav-item-active a {
+    background-color: #8a2f2f !important;
+    color: #fff !important;
   }
 
   /* ============================================================
@@ -1305,6 +1752,26 @@
     color: #e6edf3 !important;
   }
 
+  /* The hover sweep is a ::before that inverts whatever is behind it — on the
+     site's white card that reads as a dark wipe, on a dark card it flashes the
+     whole tile near-white. The wipe becomes a crimson wash instead, and the
+     ::after's screen blend (which lightened it further) is emptied out. The
+     0 -> 100% width animation is untouched. */
+  #page-content .feature1box::before,
+  #page-content .feature2box::before,
+  #page-content .feature3box::before,
+  #page-content .feature4box::before {
+    backdrop-filter: none !important;
+    background-color: rgba(224, 95, 107, .13) !important;
+  }
+
+  #page-content .feature1box::after,
+  #page-content .feature2box::after,
+  #page-content .feature3box::after,
+  #page-content .feature4box::after {
+    background-color: transparent !important;
+  }
+
   #page-content .site-news {
     --ink: #dfe3f0;
     --paper: #1a1f26;
@@ -1333,6 +1800,28 @@
   #page-content .placard::before,
   #page-content .placard::after {
     background: radial-gradient(at 50% 0, rgba(0, 0, 0, .45), rgba(0, 0, 0, 0) 65%) !important;
+  }
+
+  /* The event banner is author-drawn art: a parchment file panel painted by
+     .event-opener::before, carrying the author's own near-black ink. The page
+     ink and the --dark/--light remap above would leave that text a ghost on the
+     paper, so the banner opts back out of both. */
+  #page-content .event-banner {
+    --dark: #333;
+    --light: #fff;
+    --box-accent: #823f3f;
+    --active: #700;
+    --link-color: #b01;
+    --link-bg: #c0696014;
+  }
+
+  #page-content .event-banner,
+  #page-content .event-banner p,
+  #page-content .event-banner li,
+  #page-content .event-banner dd,
+  #page-content .event-banner dt,
+  #page-content .event-banner td {
+    color: #1b1815 !important;
   }
 
   /* The front page resets these to bare strips inside its category cards. */

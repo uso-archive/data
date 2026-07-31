@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260726.17.01
+@version      20260730.14.13
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -34,6 +34,15 @@
   /* Annotation portal grid: transparent overlay, must never be painted. */
   [class*="AnnotationPortal-desktop__Grid"] {
     background-color: transparent !important; }
+
+  /* MOBILE song page: the About + Q&A band is a "PageGrid-mobile" ("About__Grid") the
+     site paints with the brand hero gradient (#ca4e45 -> #8b7e85) and black copy. The
+     rule above only matches "PageGrid-desktop", so on the mobile bundle a ~4000px
+     salmon slab survives and our lifted light copy lands on it at ~2.5:1. Pin it to the
+     dark base. It is an in-flow section grid (not the pointer-events:none portal
+     overlay), so painting it is safe; on desktop the same grid is natively bare. */
+  [class*="About__Grid"] {
+    background-color: #14181d !important; background-image: none !important; }
 
   /* Mobile annotation reader: tapping a referent opens a ReactModal whose outer
      "Modal-mobile__Contents" is already darkened, but the inner annotation panel
@@ -319,6 +328,18 @@
   [class*="CommentForm__FakeTextField"],
   [class*="SongCommentsWithAds__CTA"] {
     background-color: #1c2128 !important; color: #c4cdd6 !important; border-color: #2d333b !important; }
+  /* Comment vote score ("+661" between the thumbs): the site paints the running total
+     green (#24c609) on comments — the same sentiment cue the legacy ".voting-total--
+     positive" rule already restores on album/artist pages. The blanket
+     "VotingActions__Button" colour flattens the React one to plain light grey, so the
+     modern song page lost a signal its legacy twin keeps. Keyed on the site's own
+     "background.<sign>Number" token attribute so the negative case follows suit.
+     Annotation and Q&A totals are natively BLACK (neutral) and must stay light — hence
+     the Comment__Footer scope rather than the bare attribute. */
+  [class*="Comment__Footer"] [color="background.positiveNumber"] {
+    color: #3fb950 !important; -webkit-text-fill-color: #3fb950 !important; }
+  [class*="Comment__Footer"] [color="background.negativeNumber"] {
+    color: #f85149 !important; -webkit-text-fill-color: #f85149 !important; }
   /* "This song bio is unreviewed" banner (SongDescription / annotation): the site flags
      pending content with a white + light-pink candy-stripe background, a pink border and a
      pink "unreviewed" explainer toggle. The stripe's white bands glare as a light slab on
@@ -500,9 +521,15 @@
   .full_width_link, .full_width_link * { color: #c4cdd6 !important; }
   /* legacy "gray_container" (album/article comment boxes, the ellipsis menu, the
      bottom strip) paints rgba(204,204,204,.2) — a translucent light wash that turns
-     into a washed-out grey slab over the dark base. Make it a normal dark card. */
-  .gray_container, .comments.gray_container, .ellipsis_menu.gray_container {
+     into a washed-out grey slab over the dark base. Make it a normal dark card.
+     ".profile_preview" (the MOBILE artist-page description teaser) uses the very same
+     translucent wash and keeps its own #222 body copy, so the teaser reads dark-on-
+     light-grey; darken the card and lift the rows, keeping the contributor link blue. */
+  .gray_container, .comments.gray_container, .ellipsis_menu.gray_container,
+  .profile_preview {
     background-color: #1c2128 !important; }
+  .profile_preview-row, .profile_preview-rows { color: #c4cdd6 !important; }
+  .profile_preview-row a { color: #9aa7f0 !important; }
   .mini_card:hover, .mini_article_card:hover, .song_card:hover { background-color: #21262d !important; }
   .full_width_container { background-color: transparent !important; }
   /* Album-tracklist / chart rows draw their divider on a full-bleed ::before carrying a
@@ -544,9 +571,16 @@
   /* article body + sidebar reference links fake an underline-skip: a black 1px
      background-image "underline" plus a WHITE text-shadow halo punched around each
      glyph. On dark the underline vanishes and the white halo outlines every letter,
-     so the links read as double-struck. Re-point both at the card surface / link hue. */
+     so the links read as double-struck. Re-point both at the card surface / link hue.
+     The size/repeat/position MUST be restated: only the desktop article stylesheet
+     ships them, so on the AMP mobile article (same .article_rich_text_formatting
+     wrapper, no underline trick) the bare gradient inherits `auto`/`repeat` and fills
+     the whole link box with a solid periwinkle block. */
   .article_reference_link, .article_rich_text_formatting a {
     background-image: linear-gradient(#9aa7f0, #9aa7f0) !important;
+    background-size: 100% 1px !important;
+    background-repeat: no-repeat !important;
+    background-position: 0 100% !important;
     text-shadow: 0.84px 0 0 #1c2128, -0.84px 0 0 #1c2128,
                  1.68px 0 0 #1c2128, -1.68px 0 0 #1c2128 !important; }
 
@@ -709,6 +743,40 @@
   .standalone_annotation { background-color: #1c2128 !important; }
   .standalone_annotation-referent_fragment--with_caret::before,
   .standalone_annotation-referent_fragment::before { background-color: #1c2128 !important; }
+
+  /* ====================================================================
+     MOBILE-ONLY surfaces (legacy "snarly" mobile + the AMP bundle)
+     Genius serves layout by USER-AGENT: the song page is React, the artist
+     page is legacy snarly, and album/article pages are AMP documents
+     (<html class="i-amphtml-singledoc">). None of these are reachable by
+     narrowing a desktop viewport, so a desktop-only pass never sees them.
+     ==================================================================== */
+
+  /* "Show all songs / albums" slide-over: the panel ships pure white and the site's
+     own song cards inside it are already dark, so the panel reads as a white frame
+     with the heading ("<Artist> Songs", lifted light by our typography) invisible on
+     it. The ".slide_over_pane" wrapper is the transparent backdrop — only the
+     scrollable panel is a surface. Click-only, so no load-time scan sees it. */
+  .slide_over_pane-scrollable { background-color: #14181d !important; }
+
+  /* AMP fixed header: a brand-yellow bar carrying a black inline-SVG wordmark and the
+     "SIGN UP" link. Our shared link rule lifts that link to periwinkle (~1.9:1 on the
+     yellow) and the embedded search amp-iframe is darkened by the body rule, so the
+     bar renders as a yellow strip with a dark hole punched in it. Darken it like every
+     other nav and lift the wordmark, which is a separate class from the React one. */
+  .page_header-header {
+    background-color: #0d1117 !important; border-bottom: 2px solid #ed4337 !important; }
+  .page_header-logo svg, .page_header-logo svg path {
+    fill: #e6edf3 !important; color: #e6edf3 !important; }
+  /* AMP accordion band ("TRANSLATIONS" on album pages) is a full-width white header
+     between two dark sections. */
+  .footer_accordion-header_with_arrow { background-color: #14181d !important; }
+  /* AMP sticky-ad chrome: the framework's own wrapper is white, so a 320px creative in
+     a 390px viewport leaves white bands down both sides plus a white 4px rule above it.
+     The close button is a white disc with a grey glyph baked into a data-URI SVG we
+     cannot recolour — invert it so the disc goes dark and the glyph light. */
+  amp-sticky-ad, amp-sticky-ad-top-padding { background-color: #14181d !important; }
+  .amp-sticky-ad-close-button { filter: invert(1) !important; }
 
   /* ====================================================================
      Forms / inputs (shared)

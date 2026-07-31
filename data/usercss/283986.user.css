@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for OLX Brasil.
-@version      20260726.17.05
+@version      20260730.14.16
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -703,6 +703,23 @@
     --color-secondary-100: #c9b6f5;
     --color-secondary-110: #c9b6f5;
   }
+  /* …and the ad page's "Garantia da OLX" chip escapes BOTH of those: it carries an
+     INLINE `background-color: var(--color-secondary-70); color: var(--color-secondary-100)`,
+     which the app's own look-feel layer then rewrites through
+     `body.look-feel [style*="background-color: var(--color-secondary-70)"] {
+     background-color: var(--color-primary-70) !important }` (and the matching `color`
+     rule). That is specificity 0-2-1 with `!important`, so the 0-1-0 `--info` rule
+     above loses the cascade outright and the chip shipped as a #F0E6FF lavender pill
+     with #6E0AD6 copy, wedged between two correctly dark siblings on the same line.
+     Beat it at the TOKEN level rather than escalating specificity: the site's rule
+     still "wins", but on this element the tokens it substitutes now compute dark.
+     Both scales are declared because the rewrite swaps secondary for primary. */
+  [class*="badge"][style*="var(--color-secondary-70)"] {
+    --color-primary-70: #2a2440;
+    --color-secondary-70: #2a2440;
+    --color-primary-100: #c9b6f5;
+    --color-secondary-100: #c9b6f5;
+  }
   /* The boosted "Impulsionado" ad-card badge is `--info` overridden by a
      `bg-primary-100` utility that paints it the OLX orange, distinct from the
      purple `bg-secondary-100` "Destaque". The explicit `--info` violet rule above
@@ -955,6 +972,17 @@
     --color-neutral-70: #21262d;
     color: #e6edf3 !important;
   }
+  /* Same inline hook, everywhere else the component ships a disc: at narrow
+     viewports the ad page floats its favourite + share pair over the photo header
+     as 40px `--background-color: var(--color-neutral-70)` circles, i.e. literal
+     white — and the `--color-neutral-130` lift above then puts a #c4cdd6 glyph on
+     that white at ~1.9:1, so both controls read as blank discs. Remapping the token
+     on any wrapper carrying the inline var covers the pair (and any future disc
+     placement) without touching the disc-less desktop icon actions, which never
+     declare it. */
+  .olx-icon-action__icon-wrapper[style*="--background-color"] {
+    --color-neutral-70: #21262d;
+  }
 
   /* …and it blanks the photo LIGHTBOX's backdrop: the expanded gallery is a
      fixed, full-viewport `section` whose only class is the hashed
@@ -968,6 +996,16 @@
      `section[class*="ad__sc-"]` (1-1-1) loses to it and the backdrop reverts to
      transparent, bleeding the live ad page through the open photo. */
   #adview section[class*="ad__sc-"]:not([style*="rgb("]) {
+    background-color: #0d1117 !important;
+  }
+  /* The gallery was rebuilt as the `advc-slide-show` component, so its root no
+     longer carries a hashed `ad__sc-` class and the restore above cannot reach it.
+     It is still a `<section>`, which means the generic `main, section` neutralizer
+     near the top of the file blanks its natively opaque #EFF1F5 sheet — the open
+     photo floats over the live ad page again. A single class (0-1-0) out-ranks the
+     bare `section` (0-0-1) that blanks it, so match the component itself and stay
+     tag-agnostic in case the element type churns. */
+  .advc-slide-show__root {
     background-color: #0d1117 !important;
   }
   /* …but that neutralizer also blanks the ad page's FIXED top bar (the
@@ -1030,6 +1068,13 @@
        Remap the coupon text token itself to the readable light violet. */
     --coupon-bg-color: #2a2440 !important;
     --coupon-text-color: #c9b6f5 !important;
+    /* Third token of the same set: the banner's "Copiar" action paints
+       `background-color: var(--coupon-button-color, var(--color-secondary-100))`, and
+       the site defines it as the raw brand purple #6E0AD6. Natively that is a dark
+       button on the lavender banner; against the dark chip above it inverts into the
+       loudest, most saturated block on the page while every other violet here is
+       refined. Lift it the same way, keeping the hue. */
+    --coupon-button-color: #7c3aed !important;
   }
   /* The price box's action links ("Simular empréstimo", "Mais opções de parcelamento")
      put their glyph in an inline `<path fill="var(--color-secondary-100)">` — the raw
@@ -1115,6 +1160,88 @@
   /* …`.olx-icon-action` brightens the same token on hover; keep that lift. */
   .olx-icon-action:hover path[fill="var(--color-neutral-130)"] { fill: #e6edf3 !important; }
 
+  /* olx-ui writes the SAME two ink tokens from a CSS CLASS as well, on SVGs whose
+     paths are a plain `fill="currentColor"` — no `color` attribute, no literal hex,
+     so every markup hook above is blind to them. The family:
+     `.olx-dropdown__chevron-icon { --color: var(--color-neutral-130); color: var(--color) }`
+     (every native-select caret — the header category picker on home/search AND the
+     profile's Categoria / Localização / Ordenar row), the profile card's
+     `> svg { color: var(--color-neutral-130) }` ("Na OLX desde", whose location pin
+     on the next line is nested one level deeper and so escaped the same rule and
+     rendered fine — two lines of one list, one icon simply absent), the search rail's
+     subcategory chevrons, and `.olx-ad-card__location svg { color: var(--color-neutral-120) }`.
+     Declaring the two ink tokens ON `svg` lifts the whole family at once and cannot
+     lighten the surfaces built from the same token: `.olx-arrow-button`'s disc,
+     `.olx-media-counter` / `.olx-ad-media-counter` pill and
+     `.olx-image-carousel__content-overlay` are HTML boxes that resolve the token on
+     THEMSELVES, and a wrapper indirecting through its own var
+     (`.olx-arrow-button { --svg-color: var(--color-neutral-130) }`) substitutes a
+     concrete colour where it is DECLARED, so the value that inherits into the glyph
+     is no longer a token this can reach. */
+  svg {
+    --color-neutral-120: #c4cdd6;
+    --color-neutral-130: #c4cdd6;
+  }
+  /* The `svg` scope above only reaches glyphs whose colour rule is written AGAINST the
+     SVG. Icon-only CONTROLS declare `color: var(--color-neutral-1x0)` on the button and
+     let a `fill="currentColor"` child inherit it — the token is then substituted on the
+     BUTTON, out of the svg rule's reach, and the glyph is near-black again. Two shipped
+     that way and are visible only at narrow viewports: the category strip's
+     `.olx-tabs__scroll-button` arrows (1.1:1) and the mobile home's location button
+     (1.8:1). This is the complete set of olx-ui controls that pair an icon with an
+     own-element `color` off the near-black end of the neutral scale; every SURFACE use
+     of the same tokens (`.olx-arrow-button`, `.olx-media-counter`, `.bg-neutral-1x0`,
+     `.olx-header__overlay`, `.olx-tooltip__floating--secondary`) declares it for its own
+     `background` and is deliberately left out. */
+  .olx-tabs__scroll-button,
+  .olx-tabs__tablist-button,
+  .olx-header__icon-button,
+  .olx-navbar__link,
+  .olx-tooltip__close-button,
+  .olx-core-input-password,
+  .olx-text-input__button-password,
+  .olx-breadcrumb__unlabeled-link,
+  .olx-multiselect__check-button,
+  .olx-help-text,
+  .olx-ad-card__labels-item > span,
+  .olx-static-footer__social-link,
+  .olx-old-static-footer__social-link,
+  [class*="home-location__button"] {
+    --color-neutral-120: #c4cdd6;
+    --color-neutral-130: #c4cdd6;
+  }
+
+  /* Scopes that deliberately run a BRIGHTER ink than the icon default must restate it
+     at the glyph — the `svg` declaration above shadows a wrapper-level remap. */
+  .olx-badge svg,
+  .olx-core-badge svg,
+  .olx-alertbox svg,
+  [class*="alertbox"] svg,
+  .olx-icon-action:hover svg {
+    --color-neutral-130: #e6edf3;
+  }
+
+  /* The ad view redefines `--color-primary-100` from the OLX orange to the brand
+     purple on `body`, so the price box's "Simular empréstimo" glyph paints #6E0AD6
+     (2.3:1) beside a link LABEL the purple lift has already brightened to #b794f6 —
+     the icon reads as a smudge next to legible copy. Lift the glyph to the same
+     violet. The hook stays inside `#adview`, the only scope where that token is the
+     purple rather than the orange, so orange icons elsewhere keep their hue. */
+  #adview svg[color="var(--color-primary-100)"],
+  #adview path[fill="var(--color-primary-100)"] {
+    fill: #b794f6 !important;
+    color: #b794f6 !important;
+  }
+  /* Same split on the listing page's transactional-seller rating: the star is
+     `fill="var(--color-primary-100)"` resolving to #6E0AD6 while its rating number is
+     lifted. Its CSS-modules class is hashed on BOTH sides of the name, so match the
+     stable middle rather than the churning build hash. */
+  [class*="__transactionalSellerStar"],
+  [class*="__transactionalSellerStar"] path {
+    fill: #b794f6 !important;
+    color: #b794f6 !important;
+  }
+
   /* OLX secondary accent is a saturated purple (#6E0AD6) that fails
      contrast on dark — lift to a lighter, readable violet, same hue. */
   .text-secondary-100, .text-secondary-110, .text-secondary-90,
@@ -1159,6 +1286,26 @@
     -webkit-text-fill-color: #d2bdff !important;
   }
 
+  /* olx-chip — the narrow-viewport filter pills ("Filtros", "Mais recentes") on the
+     seller profile and the listing filter rail. Every one of its five states paints
+     from the LIGHT end of the scales: default `--color-neutral-70` (#FFF) on a
+     `--color-neutral-90` ring, checked `--color-secondary-70` (#F0E6FF) on
+     `--color-secondary-130`, disabled `--color-neutral-80`. Desktop routes the same
+     controls through `olx-core-singleselect`, so the chips only ever render at narrow
+     widths and a desktop pass never sees the white pills. Remap the scales on the
+     content element so all five states keep their relative meaning: neutral default,
+     brighter ring on hover, violet when checked, recessed when disabled. */
+  .olx-chip,
+  .olx-chip__content {
+    --color-neutral-70: #21262d;
+    --color-neutral-80: #1c2128;
+    --color-neutral-90: #30363d;
+    --color-neutral-100: #6b7681;
+    --color-neutral-130: #c4cdd6;
+    --color-secondary-70: #2a2440;
+    --color-secondary-130: #c9b6f5;
+  }
+
   /* Tabs (home "Categorias / Tudo" nav + olx-tabs labels) — dark and
      purple-selected labels lifted to the readable scale / accent. */
   [class*="tabs-navigation__tab"],
@@ -1182,10 +1329,25 @@
      `background-IMAGE` gradient running to `--color-neutral-70` (#FFF). A
      background-COLOR override can never reach it, so a white smear survives at
      the edges of the strip. */
+  /* olx-ui ships the same widget under a SECOND name, `.olx-tabs__scroll-button`, and
+     that is the one the narrow-viewport home renders on its "Pesquisas Populares"
+     strip — a 36px block of literal white with a `--tab-font-color-default` (#1A1D23)
+     chevron on it, i.e. a white pad carrying an invisible caret. Desktop never shows
+     it, so a desktop-only pass reads clean. Its glyph comes off the TAB token family,
+     not the neutral scale, so the icon rules above cannot reach it either. */
   .olx-tabs__tablist-button--left,
-  .olx-tabs__tablist-button--right {
+  .olx-tabs__tablist-button--right,
+  .olx-tabs__scroll-button,
+  .olx-tabs__scroll-button--left,
+  .olx-tabs__scroll-button--right {
     background-image: none !important;
     background-color: transparent !important;
+  }
+  .olx-tabs__scroll-button,
+  .olx-tabs__tablist-button {
+    --tab-font-color-default: #c4cdd6;
+    --tab-font-color-hover: #e6edf3;
+    --tab-font-color-pressed: #e6edf3;
   }
 
   /* Keep semantic feedback colors readable on dark */
@@ -1339,14 +1501,20 @@
      ============================================================ */
   .olx-modal__dialog,
   .olx-modal__content,
-  [data-ds-component="DS-Modal"],
   [class*="modal__dialog"],
   [class*="modal__content"] {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
     color: #e6edf3 !important;
   }
+  /* `[data-ds-component="DS-Modal"]` marks the full-viewport fixed SCRIM
+     (`div.olx-modal`, natively `rgba(0,0,0,.333)`), never the card — the card is
+     `__dialog` / `__content` above. Painting it with the elevated surface filled the
+     whole viewport with the same tone as the dialog, so every BEM modal (share,
+     report, login prompt) lost both its backdrop dimming and its own card edge: the
+     sheet read as a blank page with floating controls. Keep it a scrim. */
   .olx-modal__overlay,
+  [data-ds-component="DS-Modal"],
   [class*="modal__overlay"],
   [class*="backdrop"] {
     background-color: rgba(0, 0, 0, 0.6) !important;
@@ -1358,6 +1526,13 @@
      single-dash side-sheet close, handled below). */
   .olx-modal__close-button { color: #e6edf3 !important; }
   .olx-modal__close-button:hover { color: #ffffff !important; }
+  /* A THIRD close-control name — `olx-modal-close-button`, single-dash but with the
+     `-button` suffix, so neither `.olx-modal__close-button` nor `.olx-modal-close`
+     matches it (class selectors match whole tokens). It is the only way out of the
+     /cupons "Categorias" filter dialog, and its `fill="currentColor"` X inherits the
+     component's #3C4453 — 1.7:1 on the dark panel, effectively invisible. */
+  .olx-modal-close-button { color: #e6edf3 !important; }
+  .olx-modal-close-button:hover { color: #ffffff !important; }
 
   /* The header "Categorias" side-sheet uses the newer single-dash component
      names (olx-modal-content / -header / -body), which the BEM rules above

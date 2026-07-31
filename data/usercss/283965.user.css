@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for Syosetu (小説家になろう). Easy-on-the-eyes reading for novel chapters, plus the home, rankings, search and bookmark controls.
-@version      20260726.17.03
+@version      20260730.14.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -34,6 +34,17 @@
        row into a grey glare block on dark. */
     --color-ui-bg: #14181d !important;
     --color-ui-bg--hover: #22272e !important;
+    /* Two more light washes the network paints ONLY on :hover, so no load-time
+       scan reaches them. --color-bg--hover (rgba(222,226,230,.4)) is the サイト案内
+       aside nav's row hover (`.c-aside__item a:hover`) — a grey glare block down the
+       whole sidebar of every /site/, /helpcenter/ and search page.
+       --color-bg-years-hover (rgba(222,226,230,.8)) does triple duty on the
+       アニメ化作品 index: the hovered year tile's fill, its season flyout's
+       `box-shadow` (a white halo ringing an otherwise-dark popover) and the season
+       item hover. One remap covers all four. #21262d keeps the site's own
+       --color-site-link on the year tile at 4.6:1. */
+    --color-bg--hover: #1c2128 !important;
+    --color-bg-years-hover: #21262d !important;
     /* Every headline on the network is painted from this one token: the
        Narou brown #582b13 on yomou, the teal #0d6572 on the portal and
        mypage. Both are ~1.5-2:1 on dark. Remapping the token covers all
@@ -106,7 +117,8 @@
   .c-tabnav-2nd__current {
     background-color: #21262d !important;
   }
-  .c-card-cluster-title {
+  .c-card-cluster-title,
+  .p-review-control__title {
     border-left-color: #e6c9a8 !important;
   }
   .c-pager__item.is-current::after {
@@ -634,8 +646,15 @@
      a disabled control, and a destructive --delete would have read as a
      neutral one. Restore each meaning; the modifier out-specifies nothing,
      so these must come after .c-button, not before.
+     EVERY modifier here is written as `.c-button.c-button--x` (0,2,0), not as a
+     bare `.c-button--x` (0,1,0): the network renders half of these as
+     <input type="submit"|"button">, and the generic input chip rule further down
+     is (0,1,1) — it beat a bare modifier and re-flattened it. That trap already
+     cost --yellow once; it was still live on yomou's イチオシレビュー filter, where
+     the 検索 submit (--primary) read as a neutral chip and 全てのチェックを外す
+     (--outline) as a filled one.
      ============================================================ */
-  .c-button--primary {
+  .c-button.c-button--primary {
     background-color: #1f6feb !important;
     color: #ffffff !important;
     border-color: #1f6feb !important;
@@ -644,32 +663,55 @@
      4.6:1 under white, so the site's lighten-on-hover move would drop the
      label (and the button's icon glyph) to 3.3:1 — a hover-only contrast
      fail no load-time scan would ever see. */
-  .c-button--primary:hover,
-  .c-button--primary:focus,
-  .c-button--primary:active {
+  .c-button.c-button--primary:hover,
+  .c-button.c-button--primary:focus,
+  .c-button.c-button--primary:active {
     background-color: #1a5fd0 !important;
     color: #ffffff !important;
   }
-  .c-button--delete {
+  .c-button.c-button--delete {
     background-color: #da3633 !important;
     color: #ffffff !important;
     border-color: #da3633 !important;
   }
   /* Brand orange kept, label darkened — same treatment as the nav's
      ユーザ登録 pill (white-on-orange is 2.1:1) */
-  .c-button--useradd {
+  .c-button.c-button--useradd {
     background-color: #ff922b !important;
     color: #1a1109 !important;
     border-color: #ff922b !important;
   }
   /* Natively transparent link-buttons, not filled chips */
-  .c-button--minor,
-  .c-button--outline {
+  .c-button.c-button--minor,
+  .c-button.c-button--outline {
     background-color: transparent !important;
     color: #5fb0e6 !important;
   }
+  /* The remaining outline family carries the network's OTHER button meanings, each
+     a transparent chip whose whole identity is its label colour: --outline-warn is
+     the destructive one (--color-ui-theme-danger #ff6b6b), --outline-cheers the
+     なろうチアーズ brand green (#0ca678, matched with --primary-cheers' #12b886
+     fill), --outline-none-active the disabled twin of --outline. Filling all four
+     with the neutral chip made danger, brand and disabled read identically. */
+  .c-button.c-button--outline-warn {
+    background-color: transparent !important;
+    color: #ff7b72 !important;
+  }
+  .c-button.c-button--outline-cheers {
+    background-color: transparent !important;
+    color: #3fbf95 !important;
+  }
+  .c-button.c-button--primary-cheers {
+    background-color: #12b886 !important;
+    color: #04231a !important;
+    border-color: #12b886 !important;
+  }
+  .c-button.c-button--outline-none-active {
+    background-color: transparent !important;
+    color: #7d8590 !important;
+  }
   /* The "already done" state (e.g. already favourited) — must read inactive */
-  .c-button--none-active {
+  .c-button.c-button--none-active {
     background-color: #30363d !important;
     color: #8b949e !important;
     border-color: #30363d !important;
@@ -950,6 +992,15 @@
      that is already the value it has, so nothing there changes. */
   .c-under-nav__item::after {
     color: inherit !important;
+  }
+  /* All four items in that row are natively the same #0033cc link, but only three are
+     real <a>: on desktop they land on the footer tone via `.l-foot-contents a`, while
+     the 縦書きPDF <input> can only be reached by the rule above — so one row rendered
+     in two different blues. Pin the whole row to the footer tone at 0,2,1, which beats
+     `.l-foot-contents a` (0,2,0) wherever this block sits in the sheet. */
+  div.c-under-nav .c-under-nav__item,
+  div.c-under-nav input.c-under-nav__pdflink {
+    color: #9bd4ff !important;
   }
 
   /* Search builder legacy tables / labels / keyword tags. This older
@@ -1276,6 +1327,132 @@
     color: #b6c0ca !important;
   }
 
+  /* Each R18 site wraps its legacy page in its OWN skin, painted with raster
+     background-IMAGES rather than colours — so every element-background scan reads
+     `transparent` and passes. ノクターン's #header / #head band and its #footer /
+     #copyright band are pale-pink JPEG tiles (noc_bg / noc_head / noc_title_nb), the
+     three brightest strips on the page; ムーンライト's #main_navi, #mobile / #marker
+     and section heads are a pale-blue plaid GIF (h_bg / s_bg). Clear the tiles and
+     paint the bands. #title keeps its own art — the mauve Nocturne wordmark band is
+     already dark and IS the site's identity. The nav pills (noc_na.jpg) become an
+     elevated chip so the row still reads as buttons. */
+  #header,
+  #head,
+  #footer,
+  #copyright,
+  #main_navi,
+  #mobile,
+  #marker,
+  #top_typesearch,
+  .div_h3 {
+    background-color: #0d1117 !important;
+    background-image: none !important;
+  }
+  #main_navi .menu li a {
+    background-color: #1c2128 !important;
+    background-image: none !important;
+  }
+
+  /* ムーンライトノベルズ (mnlt) runs a THIRD legacy frontend again — a 3-column layout
+     whose every panel is a plain #fff box. None of the .main_box / .in_box family
+     above reaches it, so the whole site shipped as white panels carrying our light
+     body text: unreadable end to end. Neutralize the panels; their section heads keep
+     an elevated bar with the network's amber heading tone, and the legacy #333 copy
+     inside them is lifted below. */
+  .left_contents_box,
+  .right_contents_box,
+  #news_box,
+  .typesearch_inbox,
+  .search_box_top,
+  .newnovel_box,
+  .xtop-syuppan__headline {
+    background-color: transparent !important;
+  }
+  #news_h,
+  .div_h3 h3 {
+    background-color: #1c2128 !important;
+    color: #e6c9a8 !important;
+  }
+  .keyword_head {
+    color: #c4cdd6 !important;
+  }
+  .pr {
+    color: #9aa3ad !important;
+  }
+  /* ...and with those panels dark, every line inside them is the legacy #333: the
+     news dates, the whole 新着順で検索 block and the search form's 種別 / 並び順 /
+     ジャンル選択 labels plus all 40 keyword checkbox labels. `.left` / `.right` are
+     generic across the network (the yomou results table uses them too), so scope
+     them to the mnlt panel. The 新着順で検索 head is a muted #557788 teal at 3.3:1 —
+     give it the network's heading amber. */
+  #news_box,
+  #top_typesearch,
+  .typesearch_inbox,
+  .search_box_top,
+  .search_box_top .left,
+  .search_box_top .right,
+  .search_box_top label,
+  .keyword_list label {
+    color: #c4cdd6 !important;
+  }
+  .typesearch_h {
+    color: #e6c9a8 !important;
+  }
+
+  /* ミッドナイトノベルズ (mid) is a FOURTH frontend: its chrome is natively dark
+     (black header, neon-green sprites, all fine on our base) but the entire content
+     column is one white <main>, with a #ccc sub-nav strip above it and a white
+     pagetop/ad rail below. Our light body text sat on all of it. <main> is bare
+     everywhere else on the network (reader, novelcom, blog all compute transparent),
+     so clearing it is a no-op off mid. The #666 work-type / note copy inside goes
+     dark-on-dark once the panel darkens. */
+  main,
+  .header_news,
+  .koukoku,
+  .pagetop {
+    background-color: transparent !important;
+  }
+  .header_info {
+    background-color: #0d1117 !important;
+  }
+  .note_box,
+  .info_box,
+  span.type {
+    color: #9aa3ad !important;
+  }
+
+  /* The R18 group serves its OWN phone sheets (smp_base / smp_noc / the mnlt and mid
+     equivalents) — a fifth family none of the desktop selectors above touch, and one
+     the desktop viewport can never render. Everything here is a full-width band or a
+     chip in that family: the "»see all" footer bar (.a_line, a white gradient), the
+     bare section heads directly under <body> (a near-white pink/grey band with #333
+     or #663300 text), the beginner/ranking/blog list chips (pale pink, cream and
+     white gradients), the keyword pills, mnlt's pale-blue #navi bar and mid's white
+     article. `body > h2` and #navi exist ONLY here — every other page type on the
+     network, desktop and phone, has zero of both. */
+  div#navi,
+  div.a_line,
+  article.top_0,
+  ul.top_listlink li,
+  ul.top_mainkeyword a,
+  div.beginner li,
+  div.beginner_rank li,
+  div.beginner_type li,
+  h2.official-x_headline {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+  /* Keep the heads' background-IMAGE: on these h2s it is the section icon
+     (news.gif megaphone, book.gif), not a band — the band is the colour. */
+  body > h2 {
+    background-color: #1c2128 !important;
+    color: #e6c9a8 !important;
+  }
+  p.outlink,
+  ul.link_list > li {
+    color: #9aa3ad !important;
+  }
+
   /* ============================================================
      Tables (generic), toasts, announcements
      ============================================================ */
@@ -1368,6 +1545,21 @@
     background-color: #21262d !important;
     color: #c4cdd6 !important;
   }
+  /* The UNMODIFIED .c-label is the same trap one level up: its base rule is
+     `color:var(--color-text) (#333); background:var(--color-label-theme-default)
+     (#e9ecef)`, and yomou's イチオシレビュー list uses exactly that bare form for its
+     レビュー作品 tag — ten light chips glaring down the page. Every coloured sibling
+     redeclares BOTH properties, so a flat `.c-label{color}` would out-!important
+     their white labels; scope the two tokens to the component instead and only the
+     unmodified chip moves. --long is the one exception: it declares a pink fill but
+     NO colour, so it rides --color-text and needs its dark label re-asserted. */
+  .c-label {
+    --color-text: #c4cdd6 !important;
+    --color-label-theme-default: #21262d !important;
+  }
+  .c-label--long {
+    color: #1a1109 !important;
+  }
   /* The 代表作 badge (.c-label--masterpiece) is the lone OUTLINE label — a
      transparent chip whose identity is its green #0ca678 border + matching
      text, not a fill. The blanket `* { border-color }` reset flattened the
@@ -1391,7 +1583,11 @@
   /* The mypage/group footer (.p-footer) ships a brand TEAL nav band and a
      bright CYAN copyright bar (audit-blind: colored, not near-white) —
      neutralize both onto the footer dark so they don't glare. The portal
-     footer carries the same cyan band as a standalone .p-copyright strip. */
+     footer carries the same cyan band as a standalone .p-copyright strip.
+     On blog.syosetu.com there is no __foot child at all: .p-footer IS the
+     copyright bar, so the cyan landed on the wrapper and the whole strip
+     across the bottom of the blog stayed brand cyan. Name the wrapper too. */
+  .p-footer,
   .p-footer__body,
   .p-footer__foot,
   .p-copyright {
@@ -1456,12 +1652,17 @@
      black-on-dark X floating over the ranking rows: the ad's only dismiss
      control, unusable. Both audits are blind to it (SVG paint, and only WHITE
      fills are flagged). Repaint the glyph light and back it with a dark chip so
-     it also reads if a light creative loads behind it. */
-  #flexible-sticky-ov-close-button {
+     it also reads if a light creative loads behind it. The mobile sheet serves the
+     same control under a DIFFERENT id (#flexible-sticky-wiped-button) with the same
+     inline black polygon, so the desktop-only id left the SP dismiss unusable. */
+  #flexible-sticky-ov-close-button,
+  #flexible-sticky-wiped-button {
     background-color: #1c2128 !important;
   }
   #flexible-sticky-ov-close-button svg polygon,
-  #flexible-sticky-ov-close-button svg path {
+  #flexible-sticky-ov-close-button svg path,
+  #flexible-sticky-wiped-button svg polygon,
+  #flexible-sticky-wiped-button svg path {
     fill: #c4cdd6 !important;
     stroke: #c4cdd6 !important;
   }
@@ -1498,6 +1699,18 @@
      our light labels. */
   .c-menu__second {
     background-color: #161b22 !important;
+  }
+  /* The SP header's ログイン link bullets itself with a 16x16 login.gif — an OPAQUE
+     (no alpha) raster tile of a grey key on WHITE, so it renders as a bright chip
+     against the dark header bar at the very top of every SP page. Same class as the
+     desktop help.gif: it cannot be recoloured, so swap in a key drawn in the link's
+     own accent blue and pin every background component (the site's shorthand leaves
+     background-size at `auto`, which would resolve against the SVG's 512 viewBox). */
+  .c-menu__first-item--login::before {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%235fb0e6' d='M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24v-40h40c13.3 0 24-10.7 24-24v-40h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 0 1 0-80z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    background-size: 16px 16px !important;
   }
   /* The chapter's 感想を書く disclosure bar (--color-impression-toggle-sp #fcfcfc)
      is a full-width near-white band; its label inherits our light body colour and

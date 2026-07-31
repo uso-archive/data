@@ -3,11 +3,11 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260726.17.00
+@version      20260730.14.13
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
-@-moz-document domain("espn.com"), domain("espn.co.uk"), domain("espn.com.au"), domain("espn.in"), domain("espn.nl"), domain("espn.com.br"), domain("espn.com.mx"), domain("espn.com.ar"), domain("espn.cl"), domain("espn.com.co"), domain("espn.com.ve"), domain("espn.com.sg"), domain("espn.ph") {
+@-moz-document domain("espn.com"), domain("espn.co.uk"), domain("espn.com.au"), domain("espn.in"), domain("espn.nl"), domain("espn.com.br"), domain("espn.com.mx"), domain("espn.com.ar"), domain("espn.cl"), domain("espn.com.co"), domain("espn.com.ve"), domain("espn.com.sg"), domain("espn.ph"), domain("espn.com.pe"), domain("espn.com.ec"), domain("espn.com.uy"), domain("espn.com.gt"), domain("espn.com.pa"), domain("espn.com.do") {
 :root { color-scheme: dark !important; }
 
   /* ---- Base surfaces ---- */
@@ -51,6 +51,18 @@
   .cscore_date-time, .cscore_date, .cscore_network, .cscore_info, .cscore_info-overview,
   .cscore_notes, .cscore_status, .cscore_odds, .scoreEvent__status,
   .ScoreCell__Time, .Schedule__Time, .scoreEvent__event, .scoreEvent__title { color: #8b949e !important; }
+  /* Non-live scoreboard-strip clock/status ("AET", "FT", a kickoff time) and the
+     two-legged-tie note ("Vuelta / Agr. 2-2") are plain neutral labels natively
+     (#000 / #48494a), but they sit inside the chip's <a>, so the `a span` rule painted
+     them link-blue — status text rendered as a hyperlink, right beside the grey
+     .cscore_status metadata on the same chip. The live clock rule below is more
+     specific and keeps its red. Two-class selectors are required: `a span` is (0,1,1),
+     so a one-class rule loses the !important tie. */
+  .cscore_time, .cscore_time.time,
+  .cscore_link .cscore_aggregate-title,
+  .cscore_link .cscore_aggregate-details,
+  .cscore_link .cscore_aggregate-score,
+  .cscore_link .cscore_notes_game { color: #c4cdd6 !important; }
   /* Legacy scoreboard-strip clock: ESPN paints an in-progress game's time RED
      (#dd0000, e.g. "5:56 - 4th") to flag LIVE games apart from scheduled/final;
      the generic grey + link-blue rules flatten it so a live game reads identical to
@@ -473,6 +485,16 @@
   .global-user .favs { background-color: #181d23 !important; }
   .global-user .favs, .global-user .favs p, .global-user .favs h3,
   .global-user .favs span, .global-user h3 { color: #c4cdd6 !important; }
+  /* "Create Account" inside the flyout's Favourites pane is a FILLED brand-blue .button
+     (#3772df/white) — the only action in the pane — and the neutral .button rule above
+     flattened it to the same grey pill as an ordinary control. Same treatment as the
+     sideLogin primary. Audit-blind: the flyout does not render until the avatar is
+     clicked. */
+  .button.open-favs, .global-user .button.open-favs {
+    background-color: #588ae4 !important; border-color: #588ae4 !important;
+    color: #121213 !important; -webkit-text-fill-color: #121213 !important; }
+  .button.open-favs:hover, .global-user .button.open-favs:hover {
+    background-color: #7aa1ea !important; }
 
   /* ---- Video-playlist modules ("Top Videos" / "NBA Videos") — white tiles ---- */
   .mediaList, .mediaList__content, .mediaList__link, .video-playlist,
@@ -579,8 +601,13 @@
   /* Search player-result tiles: team/league subtitle hardcodes #6c6d6f → dark-on-dark */
   .LogoTile__Meta, .LogoTile__Meta--subtitle, .LogoTile__Meta--category { color: #9aa4ae !important; }
 
-  /* ---- Taboola "sponsored content" wrapper (hyphenated class variant) ---- */
-  .sponsored-headlines, .trc_rbox, .trc_rbox_div, [class*="taboola"] {
+  /* ---- Taboola "sponsored content" wrapper (hyphenated class variant). The
+       right-rail mount carries its white inline on an ID with no class at all
+       (div#taboola-right-rail---dead-end---sport, style="background-color:
+       rgb(255,255,255)"), and the article-foot widget on .trc_related_container /
+       .tbl-feed-container — neither reachable via [class*="taboola"]. ---- */
+  .sponsored-headlines, .trc_rbox, .trc_rbox_div, [class*="taboola"],
+  [id*="taboola"], .trc_related_container, .tbl-feed-container {
     background-color: #14181d !important; }
   /* Taboola sponsored-widget CTA pill ("Learn more") hardcodes near-black text
      → invisible on our dark surround; lighten just the label. ---- */
@@ -930,22 +957,65 @@
   .quicklinks_list__icon::before, .contentItem__content__meta::after,
   a.external::after, li.external > a::after { color: #9aa4ae !important; }
 
-  /* ---- One-feed card top rule (.contentItem__teamBorder) carries the TEAM colour
-       inline; when a card has no team ESPN falls back to a light neutral — either
-       #cbccce OR pure #FFFFFF — a light hairline that reads as a glaring white bar
-       across our dark cards. Dark only the neutral fallbacks so every real team
-       colour survives (no team brands its rule pure white). ---- */
-  .contentItem__teamBorder[style*="#cbccce"],
-  .contentItem__teamBorder[style*="#CBCCCE"],
-  .contentItem__teamBorder[style*="#ffffff"],
-  .contentItem__teamBorder[style*="#FFFFFF"] { background-color: #2d333b !important; }
-  /* Prism News-card top rule (.ColorBorder) is the next-gen equivalent of
-     .contentItem__teamBorder — same inline team colour, same light neutral fallback
-     (#cbccce / #FFFFFF) when a card has no team. On player/team/news pages this ships
-     a glaring light hairline across every teamless card (audit-blind: 3px slips the
-     size floor). Dark only the neutral fallbacks so real team colours survive. */
-  .ColorBorder[style*="#cbccce"], .ColorBorder[style*="#CBCCCE"],
-  .ColorBorder[style*="#ffffff"], .ColorBorder[style*="#FFFFFF"] {
+  /* ---- Card top rule: the legacy one-feed bar (.contentItem__teamBorder) and its
+       Prism News-card successor (.ColorBorder) both carry the TEAM colour in an inline
+       style; a card with no team gets a light neutral from ESPN's grey scale instead —
+       a 3px hairline that glares across our dark cards (audit-blind: 3px slips the
+       size floor). No CSS can test a colour for chroma, so the neutral fallbacks have
+       to be enumerated. Two axes matter beyond the literal value, and both have shipped
+       a miss: ESPN swaps WHICH grey it uses (#cbccce, then #FFFFFF, then #a5a6a7), and
+       the same bar re-rendered client-side comes back as `rgb(165, 166, 167)` because
+       the CSSOM re-serialises the attribute — on a team page the below-the-fold cards
+       carry the rgb form while the SSR ones carry hex. So: the light achromatic rungs
+       of ESPN's own palette, each in hex (both cases) and rgb (both spacings), on both
+       classes. Chromatic team colours match none of these and survive verbatim. ---- */
+  .ColorBorder[style*="#848687"], .contentItem__teamBorder[style*="#848687"],
+  .ColorBorder[style*="rgb(132, 134, 135)"], .contentItem__teamBorder[style*="rgb(132, 134, 135)"],
+  .ColorBorder[style*="rgb(132,134,135)"], .contentItem__teamBorder[style*="rgb(132,134,135)"],
+  .ColorBorder[style*="#a5a6a7"], .contentItem__teamBorder[style*="#a5a6a7"],
+  .ColorBorder[style*="#A5A6A7"], .contentItem__teamBorder[style*="#A5A6A7"],
+  .ColorBorder[style*="rgb(165, 166, 167)"], .contentItem__teamBorder[style*="rgb(165, 166, 167)"],
+  .ColorBorder[style*="rgb(165,166,167)"], .contentItem__teamBorder[style*="rgb(165,166,167)"],
+  .ColorBorder[style*="#b5b7b7"], .contentItem__teamBorder[style*="#b5b7b7"],
+  .ColorBorder[style*="#B5B7B7"], .contentItem__teamBorder[style*="#B5B7B7"],
+  .ColorBorder[style*="rgb(181, 183, 183)"], .contentItem__teamBorder[style*="rgb(181, 183, 183)"],
+  .ColorBorder[style*="rgb(181,183,183)"], .contentItem__teamBorder[style*="rgb(181,183,183)"],
+  .ColorBorder[style*="#cbccce"], .contentItem__teamBorder[style*="#cbccce"],
+  .ColorBorder[style*="#CBCCCE"], .contentItem__teamBorder[style*="#CBCCCE"],
+  .ColorBorder[style*="rgb(203, 204, 206)"], .contentItem__teamBorder[style*="rgb(203, 204, 206)"],
+  .ColorBorder[style*="rgb(203,204,206)"], .contentItem__teamBorder[style*="rgb(203,204,206)"],
+  .ColorBorder[style*="#cfd0d1"], .contentItem__teamBorder[style*="#cfd0d1"],
+  .ColorBorder[style*="#CFD0D1"], .contentItem__teamBorder[style*="#CFD0D1"],
+  .ColorBorder[style*="rgb(207, 208, 209)"], .contentItem__teamBorder[style*="rgb(207, 208, 209)"],
+  .ColorBorder[style*="rgb(207,208,209)"], .contentItem__teamBorder[style*="rgb(207,208,209)"],
+  .ColorBorder[style*="#d9d9d9"], .contentItem__teamBorder[style*="#d9d9d9"],
+  .ColorBorder[style*="#D9D9D9"], .contentItem__teamBorder[style*="#D9D9D9"],
+  .ColorBorder[style*="rgb(217, 217, 217)"], .contentItem__teamBorder[style*="rgb(217, 217, 217)"],
+  .ColorBorder[style*="rgb(217,217,217)"], .contentItem__teamBorder[style*="rgb(217,217,217)"],
+  .ColorBorder[style*="#dcdddf"], .contentItem__teamBorder[style*="#dcdddf"],
+  .ColorBorder[style*="#DCDDDF"], .contentItem__teamBorder[style*="#DCDDDF"],
+  .ColorBorder[style*="rgb(220, 221, 223)"], .contentItem__teamBorder[style*="rgb(220, 221, 223)"],
+  .ColorBorder[style*="rgb(220,221,223)"], .contentItem__teamBorder[style*="rgb(220,221,223)"],
+  .ColorBorder[style*="#e4e5e6"], .contentItem__teamBorder[style*="#e4e5e6"],
+  .ColorBorder[style*="#E4E5E6"], .contentItem__teamBorder[style*="#E4E5E6"],
+  .ColorBorder[style*="rgb(228, 229, 230)"], .contentItem__teamBorder[style*="rgb(228, 229, 230)"],
+  .ColorBorder[style*="rgb(228,229,230)"], .contentItem__teamBorder[style*="rgb(228,229,230)"],
+  .ColorBorder[style*="#edeef0"], .contentItem__teamBorder[style*="#edeef0"],
+  .ColorBorder[style*="#EDEEF0"], .contentItem__teamBorder[style*="#EDEEF0"],
+  .ColorBorder[style*="rgb(237, 238, 240)"], .contentItem__teamBorder[style*="rgb(237, 238, 240)"],
+  .ColorBorder[style*="rgb(237,238,240)"], .contentItem__teamBorder[style*="rgb(237,238,240)"],
+  .ColorBorder[style*="#f1f2f3"], .contentItem__teamBorder[style*="#f1f2f3"],
+  .ColorBorder[style*="#F1F2F3"], .contentItem__teamBorder[style*="#F1F2F3"],
+  .ColorBorder[style*="rgb(241, 242, 243)"], .contentItem__teamBorder[style*="rgb(241, 242, 243)"],
+  .ColorBorder[style*="rgb(241,242,243)"], .contentItem__teamBorder[style*="rgb(241,242,243)"],
+  .ColorBorder[style*="#f5f5f5"], .contentItem__teamBorder[style*="#f5f5f5"],
+  .ColorBorder[style*="#F5F5F5"], .contentItem__teamBorder[style*="#F5F5F5"],
+  .ColorBorder[style*="rgb(245, 245, 245)"], .contentItem__teamBorder[style*="rgb(245, 245, 245)"],
+  .ColorBorder[style*="rgb(245,245,245)"], .contentItem__teamBorder[style*="rgb(245,245,245)"],
+  .ColorBorder[style*="#ffffff"], .contentItem__teamBorder[style*="#ffffff"],
+  .ColorBorder[style*="#FFFFFF"], .contentItem__teamBorder[style*="#FFFFFF"],
+  .ColorBorder[style*="rgb(255, 255, 255)"], .contentItem__teamBorder[style*="rgb(255, 255, 255)"],
+  .ColorBorder[style*="rgb(255,255,255)"], .contentItem__teamBorder[style*="rgb(255,255,255)"] {
     background-color: #2d333b !important; }
 
   /* ---- Gamecast Matchup Predictor: the win-probability percentages and their "%"
@@ -1035,6 +1105,25 @@
        our a span blue rule — not the grey one — flattened it); same native #dd0000. */
   .MediaList__item__playing, .mediaList__phase {
     color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
+
+  /* ---- Soccer red-card icon (scoreboard goal lists, match pages). ESPN authors it as
+       `fill: var(--icon-default, var(--color-red-600, #d00))` — it only renders red
+       because --icon-default is undefined on the light site. Our fusion token block
+       defines --icon-default (needed for every other glyph), so the card resolves to our
+       neutral grey and a RED card renders identical to a plain white/neutral one, right
+       next to the grey goal icons. Pin the fill back to a readable-on-dark red. ---- */
+  .SoccerPerformers__RedCardIcon { fill: #ff5a5a !important; }
+
+  /* ---- Match-stats comparison bars (prism ProgressBar, gamecast "Team Stats"): the
+       first team's segment carries a hardcoded near-black #1d1e1f INLINE — ESPN's
+       neutral, not a team colour (every bar on the page ships the same value) — while
+       the second team's segment is a grey diagonal hatch. On our dark card the solid
+       segment is invisible at ~1.0:1, so a 44%-vs-56% split renders as one bar and the
+       12px legend swatch beside the home team's abbreviation disappears too. Both nodes
+       carry only hashed classes, so the inline value is the only stable hook. ---- */
+  [data-test-id="prism-progress-bar"][style*="rgb(29, 30, 31)"],
+  [data-test-id="prism-progress-bar"][style*="#1d1e1f"],
+  span[style*="background:#1d1e1f"] { background-color: #c4cdd6 !important; }
 
   /* ---- Form-guide result badges (.GameResults — "Last Five Matches" table + the
        head-to-head "Last 5 Matchups" panel on a match report): ESPN paints each W/L/D

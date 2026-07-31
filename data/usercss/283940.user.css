@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Stack Overflow and the whole Stack Exchange network: easy-on-the-eyes questions, answers, code blocks, comments and sidebar.
-@version      20260726.17.06
+@version      20260730.14.17
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -457,27 +457,43 @@
     background-color: transparent !important;
   }
 
-  /* Selected nav item: SE marks it with aria-current="page" (the
-     legacy .youarehere class is gone), and paints a full white
-     pill (#f1f2f3). Recolor to a dark elevated surface with light
-     text + a tasteful SO-orange left accent. */
-  .left-sidebar .nav-links--link.youarehere,
-  .left-sidebar .nav-links--link.youarehere .-link,
-  .nav-links--link[aria-current="page"],
-  .nav-links--link[aria-current="true"],
-  #left-sidebar .nav-links--link[aria-current="page"],
-  .left-sidebar .nav-links--link[aria-current="page"],
+  /* Hover surface. The at-rest reset above carries an ID
+     (`#left-sidebar .nav-links--link`, 1-0-1-0), so every state rule below it
+     must ALSO carry that ID or the reset out-ranks it and the state never
+     paints — the sibling `.s-block-link` nav rows (Home, AI Assist, Chat) do
+     highlight on hover via their `--_bl-bg` token, so the `.nav-links--link`
+     rows (Questions, Tags, Users, Companies) were the only ones in the rail
+     with no hover feedback at all. */
+  .nav-links--link:hover,
   .left-sidebar .nav-links--link:hover,
-  .nav-links--link:hover {
+  #left-sidebar .nav-links--link:hover,
+  #left-sidebar .nav-links .nav-links--link:hover {
     background-color: #21262d !important;
     color: #e6edf3 !important;
   }
 
+  /* Selected nav item: SE marks it with aria-current="page" (the
+     legacy .youarehere class is gone), and paints a full white
+     pill (#f1f2f3). Recolor to a dark elevated surface with light
+     text + a tasteful SO-orange left accent. Must out-rank BOTH the
+     ID-carrying at-rest reset and the hover rule above, so it repeats the
+     `#left-sidebar` prefix and sits after them. */
   .left-sidebar .nav-links--link.youarehere,
+  .left-sidebar .nav-links--link.youarehere .-link,
   .nav-links--link[aria-current="page"],
-  .left-sidebar .nav-links--link[aria-current="page"] {
+  .nav-links--link[aria-current="true"],
+  .left-sidebar .nav-links--link[aria-current="page"],
+  #left-sidebar .nav-links--link[aria-current="page"],
+  #left-sidebar .nav-links--link[aria-current="true"],
+  #left-sidebar .nav-links .nav-links--link[aria-current="page"] {
     background-color: #1c2128 !important;
     border-left: 3px solid #d98b3a !important;
+    color: #e6edf3 !important;
+  }
+
+  #left-sidebar .nav-links .nav-links--link[aria-current="page"]:hover,
+  #left-sidebar .nav-links--link[aria-current="page"]:hover {
+    background-color: #21262d !important;
   }
 
   /* keep the selected item's label text bright (overrides the
@@ -592,6 +608,18 @@
   }
 
   .s-prose strong, .s-prose b { color: #e6edf3 !important; }
+
+  /* …but not when the bold text IS the link (`<a><strong>title</strong></a>`,
+     the usual shape for a cited paper or a linked heading in an answer). The
+     bright-prose rules are !important and land on the inner element, so the
+     anchor's accent never reaches the rendered text and a bold link becomes
+     bold body copy. Same trap for the metadata `strong` rules further down,
+     hence the .post-layout / .grid--cell arms. */
+  .s-prose a strong, .s-prose a b,
+  .comment-copy a strong, .comment-copy a b,
+  .post-layout a strong, .grid--cell a strong {
+    color: inherit !important;
+  }
 
   .s-prose blockquote {
     border-left-color: #2d333b !important;
@@ -1178,6 +1206,21 @@
     color: #9198a1 !important;
   }
 
+  /* Stacks also link-styles a button by adding `.s-link` ALONGSIDE the button
+     classes — SE's link colour then wins natively, but our 1-class
+     `.s-btn__muted` / `.s-btn` rules out-rank it and paint the control body
+     grey. The "Add a comment" control under every post is the live case: it
+     moved from `.js-add-link` (which this file already accents) to
+     `button.s-link.s-btn__muted.s-btn__outlined.comments-link`, so it stopped
+     reading as an action at all. Match on the `.s-link` pairing, not the one
+     renamed class, so the whole shape is covered. */
+  .s-link.s-btn,
+  .s-link.s-btn__muted,
+  .s-link.s-btn__outlined,
+  .comments-link {
+    color: #5fb0e6 !important;
+  }
+
   /* Outlined CTAs ("Log in", "Ask question") are the accent colour; only
      the muted variant is grey. */
   .s-btn.s-btn__outlined {
@@ -1218,6 +1261,43 @@
     background-color: #2d333b !important;
     color: #e6edf3 !important;
     border-color: #3d444d !important;
+  }
+
+  /* `__featured` is the last unhandled `.s-btn__<variant>`: a purple
+     (--purple-400/500) promo CTA that the base `.s-btn` grey flattened like
+     the rest of the family. Keep the purple identity, retoned for dark. */
+  .s-btn.s-btn__featured {
+    color: #a8abf2 !important;
+  }
+
+  .s-btn.s-btn__featured.s-btn__outlined {
+    color: #a8abf2 !important;
+    border-color: #5a5fc0 !important;
+  }
+
+  .s-btn.s-btn__featured.s-btn__filled {
+    background-color: #4a4fa8 !important;
+    color: #ffffff !important;
+    border-color: #5a5fc0 !important;
+  }
+
+  /* The count chip inside a sort tab ("Bountied 3"). Stacks fills
+     `.s-btn .s-btn--badge` from `background-color: currentColor`, and Stack
+     Overflow additionally stamps the element with the `.bg-blue-500` utility
+     — which our announcement-banner retone of `.bg-blue-*` swallowed, leaving
+     a near-invisible #14222e chip. The legacy `.bounty-indicator*` chip that
+     renders the SAME control on the other network sites was untouched and
+     stayed brand blue, so one component had two looks. Pin both to the
+     theme's accent fill. `.bounty-indicator-tab.flagbg` (red) is 2 classes
+     and !important in SE's own sheet, so it still wins. */
+  .s-btn-group .s-btn .s-btn--badge,
+  .s-btn--badge.bg-blue-500,
+  .s-btn--badge.bg-blue-400,
+  .s-btn--badge.bg-blue-600,
+  .bounty-indicator,
+  .bounty-indicator-tab {
+    background-color: #2f6f9f !important;
+    color: #ffffff !important;
   }
 
   /* "Ask Question" big button */
@@ -1369,6 +1449,66 @@
     border-color: #3a2f55 !important;
   }
 
+  /* The rest of the `.s-badge__*` family, same BEM trap. Stacks currently
+     ships 22 variants; the block above named 13, so these seven still fell
+     through to the base blue chip:
+       __votes   a post's score pill on a profile's "Top posts" rows. SE
+                 paints it WHITE with black-500 text unless it also carries
+                 __answered (green) — so the blue chip read as a second
+                 positive state next to the green one. Mirror SE's own
+                 `:not(.s-badge__answered)` guard so the green survives, and
+                 use the same neutral chip `.answer-votes` already gets.
+       __muted / __muted.__filled   neutral greys (black-200 / black-500).
+       __danger.__filled            red-400 fill: the 2-class __danger rule
+                                    above sets background-color directly, so
+                                    it beat SE's 3-class token rule and
+                                    flattened the solid red to the tint.
+       __info    blue-200 info chip; explicit so it does not drift.
+       __ai      orange-500 uppercase label, border = the text colour.
+       __bot     black-300 outline (the "Community Bot" author chip).
+     Each keeps the size/shape modifiers (__sm, __xs) untouched. */
+  .s-badge.s-badge__votes:not(.s-badge__answered) {
+    background-color: #20262d !important;
+    color: #9198a1 !important;
+    border-color: #2d333b !important;
+  }
+
+  .s-badge.s-badge__muted {
+    background-color: #20262d !important;
+    color: #9198a1 !important;
+    border-color: #3d444d !important;
+  }
+
+  .s-badge.s-badge__muted.s-badge__filled {
+    background-color: #3d444d !important;
+    color: #ffffff !important;
+    border-color: #3d444d !important;
+  }
+
+  .s-badge.s-badge__danger.s-badge__filled {
+    background-color: #a03a40 !important;
+    color: #ffffff !important;
+    border-color: #a03a40 !important;
+  }
+
+  .s-badge.s-badge__info {
+    background-color: #14222e !important;
+    color: #8cc6f0 !important;
+    border-color: #234055 !important;
+  }
+
+  .s-badge.s-badge__ai {
+    background-color: #2a2114 !important;
+    color: #e0913f !important;
+    border-color: #e0913f !important;
+  }
+
+  .s-badge.s-badge__bot {
+    background-color: #20262d !important;
+    color: #c4cdd6 !important;
+    border-color: #3d444d !important;
+  }
+
   /* reputation / badge counts on user cards */
   .reputation-score, .user-info .reputation-score {
     color: #c4cdd6 !important;
@@ -1411,8 +1551,12 @@
     color: #9bd4ff !important;
   }
 
+  /* SE tints ONLY the post OWNER's signature card (`.post-signature.owner`,
+     #edf5fd) — that tint is the sole marker of which of the "edited by" /
+     "asked by" cards belongs to the author. Tinting `.user-info` too painted
+     every signature on the page the same blue and erased the signal. */
   .post-signature.owner,
-  .post-signature .user-info {
+  .post-signature.owner .user-info {
     background-color: #16202c !important;
     border-radius: 5px;
   }
@@ -2078,6 +2222,50 @@
     background-color: #14222e !important;
     border-color: #234055 !important;
     color: #cfe0ef !important;
+  }
+
+  /* Post /revisions diff highlights. SE marks changed text with light-theme
+     highlighter fills — `span.diff-add` green-300 #94ccae on green-600 text,
+     `span.diff-delete` red-300 #eeaaaa on red-600 — the biggest bright
+     surfaces anywhere in the theme, and a bg-COLOR audit misses them because
+     the red channel (148 / 238) straddles the near-white threshold. The
+     whole family needs the same treatment, not just the two inline spans:
+     the side-by-side view paints WHOLE LINES from `.full-diff .inserted>div`
+     / `.deleted>div`, its `.skip` marker is a black-150 band framed by 4px
+     WHITE borders, and its `td.content` body text is black-350 (3.5:1 once
+     the page is dark). Retone to saturated-dark tints that still read as
+     highlighter marks. */
+  span.diff-add,
+  .diff-add {
+    background-color: #1c4229 !important;
+    color: #c7f0d3 !important;
+  }
+
+  span.diff-delete,
+  .diff-delete {
+    background-color: #4a1d20 !important;
+    color: #f6c8c8 !important;
+  }
+
+  .full-diff .inserted > div {
+    background-color: #16221a !important;
+  }
+
+  .full-diff .deleted > div {
+    background-color: #2a1718 !important;
+  }
+
+  .full-diff .skip {
+    background-color: #20262d !important;
+    color: #9198a1 !important;
+    border-top-color: #262c33 !important;
+    border-bottom-color: #262c33 !important;
+  }
+
+  .full-diff td.content,
+  .full-html-diff th,
+  .suggested-edit .body-diffs .full-html-diff th {
+    color: #c4cdd6 !important;
   }
 
   /* Diff "skipped lines" separator on /revisions (inline diff view):

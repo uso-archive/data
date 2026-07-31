@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Vinted with the homepage, catalog and search, item pages and seller profiles in a comfortable dark look that's easy on the eyes for late-night browsing.  Works on every country version of Vinted (vinted.fr, .de, .com, .co.uk, .es, .it, .nl, .be, .pl and more).   Prices, ratings and Vinted's teal stay clear and recognizable.
-@version      20260726.17.08
+@version      20260730.14.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -234,6 +234,15 @@
   .web_ui__InputBar__value::placeholder,
   input::placeholder, textarea::placeholder { color: #8b949e !important; opacity: 1 !important; }
 
+  /* Focusing the search bar drops a 999vw x 999vh scrim behind the suggestion
+     flyout, painted `rgb(var(--greyscale-level-1))` at 48%. That token is our
+     primary TEXT colour, so the scrim inverted into a milky white wash over
+     the entire page the moment you clicked into search. Re-anchor it to the
+     overlay colour used for dialogs. Match on both halves of the CSS-module
+     class — a bare `__background` also hits the homepage hero backdrop. */
+  [class*="SearchBar-module"][class*="__background"] {
+    background-color: #06080a !important; }
+
   /* Search autocomplete: each suggestion wraps the already-typed prefix in
      a <b> painted with the baked muted-grey literal (#5a6566). That reads as
      de-emphasised on the original light dropdown but goes dark-on-dark on our
@@ -257,17 +266,33 @@
      background carrying white text drawn from greyscale-level-6. The blanket
      Cell rule above flattened the fill to #1c2128 and our level-6 remap
      darkened the label to the same #1c2128 — the banner went invisible
-     dark-on-dark. Re-assert a dark-legible status fill and force the label
-     light (these variants are solid banners, so every child reads white).
-     web_ui's variant names are not the usual ones: `warning` is the RED
-     (error) fill and `expose` is the amber one — there is no Cell__error or
-     Cell__danger class at all. */
+     dark-on-dark. Re-assert a dark-legible fill and force the label light
+     (these variants are solid banners, so every child reads white).
+     This is the COMPLETE set of solid-fill Cell variants web_ui ships:
+     primary/amplified/muted/success/warning/expose. Every one of them pairs
+     a fill token with a greyscale-level-6 title, so leaving any out leaves
+     that variant illegible. amplified and muted fill from --amplified-default
+     / --muted-default, whose light-theme values are near-black and mid-grey;
+     the dark-theme values we adopted for their TEXT duty are near-white, so
+     without these rules those two render as glaring light banners. web_ui's
+     variant names are not the usual ones: `warning` is the RED (error) fill
+     and `expose` is the amber one — there is no Cell__error or Cell__danger
+     class at all.
+     The label rules carry a doubled attribute (`[Cell__cell][Cell__variant]`)
+     so they outrank the single-attribute Text__* rules declared below, which
+     would otherwise win the source-order tie on every labelled child. */
+  [class*="Cell__primary"]   { background-color: #0f7d84 !important; }
+  [class*="Cell__amplified"] { background-color: #39424e !important; }
+  [class*="Cell__muted"]     { background-color: #2f3742 !important; }
   [class*="Cell__success"] { background-color: #218056 !important; }
   [class*="Cell__warning"] { background-color: #a5343f !important; }
   [class*="Cell__expose"]  { background-color: #8a6a1e !important; }
-  [class*="Cell__success"], [class*="Cell__success"] *,
-  [class*="Cell__warning"], [class*="Cell__warning"] *,
-  [class*="Cell__expose"], [class*="Cell__expose"] * {
+  [class*="Cell__cell"][class*="Cell__primary"], [class*="Cell__cell"][class*="Cell__primary"] *,
+  [class*="Cell__cell"][class*="Cell__amplified"], [class*="Cell__cell"][class*="Cell__amplified"] *,
+  [class*="Cell__cell"][class*="Cell__muted"], [class*="Cell__cell"][class*="Cell__muted"] *,
+  [class*="Cell__cell"][class*="Cell__success"], [class*="Cell__cell"][class*="Cell__success"] *,
+  [class*="Cell__cell"][class*="Cell__warning"], [class*="Cell__cell"][class*="Cell__warning"] *,
+  [class*="Cell__cell"][class*="Cell__expose"], [class*="Cell__cell"][class*="Cell__expose"] * {
     color: #ffffff !important; fill: #ffffff !important; }
 
   /* web_ui Text colours are baked as literal light-theme hex inside
@@ -396,9 +421,13 @@
   .react-loading-skeleton::after, [class*="skeleton"]::after {
     background-image: linear-gradient(90deg, #232a32, #2d343d, #232a32) !important; }
 
-  /* Favourite heart button pill on each card */
+  /* Favourite heart button pill on each card. Natively an OPAQUE
+     `u-background-white` disc; a translucent fill lets the photo through, so
+     over the (very common) white product shot the pill computed to a mid grey
+     and its Text__caption count dropped to ~2:1 while the white heart washed
+     out. Keep it opaque, as the original is. */
   [data-testid$="--favourite"], .new-item-box__favourite,
-  button[class*="favourite"] { background-color: rgba(13, 17, 23, 0.55) !important; }
+  button[class*="favourite"] { background-color: #14181d !important; }
   [data-testid="favourite-icon"] svg, [class*="favourite"] svg { color: #e6edf3 !important; }
 
   /* Price text on cards stays readable */
@@ -528,12 +557,20 @@
   .web_ui__Dialog__overlay, [class*="Dialog__overlay"],
   .web_ui__BottomSheet__overlay, [class*="BottomSheet__overlay"] {
     background-color: rgba(6, 8, 10, 0.72) !important; }
+  /* The complaints carousel moved to a CSS module, so its class is now
+     `ComplaintsImageCarousel-module-scss-module__<hash>__complaints-image-…`
+     and every exact `.complaints-image-carousel*` selector is dead against it.
+     Match on the substring, and cover the outer stage too: it reads
+     rgba(level-1, .48), i.e. the same inverted-scrim bug as the dialog
+     overlay. The outer rule is declared FIRST so the wrapper/icon rules that
+     follow win the source-order tie on the nested nodes. */
+  [class*="complaints-image-carousel"] {
+    background-color: rgba(6, 8, 10, 0.72) !important; }
   .image-carousel__image-wrapper,
-  .complaints-image-carousel__wrapper,
-  .complaints-image-carousel__wrapper--phone {
+  [class*="complaints-image-carousel__wrapper"] {
     background-color: #0d1117 !important; }
   .image-carousel__icon-wrapper,
-  .complaints-image-carousel__icon-wrapper {
+  [class*="complaints-image-carousel__icon-wrapper"] {
     background-color: rgba(13, 17, 23, 0.55) !important; }
   /* web_ui paints "icon on a dark/photo surface" as Icon__greyscale-level-6,
      i.e. the white-surface token. Inverting that token to an elevated dark
@@ -543,6 +580,102 @@
   .web_ui__Icon__greyscale-level-6 svg,
   [class*="Icon__greyscale-level-6"] svg {
     fill: #e6edf3 !important; color: #e6edf3 !important; }
+  /* greyscale-level-6 is web_ui's "on-inverse" FOREGROUND — the colour of
+     anything drawn on a coloured, photographic or otherwise non-white
+     surface. The Icon rule above covers the glyph half of that family; these
+     are the text halves. Only the members whose surface is DARK for us belong
+     here: every `*__inverse` variant lands on a photo or on one of the deep
+     teal bands restored below. Members whose surface reads a token we lifted
+     to a LIGHT value must NOT be flipped — Input__primary fills from
+     --primary-default (our bright #33adb8), where the native dark level-6 ink
+     is already 6:1 and a light ink would drop to 2.3:1. */
+  [class*="Text__inverse"], [class*="Text__highlight-inverse"] > b,
+  [class*="c-text--inverse"], [class*="Validation__inverse"],
+  [class*="Checkbox__inverse"] [class*="Checkbox__label"],
+  [class*="Radio__inverse"] [class*="Radio__label"],
+  [class*="Toggle__inverse"] [class*="Toggle__label"] {
+    color: #e6edf3 !important; }
+
+  /* ============================================================
+     Marketing / help landing pages
+     ============================================================ */
+  /* Vinted's brand bands are painted from --primary-dark / --primary-medium /
+     --primary-default. All three are DARK teals natively, carrying a
+     level-6 (white) heading; we lift them for their foreground duty, which
+     turned every full-bleed band — and the tooltip — into a glaring pale
+     mint block. Restore a deep teal on each SURFACE use and keep the heading
+     light. This is the full set of surface uses of those tokens outside the
+     small accents (checkbox/radio/tab/chip) where the lifted teal is right. */
+  .web_ui__Tooltip__tooltip, [class*="Tooltip__tooltip"],
+  .web_ui__Tooltip__arrow, [class*="Tooltip__arrow"],
+  .privacy-center__bottom-section,
+  .accessibility-landingpage__third-section::after,
+  .how-it-works__get-started,
+  .u-background-theme,
+  [class*="Box__box-theme-primary-dark"],
+  [class*="Box__box-theme-primary-medium"],
+  [class*="Box__box-theme-primary-extra-dark"],
+  section[class*="item-verification"][class*="closing"],
+  [class*="advertising-module"][class*="__hero"] {
+    background-color: #0e3b42 !important; }
+  /* The /advertising hero artwork is a TRANSPARENT PNG carried by a web_ui
+     Image, whose wrapper takes the item-photo placeholder fill declared in the
+     item-grid block — that painted an opaque #1c2128 box over the right half of
+     the band and split it in two. The band colour must show through. */
+  [class*="advertising-module"][class*="__hero"] [class*="Image__image"] {
+    background-color: transparent !important; }
+  .web_ui__Tooltip__tooltip, [class*="Tooltip__tooltip"],
+  .privacy-center__bottom-section-title,
+  .accessibility-landingpage__third-section,
+  .accessibility-landingpage__third-section a,
+  .how-it-works__get-started h2, .how-it-works__get-started p,
+  section[class*="item-verification"][class*="closing"] h2,
+  section[class*="item-verification"][class*="closing"] p,
+  section[class*="item-verification"][class*="closing"] a,
+  .dac7__taxrules, .dac7__taxrules-title, .dac7__taxrules-description,
+  .dac7__checkstatus, .dac7__checkstatus-title {
+    color: #e6edf3 !important; }
+
+  /* The same pages hardcode light tint bands and cards (#f1eae1 cream,
+     #fce7dc peach, #edf2f2 grey, #edffe9 mint) whose copy reads our LIGHT
+     text tokens — the item-verification cards rendered completely blank.
+     Darken the surface so the text tokens land correctly. */
+  article[class*="item-verification"],
+  [class*="offline-verification-status"],
+  [class*="electronics-verification-status"],
+  [class*="electronics-verification-awareness-block"],
+  .privacy-center__glance-section,
+  .privacy-center__control-section,
+  .privacy-center__certification-section,
+  .dac7__howitworks, .policy__alert-note {
+    background-color: #1c2128 !important; }
+
+  /* how-it-works' hero keeps its native #fce7dc peach: the illustration is an
+     absolutely-positioned raster whose own background IS that peach, and it
+     starts 184px INSIDE the title column, so a dark band leaves the tail of
+     every heading line ("qui va", "amoureux") light-on-peach. Rebind the two
+     greyscale levels the title and body read, scoped to the band, instead of
+     recolouring the surface. */
+  .how-it-works__header {
+    background-color: #fce7dc !important;
+    --greyscale-level-1: 21, 25, 26;
+    --greyscale-level-2: 90, 101, 102; }
+
+  /* The privacy centre bakes a literal #000 on its headings and body copy —
+     only ever legible on those light bands. */
+  .privacy-center__glance-section, .privacy-center__control-section,
+  .privacy-center__manage-data-section, .privacy-center__faq-section,
+  .privacy-center__certification-section,
+  [class*="privacy-center__"] h2, [class*="privacy-center__"] h3 {
+    color: #e6edf3 !important; }
+  [class*="privacy-center__"] p { color: #c4cdd6 !important; }
+
+  /* The accessibility page's legal footnote bakes #666, which is only 3.0:1
+     on our base surface. */
+  .accessibility-landingpage__fourth-section,
+  .accessibility-landingpage__fourth-section-body,
+  .accessibility-landingpage__fourth-section-body a {
+    color: #97a1ab !important; }
 
   /* CMS-authored help tables (size charts) hardcode an inline light-grey
      header row that goes light-on-light under our text colours. */
@@ -591,4 +724,16 @@
   #onetrust-pc-btn-handler, #onetrust-banner-sdk .ot-pc-btn-handler {
     background-color: #2a3139 !important; color: #4db8c4 !important;
     border-color: #2d333b !important; }
+  /* /cookie-policy embeds OneTrust's STANDALONE cookie list, a third widget
+     with its own light palette that lives outside the banner and preference
+     -centre ids above: #f2f2f2 table headers, #4d4d4d copy on our dark card
+     and white pills around every cookie-name link. */
+  #ot-sdk-cookie-policy-v2, #ot-sdk-cookie-policy-v2 * {
+    color: #c4cdd6 !important; background-color: transparent !important; }
+  #ot-sdk-cookie-policy-v2 h3, #ot-sdk-cookie-policy-v2 h4 {
+    color: #e6edf3 !important; }
+  #ot-sdk-cookie-policy-v2 thead,
+  #ot-sdk-cookie-policy-v2 th.ot-table-header {
+    background-color: #2f3742 !important; color: #e6edf3 !important; }
+  #ot-sdk-cookie-policy-v2 a { color: #4db8c4 !important; }
 }

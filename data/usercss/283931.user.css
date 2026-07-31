@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for Slashdot, easy-on-the-eyes story feed and threaded comment discussions, with the classic Slashdot green kept intact.
-@version      20260726.17.06
+@version      20260730.14.16
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -60,6 +60,14 @@
   .nav-wrap span, .nav-secondary-wrap .nav-label,
   .nav-wrap .nav-label { color: #e6edf3 !important; }
   .nav-wrap a:hover, .nav-secondary-wrap a:hover, .nav-primary a:hover { color: #9be7d6 !important; }
+  /* The masthead has TWO hover fills: a deep teal (#004d4d) everywhere, and a burnt
+     orange (#b7590b) on the Firehose "All" tab and on every Topics-row link. The mint
+     hover colour above reads 6.8:1 on the teal but only 3.3:1 on the orange (native is
+     white, 4.7:1) — a hover state no load-time scan reaches. Both orange surfaces, at a
+     specificity that clears the (0,2,1) mint rule. */
+  .nav-site > li .filter-firehose a:hover,
+  .nav-secondary-wrap .nav-secondary li > a:hover,
+  .nav-secondary .nav-secondary-list li > a:hover { color: #ffffff !important; }
   /* "Firehose" / "or" / "Topics:" / "Follow us:" small labels. The site paints these
      `#00c2c2` with `cursor: default` — the cyan IS the not-a-link affordance. The
      blanket masthead-link rules above are (0,2,0) and outranked a bare `.nav-label`
@@ -260,6 +268,14 @@
   #slashboxes header h2.story span, .block > header h2.story span {
     color: #e6edf3 !important;
   }
+
+  /* the "Powered By" credit in the Slashdot Deals sidebar block is a 200x35 anchor whose
+     `sf-logo.png` background bakes a light-grey plate behind dark glyphs (no alpha), so
+     it renders as a bright bar on every page carrying that block. A raster cannot be
+     recoloured, but the art is monochrome, so inverting it gives light glyphs on a dark
+     plate. The masthead/footer Slashdot marks are SVGs that are already white — leave
+     them alone (`#logo`/`.logo` keep `filter: none` above). */
+  #sf-logo a, div#sf-logo a { filter: invert(1) !important; }
 
   /* user profile bio card (#user_bio renders on #e6e6e6 → bio text would land on light) */
   article#user_bio, #user_bio {
@@ -512,6 +528,22 @@
   .btn-primary, input.button {
     color: #ffffff !important;
   }
+  /* Every entry above that is a BARE class is (0,1,0) and loses to our own
+     `a, a:link, a:visited { color: #5fb0e6 }` (0,1,1) whenever the control is an
+     <a> — so a solid coloured button rendered as a link keeps its fill but takes the
+     page link-blue. Live proof: `/polls` renders "view results" / "view more" as
+     `a.btn-polls`, i.e. blue on the brand orange at 1.6:1, while the sibling
+     `button.btn-polls` ("vote now") is correctly white. Restate the whole family in
+     anchor form (incl. :link/:visited/:hover, which each beat a bare class too). */
+  a.btn-polls, a.btn-polls:link, a.btn-polls:visited, a.btn-polls:hover,
+  a.nel-button, a.nel-button:link, a.nel-button:visited, a.nel-button:hover,
+  a.btn-primary, a.btn-primary:link, a.btn-primary:visited, a.btn-primary:hover,
+  a.btn-danger, a.btn-danger:link, a.btn-danger:visited, a.btn-danger:hover,
+  a.btn-warning, a.btn-warning:link, a.btn-warning:visited, a.btn-warning:hover,
+  a.btn-info, a.btn-info:link, a.btn-info:visited, a.btn-info:hover,
+  a.btn-success:link, a.btn-success:visited, a.btn-success:hover {
+    color: #ffffff !important;
+  }
   /* slashdot's default SOLID buttons ship the brand teal fill (#057e7e) with white
      text — its primary-action affordance. The generic grey `.btn` rule above (a
      deliberate neutral-button choice) swallowed the ones carrying no Bootstrap
@@ -533,6 +565,15 @@
   a.btn.first:hover, input.btn.first:hover, button.btn.first:hover, .btn.first:hover,
   #d2loadall:hover, a#d2loadall:hover, #d2reply:hover, a#d2reply:hover {
     background-color: #0e9494 !important;
+  }
+  /* The comment bar is rendered TWICE — once in `#d2header`, once inside the page
+     footer `#fhft`. Our own footer rule `footer a, #fhft a, #ft a { color: #5fb0e6 }`
+     is (1,0,1) and outranks `a.btn.first` (0,2,1), so the bottom "Post" shipped
+     link-blue on the teal fill (2.1:1) while the identical top one was white. Any
+     primary CTA that can appear in either bar needs an id-scoped restatement. */
+  #fhft a.btn.first, #ft a.btn.first, #fhft a#d2loadall, #ft a#d2loadall,
+  #fhft a#d2reply, #ft a#d2reply, #fhft a.btn-success, #ft a.btn-success {
+    color: #ffffff !important;
   }
   /* …and keep their FILL too. The generic `.btn` rule above is !important at the
      same (0,1,0) specificity, so it swallowed every Bootstrap modifier: the green
