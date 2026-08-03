@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean dark theme for itch.io's homepage, browse, jams, community and profiles that keeps game art, sale ribbons and creators' own page designs untouched.
-@version      20260730.14.14
+@version      20260803.00.36
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -14,6 +14,17 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) {
     background-color: #14181d !important;
     color: #c4cdd6 !important;
+    /* itch's three MUTED-TEXT tokens are tuned for its white page (#606060 / #767676 /
+       #858585) and land at 2.5–4.4:1 on ours. They are referenced ~500 times across post
+       dates, edit notes, breadcrumbs, facet counts, blog metadata and moderation notices —
+       chasing them selector-by-selector is what every previous patrol did and each one found
+       more. Rebinding the tokens on the apex body fixes the whole family at once; creator
+       layouts are excluded by the prefix so their own values are untouched. Only these three
+       are safe: --itchio_body_color and _med are also painted as SURFACES (the hamburger
+       bars, the WEB flag) and are handled by their own rules. */
+    --itchio_body_color_light: #8b949e;
+    --itchio_body_color_lighter: #8b949e;
+    --itchio_body_color_gray: #8b949e;
   }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .main_column,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .index_sidebar,
@@ -105,6 +116,18 @@
   .header_logo img,
   .header_logo .full_logo,
   .header_logo .mini { filter: invert(1) !important; }
+  /* The narrow-viewport hamburger draws its three bars as div backgrounds filled
+     var(--itchio_body_color) (#222) — 1.15:1 on the dark header, i.e. the primary mobile
+     nav control is all but invisible. It is a background, so no text/glyph check sees it. */
+  .primary_header .mobile_nav_btn .menu_bar { background-color: #c4cdd6 !important; }
+
+  /* Hovering "Log in" / "Register" fills the button itch's light #cfcfd1 — designed to read
+     under its red label on the white page, but our accent lands on it at 1.2:1. Every page
+     carries these two, and only a hover reaches the state. */
+  .user_panel_widget .panel_button:hover {
+    background-color: #21262d !important;
+    color: #ffa2ad !important;
+  }
 
   .header_dropdown {
     background-color: #161b22 !important;
@@ -255,6 +278,19 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .toggle_btn.active {
     border-color: #fa7d8c !important;
   }
+  /* The chip is an <a>, so the blanket accent paints its label AND its checkbox glyph the same
+     pink whether the filter is on or off — itch writes an OFF chip muted #606060 and an ON one
+     body-ink with a red tick, so the border was left carrying the whole state on its own. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .toggle_btn,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .toggle_btn .icon {
+    color: #8b949e !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .toggle_btn.active {
+    color: #e6edf3 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .toggle_btn.active .icon {
+    color: #fa7d8c !important;
+  }
   /* Controls-bar divider is a 1px background, not a border, so the border reset misses it */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .control_sep {
     background-color: #2d333b !important;
@@ -262,6 +298,13 @@
   /* selectize "Filter with <term>…" affordance ships rgba(48,48,48,.5) — invisible on dark */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .selectize-dropdown .create {
     color: #8b949e !important;
+  }
+  /* The tag-picker input's own skin paints a near-white gradient as a background-IMAGE plus a
+     white inset highlight; both sit on top of the background-color we set, so the "Find tag"
+     box on /tags renders as a white plate with our dark placeholder chip inside it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .selectize-input {
+    background-image: none !important;
+    box-shadow: none !important;
   }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .divider {
     background-color: #2d333b !important;
@@ -364,6 +407,10 @@
   .primary_header .header_buttons a.header_button { border-color: transparent !important; }
   /* Preserve the add-to-collection button's brand-red outline */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .action_btn.add_to_collection_btn { border-color: rgba(218, 44, 73, 0.7) !important; }
+  /* The hover tools sit on a translucent plate over arbitrary cover art, which is why itch
+     labels them near-white; the blanket accent puts pink over whatever the cover happens to
+     be (4.3:1 on a mid-tone, worse on a pale one). */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .game_cell_tools .action_btn { color: #e6edf3 !important; }
 
   /* ==== Buttons ==== */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .button,
@@ -410,11 +457,29 @@
     background-color: #30363d !important;
     color: #e6edf3 !important;
   }
-  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .sale_tag,
-  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .sale_flag {
-    background-color: #2f81c9 !important;
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .sale_tag {
+    background-color: #2b76b6 !important;
     color: #ffffff !important;
-    border-color: #2f81c9 !important;
+    border-color: #2b76b6 !important;
+  }
+  /* .sale_flag has two shapes. In a game cell it is a plain filled box (keep our blue), but in
+     a sale ROW it is a corner ribbon whose shape — including the folded-under tab — comes from
+     a transparent-cornered background-image SVG over a transparent background-color. Filling
+     that one paints a square block behind the art, so the notches read as a mismatched darker
+     frame; leave the ribbon variant's fill alone. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .sale_flag {
+    background-color: #2b76b6 !important;
+    color: #ffffff !important;
+    border-color: #2b76b6 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .sale_row .sale_flag {
+    background-color: transparent !important;
+    border-color: transparent !important;
+  }
+  /* Same blue family, same reason: itch's #34a0f2 under white reads 2.8:1 on this page */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jam_tag.meta_tag {
+    background-color: #2b76b6 !important;
+    color: #ffffff !important;
   }
   /* "Free" / name-your-price marker — dark pill, positive green text */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .free_label {
@@ -514,6 +579,24 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .topic_stats .number_value,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .topics_count,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .category_pager { color: #8b949e !important; }
+  /* itch paints a board row #f7f7f7 on hover; our transparent !important fill on .topic_row
+     beats it, so the whole topic list has no hover feedback at all. Restore it dark. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .community_topic_list_widget .topic_row:hover {
+    background-color: #1a1f26 !important;
+  }
+  /* Per-topic tags. The plain pill is a light #e7e7e7; the .autocolor variant carries a
+     pastel background + dark text generated per tag string as an INLINE style, so a
+     background override would beat it and erase the tag's identity. Invert its lightness
+     instead — hue-rotate(180deg) after invert(1) puts the hue back where it started, so a
+     green tag stays green and a pink one stays pink, on a dark chip with light text. The
+     three role flags carry their own saturated fills and are left alone. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .topic_row .topic_tag:not(.autocolor):not(.new_flag):not(.sticky_flag):not(.lock_flag) {
+    background-color: #30363d !important;
+    color: #c4cdd6 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .topic_row .topic_tag.autocolor {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
 
   /* Avatar wrapper sits behind the user's avatar image — keep dark, not white */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .avatar_container,
@@ -738,6 +821,22 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_top_tags a {
     color: #8b949e !important;
   }
+  /* Tag-browse page: the pairing caption and the pager both hardcode itch's muted greys
+     (#434343 / #606060) rather than reading the tokens, so they land at 1.6:1 / 2.8:1. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .pairings_header,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .pager_label {
+    color: #8b949e !important;
+  }
+  /* A tag card wraps its blurb, its weekly count and its "Commonly tagged with" list in <a>s
+     that itch leaves at body/muted ink — only the tag TITLE is a red link. The blanket accent
+     paints all of them pink, so /tags reads as a wall of links with no title emphasis. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .tag_cell .tag_description a {
+    color: #c4cdd6 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .tag_cell .games_count a,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .tag_cell .related_tags a {
+    color: #8b949e !important;
+  }
   /* Rating count beside the stars in every game grid ships itch's #606060 (~2.2:1 here) */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .game_rating,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .rating_count {
@@ -760,6 +859,11 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .promotion_dates,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .date_format {
     color: #8b949e !important;
+  }
+  /* "Includes the following games:" heads the product half at itch's hardcoded #434343
+     (1.6:1 on the card) — the token rebind does not reach it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .game_column .stick_wrapper > p {
+    color: #c4cdd6 !important;
   }
   /* Countdown digits are the loudest thing in the buy row natively and ship #606060 */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .countdown .block_value {
@@ -862,6 +966,12 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .text_content h3 code {
     box-shadow: 0 0 0 10px #1c2128 !important;
   }
+  /* A <code> inside a link (the API reference's endpoint table of contents) inherits the link
+     red natively; the generic code rule above flattens it to body grey and the whole contents
+     list stops reading as clickable. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .text_content a code {
+    color: #fa7d8c !important;
+  }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .knowledge_base_article_page .text_content p img.showcase {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.6) !important;
   }
@@ -904,6 +1014,11 @@
     color: #ffffff !important;
     border-color: rgba(255, 255, 255, 0.8) !important;
   }
+  /* On hover itch INVERTS it — the pill fills near-white and the label flips to the band red.
+     The rule above pins white through that flip, so the hovered button reads ~1.2:1. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book_page_header .return_link:hover {
+    color: #b81c3a !important;
+  }
   /* honkit's font/theme picker: a #fafafa flyout whose generic .button class our brand-red
      button rule hijacks into a grid of red blocks. Click-gated, so no load-time scan sees it. */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book_page .dropdown-menu {
@@ -935,6 +1050,201 @@
     border-bottom-color: #1c2128 !important;
   }
 
+  /* ==== Blog (itch.io/blog, itch.io/updates/<slug>) ==== */
+  /* The blog index's tab strip ships a full-width var(--itchio_gray_back) band, so the pink
+     tab labels land on near-white at 2.3:1. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .header_nav {
+    background-color: #1a1f26 !important;
+    border-color: #2d333b !important;
+  }
+  /* Post titles in the index list ARE the page's primary links (itch link-red natively), but
+     .title also names headings, and the heading rule outranks the blanket `a` rule — so every
+     title on /blog and /updates lost its clickable cue while the byline and tag beside it kept
+     theirs. Scoped to the list widget so card/heading .title elements stay light. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .blog_post_list_widget a.title {
+    color: #fa7d8c !important;
+  }
+  /* A single post is a whole page type of its own: the article shell itself is #fff (and its
+     sticky title bar with it), so every colour we lightened rendered white-on-white down the
+     entire column. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .blog_post_page,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .post_sticky_bar {
+    background-color: #14181d !important;
+    border-color: #2d333b !important;
+  }
+  /* The bar is fixed over the article, so it has to stay opaque as the post scrolls under it */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .post_sticky_bar {
+    background-color: #0d1117 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .post_tools,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .support_post,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .post_like_button,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .aside_box h3 {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .support_post .post_tag {
+    background-color: #30363d !important;
+  }
+  /* The like widget's frame is a 2px inset box-shadow in itch's raw #FF2449, and its inner
+     .button.outline child paints over the left half — so the ring only shows around the
+     count. Natively both halves are the same red; our outline-button rule softened the
+     child's border and left the ring raw, leaving a saturated box around just the number. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .post_like_button {
+    box-shadow: inset 0 0 0 2px rgba(250, 125, 140, 0.45) !important;
+  }
+  /* "Did you like this post?" ships --itchio_body_color_med (#434343) — 1.6:1 on the card.
+     That token also paints the WEB flag's fill, so it is fixed here rather than rebound. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .support_header p {
+    color: #c4cdd6 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .likes_count {
+    color: #fa7d8c !important;
+  }
+  /* The header band paints its own white plate through a pseudo, which no element-bg rule reaches */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .blog_post_page .header_column::before {
+    background-color: #14181d !important;
+  }
+
+  /* ==== Randomizer (itch.io/randomizer) ==== */
+  /* Whole page type: the intro card and its rail are var(--itchio_gray_back), and a
+     half-white scrim covers the viewport behind them, so the heading and the whole
+     explanation render white-on-white. Reached from "Randomizer" in the home rail. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page .sidebar,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_intro {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_intro_outer {
+    background-color: rgba(5, 8, 12, 0.6) !important;
+  }
+  /* Each filter is a white pill; the .selected one carries a green tint that IS the on-state,
+     so darken the base only and leave the tint to stack on the dark pill. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page .filter {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page .filter.selected {
+    background-color: #1d3327 !important;
+    border-color: #45b976 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page .filter.selected .label {
+    color: #c4cdd6 !important;
+  }
+  /* Once a project is drawn the page swaps to .no_filters: the shell turns #fff behind the
+     game frame, the sign-up nudge ships #dadada and the two feedback buttons ship white pills.
+     None of it exists until Start is pressed, so a load-time pass sees only the intro. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page {
+    background-color: #14181d !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page .login_message,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page .rating_btn {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* ==== Directory (itch.io/directory) ==== */
+  /* Another whole page type: the facet grid is a #fff sheet holding dark cards, and each
+     section heading sits in its own white band with the "See all …" outline button in it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_columns,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .content_type > h2,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .content_type .outline_button {
+    background-color: #14181d !important;
+    border-color: #2d333b !important;
+  }
+
+  /* ==== Marketing / index pages (itch.io/app, /developers, /jobs, /game-development/…) ==== */
+  /* The app tour alternates full-width text bands: the .right ones ship
+     var(--itchio_white_back) while their .left siblings are transparent, so half the copy
+     rendered white-on-white. The closing download panel is the same white. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .app_page .image_interstitial {
+    background-color: #14181d !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .app_page .download_row {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  /* The developer page's scroll-in bar is a fixed full-width var(--itchio_white_back) strip
+     parked above the viewport at load, so it only exists on screen once the page scrolls —
+     and it carries the pure-black monochrome logo, same as the site header. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .developers_page .index_sticky_bar {
+    background-color: #0d1117 !important;
+    border-color: #2d333b !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .developers_page .sticky_logo {
+    filter: invert(1) !important;
+  }
+  /* Its "Learn more about:" chips are white pills carrying itch's link red — 2.5:1 here */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .developers_page .guide_nav .outline_button {
+    background-color: #1c2128 !important;
+    border-color: rgba(250, 125, 140, 0.45) !important;
+  }
+  /* Each section heading leads with an icon-FONT glyph left at itch's #434343 (1.8:1). It is
+     drawn by a ::before, so no text-colour walk reads it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .developers_page .guide h3 .icon {
+    color: #8b949e !important;
+  }
+  /* Job listings are white cards holding itch's link-red titles (2.5:1), and the employer
+     logo tile is a light gray_back plate — both while the logo lazy-loads and behind a
+     transparent one, plus the briefcase fallback when a listing has no logo at all. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jobs_browse_page .job_listing_row {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jobs_browse_page .post_image {
+    background-color: #1a1f26 !important;
+  }
+  /* A single listing is its own page type and the article sheet itself is
+     var(--itchio_white_back), so the entire job description rendered white-on-white. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jobs_view_page {
+    background-color: #14181d !important;
+  }
+  /* Every run of text in a listing card is wrapped in its own <a>, but itch colours only the
+     TITLE like a link (#da2c49) and leaves the summary at body ink and the tag chips muted —
+     the blanket accent turns the whole card into a wall of pink and the title stops standing
+     out. Neither scanner sees it: the native tones are achromatic, and `painted` skips colour. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .job_listing_row p.summary a {
+    color: #c4cdd6 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .job_listing_row .tags a {
+    color: #8b949e !important;
+  }
+  /* Engine directory: each row's sample-project strip is a light gray_back plate, every
+     thumbnail in it carries its own white plate behind the (often transparent) cover art,
+     and the engine icon sits on the same light tile. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .game_development_tools_page .tool_icon,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .game_development_tools_page .tool_project_preview,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .game_development_tools_page .tool_project_preview img {
+    background-color: #1a1f26 !important;
+  }
+
+  /* ==== Sale rows / goal bars ==== */
+  /* Horizontal thumbnail strips end in a 10px "more to the right" fade whose stop is solid
+     white — a bright sliver down the edge of every bundle/sale row. itch ships a dark variant
+     of this gradient for its own logged-in dark theme; this is the same remap. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .sale_gradient {
+    background-image: linear-gradient(to right, rgba(20, 24, 29, 0), #14181d) !important;
+  }
+  /* The bundle/sale funding panel is a 50%-white wash: invisible on itch's white page, a large
+     light-grey slab here that swallows its own labels. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .goal_progress_widget {
+    background-color: #1c2128 !important;
+  }
+  /* An <img class="game_thumb"> (sale rows, blog post embeds) carries a light gray_back plate
+     that shows through transparent art and while the image is still loading. Only the IMG —
+     a DIV.game_thumb holds the per-game colour extracted from the cover and is content. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) img.game_thumb,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .cover_image {
+    background-color: #1a1f26 !important;
+  }
+
+  /* ==== Moderation notices ==== */
+  /* "moved this topic to …" ships itch's #606060 straight on the post card (2.6:1) */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .moderation_action,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .moderation_action strong {
+    color: #8b949e !important;
+  }
+
   /* ==== Footer ==== */
   .footer .primary,
   .footer .secondary,
@@ -952,8 +1262,32 @@
     background-image: linear-gradient(to right, #14181d 0%, #14181d 50%, rgba(20, 24, 29, 0) 100%) !important;
   }
 
+  /* ==== Home index tab strip (narrow viewports) ==== */
+  /* Each tab carries `border-bottom: 4px solid transparent` as a spacer and colours it
+     #FF2449 on .active/:hover. The blanket border reset paints all of them grey AND, being
+     !important, beats the hover rule — so every tab is underlined and neither cue survives.
+     Below itch's breakpoint this strip IS the site nav, so a desktop pass never sees it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .index_header_tabs > a {
+    border-bottom-color: transparent !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .index_header_tabs > a.active,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .index_header_tabs > a:hover {
+    border-bottom-color: #fa7d8c !important;
+  }
+
   /* ==== Large promo / hero sections ==== */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .large_promo_section { background-color: #0d1117 !important; }
+  /* The hero's backdrop is the featured game's own blurred cover art, so its lightness varies
+     per game and our overlay sits BEHIND it. itch writes this caption white for exactly that
+     reason; the blanket accent drops it to ~1.6:1 over a pale cover. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_link a {
+    color: #ffffff !important;
+  }
+  /* The app banner's "Download app" outline button flips to a solid brand-red fill on hover,
+     where itch writes the label white; the blanket accent-hover leaves accent-on-red at 2.3:1. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .app_banner .outline_button:hover {
+    color: #ffffff !important;
+  }
   /* Featured-game promo panel ships a 30% white overlay -> washed grey on dark; darken it */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_game_promo_banner_widget {
     background-color: rgba(13, 17, 23, 0.55) !important;

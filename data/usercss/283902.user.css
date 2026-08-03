@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260730.14.13
+@version      20260803.00.35
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -262,16 +262,26 @@
   [class*="Lyrics__Root"] { color: #e6edf3 !important; background-color: transparent !important; }
   [data-lyrics-container] a { color: #e6edf3 !important; } /* inline section labels */
 
-  /* annotated (referent) words: light grey highlight -> subtle dark elevated */
+  /* Annotated (referent) words. The site paints the whole chip on the inner Highlight
+     span and encodes its state ONLY in that span's colour: light grey (#e9e9e9) at rest,
+     inverted near-black (#070707) while hovered OR while its annotation is open. Both are
+     single-class styled-components rules whose hash changes every build, so no selector
+     can name the open one — setting background-color here flattens hover AND the "you are
+     reading this one" cue into one identical chip across the whole song.
+     Blend a dark layer over whatever the site painted instead: darken() maps the light
+     resting chip down to the elevated tone and leaves the near-black active/hover chip
+     alone, so the states stay apart without naming either. Do NOT add a background-color
+     to this rule — the blend needs the site's own value underneath. */
   [class*="ReferentFragment-desktop__Highlight"],
-  [class*="ReferentFragment"][class*="Highlight"],
+  [class*="ReferentFragment"][class*="Highlight"] {
+    background-image: linear-gradient(#1c2128, #1c2128) !important;
+    background-blend-mode: darken !important;
+    color: #e6edf3 !important; }
+  /* the ClickTarget anchor around it is natively bare; painting it draws an elevated
+     rectangle in the chip's padding that the blended span no longer matches */
   [class*="ReferentFragment-desktop__ClickTarget"] {
-    background-color: #1c2128 !important; color: #e6edf3 !important; }
-  [class*="ReferentFragment-desktop__Highlight"]:hover,
-  [class*="ReferentFragment"][class*="Highlight"]:hover {
-    background-color: #2d333b !important; }
-  /* the active annotation gets the brand-red left accent */
-  [class*="ReferentFragment"][class*="Highlight"][class*="active"],
+    background-color: transparent !important; color: #e6edf3 !important; }
+  /* legacy "--active" referent (snarly pages): brand-red left accent */
   [class*="Referent"][class*="--active"] {
     background-color: #21262d !important; box-shadow: inset 3px 0 0 #ed4337 !important; }
   /* the open-annotation callout caret (the diamond pointing from the lyric to the
@@ -328,17 +338,24 @@
   [class*="CommentForm__FakeTextField"],
   [class*="SongCommentsWithAds__CTA"] {
     background-color: #1c2128 !important; color: #c4cdd6 !important; border-color: #2d333b !important; }
-  /* Comment vote score ("+661" between the thumbs): the site paints the running total
-     green (#24c609) on comments — the same sentiment cue the legacy ".voting-total--
-     positive" rule already restores on album/artist pages. The blanket
-     "VotingActions__Button" colour flattens the React one to plain light grey, so the
-     modern song page lost a signal its legacy twin keeps. Keyed on the site's own
-     "background.<sign>Number" token attribute so the negative case follows suit.
-     Annotation and Q&A totals are natively BLACK (neutral) and must stay light — hence
-     the Comment__Footer scope rather than the bare attribute. */
-  [class*="Comment__Footer"] [color="background.positiveNumber"] {
+  /* Vote score ("+661" between the thumbs, on comments / annotations / Q&A answers): the
+     site marks every running total with its own "background.<sign>Number" token attribute
+     and paints the positive one green (#24c609) — the same sentiment cue the legacy
+     ".voting-total--positive" rule restores on album/artist pages. The blanket
+     "VotingActions__Button" colour flattens them all to plain light grey, so the modern
+     song page loses a signal its legacy twin keeps. Key on the token itself, not on a
+     component scope: the open-annotation total in the sidebar is green while the in-flow
+     song-bio and Q&A totals resolve to WHITE (invisible on the site's own white card), so
+     a scope narrower than the attribute restores the cue on one and drops it on the rest.
+     The compound "VotingActions" form is required, not redundant: the neutral
+     [class*="VotingActions__Button"] surface further down this file is the same 0-1-0
+     specificity and comes LATER, so the bare attribute loses `color` to it and only the
+     -webkit-text-fill-color survives — which paints in Chromium but not in Firefox. */
+  [color="background.positiveNumber"], [color="background.positiveNumber"] *,
+  [class*="VotingActions"][color="background.positiveNumber"] {
     color: #3fb950 !important; -webkit-text-fill-color: #3fb950 !important; }
-  [class*="Comment__Footer"] [color="background.negativeNumber"] {
+  [color="background.negativeNumber"], [color="background.negativeNumber"] *,
+  [class*="VotingActions"][color="background.negativeNumber"] {
     color: #f85149 !important; -webkit-text-fill-color: #f85149 !important; }
   /* "This song bio is unreviewed" banner (SongDescription / annotation): the site flags
      pending content with a white + light-pink candy-stripe background, a pink border and a
@@ -466,20 +483,31 @@
      punches gaps around the glyphs so the rule skips descenders. On the dark card the
      black underline vanishes and the fat white halo floods the letters into a blob.
      Re-point the halo at the hovered card surface and the underline at the title tone.
-     Keeping the halo (rather than dropping it) preserves the descender skip. */
+     Keeping the halo (rather than dropping it) preserves the descender skip.
+     The size/repeat/position MUST be restated: only the DESKTOP bundle ships them, so on
+     the mobile bundle the bare gradient inherits `auto`/`repeat` and floods the whole
+     title box with a solid light slab the moment the card is touched or hovered. */
   [class*="EditorialPlacement__Link"]:hover [class*="EditorialPlacement__Title"] h2,
   [class*="EditorialPlacement__Link"]:hover [class*="EditorialPlacement__Title"] h3 {
     color: #e6edf3 !important;
     background-image: linear-gradient(#e6edf3, #e6edf3) !important;
+    background-size: 100% 1px !important;
+    background-repeat: no-repeat !important;
+    background-position: 0 100% !important;
     text-shadow: 0.03em 0 #1c2128, -0.03em 0 #1c2128, 0 0.03em #1c2128, 0 -0.03em #1c2128,
                  0.06em 0 #1c2128, -0.06em 0 #1c2128, 0.09em 0 #1c2128, -0.09em 0 #1c2128,
                  0.12em 0 #1c2128, -0.12em 0 #1c2128, 0.15em 0 #1c2128, -0.15em 0 #1c2128 !important; }
   [class*="ChartSong-desktop__Artist"], [class*="EditorialPlacement__Author"],
   [class*="EditorialPlacement__PublishedAt"], [class*="ChartSong-desktop__Metadatum"] { color: #8b949e !important; }
-  /* red eyebrow label — the word sits in a <span> inside the card's <a>, so the generic
-     "a span" link rule repaints it periwinkle unless the descendant is named too */
+  /* red eyebrow label ("NEWS" / "FEATURE" / "VIDEO") — the word sits in a <span> inside the
+     card's <a>, so the generic "a span" link rule repaints it periwinkle unless the
+     descendant is named too. Lifted from the raw brand #ed4337: that clears 4.5:1 on the
+     #14181d base but only reaches 4.21:1 once the card is HOVERED, because the hover rule
+     below raises the card to #1c2128 — measure the eyebrow against the surface it actually
+     lands on, not the page floor. #f26659 is the same brand red the Q&A titles use and
+     holds 5.3:1 on the hovered card. */
   [class*="EditorialPlacement__Label"],
-  [class*="EditorialPlacement__Label"] * { color: #ed4337 !important; }
+  [class*="EditorialPlacement__Label"] * { color: #f26659 !important; }
   [class*="UserBadge__Name"] { color: #c4cdd6 !important; }
   [class*="UserBadge__Role"], [class*="Community-desktop__Iq"], [class*="CommunityRanking-desktop__Iq"] { color: #8b949e !important; }
   /* Section eyebrows ("MOST RECENT NEWS", "GENIUS ORIGINAL SERIES") and the community
@@ -511,11 +539,17 @@
     background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   .header_search-input::placeholder { color: #8b949e !important; }
 
-  /* containers / cards */
-  .white_container, .mini_card, .mini_article_card, .thumbnail_grid,
+  /* containers / cards. ".mini_card" is excluded on its own "--transparent" modifier:
+     genius ships ".mini_card--transparent{background-color:transparent}" and the base
+     fill here outranked it, so the artist page's Top Songs list rendered as a stack of
+     elevated panels instead of the flat list the site draws. ".user_badge" is NOT a card
+     — in genius's sheet it is a bare flex row with no background at all; filling it drew
+     a lighter chip hugging the avatar+name of every leaderboard entry and stopping dead
+     mid-row. */
+  .white_container, .mini_card:not(.mini_card--transparent), .mini_article_card, .thumbnail_grid,
   .standalone_annotation, .song_card, .vertical_album_card, .full_width_container--white,
   .horizontal_album_card, .leaderboard, .feed_item, .annotation_sidebar_unit,
-  .article_card, .text_card, .cosign_unit, .user_badge,
+  .article_card, .text_card, .cosign_unit,
   .profile_contribution, .full_width_link, .full_width_card, .grid_video {
     background-color: #1c2128 !important; color: #c4cdd6 !important; border-color: #2d333b !important; }
   .full_width_link, .full_width_link * { color: #c4cdd6 !important; }
@@ -530,7 +564,9 @@
     background-color: #1c2128 !important; }
   .profile_preview-row, .profile_preview-rows { color: #c4cdd6 !important; }
   .profile_preview-row a { color: #9aa7f0 !important; }
-  .mini_card:hover, .mini_article_card:hover, .song_card:hover { background-color: #21262d !important; }
+  /* genius gates its own hover fill the same way (".mini_card:not(.mini_card--transparent):hover") */
+  .mini_card:not(.mini_card--transparent):hover,
+  .mini_article_card:hover, .song_card:hover { background-color: #21262d !important; }
   .full_width_container { background-color: transparent !important; }
   /* Album-tracklist / chart rows draw their divider on a full-bleed ::before carrying a
      near-white border. The blanket border reset at the top of the file is `*`, which does
@@ -601,30 +637,45 @@
 
   /* legacy profile header is already dark — keep it, just soften */
   .profile_header { background-color: #0d1117 !important; }
+  /* "u-white_background" is the site's own paint-it-white utility. On the MOBILE artist
+     page the profile tab strip carries it, so a 390x38 white band sits between the Q&A
+     block and the activity feed with its tab label (lifted light by our typography)
+     invisible on it. The desktop tab strip inherits the dark profile header instead, so
+     the strip only appears on the mobile bundle. Darken the utility itself. */
+  .u-white_background, .profile_tabs.u-white_background {
+    background-color: #14181d !important; }
+  /* the annotation body's loading skeleton paints pure white behind the placeholder
+     lines; it is only opacity:0 once loaded, so it flashes as a full-height white slab */
+  .annotation_placeholder, .placeholder.annotation_placeholder {
+    background-color: #1c2128 !important; }
   .profile_tabs-tab--selected { border-bottom-color: #ed4337 !important; color: #ffffff !important; }
   /* The blanket border reset above repaints EVERY border, including the ones the site
      uses as accents rather than as dividers: the coloured 2px underline that marks a
      "text_label--<colour>" link-button, and the ring around the profile avatar.
-     The avatar ring is NOT decorative: the site paints it green for a VERIFIED artist
-     (.profile_header-avatar--verified) and white otherwise, so pinning every ring to
-     white erased the verified signal. Restore the ring per state. */
+     The avatar ring is NOT decorative: the site paints it BRAND YELLOW for a VERIFIED
+     artist (.profile_header-avatar--verified, #ffff64 in bagon_desktop.css) and white
+     otherwise, so pinning every ring to white erased the verified signal. Restore the
+     ring per state, in the site's own yellow — the same hue every other verified cue
+     uses (the VerifiedInlineAvatar disc, the artist-tooltip "Verified" eyebrow). */
   .profile_header-avatar { border-color: #e6edf3 !important; }
-  .profile_header-avatar--verified { border-color: #38ef51 !important; }
+  .profile_header-avatar--verified { border-color: #ffff64 !important; }
 
   /* Legacy semantic label colours. ".text_label" sits in the light-text list above, so
-     EVERY colour variant the site ships (pink / verified-green / green / red / yellow /
+     EVERY colour variant the site ships (pink / verified / green / red / yellow /
      purple / gray / white — enumerated from bagon_desktop.css) was flattened to one
      grey: the verified-annotations CTA, the "See All" alternate-names link, the pink
      tab counts. Restore each, and the matching --button underline with it. Pink is
-     lifted from #ff1464 (4.4:1) and red from #ff1414 (4.3:1) to clear 4.5:1 on dark. */
+     lifted from #ff1464 (4.4:1) and red from #ff1414 (4.3:1) to clear 4.5:1 on dark.
+     "--verified" is the brand YELLOW #ffff64 in bagon_desktop.css, NOT a green — it is
+     the same token as "--yellow", and painting it green invents a hue the site never uses. */
   .text_label.text_label--pink, .text_label.text_label--pink *,
   .profile_tabs-tab-count, .profile_identity-alternate_names-see_all {
     color: #ff3d7f !important; }
   .text_label.text_label--pink { border-bottom-color: #ff3d7f !important; }
   .text_label.text_label--red, .text_label.text_label--red * { color: #ff4d4d !important; }
   .text_label.text_label--red { border-bottom-color: #ff4d4d !important; }
-  .text_label.text_label--verified, .text_label.text_label--verified * { color: #38ef51 !important; }
-  .text_label.text_label--verified { border-bottom-color: #38ef51 !important; }
+  .text_label.text_label--verified, .text_label.text_label--verified * { color: #ffff64 !important; }
+  .text_label.text_label--verified { border-bottom-color: #ffff64 !important; }
   .text_label.text_label--green, .text_label.text_label--green * { color: #0ecb27 !important; }
   .text_label.text_label--green { border-bottom-color: #0ecb27 !important; }
   .text_label.text_label--yellow, .text_label.text_label--yellow * { color: #ffff64 !important; }
@@ -687,12 +738,23 @@
   .header_search-submit svg, .header_search-submit svg path {
     fill: #c4cdd6 !important; color: #c4cdd6 !important; }
 
-  /* Genius IQ badges: keep the signature yellow fill, dark text for contrast */
-  .tag_label--yellow_background, [class*="tag_label--yellow"],
-  .profile_identity-iq, .user_badge-iq {
+  /* Genius IQ badges: keep the signature yellow fill, dark text for contrast.
+     The fill belongs to "tag_label--yellow_background" and NOTHING else — in genius's
+     own sheet ".user_badge-iq" carries no colour at all and ".profile_identity-iq" only
+     a font-size. Keying the yellow on those bare classes invented a surface: the artist
+     page's scholars leaderboard renders ".user_badge-iq--one_line" (transparent, #9a9a9a
+     ink) and every row came out a loud yellow pill genius never paints. The genuinely
+     yellow badges all carry the tag_label class too, so they stay covered. */
+  .tag_label--yellow_background, [class*="tag_label--yellow"] {
     background-color: #ffff64 !important; color: #14181d !important; }
-  .tag_label--yellow_background *, [class*="tag_label--yellow"] *,
-  .profile_identity-iq *, .user_badge-iq * { color: #14181d !important; }
+  .tag_label--yellow_background *, [class*="tag_label--yellow"] * { color: #14181d !important; }
+  /* the unfilled IQ variant: keep the site's muted grey, legible on the dark card */
+  .user_badge-iq--one_line:not(.tag_label--yellow_background),
+  .user_badge-iq--one_line:not(.tag_label--yellow_background) * {
+    background-color: transparent !important; color: #9a9a9a !important; }
+  /* lazy-load skeleton paints the badge #ccc on #ccc */
+  .placeholder .user_badge-iq, .placeholder .user_badge-login {
+    background-color: #2d333b !important; color: #2d333b !important; }
 
   /* periwinkle count chips: keep accent bg, dark label for contrast */
   .profile_contributions_group-count, .profile_contributions_group-count * { color: #14181d !important; }
@@ -735,14 +797,26 @@
   .feed_dropdown .section_header, .feed_dropdown-section_header,
   .feed_dropdown .text_label { color: #8b949e !important; }
 
-  /* legacy lyric annotation highlight */
-  .referent, a.referent { background-color: #1c2128 !important; color: #e6edf3 !important; }
+  /* legacy lyric annotation highlight. Every colour variant the site ships
+     (--green #ff9, --yellow, --red #ff7070, --gray, --white) paints the chip TWICE: a
+     background-color AND a matching pair of 0.01em left/right box-shadows that extend the
+     highlight past the inline box. Overriding only the background leaves those two shadows
+     at their original pale-yellow, so each annotated lyric on an artist/legacy page ends up
+     bracketed by a bright sliver at both ends. Drop them; the chip fill is the whole cue.
+     ".referent--yellow" below restates its own shadow at higher specificity, so its brand-red
+     accent still wins. */
+  .referent, a.referent {
+    background-color: #1c2128 !important; color: #e6edf3 !important; box-shadow: none !important; }
   .referent--yellow, .referent.referent--yellow { background-color: #21262d !important; box-shadow: inset 3px 0 0 #ed4337 !important; }
   /* standalone annotation (artist profile contributions): the caret pointing to the
-     card is a rotated ::before square painted pure white -> match the card surface */
+     card is a rotated ::before square painted pure white -> match the card surface.
+     Its top+left borders are the only two edges the rotation leaves visible and the
+     site draws them #e9e9e9; the blanket border reset is `*`, which does not match
+     pseudo-elements, so they survive as a bright chevron outline on the dark card. */
   .standalone_annotation { background-color: #1c2128 !important; }
   .standalone_annotation-referent_fragment--with_caret::before,
-  .standalone_annotation-referent_fragment::before { background-color: #1c2128 !important; }
+  .standalone_annotation-referent_fragment::before {
+    background-color: #1c2128 !important; border-color: #2d333b !important; }
 
   /* ====================================================================
      MOBILE-ONLY surfaces (legacy "snarly" mobile + the AMP bundle)
@@ -768,6 +842,16 @@
     background-color: #0d1117 !important; border-bottom: 2px solid #ed4337 !important; }
   .page_header-logo svg, .page_header-logo svg path {
     fill: #e6edf3 !important; color: #e6edf3 !important; }
+  /* The header search box is an amp-iframe loading a same-origin
+     genius.com/amp_iframe_html/search.html document, so domain("genius.com") matches
+     inside it. Two things hide its magnifier: the glyph ships a pure-black fill (drawn
+     for the yellow bar), and the icon is position:absolute BEHIND the input, which is
+     natively transparent — the shared `input` surface rule paints it opaque and buries
+     the icon. Keep the field bare (its own 2px underline is the affordance) and lift
+     the glyph, or the header shows an empty box with no search cue at all. */
+  .search_form-text_input { background-color: transparent !important; }
+  .search_form-icon, .search_form-icon path {
+    fill: #c4cdd6 !important; color: #c4cdd6 !important; }
   /* AMP accordion band ("TRANSLATIONS" on album pages) is a full-width white header
      between two dark sections. */
   .footer_accordion-header_with_arrow { background-color: #14181d !important; }
@@ -777,6 +861,14 @@
      cannot recolour — invert it so the disc goes dark and the glyph light. */
   amp-sticky-ad, amp-sticky-ad-top-padding { background-color: #14181d !important; }
   .amp-sticky-ad-close-button { filter: invert(1) !important; }
+  /* AMP consent prompt: <amp-consent> is itself the full-screen dimmer AMP puts behind
+     the prompt, painted rgba(255,255,255,.7) — on the dark AMP bundle that washes the
+     whole page to a bright grey while the prompt is up. It sits at visibility:hidden
+     until the prompt opens, so no load-time scan sees it, and the blanket "paint it
+     dark" rules miss it because the wash comes from the alpha, not a light surface.
+     Dim on dark instead; the prompt panel is a CHILD element and still paints on top. */
+  amp-consent, amp-consent#consent_element {
+    background-color: rgba(0, 0, 0, 0.7) !important; }
 
   /* ====================================================================
      Forms / inputs (shared)
@@ -816,6 +908,59 @@
      light block in the lyrics column + leaderboards. It's always the next sibling
      of the [id^="div-gpt-ad-"] slot, so target it structurally. */
   [id^="div-gpt-ad-"] + div { background-color: #14181d !important; }
+
+  /* ====================================================================
+     OneTrust consent surfaces
+     The banner every first-time visitor lands on ("#onetrust-banner-sdk") and the
+     preference centre behind the "Privacy Preferences" link in every footer
+     ("#onetrust-pc-sdk"). Both ship a pure-white panel, and their copy is MIXED:
+     OneTrust paints most of it black with its own !important while the shared
+     p/span/button typography lifts the rest to light — so today half the text is
+     already invisible ON the white panel (the banner's purposes paragraph, the whole
+     preference-centre body and its category tabs). Darken both panels and lift ALL the
+     copy. These are OneTrust's own SDK ids, stable across builds.
+     ==================================================================== */
+  #onetrust-banner-sdk, #onetrust-pc-sdk, #onetrust-pc-sdk .ot-active-menu {
+    background-color: #1c2128 !important; }
+  #onetrust-pc-sdk .category-menu-switch-handler,
+  #onetrust-pc-sdk .ot-pc-footer-logo { background-color: #21262d !important; }
+  #onetrust-banner-sdk, #onetrust-banner-sdk *,
+  #onetrust-pc-sdk, #onetrust-pc-sdk * {
+    color: #c4cdd6 !important; -webkit-text-fill-color: #c4cdd6 !important; }
+  #onetrust-banner-sdk a, #onetrust-pc-sdk a {
+    color: #9aa7f0 !important; -webkit-text-fill-color: #9aa7f0 !important; }
+  /* every action here is a button: either a solid brand-black fill or a bare text
+     button on the panel — white reads on both */
+  #onetrust-banner-sdk button, #onetrust-banner-sdk button *,
+  #onetrust-pc-sdk button, #onetrust-pc-sdk button * {
+    color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+  /* ...except the banner's secondary "Show Purposes", which OneTrust fills pure WHITE.
+     It is invisible against the white banner, so it reads as a text button there; on the
+     dark panel it becomes a white slab swallowing its own white label. Strip the fill. */
+  #onetrust-banner-sdk #onetrust-pc-btn-handler {
+    background-color: transparent !important; }
+  /* the selected category is marked ONLY by a 10px left bar, and every other item ships
+     that bar transparent — the blanket border reset paints them all alike, so the
+     "you are here" cue disappears. Clear them, then repaint the active one brand red. */
+  #onetrust-pc-sdk .category-menu-switch-handler { border-left-color: transparent !important; }
+  #onetrust-pc-sdk .ot-active-menu.category-menu-switch-handler {
+    border-left-color: #ed4337 !important; }
+  /* the OneTrust wordmarks (header + "Powered by" footer) are black raster/SVG logos */
+  #onetrust-pc-sdk .ot-pc-logo img, #onetrust-pc-sdk .ot-pc-footer-logo img {
+    filter: invert(1) !important; }
+  /* The preference centre's category list is its own scroll container and OneTrust paints
+     the thumb #c1c1c1 with an explicit ::-webkit-scrollbar-thumb rule, so `color-scheme:
+     dark` never gets a say: a bright 11px bar runs down the middle of the dark panel.
+     Repaint both the standard and the WebKit scrollbar. */
+  #onetrust-banner-sdk, #onetrust-pc-sdk, #onetrust-pc-sdk .ot-tab-list,
+  #onetrust-pc-sdk .ot-pc-scrollbar, #onetrust-pc-sdk .ot-grps-cntr {
+    scrollbar-color: #4a525c #1c2128 !important; }
+  #onetrust-banner-sdk::-webkit-scrollbar-track,
+  #onetrust-pc-sdk ::-webkit-scrollbar-track {
+    background: #1c2128 !important; }
+  #onetrust-banner-sdk::-webkit-scrollbar-thumb,
+  #onetrust-pc-sdk ::-webkit-scrollbar-thumb {
+    background: #4a525c !important; }
 
   /* ---- Misc ---- */
   hr { border-color: #2d333b !important; }

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Vinted with the homepage, catalog and search, item pages and seller profiles in a comfortable dark look that's easy on the eyes for late-night browsing.  Works on every country version of Vinted (vinted.fr, .de, .com, .co.uk, .es, .it, .nl, .be, .pl and more).   Prices, ratings and Vinted's teal stay clear and recognizable.
-@version      20260730.14.18
+@version      20260803.00.40
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -207,9 +207,18 @@
     color: #e6edf3 !important; }
   .nav-links a:hover, .header-nav a:hover { color: #9bd4ff !important; }
 
-  /* Category nav bar under the header */
+  /* Category nav bar under the header.
+     A bare `[class*="HorizontalScroll"]` must NEVER go here: web_ui's
+     HorizontalScrollArea ships a `__controls` layer that is absolutely
+     positioned over the WHOLE rail (it only holds the two arrow handles), so an
+     opaque fill on it hides every tile behind it — the pro-seller carousel on
+     catalog/search and the "similar items" rail on item pages both rendered as
+     one solid black slab. Scope the fill to the header, and paint only the
+     arrow handle, which is the one natively-white part of the component. */
   .catalog-tree-menu, .nav-tabs, .horizontal-navigation,
-  [class*="HorizontalScroll"] { background-color: #0d1117 !important; }
+  [class*="__l-header"] [class*="HorizontalScroll"] {
+    background-color: #0d1117 !important; }
+  [class*="horizontal-scroll__handle"] { background-color: #1c2128 !important; }
   /* The category row is a web_ui Tabs bar, whose surface reads the white
      token (level-6). We map that to the elevated #1c2128, so inside the
      darker header the bar renders as a lighter floating box with the header
@@ -261,6 +270,13 @@
     background-color: #1c2128 !important; }
   .web_ui__Cell__cell.web_ui__Cell__transparent,
   [class*="Cell__transparent"] { background-color: transparent !important; }
+  /* web_ui casts the elevation shadow of every lifted/elevated Card with
+     `rgba(var(--greyscale-level-1), .12)` — the token we inverted into the
+     primary TEXT colour — so each dropdown, overflow menu and popover wore a
+     white halo instead of a shadow. Re-anchor it to black. */
+  .web_ui__Card__lifted, [class*="Card__lifted"],
+  .web_ui__Card__elevated, [class*="Card__elevated"] {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55) !important; }
   /* Prominent status cells (the green "Vendu"/Sold banner on a sold item,
      plus error/warning notices) are solid-colour web_ui Cells: a saturated
      background carrying white text drawn from greyscale-level-6. The blanket
@@ -295,6 +311,47 @@
   [class*="Cell__cell"][class*="Cell__expose"], [class*="Cell__cell"][class*="Cell__expose"] * {
     color: #ffffff !important; fill: #ffffff !important; }
 
+  /* Badge and Navigation ship the SAME solid-fill variant family as Cell, and
+     break the same way: the fill reads a semantic token while the label reads
+     greyscale-level-6, i.e. white in the light theme and our elevated #1c2128
+     here. Two consequences: the `amplified`/`muted` pills fill from
+     --amplified-default / --muted-default, whose dark-theme values we adopted
+     for their TEXT duty are near-white — those rendered as glaring light pills
+     on the dark page; and every coloured pill (the /advertising form's step
+     discs are Badge__filled Badge__primary) lost its white label to a dark one,
+     dropping the red one to 3.8:1. Pin the fills to the same deep set the Cell
+     block uses and put the white label back.
+     `expose` is the odd one out both here and in web_ui: its label reads
+     greyscale-level-1 (near-black natively, near-WHITE for us) over the amber
+     fill, which we leave at Vinted's value — so it needs dark ink, not white.
+     Navigation__expose is left alone entirely: it is the notification dot,
+     whose label is deliberately `transparent`. */
+  [class*="Badge__filled"][class*="Badge__primary"],
+  [class*="Navigation__primary"]   { background-color: #0f7d84 !important; }
+  [class*="Badge__filled"][class*="Badge__success"],
+  [class*="Navigation__success"]   { background-color: #218056 !important; }
+  [class*="Badge__filled"][class*="Badge__warning"],
+  [class*="Navigation__warning"]   { background-color: #a5343f !important; }
+  [class*="Badge__filled"][class*="Badge__amplified"],
+  [class*="Badge__light"][class*="Badge__amplified"],
+  [class*="Navigation__amplified"] { background-color: #39424e !important; }
+  [class*="Badge__filled"][class*="Badge__muted"],
+  [class*="Navigation__muted"]     { background-color: #2f3742 !important; }
+  [class*="Badge__filled"][class*="Badge__primary"], [class*="Badge__filled"][class*="Badge__primary"] *,
+  [class*="Badge__filled"][class*="Badge__success"], [class*="Badge__filled"][class*="Badge__success"] *,
+  [class*="Badge__filled"][class*="Badge__warning"], [class*="Badge__filled"][class*="Badge__warning"] *,
+  [class*="Badge__filled"][class*="Badge__amplified"], [class*="Badge__filled"][class*="Badge__amplified"] *,
+  [class*="Badge__filled"][class*="Badge__muted"], [class*="Badge__filled"][class*="Badge__muted"] *,
+  [class*="Badge__light"][class*="Badge__amplified"], [class*="Badge__light"][class*="Badge__amplified"] *,
+  [class*="Navigation__primary"], [class*="Navigation__primary"] *,
+  [class*="Navigation__success"], [class*="Navigation__success"] *,
+  [class*="Navigation__warning"], [class*="Navigation__warning"] *,
+  [class*="Navigation__amplified"], [class*="Navigation__amplified"] *,
+  [class*="Navigation__muted"], [class*="Navigation__muted"] * {
+    color: #ffffff !important; fill: #ffffff !important; }
+  [class*="Badge__filled"][class*="Badge__expose"], [class*="Badge__filled"][class*="Badge__expose"] * {
+    color: #14181d !important; fill: #14181d !important; }
+
   /* web_ui Text colours are baked as literal light-theme hex inside
      the (cross-origin) component CSS, so the token ramp can't reach
      them — override the variants explicitly. Keep the semantic
@@ -307,6 +364,13 @@
   .web_ui__Text__subtitle, [class*="Text__subtitle"] { color: #c4cdd6 !important; }
   .web_ui__Text__caption, [class*="Text__caption"],
   .web_ui__Text__muted, [class*="Text__muted"] { color: #97a1ab !important; }
+  /* `amplified` is a THEME variant and `body`/`subtitle`/`caption` are TYPE
+     variants, so a span routinely carries one of each — and the type rules
+     above, declared later, won the source-order tie and made the emphasised
+     text DIMMER than plain body copy (the applied filter chip's own label was
+     one). Re-assert amplified after them; the semantic theme variants below
+     (primary/success/warning) still win, and they never co-occur with it. */
+  .web_ui__Text__amplified, [class*="Text__amplified"] { color: #e6edf3 !important; }
   /* Teal text links — lift for AA contrast on the dark surfaces */
   .web_ui__Text__clickable, [class*="Text__clickable"] { color: #4db8c4 !important; }
   .web_ui__Text__clickable:hover, [class*="Text__clickable"]:hover { color: #7fd2da !important; }
@@ -323,12 +387,17 @@
      solid banner fill under white text, but that red only reaches 3.5:1 as
      text on our surfaces — lift the text/glyph uses on their own. A span that
      also carries Text__body/caption would otherwise be flattened to grey, so
-     these are declared after those rules to win the source-order tie. */
+     these are declared after those rules to win the source-order tie.
+     web_ui ships the field-level form error under TWO class families —
+     `Cell__validation` and the standalone `Validation__validation` +
+     `Validation__warning` pair the signup/login forms use. Both must be
+     listed; matching only the Cell form leaves the signup errors at 3.6:1. */
   [class*="Text__success"], [class*="Icon__success-default"] svg,
   [class*="Text__highlight-success"] > b {
     color: #57c98a !important; fill: #57c98a !important; }
   [class*="Text__warning"], [class*="Icon__warning-default"] svg,
-  [class*="Text__highlight-warning"] > b, [class*="Cell__validation"] {
+  [class*="Text__highlight-warning"] > b, [class*="Cell__validation"],
+  [class*="Validation__warning"] {
     color: #f2707a !important; fill: #f2707a !important; }
 
   /* Ghost / outlined / tertiary buttons render teal text on a dark
@@ -383,6 +452,20 @@
   [class*="Button__icon"] svg path[fill="#000"],
   [class*="Button__icon"] svg path[fill="#000000"],
   [class*="Button__icon"] svg path[fill="black"] { fill: #e6edf3 !important; }
+
+  /* A star of web_ui's Rating draws its two halves from `color`: the filled
+     half reads --expose-default (amber, untouched), the EMPTY half reads
+     --greyscale-level-4, which we remapped to the divider line colour. On our
+     cards that lands ~1.1:1, so the unearned part of the scale disappeared —
+     a 4.6/5 seller rendered as four and a half stars with nothing after them,
+     and a 0-review seller showed no stars at all. Give the empty half its own
+     dim grey (still clearly below the amber, as the light theme has it).
+     Both halves of an `empty` star AND the trailing half of a `half-full` one
+     read that token — covering only `empty` leaves every X.5 rating clipped. */
+  [class*="Rating__empty"] [class*="Rating__star-first-half"],
+  [class*="Rating__empty"] [class*="Rating__star-second-half"],
+  [class*="Rating__half-full"] [class*="Rating__star-second-half"] {
+    color: #4c5663 !important; }
 
   /* Tabs (seller profile, item page sections) bake the dark literal */
   .web_ui__Tabs__title, [class*="Tabs__title"] { color: #c4cdd6 !important; }
@@ -442,11 +525,23 @@
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
     color: #e6edf3 !important; }
-  .web_ui__Chip__chip:hover, [class*="Chip__chip"]:hover {
-    background-color: #232a32 !important; }
+  /* Hovering a chip natively swaps the grey ring for the brand teal one; our
+     unconditional border-color above overwrote that, so the only hover cue left
+     was a 2%-lighter fill. Restore the ring (lifted for dark) alongside it, and
+     cover the filter triggers, which are Chips without the Chip class. */
+  .web_ui__Chip__chip:hover, [class*="Chip__chip"]:hover,
+  [data-testid$="-filter--trigger"]:hover, [data-testid$="--trigger"]:hover {
+    background-color: #232a32 !important;
+    border-color: #4db8c4 !important; }
   .web_ui__Chip__selected, [class*="Chip__selected"],
   [class*="Chip__chip"][aria-pressed="true"] {
     background-color: #12363d !important; border-color: #1a7d88 !important; }
+  /* A `filled` Chip is the APPLIED state — the removable keyword/filter pills
+     under the trigger row; `outlined` is the idle trigger. Both flattened to the
+     same #1c2128, and the applied one even read dimmer than the triggers, so an
+     active filter looked inactive. Elevate it above the idle chips. */
+  [class*="Chip__chip"][class*="Chip__filled"] {
+    background-color: #2a3139 !important; border-color: #39424e !important; }
 
   /* Pagination — natively the current page is near-black text against
      mid-grey siblings. Our page-link colour was so close to the active
@@ -503,7 +598,13 @@
   /* ============================================================
      Footer
      ============================================================ */
-  .main-footer, .l-footer, footer, .main-footer__content {
+  /* The footer body is a CSS module now, so the exact `.main-footer__content`
+     went dead and the block fell back to its own greyscale-level-6 fill — our
+     elevated #1c2128 — leaving a lighter panel with a visible seam against the
+     `<footer>` shell. Match the substring so the whole footer stays one deep
+     surface. */
+  .main-footer, .l-footer, footer,
+  [class*="main-footer__content"] {
     background-color: #0d1117 !important; }
   .main-footer a, .l-footer a, footer a { color: #c4cdd6 !important; }
   /* The privacy row mixes <a> links with a <button> ("cookie settings") that
@@ -605,12 +706,17 @@
      turned every full-bleed band — and the tooltip — into a glaring pale
      mint block. Restore a deep teal on each SURFACE use and keep the heading
      light. This is the full set of surface uses of those tokens outside the
-     small accents (checkbox/radio/tab/chip) where the lifted teal is right. */
+     small accents (checkbox/radio/tab/chip) where the lifted teal is right.
+     Every landing page below is a CSS module now, so its classes carry a
+     per-build hash PREFIX (`Accessibility-module-scss-module__<hash>__…`).
+     The readable suffix survives, so match on the substring — an exact
+     `.accessibility-landingpage__third-section` silently stops matching on the
+     next deploy and the band comes back as a glaring pale-mint slab. */
   .web_ui__Tooltip__tooltip, [class*="Tooltip__tooltip"],
   .web_ui__Tooltip__arrow, [class*="Tooltip__arrow"],
-  .privacy-center__bottom-section,
-  .accessibility-landingpage__third-section::after,
-  .how-it-works__get-started,
+  [class*="privacy-center__bottom-section"],
+  [class*="accessibility-landingpage__third-section"]::after,
+  [class*="how-it-works__get-started"],
   .u-background-theme,
   [class*="Box__box-theme-primary-dark"],
   [class*="Box__box-theme-primary-medium"],
@@ -625,16 +731,23 @@
   [class*="advertising-module"][class*="__hero"] [class*="Image__image"] {
     background-color: transparent !important; }
   .web_ui__Tooltip__tooltip, [class*="Tooltip__tooltip"],
-  .privacy-center__bottom-section-title,
-  .accessibility-landingpage__third-section,
-  .accessibility-landingpage__third-section a,
-  .how-it-works__get-started h2, .how-it-works__get-started p,
+  [class*="privacy-center__bottom-section"],
+  [class*="privacy-center__bottom-cta"],
+  [class*="accessibility-landingpage__third-section"],
+  [class*="accessibility-landingpage__third-section"] a,
+  [class*="accessibility-landingpage__third-section"] h2,
+  [class*="accessibility-landingpage__third-section"] p,
+  [class*="how-it-works__get-started"] h2,
+  [class*="how-it-works__get-started"] p,
   section[class*="item-verification"][class*="closing"] h2,
   section[class*="item-verification"][class*="closing"] p,
   section[class*="item-verification"][class*="closing"] a,
-  .dac7__taxrules, .dac7__taxrules-title, .dac7__taxrules-description,
-  .dac7__checkstatus, .dac7__checkstatus-title {
+  [class*="dac7__taxrules"], [class*="dac7__checkstatus"] {
     color: #e6edf3 !important; }
+  /* The privacy centre's own h1 bakes a literal #000 that only ever worked on
+     its light #edf2f2 band — the h2/h3 rule below never reached it. */
+  [class*="privacy-center__glance-title"],
+  [class*="privacy-center__"] h1 { color: #e6edf3 !important; }
 
   /* The same pages hardcode light tint bands and cards (#f1eae1 cream,
      #fce7dc peach, #edf2f2 grey, #edffe9 mint) whose copy reads our LIGHT
@@ -644,11 +757,12 @@
   [class*="offline-verification-status"],
   [class*="electronics-verification-status"],
   [class*="electronics-verification-awareness-block"],
-  .privacy-center__glance-section,
-  .privacy-center__control-section,
-  .privacy-center__certification-section,
-  .dac7__howitworks, .policy__alert-note {
+  [class*="dac7__howitworks"], [class*="policy__alert-note"] {
     background-color: #1c2128 !important; }
+  /* The privacy centre's tinted section bands are NOT listed above on purpose:
+     they read --greyscale-level-5, so the token remap already lands them on the
+     base surface. Painting them elevated would swallow the #1c2128 cards that
+     sit inside them. */
 
   /* how-it-works' hero keeps its native #fce7dc peach: the illustration is an
      absolutely-positioned raster whose own background IS that peach, and it
@@ -656,31 +770,54 @@
      every heading line ("qui va", "amoureux") light-on-peach. Rebind the two
      greyscale levels the title and body read, scoped to the band, instead of
      recolouring the surface. */
-  .how-it-works__header {
+  [class*="how-it-works__header"] {
     background-color: #fce7dc !important;
     --greyscale-level-1: 21, 25, 26;
     --greyscale-level-2: 90, 101, 102; }
 
   /* The privacy centre bakes a literal #000 on its headings and body copy —
      only ever legible on those light bands. */
-  .privacy-center__glance-section, .privacy-center__control-section,
-  .privacy-center__manage-data-section, .privacy-center__faq-section,
-  .privacy-center__certification-section,
+  [class*="privacy-center__glance-section"],
+  [class*="privacy-center__control-section"],
+  [class*="privacy-center__manage-data-section"],
+  [class*="privacy-center__faq-section"],
+  [class*="privacy-center__certification-section"],
   [class*="privacy-center__"] h2, [class*="privacy-center__"] h3 {
     color: #e6edf3 !important; }
   [class*="privacy-center__"] p { color: #c4cdd6 !important; }
 
   /* The accessibility page's legal footnote bakes #666, which is only 3.0:1
      on our base surface. */
-  .accessibility-landingpage__fourth-section,
-  .accessibility-landingpage__fourth-section-body,
-  .accessibility-landingpage__fourth-section-body a {
+  [class*="accessibility-landingpage__fourth-section"],
+  [class*="accessibility-landingpage__fourth-section"] a {
     color: #97a1ab !important; }
+
+  /* The infoboard/about CMS copy bakes the raw brand teal as an INLINE style on
+     the <span> inside each link, so no token or class rule reaches it — #007782
+     is 3.0:1 on our base. Lift the whole link, inner spans included. */
+  [class*="new-about__paragraph"] a,
+  [class*="new-about__paragraph"] a * { color: #4db8c4 !important; }
+
+  /* The item-verification testimonial stars ship as <img> SVGs with a baked
+     near-black fill, so CSS cannot reach the path and all five vanished on the
+     dark card. Invert the raster; it is monochrome, so the result is a clean
+     light star. */
+  img[src*="item-verification/star-"] { filter: invert(1) !important; }
 
   /* CMS-authored help tables (size charts) hardcode an inline light-grey
      header row that goes light-on-light under our text colours. */
   .table-wrapper thead tr, .user-created-content thead tr {
     background-color: #2f3742 !important; }
+
+  /* CMS ordered lists draw their marker as a numbered disc on a ::before:
+     `background: rgba(var(--greyscale-level-2))` with `color: level-6`. Both
+     tokens are inverted for us, so the pair flips — a mid-grey disc carrying a
+     white numeral becomes a LIGHT disc carrying a dark one, and the /cookie-policy
+     list renders as a column of bright blobs. Restore the native relationship:
+     a subdued disc under a light numeral. (A pseudo-element is invisible to every
+     element-background scan, so nothing but the pixels shows this.) */
+  .user-created-content ol > li::before {
+    background-color: #2f3742 !important; color: #e6edf3 !important; }
 
   /* The no-photo avatar is an external <img> SVG: a full-bleed #EDF2F2 square
      with a #B6BEBF silhouette, so it renders as a glaring near-white disc on

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for Slashdot, easy-on-the-eyes story feed and threaded comment discussions, with the classic Slashdot green kept intact.
-@version      20260730.14.16
+@version      20260803.00.39
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -276,6 +276,9 @@
      plate. The masthead/footer Slashdot marks are SVGs that are already white — leave
      them alone (`#logo`/`.logo` keep `filter: none` above). */
   #sf-logo a, div#sf-logo a { filter: invert(1) !important; }
+  /* the Deals block's content wrapper is a hardcoded #fff; it only gets laid out once the
+     deals feed returns items, so a load-time scan sees a zero-size (or display:none) node */
+  .deals-wrapper, div.deals-wrapper { background-color: #1c2128 !important; }
 
   /* user profile bio card (#user_bio renders on #e6e6e6 → bio text would land on light) */
   article#user_bio, #user_bio {
@@ -284,6 +287,27 @@
     border-color: #262c33 !important;
   }
   #user_bio a { color: #5fb0e6 !important; }
+
+  /* /~user/achievements is the only page that loads `u2.ssl.css`, and every rule in
+     it was uncovered: each row is two tiles — `.v` (the count, #ccc) and `.n` (the
+     label, #eee) — and each paints its fill TWICE, once as `background` and again as
+     a `background-image` gradient, so a background-color override alone leaves the
+     light gradient on top. They also carry a `rgb(185,185,185) 0 1px 5px` shadow (no
+     colour audit sees a shadow) and the count `span.math`/`sup` is hardcoded #000.
+     Result: a full page of white cards with our light-grey label text on them. */
+  div.achievements ul li div .v {
+    background-color: #21262d !important;
+    background-image: none !important;
+    box-shadow: none !important;
+  }
+  div.achievements ul li div .n {
+    background-color: #1c2128 !important;
+    background-image: none !important;
+    box-shadow: none !important;
+  }
+  div.achievements ul li span.math,
+  div.achievements ul li span.math sup,
+  div.achievements ul li sup { color: #e6edf3 !important; }
 
   /* user-page comment/submission list tables (~/comments) ship a white table
      background; the td cells get darkened by the neutralizer but the header
@@ -329,6 +353,19 @@
     color: #8b949e !important;
     opacity: 1 !important;
   }
+  /* every <select> lost its drop-down arrow. The site already sets `appearance:none`
+     itself, so there is no UA caret to fall back on — it draws its own teal one as
+     `background-image: url(arrow-down.png)` at `97% 50%`, and the `background:`
+     SHORTHAND above resets background-image to none. Result: the search page's
+     "Order by" / "Author" / "Threshold" controls render as plain boxes that no longer
+     read as dropdowns (a colour audit sees nothing; the field is correctly dark).
+     Redraw the caret in the theme's brand teal instead of re-fetching the site asset. */
+  select {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath fill='%236fd8be' d='M1.4 0 7 5.6 12.6 0 14 1.4 7 8.4 0 1.4Z'/%3E%3C/svg%3E") !important;
+    background-position: right 8px center !important;
+    background-repeat: no-repeat !important;
+    padding-right: 28px !important;
+  }
   /* buttons — text-shadow:none clears the site's `text-shadow: white 0 1px`
      on submit inputs and .btn, which outlines every glyph on a dark fill */
   input[type="submit"], input[type="button"], button, .btn, a.button {
@@ -347,6 +384,21 @@
     color: #6e7681 !important;
     border-color: #2d333b !important;
   }
+
+  /* form validation messages: `.error`/`.notice`/`.success` are one site rule block
+     shipping a light pastel fill with dark ink (#FBE3E4/#8a1f11, #FFF6BF/#514721,
+     #E6EFC2/#264409). Every instance is `display:none` until a form fails, so no
+     load-time scan walks one — the live case is `div.replyto_msg.notice` in the
+     comment reply form. `.forums .*` are the same panels on the forum skin. */
+  .error, .notice, .success, .replyto_msg,
+  .forums .error, .forums .notice, .forums .success {
+    background: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  .error, .error p, .forums .error { color: #ff9492 !important; }
+  .notice, .notice p, .replyto_msg, .replyto_msg p, .forums .notice { color: #e3b341 !important; }
+  .success, .success p, .forums .success { color: #6fd8be !important; }
+  .error a, .notice a, .success a, .replyto_msg a { color: #9bd4ff !important; }
 
   /* ---------- story submission form ---------- */
   /* header + subtitle were near-black (#2e2e2e / #676767) on the dark bg */
@@ -383,6 +435,24 @@
     color: #e6edf3 !important;
   }
   #embbeded_login_modal a { color: #6fd8be !important; }
+
+  /* the footer's "Privacy Choices" (#ccpa-modal) and "Cookie Choices" (.modal-box) panels
+     are `.modal-content`, hardcoded #fefefe — a class none of the modal selectors above
+     covered, so the whole opt-out text rendered our light grey ON white. Both ship in the
+     DOM of EVERY page but stay display:none until the footer link is clicked, so no
+     load-time scan reaches them. `#ccpa-modal` also sits INSIDE `#ft`, and our own
+     `#ft a` (1,0,1) outranks `a.button.green` (0,2,1) — hence link-blue labels on the
+     teal opt-out CTAs. The cookie panel's action bar is a bare `<footer>` at #f4f4f4. */
+  .modal-content, .modal-content-ccpa, .modal-box footer, .modal-content footer {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+  #ccpa-modal b, #ccpa-modal h2, #ccpa-modal h3, .modal-content h2 { color: #e6edf3 !important; }
+  #ccpa-modal a.button.green, #ccpa-modal .button.green { color: #ffffff !important; }
+  /* the panel's × is #aaa and the site DARKENS it to #000 on hover — an invert on dark */
+  #ccpa-modal .close, .modal-content .close { color: #8b949e !important; }
+  #ccpa-modal .close:hover, .modal-content .close:hover { color: #e6edf3 !important; }
 
   /* box-shadows the site drew for a white page read as a bright HALO on dark, and no
      colour/background audit sees a shadow at all: the selected "Comments Filter" tab
@@ -464,6 +534,13 @@
      the bare element types instead left dark chips behind every form label
      (login modal) and every transparent table cell. */
   #pollBooth label { background-color: #21262d !important; }
+  /* each option row is a click target and the site lifts it on hover
+     (`.poll-group-form label:hover { background-color: #ecf2f2 }`); the id-scoped
+     fill above is (1,1,0) !important and outranks it, so the whole booth lost its
+     only hover affordance — a state no load-time scan reaches. */
+  #pollBooth label:hover, .poll-group-form label:hover {
+    background-color: #2d333b !important;
+  }
   table.thisday-tb td { background-color: #14181d !important; }
   section.bq, .bq, blockquote.msg, blockquote,
   .bq p, blockquote.msg p, section.bq p {
@@ -600,6 +677,26 @@
     background-color: #5bc0de !important;
     border-color: #46b8da !important;
   }
+  /* …and their HOVER. Each fill above is (0,2,0) — exactly the specificity of the site's
+     own `.btn-success:hover` etc. — and ships later, so every solid button lost its hover
+     response entirely: the masthead's green "Submit" measured identical resting vs hovered
+     while natively it darkens to #449d44. A hover state is invisible to every load-time
+     scan; a native-vs-themed hover diff is what surfaces it. */
+  .btn.btn-success:hover, a.btn-success:hover, button.btn-success:hover {
+    background-color: #449d44 !important;
+  }
+  .btn.btn-primary:hover, a.btn-primary:hover, button.btn-primary:hover {
+    background-color: #035553 !important;
+  }
+  .btn.btn-danger:hover, a.btn-danger:hover, button.btn-danger:hover {
+    background-color: #c9302c !important;
+  }
+  .btn.btn-warning:hover, a.btn-warning:hover, button.btn-warning:hover {
+    background-color: #ec971f !important;
+  }
+  .btn.btn-info:hover, a.btn-info:hover, button.btn-info:hover {
+    background-color: #31b0d5 !important;
+  }
   /* prev/next pager buttons sat on white. Natively the active one is the brand teal
      and the disabled one a faded grey; the theme flattened BOTH to the same grey with
      blue link text (an `a:link` at 0,1,1 even beat this rule's colour), so a disabled
@@ -663,6 +760,13 @@
     background-color: #21262d !important;
     color: #9bd4ff !important;
     border-color: #2d333b !important;
+  }
+  /* the id above is (1,0,0) and outranks the generic `.btn:hover`, so this control —
+     natively a link that darkens #006b6b -> #002f2f — had no hover response at all.
+     Restate at id specificity. */
+  #more_comments_button:hover, .nbutton:hover, span.nbutton:hover {
+    background-color: #2d333b !important;
+    color: #cfe8ff !important;
   }
 
   /* prev/next page links sitting on the light-grey article footer band */
@@ -868,6 +972,13 @@
      one place the blanket `* { border-color }` reset erased a real signal */
   section.m-section-emphasized, section.psp-section,
   .button.blue, a.button.blue, div.button.blue { border-color: #0e9494 !important; }
+  /* the grey `.button` family ("Free Trial" = `.btn-masthead-cmpn-secondary`,
+     "View Integrations" = `.sandiego .blue.button`) took the neutral fill above but no
+     hover: `button:hover`/`.btn:hover` never match Foundation's `.button`, so these CTAs
+     measured identical resting vs hovered while natively they lighten #006665 -> #038686.
+     Keep this at (0,2,0) so the green/hollow/hollow-opaque hovers below still win. */
+  a.button:hover, .button:hover, input.button:hover,
+  .btn-masthead-cmpn-secondary:hover { background-color: #2d333b !important; }
   input.search-submit, .m-sidebar-widget input.search-submit {
     background-color: #0b7c7c !important;
     border-color: #0e9494 !important;
@@ -934,6 +1045,37 @@
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
+  /* both the open menu's rows and the `Sort:` trigger that opens it lost the site's only
+     hover cue (#333 -> #006665) because our accent colour is already applied at rest */
+  ul.menu.is-dropdown-submenu a:hover,
+  .dropdown.menu .is-dropdown-submenu a:hover,
+  .m-project-search-results div.sort-by a:hover, a.current-sort:hover {
+    background-color: #262c33 !important;
+    color: #9be7d6 !important;
+  }
+  /* the shell's OTHER two Foundation floating surfaces, both hardcoded #fefefe and both
+     display:none until opened, so no load-time scan reaches either: `.reveal` is the
+     product page's "Get Information About <product>" lead-form modal (a 600x720 white
+     panel carrying our light-grey field labels and consent copy) and `.dropdown-pane` the
+     five review filters (Rating / Organization Size / User's Role / …). */
+  .reveal, .dropdown-pane {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+  .reveal h1, .reveal h2, .reveal h3, .dropdown-pane li { color: #c4cdd6 !important; }
+  /* the review-filter chip's own open/hover state is `.sandiego .default.hollow-blue
+     .hollow.button:hover` — one class MORE than the `.hollow` variant restated above, so
+     the chip still flipped to the site's #e6ecec with black text while its pane opened. */
+  .sandiego .default.hollow-blue.hollow.button:hover,
+  .sandiego .default.hollow-blue.hollow.button:focus {
+    background: #2d333b !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+  /* long reviews are clamped and a `#fff` "read more" chip is laid over the bottom-right
+     corner of the text (`.m-review.extended.needs-readmore .link-read-more`) */
+  .link-read-more, a.link-read-more { background: #1c2128 !important; }
   /* that menu's caret is a pair of real-element border triangles (transparent sides,
      coloured top), so the blanket `* { border-color }` reset filled all four sides and it
      rendered as a solid box. `.over-triangle` exists only to notch `.triangle` against a
@@ -951,6 +1093,18 @@
   .pagination-next a::after, .pagination-previous a::after,
   .pagination .pagination-next a::after,
   .pagination .pagination-previous a::after { color: #ffffff !important; }
+  /* Foundation's `.pagination a:hover { background:#e6e6e6 }` survived every rule above
+     (nothing here restates a pagination hover), so hovering a page number painted a
+     near-white chip carrying our #9bd4ff link ink at ~1.5:1. Click-state only, so no
+     load-time scan sees it; present on the directory AND every product review pager. */
+  .pagination a:hover, .pagination button:hover,
+  .pagination li a:hover, ul.pagination a:hover {
+    background: #262c33 !important;
+    color: #e6edf3 !important;
+  }
+  .pagination .disabled:hover, .pagination li.disabled a:hover {
+    background: transparent !important;
+  }
   /* the sponsor bar's CTA label is also ::before content, hardcoded #001e2b — on the
      dark bar it renders at 1.1:1, i.e. an invisible call-to-action */
   .sticky-cta::before, .sticky-wrapper .sticky-cta::before,
@@ -967,5 +1121,55 @@
   .typeahead__container input::placeholder, .typeahead__query input::placeholder {
     color: #8b949e !important;
     opacity: 1 !important;
+  }
+  /* …and the typeahead's own RESULT panel is a separate `ul.typeahead__list` at #fff.
+     It only exists once you type, so no load-time scan reaches it: the "Find software
+     to compare" flyout listed every product as our light grey ON white. The rows'
+     selected state is already our dark `li.active`, so only the panel needs darkening. */
+  ul.typeahead__list, .typeahead__list, .typeahead__result {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+  /* the highlighted row's #f5f5f5 fill sits on the row's ANCHOR, not on the
+     `li.active` our tab rules already darken, so one band stayed white */
+  .typeahead__item.active > a, .typeahead__item:hover > a,
+  .typeahead__list li.active > a, .typeahead__list li:hover > a {
+    background-color: #2d333b !important;
+  }
+
+  /* ---------- /software/comparison/ (the side-by-side compare grid) ----------
+     A page type the theme never covered. `.m-compare-table-grid .cell` ships
+     `background:#fff` with 2px #057e7e side borders — 42 of them — so the whole grid
+     rendered as full-height white columns carrying our light-grey copy, and the
+     blanket `*` border reset had already erased the teal column outline. */
+  .m-compare-table-grid .cell, .m-compare-table-grid-header .cell {
+    background-color: #1c2128 !important;
+    border-left-color: #0e9494 !important;
+    border-right-color: #0e9494 !important;
+  }
+  .m-compare-table-grid .cell.col-header, .m-compare-table-grid-header .cell.col-header {
+    border-top-color: #0e9494 !important;
+  }
+  .m-compare-table-grid .cell.col-footer, .m-compare-table-grid-header .cell.col-footer {
+    border-bottom-color: #0e9494 !important;
+  }
+  /* the feature ticks encode presence as `path{fill:#00c2c2}` and ABSENCE as #e6ecec —
+     a near-white that was the fainter of the two on the site's white cell but is the
+     BRIGHTER of the two on a dark one, inverting the signal on ~400 rows. Mute the
+     absent tick and keep the site's cyan for the present one. */
+  .m-compare-table-grid .feature svg path,
+  .m-compare-table-grid-header .feature svg path { fill: #3d444d !important; }
+  .m-compare-table-grid .feature.has-feature svg path,
+  .m-compare-table-grid-header .feature.has-feature svg path { fill: #00c2c2 !important; }
+  /* the pros/cons headings are the same #497f81 / #cd0303 the site uses on white */
+  .m-compare-table-grid .pros-cons-label.pros { color: #6fd8be !important; }
+  .m-compare-table-grid .pros-cons-label.cons { color: #f08a86 !important; }
+  /* the "Explore All N Integrations" CTAs are `.hollow-opaque`, which the shell paints
+     `background:#fff !important` at (0,4,0) — the generic button rules never reached it */
+  .sandiego .green.hollow-opaque.button, .sandiego .default.hollow-opaque.button,
+  .sandiego .blue.hollow-opaque.button, .sandiego .orange.hollow-opaque.button,
+  a.button.hollow-opaque, .button.hollow-opaque {
+    background-color: #1c2128 !important;
+    color: #6fd8be !important;
   }
 }

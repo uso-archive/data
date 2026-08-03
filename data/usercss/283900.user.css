@@ -3,11 +3,11 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260730.14.13
+@version      20260803.00.35
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
-@-moz-document domain("espn.com"), domain("espn.co.uk"), domain("espn.com.au"), domain("espn.in"), domain("espn.nl"), domain("espn.com.br"), domain("espn.com.mx"), domain("espn.com.ar"), domain("espn.cl"), domain("espn.com.co"), domain("espn.com.ve"), domain("espn.com.sg"), domain("espn.ph"), domain("espn.com.pe"), domain("espn.com.ec"), domain("espn.com.uy"), domain("espn.com.gt"), domain("espn.com.pa"), domain("espn.com.do") {
+@-moz-document domain("espn.com"), domain("espn.co.uk"), domain("espn.com.au"), domain("espn.in"), domain("espn.nl"), domain("espn.com.br"), domain("espn.com.mx"), domain("espn.com.ar"), domain("espn.cl"), domain("espn.co.cr"), domain("espn.com.co"), domain("espn.com.ve"), domain("espn.com.sg"), domain("espn.ph"), domain("espn.com.pe"), domain("espn.com.ec"), domain("espn.com.uy"), domain("espn.com.gt"), domain("espn.com.pa"), domain("espn.com.do") {
 :root { color-scheme: dark !important; }
 
   /* ---- Base surfaces ---- */
@@ -127,6 +127,11 @@
   /* ---- Links: ESPN headline blue is too dark on dark → readable blue ---- */
   a, a span { color: #5fb0e6 !important; }
   a:hover { color: #9bd4ff !important; }
+  /* A bold lead-in inside a link ("<b>Kram:</b> Grades for every trade") is part of the
+     link, but the generic b/strong body-text rule above out-specifies `a` and greyed just
+     that run — every ESPN inline link list rendered two-tone. Inherit the anchor's colour
+     so headline-white and link-blue anchors both stay one colour. */
+  a b, a strong { color: inherit !important; }
   /* headline links inside cards: bright, high-contrast */
   .contentItem__title, .contentItem__title--story, .contentItem__title--hero,
   .contentItem__title a, .headlineStack__list > li > a,
@@ -146,6 +151,12 @@
      (dark-grey) via .Byline__Meta--publishDate → ~3.1:1 dark-on-dark on the card. The
      .Byline rule above only colors the section; the child meta overrides it. Lift it. */
   .Byline__Meta, .Byline__Meta--publishDate, .Byline__TimestampWrapper { color: #9aa4ae !important; }
+  /* When .author is an ANCHOR (one-feed shortstop cards link the name to the
+     contributor page) the blanket metadata grey above swallowed ESPN's #3772df link
+     colour, so the byline name became typographically identical to the timestamp
+     beside it and lost every hint that it is clickable. A muted link blue restores the
+     affordance without competing with the headline. Plain-span bylines stay grey. */
+  a.author { color: #8ab4d8 !important; }
   /* Story pullquotes carry a 4px ESPN-red (#dd0000) left bar as a brand accent; the
      generic grey border-left flattened it to an invisible #2d333b strip on dark. Keep the
      panel dark but restore the brand-red bar (decorative, so the vivid ESPN red is fine). */
@@ -186,13 +197,22 @@
      Audit-blind: each cell is <40px tall so it slips the light-surface size filter.
      Keep them transparent so the dark card + row striping show; the header row (TH)
      keeps its own dark band. ---- */
-  .Table__TD, .Table2__td, td.playByPlay__linescore__score {
-    background-color: transparent !important; }
+  .Table__TD, .Table2__td, td.playByPlay__linescore__score,
+  /* A story-body <table class="inline-table"> puts its footnote row in a <tfoot> whose
+     cell hardcodes a solid WHITE bg — an unclassed <td>, so neither the Table__TD rule
+     nor the inline-white catch-all reaches it. Our already-pale footnote text then
+     rendered white-on-white. */
+  tfoot td { background-color: transparent !important; }
 
   /* ---- Forms / inputs / search ---- */
   input, textarea, select, .search-box, .Search__Input {
     background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   input::placeholder { color: #8b949e !important; }
+  /* Legacy global-search submit (.btn-search, desktop header AND the mobile in-nav search
+     reveal) draws its magnifier as a BLACK raster PNG background-image — legible on ESPN's
+     white field, ~1.4:1 once the input is dark, and no fill/color rule can touch a raster.
+     Zero the button's own fill so the invert only flips the glyph, not a surface. */
+  .btn-search { background-color: transparent !important; filter: invert(1) !important; }
 
   /* ---- Buttons ---- */
   .button, .btn, .Button, .button-alt, .button-filter, .btn-social,
@@ -287,6 +307,26 @@
   .Button.Button--disabled {
     background-color: transparent !important; border-color: #4a525b !important;
     color: #6e7681 !important; -webkit-text-fill-color: #6e7681 !important; }
+  /* Where-to-Watch row CTA: a filled brand-blue <a> whose only classes are hashed, so the
+     `a` link rule painted its label #5fb0e6 on the site's own #5990f6 fill (~1.2:1). The
+     data-testid is the one stable hook; reuse the theme's dark-on-blue CTA pairing. */
+  [data-testid="watchButton"] {
+    color: #121213 !important; -webkit-text-fill-color: #121213 !important; }
+  /* Shot-map filter row (soccer match report / gamecast "SHOT MAP"): the shot-type pills
+     and the All-Periods / All-Players dropdowns are built on `.Button--default`, so the
+     filled brand-blue PRIMARY rule above turned the whole filter bank into a row of blue
+     CTAs — and ESPN's selected pill (`--active`, #e0e0e0 against the #f9f9f9 unselected)
+     collapsed into that same blue, so nothing showed which shot types were on. These are
+     neutral controls, not primary actions: give them the theme's control surface and a
+     lighter selected state. The pill glyph is a two-tone SVG resolving through
+     --color-combo-white-gray90 / --color-combo-black-white, so it already darks correctly. */
+  .ShotMapFilterButtons__Pill.Button--default,
+  .ShotMapFilterButtons__Dropdown.Button--default {
+    background-color: #21262d !important; border-color: #2d333b !important;
+    color: #c4cdd6 !important; -webkit-text-fill-color: #c4cdd6 !important; }
+  .ShotMapFilterButtons__Pill--active.Button--default {
+    background-color: #2d333b !important; border-color: #4a525b !important;
+    color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
 
   /* ---- Tabs ---- */
   .tabs__list, .Tabs, .mod-tabs, .ui-tabs-nav, .ContentList__Tabs {
@@ -320,11 +360,24 @@
   .takeover, .promoModule, .EdpHeader, .ClubhouseHeader, .ClubhouseHeader.bg-clr-white {
     background-color: #1a1f26 !important; color: #c4cdd6 !important; border-color: #2d333b !important; }
 
-  /* ---- Footer ---- */
+  /* ---- Footer. NOT a bare `footer`: ESPN builds every card's action strip out of a
+       <footer> too (.Card__Footer "All NBA News" / "Full Team Stats", the prism
+       hashed-class variant, .contentItem__footer), all natively transparent. The page
+       chrome colour then painted an inset near-black band inside each elevated card —
+       a two-tone card the site never renders. The page footer always carries one of the
+       classes below (or lives in .PageFooter__Footer). ---- */
   .PageFooter, .PageFooter__Footer, .PageFooter__QuickLinks, #global-footer,
-  footer, .footer, .Footer { background-color: #0d1117 !important; border-color: #2d333b !important; }
+  .footer, .Footer { background-color: #0d1117 !important; border-color: #2d333b !important; }
   .PageFooter a, .PageFooter__QuickLinks a, .Footer a { color: #8ab4d8 !important; }
   .PageFooter__Footer span, .PageFooter small, .copyright { color: #8b949e !important; }
+  /* Legacy story pages append their own legal strip as an unclassed-by-our-rules
+     <footer class="article-legal-footer">. The --bottom-fixed variant is a #f9f9fb bar
+     pinned to the viewport bottom, held off-screen by translateY(100%) until a `.show`
+     class slides it up mid-article — invisible to any load-time scan — and the --gray
+     variant is the same fill inline in the article body. Its own `ul` ink is #1d1e1f. */
+  .article-legal-footer--bottom-fixed, .article-legal-footer--gray {
+    background-color: #14181d !important; border-color: #2d333b !important; }
+  .article-legal-footer, .article-legal-footer ul { color: #8b949e !important; }
 
   /* ---- Ad surrounds: dark, no bright leaks (don't theme iframe content).
        Match "ad-" only at a CLASS-NAME BOUNDARY: a bare [class*="ad-"] also hits
@@ -423,6 +476,15 @@
   #global-header li.user a::before, #global-header li.user a::after,
   #global-header li.search a::before, #global-header li.search a::after {
     border-bottom-color: #1c2128 !important; border-top-color: #1c2128 !important; }
+  /* The SELECTED sport's caret is a different pseudo: li.active (no flyout involved), and
+     it is filled with the SECONDARY bar's colour, not the flyout's — natively #fff against
+     the white per-sport nav below, so it reads as a notch rather than a marker. Against
+     our dark secondary bar the untouched white triangle is the loudest thing in the
+     header. ESPN's own [data-appearance='dark'] half paints it #252627, i.e. matched to
+     the dark bar; mirror that with our bar colour. Only rendered on a sport page. */
+  #global-nav > ul > li.active::before,
+  #global-nav > ul > li.submenu-parent-active::before {
+    border-bottom-color: #0d1117 !important; }
 
   /* ---- Per-sport SECONDARY nav (#global-nav-secondary "Scores / Teams / Stats /
        Odds / More") dropdowns: the panel is a bare unclassed <div> holding a
@@ -453,6 +515,11 @@
   .search_results__header { color: #e6edf3 !important; }
   .search_results__cat { color: #9aa4ae !important; }
   .search_results__item:hover, .search_results__link:hover { background-color: #21262d !important; }
+  /* The panel's "View all results for '<q>'" strip is an UNCLASSED <footer> (#f9f9fb) —
+     no search_results__* class reaches it, and the footer rule above deliberately drops
+     the bare `footer` selector, so it is the one light band left in the flyout. */
+  .search_results > footer, .global-search footer, #global-search footer {
+    background-color: #1c2128 !important; border-color: #2d333b !important; }
   /* Autocomplete result avatars are the same transparent-cutout-on-a-solid-white-disc
      component the theme already darks as .headshot — but the list variant is classed
      .headshot-sm, which that rule never matched, so every player row shipped a glaring
@@ -844,6 +911,13 @@
     background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   .ShotChart__Court__Play__Tooltip::before, .ShotChart__Court__Play__Tooltip::after {
     background-color: #1c2128 !important; border-color: #1c2128 !important; }
+  /* Shot-chart / play-by-play mini-court markers: a MISSED shot is a hollow white disc with
+     the team-colour ring, a MADE shot a solid team-colour disc — both carry the value inline,
+     so the inline-white catch-all darkened every missed marker. The court itself is a light
+     brand graphic we never darken, and ESPN gives an achromatic team the near-black #1d1e1f,
+     so made and missed collapsed into two identical dark dots. Keep missed white. */
+  .ShotChart__Court__Play:not(.ShotChart__Court__Play--made) {
+    background-color: #ffffff !important; }
   /* Gamecast Game-Odds (DraftKings) odds cells: the value text hardcodes pure black
      (--color-neutral-1000) — fine on the original white cell, dark-on-dark once the
      cell surface is darked. Light the cell text via the stable testid. */
@@ -942,6 +1016,13 @@
        no longer maps a colour to a team (CON's #f05023 orange went flat grey). Restore
        the swatch to its own inline colour. ---- */
   .GraphHeader__ColorLegend { border-color: var(--legend-color) !important; }
+  /* An achromatic team gets ESPN's near-black #1d1e1f instead of a brand hue, so on the dark
+     card its win-probability curve (an SVG gradient stroke) and its legend dash both vanish
+     — the chart reads as if only one team were plotted. Lift just that one neutral to the
+     light equivalent the theme already uses for #1d1e1f team-stat bars; chromatic team
+     colours match neither selector and survive. */
+  stop[stop-color="#1d1e1f"] { stop-color: #c4cdd6 !important; }
+  .GraphHeader__ColorLegend[style*="#1d1e1f"] { border-color: #c4cdd6 !important; }
 
   /* ---- ESPNIcons glyphs drawn through ::before / ::after in ESPN's hardcoded darks
        (#2b2c2d, #48494a, #6c6d6f) or link-blue #0066cc. Doubly audit-blind: a
@@ -1026,8 +1107,11 @@
 
   /* ---- Player headshot discs ship a solid white circle behind a transparent PNG.
        This was already fixed inside .Gamecast__Baseball, but every sibling using the
-       same component (gamecast WIN/LOSS/SAVE pitchers, athlete rows) kept the glare. */
-  .headshot { background-color: #1c2128 !important; }
+       same component (gamecast WIN/LOSS/SAVE pitchers, athlete rows) kept the glare.
+       .headshot-md is the one-feed shortstop-card variant and .author-img the story
+       byline mugshot — same white disc, different class, and at 40px both duck the
+       audit's size floor. */
+  .headshot, .headshot-md, .author-img { background-color: #1c2128 !important; }
 
   /* News-item fallback thumbnail (.News__Item__Thumbnail.no-img): when a headline has no
      image ESPN paints a light #edeef0 rounded box holding a faint grey ESPN wordmark. On
@@ -1069,6 +1153,28 @@
     background-color: #1c2128 !important; border-color: #2d333b !important; }
   .DateCarousel__MonthTrigger svg, .DateCarousel__MonthTrigger path,
   .DateCarousel__MonthTrigger use { fill: #c4cdd6 !important; }
+  /* The month-picker popover the trigger above opens (every scoreboard/fixtures page,
+     desktop AND mobile): .DatePicker__MonthContainer is a 375×415 solid-white card with
+     a near-white #edeef0 halo box-shadow. Closed at load, so no load-time scan sees it.
+     Its "August 2026" caption is a hardcoded near-black (#151617) that survives our
+     token remaps, and ESPN separates the SELECTED day from the rest by tone (#000 bold
+     vs #48494a) — our broad text rule paints both the same grey, leaving weight as the
+     only cue. Dark the card, lift the caption, restore the selected day's brighter ink. */
+  .DatePicker__MonthContainer, .DatePicker__MonthContainer.calendar--embedded {
+    background-color: #1c2128 !important; border-color: #2d333b !important;
+    box-shadow: 0 0 3px 3px #14181d !important; }
+  .MonthContainer__MonthYear { color: #e6edf3 !important; }
+  .MonthContainer__Day--selected {
+    color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+  /* The popover's own chrome is drawn by two pseudo-elements the `*` border reset cannot
+     reach: ::before is the CSS-triangle pointer (border-bottom #fff) and ::after is the
+     rotated #edeef0 rule under the caption. Both were invisible while the card was white
+     and glare once it darks. The trigger's ::before is the same story — a 1px #edeef0
+     divider beside the calendar icon. */
+  .MonthContainer__Header::before { border-bottom-color: #1c2128 !important; }
+  .MonthContainer__Header::after { border-color: #2d333b !important; }
+  .DateCarousel__MonthTrigger::before {
+    background-color: #2d333b !important; border-color: #2d333b !important; }
   /* Mobile favourites/sport-shortcut strip (ul.fav-menu.strip.mobile, "favorites_mgmt"):
      the espnfitt mobile frontend paints a solid WHITE 390×64 nav band right below the
      header carrying the sport shortcut icons + blue labels → a glaring white strip on the

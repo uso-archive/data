@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for FanFiction.Net and FictionPress, with an easy-on-the-eyes story reader, dark browse filters, profiles and forums.
-@version      20260730.14.13
+@version      20260803.00.35
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -138,6 +138,13 @@
   #content_wrapper_inner {
     background-image: none !important;
   }
+  /* The panel's own live preview pane takes that same inline texture url() the
+     moment a swatch is clicked, so the sample text renders --ff-body on cream
+     paper (~1.3:1) while the reader behind it is correctly dark. */
+  #_fontastic_reading_preview {
+    background-image: none !important;
+    background-color: var(--ff-surface-2) !important;
+  }
 
   /* ---- Header / top brand bar ------------------------------------------ */
   /* FFN navy + FP maroon raw bars refined to harmonize with the dark palette.
@@ -204,11 +211,30 @@
   .dropdown-menu a {
     color: var(--ff-body) !important;
   }
+  /* Bootstrap 2 paints the highlight as a background-IMAGE gradient (#5678B2 →
+     #5670B2) layered over its background-color, so our background-color never
+     shows: the item renders the site's light blue under our dimmed --ff-text at
+     3.9:1, where the site's own #fff cleared 4.6:1. Kill the gradient so the fill
+     below is the one that paints. (`.active` is the same gradient trick in
+     #0081c2; it does not render logged-out but shares the rule.) */
   .dropdown-menu li > a:hover,
   .dropdown-menu a:hover,
   .dropdown-menu > .active > a {
-    background-color: var(--ff-surface-2) !important;
+    background-color: var(--ff-brand) !important;
+    background-image: none !important;
     color: var(--ff-text) !important;
+  }
+  /* Each nav dropdown heads its groups with a `li.disabled > a` label ("Stories",
+     "Crossovers"): the site dims it to #999 against #333 entries and gives it no
+     hover fill, which is the only cue that it is a heading and not a link. Both
+     generic rules above outrank that, so headings read as entries and light up
+     under the cursor. */
+  .dropdown-menu > .disabled > a,
+  .dropdown-menu > .disabled > a:hover,
+  .dropdown-menu > .disabled > a:focus {
+    color: var(--ff-muted) !important;
+    background-color: transparent !important;
+    background-image: none !important;
   }
 
   /* sub-nav grey links (Stories / Crossovers / All / Specific) */
@@ -259,6 +285,21 @@
   span._thread:hover span {
     color: var(--ff-link-hover) !important;
   }
+  /* Every story row ends with an orange `.reviews` link (#f50) — the site's only
+     cue that it leads to the review list rather than to the story. The bare `a`
+     rule above outranks the site's `.reviews` colour and the `a:hover` rule
+     outranks it again on hover, so both states read as an ordinary blue link.
+     #f50 clears 4.5:1 on the card surface; keep it verbatim. `.z-list a` below
+     ties `a.reviews` on specificity and comes later, so the row form needs the
+     `.z-list` prefix to win. */
+  a.reviews,
+  a.reviews:hover,
+  .reviews,
+  .z-list a.reviews,
+  .z-list a.reviews:hover {
+    color: #ff5500 !important;
+  }
+
   /* Two fontello glyphs get their brand hue from an inline style attribute, and
      the blanket `span` rule below beats it. The crossover blue is lifted out of
      the 2:1 range it would land in on the dark surface. */
@@ -486,9 +527,12 @@
   }
 
   /* ---- Profile / story tabs (Bootstrap .nav-tabs) ---------------------- */
-  /* FFN renders the active tab (li.active > a.current) with a white "folder"
-     bg meant to sit on light content — paints a bright panel on dark. As a
-     short 38px pill it slips past the height-based light-surface audit. */
+  /* FFN renders the active tab (li.active > a) with a white "folder" bg meant
+     to sit on light content — paints a bright panel on dark. As a short 38px
+     pill it slips past the height-based light-surface audit.
+     Selection lives on `li.active` ONLY: `a.current` is an inert marker the
+     site never styles and its tab-switch JS never moves, so keying off it
+     leaves the first tab looking selected alongside the real one. */
   .nav-tabs > li > a,
   .nav-tabs a {
     background-color: transparent !important;
@@ -496,8 +540,7 @@
   }
   .nav-tabs > li.active > a,
   .nav-tabs > .active > a:hover,
-  .nav-tabs > .active > a:focus,
-  .nav-tabs a.current {
+  .nav-tabs > .active > a:focus {
     background-color: var(--ff-surface) !important;
     color: var(--ff-text) !important;
     border-color: var(--ff-border-2) !important;
@@ -587,5 +630,15 @@
   /* ---- Misc: don't tint cover images ----------------------------------- */
   img, .cimage {
     background-color: transparent !important;
+  }
+  /* FFN serves ONE raster for every missing cover and every missing avatar:
+     /static/images/d_60_90.jpg, a near-white plate (mean luminance 170/255)
+     that repeats 13-26 times per browse row list, review list, forum thread,
+     community index and beta list. Real cover art and real user avatars are
+     served from /image/<id>/ and must stay untouched, so the correction is
+     keyed to that one filename. No DOM scan reads image pixels, and the
+     element itself is transparent, so every bucket passes on it. */
+  img[src*="d_60_90"] {
+    filter: brightness(.35) !important;
   }
 }

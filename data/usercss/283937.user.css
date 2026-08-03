@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Weather Underground. Darkens forecasts, hourly and 10-day pages and data tables while keeping radar, maps and weather icons intact.
-@version      20260730.14.18
+@version      20260803.00.41
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -365,6 +365,18 @@
     color: var(--wu-text-muted) !important;
   }
 
+  /* The mini-map's own zoom / play chips are native map chrome we deliberately
+     leave as WU's translucent white pad -- but on /health the map sits INSIDE a
+     .data-module, so the `.data-module *` neutralizer above zeroed the pad and
+     left the cyan glyphs floating bare on the basemap while the identical
+     control on the city page kept its chip. Restore the native fill; the
+     neutralizer is (0,2,4), so this needs three class-level components. */
+  .data-module .mini-map .zoomIn,
+  .data-module .mini-map .zoomOut,
+  .data-module .mini-map .mapPlay {
+    background-color: rgba(247, 247, 247, 0.9) !important;
+  }
+
   /* Mapbox attribution overlay (white text on white pill) on the mini-map. */
   .__wxmap_MapboxAttribution,
   [class*="MapboxAttribution"] {
@@ -705,6 +717,23 @@
   .legend-def.snowchance .legend-key {
     border-color: #15aadc !important;
   }
+  /* WU's form checkbox is an <input type=checkbox> + <label> whose visible box
+     is the LABEL's ::before painted from wu4Form_sprite.png. UNCHECKED is a
+     solid white cell of that sprite -- a bg-IMAGE on a pseudo-element, so
+     neither the element-bg scan nor a pseudo-bg-COLOR probe sees it, and every
+     instance is click-gated on top of that. Invert only the unchecked cell
+     (white box -> near-black with a legible rim); the checked cell is a cyan
+     tick that already reads on dark and must keep its hue, so it is exempted
+     via :checked. Two instances: the 10-day "Customize" series menu and the
+     city-page station-nav "Report Station" dropdown. */
+  .wu-forecastextended-seriesselector-preset label::before,
+  .checkbox-wrap label::before {
+    filter: invert(1) brightness(2.2) !important;
+  }
+  .wu-forecastextended-seriesselector-preset input:checked + label::before,
+  .checkbox-wrap input:checked + label::before {
+    filter: none !important;
+  }
 
   /* ---- (3) dashboard tiles (Precip / Pollen / Air Quality / UV) --------- */
   /* Each lib-*-tile body is a div#*BarChart wrapping an inline-styled white
@@ -835,6 +864,15 @@
     color: var(--wu-text-2) !important;
   }
 
+  /* The Category 6 blog separates its sections with <span class="cat-six-line">, a
+     2px #bdbdbd rule painted as a background-COLOR rather than a border, so the
+     blanket `*` border reset never touches it and it is far below the light-surface
+     scan's size floor -- it renders as a bright grey bar straight across the dark
+     page. Mute it to the component line colour. */
+  .cat-six-line {
+    background-color: var(--wu-border-2) !important;
+  }
+
   /* The Category 6 blog "ALL SECTIONS" filter is a Material <mat-select> whose
      trigger renders as a #f7f7f7 box with near-black value/arrow -- a glaring
      white pill on the dark page. Darken the trigger and lift its value + arrow;
@@ -923,6 +961,24 @@
   #position-1-banner-ad-browser {
     background-color: var(--wu-chrome) !important;
   }
+  /* The radar-animation transport strip (rewind / prev / play / next / end, the
+     scrubber wrapper and the speed dropdown) is a row of `.control-button` chips
+     WU paints rgba(247,247,247,.98) with a dim teal (#006f9e) glyph. Our generic
+     form rules DO reach inside it -- the "1x" <select> and the scrubber <input>
+     both compute dark -- so the strip shipped as dark pills sitting in a white
+     pad floating over the map. Each chip is 31x31, under the light-surface scan's
+     size floor, so only a screenshot shows it. Darken the strip to the same
+     surface as the controls it holds and keep WU's cyan chip divider. Scoped to
+     `.control-button`: the city-page radar card's play button carries only
+     `.mapPlay` and stays native map chrome. */
+  .control-button,
+  .control-button.control-scrubber,
+  .control-button.control-dropdown {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-link) !important;
+    border-right-color: #15aadc !important;
+  }
+
   wm-layer .accordion-content,
   wxstn-layer .accordion-content,
   .layers-container .accordion-content,
@@ -960,6 +1016,25 @@
   }
   .accordion-content .layerTitle {
     background-color: var(--wu-surface-2) !important;
+  }
+  /* Every layer toggle in that panel is a <span.wuCheckbox>/<span.wuRadioButton>
+     whose art is a background-IMAGE sprite (wu4Checkbox.png / wu4RadioButton.png).
+     The UNCHECKED cell is a solid white box/disc -- 16 checkboxes and 3 radios of
+     glaring white on the darkened panel, at 24x24 each (under the light-surface
+     size floor) and painted by a bg-image, so no bg-colour scan reports them.
+     Invert the unchecked art; the checked/selected cells are WU's cyan tick and
+     cyan-ringed dot, which read correctly on dark and are exempted so the
+     on/off distinction survives. State is encoded by background-position, so
+     the exemption must key off `.selected` (WU's own class), not the sprite.
+     `.map-accordion` scopes this to both the desktop rail and the
+     .mobile-wundermap-wrapper copy. */
+  .map-accordion .wuCheckbox,
+  .map-accordion .wuRadioButton {
+    filter: invert(1) brightness(2.2) !important;
+  }
+  .map-accordion .selected .wuCheckbox,
+  .map-accordion .wuRadioButton.selected {
+    filter: none !important;
   }
   lib-wm-sidebar {
     background-color: var(--wu-chrome) !important;
@@ -1047,6 +1122,15 @@
   .mobile-wundermap-wrapper .layerTitle.selected,
   .mobile-wundermap-wrapper .layerTitle.selected .layerName {
     color: var(--wu-text) !important;
+  }
+  /* (c) the panel caps itself with a `.done-wrapper` footer holding the "Done"
+         button, painted #fff -- a white slab under the otherwise-dark layer list.
+         It only has a box on the MOBILE wundermap (the desktop Save-Pref copy
+         computes 0x0), it sits below the panel's scroll fold, and the panel is
+         click-gated, so nothing but opening it and scrolling down shows it. */
+  .done-wrapper,
+  .menu-content .item-content .done-wrapper {
+    background-color: var(--wu-surface) !important;
   }
 
   /* ---- station selector ("CHANGE" next to the city name) ---------------- */
@@ -1249,6 +1333,17 @@
     border-color: #15aadc !important;
   }
 
+  /* The sticky bottom ad-adhesion rail (CafeMedia `.ci-adhesion`, present on
+     EVERY page type) is a full-width 1280x100 fixed bar painted
+     rgba(255,255,255,.5). It centres a narrower creative inside itself, so the
+     translucent white flanks the ad and washes a bright band across the bottom
+     of the dark page. It ships `visibility:hidden` until an ad is served, so no
+     scan of an ad-free load reports it -- only its computed paint does. Clear
+     the wash; the creative itself is untouched. */
+  .ci-adhesion {
+    background-color: transparent !important;
+  }
+
   /* ---- sponsored "You May Like" widget (Taboola) ------------------------ */
   /* The recommendation widget renders its header, attribution and item titles
      in near-black -- readable on its original white page, dark-on-dark once
@@ -1332,10 +1427,15 @@
      appearance:none and a sprite background-IMAGE (sprite-common-vert.png) that
      paints a WHITE rounded dropdown-arrow chip on the right of every field --
      audit-blind (the select's bg-color is already dark, the sprite survives) so
-     four glaring white chips ship on the dark dashboard. Drop the light sprite;
-     the dark field body + light value text remain. */
+     four glaring white chips ship on the dark dashboard. Replacing the sprite with
+     `none` leaves the four fields with NO dropdown indicator at all: with
+     appearance:none there is no UA arrow and a <select> cannot carry a pseudo-
+     element, so the only way back is another background-image. Draw the caret as a
+     tiny inline SVG in the muted grey the site's other carets use. */
   .wu-select {
-    background-image: none !important;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%238b949e' d='M0 0h10L5 6z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: 94% 50% !important;
   }
   /* The "Previous"/"Next" history pager buttons (.custom-button) use a gradient
      background-IMAGE: enabled = WU cyan (kept), but the DISABLED state (parent
@@ -1668,6 +1768,17 @@
     background-color: var(--wu-surface-2) !important;
     color: var(--wu-text) !important;
   }
+  /* WU paints an even brighter hover on the bar's leading STAR chip
+     (`.favorites .favorites-bar .star-wrapper a:hover` -> pure #fff), which the
+     city-chip rule above never reached. The star glyph then renders in our light
+     link-hover blue on white at ~1.5:1 -- the affordance disappears exactly when you
+     point at it. The bar is global chrome, so this is on every page type, and it is
+     hover-gated, so no load-time scan reaches it. Darkening the chip is enough: the
+     glyph keeps the accent blue it already carries. */
+  .favorites .favorites-bar .star-wrapper a:hover,
+  .favorites-bar .star-wrapper a:hover {
+    background-color: var(--wu-surface-2) !important;
+  }
 
   /* ---- (e) blog / news pagination --------------------------------------- */
   /* The page-number discs are #f7f7f7 (unthemed white) and the CURRENT one is a
@@ -1678,6 +1789,12 @@
   .pagination a.page-number {
     background-color: var(--wu-surface-2) !important;
     color: var(--wu-text) !important;
+  }
+  /* WU's own `.pagination a:hover` (#e7e7e7) carries no `!important`, so the rule
+     above beats it and the discs give no hover feedback at all -- restate the tint
+     in the dark palette. */
+  .pagination a.page-number:hover {
+    background-color: var(--wu-border-2) !important;
   }
   .pagination a.page-number.current {
     background-color: #15aadc !important;
@@ -1719,5 +1836,15 @@
   i.mat-mdc-tooltip-trigger.material-icons,
   .module__header .mat-mdc-tooltip-trigger {
     color: var(--wu-link) !important;
+  }
+
+  /* ---- (h) maps-catalog "MAP SELECT" current map ------------------------ */
+  /* The catalog's MAP SELECT grid marks the map you are viewing with a 2px
+     #006f9e ring around its thumbnail -- the ONLY cue, since the caption stays
+     the same link blue as its siblings. The blanket `*` border reset flattened
+     the ring to the generic line colour, so all five tiles looked identical.
+     Restore the accent (the ring's width is WU's, we only recolour it). */
+  .thumbnail-img.selected {
+    border-color: #15aadc !important;
   }
 }

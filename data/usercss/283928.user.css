@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Depop, easy on the eyes across home, search, categories and product pages, with prices, sale tags and the Depop red kept readable.
-@version      20260730.14.12
+@version      20260803.00.34
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -28,6 +28,13 @@
 
   :root {
     color-scheme: dark;
+
+    /* One of the few design tokens worth remapping on its own: it resolves to
+       #f3f3f3 and its only consumers are light SURFACES — the PDP's social-proof
+       nudge pill (re-established by class below, since `main div` outranks the
+       token there) plus the chip-button and condensed-card icon-button hover
+       fills, which only exist on logged-in surfaces we cannot reach. */
+    --surface-primary-weak: #1c2128;
   }
 
   /* ---- Base ---- */
@@ -125,6 +132,17 @@
   a[class*="navigationLink--active"],
   a[class*="navigationLink--active"] * {
     color: #6ea8fe !important;
+  }
+
+  /* The banner's first tab stop is a "Skip to main content" link (and a "Skip to
+     footer" twin) that the site keeps clipped until :focus, then reveals as a solid
+     #ffff47 slab with #262626 ink. The blanket banner-text rule above paints it
+     #e6edf3 — white on yellow, ~1.1:1 — so the first control a keyboard user meets is
+     unreadable. It exists only in the focus state, which no load-time scan renders.
+     Keep the site's high-visibility yellow and restore the dark ink on it. */
+  [class*="skipToLink"]:focus {
+    color: #262626 !important;
+    -webkit-text-fill-color: #262626 !important;
   }
 
   /* Category nav buttons (Women / Men / Kids / Brands ...) and the
@@ -346,8 +364,39 @@
     background-color: transparent !important;
   }
 
+  /* The homepage's "Shop by price" tiles (Under £10 / £20 / £50 / £100) take
+     their fill from an inline `--background` custom property holding the same
+     light linear-gradient as the hero thumb (#FBF6F1 → #E2E8F7). It arrives as
+     a background-IMAGE, so every bg-COLOUR reset leaves it: four near-white
+     slabs across the dark page, each with a #262626 label our text rules re-light
+     to #c4cdd6 — light-on-light. Hook BOTH the module fragment and the inline
+     property: a CSS-modules reshuffle breaks one, a data change breaks the other.
+     `--background:` with the colon does not match the colour swatches'
+     `--background-color:` / `--background-image:`, which must keep their fill. */
+  [class*="tileWrapper"] [class*="background"],
+  main [style*="--background:"] {
+    background-image: none !important;
+    background-color: #1c2128 !important;
+  }
+
   button {
     color: #e6edf3 !important;
+  }
+
+  /* Carousel prev/next arrows on the homepage promo rail are 40px discs the site
+     paints `background:#fff; border:1px solid #fff` with a #262626 chevron drawn
+     as a currentColor STROKE. They are <button>s, so the `main div` transparent
+     reset never reached them: the disc stays pure white on the dark page while
+     the `button` colour rule above re-lights the chevron to #e6edf3 — a white
+     arrow on a white disc, ~1.1:1. Elevate the disc and ring it so the arrow the
+     rule already lights has something to sit on. */
+  button[class*="navButton"] {
+    background-color: #1c2128 !important;
+    border-color: #4a525b !important;
+  }
+
+  button[class*="navButton"]:hover {
+    background-color: #262c33 !important;
   }
 
   /* Filter / sort trigger pills and dropdown buttons.
@@ -415,6 +464,21 @@
   [class*="filtersContainer"] [class*="footer"] {
     background-color: #14181d !important;
     color: #8b949e !important;
+  }
+
+  /* The empty-bag state is an illustration: a row of #d7d7d7 placeholder tiles with a
+     white message card ("Your bag is empty" + Explore) floating over them. Both are
+     plain <div>s inside <main>, so the blanket transparent reset erased the tiles
+     outright and left the card see-through — the page renders as a headline stranded
+     on an empty screen. Restore the tiles as elevated squares, and keep the card a
+     step lighter and opaque so the tiles do not run behind its text, reproducing the
+     site's card-over-tiles stacking. */
+  [class*="emptySlide"] {
+    background-color: #1c2128 !important;
+  }
+
+  [class*="emptyMessage"] {
+    background-color: #262c33 !important;
   }
 
   /* Colour swatch dots take their fill from an inline
@@ -501,13 +565,26 @@
     border-color: #e6edf3 !important;
   }
 
+  /* ...and the strip that <hr> lives in is a position:sticky, z-index:3 bar the site
+     paints #fff. It sits inside <main>, so the blanket `main div` transparent reset
+     makes it see-through: once the profile is scrolled, product photos run visibly
+     behind "Shop / Likes" and the indicator. At scroll offset 0 the bar is still in
+     flow and looks perfect, which is why only a scrolled pixel check shows it. */
+  [class*="tabsWrapper"] {
+    background-color: #14181d !important;
+  }
+
   [class*="divider"]::before,
   [class*="divider"]::after {
     border-color: #262c33 !important;
   }
 
+  /* The PDP attribute line's dot separator is a bare "•" TEXT glyph in an
+     aria-hidden span with no painted surface of its own — a background fill on it
+     draws a 6x24 grey slab straight over the bullet. Keep the box bare; the glyph
+     takes the span text colour. */
   [class*="dotDivider"] {
-    background-color: #4a525b !important;
+    background-color: transparent !important;
   }
 
   /* ============================================================
@@ -560,6 +637,30 @@
     background-color: transparent !important;
   }
 
+  /* The MOBILE gallery's like / save controls float OVER the product photo, each
+     one sitting in a 44px `background-color:#fff; border-radius:50%` disc — that
+     disc is the whole reason they read as buttons on any photo. It is a plain
+     <div> inside <main>, so the blanket `main div` transparent reset erased it
+     and left a bare light heart + count on the shot: over a pale photo they wash
+     out completely. Desktop mounts no such overlay, so only a mobile-viewport
+     pixel check shows it. Ring it with an `outline` rather than a box-shadow —
+     the site's own :focus-within paints a #ffda0a box-shadow ring that an
+     !important box-shadow here would erase, while it only sets outline-width /
+     outline-color, which our shorthand keeps. */
+  [class*="buttonInteractionWrapper"] {
+    background-color: #1c2128 !important;
+    outline: 1px solid #4a525b !important;
+  }
+
+  /* The PDP's social-proof nudges ("In 2 people's bags", "1 offer sent") are
+     border-radius:50px pills filled from --surface-primary-weak. They are <div>s
+     inside <main>, so `main div` outranks the token and flattens each one to bare
+     text that reads as one more line of metadata. Hook the testid, not the module
+     hash: the same component ships one wrapper per nudge kind. */
+  [data-testid*="NudgeWrapper"] {
+    background-color: #1c2128 !important;
+  }
+
   /* Loading skeletons — the PDP buy-box renders its CTA pills (Buy now /
      Make offer / Add to bag) and the two wishlist/share circles over the
      image as shimmer placeholders during hydration, and the same component
@@ -603,9 +704,17 @@
      is [data-testid="productPrimaryAttributes"] (coloured below); the size line
      inherits the p/span text colour. */
 
-  /* Seller card / avatar block */
+  /* Seller avatar: the round disc IS the initials child — border-radius:50% filled
+     #747474 with white initials — while [data-testid="avatar"] is a bare square
+     wrapper the site never paints (a photo avatar mounts an <img> in it). Filling
+     the wrapper drew a grey block, and `main div` erased the disc, so a round
+     avatar rendered as a dark square. Paint the disc; leave the wrapper bare. */
   [data-testid="avatar"] {
-    background-color: #1c2128 !important;
+    background-color: transparent !important;
+  }
+
+  [data-testid="avatar__initials"] {
+    background-color: #4a525b !important;
   }
 
   /* Seller rating "feedback" link (★★★★★ (6)) on PDP + profile.
@@ -620,6 +729,34 @@
 
   [class*="feedbackButton"] * {
     color: #c4cdd6 !important;
+  }
+
+  /* ...but the star row inside it draws the SAME glyph for both states and encodes the
+     score purely in colour: filled = #262626 (--text-primary-base), empty = #e3e3e3.
+     The blanket rule directly above repaints every descendant #c4cdd6, so a 5-star
+     seller and an unrated one render identically — the rating carries no information.
+     Both native colours are achromatic, so the chroma diff is blind to the loss, and
+     the glyph is a currentColor <path>, so no white-fill scan sees it either. These
+     rules must stay BELOW the feedbackButton rule: the bare-class forms tie with it on
+     specificity and win only by order. The path also needs its own `fill`: the
+     feedbackButton rule lands a DIRECT `color` on that path, which beats anything we
+     only let it inherit from the span or the <svg>. */
+  [class*="filledStar"],
+  [class*="filledStar"] svg {
+    color: #e6edf3 !important;
+  }
+
+  [class*="filledStar"] svg path {
+    fill: #e6edf3 !important;
+  }
+
+  [class*="emptyStar"],
+  [class*="emptyStar"] svg {
+    color: #4a525b !important;
+  }
+
+  [class*="emptyStar"] svg path {
+    fill: #4a525b !important;
   }
 
   /* "See more" on the description and the login page's link-buttons are
@@ -761,6 +898,18 @@
     box-shadow: inset 0 0 0 1px #3a4149 !important;
   }
 
+  /* ...and /magic-link mounts the same Apple button under a DIFFERENT wrapper module
+     (a rowWrapper, no ssoLoginOptionsContainer ancestor), so the container-scoped rule
+     above reaches /login only and the magic-link pill stayed erased. Paint the button
+     itself instead — it exactly fills the wrapper, so carrying the wrapper's 40px
+     radius here reproduces the pill without a layout change and survives the next
+     module reshuffle. */
+  [class*="appleButton"] {
+    background-color: #000000 !important;
+    border-radius: 40px !important;
+    box-shadow: inset 0 0 0 1px #3a4149 !important;
+  }
+
   [class*="appleButton"],
   [class*="appleButton"] * {
     color: #ffffff !important;
@@ -827,9 +976,14 @@
      above flatten every one of them to the same grey as body copy, so an
      action reads as inert text. Restore the accent, toned for dark.
      (sellerWebsite is the profile bio's site link — the site's other blue,
-     #2960af; same treatment.) */
+     #2960af; same treatment, and so is ctaButton — the PDP's "Clear all" over
+     the Recently-viewed rail, whose only mark as an action is that colour.
+     Qualify ctaButton with `button`: a third module reuses the name for a
+     geometry-only (flex-grow) modal CTA that must keep its solid-button ink.) */
   [class*="resetAllButton"],
   [class*="resetAllButton"] *,
+  button[class*="ctaButton"],
+  button[class*="ctaButton"] *,
   [class*="dismissModalButton"],
   [class*="deleteText"],
   [class*="categorySuggestionText"],
@@ -909,6 +1063,18 @@
      progress fill inside it stays Depop red. */
   [class*="progressionBarContainer"] {
     background-color: #30363d !important;
+  }
+
+  /* Each quiz option is a photo tile with its caption ("Womenswear", "Designer &
+     luxe"...) laid directly over the shot, where the site paints it pure #ffffff so it
+     survives a bright frame. The blanket p/span rule dims it to #c4cdd6 and the label
+     washes out on the pale photos. The same component backs both the home section's
+     inline tiles and the modal's later steps. */
+  [class*="labelOverlay"],
+  [class*="labelOverlay"] p,
+  [class*="labelOverlay"] span {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
   }
 
   /* ============================================================

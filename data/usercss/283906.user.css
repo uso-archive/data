@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for OLX that turns the bright marketplace into an easy-on-the-eyes dark interface, perfect for late-night browsing.
-@version      20260730.14.15
+@version      20260803.00.38
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -237,6 +237,27 @@
   header.app-header a,
   header[class*="app-header"] a,
   header.app-header button { color: #e6edf3 !important; }
+  /* Every header control (Czat / Obserwowane / Powiadomienia / Dla biznesu) marks
+     hover by dimming its white label to the disabled foreground — the bar's only
+     pointer affordance. The lift above is `!important`, so it pinned the label and
+     those controls stopped responding entirely; only the account link still dimmed
+     (it reads a token instead), leaving the row half-dead. Dim them the way the site
+     does. The accent "Dodaj ogłoszenie" pill has no native hover state and must keep
+     its dark-on-mint label, so it is re-asserted with the header class in the
+     selector to out-specify the rule above. */
+  header.app-header a:hover,
+  header[class*="app-header"] a:hover,
+  header.app-header button:hover {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+  header.app-header [data-testid="post-new-ad-button"]:hover,
+  header.app-header [data-testid="post-new-ad-button"]:hover span,
+  header.app-header [data-cy="post-new-ad-button"]:hover,
+  header.app-header [data-cy="post-new-ad-button"]:hover span {
+    color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
+  }
 
   /* Header language switcher (multi-language domains — olx.ua/.kz/.uz show
      "Укр | Рус", etc.). The CURRENT language is a non-clickable
@@ -381,6 +402,18 @@
     border-color: #2d333b !important;
   }
   ::placeholder { color: #7d8893 !important; opacity: 1 !important; }
+  /* Nexus text fields draw the field surface on the WRAPPER and leave the <input>
+     transparent — the same contract as the price-range fields further down. The
+     generic rule above filled only the input, so each of these rendered two-tone: a
+     lighter slab inset inside its own darker box, with the magnifier / chevron gutter
+     left on the wrapper colour (the seller-profile "Znajdź na tej stronie" and Sortuj
+     boxes, and the mobile filter form's Kategoria / Lokalizacja / Stan pickers). Hand
+     the surface back to the wrapper. Ties the generic rule on specificity, so it has
+     to stay after it. */
+  input.n-textinput-input,
+  [data-nx-name="NexusInputSearch"] input {
+    background-color: transparent !important;
+  }
 
   /* Nexus checkboxes ("tylko ze zdjęciem", "Tylko z przesyłką", the sign-up
      consents). The real <input> is visually replaced by a sibling
@@ -585,6 +618,29 @@
     border-color: #1fcabf !important;
   }
 
+  /* Condition badge ("Nowe" / "Używane" / "Uszkodzone") — the card's other Nexus badge,
+     a solid #F2F4F5 pill on the light card. It carries no testid of its own, so the
+     blanket neutraliser stripped its fill and it rendered as bare text right beside the
+     delivery pill that kept one: the two chips stopped reading as the same kind of
+     control. Give it the raised surface the rest of the card's chrome uses. The delivery
+     badge is the SAME component, so the selector reaches it too and its mint pill is
+     re-asserted below at equal specificity (later source wins). The mobile host has no
+     #mainContent, so its ad-card twin is covered separately. */
+  #mainContent [data-testid="l-card"] [data-nx-name="NexusBadge"],
+  #searchmain-container [data-testid="l-card"] [data-nx-name="NexusBadge"],
+  [data-testid="ad-card"] [data-nx-name="NexusBadge"] {
+    background-color: #21262d !important;
+  }
+  #mainContent [data-testid="l-card"] [data-testid="free-delivery-tag"],
+  #mainContent [data-testid="l-card"] [data-testid="card-delivery-badge"],
+  #searchmain-container [data-testid="l-card"] [data-testid="free-delivery-tag"],
+  #searchmain-container [data-testid="l-card"] [data-testid="card-delivery-badge"],
+  [data-testid="ad-card"] [data-testid="free-delivery-tag"],
+  [data-testid="ad-card"] [data-testid="card-delivery-badge"] {
+    background-color: #103c3b !important;
+    border-color: #1fcabf !important;
+  }
+
   /* "Wyróżnione" (Featured/highlighted-ad) badge, the card's data-nx-name="Tag"
      component (delivery/promoted badges have their own testids). It is NOT bare
      text on the light site: it is a SOLID OLX-mint (#23E5DB) pill with a
@@ -618,6 +674,18 @@
   #mainContent [class*="badge-portal"] [data-nx-name="Tag"] * {
     color: #07232a !important;
     -webkit-text-fill-color: #07232a !important;
+  }
+
+  /* Partner-brand chip on the promoted/partner cards ([data-testid="adCard-partner"] —
+     the OTOMOTO / Otodom / obido wordmark laid over the card photo). OLX plates it with
+     the near-black #02282c inverse fill so the white wordmark reads on any picture; the
+     blanket `#mainContent div` neutraliser strips that plate and the mark floats
+     directly on the user's photo (gone over a bright one). The plate is the chip's only
+     child div; anchor it under the page containers so it out-specifies the neutraliser
+     and keep the native near-black, which is what the white wordmark is drawn for. */
+  #mainContent [data-testid="adCard-partner"] div,
+  #searchmain-container [data-testid="adCard-partner"] div {
+    background-color: #02282c !important;
   }
 
   /* The homepage "recommended"/partner (Storia real-estate) l-card variant
@@ -662,6 +730,20 @@
     -webkit-text-fill-color: #6fe3da !important;
   }
 
+  /* …but [data-testid="ad-price"] IS the price <p> (the amount is its own text node)
+     and its only children are Nexus Label2 <span>s carrying the price QUALIFIER
+     ("do negocjacji", "od"). OLX ranks those a step down — dim #406367 against the
+     near-black #02282c amount — while the ` span` arms of the white rules above painted
+     them the same #ffffff as the amount, so the qualifier shouted as loudly as the
+     price. Hand the step back; ties the l-card rule on specificity, so it has to stay
+     after it. */
+  #mainContent [data-testid="ad-price"] span[data-nx-name="Label2"],
+  #searchmain-container [data-testid="ad-price"] span[data-nx-name="Label2"],
+  [data-testid="ad-card"] [data-testid="ad-price"] span[data-nx-name="Label2"] {
+    color: #9aa6b0 !important;
+    -webkit-text-fill-color: #9aa6b0 !important;
+  }
+
   /* Favourite (heart) toggle. The heart is an inline <svg> whose <path> is
      fill="currentColor", and OLX sets the colour on the SVG itself through a
      hashed emotion class carrying a literal #02282c — so colouring the wrapping
@@ -696,12 +778,28 @@
      The popup's downward caret is a real-element CSS triangle whose left/right
      borders must stay transparent — the blanket `* { border-color }` reset
      painted all four sides, so it rendered as a solid grey rectangle. */
-  #mainContent [id^="baxter-native-listing"] [class*="_spnu"],
   #mainContent [id^="baxter-native-listing"] [class*="attribution"],
   #mainContent [id^="baxter-native-listing"] [class*="popup"],
   #mainContent [id^="baxter-native-listing"] [class*="tooltip"] {
     background-color: #103c3b !important;
     border-color: #2d333b !important;
+  }
+  /* `…_spnu` is the template's CONDITION chip ("Nowe" / "Używane" — it sits inside
+     `…__nu`, nowe/używane), NOT part of the SPONSOROWANE disclosure: natively it is the
+     same neutral #F2F4F5 pill every organic l-card carries. Grouped with the mint
+     disclosure surfaces it became the only condition chip on the page wearing the
+     ad-tint, reading as a delivery/promoted badge. Match its l-card twin instead. */
+  #mainContent [id^="baxter-native-listing"] [class*="_spnu"] {
+    background-color: #21262d !important;
+  }
+  /* The popup's close ✕ is two STROKED line segments carrying a literal
+     stroke="black" (no fill at all — a `fill` override paints nothing). The
+     `#mainContent svg { color: inherit }` icon rule sets `color`, which a path that
+     never says `currentColor` cannot read, so on the light popup black was correct and
+     on our dark panel the only control that dismisses it sat at ~1.5:1. Point the
+     stroke at the colour its container already carries. */
+  #mainContent [id^="baxter-native-listing"] [class*="link_close"] svg path {
+    stroke: currentColor !important;
   }
   #mainContent [id^="baxter-native-listing"] [class*="attribution-link"] {
     background-color: #1c2128 !important;
@@ -718,6 +816,13 @@
      colour of its own, so it inherits the body text colour — which we flipped
      to light — and the only control that dismisses the ad became white-on-white.
      Give it the elevated dark surface it now needs. */
+  /* Its host slot `.baxter-inner-sticky` is a literal white bar sized to the viewport
+     while the creative inside it is a fixed 320px iframe, so on a 390px phone the ad
+     sits in a bright white frame — 35px of white down each side plus the strip the
+     close button sits on. Only the button had been darkened. */
+  .baxter-inner-sticky {
+    background-color: #14181d !important;
+  }
   .baxter-inner-sticky-close-button {
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
@@ -770,9 +875,12 @@
      square here — and its headline is a hardcoded #3473FE that lands at ~4.3:1
      on the page base, under AA. Invert the monochrome tile so the glyph keeps its
      shape on a dark ground, and lift the blue enough to read while staying
-     recognisably the advertiser's link colour. */
+     recognisably the advertiser's link colour. The headline element varies by
+     deploy — a <strong>, or a bare <span class="ing_gal_span"> carrying the hex
+     as an INLINE style — so cover both. */
   .creditbox img { filter: invert(1) !important; }
   .creditbox strong,
+  .creditbox span,
   .creditbox span strong {
     color: #8ab4ff !important;
     -webkit-text-fill-color: #8ab4ff !important;
@@ -811,6 +919,27 @@
     background-color: #21262d !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
+  }
+  /* `banner-btn` is shared by two very different banners. The top info/scam strip
+     publishes its button as the site's own `flat` variant, for which the neutral chip
+     above is right. The homepage "OLX dla biznesu" band ([data-testid="business-banner"],
+     a full-width `!bg-background-inverse` near-black sheet) publishes ITS CTA as
+     `primary` and paints it a SOLID WHITE pill with a near-black label — the band's
+     only action. The chip fill turned that into a dim slab on an almost-equally-dark
+     band. Key on the variant OLX itself publishes and hand the primary the accent every
+     other primary CTA in the theme gets; its label <span> also carries the near-black
+     text-fill, so both channels have to be set. */
+  #mainContent [data-testid="banner-btn"][data-button-variant="primary"],
+  #mainContent [data-testid="bep-button"][data-button-variant="primary"] {
+    background-color: #1fcabf !important;
+    border-color: #1fcabf !important;
+  }
+  #mainContent [data-testid="banner-btn"][data-button-variant="primary"],
+  #mainContent [data-testid="banner-btn"][data-button-variant="primary"] span,
+  #mainContent [data-testid="bep-button"][data-button-variant="primary"],
+  #mainContent [data-testid="bep-button"][data-button-variant="primary"] span {
+    color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
   }
 
   /* ============================================================
@@ -945,6 +1074,15 @@
   #mainContent [data-testid="sorting-wrapper"] span {
     color: #c4cdd6 !important;
     -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  /* "Wyczyść filtry" is the panel's only reset, and OLX marks it purely by hover
+     (#406367 darkening to #02282c). The lift above is `!important`, so it pinned the
+     label and the control stopped answering the pointer entirely. Brighten it the way
+     the site strengthens it. */
+  #mainContent [data-testid="filter-clear-all"]:hover,
+  #mainContent [data-testid="filter-clear-all"]:hover span {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
   }
   /* Filter segmented-control values (Wszystkie / Firmowe / Prywatne)
      are <span> inside <button> in a filter <header> — flip to legible. */
@@ -1416,9 +1554,12 @@
      "Ai nevoie de împrumut?" prompt and the "Rată estimată/lună" line all fell
      dark-on-dark, and the finalize button kept a literal white fill. The
      container's colour is inherited, so lifting it on the shell is enough; the
-     green estimate (.comperia_calc_rate) sets its own and stays semantic. */
-  .adv-financing-widget-ad-under-price-entrypoint-button,
-  .adv-financing-widget-ad-under-price-entrypoint-span {
+     green estimate (.comperia_calc_rate) sets its own and stays semantic.
+     The teaser's own headline ("Potrzebujesz finansowania?" /
+     `-entrypoint-p-main`) carries the same near-black and only renders in the
+     mobile shell, so key on the whole entrypoint class family rather than the
+     two element suffixes the desktop deploy happens to use. */
+  [class*="adv-financing-widget-ad-under-price-entrypoint"] {
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
   }
@@ -1443,6 +1584,22 @@
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
   }
+
+  /* The CarVertical vehicle-history slot further down the same Romanian offer
+     (stable `cvg_*` ids). Its whole copy — headline, pitch, the right column's
+     title and the "Partener" label — inherits OLX's near-black #02282C from the
+     widget root and fell to ~1.05:1; only the checklist items and the white CTA
+     label read. `color` only, so the CTA label's own white still wins. Its CTA
+     plate is a literal #022840 navy that the #mainContent neutraliser stripped,
+     leaving the label floating with no button shape — give it a lifted navy that
+     still reads as the advertiser's blue. The headline sets the near-black on
+     itself, so inheritance never reaches it — it needs its own rule. */
+  #cvg_king_div { color: #c4cdd6 !important; }
+  #cvg_first_line {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  #mainContent .cvg_button_div { background-color: #1e4d7b !important; }
 
   /* ============================================================
      Login / registration pages (login.olx.<tld> — separate app,
@@ -1475,6 +1632,14 @@
     background-color: #1c2128 !important;
     border: 1px solid #2d333b !important;
     color: #e6edf3 !important;
+  }
+  /* At narrow widths the sign-in card gains a 40px "Witamy na OLX!" masthead
+     that the desktop layout never renders. It sets OLX's near-black #02282C on
+     itself, so the card colour above never reaches it and it vanished into the
+     panel at ~1.05:1 — the largest element on the page, invisible. */
+  .login-box h1 {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
   }
   /* Social sign-in buttons (white pills) -> elevated dark.
      The testid sits on a wrapper; the white surface is the inner button. */
@@ -1694,12 +1859,79 @@
      either has no desktop counterpart or loses there to the id-scoped rule that
      already covers it — so nothing on the desktop cascade moves.
      ============================================================ */
+  /* SPONSOROWANE native ads. OLX injects the same baxter template into the mobile
+     listing grid, but this build publishes `baxter-native-listing-olx-<tld>-mobile-…`
+     as a CLASS on the ad root where the desktop build makes it an id — so every rule
+     in the native-ad block above (all keyed on `[id^="baxter-native-listing"]`, most
+     also on `#mainContent`) matched nothing here and the whole sponsored card shipped
+     as a literal WHITE panel: the headline sat on it at ~1.7:1 and the condition chip
+     vanished. Mirror that block on the class form. It is inert on desktop, where the
+     class matches zero elements (verified on the listing and offer pages). */
+  [class*="baxter-native-listing"],
+  [class*="baxter-native-listing"] * {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  [class*="baxter-native-listing"] [class*="title"] {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+  /* The template's own card panel (`…__wrapper`) carries the literal white. */
+  [class*="baxter-native"][class*="wrapper"] {
+    background-color: #14181d !important;
+  }
+  /* …and `…__state` is its condition chip ("Nowe" / "Używane"), a #F2F4F5 pill — the
+     mobile twin of the desktop `_spnu`, so it takes the same neutral raised surface. */
+  [class*="baxter-native"][class*="__state"] {
+    background-color: #21262d !important;
+  }
+  /* The attribution popup's downward caret is a real-element CSS triangle whose
+     left/right borders must stay transparent; the blanket `*` reset paints all four,
+     so it renders as a solid grey rectangle. Same repair the desktop arm makes. */
+  [class*="baxter-native-listing"] [class*="attribution"],
+  [class*="baxter-native-listing"] [class*="popup"],
+  [class*="baxter-native-listing"] [class*="tooltip"] {
+    background-color: #103c3b !important;
+    border-color: #2d333b !important;
+  }
+  [class*="baxter-native-listing"] [class*="attribution-link"] {
+    background-color: #1c2128 !important;
+    border-color: #83a4ec !important;
+  }
+  [class*="baxter-native-listing"] [class*="template__after"] {
+    border-top-color: #83a4ec !important;
+    border-right-color: transparent !important;
+    border-left-color: transparent !important;
+  }
+  [class*="baxter-native-listing"] [class*="link_close"] svg path {
+    stroke: currentColor !important;
+  }
+
   /* Ad card: the body panel is a literal #FFFFFF and the photo box a literal
      #ECEEEF placeholder. The card link holds the photo box first and the badge
      overlay second, so scope the placeholder to the first child (as the desktop
      l-card rule does) and leave the badges transparent. */
   [data-testid="ad-card"] > div { background-color: #1c2128 !important; }
   [data-testid="ad-card"] a > div:first-child { background-color: #21262d !important; }
+  /* Motor/property categories give the mobile card a swipeable photo GALLERY instead
+     of a single photo, so its placeholder is not the `a > div:first-child` the rule
+     above covers: it is the swiper's own `div[type="gallery"]`, still carrying the
+     literal #ECEEEF. Every card was a full-width near-white slab until its photo
+     painted — and on a lazy-loading list that is most of them. This gallery exists
+     only on the mobile host (zero matches on the desktop car listing). */
+  [data-testid="ad-card"] div[type="gallery"],
+  [data-testid="ad-card"] .swiper-zoom-container {
+    background-color: #21262d !important;
+  }
+  /* A photoless ad falls back to OLX's "no thumbnail" graphic, an SVG served as
+     an <img> (no_thumbnail-x.*.svg): an #ECEEEF plate carrying a #D8DFE0 X. As
+     an <img> no selector reaches inside it, so it renders as a near-white slab
+     the size of a card photo — several per screen on a list view, on both hosts.
+     A partial invert lands the plate near the card surface and keeps the X a
+     step lighter, so the "no photo" cue survives. Grayscale first: the plate and
+     the X are both faintly blue, and inverting a blue grey turns it brown. */
+  img[src*="no_thumbnail"] { filter: grayscale(1) invert(0.9) !important; }
+
   /* Its location / date lines are the dim #406367 that only worked on the white
      panel; the title link keeps the brighter colour set on it directly. */
   [data-testid="ad-card"] p,
@@ -1821,6 +2053,18 @@
      the page base rather than flattening it to transparent, or the cards scroll
      straight through the search field. */
   main#homepage > section { background-color: #14181d !important; }
+  /* The search submit beside that field is an <svg> that IS the button plate (the fill
+     is the SVG's own background-color) with a white fill="currentColor" magnifier. OLX
+     paints the plate its near-black #02282c — the strongest control on the white bar,
+     but 1.1:1 against our base, so the mobile home's primary action lost its shape and
+     only the floating glyph read. Same accent the desktop twin
+     ([data-testid="search-submit"]) already gets, with the glyph flipped dark so it
+     reads on the mint. `[data-testid="search-bar"]` exists only on the mobile host, and
+     this is its one <svg>. */
+  [data-testid="search-bar"] svg {
+    background-color: #1fcabf !important;
+    color: #07232a !important;
+  }
   [data-testid="search-bar"] p {
     color: #9aa6b0 !important;
     -webkit-text-fill-color: #9aa6b0 !important;
@@ -1918,6 +2162,49 @@
   [data-testid="ad-component"] [data-testid="go-to-delivery-options"] span {
     color: #07232a !important;
     -webkit-text-fill-color: #07232a !important;
+  }
+  /* …and the SECONDARY half of that ladder. The mobile shell publishes the call
+     CTA under its own hook, [data-testid="ad-contact-call-button"], which none
+     of the #mainContent / .n-modal-portal secondary lists carry — so it fell
+     through to the generic hairline and rendered as a grey slab whose outline is
+     ~1.4:1 on the base, beside a vivid mint primary. Give it the same accent
+     outline the desktop rail and the photo lightbox get. */
+  [data-testid="ad-component"] [data-testid="ad-contact-call-button"][data-button-variant="secondary"],
+  [data-testid="ad-component"] [data-testid="ad-contact-message-button"][data-button-variant="secondary"],
+  [data-testid="ad-component"] [data-testid="ad-contact-phone"][data-button-variant="secondary"],
+  [data-testid="ad-component"] [data-testid="show-phone"][data-button-variant="secondary"],
+  [data-testid="ad-component"] [data-testid="chat-button"][data-button-variant="secondary"] {
+    background-color: transparent !important;
+    border-color: #5fd0c6 !important;
+  }
+  [data-testid="ad-component"] [data-testid="ad-contact-call-button"][data-button-variant="secondary"],
+  [data-testid="ad-component"] [data-testid="ad-contact-call-button"][data-button-variant="secondary"] span,
+  [data-testid="ad-component"] [data-testid="ad-contact-message-button"][data-button-variant="secondary"],
+  [data-testid="ad-component"] [data-testid="ad-contact-message-button"][data-button-variant="secondary"] span,
+  [data-testid="ad-component"] [data-testid="ad-contact-phone"][data-button-variant="secondary"],
+  [data-testid="ad-component"] [data-testid="ad-contact-phone"][data-button-variant="secondary"] span,
+  [data-testid="ad-component"] [data-testid="show-phone"][data-button-variant="secondary"],
+  [data-testid="ad-component"] [data-testid="show-phone"][data-button-variant="secondary"] span,
+  [data-testid="ad-component"] [data-testid="chat-button"][data-button-variant="secondary"],
+  [data-testid="ad-component"] [data-testid="chat-button"][data-button-variant="secondary"] span {
+    color: #5fd0c6 !important;
+    -webkit-text-fill-color: #5fd0c6 !important;
+  }
+  /* The gallery's favourite disc is a solid #FF5636 circle whose 2px border is
+     the same orange, so it reads as one shape. The blanket border reset painted
+     that ring the neutral hairline and cut a grey outline into the brand
+     control; give the border back its fill colour. */
+  [data-testid="photos-fav-icon"] div { border-color: #ff5636 !important; }
+
+  /* The vehicle-history (autoDNA) block only exists in the mobile offer shell,
+     under the description section, and its body copy — "Partner:", the pitch
+     line and both bullets — is the near-black #02282C built for the white card.
+     Its heading and CTA read a token we remap, so only these NexusText
+     paragraphs were stranded at ~1.05:1. They are the section's only
+     NexusText paragraphs; the ad description itself is not one. */
+  [data-testid="ad-description-section"] p[data-nx-name="NexusText"] {
+    color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
   }
 
   /* ============================================================

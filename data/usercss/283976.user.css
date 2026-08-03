@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260730.14.14
+@version      20260803.00.36
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -429,6 +429,141 @@
   [data-testid="navbar-search-button"]:hover { background-color: #232a32 !important; }
 
   /* ====================================================================
+     Marketing site (/about, /about/*, /teachers, /schools)
+     Khan builds these in Webflow, not Wonder Blocks: there is no
+     `#main-content`, no design token and no hashed atomic class, so not one
+     rule above reaches them. What DID reach them is the global text block
+     (`html, body`, `h1-h6`, `p, li, …`), which lifts every heading, paragraph
+     and nav link to near-white — on Webflow's white sections, i.e. invisible.
+     The pages are one click from every footer ("About us", "Impact",
+     "Leadership", "Supporters", "Careers", "Khan Academy for Teachers").
+     Only the SURFACES need work: the whole ink layer is inherited (99 of the
+     101 links on /teachers take their colour from an ancestor, including the
+     white labels on the purple CTAs), so once the sections go dark the text
+     already lands right way up. `.page_wrap` is the Webflow shell wrapper and
+     the `[class]` neutralizer flattens its pale bands (white, #ddf0fe,
+     #eef7fe and the cream testimonial card) exactly like the `#main-content`
+     one does; nothing here paints a background-image, so clearing them is
+     safe. The header and its mega-menu panels are floating surfaces and must
+     stay opaque, and the tab module's cards have to keep reading as cards.
+     Webflow class names are author-written and stable (nothing here is hashed),
+     and the pale surfaces are a CLOSED set — enumerated live across all seven
+     marketing pages — so these are listed explicitly rather than swept up by a
+     `[class]` neutralizer like the app's. That distinction matters: a blanket
+     sweep here also erased the purple active-tab underline (`.tab_button_line`),
+     the coloured stat cards and the CTA fills, which are the only colour the
+     page carries. Left deliberately alone for the same reason:
+     `.card_icon_circle` and `.graphic_shape_wrap`, whose pale-blue instances
+     have green and pink siblings that are the site's own colour code.
+     ==================================================================== */
+  .page_wrap, section.u-section { background-color: #14181d !important; }
+  /* `.nav_mobile_layout` is the narrow-width twin of the desktop bar and is a
+     separate white strip — the drawer under it already resolves dark, so at 390
+     the header alone stayed white above a dark menu. */
+  .nav_desktop_contain, .nav_mobile_layout { background-color: #0d1117 !important; }
+  .nav_dropdown_main_content, .nav_dropdown_main_scroll, .nav_skip_wrap,
+  .tab_button_item, .tab_content_list, .card_testimonial_inner,
+  .card_primary_element { background-color: #1c2128 !important; }
+  /* Full-bleed decorative section bands. Despite the name these are not small
+     shapes: both live under `.u-cover-absolute` and measure 1268px wide (a
+     517px pale-blue slab behind the supporters hero, a 348px pink one on
+     /teachers), i.e. they are section backdrops like the `u-section` fills
+     above and get the same flattening. The child combinator keeps it off any
+     genuinely small `.graphic_shape_wrap` Khan adds later. */
+  .u-cover-absolute > .graphic_shape_wrap { background-color: #14181d !important; }
+  /* The /schools hero's decorative street map: a 1312x436 inline <svg> whose
+     26px-wide "roads" are `stroke="currentColor"` over Khan's palest blue
+     (#eef7fe). It is a whisper on the white page — 1.06:1, a texture you have to
+     look for — and nothing in this sheet touches an SVG stroke, so on the dark
+     hero the SAME colour becomes near-white ribbons: the brightest thing on the
+     page, out-shouting the headline and the purple CTA. Restating `color` is
+     enough (the strokes inherit it); the coloured schoolhouse markers are
+     separate literal fills and keep their blue/green/pink/gold. This tone leaves
+     the map legible as a map while putting it back under the type. */
+  .graphic_map_lines { color: #232a34 !important; }
+  /* Webflow's hairline rules are 1px DIVs with a light background, so the
+     blanket `* { border-color }` reset never reaches them. */
+  .c-divider { background-color: #2d333b !important; }
+  /* Text that Webflow colours directly instead of inheriting, so the global
+     `html, body` ink does not reach it: the skip link, the testimonial
+     attribution (near-black on the now-dark card — "Sal Khan / Founder & CEO"
+     was rendering at ~1.2:1) and the mega-menu group headers (a mid grey that
+     lands ~3.2:1 on the panel). The stat cards are deliberately NOT lifted here:
+     they sit on Khan's gold/orange/pink tiles, which keep their fill, so their
+     near-black ink is still the correct colour — the block below RE-ASSERTS it. */
+  .nav_skip_text { color: #e6edf3 !important; }
+  .card_testimonial_quote, .card_testimonial_author_name,
+  .card_testimonial_author_title { color: #c4cdd6 !important; }
+  .nav_group_title { color: #9aa4af !important; }
+  /* The coloured cards Webflow KEEPS its fill on — the impact/teacher stat tiles
+     (`.card_stat_inner`, gold / orange / pink / green / blue / periwinkle) and the
+     full-width feature card (`.card_large_wrap`, 1120x492 pink on /schools) — are
+     the one place on these pages where near-black ink is still the RIGHT colour,
+     and the global `h1-h6` / `p, li, …` block above repaints it near-white:
+     "learning minutes" landed at 1.01:1 on the pink tile (i.e. gone) and
+     "Students deserve more than chatbots." at 1.6:1. The `.card_stat_number` was
+     already left alone but its caption is a Webflow rich-text `<p>` INSIDE the
+     wrapper, so the wrapper's own colour never reached it. Restate the authored
+     ink for the whole subtree; neither card contains a button or link whose label
+     needs a different colour. `-webkit-text-fill-color` too, since the global bold
+     rule sets it and it overrides `color` on every descendant. */
+  .card_stat_inner, .card_stat_inner *,
+  .card_large_wrap, .card_large_wrap * {
+    color: #191918 !important;
+    -webkit-text-fill-color: #191918 !important;
+  }
+  /* Webflow's text-link button ("See Tier 1 studies →", inside the evidence cards
+     on /about/impact) keeps the light page's near-black ink, which lands ~1.3:1 on
+     the `.card_primary_element` surface the block above darkens — the only call to
+     action on those three cards, effectively invisible. Native it is the strongest
+     ink on the card, so it maps to the theme's strong ink rather than the link
+     blue. */
+  .button_link_element, .button_link_text { color: #e6edf3 !important; }
+  /* Webflow's SECONDARY button variant is a pale-blue (#ebf1fd) pill with a purple
+     label — the inverse of the solid purple primary, and on the dark page it is the
+     brightest thing on the screen ("Read our blog to learn more", "View internships",
+     "Join the Learners Fund", plus the 48px carousel play/pause toggle). Same
+     treatment the Wonder Blocks `secondary` navbar search button gets: dark fill,
+     bordered, label lifted to a light shade of Khan's purple so the secondary still
+     reads as the quieter sibling of the solid CTA. Matched on the Webflow variant
+     id, which marks ONLY this variant (the solid primary carries no variant class);
+     if Khan re-authors it the rule simply stops applying and the button returns to
+     today's pale pill. */
+  .button_main_element[class*="w-variant-e85564cd"],
+  .button_toggle_element[class*="w-variant-ab355ea0"] {
+    background-color: #1c2128 !important;
+    border-color: #3a424c !important;
+  }
+  .button_main_element[class*="w-variant-e85564cd"] .button_main_text,
+  .button_toggle_element[class*="w-variant-ab355ea0"] .button_toggle_icon {
+    color: #a5a1ff !important;
+    -webkit-text-fill-color: #a5a1ff !important;
+  }
+  /* The "AS SEEN ON" press band (/teachers) and the district band (/schools):
+     flat greyscale wordmarks drawn for the white section, invisible once it goes
+     dark, so a straight inversion is faithful.
+
+     `lighten` is what makes that inversion safe on the ones that ship an OPAQUE
+     white plate instead of alpha — GatesNotes (1% transparent, 69% white) and the
+     Palm Beach County seal (11% transparent, 34% white). Inverting those paints a
+     pure #000 rectangle, DARKER than the band, so the plate reads as a hard-edged
+     black box around the mark. Blending picks the lighter of image and backdrop:
+     everything the inversion pushes below the band colour snaps back to the band,
+     the light linework is untouched, and the alpha-backed marks (55-82%
+     transparent, ~0% white) are unaffected — so no per-file exception list to keep
+     in sync as Khan swaps logos.
+
+     The wrapper fill is load-bearing: `.section_contain` is `position:relative;
+     z-index:1`, i.e. a stacking context, so the blend's backdrop is empty unless
+     the band colour is painted INSIDE it. It restates the `section.u-section`
+     colour these bands always sit on, so it is invisible on its own. */
+  .item_logo_wrap { background-color: #14181d !important; }
+  .item_logo_wrap .item_logo_image {
+    filter: invert(1) !important;
+    mix-blend-mode: lighten !important;
+  }
+
+  /* ====================================================================
      Hardcoded light surfaces that bypass the design tokens
      (some cards/sections set white or pale-grey directly, not via a var)
      ==================================================================== */
@@ -525,6 +660,14 @@
   #main-content ._1akjgsg9 { border-color: #948ebe !important; }  /* Proficient outline */
   #main-content ._1hupj7i9 { border-color: #d77d0f !important; }  /* Familiar outline */
   #main-content ._88nb8z9 { border-color: #c66024 !important; }   /* Attempted outline */
+
+  /* Course page "Up next for you:" card. Khan marks it as the recommended next
+     step with a 4px top rule in the brand blue; the blanket `* { border-color }`
+     reset near the end of this file repaints all four sides, so the accent drops
+     to the generic divider grey and the card reads as an ordinary bordered box.
+     Restore the top edge only — the other three sides are Khan's own hairline
+     and are correctly softened. Stable test id. */
+  [data-testid="course-challenge-card"] { border-top-color: #5fb0e6 !important; }
 
   /* The "Level N … 0 /1 skill" bar above every article, video and exercise
      marks how far along the level you are with a 14px knob Khan fills its
@@ -887,6 +1030,33 @@
     border-top-color: transparent !important;
     border-right-color: #1c2128 !important;
   }
+
+  /* The live editor's error bubble (`.tipbar`, "Oh noes! `ackground` is not
+     defined…") floats OVER the program canvas, which the learner's own program
+     paints and which no rule here can reach — white by default. The bubble itself
+     is plain HTML hardcoded for that white page (#f9f9f9 panel, black copy), so
+     the `#main-content [class]` neutralizer flattens the panel to transparent
+     while the text rules lift the copy to near-white: the whole error message
+     renders white-on-white and only the "Show me where" link stays readable, on
+     the one surface a beginner most needs to read. Give the bubble an opaque dark
+     panel of its own. The `.quote` chips holding the offending identifier are
+     <span>s — which the neutralizer deliberately skips, so they keep their
+     hardcoded white fill under that same near-white text — and need their own
+     dark tone. `.close` is a black glyph built for the light bubble.
+     The bubble's two sprite decorations (the `.speech-arrow` nub and the
+     `.error-buddy` mascot) are `background-image`s the neutralizer clears; both
+     are drawn for a light bubble, so they are left off rather than restored. */
+  .tipbar {
+    background-color: #1c2128 !important;
+    border-color: #3a424c !important;
+    color: #e6edf3 !important;
+  }
+  .tipbar .quote {
+    background-color: #0d1117 !important;
+    border-color: #3a424c !important;
+    color: #e6edf3 !important;
+  }
+  .tipbar .close { color: #9aa4af !important; text-shadow: none !important; }
 
   /* ====================================================================
      Worked-example math highlight colors (MathML `mathcolor`)

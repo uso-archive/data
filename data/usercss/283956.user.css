@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260730.14.18
+@version      20260803.00.41
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -95,6 +95,22 @@
   .border-black,
   .border-white {
     border-color: var(--wx-text) !important;
+  }
+  /* ...but the article byline avatar is `border-2 border-white` on the white article
+     body, i.e. an INVISIBLE spacer ring, so lifting it to --wx-text drew a bright halo
+     round the author photo that weather.com never shows. Keep the ring, drop the paint. */
+  img[class*="authorImage"] {
+    border-color: transparent !important;
+  }
+  /* Tailwind's hover border variants are a real affordance the blanket rule pins flat:
+     the Today's-Details tiles darken border-gray-200 -> -400 on hover and the carousel
+     arrows go border-black, and both froze at --wx-border with no cue at all. On dark the
+     equivalent move is to brighten; the muted ink is the visible-but-quiet step. */
+  [class*="hover:border-gray-300"]:hover,
+  [class*="hover:border-gray-400"]:hover,
+  [class*="hover:border-gray-500"]:hover,
+  [class*="hover:border-black"]:hover {
+    border-color: var(--wx-text-muted) !important;
   }
 
   /* ---- header / sidebar chrome ----------------------------------------- */
@@ -282,7 +298,23 @@
     background-color: var(--wx-chrome) !important;
   }
   [class*="adBackground"],
-  [class*="combinedTopAds"] {
+  [class*="combinedTopAds"],
+  /* news/video articles carry a THIRD ad chrome family: a `position: fixed`, full-width
+     100px sticky footer slot (`.ci-adhesion`) whose own fill is rgba(255,255,255,.5).
+     Over the site's white page that is invisible; over our base it composites to a
+     mid-grey #8b8d8e band pinned across the bottom of every article -- and the banner
+     that fills it is narrower than the bar, so the grey shows on both sides. The slot
+     ships `visibility: hidden` until an ad is served, so a scan (and a screenshot) of a
+     session with an unfilled slot reports clean. */
+  .ci-adhesion {
+    background-color: var(--wx-surface-2) !important;
+  }
+  /* Once the slot is filled the ad stack adds a `ci-<id>-open` body class and a
+     `.ci-<id>-open .ci-ad-<id> { background: #fff !important }` rule -- (0,2,0), so it
+     beats the single-class rule above and the bar renders solid white across the
+     viewport with the (narrower) creative floating in it. The numeric id rotates per
+     creative; the `ci-ad-` prefix does not. */
+  div[class*="ci-adhesion"][class*="ci-ad-"] {
     background-color: var(--wx-surface-2) !important;
   }
   /* the ad-disclosure label ("Advertisement") ships #6f7585 -- 3.68:1 on the
@@ -457,6 +489,15 @@
   [class*="hover:bg-neutral-100"]:hover,
   [class*="hover:bg-neutral-200"]:hover {
     background-color: var(--wx-surface-2) !important;
+  }
+  /* A control that is ALREADY a grey fill at rest (bg-gray-100) and steps one shade
+     down on hover collapses to a no-op above, because both the rest rule and the hover
+     rule land on --wx-surface-2 -- the /hourbyhour/day-N prev/next day pills lost their
+     fill change that way. Step them to the component border tone instead so the hover
+     is a real shade change. Needs three classes to out-rank both rules. */
+  [class*="bg-gray-100"][class*="hover:bg-gray-200"]:hover,
+  [class*="bg-gray-50"][class*="hover:bg-gray-100"]:hover {
+    background-color: var(--wx-border-2) !important;
   }
 
   /* ---- cards / modules / wells ----------------------------------------- */
@@ -710,6 +751,21 @@
   a b {
     color: inherit !important;
   }
+  /* the legacy layout's SECTION HEADINGS ("Sun & Moon >", "Travel Far, Travel Often >",
+     "We Love Our Critters >") are `a.Button--default` wrapping an <h2>. weather.com's only
+     hover feedback on them is fading the anchor's ink to 80% alpha, which the <h2>
+     inherits -- but our `h1..h6` rule matches that heading DIRECTLY, and a matched rule
+     beats an inherited value, so under the theme these links had NO hover state at all
+     (no colour change, no underline, no opacity shift). A load-time scan cannot see this;
+     only a native-vs-themed hover diff can. Brighten the heading instead of dimming it,
+     which is the dark-surface equivalent of the site's fade. Exactly the five legacy
+     section headers carry a heading inside a Button--default anchor -- the article-card
+     titles are `a.mediaLink` and keep their own underline-on-hover. */
+  a[class*="Button--default"]:hover h1,
+  a[class*="Button--default"]:hover h2,
+  a[class*="Button--default"]:hover h3 {
+    color: var(--wx-link-hover) !important;
+  }
   /* weather.com's solid brand CTAs ("See Details", ...) are `bg-brand-400`/`-300`
      (#0d142a / #204794 -- dark navies we deliberately leave alone) labelled with
      `text-primary-foreground`, i.e. near-white. The `a` rule above repainted that
@@ -720,6 +776,25 @@
   .bg-brand-400 {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
+  }
+  /* The Today "Next 10 Days" CTA is an `<a data-testid="next-48-hours">` -- the SAME
+     testid the surrounding card carries, so the card rule above (0,1,0) painted the
+     button --wx-surface and the plate vanished into the card it sits on: the CTA read
+     as bare text. Restating the brand fills here (later in the file wins the 0,1,0 tie)
+     keeps the site's own navy plate wherever a bg-brand utility lands. The arbitrary
+     hover/active values are the button's own, matched verbatim so the press states
+     survive the restatement. */
+  .bg-brand-400 {
+    background-color: #0d142a !important;
+  }
+  .bg-brand-300 {
+    background-color: #204794 !important;
+  }
+  [class*="hover:bg-[#252C3F]"]:hover {
+    background-color: #252c3f !important;
+  }
+  [class*="active:bg-[#0C1226]"]:active {
+    background-color: #0c1226 !important;
   }
   /* `text-brand-dark` / `text-brand-400` resolve to #0d142a -- the design system's
      ink colour, not an accent. It currently only lands on <button>s (which take
@@ -1084,6 +1159,23 @@
   [class*="Footer--container"] p a {
     color: var(--wx-link) !important;
   }
+  /* the footer's sibling-brand lockup is four <img> tiles. Two of them are
+     transparent-background artwork drawn for the site's WHITE page: The Weather
+     Company is a #00279E navy wordmark (~1.7:1 on our chrome) and Weather
+     Underground bakes its "WEATHER UNDERGROUND" tagline in as #1C1F22. Nothing
+     in CSS reaches inside an <img>, and no bucket sees it (it is a raster/vector
+     FILE, not a colour). Put the white page back BEHIND them -- same trick as the
+     header wordmark above -- so the brand colours stay exact. The Weather Channel
+     tile ships its own blue plate and Storm Radar its own dark rounded square, so
+     both are left alone (a plate would show through the latter's cut corners).
+     One src match covers both frontends: the SPA serves
+     `/_next/static/media/the-weather-company.<hash>.svg`, legacy Daybreak
+     `/monthly/assets/the-weather-company.resource.<hash>.svg`. */
+  img[src*="the-weather-company"],
+  img[src*="weather-underground"] {
+    background-color: #ffffff !important;
+    border-radius: 4px !important;
+  }
 
   /* ---- Taboola "More from weather.com" recommendation strip ------------- */
   /* The Taboola widget (trc_*) renders white cards with hardcoded near-black
@@ -1335,6 +1427,16 @@
   [class*="TabList--tabSelected"] {
     border-bottom-color: var(--wx-text) !important;
   }
+  /* Map Options radio groups (Map Style, Main map layer, radar speed): the
+     visual control IS the appearance:none <input>, and its selected dot is an
+     `::after` filled with the Helios ink #252422. On the site's white ring that
+     dot is the ONLY per-row selected marker; our darkened ring left it
+     near-black on near-black, so checked and unchecked rows rendered identically.
+     Element-bg and chroma scans both pass -- a pseudo-element on a 20px control,
+     achromatic either way. */
+  [class*="Radio--inputClass"]:checked::after {
+    background-color: var(--wx-text) !important;
+  }
   /* with the range input transparent again, the radar scrubber's real track is
      visible -- and it is `background: var(--PureWhite)`, a bright 264x14 pill on
      the dark panel. Remap the Helios token ON the track (variable resolution is
@@ -1374,6 +1476,20 @@
   [class*="ExtendedFluForecast--controlContainer"] svg path[fill="#2b2b2b"] {
     fill: var(--wx-text-2) !important;
   }
+  /* the "New York CDC Flu Report" bar chart on the same page is a D3 SVG whose
+     High/Med/Low gridlines and y-axis ticks are `<line stroke="currentColor">` inside
+     `g.grid`/`g.axis--y` -> `g.tick`, resolved to #ececec. At 1px on the site's white
+     card that lattice is all but invisible; on our dark card it is the brightest thing
+     in the widget and out-shouts the blue case bars. The colour never appears as an
+     attribute value (it comes from a rule we cannot read), so the `svg line[stroke=...]`
+     attribute selectors at the bottom of this file can't reach it. Match the ticks by
+     their chart's stable module prefix and drop them to the component border, which is
+     as subtle against dark as #ececec was against white. Only chrome lives in `g.tick`
+     -- the case bars are separate <rect>s and keep their data blue. */
+  [class*="FluCDCReport--chart"] g.tick line {
+    stroke: var(--wx-border-2) !important;
+  }
+
   /* the "Very Low ... Very High" legend floats over the choropleth map in a
      WHITE box; it inherits the card's lifted light text from our Card--card
      rule, so its two labels rendered light-on-white (~1.7:1) and vanished.
@@ -1401,6 +1517,32 @@
   [class*="AllergyLineChart"] stop {
     stop-color: var(--wx-surface-2) !important;
     stop-opacity: 1 !important;
+  }
+
+  /* the article Share popover draws its pointer notch as two stacked
+     `<svg class="fill-white">` polygons (a shadow layer under a fill layer)
+     rather than a bordered CSS triangle, so the blanket border reset never
+     touches it and the popover body's own dark fill never reaches it: a bright
+     white arrowhead hung off the bottom edge of an otherwise dark panel. The
+     notch must match the popover surface, so scope it to the popover -- a global
+     `fill-white` remap would blacken the play/overlay glyphs the site paints
+     white on top of photo thumbnails. */
+  [data-testid="share-popover-content"] svg[class*="fill-white"],
+  [data-testid="share-popover-content"] svg[class*="fill-white"] polygon,
+  [data-testid="share-popover-content"] svg[class*="fill-white"] path {
+    fill: var(--wx-surface) !important;
+  }
+
+  /* syndicated articles credit the partner with `<img class="partner-logo">`
+     under "In partnership with" -- e.g. the SURFER wordmark, black linework on a
+     transparent PNG, correct on the site's white page and invisible on our card.
+     No selector reaches inside an <img> and no bucket sees it (it is artwork, not
+     a colour), and it only exists on partner articles, so page-type sampling
+     misses it too. Invert to flip the ink light; the hue-rotate returns any
+     coloured partner mark (Healthline, Outside) to roughly its own hue, and the
+     transparent background stays transparent because filters leave alpha alone. */
+  img.partner-logo {
+    filter: invert(1) hue-rotate(180deg) !important;
   }
 
   /* The "DeeperDive" AI-overview widget injected into news articles (#dd-widget)
@@ -1565,6 +1707,20 @@
   /* white track / grid / plot chrome is darkened while the COLORED data    */
   /* arcs / bars / series are preserved verbatim.                           */
   /* ====================================================================== */
+
+  /* (0) the Today's Outlook "Precipitation Intensity Chart" is a <canvas>, so no
+     selector reaches its pixels: each of the ~30 hour columns is drawn as a full-height
+     #eeeeee TRACK with the actual precipitation painted as a coloured tip at its base.
+     On the site's white card those tracks are invisible; on our dark card the strip
+     rendered as a wall of glaring near-white bars with two small green tips. A canvas
+     is unreachable by fill/background rules, but it IS filterable: invert + a 180deg
+     hue rotation maps the #eeeeee track to a near-black one and the #676767 axis to a
+     legible grey, while returning every saturated data colour to (very near) itself --
+     the precip green stays green and the heavier blues stay blue. The chart carries a
+     stable `aria-label`, so nothing else on the page is filtered. */
+  [aria-label="Precipitation Intensity Chart"] canvas {
+    filter: invert(1) hue-rotate(180deg);
+  }
 
   /* (1) the semicircle wind/pressure gauge: track arc is a light #E7ECF1
      stroke. Darken the track; the colored value arc keeps its own stroke. */

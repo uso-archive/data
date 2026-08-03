@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Substack (the hub, discovery, and every publication and post) while keeping each newsletter's own accent color intact.
-@version      20260730.14.17
+@version      20260803.00.40
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -61,6 +61,29 @@
     --color-fg-tertiary-themed: #8b949e !important;
     --print_on_web_bg_color: #e6edf3 !important;
     --print_secondary_on_web_bg_color: #8b949e !important;
+
+    /* --- Semantic INK (mentions, link previews, status/paid/live labels) ---
+       Every `--color-semantic-*-fg-primary` keeps its light-scheme value here, and
+       these are text colors: the mention blue #0083d5 measures 4.42:1 on the #14181d
+       canvas (AA fail). Each value below is the site's OWN dark-scheme ink
+       (--color-dark-semantic-*-fg-primary), so the semantics stay the site's.
+       The matching -bg-primary* fills are untouched — they carry white ink and are
+       identical in both schemes. Both the alias and the --color-light-* source are
+       set: some rules reference the light token by name. */
+    --color-semantic-highlight-fg-primary: rgb(24, 160, 251) !important;
+    --color-light-semantic-highlight-fg-primary: rgb(24, 160, 251) !important;
+    --color-semantic-select-fg-primary: rgb(0, 118, 255) !important;
+    --color-light-semantic-select-fg-primary: rgb(0, 118, 255) !important;
+    --color-semantic-error-fg-primary: rgb(255, 119, 114) !important;
+    --color-light-semantic-error-fg-primary: rgb(255, 119, 114) !important;
+    --color-semantic-success-fg-primary: rgb(82, 221, 152) !important;
+    --color-light-semantic-success-fg-primary: rgb(82, 221, 152) !important;
+    --color-semantic-warn-fg-primary: rgb(255, 223, 65) !important;
+    --color-light-semantic-warn-fg-primary: rgb(255, 223, 65) !important;
+    --color-semantic-paid-fg-primary: rgb(155, 125, 255) !important;
+    --color-light-semantic-paid-fg-primary: rgb(155, 125, 255) !important;
+    --color-semantic-substack-fg-primary: rgb(255, 133, 61) !important;
+    --color-light-semantic-substack-fg-primary: rgb(255, 133, 61) !important;
 
     /* --- Borders / hairlines --- */
     --color-utility-detail: rgba(255, 255, 255, 0.1) !important;
@@ -199,19 +222,29 @@
 
   /* --- Inputs / textareas ---
      Subscribe email inputs carry the publication's accent border (part of the
-     accent-preservation feature), so the neutral border override skips them. --- */
-  input,
+     accent-preservation feature), so the neutral border override skips them.
+     `emailInputOnAccentBackground` sits inside the "Ready for more?" band that
+     the pub's accent already paints, and takes that accent as its own fill with
+     white ink + a white hairline; filling it dark drops a navy box into the
+     accent band, so it keeps the site's fill, ink AND placeholder. --- */
+  input:not([class*="emailInputOnAccentBackground"]),
   textarea,
   select {
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
   }
-  input:not([class*="emailInput"]):not([class*="email-input"]),
-  textarea,
-  select {
+  /* The `:not(:focus)` guard is load-bearing: Pencraft paints the focus ring as
+     `border: var(--border-focus)` (the pub accent inside a pub scope, the select
+     blue in the app shell). A blanket `border-color` override outranks it and
+     leaves only a 20%-alpha glow as the focus cue. Skipping the focused state
+     hands the border back to the site rather than restating it — elements the
+     site leaves border-less on focus (the comment textarea) stay border-less. */
+  input:not([class*="emailInput"]):not([class*="email-input"]):not(:focus),
+  textarea:not(:focus),
+  select:not(:focus) {
     border-color: #2d333b !important;
   }
-  input::placeholder,
+  input:not([class*="emailInputOnAccentBackground"])::placeholder,
   textarea::placeholder {
     color: #8b949e !important;
   }
@@ -237,6 +270,16 @@
     color: #e6edf3 !important;
   }
 
+  /* --- Archive month dividers ---
+     The grouped-archive month header takes the pub accent as INK. Accent-as-ink
+     is kept everywhere it carries brand meaning (links, CTAs), but this is an
+     11px uppercase date label that fails AA even on a bright accent (4.46:1 on
+     #ea410b) and is unreadable on a dark one (1.11:1 on #1e1b4b). It shares the
+     `meta-` family with the byline dates below it, so it takes their muted grey. --- */
+  [class*="monthHeader"] {
+    color: #8b949e !important;
+  }
+
   /* --- Sticky publication nav spacer (inline-styled hardcoded white block
      reserving the header's layout height) --- */
   .main-menu > div {
@@ -248,6 +291,15 @@
      white). Darken the pill to an elevated surface. --- */
   .homepage-nav [class*="bg-white"] {
     background-color: #262c33 !important;
+  }
+
+  /* --- www marketing mobile nav toggle. The lucide burger ships a hardcoded
+     stroke="#3a261c" presentation attribute (the same brown as the footer
+     headings), which on the dark bar measures ~1.4:1. Its <line> children carry
+     no stroke of their own and inherit this one. --- */
+  .homepage-nav .burger-icon,
+  .homepage-nav .burger-icon * {
+    stroke: #e6edf3 !important;
   }
 
   /* --- www marketing mobile slide-in menu (hardcoded white drawer; its links

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A full dark theme for Thingiverse: browse the feed, model pages, search and profiles in comfortable dark while 3D model previews stay true to color.
-@version      20260730.14.17
+@version      20260803.00.40
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -290,6 +290,12 @@
   [class*="Flag__warn"] { background-color: #ff9800 !important; }
   [class*="Flag__default"] { background-color: #525b75 !important; }
   [class*="Flag__flagIconWrapper"] { background-color: #ffffff !important; }
+  /* `GradientFlag` is a SECOND flag family whose class names contain `Flag__…`, so the
+     rules above also match it — but it inverts the icon disc: its wrapper is a translucent
+     BLACK scrim (rgba(0,0,0,.2)) under a WHITE glyph, not a white disc under a coloured
+     one. The `#ffffff` above therefore painted a white glyph on a white disc. Restore the
+     native scrim (the variant fills above are correct for it and stay). */
+  [class*="GradientFlag__flagIconWrapper"] { background-color: rgba(0, 0, 0, 0.2) !important; }
 
   /* Collection cards (profile > Collections, /<user>/collections) carry their
      whole identity in colour: the site paints the card panel MakerBot-indigo
@@ -372,7 +378,14 @@
      both single-class fills the neutralizer flattens, so the confirmation lost
      its positive colour and the disc vanished. */
   [class*="CheckInboxView__linkSentBanner"] { background-color: #122a25 !important; }
-  [class*="CheckInboxView__iconCircle"] { background-color: #1e2750 !important; }
+  /* The disc also INKS the glyph inside it, hardcoded to the raw brand blue #2b52fe that
+     was drawn for the native #eaeeff disc — on the dark disc that is 2.6:1. Lift the glyph
+     with the surface. */
+  [class*="CheckInboxView__iconCircle"] {
+    background-color: #1e2750 !important; color: #9bd4ff !important; }
+  /* The step's heading is a <span>, not a heading element, so the h1-h6 rule never reaches
+     it: it keeps the site's dark-navy #12226b and reads 1.1:1 on the dark auth card. */
+  [class*="CheckInboxView__title--"] { color: #e6edf3 !important; }
 
   /* Thing-page status banners (Banner__banner): the site paints these as a
      SOLID status bar — the WIP banner ("Hey! This Thing is still a Work in
@@ -565,6 +578,16 @@
   [class*="Dropdown"], [class*="dropdown"], [class*="Menu"], [class*="menu"],
   [class*="Popover"], [class*="popover"], [class*="Tooltip"], [role="menu"], [role="listbox"] {
     background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
+  /* The header search panel and the mobile dropdowns each lay a full-viewport scrim
+     (position:fixed, 100vw x 100vh) UNDER themselves, and its class name carries the
+     `Menu`/`Dropdown` substring — so the surface rule above painted the scrim SOLID
+     #1c2128 and typing in the search box blanked the entire page behind the suggestions.
+     Put back a translucent dim (native is rgba(0,14,26,.25), deepened here so it still
+     reads as a dim over an already-dark page). Must stay AFTER the rule above. */
+  [class*="MenuOverlay"], [class*="menuOverlay"],
+  [class*="DropdownOverlay"], [class*="dropdownOverlay"] {
+    background-color: rgba(0, 14, 26, 0.55) !important; }
+
   [role="menuitem"], [role="option"], [class*="MenuItem"], [class*="menuItem"] {
     color: #e6edf3 !important; background-color: transparent !important; }
   [role="menuitem"]:hover, [role="option"]:hover,
@@ -601,6 +624,30 @@
   .tv-tooltip-arrow, [class*="tv-tooltip-arrow"], [class*="userTooltipArrow"] {
     border-color: transparent transparent #1c2128 transparent !important; }
 
+  /* react-toastify toasts (link copied, saved, errors). The `--toastify-color-light`
+     retone above turns the default LIGHT toast into a dark panel, but the close button
+     keeps react-toastify's own `color: #000` at opacity .3 — a black glyph on the dark
+     panel, invisible. Lift it to the panel's ink so the .3 still reads as a muted grey. */
+  .Toastify__close-button--light { color: #e6edf3 !important; }
+
+  /* "Opening in Cura" modal (thing page > Files > Open in Cura). It renders in a
+     ReactModal PORTAL outside #react-app, so the neutralizer never reaches it and
+     its hardcoded near-black #000e1a paints as-is: the connector rule between the
+     two illustrations, the arrow head after it, and the loading spinner between
+     them all sit at ~1.3:1 on the dark modal, so the whole "site -> Cura" hand-off
+     graphic reads as an empty gap. */
+  [class*="OpenSlicerModal__openSlicerModalLine"] { background-color: #8b949e !important; }
+  [class*="OpenSlicerModal__openSlicerModalArrow"] { color: #c4cdd6 !important; }
+  /* Spinner variants are a hardcoded ink each. `black` (#000e1a) and `grayDark`
+     (#525b75) were drawn for the white page; both are near-invisible on ours.
+     `white`/`default`/`primary` already read on dark and are left alone. */
+  [class*="Spinner__black"], [class*="Spinner__grayDark"] { color: #c4cdd6 !important; }
+
+  /* Magic-link "check your inbox" step: the Resend button is a text button inked
+     with the raw brand blue #2b52fe, drawn for the white auth card — 2:1 on the
+     dark one. Same trap as its `iconCircle` sibling above. */
+  [class*="CheckInboxView__resendButton"] { color: #9bd4ff !important; }
+
   /* ====================================================================
      NO blanket `* { border-color }` reset here. The site drives every border
      through the `--tv-border-*` tokens retoned above, so a blanket reset buys
@@ -619,11 +666,28 @@
      dark, so that hairline glares — mute it to the standard divider tone. */
   [class*="pageHeaderMobileMenu"] [class*="mobileSubSection"] { border-top-color: #2d333b !important; }
 
-  /* Gallery thumbnail rail: the site hardcodes a light scrollbar track here,
-     scoped tightly enough to beat our global scrollbar rule. */
-  [class*="carouselThumbnailsWrapper"] ::-webkit-scrollbar-track { background: #14181d !important; }
-  [class*="carouselThumbnailsWrapper"] ::-webkit-scrollbar-thumb { background-color: #2d333b !important; }
-  [class*="carouselThumbnailsWrapper"] * { scrollbar-color: #2d333b #14181d !important; }
+  /* Four widgets hardcode the SAME light scrollbar pair (#c9ccd4 track under a
+     #525b75 thumb), each scoped tightly enough to beat our global scrollbar rule:
+     the gallery thumbnail rail, the search Filters modal's scrolling body (open
+     Filters > expand Categories), the comment textarea and the AddFeatures list.
+     `scrollbar-color` matters as much as the `::-webkit-` pair — Chromium draws
+     an overlay thumb with no track, but Firefox (the Stylus target) paints the
+     full #c9ccd4 track as a bright strip down the panel edge. */
+  [class*="carouselThumbnailsWrapper"] ::-webkit-scrollbar-track,
+  [class*="SearchFilterModal__modalContentWrapper"] ::-webkit-scrollbar-track,
+  [class*="autosizeTextareaWrapper"] ::-webkit-scrollbar-track,
+  [class*="AddFeaturesModal__itemsListContainer"] ::-webkit-scrollbar-track {
+    background: #14181d !important; }
+  [class*="carouselThumbnailsWrapper"] ::-webkit-scrollbar-thumb,
+  [class*="SearchFilterModal__modalContentWrapper"] ::-webkit-scrollbar-thumb,
+  [class*="autosizeTextareaWrapper"] ::-webkit-scrollbar-thumb,
+  [class*="AddFeaturesModal__itemsListContainer"] ::-webkit-scrollbar-thumb {
+    background-color: #2d333b !important; }
+  [class*="carouselThumbnailsWrapper"] *,
+  [class*="SearchFilterModal__modalContentWrapper"] *,
+  [class*="autosizeTextareaWrapper"] *,
+  [class*="AddFeaturesModal__itemsListContainer"] * {
+    scrollbar-color: #2d333b #14181d !important; }
 
   /* ====================================================================
      Image / thumbnail loading skeletons: light-grey -> dark, so empty
@@ -658,6 +722,78 @@
   footer, [class*="Footer"], [class*="footer"] {
     background-color: #0d1117 !important; border-color: #2d333b !important; color: #c4cdd6 !important; }
   footer a, [class*="Footer"] a, [class*="footer"] a { color: #9bd4ff !important; }
+
+  /* ====================================================================
+     Legacy (non-React) pages — /challenges, /challenges/<slug>, /apps and
+     the legacy 404. These are still served by the OLD Thingiverse stack:
+     no `#react-app`, a `.page-container` shell, and the
+     `build/{basic,main,challenges,apps}.css` stylesheets. Nothing above
+     reaches them (every rule keys off `#react-app` or a hashed React class),
+     so they shipped in the site's original LIGHT design — white
+     `.content-box`/`.item`/`.app-card` panels — and our page-wide light ink
+     lands on white, so the challenge copy and app titles wash out entirely.
+     Retone the legacy palette (#fff surfaces, #ececec/#e7e7e7/#cbcbcb
+     hairlines, #666/#333 ink, #ececec/#e4e4e4/#ddd fills) here.
+
+     Every selector is scoped to `.page-container`, which exists ONLY on
+     these pages, so the deliberately generic legacy class names (`.item`,
+     `.icon`, `.modal`, `.more`) can never leak into the React UI. The
+     shared header/footer/`tv-button` chrome is already handled above and
+     renders correctly on these pages as-is.
+     ==================================================================== */
+  .page-container { background-color: #14181d !important; }
+  .page-container .content-box, .page-container .item, .page-container .app-card,
+  .page-container .challenge-header, .page-container .item-interactions,
+  .page-container .interaction-title, .page-container .avatar-wrapper,
+  .page-container .tab-nav, .page-container .tab-nav a, .page-container .dropdown-menu,
+  .page-container .category-card, .page-container .group-mini, .page-container .user-info,
+  .page-container .user-stats, .page-container .search-form, .page-container .comment-card,
+  .page-container .modal-content, .page-container .gallery-main,
+  .page-container .share-buttons, .page-container .screen {
+    background-color: #1c2128 !important; }
+  .page-container .content-box, .page-container .item, .page-container .item-interactions,
+  .page-container .challenge-header, .page-container .challenge-desc,
+  .page-container .interaction, .page-container .avatar-wrapper, .page-container .section-nav,
+  .page-container .tab-nav, .page-container .tab-nav a, .page-container .dropdown-menu,
+  .page-container .category-card, .page-container .group-mini, .page-container .thing-mini,
+  .page-container .search-form, .page-container .pagination-view-more,
+  .page-container .to-top, .page-container .button-icon, .page-container .table-list,
+  .page-container .challenge-prizes > div, .page-container .content-separator,
+  .page-container hr { border-color: #2d333b !important; }
+  /* #ececec / #e4e4e4 / #ddd fills: row hovers, dividers and empty-slot tiles */
+  .page-container .table-list-item:hover, .page-container .pagination-link:hover,
+  .page-container .pagination-view-more:hover, .page-container .category-card:hover,
+  .page-container .dropdown-option:hover, .page-container .card-footer,
+  .page-container .inline-upload, .page-container .template-micro,
+  .page-container .attachment-assets, .page-container .add_item,
+  .page-container .add_item-instructions { background-color: #21262d !important; }
+  /* the legacy #666 / #333 inks */
+  .page-container .content-box, .page-container .content-box h1, .page-container .more,
+  .page-container .copyright, .page-container .pagination-link,
+  .page-container .pagination-view-more, .page-container .plain-nav,
+  .page-container .plain-nav a, .page-container .plain-link, .page-container .read_more,
+  .page-container .table-list, .page-container .table-list-header,
+  .page-container .table-list-item, .page-container .icon, .page-container .modal,
+  .page-container .text-card, .page-container .user-fullname, .page-container .user-about,
+  .page-container .card-footer, .page-container .basic-page h1,
+  .page-container .basic-page h3, .page-container .basic-page h4,
+  .page-container section h1, .page-container .app-info, .page-container .select-menu,
+  .page-container .item-name, .page-container .inline-upload p {
+    color: #c4cdd6 !important; }
+  /* `.white-button` is a white slab (APP INFO / LAUNCH APP) floating on the app
+     card's dark cover — keep it a raised, clearly-clickable control, just dark.
+     It has no border natively, so give it one or it melts into that cover. */
+  .page-container .white-button {
+    background-color: #21262d !important; border: 1px solid #3a424c !important;
+    color: #e6edf3 !important; }
+  /* The legacy footer paints a light #f5f5f5 -> #e8e8e8 GRADIENT, so the dark
+     background-COLOR the footer rule above sets never shows through it. Its
+     wordmark is `thingiverse_logo.svg` loaded through an `<img>`, whose paths are
+     `fill="currentColor"` — an <img> SVG is its own document, so that resolves to
+     the SVG's default BLACK and no host-page rule can reach it. Once the bar is
+     dark the wordmark disappears, so invert the raster instead. */
+  .page-container .site-footer { background-image: none !important; }
+  .page-container .site-footer .site-logo img { filter: invert(1) !important; }
 
   /* ====================================================================
      Scrollbars + selection

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Pikabu.
-@version      20260730.14.16
+@version      20260803.00.38
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -166,6 +166,27 @@
     --reaction-popover-click: #39414b;
     --reaction-popover-active: #39414b;
     --reaction-donat-default: #2a2318;
+    /* The reaction PICKER (.emotions-modal, opened from the "+" smiley beside a post's
+       reaction row) marks recently-added reactions with .emotions-modal__btn_new, whose
+       whole tile is painted from this pale-green family — eight #eaffd9 tiles glaring
+       through the dark picker. The picker is portaled in on click, so no load-time scan
+       sees it. Pikabu's own dark theme gives the family a dark-green equivalent that
+       keeps the "new" signal; use it. The donate tile's hover/press are the same story. */
+    --reaction-popover-newDefault: #1d2615;
+    --reaction-popover-newHover: #26331c;
+    --reaction-popover-newClick: #47662e;
+    --reaction-popover-newStroke: #3a4d2a;
+    --reaction-donat-hover: #352c1e;
+    --reaction-donat-click: #2e2b1f;
+
+    /* "Продвинуть" (promote) button on your own post: a pale-green #f4ffeb pill with a
+       pale-green ring. Same dark-green family as above; the label goes to the theme's
+       brand green, which carries it at 5.1:1 (Pikabu's own #78b247 lands at 3.7:1). */
+    --story-btn-promote-default: #3a4d2a;
+    --story-btn-promote-hover: #47662e;
+    --story-btn-promote-click: #598039;
+    --story-btn-promote-stroke: #598039;
+    --story-btn-promote-content: var(--pk-green);
 
     /* Truncation fade for LONG COMMENTS (.comment__show-all::before) and a community's
        collapsed description (.community-info-block__read-more::before). All three fades
@@ -333,6 +354,16 @@
     --c-btn-negativeText-bgHover: #2e1c1a;
     --c-btn-negativeText-bgClick: #3d211d;
 
+    /* The DANGER button (.pkb-normal-btn_negative-outline — destructive actions such as
+       "Удалить") carries its whole identity in one token: it fills transparent and takes
+       both its ring AND its label from --c-btn-negativeOutline-textStroke*. Pikabu's
+       #cc4235 measures 3.4:1 on the elevated surface, under the WCAG floor; lift the
+       family to the theme's danger red. (The ring also needs a selector rule further
+       down — the blanket border reset outranks a :root remap.) */
+    --c-btn-negativeOutline-textStrokeDefault: #ef6a5d;
+    --c-btn-negativeOutline-textStrokeHover: #f4837a;
+    --c-btn-negativeOutline-textStrokeClick: #d9483b;
+
     /* Remaining light control fills: tag press state, tertiary icon-button press,
        split-button neutral half, and the disabled small icon button. */
     --c-tag-bgClick: var(--pk-border);
@@ -424,6 +455,30 @@
        the green amount labels are preserved. */
     --color-donate-bg: var(--pk-border);
 
+    /* ---- Mid-tone tokens that lose contrast on dark ----
+       The "pale token / near-black token" sweep only flags values whose channels are all
+       >200 or all <95, so a MID grey or a saturated mid red slips through it while still
+       failing WCAG once the surface goes dark. Each token below is Pikabu's light-theme
+       value measured against --pk-surface, with its own dark-theme value as the fix. */
+
+    /* #757880 = 3.66:1. Feeds the reaction-picker "+" smiley on every post and comment,
+       the section/profile/community info icons, .pkb-icon-btn and the sidebar footer
+       link column. Pikabu's dark theme lifts each of these itself. */
+    --s-icon-primary: #b6b8bf;
+    --c-btnIcon-primary-textIcon: #909299;
+    --c-btnIcon-tertiary-textIcon: #b6b8bf;
+    --sidebar-link-default: #909299;
+    --sidebar-link-click: #aaacb2;
+    --tabbar-contentDefault: #aaacb2;
+
+    /* #e13d27 = 3.78:1 across 38 consumers — the NSFW tag, form/comment errors, the
+       profile minus counter, ban icons and the community rules header. */
+    --color-danger-900: #f75c48;
+
+    /* Sole consumer is `.carousel__scroll svg { stroke: … }`, the games-carousel arrow;
+       its #212121 stroke sat on a disc we darken to --pk-surface, i.e. no arrow at all. */
+    --color-contrast-bg: var(--pk-text);
+
     /* ---- Subtle shadows: soften so they don't glow on dark ---- */
     --shadow-low: 0 1px 12px rgba(0, 0, 0, 0.4);
     --s-shadow-mainStroke: rgba(255, 255, 255, 0.06);
@@ -454,6 +509,16 @@
   .header-menu a { color: var(--pk-text-soft) !important; }
   .header a:hover,
   .menu__link:hover { color: var(--pk-text) !important; }
+  /* The three round header buttons (search / add / notifications) are brand-green discs
+     whose glyph paints from --c-btn-primary-textIcon, which we flip dark to read on
+     green. Two of them are <a>, so the `.header a` label rule above repainted the glyph
+     --pk-text-soft — a pale grey icon on bright green, ~1.1:1, while the search one (a
+     <div>, unmatched) stayed correct. Restate the dark glyph for the anchors. */
+  .header a.header-right-menu__add,
+  .header a.header-right-menu__notification,
+  .header a.header-right-menu__search {
+    color: var(--pk-bg) !important;
+  }
   .header-dropdown,
   .header-menu__dropdown,
   .menu-popup,
@@ -1089,8 +1154,16 @@
 
   /* Fundraising "support" icon button on a post, and the profile "goal of the day" card
      (the sibling of .daily-goal-badge above, which was fixed while this one was not). */
-  .pkb-donation-btn { background-color: #1d2615 !important; }
-  .pkb-donation-btn:hover { background-color: #26331c !important; }
+  /* The ring is restated because the blanket border reset flattens it — the button is a
+     24px circle whose green outline plus green heart ARE the whole "support" affordance. */
+  .pkb-donation-btn {
+    background-color: #1d2615 !important;
+    border-color: var(--pk-green-deep) !important;
+  }
+  .pkb-donation-btn:hover {
+    background-color: #26331c !important;
+    border-color: var(--pk-green) !important;
+  }
   .gamification-daily-goal { background-color: #3a4d2a !important; }
   /* mobile header gamification pill */
   .mini-gamification-profile { background-color: #261306 !important; }
@@ -1155,6 +1228,89 @@
      the CONTAINER only; the artwork is untouched. */
   .sidebar__community-info img,
   .profile__promocode img { background-color: var(--pk-surface-2) !important; }
+
+  /* Both green-tinted tiles above take their ring from a token, and the universal
+     `* { border-color }` reset outranks a :root remap — so the tint would land while the
+     ring stayed grey. Restate the ring from the same token. */
+  .emotions-modal__btn_new { border-color: var(--reaction-popover-newStroke) !important; }
+  .story__btn-promote { border-color: var(--story-btn-promote-stroke) !important; }
+  .emotions-modal__alert { border-color: var(--c-alert-accentStroke) !important; }
+
+  /* ===== Rings that ENCODE STATE, flattened by the universal border reset =====
+     `* { border-color }` above is !important at specificity (0,0,0): it loses to any
+     class/attribute selector but beats every token remap. Pikabu writes `!important`
+     on exactly two ring rules — the LEGACY `.input:focus` and `.input_error` — so the
+     legacy login/registration forms keep their green focus and red error rings unaided,
+     and every modern ui-kit control needs its ring restated here.
+
+     Focus / open ring on the ui-kit fields: the header search field, the search-filter
+     tag/author/community comboboxes, the sort Select and the date-range inputs. Without
+     it a focused field is pixel-identical to an idle one. */
+  [class*="Input__host"]:focus-within,
+  [class*="Textarea__host"]:focus-within,
+  [class*="ComboBox__host_focused"],
+  [class*="Select__host_open"] { border-color: var(--pk-green-deep) !important; }
+
+  /* Invalid field: this ring is the ONLY error signal the component draws, so flattening
+     it leaves a rejected form with no visible reason. */
+  [class*="Input__host_error"],
+  [class*="Textarea__host_error"],
+  [class*="ComboBox__host_error"] { border-color: #e5594c !important; }
+
+  /* Destructive button — see the --c-btn-negativeOutline-* remap above. */
+  .pkb-normal-btn_negative-outline { border-color: var(--c-btn-negativeOutline-textStrokeDefault) !important; }
+  .pkb-normal-btn_negative-outline:hover { border-color: var(--c-btn-negativeOutline-textStrokeHover) !important; }
+  .pkb-normal-btn_negative-outline:active { border-color: var(--c-btn-negativeOutline-textStrokeClick) !important; }
+
+  /* "Current theme" swatch in Pikabu's own theme picker. The ring is the swatch's ONLY
+     selected marker (the tick inside it is opacity-driven), so a grey ring leaves the
+     row with no indication of which theme is active. */
+  .theme-picker__button_current { border-color: var(--pk-green) !important; }
+
+  /* Green-variant tooltip card: the ring is what makes it read as the "positive" variant
+     rather than the neutral one. */
+  [class*="pkb-tooltip-base__host_green"] [class*="pkb-tooltip-base__card"] { border-color: var(--pk-green-deep) !important; }
+
+  /* "Пикабу в цифрах" stat cards on /about. Pikabu paints each card a literal #fff and
+     its number + caption a literal #212121. Our generic `.block` surface rule darkens
+     the card but cannot reach the two literal text colours, so all five cards render
+     blank — a lost fix half, not an unthemed surface, which is why a light-surface scan
+     stays green while nothing is readable. */
+  .content__numbers .block h3 { color: var(--pk-text) !important; }
+  .content__numbers .block p { color: var(--pk-text-soft) !important; }
+
+  /* Support-request widget on /information/help-request (a Usedesk form mounted straight
+     into the page, not an iframe). Its panel, bot bubble, <select>, <textarea> and footer
+     are literal light surfaces carrying near-black text, so the form shipped as a white
+     card with two dark inputs punched into it.
+     Every selector here MUST carry the #usedesk-widget prefix: the widget scopes its own
+     rules to that mount id, so a plain `.uw__field-textarea` — or even
+     `textarea.uw__field-textarea` — loses the !important tie on specificity and paints
+     nothing. Key off the `uw__` classes rather than the `sc-dhKdcB` hashes beside them;
+     those are styled-components names and rotate on every build. The green header,
+     avatar and submit button are the widget's brand and stay. */
+  #usedesk-widget .uw__widget-layout__content { background-color: var(--pk-bg) !important; }
+  #usedesk-widget .uw__chat-message-content { background-color: var(--pk-surface) !important; }
+  #usedesk-widget .uw__chat-message-content,
+  #usedesk-widget .uw__chat-message__text { color: var(--pk-text-soft) !important; }
+  #usedesk-widget .uw__chat-message__date { color: var(--pk-text-muted) !important; }
+  #usedesk-widget .uw__field-text,
+  #usedesk-widget .uw__field__select,
+  #usedesk-widget .uw__field-textarea {
+    background-color: var(--pk-surface-2) !important;
+    color: var(--pk-text) !important;
+    border-color: var(--pk-border) !important;
+  }
+  #usedesk-widget .uw__field-text::placeholder,
+  #usedesk-widget .uw__field-textarea::placeholder { color: var(--pk-text-muted) !important; }
+  #usedesk-widget .uw__footer {
+    background-color: var(--pk-surface-2) !important;
+    color: var(--pk-text-muted) !important;
+  }
+  /* The attach-file paperclip is a remote black-linework SVG loaded as a background-image,
+     so darkening the panel under it erases it. Invert it; the header's close glyph is a
+     white inline data-URI on the green bar and must NOT be touched, hence the scope. */
+  #usedesk-widget .uw__file-loader .uw__icon { filter: invert(1) brightness(0.85) !important; }
 
   /* Labels sitting on the dark-tuned semantic tints above: Pikabu's saturated mid-tones
      fall under the WCAG floor on them, so lift the red and blue ones. (The green and

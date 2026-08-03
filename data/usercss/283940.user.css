@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Stack Overflow and the whole Stack Exchange network: easy-on-the-eyes questions, answers, code blocks, comments and sidebar.
-@version      20260730.14.17
+@version      20260803.00.39
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -80,6 +80,17 @@
     background-color: #14181d !important;
   }
 
+  /* Stacks paints every custom scrollbar THUMB (code blocks, textareas, the modal
+     dialog, the site-switcher pane, every `.overflow-*` utility) from one token,
+     `--scrollbar: hsla(0,0%,0%,.2)` — 20% BLACK, which on the darkened surfaces
+     is indistinguishable from the track: a wide code block gives no hint that it
+     scrolls. The token feeds nothing but `::-webkit-scrollbar-thumb`, so flipping
+     it to a translucent light is safe. Declared on `body`, not `:root`. */
+  body,
+  body.unified-theme {
+    --scrollbar: rgba(255, 255, 255, 0.22) !important;
+  }
+
   /* Generic light-surface neutralizers (broad, then re-elevate
      specific surfaces below). These hit the common Stacks bg
      utility classes that paint white/near-white. */
@@ -92,6 +103,48 @@
   .snippet-hidden,
   .ws-nowrap.bg-white {
     background-color: transparent !important;
+  }
+
+  /* Stacks ships a full set of HOVER utilities — `h:bg-black-100`,
+     `h:fc-black-600`, … — and compiles each one grouped with its static
+     sibling as `.bg-black-100, .h\:bg-black-100:hover, … { … !important }`.
+     The `:hover` arm therefore lands at TWO simple selectors with `!important`,
+     which out-ranks every one-class override in this file: our `.bg-black-*`
+     surface remap and our `.fc-black-*` text lift both apply at rest and are
+     thrown away the moment the pointer arrives. Nothing in a load-time scan
+     can see it, and the elements carrying them live in flyouts (the topbar
+     "Products" panel painted a #d6d9dc card under our grey label, ~1.1:1) and
+     in the left rail (the "Collectives" / "Stack Internal" section links go to
+     var(--black-600) #0c0d0e, pure black on the dark rail).
+     Matched as attribute selectors: the class name contains a colon, and
+     `[class~="…"]` keeps the same 2-selector weight without escaping. Declared
+     HERE, before the component sections, so the specific tag / button /
+     block-link hovers further down still win at equal specificity. */
+  [class~="h:bg-white"]:hover,
+  [class~="h:bg-black-050"]:hover,
+  [class~="h:bg-black-075"]:hover,
+  [class~="h:bg-black-100"]:hover,
+  [class~="h:bg-black-150"]:hover,
+  [class~="h:bg-black-200"]:hover,
+  [class~="h:bg-black-225"]:hover {
+    background-color: #222831 !important;
+  }
+
+  [class~="h:bg-purple-100"]:hover,
+  [class~="h:bg-purple-200"]:hover {
+    background-color: #2b2545 !important;
+  }
+
+  [class~="h:fc-black-500"]:hover,
+  [class~="h:fc-black-600"]:hover,
+  [class~="h:fc-dark"]:hover,
+  [class~="h:fc-medium"]:hover {
+    color: #e6edf3 !important;
+  }
+
+  [class~="h:fc-blue-500"]:hover,
+  [class~="h:fc-blue-600"]:hover {
+    color: #9bd4ff !important;
   }
 
   /* ---- Headings & text -------------------------------------- */
@@ -132,6 +185,37 @@
     color: #9198a1 !important;
   }
 
+  /* The "Skip to main content" link is clipped to 1px until it takes focus,
+     then expands to a full-width 1280x44 bar with SE's white background. Our
+     text lift paints its label #c4cdd6, so the first Tab press on any network
+     page produces a blinding white band with a near-invisible label on it.
+     No load-time DOM scan sees it — the element has no size until focused. */
+  .s-topbar--skip-link,
+  .s-topbar--skip-link:focus,
+  a.s-topbar--skip-link:focus {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
+
+  /* The BLUE end of the Stacks colour scale is as dark as the black scale and
+     was never remapped: `.fc-blue-400` is #1b75d0 (3.4:1 on an elevated card —
+     every chat room-card title and its "More info" link reads at that), and
+     500 upwards are darker still. The `.fc-*` utilities are `!important` in
+     Stacks, so a bare `a { color }` never wins against them — they need their
+     own remap, exactly like `.fc-black-*`. Numbers run DARKER on the light
+     site, so on dark they run brighter. */
+  .fc-blue-400 {
+    color: #5fb0e6 !important;
+  }
+
+  .fc-blue-500,
+  .fc-blue-600,
+  .fc-blue-700,
+  .fc-blue-800,
+  .fc-blue-900 {
+    color: #6fb3e8 !important;
+  }
+
   /* The SELECTED horizontal nav pill (.s-navigation--item.is-selected — the
      "Profile"/"Activity" sub-nav on a user page, and similar sort tabs) is
      filled with SE's theme-primary ORANGE (#e7700d) and natively carries
@@ -142,6 +226,56 @@
   a.s-navigation--item.is-selected,
   .s-navigation--item.is-selected .s-navigation--item-text {
     color: #ffffff !important;
+  }
+
+  /* …but the MUTED variant of the same component never uses the brand orange:
+     `.s-navigation.s-navigation__muted` re-points
+     `--_na-item-selected-bg: var(--black-150)` (#f1f2f3) with a near-black
+     `--_na-item-selected-fc`. That variant is the vertical rail down a user
+     profile (Summary / Answers / Questions / Tags / Badges / Reputation / …),
+     so the white-label rule above rendered WHITE ON A WHITE PILL and the
+     current section was unreadable. The plain `.s-navigation` beside it (the
+     "Profile / Activity" pair, same `.is-selected` class) must keep its orange
+     pill — so scope by the muted variant's own token, not by the class.
+     `--_na-item-selected-bg-hover` is deliberately left alone: Stacks points it
+     at `--_na-item-bg` (`none`), i.e. natively the pill drops on hover and the
+     white label sits on the page — which stays legible on dark. */
+  .s-navigation__muted,
+  .s-navigation.s-navigation__muted {
+    --_na-item-selected-bg: #2d333b !important;
+    --_na-item-selected-fc: #e6edf3 !important;
+  }
+
+  /* HOVER on an unselected `.s-navigation--item` (the top-bar "About / Products /
+     Stack Internal" links, and the same control on a user page's sub-nav). Stacks
+     paints it from `--_na-item-bg-hover: var(--black-150)` — a near-white #e3e6e8
+     pill, and the muted-grey label rule above then reads ~1.9:1 on it. The colour
+     lives ONLY in the component token, so no `.bg-*` utility remap reaches it, and
+     the node is styled only while the pointer is over it, so no load-time scan
+     sees it. `:not(.is-selected)` is load-bearing: Stacks re-points
+     `--_na-item-bg-hover` at the darker brand orange from the `.is-selected`
+     modifier, so an unguarded token override out-!importants that and paints the
+     OPEN item's pill dark grey. */
+  .s-navigation--item:not(.is-selected) {
+    --_na-item-bg-hover: #21262d !important;
+    --_na-item-fc-hover: #e6edf3 !important;
+  }
+
+  /* Inside the top bar the component token is NOT what paints: a separate rule
+     `.s-topbar .s-navigation .s-navigation--item:not(.is-selected):hover` fills
+     from `var(--theme-topbar-item-background-hover, var(--black-200))`, and no
+     network site defines that theme token — so every one of them falls back to
+     the near-white #e3e6e8. Declare the fill directly here; `:not(.is-selected)`
+     leaves the open item's brand-orange pill alone. */
+  .s-topbar .s-navigation .s-navigation--item:not(.is-selected):hover,
+  .s-topbar .s-popover .s-navigation .s-navigation--item:not(.is-selected):hover {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+  }
+
+  .s-navigation--item:not(.is-selected):hover,
+  .s-navigation--item:not(.is-selected):hover .s-navigation--item-text {
+    color: #e6edf3 !important;
   }
 
   /* The user-card display NAME (`.s-user-card--link` — the author link under
@@ -250,6 +384,22 @@
     color: #e6edf3 !important;
   }
 
+  /* The search-syntax popover hangs off the top-bar searchbar, so its body links
+     ("Search help") are matched by the `.s-topbar a` chrome rule above and lose
+     SE's link blue — the only real link in the panel then reads as more hint text.
+     Scope the accent to the hint block: a blanket `.s-topbar .s-popover a` would
+     also repaint the `.s-block-link` menu rows in the other top-bar popovers. And
+     `:not(.s-btn)` spares the filled "Ask a question" CTA sharing this panel's
+     footer row — it needs its white-on-blue label, not the link accent. */
+  .s-topbar .js-search-hints a:not(.s-btn),
+  .s-topbar .js-search-hints a.s-link:not(.s-btn) {
+    color: #5fb0e6 !important;
+  }
+
+  .s-topbar .js-search-hints a:not(.s-btn):hover {
+    color: #9bd4ff !important;
+  }
+
   /* EVERY topbar dropdown trigger (help "?", inbox, achievements, the network
      site-switcher) gets `.is-selected` while its dialog is open, and SE fills
      the selected item with #e3e6e8 — a white pill in our dark topbar carrying
@@ -260,6 +410,33 @@
   .s-topbar--item.is-selected {
     background-color: #21262d !important;
     color: #e6edf3 !important;
+  }
+
+  /* …and the same fill lands on plain HOVER, from the same Stacks rule
+     (`.s-topbar .s-topbar--item:not(.s-topbar--item__unset):hover` sets
+     `--_tb-item-bg: var(--theme-topbar-item-background-hover, var(--black-200))`
+     and no network site defines that theme token). Only the OPEN state was
+     covered above, so merely passing the pointer over the help "?" / inbox /
+     achievements / site-switcher icon painted a #e3e6e8 pill under our
+     #c4cdd6 glyph — about 1.2:1, the glyph disappears under the cursor.
+     `:not(.s-topbar--item__unset)` is load-bearing and mirrors SE's own
+     selector: the "Log in" / "Sign up" buttons carry `.s-topbar--item` too,
+     and this rule out-specifies our `.s-btn__filled:hover` accent. */
+  .s-topbar .s-topbar--item:not(.s-topbar--item__unset):hover,
+  .s-topbar .s-topbar--item:not(.s-topbar--item__unset):hover .svg-icon {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+  }
+
+  /* The site wordmark is a `.s-topbar--logo` link and takes the SAME treatment
+     from its own token (`--_tb-logo-bg`), so hovering the logo filled a
+     near-white #e3e6e8 pill behind a wordmark that our theme leaves light —
+     white-on-#e3e6e8, the logo all but vanishes under the pointer. */
+  .s-topbar a.s-topbar--logo:hover,
+  .s-topbar a.s-topbar--logo.is-selected,
+  .s-topbar .s-topbar--logo:hover {
+    --_tb-logo-bg: #21262d !important;
+    background-color: #21262d !important;
   }
 
   /* Mobile hamburger. Once the drawer is open SE marks it `.is-selected`
@@ -332,10 +509,20 @@
     filter: invert(1) hue-rotate(180deg) !important;
   }
 
-  /* Global search box in the top bar */
+  /* Global search box in the top bar. Below the `md` breakpoint the searchbar
+     is a full-width overlay row (`.s-topbar--searchbar__open`) that Stacks
+     fills from `var(--theme-topbar-item-background-hover, var(--black-200))` —
+     the same undefined theme token as the topbar items, so it falls back to
+     #e3e6e8: tapping the mobile search icon dropped a near-white 390x49 band
+     across the top of every page. The legacy `.searchbar` class below matches
+     nothing on the current frontend (the live class is the BEM
+     `.s-topbar--searchbar`), and the rule only fires inside a media query, so
+     a desktop-only review never renders it. */
   .s-topbar .searchbar,
-  .top-bar .searchbar {
-    background-color: transparent !important;
+  .top-bar .searchbar,
+  .s-topbar .s-topbar--searchbar,
+  .s-topbar .s-topbar--searchbar.s-topbar--searchbar__open {
+    background-color: #0d1117 !important;
   }
 
   /* ============================================================
@@ -650,6 +837,24 @@
     border-color: #2d333b !important;
   }
 
+  /* The `.s-page-title` header block's own two text parts. Both take raw tokens
+     the `.fc-black-*` utility remap never reaches: the breadcrumb trail
+     ("Stack Overflow > Help center") and the standfirst under the H1 sit on
+     var(--black-400) #636b74 = 3.0:1, and a breadcrumb link flips to
+     `--_br-link-fc: var(--fc-medium)` #3b4045 = 1.5:1 ON HOVER — it all but
+     disappears under the pointer, which no load-time scan can see. */
+  .s-breadcrumbs--link,
+  .s-breadcrumbs .s-breadcrumbs--link,
+  .s-page-title--description,
+  .s-page-title .s-page-title--description {
+    color: #9198a1 !important;
+  }
+
+  .s-breadcrumbs--link:hover,
+  .s-breadcrumbs .s-breadcrumbs--link:hover {
+    color: #c4cdd6 !important;
+  }
+
   /* Accepted answer highlight */
   .answer.accepted-answer,
   .accepted-answer {
@@ -684,8 +889,29 @@
     color: #9198a1 !important;
   }
 
-  .js-vote-up-btn:hover, .js-vote-down-btn:hover {
+  /* The vote arrows are the only control on a post that signals what a click
+     will DO, and SE signals it with the theme orange (`h:bg-theme-primary-200`
+     on the button itself). The buttons are also `.s-btn.s-btn__muted`, so the
+     generic `.s-btn:hover` grey further down this file — same specificity,
+     declared later — was winning and the hovered arrow came up the same
+     neutral grey as its idle sibling. Restate at 2 classes + the element so
+     both the generic mute and the outlined-button rules lose. */
+  .js-vote-up-btn:hover, .js-vote-down-btn:hover,
+  .s-btn.js-vote-up-btn:hover, .s-btn.js-vote-down-btn:hover,
+  button.s-btn.js-vote-up-btn:hover, button.s-btn.js-vote-down-btn:hover {
     background-color: rgba(217, 139, 58, 0.18) !important;
+    color: #d98b3a !important;
+  }
+
+  /* The arrow glyph itself: the button is `.s-btn__outlined.s-btn__muted`, and
+     that 3-class rule sits LATER in this file than the hover rule above, so it
+     out-ranked the accent and the arrow stayed grey inside its orange tint.
+     The element qualifier lifts these past it; `.svg-icon` inherits
+     currentColor, so colouring the button is enough. */
+  button.s-btn.js-vote-up-btn:hover,
+  button.s-btn.js-vote-down-btn:hover,
+  button.s-btn.js-vote-up-btn:hover .svg-icon,
+  button.s-btn.js-vote-down-btn:hover .svg-icon {
     color: #d98b3a !important;
   }
 
@@ -914,10 +1140,24 @@
      dark. Unify to the same warm gold-amber so every widget header
      reads the same, regardless of page (list/question/code/tags). */
   .s-sidebarwidget__yellow .s-sidebarwidget--header,
-  .s-sidebarwidget .s-sidebarwidget--header,
-  .module.hot-network-questions h4 {
+  .s-sidebarwidget .s-sidebarwidget--header {
     background-color: #20262d !important;
     color: #e8c98a !important;
+  }
+
+  /* "Hot Network Questions" is a legacy `.module` widget like Linked/Related,
+     NOT an `.s-sidebarwidget`, so its plain <h4> belongs with those two, not
+     with the filled gold band above. Two things broke it: SE ships the widget
+     as `<div id="hot-network-questions" class="module tex2jax_ignore">` — the
+     hook is an ID now, so a `.module.hot-network-questions` selector matches
+     nothing network-wide — and the heading TEXT is an <a> that SE explicitly
+     opts out of the link colour with `.s-link__inherit`, which our blanket
+     `#sidebar a` accent overrode. The heading therefore rendered link-blue
+     right under a white "Related" heading of the same kind. */
+  #hot-network-questions h4,
+  #hot-network-questions h4 a,
+  #hot-network-questions h4 a.s-link__inherit {
+    color: #e6edf3 !important;
   }
 
   .s-sidebarwidget__yellow .s-sidebarwidget--header {
@@ -1157,8 +1397,19 @@
     border-color: #3b82b8 !important;
   }
 
-  .s-btn__primary:hover,
-  .s-btn__filled:hover { background-color: #3b82b8 !important; color: #fff !important; }
+  /* HOVER on the filled primary CTA ("Sign up", "Ask Question", "Post Your
+     Answer", "Apply filter"). This must out-rank BOTH the generic
+     `.s-btn:hover` mute below it (equal specificity, declared later, so it was
+     winning and turning the primary button the same dark #1c2128 as a
+     secondary one — hovering "Sign up" made it indistinguishable from the
+     outlined "Log in" beside it) AND the 3-class `.s-btn.s-btn__primary.ws-nowrap`
+     fill near the end of this section. Hence the element-qualified arms. */
+  .s-btn.s-btn__primary:hover,
+  .s-btn.s-btn__filled:hover,
+  a.s-btn.s-btn__primary:hover,
+  a.s-btn.s-btn__filled:hover,
+  button.s-btn.s-btn__primary:hover,
+  button.s-btn.s-btn__filled:hover { background-color: #3b82b8 !important; color: #fff !important; }
 
   .s-btn,
   .s-btn__muted,
@@ -1204,6 +1455,15 @@
   .js-post-menu .s-btn.s-btn__link,
   .post-menu .s-btn.s-btn__link {
     color: #9198a1 !important;
+  }
+
+  /* …except "Copy link", which lives INSIDE the share popover the post menu owns,
+     so the mute above swallowed it too: it rendered grey right next to the blue
+     "CC BY-SA 4.0" link in the same row, the only two link-styled controls there.
+     It is an action, and SE paints it the link blue — put it back. */
+  .js-post-menu .s-btn.s-btn__link.js-copy-link-btn,
+  .post-menu .s-btn.s-btn__link.js-copy-link-btn {
+    color: #5fb0e6 !important;
   }
 
   /* Stacks also link-styles a button by adding `.s-link` ALONGSIDE the button
@@ -1509,6 +1769,32 @@
     border-color: #3d444d !important;
   }
 
+  /* `.s-label--status` — the small rounded status pill beside a heading
+     ("Open to all users", "Last message 2m ago", "Beta"). It paints from
+     per-component tokens only (`--_la-status-bg` / `--_la-status-fc`), so no
+     `.bg-*` / `.fc-*` remap reaches it and every variant shipped as a light
+     pill with dark ink. Redefining the tokens keeps the variant semantics
+     (neutral / blue beta / green new / red required) and the pill geometry. */
+  .s-label--status {
+    --_la-status-bg: #262c33 !important;
+    --_la-status-fc: #c4cdd6 !important;
+  }
+
+  .s-label--status.s-label--status__beta {
+    --_la-status-bg: #14222e !important;
+    --_la-status-fc: #7cb7dd !important;
+  }
+
+  .s-label--status.s-label--status__new {
+    --_la-status-bg: #14261c !important;
+    --_la-status-fc: #8fdc9e !important;
+  }
+
+  .s-label--status.s-label--status__required {
+    --_la-status-bg: #2d1a1a !important;
+    --_la-status-fc: #f0a0a0 !important;
+  }
+
   /* reputation / badge counts on user cards */
   .reputation-score, .user-info .reputation-score {
     color: #c4cdd6 !important;
@@ -1597,6 +1883,133 @@
   .subcommunity-topic-avatar .fs-body1,
   a.s-link__inherit .subcommunity-topic-avatar div {
     color: #e6edf3 !important;
+  }
+
+  /* Reputation sparkline (`.profile-cards--graph`). Its horizontal gridlines
+     are a repeating-linear-gradient BACKGROUND-IMAGE in `var(--black-200)`
+     #e3e6e8 over a transparent background-COLOR, so a bg-color scan reads the
+     node as clean while three near-white bands stripe the card. Repaint the
+     bands only — the geometry (`background-position: 0 -4px`) is a separate
+     longhand we do not touch, and the green `.line` data stroke is untouched. */
+  .profile-cards--graph,
+  div.profile-cards--graph,
+  .profile-cards--graph.js-reputation-graph {
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 13px, #2d333b -13px, #2d333b 21px) !important;
+  }
+
+  /* Progress bars. The TRACK is `--_pr-bg: var(--black-300)` #babfc5 — a
+     light-grey rail that shows wherever the bar is not filled ("Next tag
+     badge" on a profile, every privilege row on /help/privileges, where an
+     anonymous visitor's bar is ~0% and the whole rail is bare). Darken the
+     track token only; `--_pr-bar-bg` (the green #18864b fill) is untouched, so
+     the filled/empty split still reads. */
+  .s-progress {
+    --_pr-bg: #2d333b !important;
+  }
+
+  /* Badge-progress pills (`.s-progress__badge`, "Next badge / Instructor").
+     Each medal variant fills the bar with a LIGHT metal tint —
+     --silver-100 #f2f2f2, --gold-100 #ffeec2, --bronze-100 #f3e8de — while the
+     label is `var(--fc-dark)` #0c0d0e absolutely positioned across the FULL
+     width. On dark that is a near-white pill for the filled part and
+     black-on-dark for the remainder. Retone each metal to a dark member of its
+     own hue family so the silver/gold/bronze signal survives, and lift the
+     label so it reads over both halves. `--_pr-label-bc` (the metal-400 ring)
+     is already dark enough to keep. */
+  .s-progress.s-progress__silver {
+    --_pr-bar-bg: #4b5057 !important;
+  }
+
+  .s-progress.s-progress__gold {
+    --_pr-bar-bg: #6b5713 !important;
+  }
+
+  .s-progress.s-progress__bronze {
+    --_pr-bar-bg: #5f4531 !important;
+  }
+
+  /* The privilege variant fills with `var(--green-200)` hsl(148,35%,88%), a
+     near-white mint — same shape as the metals. Only rendered for signed-in
+     users, so it is fixed by the same token path rather than verified live. */
+  .s-progress.s-progress__privilege {
+    --_pr-bar-bg: #1f7a45 !important;
+  }
+
+  .s-progress__badge .s-progress--label,
+  .s-progress__privilege .s-progress--label {
+    color: #e6edf3 !important;
+  }
+
+  /* The "Graph" view of a profile's Reputation tab
+     (`?tab=reputation&sort=graph`) draws two Highcharts SVGs — `#detail-graph`
+     and the `#master-graph` navigator under it. Highcharts writes its colours
+     as ATTRIBUTES and INLINE `style="fill:…"`, so nothing but a `fill:` /
+     `stroke:` rule reaches them:
+       - the detail chart's plate is a class-less `<rect fill="var(--white)">`,
+         886x300 of pure white — the largest light surface left anywhere under
+         /users/;
+       - the tooltip box takes the same `var(--white)` with near-black text, and
+         exists in the DOM only while a bar is hovered;
+       - axis lines and ticks are --black-300 / --black-350 / #C0D0E0;
+       - every bar carries a #FFFFFF separator stroke.
+     The `--green-500` gains and `--red-400` losses ARE the data series and stay
+     exactly as SE painted them, and `.highcharts-tracker` rects are the
+     invisible hit targets (`rgb(192,192,192)` at fill-opacity ~0) — neither is
+     touched. */
+  .highcharts-container rect[fill="var(--white)"] {
+    fill: #1c2128 !important;
+  }
+
+  .highcharts-container g.highcharts-series rect[stroke="#FFFFFF"] {
+    stroke: #1c2128 !important;
+  }
+
+  .highcharts-container path[stroke="#C0D0E0"],
+  .highcharts-container path[stroke="var(--black-300)"],
+  .highcharts-container path[stroke="var(--black-350)"] {
+    stroke: #2d333b !important;
+  }
+
+  /* Each `<text>` carries an inline `style` that sets BOTH `fill` and `color`;
+     only `fill` paints an SVG glyph, but pin `color` too — Highcharts switches
+     the same label to an HTML node under `useHTML`, where `color` is what
+     renders (see the tooltip below). */
+  .highcharts-container g.highcharts-axis text,
+  .highcharts-container g.highcharts-axis tspan {
+    fill: #9198a1 !important;
+    color: #9198a1 !important;
+  }
+
+  /* The axis TITLE ("reputation per day") is a direct child of the <svg> and
+     takes --blue-500 #155ca2 — 2.4:1 once the plate is dark. Lift to the link
+     accent so it still reads as SE's blue label. */
+  .highcharts-container > svg > text,
+  .highcharts-container > svg > text tspan {
+    fill: #5fb0e6 !important;
+    color: #5fb0e6 !important;
+  }
+
+  .highcharts-container g.highcharts-tooltip text,
+  .highcharts-container g.highcharts-tooltip tspan {
+    fill: #e6edf3 !important;
+    color: #e6edf3 !important;
+  }
+
+  /* …and the tooltip's TEXT is not SVG at all: Highcharts renders it with
+     `useHTML`, as `<span>`s absolutely positioned over the chart, carrying
+     `color: var(--black-600)` #0c0d0e. Inside the now-dark box that is
+     dark-on-dark, and no `fill:` rule can reach an HTML node. */
+  .highcharts-container > span,
+  .highcharts-container > span span,
+  .highcharts-container > span strong {
+    color: #e6edf3 !important;
+  }
+
+  /* The series label ("rep:") is the span right after the <br> and takes the
+     series colour --green-500 #0e6235 (1.9:1 on the dark box). Keep it green,
+     at the theme's readable green. */
+  .highcharts-container > span > br + span {
+    color: #3fb950 !important;
   }
 
   /* ============================================================
@@ -1813,6 +2226,24 @@
   .s-anchors.s-anchors__default {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* Stacks colours the modal's two inner regions on the REGION, not on the
+     dialog: `.s-modal--header` is black-800 and `.s-modal--body` is black-500
+     #3b4045. Children that carry an `.fc-*` utility get lifted by the text
+     block above, but an unclassed `<p>` inherits the region colour and lands
+     at ~2:1 on the dark dialog. Live case, reachable logged-out: clicking a
+     vote arrow opens the "Hang on, you can't upvote just yet." modal, whose
+     whole explanatory paragraph is unclassed. Colour the regions themselves. */
+  .s-modal--header,
+  .s-modal--title {
+    color: #e6edf3 !important;
+  }
+
+  .s-modal--body,
+  .s-modal--subtitle,
+  .s-modal--footer {
     color: #c4cdd6 !important;
   }
 
@@ -2044,6 +2475,25 @@
     background-color: #9198a1 !important;
   }
 
+  /* Each cookie category's on/off toggle. OFF is a #a7abb1 track carrying a pure
+     WHITE knob (a `::before`) — three 45x25 light pills that are the brightest
+     things left on the dark panel, and both too small for the light-surface
+     height filter and pseudo-painted. Darken the OFF track; the checked rule is
+     matched separately so the ON state keeps reading as green, not neutral. */
+  #onetrust-pc-sdk .ot-switch .ot-switch-nob {
+    background-color: #3d444d !important;
+    border-color: #3d444d !important;
+  }
+
+  #onetrust-pc-sdk .ot-switch .ot-switch-nob:before {
+    background-color: #c4cdd6 !important;
+  }
+
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-tgl input:checked + .ot-switch .ot-switch-nob {
+    background-color: #3fb950 !important;
+    border-color: #3fb950 !important;
+  }
+
   #onetrust-pc-sdk #clear-filters-handler {
     color: #5fb0e6 !important;
   }
@@ -2051,6 +2501,38 @@
   /* preference-center close glyph */
   #onetrust-pc-sdk .ot-close-icon {
     filter: invert(1) brightness(0.9);
+  }
+
+  /* The banner is a fixed-height scrolling panel and OneTrust styles its own
+     scrollbar: `::-webkit-scrollbar { width: 11px }` with a #c1c1c1 thumb and no
+     track rule. On the darkened panel that thumb is a bright light bar running its
+     full height — the single brightest thing on a first visit, and a scrollbar
+     pseudo-element no element walk can reach. Mirror OneTrust's own
+     id+class specificity so the override lands. */
+  #onetrust-banner-sdk::-webkit-scrollbar,
+  #onetrust-banner-sdk.otFloatingRoundedCorner::-webkit-scrollbar,
+  #onetrust-pc-sdk::-webkit-scrollbar,
+  #onetrust-pc-sdk #ot-pc-lst::-webkit-scrollbar {
+    background-color: #14181d !important;
+  }
+
+  #onetrust-banner-sdk::-webkit-scrollbar-thumb,
+  #onetrust-banner-sdk.otFloatingRoundedCorner::-webkit-scrollbar-thumb,
+  #onetrust-pc-sdk::-webkit-scrollbar-thumb,
+  #onetrust-pc-sdk #ot-pc-lst::-webkit-scrollbar-thumb {
+    background: #3d444d !important;
+  }
+
+  /* The preference-center panel is `overflow: scroll` on BOTH axes, so both
+     gutters are always drawn and they meet in a `::-webkit-scrollbar-corner`
+     — a separate pseudo-element the track rule above does not cover, and one
+     that defaults to solid WHITE. It renders as a bright 16px square welded to
+     the bottom-right corner of the dialog. */
+  #onetrust-banner-sdk::-webkit-scrollbar-corner,
+  #onetrust-banner-sdk.otFloatingRoundedCorner::-webkit-scrollbar-corner,
+  #onetrust-pc-sdk::-webkit-scrollbar-corner,
+  #onetrust-pc-sdk #ot-pc-lst::-webkit-scrollbar-corner {
+    background-color: #14181d !important;
   }
 
   /* ============================================================
@@ -2335,6 +2817,17 @@
     background-color: transparent !important;
   }
 
+  /* The in-comments "native" ad row (`li.comment.native-comment-ad`) draws its own
+     1px #f1f2f3 bottom rule on the INNER `.js-zone-container`, not on the `.comment`
+     our divider rule targets — a bright white line straight across the comment list.
+     A filled creative hides it; an unfilled or blocked slot leaves just the line. */
+  .js-zone-container,
+  .zone-container-native-comment,
+  .comment.native-comment-ad,
+  .comment.native-comment-ad .js-zone-container {
+    border-color: #262c33 !important;
+  }
+
   /* The MOBILE sticky bottom anchor ad (Aditude) wraps its slot in a hard
      #fff container pinned across the foot of the viewport. A creative that
      fills it hides the white; an unfilled, transparent or narrower one leaves
@@ -2379,5 +2872,581 @@ header.site-header,
   #hlogo img,
   .-logo img {
     filter: none !important;
+  }
+}
+
+@-moz-document domain("chat.stackoverflow.com"), domain("chat.stackexchange.com"), domain("chat.meta.stackexchange.com") {
+/* ---- page shell ------------------------------------------- */
+  /* chat.css sets `body { color:#222222 }` and repeats it on `#content`,
+     `#header` and `.subheader`, which the body-level lift cannot reach —
+     the whole FAQ / rooms / user page body copy renders near-black. */
+  body,
+  #content,
+  #header,
+  .subheader,
+  #sidebar,
+  .mspark {
+    color: #c4cdd6 !important;
+  }
+
+  body.outside.create-edit-page {
+    background-color: #14181d !important;
+  }
+
+  body.outside.create-edit-page #container {
+    background-color: #1c2128 !important;
+  }
+
+  /* ---- the conversation ------------------------------------- */
+  /* `.messages` is the bubble behind every message (#f6f6f6); `.mine` is the
+     warm cream variant that marks your own. Keep the two distinguishable. */
+  .messages {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .mine .messages {
+    background-color: #26221a !important;
+  }
+
+  .message .content,
+  .message .message-source,
+  div.message .meta {
+    color: #c4cdd6 !important;
+  }
+
+  div.message .meta {
+    background-color: #262c33 !important;
+  }
+
+  /* per-message timestamp pill: white bg + pure black text */
+  .monologue .timestamp,
+  div.timestamp {
+    background-color: #0d1117 !important;
+    color: #9198a1 !important;
+  }
+
+  /* the author column beside each bubble inherits chat.css's #222 */
+  .monologue .signature,
+  .monologue .signature .username,
+  .user-container .username,
+  .avatar,
+  .fly-in-user .username {
+    color: #9198a1 !important;
+  }
+
+  /* moderators are marked by a blue username; the 3-class signature rule above
+     out-ranks a bare `.username.moderator`, so restate it at equal depth or the
+     marker flattens to the same grey as everyone else. */
+  .username.moderator,
+  .monologue .signature .username.moderator,
+  .user-container .username.moderator,
+  .username.moderator span {
+    color: #6fb3e8 !important;
+  }
+
+  /* `.system-message` is the faint "N hours later…" / "The last message was
+     posted…" rule between monologues, and `.msg-small` the sidebar's "not the
+     room you are looking for?" / "all times are UTC" — both raw #222222, i.e.
+     invisible on dark. `.flair` (the rep number under an avatar) is raw #000.
+     chat.css declares the first as `.system-message-container .system-message`
+     WITH `!important`, so a one-class override never lands. */
+  .system-message-container .system-message,
+  div.system-message,
+  .msg-small,
+  .flair {
+    color: #767e87 !important;
+  }
+
+  /* "N hours later" catch-up separators are three grey ramps */
+  .monologue.catchup-marker-1 {
+    border-top-color: #3d444d !important;
+  }
+
+  .monologue.catchup-marker-2 {
+    border-top-color: #333a42 !important;
+  }
+
+  .monologue.catchup-marker-3 {
+    border-top-color: #2a3038 !important;
+  }
+
+  div.message.reply-parent,
+  div.message.reply-child {
+    background-color: #2d333b !important;
+  }
+
+  #main.select-mode .message.selected {
+    background-color: #1d3346 !important;
+  }
+
+  #main.select-mode .message:hover {
+    border-color: #5fb0e6 !important;
+  }
+
+  /* reply/flag/mod count bubbles ring themselves in 3px of pure white */
+  #reply-count,
+  #flag-count,
+  #modflag-count,
+  #annotation-count,
+  .reply-count {
+    border-color: #14181d !important;
+    box-shadow: none !important;
+  }
+
+  /* ---- the composer bar (fixed to the bottom of every room) --- */
+  #input-area {
+    background-color: #0d1117 !important;
+    border-top: 1px solid #262c33 !important;
+    color: #c4cdd6 !important;
+  }
+
+  #input,
+  #input.editing,
+  #searchbox,
+  #top-menu #search-form input.textbox {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+
+  #input-area .input-hint {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  /* the hint's CSS-triangle pointer is a 20px #fafafa left border */
+  #input-area .input-hint:after {
+    border-left-color: #1c2128 !important;
+  }
+
+  #inputerror {
+    background-color: #2d1f1f !important;
+    border-color: #5c2b2b !important;
+    color: #f0b0b0 !important;
+  }
+
+  /* tab-completion strip above the composer */
+  #tabcomplete li {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
+    box-shadow: none !important;
+  }
+
+  #tabcomplete li.chosen {
+    background-color: #5fb0e6 !important;
+    border-color: #5fb0e6 !important;
+    color: #0d1117 !important;
+  }
+
+  #tabcomplete li.exact-match {
+    background-color: #262c33 !important;
+    border-color: #3d444d !important;
+  }
+
+  #tabcomplete li.too-many {
+    border-color: #2d333b !important;
+    color: #8b949e !important;
+  }
+
+  #tabcomplete-container.super-ping {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  #tabcomplete-container.super-ping > #tabcomplete > li {
+    background-color: #2d1f1f !important;
+    border-color: #5c2b2b !important;
+  }
+
+  /* ---- floating surfaces (must stay opaque) ------------------ */
+  /* `.notification` is the fixed full-width banner at the top of every chat
+     page ("Welcome to Stack Overflow chat!"). chat.css paints it
+     rgba(255,255,255,.95); with our light body text on top it was a white
+     band carrying near-invisible grey copy. */
+  .notification,
+  #feed-ticker,
+  .popup,
+  #conversation-sel,
+  #main.message-admin-mode .message-controls,
+  .fly-in-user,
+  .share-tip,
+  .message-editor > .instructions,
+  div.time-picker {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+    box-shadow: 0 1px 15px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .notification .notify-close-info,
+  #dismiss-ticker {
+    color: #9198a1 !important;
+  }
+
+  .popup hr {
+    border-top-color: #2d333b !important;
+  }
+
+  .popup .btn-close,
+  #conversation-sel .btn-close {
+    background-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+
+  .flags-popup li.flagged-message div.content {
+    background-color: #262c33 !important;
+  }
+
+  div.time-picker li.selected {
+    background-color: #2b4253 !important;
+    color: #e6edf3 !important;
+  }
+
+  #loading {
+    background-color: rgba(20, 24, 29, 0.9) !important;
+  }
+
+  #loading #loading-message {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+    box-shadow: 0 1px 15px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .message-editor > .notice.good {
+    background-color: #14261c !important;
+    color: #8fdc9e !important;
+  }
+
+  .message-editor > .notice.bad {
+    background-color: #2d2415 !important;
+    color: #e0c07a !important;
+  }
+
+  /* ---- oneboxes (link previews inside messages) -------------- */
+  .onebox,
+  .ob-message,
+  .ob-post,
+  .ob-user,
+  .ob-tweet,
+  .ob-twitteruser,
+  .ob-wikipedia,
+  .ob-amazon,
+  .ob-gist,
+  .ob-lpadbug,
+  .ob-manpage,
+  .ob-blog,
+  .ob-exception,
+  .ob-anime,
+  .ob-github,
+  .ob-job,
+  .ob-docs,
+  .ob-trello-card {
+    background-color: #161b22 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .ob-post-votes,
+  .ob-question-stats,
+  .ob-trello-card-badge,
+  .ob-docs .example-metric {
+    background-color: #262c33 !important;
+    border-color: #3d444d !important;
+    color: #c4cdd6 !important;
+  }
+
+  .ob-exception .ob-exception-detail {
+    background-color: #26221a !important;
+    color: #e3d9b0 !important;
+  }
+
+  .ob-docs .topic-links .example-row {
+    border-top-color: #2d333b !important;
+  }
+
+  /* ---- room / user cards (rooms list, transcript rail, profiles) */
+  .roomcard,
+  .usercard,
+  .roomcard-xxl,
+  .usercard-xxl,
+  .room-mini,
+  .conversation-info {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .roomcard.frozen,
+  .roomcard-xxl.frozen,
+  .room-mini.frozen-room {
+    background-color: #23262b !important;
+  }
+
+  /* a frozen card dims its own links to a brown #996b49 (2.9:1 on the card) */
+  .roomcard.frozen a,
+  .roomcard-xxl.frozen a,
+  .room-mini.frozen-room a,
+  .roomcard.frozen .room-name a,
+  .roomcard-xxl.frozen .room-name a {
+    color: #c9a37e !important;
+  }
+
+  /* `.room-header` / `#top-section` / the calendar weekday bands declare a
+     border WIDTH with no colour, so they inherit currentColor — which the text
+     lift just turned near-white. */
+  .room-header,
+  #top-section,
+  .faq-page #top-section,
+  .onebox .quote,
+  .ob-message .quote,
+  .calendar .weekday,
+  .calendar-small .weekday-small,
+  #filter-btn-handler {
+    border-color: #2d333b !important;
+  }
+
+  .roomcard.deleted,
+  .roomcard-xxl.deleted {
+    background-color: #191d23 !important;
+    border-color: #2d333b !important;
+    color: #767e87 !important;
+    box-shadow: none !important;
+  }
+
+  .beginner-room-section {
+    border-bottom-color: #262c33 !important;
+  }
+
+  .beginner-room-section .new-badge {
+    background-color: #14261c !important;
+    color: #8fdc9e !important;
+  }
+
+  /* ---- legacy tabs / tags ----------------------------------- */
+  /* `.subheader #tabs a.youarehere` is 0-1-2-1, so the main block's flat
+     `.youarehere` reset never reached it and the selected tab stayed a white
+     pill under our light label — white on white. */
+  .subheader #tabs a,
+  .subheader #tabs .disabled {
+    border-color: #2d333b !important;
+    color: #9198a1 !important;
+  }
+
+  .subheader #tabs a:hover {
+    background-color: #1c2128 !important;
+    border-color: #3d444d !important;
+    border-bottom-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
+
+  .subheader #tabs a.youarehere {
+    background-color: #1c2128 !important;
+    border-color: #3d444d !important;
+    border-bottom-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
+
+  .subheader #tabs .tabcount {
+    background-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+
+  .subtabs a {
+    border-color: #2d333b !important;
+    color: #9198a1 !important;
+  }
+
+  .subtabs a.youarehere {
+    background-color: #2b4253 !important;
+    border-color: #2b4253 !important;
+    color: #e6edf3 !important;
+  }
+
+  .tag,
+  .ob-post-tag,
+  .ob-user-tag {
+    background-color: #1c2b36 !important;
+    border-color: #2d4a5c !important;
+    color: #7cb7dd !important;
+  }
+
+  .tag:hover {
+    background-color: #2d4a5c !important;
+    border-color: #2d4a5c !important;
+    color: #cfe6f5 !important;
+  }
+
+  /* ---- right sidebar ---------------------------------------- */
+  /* `#roomtitle` carries a white text-shadow meant to emboss it on the light
+     page; on dark it draws a halo under every letter. */
+  #sidebar #info #roomtitle {
+    text-shadow: none !important;
+  }
+
+  #sidebar #info #sidebar-menu,
+  #present-users,
+  ul#my-rooms,
+  div#starred-posts > div > ul > li,
+  div#room-files > div > ul > li,
+  .faq-page .share-more {
+    border-color: #2d333b !important;
+  }
+
+  /* room list "recency" ramp: chat.css runs #006000 -> #c0c0c0, i.e. it gets
+     LIGHTER as a room goes stale. On dark the first four are unreadable, so
+     invert the ramp direction while keeping green = active. */
+  ul#my-rooms > li.activity-0 {
+    color: #8fdc9e !important;
+  }
+
+  ul#my-rooms > li.activity-1 {
+    color: #66b57c !important;
+  }
+
+  ul#my-rooms > li.activity-2 {
+    color: #e6edf3 !important;
+  }
+
+  ul#my-rooms > li.activity-3 {
+    color: #c4cdd6 !important;
+  }
+
+  ul#my-rooms > li.activity-4 {
+    color: #9198a1 !important;
+  }
+
+  ul#my-rooms > li.activity-5 {
+    color: #767e87 !important;
+  }
+
+  ul#my-rooms > li.activity-6 {
+    color: #5c636b !important;
+  }
+
+  div#room-files > div > ul > li.file-thumbnail,
+  div#room-files > div > ul > li.file-thumbnail .quick-delete {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  div#room-files > div > ul > li.file-thumbnail .quick-delete:hover {
+    background-color: #2d333b !important;
+  }
+
+  /* the top strip behind the room menu is painted by a pseudo-element */
+  #top-menu:before {
+    background-color: #0d1117 !important;
+  }
+
+  /* ---- transcript page -------------------------------------- */
+  /* Date tiles: a #f5f5f5 -> #e4e4e4 background-IMAGE gradient (a colour scan
+     reads the element as transparent) with a grey or brand-red weekday band. */
+  .calendar,
+  .calendar-small {
+    background-image: none !important;
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+
+  .weekday-small {
+    background-image: none !important;
+    background-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .weekday {
+    background-image: none !important;
+    background-color: #6e2f2f !important;
+    color: #f0d5d5 !important;
+  }
+
+  /* message-volume sparkline. The `.now` marker is the only chromatic bar in
+     the strip, so it needs its own rule — a blanket `!important` on `.mspbar`
+     beats the more specific `.mspbar.now` and erases the "you are here" tick. */
+  .mspark .mspbar {
+    background-color: #454e59 !important;
+  }
+
+  .mspark .mspbar.now {
+    background-color: rgba(221, 98, 5, 0.85) !important;
+  }
+
+  /* ---- FAQ page --------------------------------------------- */
+  .faq-page #toc,
+  #toc.module {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  .faq-page #top-section .col-section {
+    background-color: #26221a !important;
+    border-color: #4a4327 !important;
+  }
+
+  /* ---- markdown editor -------------------------------------- */
+  .wmd-prompt-dialog {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .wmd-mini-button:hover,
+  .wmd-mini-button.selected {
+    background-color: #2d333b !important;
+  }
+
+  .wmd-mini-button.selected:hover,
+  .wmd-mini-button.selected {
+    background-color: #3d444d !important;
+    color: #e6edf3 !important;
+  }
+
+  /* ---- misc ------------------------------------------------- */
+  /* chat's solid orange `.button` ("load older messages", "join N users in
+     this room now", "« first day") carries a white label via a Stacks link
+     token; the network-wide link accent repaints it to our blue, which lands
+     at 1.1:1 on the orange. Pin the label back to white. The sidebar accent
+     `#sidebar a` (1 id) out-ranks a bare `a.button`, so the transcript rail's
+     "join N users in this room now" / "about this room" need the id too. */
+  a.button,
+  span.button,
+  .roomcard-xxl .button,
+  .frozen a.button,
+  #sidebar a.button,
+  #sidebar .button,
+  #info a.button,
+  a#join-room.button {
+    color: #ffffff !important;
+  }
+
+  .button.disabled,
+  .button.disabled:hover {
+    background-color: #3d444d !important;
+    color: #9198a1 !important;
+  }
+
+  /* The logged-out composer shows SE's anonymous avatar raster — a light-grey
+     64px tile with a white silhouette, i.e. the brightest thing on the page for
+     exactly the visitors this theme is for. It is a placeholder, not content,
+     so inverting it in place is safe; real user avatars keep a different src. */
+  img[src*="Img/anon.png"] {
+    filter: invert(1) !important;
+  }
+
+  #conversation-body ul#participants li.selected {
+    background-color: #3d2f1c !important;
+  }
+
+  kbd {
+    background-color: #262c33 !important;
+    border-color: #3d444d #2d333b #21262d #3d444d !important;
+    color: #e6edf3 !important;
   }
 }

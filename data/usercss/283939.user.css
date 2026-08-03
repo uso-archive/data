@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for TechPowerUp: easy on the eyes across news, reviews, the GPU/CPU spec databases and the forums, with readable tables and code.
-@version      20260730.14.17
+@version      20260803.00.40
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -211,6 +211,31 @@
   .filter-list-item,
   .filter-title-remove-hint {
     color: #8b949e !important;
+  }
+
+  /* The site's own modal widget (popup.min.css, `new Popup().Show*`) — the
+     sidebar "change timezone" link opens one on EVERY page. Nothing else in the
+     theme reaches it: it is appended to <body> at click time and its shell is a
+     translucent light-grey frame (rgba(82,82,82,.8)) around a `#popup_content`
+     the site paints pure #FFF, so our light body ink lands white-on-white. The
+     frame must stay OPAQUE — the page scrolls under it. */
+  .popup_container .popup_inner {
+    background-color: #161d27 !important;
+    background-image: none !important;
+    border: 1px solid #2d333b !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .popup_content h2 {
+    background-color: #21262d !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+
+  .popup_content #popup_content {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
   }
 
   /* ---- Search / sidebar strip (.s- , light-grey #fafafa) ---- */
@@ -1060,6 +1085,46 @@
     color: #ffffff !important;
   }
 
+  /* Under ~600px the spec databases drop their <table> entirely and re-render
+     every row as a CARD (`items-mobile--item` on GPU/CPU, `drives-mobile--drive`
+     on SSD/VGA-BIOS). The card carries its OWN #f4f4f4 background, so the
+     desktop table rules never reach it and the whole list reads as white plates
+     under the sitewide light ink. Desktop-only review cannot see this. */
+  .items-mobile--item,
+  .drives-mobile--drive,
+  .drives-desktop-table {
+    background-color: #1c2128 !important;
+  }
+
+  /* Product-photo wells: every source is an opaque JPG, so the #fff plate is
+     only ever visible while the lazily-loaded image is still in flight —
+     a white flash per tile down a 200-row list. */
+  .items .item-image,
+  .drives .drive-image,
+  .vgabios-details .cardimage {
+    background-color: #21262d !important;
+  }
+
+  /* Review-database popularity bars: the #dfe3ef track is a 50x12 strip (below
+     the audit size floor); the blue fill inside it is the data and stays. */
+  .reviews-container .clicks > .bar-wrap {
+    background-color: #21262d !important;
+  }
+
+  /* Disambiguation list shown when a GPU lookup matches several cards */
+  .gpu-lookup-multiple-found .entry {
+    background-color: #1c2128 !important;
+  }
+
+  .gpu-lookup-multiple-found .entry:hover {
+    background-color: #21303f !important;
+  }
+
+  /* Staff-flagged BIOS rows keep their amber "needs attention" tint */
+  .vgabios .contnt table.bioslist .staff-only {
+    background-color: #332d1a !important;
+  }
+
   /* Image filmstrip caption pills (Back / PCB Front / PCB Back) overlay each
      thumbnail with a hardcoded #f5f5f5 pill + dark #443b3b label — audit-blind
      (short <40px pills) and a bright eyesore on the dark thumbnails */
@@ -1292,8 +1357,7 @@
   .button,
   .search-button,
   input[type="submit"],
-  input[type="button"],
-  .button--cta {
+  input[type="button"] {
     background-color: #21262d !important;
     background-image: none !important;
     color: #e6edf3 !important;
@@ -1312,7 +1376,6 @@
   /* Primary / CTA buttons keep a blue identity. `.startbutton` is the big blue
      download CTA (#4486c7) on every /download/<app> page — the base `.button`
      rule above would otherwise flatten it into the same neutral grey. */
-  .button--cta,
   .btn-primary,
   .button.inverted,
   .submitUnit button[type="submit"],
@@ -1323,12 +1386,62 @@
     color: #ffffff !important;
   }
 
-  .button--cta:hover,
   .btn-primary:hover,
   .button.inverted:hover,
   .button.startbutton:hover,
   input.startbutton:hover {
     background-color: #2f74c0 !important;
+  }
+
+  /* ---- XenForo button VARIANTS (the /forums/ half of the domain) ----
+     TPU's forum paints a hierarchy the base `.button` rule above flattens: the
+     plain button is blue, `--primary` a brighter blue, `--cta` ORANGE (not
+     blue), `--plain` a bare glyph with no plate at all, and `is-disabled` a
+     muted face. At (0,1,0) the base rule swallows all of them, so the login
+     form's primary submit, the mobile nav trigger and a disabled control all
+     render as one identical neutral chip. Reclaim each at (0,2,0) — which also
+     has to out-rank the sitewide `a:link` blue (0,1,1), since every one of
+     these variants is an <a> as often as a <button>. */
+  .button.button--primary {
+    background-color: #2563a8 !important;
+    border-color: #2f74c0 !important;
+    color: #ffffff !important;
+  }
+
+  .button.button--primary:hover,
+  .button.button--primary:focus {
+    background-color: #2f74c0 !important;
+    color: #ffffff !important;
+  }
+
+  /* `--cta` is the forum's ORANGE call to action (#f2930d light / #a5660d dark);
+     painting it our blue both loses the hue and — once `a:link` wins the ink on
+     the anchor form — leaves blue-on-blue at ~2.8:1. */
+  .button.button--cta {
+    background-color: #a4620d !important;
+    border-color: #c8791a !important;
+    color: #ffffff !important;
+  }
+
+  .button.button--cta:hover,
+  .button.button--cta:focus {
+    background-color: #c8791a !important;
+    color: #ffffff !important;
+  }
+
+  /* `--plain` is a plate-less text/glyph button — the mobile nav trigger is one.
+     Giving it the neutral chip boxes a bare hamburger into a grey square. */
+  .button.button--plain {
+    background-color: transparent !important;
+    border: 0 !important;
+  }
+
+  /* A disabled control must not read as an enabled one */
+  .button.is-disabled,
+  .button.is-disabled:hover {
+    background-color: #1a1f25 !important;
+    border-color: #262c33 !important;
+    color: #7d8590 !important;
   }
 
   /* The review pager's "Next Page »" CTA carries the next section's name in a
@@ -1376,6 +1489,306 @@
   pre,
   .bbCodeBlock {
     border: 1px solid #2d333b !important;
+  }
+
+  /* ============================================================
+     Case Mod Gallery ( /gallery/ )
+
+     A separate stylesheet (gallery-*.css) the rest of the theme never
+     reached: the index (`.gallery-index`) and the case page (`.casemod`)
+     ship their own white cards, chips and rating widgets. `.casemod` is the
+     one part of TechPowerUp with a custom-property layer, so remap its six
+     tokens at the source and only hard-code the surfaces it paints literally.
+     ============================================================ */
+
+  .casemod {
+    --accent: #5fb0e6;
+    --line: #2d333b;
+    --muted: #8b949e;
+    --hdr: #cfe2f3;
+  }
+
+  /* ---- Gallery index: filter bar + facet chips ---- */
+  .gallery-index .search-new {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+  }
+
+  .gallery-index .facet-bar-label,
+  .gallery-index .filter-list-item-entry-count {
+    color: #8b949e !important;
+  }
+
+  .gallery-index .facet-chip {
+    background-color: #21262d !important;
+    border-color: #2d333b !important;
+    color: #5fb0e6 !important;
+  }
+
+  .gallery-index .facet-chip.is-active,
+  .gallery-index .facet-chip:hover {
+    background-color: #2f74c0 !important;
+    border-color: #2f74c0 !important;
+    color: #ffffff !important;
+  }
+
+  /* Selected value inside an open facet picker — the site marks it with a pale
+     #ebeff2 plate, the only thing separating it from its unselected siblings. */
+  .gallery-index .filter-options > a.is-selected {
+    background-color: #21303f !important;
+    border-color: #2f74c0 !important;
+  }
+
+  /* Hovering a selected value turns it red and swaps its label for a ✕ — that
+     is the only "click to remove" affordance, so the rule above must not eat it. */
+  .gallery-index .filter-options > a.is-selected:hover {
+    background-color: #711a1a !important;
+    border-color: #a03a3a !important;
+  }
+
+  .gallery-index .filter-options-nothing-found {
+    color: #f0a0a0 !important;
+  }
+
+  /* The "you must be registered" notice is a #fd5 identity plate; only its ink
+     was broken — the sitewide light body colour landed white-on-yellow. */
+  .gallery-index .addcase-button,
+  .gallery-index .addcase-button * {
+    color: #4a3a00 !important;
+  }
+
+  .gallery-index .addcase-button a {
+    color: #1f4e79 !important;
+  }
+
+  /* Image well behind each tile photo (site paints it flat `gray`) */
+  .gallery-index .gallery-box > a {
+    background-color: #21262d !important;
+  }
+
+  /* Tile hover flips the card to #eee with a #ddd outline — nothing in the
+     theme reads `outline`, so every hovered tile drew a bright ring. */
+  .gallery-index .gallery-box:hover {
+    background-color: #1c2128 !important;
+    outline-color: #2d333b !important;
+  }
+
+  /* Tile description (#444) and byline (#777) were dark-on-dark */
+  .gallery-index .gallery_box_text,
+  .gallery-index .gallery_box_info {
+    color: #8b949e !important;
+  }
+
+  /* Comments heading names the case in a #458 <i>/<a> — 2.1:1 on the dark page */
+  .comments > h2 > span > i,
+  .comments > h2 > span > a {
+    color: #5fb0e6 !important;
+  }
+
+  /* ---- Case page ( .casemod ) ---- */
+  .casemod .casenav .button-group {
+    background-color: transparent !important;
+  }
+
+  /* The 2px accent frame is what marks the score card out from the plain
+     panels around it; the blanket border reset greys it, and --accent alone
+     cannot win against an !important rule. */
+  .casemod .ratebox {
+    background-color: #1c2128 !important;
+    background-image: none !important;
+    border-color: #2f74c0 !important;
+    box-shadow: none !important;
+  }
+
+  /* The rating summary's score is a <span>, so the sitewide span ink beats
+     `color: var(--accent)` and the number reads as plain body text. */
+  .casemod .rs-num {
+    color: #5fb0e6 !important;
+  }
+
+  .casemod .kv,
+  .casemod .other-projects ul,
+  .casemod .linkpill {
+    background-color: #1c2128 !important;
+  }
+
+  .casemod .kv dt,
+  .casemod .lp-icon,
+  .casemod .op-score,
+  .casemod .rdist {
+    background-color: #21262d !important;
+  }
+
+  .casemod .linkpill:hover .lp-icon,
+  .casemod .other-projects a:hover,
+  .casemod .showall:hover {
+    background-color: #21303f !important;
+  }
+
+  /* Rating histogram: the #7d97c8 fill is the data and stays; the #dfe2e6
+     "no votes at this score" stub and the 3px byline dot were light specks. */
+  .casemod .rdc-zero,
+  .casemod .byline .dot {
+    background-color: #30363d !important;
+  }
+
+  .casemod .rdc:hover .rdc-zero {
+    background-color: #444c56 !important;
+  }
+
+  .casemod .rdc:hover .rdc-num {
+    color: #e6edf3 !important;
+  }
+
+  /* ============================================================
+     DRAM Latency Calculator ( /dram-latency/ )
+
+     Styled entirely from a page-local <style>, so nothing else in the theme
+     claims it: the whole tool sits on an #f4f4f4 slab and every row label
+     ("Data Rate", "Latency", "ns") is sitewide body ink, i.e. white-on-white.
+     ============================================================ */
+
+  .dram-latency-form {
+    background-color: #1c2128 !important;
+    border-color: #262c33 !important;
+  }
+
+  /* Spinner arrows are a background-image SVG whose <polygon> carries no
+     `fill`, so it renders BLACK — invisible once the input goes dark. Restate
+     the same two triangles in the theme's ink; geometry (16px, centred,
+     no-repeat) is inherited from the site's own rule. */
+  .number-input-button {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpolygon points='8,11 13,6 3,6' fill='%23c4cdd6'/%3E%3C/svg%3E") !important;
+  }
+
+  .number-input-button.number-up {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpolygon points='8,5 13,10 3,10' fill='%23c4cdd6'/%3E%3C/svg%3E") !important;
+  }
+
+  .number-input-button:hover {
+    background-color: #2d333b !important;
+  }
+
+  /* A locked field is marked by a pale cream plate — the only signal that the
+     value is derived rather than editable. Keep the amber, dark. */
+  .number-input input:disabled {
+    background-color: #332d1a !important;
+    color: #e3c46a !important;
+  }
+
+  /* ============================================================
+     Computer Trivia ( /trivia/ )
+
+     The live message log colour-codes every row by KIND, so the tints are
+     signal, not decoration — keep the five hues and only take them dark.
+     ============================================================ */
+
+  .trivia .messagecontainer > #messages > .connection {
+    background-color: #21262d !important;
+  }
+
+  .trivia .messagecontainer > #messages > .question {
+    background-color: #16242e !important;
+  }
+
+  .trivia .messagecontainer > #messages > .solved {
+    background-color: #332d1a !important;
+  }
+
+  .trivia .messagecontainer > #messages > .notice {
+    background-color: #2a1e33 !important;
+  }
+
+  .trivia .messagecontainer > #messages > .chat {
+    background-color: #17251a !important;
+  }
+
+  .trivia > .score > #score {
+    color: #e6edf3 !important;
+  }
+
+  /* ============================================================
+     Live event coverage ( /live/ , tpulive-*.css )
+     ============================================================ */
+
+  .tpulive-files .imageitem {
+    background-color: #1c2128 !important;
+  }
+
+  .tpulive-events .eventlist {
+    background-color: #1c2128 !important;
+  }
+
+  /* Coverage-progress markers: red / blue / green is the whole message, and
+     the site's `#00f` and `green` are both under 3:1 on a dark page. */
+  .tpulive-files .categories .status-incomplete {
+    color: #ff7b72 !important;
+  }
+
+  .tpulive-files .categories .status-partial {
+    color: #79c0ff !important;
+  }
+
+  .tpulive-files .categories .status-complete {
+    color: #3fb950 !important;
+  }
+
+  /* Event announcement banner (#fef89c) — keep the amber signal, take it dark */
+  .tpulive-files .announcement {
+    background-color: #332d1a !important;
+    color: #e3c46a !important;
+  }
+
+  .tpulive-files .announcement table th {
+    color: #c9b68a !important;
+  }
+
+  /* News live-blogs: the "just updated" flash (#dbffdb) and the standing info
+     panel (#dbedff, dark navy ink) are the only two tinted news surfaces. */
+  .newspost > .text > .live-blog-updated--highlight {
+    background-color: #17251a !important;
+  }
+
+  .newspost > .live-blog-info {
+    background-color: #16242e !important;
+    color: #9bd4ff !important;
+  }
+
+  /* ============================================================
+     Fancybox image lightbox (news photos, live coverage, gallery)
+
+     Its prev/next/close are `<button>`s that the site keeps as TRANSPARENT
+     hit-areas carrying only a background-image glyph, so the generic button
+     rule above did both halves of the damage: a #21262d plate ~190px wide over
+     the photo, and `background-image: none` erasing the arrows outright —
+     the lightbox had no visible navigation at all. Reclaim the transparency
+     and restate the three glyphs in the theme's ink (their size/position stay
+     the site's). `opacity: .3`, and 1.0 on hover, is the site's own affordance.
+     ============================================================ */
+
+  .fancybox-container .fancybox-tpu-btn {
+    background-color: transparent !important;
+  }
+
+  .fancybox-container .fancybox-tpu-btn-prev {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M160 40 L72 128 L160 216' fill='none' stroke='%23e6edf3' stroke-width='26' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  }
+
+  .fancybox-container .fancybox-tpu-btn-next {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M96 40 L184 128 L96 216' fill='none' stroke='%23e6edf3' stroke-width='26' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  }
+
+  .fancybox-container .fancybox-tpu-btn-close {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M56 56 L200 200 M200 56 L56 200' fill='none' stroke='%23e6edf3' stroke-width='26' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+  }
+
+  /* Shown in place of the photo when an ad blocker kills the request */
+  .fancybox-error {
+    background-color: #1c2128 !important;
+  }
+
+  .fancybox-error p {
+    color: #c4cdd6 !important;
   }
 
   /* ---- Footer ---- */
@@ -1482,9 +1895,25 @@
     background-image: linear-gradient(rgba(28, 33, 40, 0), #1c2128 80%) !important;
   }
 
-  .block-footer {
+  /* Its own ink is the light style's `--xf-blockFooterTextColor` #4f4f4f, a
+     direct declaration that beats the light body colour our .block rules
+     inherit down, so the footer note ("Totals may include hidden visitors.",
+     "Emoji provided by JoyPixels.") lands at 2.1:1 on the dark plate.
+     `.u-dimmed` / `.menu-footer` are the same #4f4f4f token on other surfaces. */
+  .block-footer,
+  .menu-footer,
+  .u-dimmed {
+    color: #8b949e !important;
+  }
+
+  .block-footer,
+  .menu-footer {
     background-color: #161d27 !important;
     background-image: none !important;
+  }
+
+  .u-textColor {
+    color: #c4cdd6 !important;
   }
 
   /* Content blocks / cards */
@@ -1572,6 +2001,60 @@
      border; the blanket `*` border reset greys it into the navy plate. */
   .blockLink.is-selected {
     border-left-color: #5fb0e6 !important;
+  }
+
+  /* XenForo's remaining `--xf-contentAltBg` (#f5f5f5) chips and panels. None is
+     claimed by a rule above, so under a light OS each renders a near-white plate
+     carrying our pale ink. `.bbCodeDemoBlock-item dd` is the BB-code help page's
+     example/output column (~30 white slabs down the page, its sample text at
+     1.1:1) and `.smilieText` the smilie-code pills beside it. */
+  .bbCodeDemoBlock-item dd,
+  .smilieText,
+  .tagItem,
+  .reactionScore,
+  .likesBar,
+  .bbMediaWrapper-fallback,
+  .blockStatus,
+  .filterBlock,
+  .block-minorTabHeader {
+    background-color: #21262d !important;
+    background-image: none !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .smilieText:hover,
+  .tagItem:hover,
+  .reactionScore:hover {
+    background-color: #2d333b !important;
+    color: #ffffff !important;
+  }
+
+  /* A form's inline validation error and the post-action toast keep the light
+     style's pale plate + near-black ink; retint to the alert palette so the
+     error still reads as an error. */
+  .inputValidationError {
+    background-color: #2d1a1a !important;
+    border-color: #7d2a2c !important;
+    color: #ff7b72 !important;
+  }
+
+  .flashMessage {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+  }
+
+  /* Narrow-viewport sidebar drawer: the `--blocks` variant paints its own
+     #e8e8e8 shell and #e8f4fc header, neither of which the `--nav` drawer rules
+     above reach. */
+  .offCanvasMenu--blocks .offCanvasMenu-content {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .offCanvasMenu--blocks .offCanvasMenu-header {
+    background-color: #161d27 !important;
+    color: #e6edf3 !important;
   }
 
   /* Node listing (forum index) */
@@ -1699,9 +2182,21 @@
   }
 
   .label--grey,
-  .label--lightGrey {
+  .label--lightGrey,
+  .label--subtle,
+  .label--silver {
     background-color: #21262d !important;
     color: #c4cdd6 !important;
+  }
+
+  .label--lightGreen {
+    background-color: #182a1a !important;
+    color: #7ee787 !important;
+  }
+
+  .label--error {
+    background-color: #2d1a1a !important;
+    color: #ff7b72 !important;
   }
 
   /* User banners under a username are `<a>` (or `<span>`) elements, so the blanket
@@ -1979,14 +2474,22 @@
     border-color: #2d333b !important;
   }
 
-  /* Member tooltip (hover a username): only its bottom stats strip inherited our
-     dark card — the header is a `.memberProfileBanner` painted #e8f4fc, and every
-     line in it (`.memberTooltip-blurb`: user title, trophy count, location) keeps
-     the light style's #141414 ink, which turns dark-on-dark the moment the banner
-     is darkened. Scope the banner fix to the TOOLTIP: the same class carries a
-     user's uploaded banner IMAGE on the full profile page, so only recolour here. */
+  /* Member tooltip (hover a username) and the full profile header: both are a
+     `.memberProfileBanner` painted #e8f4fc, and every line in the tooltip
+     (`.memberTooltip-blurb`: user title, trophy count, location) keeps the light
+     style's #141414 ink, which turns dark-on-dark the moment the banner darkens.
+     A member's uploaded banner is a background-IMAGE (the site's own rule gives
+     the class `background-size: cover`), so it paints over this colour and is
+     unaffected — only the default no-banner plate changes. */
   .memberTooltip-header,
-  .memberTooltip .memberProfileBanner {
+  .memberProfileBanner {
+    background-color: #161d27 !important;
+  }
+
+  /* Reaction / response strip under a post or profile post (--xf-contentAltBg,
+     #f5f5f5 in the light style). `.reactionsBar` above is only one member of the
+     family; the profile-post rows use `.message-responseRow` directly. */
+  .message-responseRow {
     background-color: #161d27 !important;
   }
 

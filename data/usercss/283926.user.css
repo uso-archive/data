@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for DaFont. Browse fonts late at night without the  glare: the homepage, font categories, search, font pages and author pages all get an  easy-on-the-eyes dark look.
-@version      20260730.14.12
+@version      20260803.00.34
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -50,11 +50,12 @@
   div.thumb_cont[style*="#fc3"] { border-color: #fc3 !important; }
   div.thumb_cont[style*="#3d6"] { border-color: #3d6 !important; }
   /* Inside a thread, a solved font request gets an "Identified font:" callout drawn
-     as a bare inline-styled div with `border:2px solid #3d6` — the same success green
-     as the answered-thread ring. The blanket border reset greys it out, dropping the
-     "solved" signal; keep the green edge (and its amber #fc3 twin, if present). */
-  div[style*="solid #3d6"] { border-color: #3d6 !important; }
-  div[style*="solid #fc3"] { border-color: #fc3 !important; }
+     as a bare inline-styled element with `border:2px solid #3d6` — the same success green
+     as the answered-thread ring — and its amber `#fc3` twin marks "Suggested font:".
+     The blanket border reset greys both out, dropping the solved/suggested signal.
+     NOT `div[…]`: `/forum/user.php?user=` draws the same two callouts as a <span>. */
+  [style*="solid #3d6"] { border-color: #3d6 !important; }
+  [style*="solid #fc3"] { border-color: #fc3 !important; }
   /* The empty-state notice ("No font with the limits you chose:") on author/listing
      pages is a bare inline-styled div framed top AND bottom with `10px solid #cc0000`
      brand red. The blanket reset greys that frame, dropping the alert's entire visual
@@ -88,6 +89,12 @@
   }
   a.tdn:hover, .lv2right a:hover, .noindex a:hover, .menu a:hover,
   .catpp a:hover, .dfsmall a:hover { color: #9bd4ff !important; }
+  /* The language row is `a.flag{color:#000; opacity:.60}` — deliberately faded
+     chrome, and the fade is its own hover affordance (`a.flag:hover{opacity:1}`).
+     It also carries `.tdn`, so the link colours above would paint it #5fb0e6 at
+     60% alpha over the base = 3.5:1, a fail. Keep it body-grey in BOTH states
+     (4.75:1 faded, 8:1 hovered); must sit after `a:hover` to win the 0,1,1 tie. */
+  a.flag, a.flag:hover { color: #c4cdd6 !important; }
 
   /* ---- Brand red, refined for dark ---- */
   /* DaFont's raw #cc0000 is garish on near-black — keep the identity, soften it. */
@@ -111,10 +118,9 @@
     background-color: #b3322f !important;
     color: #ffffff !important;
   }
-  /* Category-nav links sit in a bar that also carries .dfsmall. These selectors
-     are NOT enough on their own — `.dfsmall a:not(.dl)` below scores higher and
-     greys them out on the red bar; the brand-bar block near the end restores
-     them. Keep this rule for the plain (non-.dfsmall) metacat bars. */
+  /* Category-nav links sit in a bar that also carries .dfsmall, so the
+     `.dfsmall`-scoped muted rules further down must never out-specify this pair
+     (0,1,1) / (0,2,1) — see the note on the muted-text block. */
   .metacat a, .metacat.dfsmall a { color: #ffffff !important; }
   .catpp { background-color: transparent !important; color: #c4cdd6 !important; }
   /* `.catpp a:hover` hardcodes a light-grey #e3e3e3 pill (drawn for the white page).
@@ -196,12 +202,20 @@
   /* ---- Font preview samples (background-image PNGs: black-on-white) ---- */
   /* Inverting turns the black glyphs into light text that reads cleanly on dark,
      while preserving the exact glyph shapes of each font. */
-  .preview {
+  /* The option bar's "Size" <select> (name=psize) swaps the preview class per row:
+     m→.preview (default), l→.preview_l, s→.preview_s, xs→.preview_xs, each pulling
+     from its own raster dir (/img/preview_l/…). Only the default was inverted, so
+     picking any other size shipped a full-width WHITE slab per font row on every
+     listing, search, new and font-detail page. The class carries no shared hook and
+     the raster is a background-IMAGE, so no colour scan sees it. */
+  .preview, .preview_s, .preview_xs, .preview_l {
     filter: invert(0.92) !important;
     border-radius: 4px !important;
   }
   /* Font-page character map is a black-on-white <img> — invert it the same way */
-  img[src*="/img/charmap/"], img[src*="/img/preview/"] {
+  img[src*="/img/charmap/"], img[src*="/img/preview/"],
+  img[src*="/img/preview_s/"], img[src*="/img/preview_xs/"],
+  img[src*="/img/preview_l/"] {
     filter: invert(0.92) !important;
     border-radius: 4px !important;
   }
@@ -361,8 +375,12 @@
      pure black on the elevated .hmessage bar. Colour the wrapper and the name span. */
   div.user, .username { color: #c4cdd6 !important; }
   /* Forum post message body (.body) carries the actual post text as classless
-     nodes under DaFont's base `color:#000` — black-on-dark unless remapped. */
-  .body, .body p, .body div { color: #c4cdd6 !important; }
+     nodes under DaFont's base `color:#000` — black-on-dark unless remapped.
+     `/forum/user.php?user=` (a poster's own post list, linked from every avatar)
+     renders the identical text as `.body_alt`, which forum4.css declares with no
+     colour of its own — so that whole page's content was pure black on dark. */
+  .body, .body p, .body div,
+  .body_alt, .body_alt p, .body_alt div { color: #c4cdd6 !important; }
 
   /* ---- Body content text + form/control labels ---- */
   /* DaFont hardcodes black on much of its content (the "Note of the author"
@@ -386,6 +404,11 @@
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
   }
+  /* …but that `*` (0,1,1) also swallows the author's own website link inside the
+     block, so it read as prose and lost DaFont's `a:hover{color:#c00}`. Anchors
+     are links: (0,1,2) beats the wildcard. */
+  div[style*="border-left:5px solid #eee"] a { color: #5fb0e6 !important; }
+  div[style*="border-left:5px solid #eee"] a:hover { color: #9bd4ff !important; }
   /* Main content column ("margin-left:140px") holds classless body text such as
      the install-instruction steps and the FAQ's bare "Votre question…" text
      node directly on the column div — keep both the column and its classless
@@ -449,6 +472,14 @@
   div[style*="background:#e9e9e9"] {
     background-color: #1c2128 !important;
   }
+  /* The zebra's other half: the alternating row is a bare `background:#fff`, which the
+     white-cell safety net at the end of this sheet lifts to the SAME elevated surface as
+     the #e9e9e9 row — 174 identical rows, the stripe gone. Drop the white ones to the
+     base so the alternation survives. The `padding:9px 3px` half of the selector keeps it
+     to the comment rows (and takes it to (0,2,1), over the net's (0,1,0)). */
+  div[style*="padding:9px 3px"][style*="background:#fff"] {
+    background-color: #14181d !important;
+  }
   /* The "author of <font>" badge on a comment keeps DaFont's yellow `background:#ff0`,
      but our `.dfsmall b` rule repaints its text light grey — 1.9:1 on that yellow.
      Same shape as the div.notif banner below: keep the yellow, darken the text. */
@@ -464,8 +495,34 @@
 
   /* ---- Secondary / muted text ---- */
   .light { color: #8b949e !important; }
-  .dfsmall, .dfxsmall, .points, .dfsmall b, .dfsmall label,
-  .dfsmall a:not(.dl) { color: #c4cdd6 !important; }
+  /* Text only — keep `a` OUT of this list. Anything of the shape `.dfsmall a…`
+     here scores at least (0,2,1) and beats both the `.dfsmall a` link rule and the
+     `.dfsmall a:hover` rule at the top of this sheet, which paints every .dfsmall
+     link the same grey as the prose around it and erases DaFont's
+     `a:hover{color:#c00}` — the top-left Login/Register pair, the footer row and
+     the font author's own website link end up with no hover feedback at all.
+     The red brand bars don't need such a rule: `.metacat.dfsmall a` (0,2,1) and
+     `.dfbg a` (0,1,1) already outrank the plain `a` rule. */
+  .dfsmall, .dfxsmall, .points, .dfsmall b, .dfsmall label {
+    color: #c4cdd6 !important;
+  }
+  /* DaFont mutes its secondary numbers and captions with greys of its own: `.light` and
+     `.grey` (both #888), the forum-stats share column (`td.tot {color:#999}`), and the
+     ad-disclosure labels it writes inline ("Google Ads of <author>", "Ad by <author>").
+     `.light` is remapped above, but the `.dfsmall` rule right here ties it at (0,1,0) and
+     comes later — so every `.dfsmall.light` ("Edited on …" under a forum post) and every
+     `.dfsmall.grey` (the 100 download counts on authors.php) rendered at full body
+     strength, erasing the muted/primary split. Match at (0,2,0) or higher, and after, so
+     the tie cannot come back. Not `[style*="color:#777"]`: the login form's section
+     heading uses that one as an EMPHASIS, and #777 is 3.9:1 here anyway. `div.nr`
+     ("Forum: <link>" above every post on `/forum/user.php?user=`) is forum4's #777 and
+     measures 3.61:1 on the .hmessage bar — a real fail, not just a lost distinction;
+     `div.` keeps it off `a.nr` (the post permalink), which stays a link. `.orig_url`
+     is the same shape at #999. */
+  .dfsmall.light, .grey, .dfsmall.grey, td.tot, div.nr, div.orig_url,
+  div.dfsmall[style*="color:#888"], div.dfsmall[style*="color:#999"] {
+    color: #8b949e !important;
+  }
   .tdh, .black, td.black { color: #c4cdd6 !important; }
 
   /* ---- Pagination ---- */
@@ -508,10 +565,16 @@
   }
 
   /* ---- Brand-red bar text stays white (must outrank our own muted rules) ---- */
-  /* The broad `b, strong` and `.dfsmall a:not(.dl)` rules above repaint the font
-     name and the category headers a muted grey ON the red bar (~3.8:1 — the site
-     ships them white). Same specificity as `.dfsmall b` / `.dfsmall a:not(.dl)`,
-     so this block has to come last to win the tie. */
+  /* The broad `b, strong` and `.dfsmall b` rules above repaint the font name and
+     the category headers a muted grey ON the red bar (~3.8:1 — the site ships them
+     white). `.dfbg b` ties `.dfsmall b` at (0,2,0), so this block has to come last
+     to win on source order. The font-file caption bar recoloured above is the same
+     shape without a class: its filename sits in a <b>, so `b, strong` painted it
+     #c4cdd6 on the red gradient (3.81:1) while the site ships it white. */
+  div[style*="linear-gradient(to right,#c8c8c8"] b,
+  div[style*="linear-gradient(to right,#c8c8c8"] strong,
+  div[style*="linear-gradient(to right, #c8c8c8"] b,
+  div[style*="linear-gradient(to right, #c8c8c8"] strong,
   .dfbg b, .dfbg strong, .metacat b, .metacat strong,
   .lv1left b, .lv1left strong, .lv1right b, .lv1right strong,
   .lv2left b, .lv2left strong,
@@ -535,11 +598,44 @@
   .settingshead { background-color: #b3322f !important; color: #ffffff !important; }
   span.newflag_index { background-color: #21262d !important; color: #e86a64 !important; }
   span.no_index_read a { background-color: #21262d !important; }
+  /* `span.newflag a {background:#c00; color:#fff}` is the unread-posts pill on the
+     forum list. Our `a` rule is !important and beats the site's non-important #fff
+     whatever the specificity, so the label would render #5fb0e6 on #c00 = 2.4:1.
+     `.thumb_user {background:#fff}` is the poster chip overlapping a thread
+     thumbnail — a plain white pill. Both need a read cookie, so neither is
+     reachable logged-out; matched from forum4.css, same precedent as above. */
+  span.newflag a, span.newflag a:hover { color: #ffffff !important; }
+  .thumb_user { background-color: #1c2128 !important; }
 
   /* Forum breadcrumb separator: DaFont's base `div { color:#000 }` leaves this
      arrow glyph pure black — 1.18:1 on the dark page. It carries no own colour
      rule, and it is a single character, so the dark-on-dark scan skips it. */
   .rr { color: #8b949e !important; }
+
+  /* ---- Forum stats page (`/forum/stats.php`) ---- */
+  /* The "Identification Topics" pie is an inline Google-Charts <svg> (not an iframe):
+     its plot panel and legend box are `rect fill="#ffffff"` and every label is
+     `text fill="#000000"`, so the page renders a 478x250 white slab with black type.
+     SVG paint attributes are invisible to every background-color/colour audit.
+     The slice fills are the same three-hue status key as the forum legend
+     (#33dd66 solved / #ffcc33 suggestions / #d4d4d4 none) — data series, keep them
+     verbatim; only the chrome moves, including the `stroke="#ffffff"` slice gaps. */
+  #chart_div svg rect[fill="#ffffff"] { fill: #1c2128 !important; }
+  #chart_div svg text { fill: #c4cdd6 !important; }
+  #chart_div svg path[stroke="#ffffff"] { stroke: #1c2128 !important; }
+  /* …but the percentage labels are painted ON the slices, i.e. on the light series
+     fills, where the site's black is correct and our light grey drops to ~1.2:1 on
+     the #d4d4d4 wedge. They are the only <text> that are grandchildren of the <svg>
+     (the legend sits three <g> deep), and that extra step wins the cascade. */
+  #chart_div svg > g > text { fill: #000000 !important; }
+  /* Hovering a slice pops a tooltip drawn INSIDE the same <svg> as a
+     `path fill="#ffffff" stroke="#cccccc"` callout — a white card the light label
+     above then sits on at ~1.4:1. It does not exist in the DOM until the pointer is
+     over a wedge, so no load-time scan reaches it. */
+  #chart_div svg g.google-visualization-tooltip path {
+    fill: #1c2128 !important;
+    stroke: #2d333b !important;
+  }
 
   /* ---- Tables / generic light cells safety net ---- */
   td[bgcolor="#FFFFFF"], td[bgcolor="#ffffff"], td[bgcolor="white"],

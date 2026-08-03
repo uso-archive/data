@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260730.14.16
+@version      20260803.00.38
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -113,6 +113,24 @@
     --ozWhiteOverlay: rgba(20, 24, 29, 0.82) !important;
     --ozWhiteOverlay2: rgba(20, 24, 29, 0.62) !important;
     --ozWhiteOverlay3: rgba(20, 24, 29, 0.42) !important;
+    /* Highlight plate under the pointed-at row of EVERY Ozon select dropdown
+       (language, currency, address, delivery …). Literal #e5efff — a pale blue that
+       is invisible on the white site and a near-white slab on ours, and since the
+       option label is lifted to light text by the token remap, the row you are
+       actually pointing at is the one row you cannot read (~1.02:1). It exists only
+       under the cursor inside an opened menu, so no load-time scan and no static
+       screenshot can reach it. Single-role: measured live, `background-color` on the
+       option row is its ONLY use anywhere in the site's sheets, so it is safe at
+       :root. Inverted rather than neutralised, keeping the blue tint that marks the
+       row as the highlighted one. */
+    --ozBluePale: #16233a !important;
+    /* Same shape, same design-system module: a pale-green #c2eecf plate whose only
+       two uses are `background-color` on a button variant and its :hover, with
+       --ozTextPrimary (lifted to light by us) as the label — so the button paints
+       light-on-light at ~1.1:1. That variant renders on no logged-out surface
+       reachable here, so unlike --ozBluePale it is fixed from the stylesheet rather
+       than against a live element; the remap is background-only either way. */
+    --ozGreenPale: #13291d !important;
 
     /* ---- accents: keep brand identity, tune for dark ---- */
     --ozCtrlPrimary: var(--d-blue) !important;
@@ -394,6 +412,35 @@
   .vue-portal-target a[isload="true"] {
     background-color: var(--layerActiveFloor0) !important;
   }
+  /* REVIEW MEDIA VIEWER "Отзыв" BADGE — the pill laid over the top-left of each
+     slide in the lightbox, carrying the label plus the reviewer's gold stars. Its
+     label is a fourth --layerFloor1-as-WHITE-TEXT use (on the native rgba(7,7,7,.48)
+     scrim), so our :root remap of that card-SURFACE token turns it #1c2128 on a
+     near-black scrim — the stars stay gold beside a word that has vanished.
+
+     Rebound on the slide rather than recoloured, because the label's own class is a
+     rotating hash. Each slide carries Vue props leaked as plain lowercase attributes
+     (uuid / reviewuuid / videoduration), which do NOT rotate with the build; measured
+     live, no --layerFloor1 BACKGROUND use falls inside a slide, so rebinding it there
+     repaints the label and nothing else. Mounts only on click, so no load-time scan
+     sees it. */
+  .vue-portal-target [reviewuuid] {
+    --layerFloor1: #ffffff !important;
+  }
+  /* PORTAL ELEVATION SHADOWS — Ozon's is a PALE grey
+     (`rgba(204,214,228,.6) 0 6px 16px 2px`), a soft drop shadow on the white site
+     and a bright HALO on ours: it rings the review media viewer's whole 1120x612
+     panel and its next/prev arrow discs with a visible light band. The colour is a
+     literal outside the token system, so the remaps never reach it, and the viewer
+     only exists after a click, so no load-time scan sees it. Measured live, every
+     box-shadow anywhere in this portal is a light-site elevation cue that a dark
+     surface no longer needs — the panel already separates from the dimmed page by
+     value — so clear them rather than invent a dark shadow per shape. Restricted to
+     DIVs on purpose: the viewer's own 48px arrow discs are <span>s carrying an
+     already-dark rgba(0,26,52,.16) shadow, which stays. */
+  .vue-portal-target div {
+    box-shadow: none !important;
+  }
 
   /* ------------------------------------------------------------
      PORTAL-MOUNTED MODALS (language/currency, address book, …). Ozon mounts
@@ -611,6 +658,41 @@
      nothing that was carrying a colour of its own. ------------------------ */
   [data-widget="objectLine"] a [class*="tsBody"] {
     color: var(--d-text) !important;
+  }
+
+  /* ------------------------------------------------------------
+     BRAND SHELF (data-widget="objectThumbnailList") — the "Популярные бренды"
+     row on category / Ozon Fresh landings. Its CMS text component pins a literal
+     rgb(7,7,7) on BOTH the section heading and every brand caption, outside the
+     token system, so the :root remap never reaches either. On the darkened island
+     card that is ~1.1:1 — the heading and all twenty brand names go fully
+     invisible while the logo tiles above them still read, so the row looks like
+     an unlabelled strip of logos with no title.
+
+     The heading needs the CHILD selector: the site puts tsHeadline600Medium on
+     the WRAPPER and the colour on the wrapper's inner div, so the theme's own
+     `[class*="tsHeadline600Medium"]` rule only reaches the wrapper and the inner
+     declaration wins (inherited colour never beats a direct one). Both rules are
+     scoped to the widget, whose hashed CMS classes (q4b1_5_6-*, uw_za9) rotate
+     every build. ------------------------------------------------------------ */
+  [data-widget="objectThumbnailList"] [class*="tsHeadline"] > div {
+    color: var(--d-text) !important;
+  }
+  [data-widget="objectThumbnailList"] a p {
+    color: var(--d-text-2) !important;
+  }
+  /* …and that caption rule, being !important, also swallowed the shelf's only hover
+     feedback: natively a brand caption flips from the literal near-black to Ozon's
+     pressed blue #0050e0 under the cursor, so with both states pinned to one grey
+     the whole row of twenty tiles answers the mouse with nothing. Invisible to both
+     scanners — a state that is not rendered cannot be scanned — and found by a
+     native-vs-themed hover diff. Lifted to the theme's hover blue rather than the
+     site's #0050e0, which is only ~2.6:1 on our canvas: the same substitution the
+     filter-rail / breadcrumb / footer hovers already make. The sibling
+     objectLine captions are deliberately NOT given a hover — measured live, they
+     have none natively either. */
+  [data-widget="objectThumbnailList"] a:hover p {
+    color: var(--d-blue-hover) !important;
   }
 
   /* CATALOG MEGA-MENU text: the flyout's section headings and its
@@ -900,6 +982,26 @@
   [data-widget="bigPromoPDP"] div:not([style*="background"]) {
     background-color: transparent !important;
   }
+  /* REVIEW-SCOPE SEGMENTED CONTROL ("Все отзывы" / "Этот вариант товара (188)").
+     Ozon builds it as a recessed #f5f7fa track with the ACTIVE segment raised on a
+     white pill; that pill is the control's only state signal — both labels are the
+     same near-black weight natively. The webReviewTabs reset above nests it, so it
+     flattens the track AND the pill, and the control ships as two identical labels
+     floating on the page with nothing marking which scope the review list is showing.
+     Legible dark text either way, so no contrast, DOM or chroma check flags it.
+
+     The active segment carries a modifier class on top of the shared segment class,
+     while the idle one carries the shared class alone — so `[class*=" "]` (a class
+     attribute holding more than one name) names the active segment at any build,
+     without pinning the modifier's rotating hash. Both segments are `div[tabindex]`.
+     Track and pill are given two distinct elevations so the raised-vs-recessed
+     relationship survives the inversion. */
+  [data-widget="webReviewsVariantMode"] > div[class] {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+  }
+  [data-widget="webReviewsVariantMode"] div[tabindex][class*=" "] {
+    background-color: var(--layerActiveFloor1) !important;
+  }
   /* PINNED-REVIEW CLAMP FADE — the pinned review card clamps its body copy and
      fades the last two lines out under a 50px-tall ::after carrying
      `linear-gradient(0deg, rgb(235,239,245), transparent)`. The stop is a
@@ -946,9 +1048,44 @@
      proportion fill, so the distribution bars vanish (only the counts remain).
      Ratings are a kept-brand surface, so restore the gold fill. The fill is the
      only descendant carrying an inline PERCENT width (the track/underline use px),
-     so this matches exactly the five bars and never the blue tab underline. */
-  [data-widget="webReviewTabs"] div[style*="width"][style*="%"] {
+     so this matches exactly the five bars and never the blue tab underline.
+
+     webReviewProductScore is the SAME control on the standalone /reviews/ page,
+     where the score summary is its own widget instead of a webReviewTabs panel —
+     and it carries its own copy of the `div { transparent }` reset, so the fills
+     were flat there while the PDP's were gold. The track stays visible on that
+     page, which is exactly what hides it: five identical grey bars still look
+     like a chart, so 869 five-star and 1 two-star read the same.
+
+     The grey TRACK behind the fill is flattened by the same reset and has no
+     selector of its own — it is the fill's PARENT, hashed, attribute-less. It does
+     carry `overflow: hidden` with a 5px radius, so a large-spread box-shadow on the
+     fill paints the remainder and is clipped to exactly the track's rounded box.
+     That also keeps a bar visible for a rating with zero reviews, whose fill is
+     0px wide. */
+  [data-widget="webReviewTabs"] div[style*="width"][style*="%"],
+  [data-widget="webReviewProductScore"] div[style*="width"][style*="%"] {
     background-color: var(--d-gold) !important;
+    box-shadow: 0 0 0 300px rgba(255, 255, 255, 0.12) !important;
+  }
+  /* Each histogram row spaces itself from the next with a 6px `border-bottom` that
+     is natively TRANSPARENT — a border used as a gap, not as a line. The blanket
+     `* { border-color }` softener at the top of this file paints it --d-border, so
+     a fat grey bar appears under every rating row: the chart renders as ten bars
+     where the site draws five, and the phantom ones are thicker than the real ones.
+     Nothing flags it — the colour is a legitimate theme value, the element has no
+     background, and the native side reads `rgba(0,0,0,0)`, which every "is it light?"
+     test passes.
+
+     Cleared across the whole widget rather than aimed at the rows: the histogram
+     list sits at a different depth on the PDP (where an extra summary block precedes
+     it) than on the standalone /reviews/ page, so any nth-child path that names the
+     rows on one page names a wrong element on the other. The widget's only other
+     bottom border is the 1px hairline under the stars header, which sits at that same
+     shifting depth and so goes with them; the header is still set off by its own
+     spacing, and one lost hairline beats five phantom bars. */
+  [data-widget="webReviewProductScore"] div {
+    border-bottom-color: transparent !important;
   }
   /* ACTIVE review-tab underline ("Отзывы о товаре" / "Вопросы о товаре"): a 2px bar
      Ozon slides under the current tab, painted brand-blue via an inline left+width.
@@ -1077,6 +1214,48 @@
   [data-widget="filtersDesktop"] img {
     position: relative !important;
     z-index: 1 !important;
+  }
+  /* CURRENT CATEGORY in the "Категория" rail — Ozon marks the page you are on with
+     a pale #f5f7fa pill behind its row; the ancestor rows above it carry a back
+     chevron and its child categories below it carry nothing. The `div { transparent }`
+     neutraliser above erases that pill, so the current category becomes
+     indistinguishable from the children listed under it: the rail loses its only
+     "you are here". Neither scanner sees it — the pill is a neutral grey, so chroma
+     has no hue to miss, and a flattened highlight is still a legible link.
+
+     The row is reachable without betting on a hash. Ozon adds a modifier class to
+     the CURRENT row only; every other category row ships `class=""`, and the section
+     header and the "Посмотреть все" action carry no inline margin. So "a category
+     row whose class attribute is not empty" names the current one exactly, at any
+     tree depth, while the modifier's own hash rotates freely. Verified on a
+     top-level, a mid-level and a leaf category. Repainted to the same active
+     elevation the catalog flyout's loaded rail category uses. */
+  [data-widget="filtersDesktop"] div[style*="margin-left"][class]:not([class=""]) {
+    background-color: var(--layerActiveFloor0) !important;
+  }
+
+  /* TOGGLE SWITCHES in the rail ("Распродажа", "Бренд проверен", "Официальные
+     магазины бренда") — a 44x28 pill whose track is the input's ADJACENT SIBLING
+     div and whose knob is that div's ::before. Two of our own rail resets erase the
+     control whole: the `div { transparent }` neutraliser above clears the track
+     (natively rgba(204,214,228,.6)) and the `*::before { --d-surface }` pseudo
+     repaint turns the white knob into #1c2128. An OFF switch therefore renders as
+     literally nothing — no track, no knob, no hint the row is a control at all,
+     while the label beside it reads perfectly, which is exactly what hides it. The
+     lock glyph inside the knob keeps its native dark rgba(0,26,52,.4), and that is
+     right only once the knob is light again.
+
+     The switches are the one input kind in the rail with NO `name` attribute — the
+     checkboxes, radios and price-range fields all ship `name=""` — so they are
+     reachable with no hashed class. Specificity is deliberately held at (0,2,2),
+     level with the `input:checked + div` fill rule below, so a CHECKED switch still
+     takes the brand blue from that rule, which wins on source order. Adding
+     [type="checkbox"] here would outrank it and grey out every checked switch. */
+  [data-widget="filtersDesktop"] input:not([name]) + div {
+    background-color: rgba(255, 255, 255, 0.16) !important;
+  }
+  [data-widget="filtersDesktop"] input:not([name]) + div::before {
+    background-color: #ffffff !important;
   }
   /* CHECKED filter radio / checkbox — Ozon fills the selected control with its
      brand blue (#005bff) and draws the dot/tick in white on top of it. The
@@ -1209,6 +1388,18 @@
   button[aria-label="Открыть галерею"] svg {
     color: #ffffff !important;
   }
+  /* The REVIEW/GALLERY PHOTO STRIP (data-widget="webListPhotos" — the thumbnail
+     rail under the PDP gallery and the "photos from reviews" row above the review
+     list) is the THIRD --layerFloor1-as-a-glyph use, and it carries no aria-label,
+     so neither the inline-keyed timecode rule nor the aria-label rule above ever
+     reached it. Every video thumbnail in those strips therefore drew its play
+     ring + triangle in #1c2128 on the video still — the "this is a video"
+     affordance, all but gone (14 of them on a review-rich PDP). Every button in
+     this widget sits on top of a photo or video still, so white is right in every
+     instance, exactly as the site paints it natively. */
+  [data-widget="webListPhotos"] button svg {
+    color: #ffffff !important;
+  }
 
   /* "Новинка" marketing chip — Ozon ships it as an INLINE pale-green plate with
      green text (`background:#E4FDEC; color:#10C44C`). The inline guard on the
@@ -1310,6 +1501,18 @@
      <div> parent uniquely reaches the selected one without a rotating hash. */
   [data-widget="webAspects"] div > span.pdp_e7 {
     border-color: var(--d-blue) !important;
+  }
+  /* HOVERING an UNSELECTED aspect chip / swatch natively lifts its ring to the pale
+     brand blue #99bdff; our blanket border softener flattens that too, so the whole
+     picker gives no feedback at all under the cursor (the ring stays the same dark
+     grey it had at rest). No load-time scan can see a state that is not rendered —
+     only a native-vs-themed hover diff. The unselected options are the navigable
+     <a>s (the current one is a <div>, kept blue by the two rules above), so this
+     never competes with the selection ring. Deliberately a dimmer blue than the
+     selected ring: on near-black the site's pale #99bdff would outshine the
+     selection it is supposed to sit under. */
+  [data-widget="webAspects"] a:hover > span {
+    border-color: rgba(46, 120, 255, 0.55) !important;
   }
 
   /* Carousel shelf headings ("Покупают вместе", "Рекомендуем также")

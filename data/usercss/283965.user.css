@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for Syosetu (小説家になろう). Easy-on-the-eyes reading for novel chapters, plus the home, rankings, search and bookmark controls.
-@version      20260730.14.15
+@version      20260803.00.37
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -681,9 +681,15 @@
     color: #1a1109 !important;
     border-color: #ff922b !important;
   }
-  /* Natively transparent link-buttons, not filled chips */
+  /* Natively transparent link-buttons, not filled chips.
+     blog.syosetu.com ships its OWN button scale where the bare .c-button is the
+     brand-blue PRIMARY and --secondary is the quiet one (white fill, --color-link
+     label) — the inverse of the portal's. Our neutral chip therefore erased the
+     only distinction the blog draws between its two button ranks, leaving the
+     "ページの先頭へ戻る" control reading as a filled action. */
   .c-button.c-button--minor,
-  .c-button.c-button--outline {
+  .c-button.c-button--outline,
+  .c-button.c-button--secondary {
     background-color: transparent !important;
     color: #5fb0e6 !important;
   }
@@ -927,6 +933,33 @@
     border-color: #2d333b !important;
   }
 
+  /* Every control the network leaves UNstyled keeps the UA's
+     `border: 2px inset|outset`, and Chromium draws that 3D bevel by
+     LIGHTENING two of the four edges — measured rgb(109,124,143) on the page
+     base, i.e. a bright frame that NO border-color override can reach (the
+     blanket `* { border-color }` reset above sets the colour and the browser
+     still derives its own shades from the style keyword). It hits the legacy
+     search builder's 文字数 / 掲載日 fields, blog.syosetu.com's search box and
+     the +作品検索+ box + 検索 submit on all three R18 sites. Flatten the style;
+     the width is untouched, so nothing reflows. */
+  input[type="text"],
+  input[type="search"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  input[type="submit"],
+  input[type="button"],
+  textarea {
+    border-style: solid !important;
+  }
+  /* ...but the reader's 行間 / 文字サイズ readout declares `border: none`, whose
+     USED width springs from 0 to `medium` (3px) the instant a style is set —
+     it would grow a frame it never had. Same for the 縦書きPDF link further
+     down, which re-asserts it on its own rule. */
+  input.p-adjust-layout__console-display {
+    border-style: none !important;
+  }
+
   /* The custom <select> (header scope picker, sort order, 感想絞り込み)
      paints its chevron with an inline SVG data-URI whose <path> has no
      fill — i.e. pure black. On the dark input that is ~1.05:1, an
@@ -983,6 +1016,7 @@
     background-color: transparent !important;
     color: #5fb0e6 !important;
     border-color: transparent !important;
+    border-style: none !important;
   }
   /* Every item in that row ends with an icon-font chevron. On the mobile sheet the
      pseudo carries its own #0033cc (~2:1 on dark) while the label beside it lifts
@@ -1068,6 +1102,13 @@
   .tab_box li.pointer {
     background-color: #161b22 !important;
   }
+  /* An unselected tab's :hover is a `background:` SHORTHAND gradient
+     (#fefefe → #eee), so the background-COLOR above paints behind it and the
+     pill still went solid white under the pointer — with the tab's own light
+     blue label on it. Clear the image; the dark fill above then shows. */
+  .tab_box li.pointer:hover {
+    background-image: none !important;
+  }
   .tab_box li.select {
     background-color: #21262d !important;
     color: #e6c9a8 !important;
@@ -1103,6 +1144,15 @@
   input.btn-search:hover {
     background-color: #1a5fd0 !important;
     color: #ffffff !important;
+  }
+  /* The 検索 submit is embossed with `0 2px 0 1px rgba(255,255,255,.3)`. On the
+     site's white page that stop is invisible; on ours it resolves to a solid
+     rgb(91,94,97) bar hugging the bottom of the page's primary CTA — measured,
+     3 CSS px tall, on both the desktop and the phone builder. Keep the emboss
+     geometry, drop the light stop to a value that reads the way white does on
+     white. */
+  input.btn-search {
+    box-shadow: 0 -2px 0 1px rgba(0, 0, 0, 0.25), 0 2px 0 1px rgba(255, 255, 255, 0.06) !important;
   }
 
   /* Expanding search-builder panels (ジャンル選択 / 詳細条件設定) are white
@@ -1162,6 +1212,84 @@
     color: #5fb0e6 !important;
     border-color: #2d333b !important;
   }
+  /* Each saved-history row hovers to a near-white #f7f6f9 (its 編集 sibling to
+     #eee) — a full-width bright block under the pointer carrying the row's own
+     accent-blue label at ~1.6:1. Hover-only, so no load-time scan reaches it,
+     and the panel itself only exists once 履歴から検索 is opened. */
+  .search-history_list-link:hover,
+  .search-history_edit-btn:hover {
+    background-color: #21262d !important;
+  }
+
+  /* ============================================================
+     jQuery UI datepicker (#ui-datepicker-div)
+     The 詳細条件設定 panel's 最新掲載日 / 初回掲載日 fields open the stock
+     jQuery-UI 1.12 calendar — a floating widget that does not exist in the
+     DOM until a date field is clicked, so no load-time scan can reach it. It
+     ships the untouched "base" theme: a solid #fff panel (.ui-widget-content),
+     a #ccc header bar, #e6e6e6 day cells with #555 numerals and a cream
+     .ui-state-highlight for today. Rebuild the scale on dark, and keep the
+     three states distinguishable — default chip, hover chip, and the accent
+     blue for the selected day, which is the widget's only selection cue.
+     ============================================================ */
+  .ui-widget-content {
+    background: #1c2128 !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+  .ui-widget-content a {
+    color: #c4cdd6 !important;
+  }
+  .ui-widget-header {
+    background: #21262d !important;
+    background-image: none !important;
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+  }
+  .ui-state-default,
+  .ui-widget-content .ui-state-default,
+  .ui-widget-header .ui-state-default {
+    background: #21262d !important;
+    background-image: none !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+  .ui-state-hover,
+  .ui-widget-content .ui-state-hover,
+  .ui-state-focus,
+  .ui-widget-content .ui-state-focus {
+    background: #2d333b !important;
+    background-image: none !important;
+    color: #e6edf3 !important;
+    border-color: #3d444d !important;
+  }
+  .ui-state-active,
+  .ui-widget-content .ui-state-active {
+    background: #1f6feb !important;
+    background-image: none !important;
+    color: #ffffff !important;
+    border-color: #1f6feb !important;
+  }
+  /* "Today" — the widget's warm highlight; keep it warm, not neutral, so it
+     still reads as a distinct marker beside the plain day chips. */
+  .ui-state-highlight,
+  .ui-widget-content .ui-state-highlight {
+    background: #3a2f14 !important;
+    background-image: none !important;
+    color: #e6c9a8 !important;
+    border-color: #5a4a20 !important;
+  }
+  .ui-state-highlight a,
+  .ui-widget-content .ui-state-highlight a {
+    color: #e6c9a8 !important;
+  }
+  /* The <前 / 次> arrows are 16x16 cutouts of a #222 sprite sheet — a dark glyph
+     on a now-dark header. The sheet is a raster, so invert it rather than
+     restating a URL; the filter sits on the inner <span>, not on the <a> that
+     carries the click handler. */
+  .ui-datepicker .ui-icon {
+    filter: invert(0.85) !important;
+  }
 
   /* ============================================================
      Legacy search RESULTS list (yomou.syosetu.com/search.php)
@@ -1206,9 +1334,13 @@
   /* .attention is NOT metadata — it is the emphasised 総合ポイント figure the
      site paints #dd0000 on every result row. Lumping it in with the muted
      lines above made the ONE emphasised line the dimmest thing on the row.
-     (#trad/#main_search out-specify a bare .attention, so name them.) */
+     (#trad/#main_search out-specify a bare .attention, so name them.)
+     The R18 search hosts nest the same figure under .in_box, where this sheet's
+     own `.in_box span` lift (0,1,1) out-specifies a bare `.attention` (0,1,0)
+     and greyed all 20 rows a page — qualify the element to win. */
   #trad .attention,
   #main_search .attention,
+  .in_box span.attention,
   .attention {
     color: #ff7b72 !important;
   }
@@ -1264,6 +1396,15 @@
   #main_search .novel_h a:hover {
     color: #ffb877 !important;
   }
+  /* On the phone sheet each result title is a <span class="novel_h"> whose only
+     decoration is a 1px bottom rule drawn in the Narou orange #fe7643 — the same
+     hue as the title above it. The blanket border reset turned all 20 per page
+     into the generic divider grey, so the title's own underline stopped matching
+     it. The desktop results carry no such border, so the tag-qualified form
+     changes nothing there. */
+  span.novel_h {
+    border-bottom-color: #f0954a !important;
+  }
 
   /* ============================================================
      R18 group sites (noc / mnlt / mid .syosetu.com — ノクターン /
@@ -1310,6 +1451,34 @@
      swap to the warm orange used for novel titles elsewhere */
   .xtop-syuppan__syoseki-title {
     color: #f0954a !important;
+  }
+  /* A book in 書報 with no cover on file falls back to .c-syuppan-noimage — a
+     base64 PNG of a lavender rgb(183,180,208) book plate carrying the title in
+     white. Six of them sit side by side on the noc / mnlt / mid tops: the
+     brightest band on the page, and invisible to every audit (the element's own
+     background-COLOR is transparent; the plate is the background-IMAGE). The
+     art IS the placeholder, so multiply it against a dark chip rather than
+     clearing it — the book outline and spine survive, the white title stays on
+     top (a filter would invert that too) and the rounded corners hold. */
+  .c-syuppan-noimage {
+    background-color: #2a2f38 !important;
+    background-blend-mode: multiply !important;
+  }
+  /* 書報's cards and its ">>書報" readmore hardcode `rgba(241,243,245,.5)` as their
+     hover fill — the same translucent light wash the portal paints through
+     --color-ui-bg--hover, but written inline here, so the :root remap never
+     reached it. On dark the hovered card became a grey glare block with our warm
+     title sitting light-on-light inside it. Exists only on :hover, so no
+     load-time scan reaches it. */
+  a.xtop-syuppan__list-item:hover,
+  .xtop-syuppan__readmore:hover {
+    background-color: #1c2128 !important;
+  }
+  /* The card title's hover is a hue swap to green (#339933), which our
+     !important orange silently swallowed — the row lost its only pointer cue.
+     Keep the swap, lifted for dark. */
+  .xtop-syuppan__syoseki-title:hover {
+    color: #56d364 !important;
   }
   /* Legacy brown #663300 section headlines -> warm amber */
   .h2_news,
@@ -1399,6 +1568,199 @@
     color: #e6c9a8 !important;
   }
 
+  /* ============================================================
+     R18 SUB-pages (rankings, サイト概要, search results, review + blog lists)
+     Every rule above lands on the three R18 TOP pages. Their sub-pages run the
+     same legacy frontends but a different set of containers, none of which any
+     selector reached: noc's and mnlt's /rank/top/ is one plain #fff #rank_box
+     (plus noc's #ranking_about), mid's /review/list/ and /xblog/list/ are
+     stacks of #fcfcfc / #f3f3f3 article cards, and mid's /search/search/ gives
+     every one of its 20 hits a solid #ffffff <header>. The R18 base sheets also
+     ship a universal `* { color:#333 }` — a DIRECT match, so `body { color }`
+     never reaches it — which left サイト概要 and both search-result pages as
+     near-invisible copy once those panels went dark.
+     ============================================================ */
+  #rank_box,
+  #ranking_about,
+  .rank_box,
+  .review_list section,
+  .review_list article,
+  .xblog_list article,
+  article.search_novel header {
+    background-color: transparent !important;
+  }
+  /* mnlt's sub-page section bars are a white plate, the sibling of the .div_h3
+     head already handled on its top page. */
+  .div_h2 h2 {
+    background-color: #1c2128 !important;
+    color: #e6c9a8 !important;
+  }
+  /* The legacy copy inside all of the above. Titles, authors and links carry
+     their own colour and out-specify nothing here, so they are untouched. */
+  .right_contents_box,
+  .ranking_top5box,
+  .ranking_top5box li,
+  .ranking_top5box span.name,
+  .rank_attention,
+  .rank_attention .attention_title,
+  .main2_box .site_h2,
+  .main2_box .section,
+  .main2_box .section p,
+  .main2_box .section li,
+  .main2_box .entry_link_body p,
+  .right_contents_box .section,
+  .right_contents_box .section p,
+  .right_contents_box .section li,
+  .right_contents_box .entry_link_body p,
+  .right_contents_box > p,
+  .right_contents_box .page,
+  .right_contents_box .page b,
+  .site-browser__headline,
+  .site-browser__list li,
+  .searchdate_box p,
+  .searchdate_box b,
+  p.pager,
+  p.pager b,
+  #rank_box,
+  #rank_box td,
+  #ranking_about,
+  #ranking_about p,
+  .rank_box,
+  .rank_box td,
+  .review_list article,
+  .review_list .review_box,
+  .review_list .novelinfo_box,
+  .xblog_list article,
+  .xblog_list p,
+  article.search_novel,
+  article.search_novel p {
+    color: #c4cdd6 !important;
+  }
+  /* Timestamps and the results-footer note are the pages' muted metadata */
+  .review_list time,
+  .xblog_list time,
+  p.search_footer,
+  .search_items,
+  article.search_novel span.ncode {
+    color: #9aa3ad !important;
+  }
+  /* mid's search-result titles are the Narou orange #fd6532; the generic link
+     rule flattened all 20 a page to accent blue, exactly as it once did to
+     yomou's #trad results. The synopsis under them is a #663333 maroon. */
+  article.search_novel h1 a {
+    color: #f0954a !important;
+  }
+  article.search_novel h1 a:hover {
+    color: #ffb877 !important;
+  }
+  article.search_novel p.ex {
+    color: #b6c0ca !important;
+  }
+  /* The rating panel beside each hit is fill-less: its #66cc99 green frame is
+     the whole box, matching the 総合ポイント figure inside it. The blanket border
+     reset flattened all 20 a page to the divider grey. */
+  p.point {
+    border-color: #66cc99 !important;
+  }
+  /* noc's ranking explainer heading is a #aa3366 wine that drops to 2.4:1, and
+     each BEST5 block's own head is the legacy #663300 brown at 1.5:1 */
+  #ranking_about h3,
+  .h2_rank {
+    color: #e6c9a8 !important;
+  }
+  /* The period tabs above each ranking are pale pills (#ffeeff on noc, #eeffff
+     on mnlt) with BLACK labels, and the current one is a white pill whose only
+     other marker is a 2px bottom rule in the site's brand hue — which the
+     blanket border reset flattened. Rebuild the scale and restore each site's
+     own accent on its own selector. `.change_rank` is the switch-to-the-other-
+     ranking pill, natively the loudest chip in the row. */
+  #ranking_navi a,
+  .r_navilist li,
+  .r_navilist li a {
+    background-color: #161b22 !important;
+    color: #c4cdd6 !important;
+  }
+  #ranking_navi li.on a,
+  .r_navilist li.on,
+  .r_navilist li.on a {
+    background-color: #21262d !important;
+    color: #e6c9a8 !important;
+  }
+  #ranking_navi li.change_rank a,
+  .r_navilist li.change_rank,
+  .r_navilist li.change_rank a {
+    background-color: #3a2f14 !important;
+    color: #e6c9a8 !important;
+  }
+  #ranking_navi li.on a,
+  #ranking_navi a:hover {
+    border-bottom-color: #ffaaff !important;
+  }
+  .r_navilist li.on,
+  .r_navilist a:hover {
+    border-bottom-color: #66ccff !important;
+  }
+  /* The ユーザ登録 CTA on サイト概要 is a pale plate — #eeccee on noc, #ddeeee on
+     mnlt — carrying a link label that our accent blue leaves at ~2:1 on it. */
+  a.entry_link {
+    background-color: #21262d !important;
+    color: #9bd4ff !important;
+  }
+  /* mid's PHONE sheet paints the bare tag — `article { background-color:#fff }` —
+     so its review list, search results, ranking and 閲覧履歴 all render as white
+     slabs no class-scoped rule can reach; the 閲覧履歴 panels add their own #fff
+     h2/h3/div plus an #eee radial-gradient wrapper. `article` is (0,0,1), below
+     every class rule in this sheet, so the elevated cards above keep their fill;
+     on the main network every <article> (the reader's .p-novel, the blog's
+     .c-article) is natively bare, so clearing it changes nothing there. */
+  article,
+  .order_box,
+  .review_list h1,
+  .rireki_setting,
+  .rireki_setting h2,
+  .rireki_setting h3,
+  .rireki_setting div {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+  /* ...and the history page's controls are #eee / #f9fcff chips */
+  .rireki_box a,
+  a#rireki_alldelete,
+  a#disable_history,
+  a#enable_history {
+    background-color: #21262d !important;
+  }
+  /* The MAIN network's 閲覧履歴 (yomou.syosetu.com/rireki/list/) now renders the
+     same two ids as modern `.c-button--primary` CTAs. The id rule above is
+     (1,0,1) and beat the modifier (0,2,0), so 閲覧履歴を記録しない and
+     閲覧履歴をすべて削除する sat as neutral chips beside a 続きから読む that
+     carries the identical classes and paints blue. Qualify to (1,1,1). */
+  a#rireki_alldelete.c-button--primary,
+  a#disable_history.c-button--primary,
+  a#enable_history.c-button--primary {
+    background-color: #1f6feb !important;
+    border-color: #1f6feb !important;
+    color: #ffffff !important;
+  }
+  /* With those panels dark, everything written on them turns out to be the same
+     legacy #333/#444/#555 ink the R18 base sheets set directly. */
+  .review_list .novelinfo,
+  .review_list .review,
+  .rireki_setting p,
+  .rireki_setting div {
+    color: #c4cdd6 !important;
+  }
+  .rireki_setting h2,
+  .rireki_setting h3,
+  h2.rank {
+    color: #e6c9a8 !important;
+  }
+  a#rireki_alldelete span,
+  a#disable_history span,
+  a#enable_history span {
+    color: #9aa3ad !important;
+  }
+
   /* ミッドナイトノベルズ (mid) is a FOURTH frontend: its chrome is natively dark
      (black header, neon-green sprites, all fine on our base) but the entire content
      column is one white <main>, with a #ccc sub-nav strip above it and a white
@@ -1419,6 +1781,91 @@
   .info_box,
   span.type {
     color: #9aa3ad !important;
+  }
+  /* mid's ranking/list nav rows hover into a `background:` shorthand gradient
+     (#fdfdfd → #f0f0f0, with an #edffed stop on the -ms branch) — a full-width
+     WHITE bar carrying the row's own light-blue label at ~1.4:1, and the only
+     hover cue the page has. A background-COLOR override paints behind the
+     gradient, so the image has to go. Both selectors are one rule in the site's
+     sheet. */
+  nav.ranklist_nav li a:hover,
+  nav.list_link li a:hover {
+    background-color: #21262d !important;
+    background-image: none !important;
+  }
+  /* mid's ranking pages list every entry as a <dl class="ranking"> whose <dd>
+     carries the 作者 line at #666 — 5.7:1 on the site's white page, 3.1:1 on
+     ours, and the dimmest thing in a 25-row list. The title and 作品情報 inside
+     it are anchors and keep their own colour. `dl.ranking` exists nowhere else
+     on the network (verified across the portal, yomou, noc, mnlt and mid's own
+     top), so the bare selector stays mid-only. */
+  dl.ranking dd {
+    color: #9aa3ad !important;
+  }
+
+  /* The R18 paged ranking LIST (/rank/list/type/<period>/) is a different
+     container family from the ranking TOP handled above. noc wraps its 300 rows
+     in a `.ranking_inbox` painted a solid #ffffff — a full-length white slab
+     carrying our light body text; mnlt's is bare and mid has none. Each row's
+     heading is `#rank_box .rank_h` with a `.name` author span, both left at the
+     base sheet's universal `* { color:#333 }` — a DIRECT match, so no inherited
+     body colour reaches them. The title inside is an anchor and keeps its own. */
+  .ranking_inbox {
+    background-color: transparent !important;
+  }
+  #rank_box .rank_h,
+  #rank_box .rank_h .ranking_number {
+    color: #c4cdd6 !important;
+  }
+  #rank_box .rank_h .name {
+    color: #9aa3ad !important;
+  }
+  /* The 総合/短編/連載中/完結済 novel-type chips are the class twin of the
+     .r_navilist period pills above: a pale plate (#ffeeff on noc, #eeffff on
+     mnlt) under a BLACK label, the current one marked only by a 2px rule in the
+     site's own accent that the blanket border reset flattened. noc wraps the row
+     in `.r_navititle` (class), mnlt in `#r_navititle` (id) — that pair is the
+     only way to tell the two hosts apart from CSS. */
+  ul.r_noveltypelist li,
+  ul.r_noveltypelist li a {
+    background-color: transparent !important;
+    color: #c4cdd6 !important;
+  }
+  ul.r_noveltypelist li.on,
+  ul.r_noveltypelist li.on a {
+    background-color: #21262d !important;
+    color: #e6c9a8 !important;
+  }
+  ul.r_noveltypelist a:hover {
+    background-color: #21262d !important;
+  }
+  .r_navititle ul.r_noveltypelist li.on {
+    border-bottom-color: #ffaaff !important;
+  }
+  #r_navititle ul.r_noveltypelist li.on {
+    border-bottom-color: #66ccff !important;
+  }
+  /* mid's paged ranking list is a THIRD family again: each of its 300 rows is a
+     #fcfcfc `.rankList_info` card, and `.rankList` ships a #666 ink that the
+     作者 / 連載中 / キーワード / 最終更新日 lines inherit. The rank and point
+     figures keep their own #3bd cyan (a direct declaration beats inheritance). */
+  .rankList_info {
+    background-color: transparent !important;
+  }
+  .rankList {
+    color: #c4cdd6 !important;
+  }
+  /* mid marks the current period tab and novel-type chip with a #008877 teal
+     rule plus label — 2.2:1 on our base, and the label is additionally
+     overwritten by the generic link blue, so selected and unselected render
+     identical. Lift the teal on both; it is the row's only "you are here" cue. */
+  nav.rank_navtype li.on,
+  ul.rank_noveltypelist li.on {
+    border-bottom-color: #3ac9b4 !important;
+  }
+  nav.rank_navtype li.on a,
+  ul.rank_noveltypelist li.on a {
+    color: #3ac9b4 !important;
   }
 
   /* The R18 group serves its OWN phone sheets (smp_base / smp_noc / the mnlt and mid
@@ -1442,6 +1889,18 @@
     background-color: transparent !important;
     background-image: none !important;
   }
+  /* Clearing those plates leaves the 新着一覧 / ランキング pair identical: their
+     only remaining difference was ランキング's saturated #ee9933 frame + #ee7633
+     label, both flattened. (新着一覧's own frame is a pale #cc99bb on noc /
+     #99bbcc on mnlt — correctly left flattened.) */
+  div.beginner li.ranking,
+  div.beginner_rank li.ranking {
+    border-color: #ee9933 !important;
+  }
+  div.beginner li.ranking a,
+  div.beginner_rank li.ranking a {
+    color: #f0954a !important;
+  }
   /* Keep the heads' background-IMAGE: on these h2s it is the section icon
      (news.gif megaphone, book.gif), not a band — the band is the colour. */
   body > h2 {
@@ -1451,6 +1910,81 @@
   p.outlink,
   ul.link_list > li {
     color: #9aa3ad !important;
+  }
+  /* The R18 phone SUB-pages (rankings, search results, サイト概要) add a second
+     tier of the same family: a `body > h3` section band (white on サイト概要, a
+     #333 head above each BEST5 block), the ranking's period pills as
+     `ul#r_navilist` — a white strip of pale pink / pale cyan chips, the id twin
+     of the desktop `.r_navilist` handled above — the ユーザ登録 CTA as a white
+     gradient, and, on every one of the 20 hits per results page, an
+     `▼あらすじ等` disclosure bar at #f3f9f9. Only the phone sheets emit any of
+     these. */
+  body > h3 {
+    background-color: #1c2128 !important;
+    color: #e6c9a8 !important;
+  }
+  ul#r_navilist,
+  ul#r_navilist > li {
+    background-color: #161b22 !important;
+    color: #c4cdd6 !important;
+  }
+  ul#r_navilist > li.on {
+    background-color: #21262d !important;
+    color: #e6c9a8 !important;
+  }
+  /* …and beside it the novel-type row as `ul#r_noveltypelist`, the id twin of
+     the desktop `ul.r_noveltypelist` above: four solid-white chips (#ffffff on
+     noc, #f0ffff on mnlt) under a #006699 label, the current one #eeeeee with a
+     #999999 rule. These legacy R18 rows always come in a desktop-class /
+     phone-id pair — fix the twin whenever you fix one. */
+  ul#r_noveltypelist > li,
+  ul#r_noveltypelist > li a {
+    background-color: #161b22 !important;
+    color: #c4cdd6 !important;
+  }
+  ul#r_noveltypelist > li.on,
+  ul#r_noveltypelist > li.on a {
+    background-color: #21262d !important;
+    color: #e6c9a8 !important;
+  }
+  ul#r_noveltypelist > li.on {
+    border-bottom-color: #8b949e !important;
+  }
+  /* Ranks 1–5 are medal GIFs; 6位 down is a text `.ranking_number` the phone
+     sheet paints #993333 — a maroon that reads on the site's white page and
+     vanishes on ours. Keep it in the native red family. The keyword and date
+     lines under each row are the same sheet's #666666. */
+  ul.ranking li .ranking_number {
+    color: #ff7b72 !important;
+  }
+  ul.ranking li.keyword,
+  ul.ranking li.date {
+    color: #9aa3ad !important;
+  }
+  /* mid's phone sheet moves the #666 ink off `.rankList` onto `.rankList p`
+     directly, so lifting the container is not enough — the 作者 / 連載中 /
+     キーワード / 最終更新日 paragraphs stay dark. Re-assert the rank line's own
+     #33bbdd afterwards; the broad lift would otherwise swallow it. */
+  .rankList p {
+    color: #c4cdd6 !important;
+  }
+  .rankList p.rank {
+    color: #33bbdd !important;
+  }
+  div#entry_link > a,
+  .genre_list.content-bg,
+  .toggle-next-tab {
+    background-color: #21262d !important;
+    background-image: none !important;
+    color: #c4cdd6 !important;
+  }
+  ul.novellist li.date,
+  div.update24 {
+    color: #9aa3ad !important;
+  }
+  /* mnlt's ジャンル選択 head inside that panel is a #682485 purple at 1.6:1 */
+  .genre_list .content-head_h3 {
+    color: #e6c9a8 !important;
   }
 
   /* ============================================================
@@ -1638,6 +2172,123 @@
   #modal,
   #modal p {
     color: #c4cdd6 !important;
+  }
+  /* nl.syosetu.com/redirect/ageauth/ — the gate every noc / mnlt / mid visitor
+     lands on first, desktop AND phone. Its two choices are fill-less boxes
+     whose `3px double` edge is their whole identity: cyan #18b7cd for "under
+     18, leave" and pink #eeaae0 for "18+, enter". The blanket border reset
+     crushed both to the divider grey, so the only control on the page read as
+     two identical unlabelled frames. Same class as the #index_* gates below. */
+  #modal .no {
+    border-color: #18b7cd !important;
+  }
+  #modal .yes {
+    border-color: #eeaae0 !important;
+  }
+  /* ...but #modal is only ONE of the group's age gates. Each R18 site serves a
+     different gate markup, and it is the FIRST page every visitor to noc / mnlt
+     sees, so none of it is reachable behind a login: ノクターン's desktop gate is
+     one solid #fff page (#index_contents wrapping a #fcfbfc 【利用上の注意】 box,
+     over a #fff #index_footer), and both phone gates paint the same box's <h2> a
+     full-width #fff band, with ムーンライト adding a near-white #f5f5ff title
+     plate. Neutralize every plate; #index_title keeps its logo GIF, since only
+     the colour behind it is the band. */
+  #index_contents,
+  #index_footer,
+  #index_attention,
+  #index_attention > h2,
+  h1#index_title {
+    background-color: transparent !important;
+  }
+  /* The 【利用上の注意】 heading is 16px bold #cc3399 on the phone sheet — 3.8:1
+     once its white plate is gone. The desktop gate paints the same heading the
+     network's brighter #ff3399 (5.3:1), so adopt that everywhere. */
+  #index_attention > h2 {
+    color: #ff3399 !important;
+  }
+  /* With the plate dark, every line on the gate turns out to be legacy #333 —
+     and NOT by inheritance: both R18 base sheets declare a universal
+     `* { color:#333 }`, and a direct match beats anything cascading down from
+     our `body`, so `body { color }` never reaches one of them. Name the gate's
+     own boxes. */
+  #index_contents,
+  #index_contents p,
+  #index_contents div,
+  #index_attention,
+  #index_mnlt,
+  #index_mid,
+  #no_yes,
+  .entrance_text,
+  .entrance_text p {
+    color: #c4cdd6 !important;
+  }
+  /* Every framed box on the gate is fill-less: its coloured edge IS the box.
+     The blanket border reset above flattened them all to the divider grey,
+     leaving the notice and the sister-site cards as unframed text. Restore the
+     native edge per box. The desktop and phone sheets use different shades for
+     two of them, so the desktop values are qualified with #index_contents,
+     which exists only on the desktop gate. */
+  #index_attention {
+    border-color: #cc3399 !important;
+  }
+  #index_contents #index_attention {
+    border-color: #cc99ff !important;
+  }
+  #entrance_in {
+    border-top-color: #aa99ff !important;
+    border-bottom-color: #aa99ff !important;
+  }
+  #index_mnlt {
+    border-color: #3399cc !important;
+  }
+  #index_contents #index_mnlt {
+    border-color: #66ccff !important;
+  }
+  #index_noc {
+    border-color: #cc3399 !important;
+  }
+  #index_mid {
+    border-color: #00dd99 !important;
+  }
+  /* The gate's NO / YES pair is the only control on the page. The phone sheet
+     makes them solid teal #44afaa / magenta #d449a9 chips and paints the label
+     white at `#entrance a` (0,1,1) — our generic `a` rule wins that on
+     !important alone and dropped both labels, and their sub-caption, to the
+     accent blue at ~1.8:1 on the fill. Pin them back to white. Scoped by the
+     phone-only ids so the desktop gate's bare links keep the accent blue. */
+  #entrance a#no,
+  #entrance a#yes,
+  #entrance a#no span,
+  #entrance a#yes span {
+    color: #ffffff !important;
+  }
+  /* ムーンライト's desktop gate is a fourth layout again, and all of its copy is
+     legacy-dark: the lead is #0066aa (2.6:1) and the notice #666 (3.0:1). Worse,
+     mnlt's legacy base sheet ships a universal `* { color:#333 }` — a DIRECT
+     match, which beats anything the <a> above it inherits down — so the caption
+     under each entry link ("入場します。") rendered #333 at 1.4:1, i.e. invisible.
+     Name them explicitly; the entry links themselves stay accent blue. */
+  #index_right p.index_text {
+    color: #9bd4ff !important;
+  }
+  p.index_attention,
+  .free,
+  .no_free {
+    color: #9aa3ad !important;
+  }
+  /* That same gate hangs its 890x860 wordmark off #container as a raster
+     background — a solid WHITE plate filling the left half of the page — and
+     rules the entry links with two opaque white PNGs. No colour rule reaches
+     either. An INSET box-shadow paints over an element's background but under
+     its content, so it veils the plate without restating the image URL (a
+     re-declared background-image would land the moon logo on every other
+     #container in the group, none of which has one); the PNGs invert the way
+     the reader's 挿絵 pill does. */
+  div#container {
+    box-shadow: inset 0 0 0 9999px rgba(20, 24, 29, 0.94) !important;
+  }
+  img[src*="mnlt_index_entrance_line"] {
+    filter: invert(0.92) hue-rotate(180deg);
   }
 
   /* Ad / PR slots: neutral dark so blank slots don't flash white */

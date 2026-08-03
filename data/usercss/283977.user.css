@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for KHInsider's game-music archive: easy on the eyes across album pages, song lists, the audio player, search and comments.
-@version      20260730.14.14
+@version      20260803.00.36
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -213,6 +213,17 @@
   }
   .audioplayerTimeCurrent, .audioplayerTimeDuration { color: #c4cdd6 !important; }
   .audioplayer .material-icons { color: #e6edf3 !important; }
+  /* One site rule — `… a i:hover, .audioplayerloopOn` set to #4d707f — carries BOTH the
+     icon hover tint and the loop-ON state, and the loop toggle writes that colour inline
+     on the glyph. Our `.audioplayer *` colour is !important, so it outranks the rule AND
+     the inline style: no button showed hover feedback, and the loop button's three states
+     (off / loop-all / loop-one) collapsed to two — "loop all" differs from "off" by the
+     colour alone, the `repeat_one` ligature only marking the third. #4d707f is picked for
+     the light player; lift both to the player's own accent. */
+  .audioplayer a i:hover,
+  .audioplayer span i:hover,
+  .audioplayer .material-icons[style*="4d707f"],
+  .audioplayerloopOn { color: #5fb0e6 !important; }
   /* progress track + played accent */
   .audioplayerBar {
     background-color: #1c2128 !important;
@@ -275,6 +286,10 @@
     background-color: #1f6feb !important;
     color: #ffffff !important;
   }
+  /* The site's own `:hover` darkens the CTA to #4385A7; our !important base outranks it,
+     and the label sits in a `<font color="#FFFFFF">` we also force, so the anchor's link
+     hover colour never shows either — the button had no hover feedback at all. */
+  .reply_to_comment a:hover { background-color: #388bfd !important; }
   #pageContent .reply_to_comment a font,
   #pageContent .reply_to_comment a span { color: #ffffff !important; }
 
@@ -376,6 +391,15 @@
 
   /* ---- Breadcrumbs / page title ---- */
   .p-breadcrumbs li, .p-breadcrumbs a, .p-breadcrumbs:before { color: #aab4bf !important; }
+  /* Every breadcrumb crumb signals hover two ways natively: the link darkens
+     (#1474b8 -> #0f578a) and a `rgba(20, 20, 20, .05)` chip fades in behind it. Our
+     muted crumb colour is !important so it outranks the first, and a 5%-black wash is
+     invisible on a dark page — the crumbs had no hover feedback at all. Lift the ink
+     and give the chip a real dark tone. */
+  .p-breadcrumbs > li > a:hover {
+    color: #ffffff !important;
+    background-color: #21262d !important;
+  }
   .p-title-value { color: #e6edf3 !important; }
   .p-description { color: #8b949e !important; }
 
@@ -491,6 +515,13 @@
   }
   .input:focus { background-color: #1a2029 !important; border-color: #3d6a96 !important; }
   .input::placeholder, .js-editor::placeholder { color: #8b949e !important; opacity: 1 !important; }
+  /* `select.input` is `appearance: none` and draws its caret as a data-URI SVG whose
+     fill is baked to #141414 — 1.08:1 on our control, so the arrows vanish. A <select>
+     accepts no pseudo-element, so the glyph can only be swapped for another data URI.
+     Replacing background-IMAGE alone keeps the site's position/size/repeat. */
+  select.input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4.9 10'%3E%3Cpath fill='%238b949e' d='M1.4 4.7l1.1-1.5 1 1.5m0 .6l-1 1.5-1.1-1.5'/%3E%3C/svg%3E") !important;
+  }
   .button, .menuTrigger, .buttonGroup {
     background-image: none !important;
     background-color: #21262d !important;
@@ -836,6 +867,46 @@
     border-color: #1f6feb !important;
   }
   .pageNav-jump, .pageNavSimple-el { color: #5fb0e6 !important; }
+  /* Both pagers lost their hover feedback to the flat repaints above: the page pill
+     darkens natively (#fef4e7 -> #fdeed8) and the per-row jump pill swaps to a white
+     tile, and our !important rules outrank each. The current-page rule is restated at
+     `:hover` (same specificity, later) so the generic pill hover cannot grey it out —
+     it lifts to a brighter blue instead, keeping the selected identity while still
+     answering the pointer, as the native cream chip does (#fef4e7 -> #fdeed8). */
+  .pageNav-page:hover, .pageNav-page a:hover { background-color: #262c33 !important; }
+  .pageNav-page--current:hover,
+  .pageNav-page--current a:hover { background-color: #388bfd !important; }
+  /* The Prev/Next jump buttons flanking the page pills are a separate element with its
+     own native hover (#e8f4fc -> #daedfb) that the flat repaint above also swallowed. */
+  .pageNav-jump:hover { background-color: #262c33 !important; }
+  /* ---- Simple pager (the ≤650px replacement for the pill pager) ----
+     XenForo gives its five controls three deliberately different treatments: First/Last
+     are BARE (transparent border, link colour at 60% opacity), Prev/Next are solid
+     light-blue tiles, and "N of M" is an amber status chip. The base `.pageNavSimple-el`
+     repaint above is !important and flattens all five into the same bordered chip, and
+     takes every hover with it — the mobile pager read as five identical buttons.
+     Restate each variant at (0,2,0), as XenForo's own rules do. */
+  .pageNavSimple-el.pageNavSimple-el--first,
+  .pageNavSimple-el.pageNavSimple-el--last {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    color: #7ba7cc !important;
+  }
+  .pageNavSimple-el.pageNavSimple-el--first:hover,
+  .pageNavSimple-el.pageNavSimple-el--last:hover {
+    background-color: #262c33 !important;
+    border-color: #2d333b !important;
+    color: #9bd4ff !important;
+  }
+  .pageNavSimple-el.pageNavSimple-el--prev:hover,
+  .pageNavSimple-el.pageNavSimple-el--next:hover { background-color: #262c33 !important; }
+  /* the current-page chip, matched to the pill pager's own current state */
+  .pageNavSimple-el.pageNavSimple-el--current,
+  .pageNavSimple-el.pageNavSimple-el--current:hover {
+    background-color: #1f6feb !important;
+    color: #ffffff !important;
+    border-color: #1f6feb !important;
+  }
   /* per-row page-jump pills inside thread rows */
   .structItem-pageJump a {
     background-image: none !important;
@@ -843,6 +914,7 @@
     color: #9bd4ff !important;
     border-color: #2d333b !important;
   }
+  .structItem-pageJump a:hover { background-color: #2a313a !important; }
 
   /* filter/sort bar above thread lists ships a light gradient strip */
   .block-filterBar, .filterBar {

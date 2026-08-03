@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for OLX Brasil.
-@version      20260730.14.16
+@version      20260803.00.38
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -65,6 +65,24 @@
   #header form > button * { color: #e6edf3 !important; }
   #header form > button:hover { background-color: #2d333b !important; }
   #header form > button::before { background-color: #2d333b !important; }
+  /* The narrow-viewport shell opens with a smart-app banner ("Só no app da OLX")
+     ABOVE the nav — `div.olx-header__app-banner`, a full-width literal #EFF1F5 strip
+     that only exists at mobile widths, so no desktop pass ever saw it and no rule here
+     reached it. Natively it is the tinted sibling of the white header; keep that
+     relationship inverted by settling it on the elevated tone rather than the header's
+     own #0d1117. Its title carries the palette's near-black ink and its description the
+     muted #5E6A82 — both dark-on-dark once the strip darkens — and the close X is a
+     `fill="currentColor"` glyph off the same #5E6A82, on its own #EFF1F5 button fill.
+     The purple app tile and the orange "Baixe" CTA (already `--primary`) are the
+     banner's brand identity and stay. */
+  .olx-header__app-banner {
+    background-color: #1c2128 !important;
+    border-bottom: 1px solid #2d333b !important;
+  }
+  .olx-header__app-banner-close-button { background-color: transparent !important; }
+  .olx-header__app-banner-close-icon { color: #c4cdd6 !important; }
+  .olx-header__app-banner-title { color: #e6edf3 !important; }
+  .olx-header__app-banner-description { color: #9aa6b0 !important; }
   /* Narrow viewports swap the header nav for a FIXED bottom tab bar
      (nav.olx-navbar, literal white). Nothing else in the theme reaches it, so
      its Início/Buscar/Anunciar/Chat/Menu labels — already lifted to near-white
@@ -176,6 +194,36 @@
   #__next .olx-container--outlined > div:last-child > div {
     background-color: transparent !important;
   }
+  /* The login flow's "Como podemos ajudar?" bottom sheet (Quero reativar minha conta /
+     Esqueci a minha senha / Entrar sem senha / Preciso de mais ajuda) is a literal-white
+     styled-components panel behind a dark scrim, so our lifted near-white heading ghosts
+     straight into it. It is pre-rendered hidden, which is why no load-time scan of
+     /acesso ever reported it. Every class on it is a churning `sc-*` hash, so anchor on
+     its position instead: it is the auth shell's only element at this depth that is an
+     only child, and on /cadastro the path matches nothing at all.
+     The auth app then DROPPED a nesting level — the panel is now the only child of a
+     fixed z-9999 scrim that is itself a direct child of `#__next`, i.e. one `> div`
+     shallower — so the three-deep path matched only two 0x0 wrappers and the sheet went
+     literal white again, with our lifted near-white heading ghosting into it. Cover both
+     depths: the two-deep form matches exactly this panel on /acesso and, like the
+     three-deep one, nothing at all on /cadastro (re-verify both whenever this moves). */
+  #__next > div > div[class*="sc-"]:only-child,
+  #__next > div > div > div[class*="sc-"]:only-child {
+    background-color: #1c2128 !important;
+  }
+  /* Its close X — the sheet's only exit — is a `path fill="#4A4A4A"` literal in the
+     SVG markup, i.e. a dark X drawn for the native WHITE panel. Once the panel goes
+     dark it sits at ~1.9:1 and all but disappears; no `color` rule reaches an SVG
+     fill. Key on the markup hex (the surrounding `sc-*` classes churn) and scope to
+     the auth app, where it is the only element painted that colour. */
+  #__next path[fill="#4A4A4A"] { fill: #c4cdd6 !important; }
+  /* Its four action buttons ring themselves with a literal #E5E5E5 box-shadow written by
+     the styled component (not the DS `--button-border-color-default` token), so neither
+     the blanket border softening nor the neutral-variant rule reaches it and each button
+     wore a bright white outline. Only the auth app does this; scope there. */
+  #__next .olx-core-button--neutral {
+    box-shadow: inset 0 0 0 1px #2d333b !important;
+  }
 
   /* ============================================================
      Layout containers / generic surfaces
@@ -221,6 +269,22 @@
   .olx-core-input-container {
     box-shadow: 0 0 0 1px #2d333b !important;
   }
+  /* olx-ui reships the same field as `olx-core-input-textarea-element`, which draws
+     its ring from `--input-textarea-box-shadow` on the INPUT itself rather than on a
+     container — so the container rule above cannot reach it (neither container class
+     renders on the search rail or the header location sheet). Its empty/default state
+     rings itself in `--color-neutral-90` (#CFD4DD), a bright white outline around the
+     filters rail's Preço Min./Máx. fields, the mobile Filtros sheet and the location
+     sheet's search box; the `--filled` state rings itself in `--color-neutral-130`
+     (#1A1D23), which vanishes on dark. Remap the two tokens on the element so both
+     states keep their relative weight. The typed value is already pinned to #e6edf3 by
+     the input rule above, so the -130 remap cannot dim it, and the focus ring
+     (`--input-textarea-border-color-selected`) and the success / error rings paint
+     from their own tokens and are untouched. */
+  .olx-core-input-textarea-element {
+    --color-neutral-90: #484f58;
+    --color-neutral-130: #6b7681;
+  }
   /* Native select dropdowns (filters, sort, location) */
   .olx-dropdown__native,
   select {
@@ -252,6 +316,37 @@
   .olx-autocomplete__list li * { color: #c4cdd6 !important; }
   .olx-autocomplete__list button strong,
   .olx-autocomplete__list button p { color: #e6edf3 !important; }
+  /* At narrow widths the header does NOT render that inline `olx-autocomplete` panel at
+     all: tapping the search pill opens a full-screen search MODAL inside
+     `.olx-header__search` — a `[role="dialog"] > [role="document"]` pair on a literal
+     white sheet, under an #EFF1F5 strip holding the back arrow and the pill, with every
+     suggestion row a white <button> of near-black copy. So the site's single most-used
+     mobile interaction opened as a full white page, and a desktop pass never sees it
+     because the component only mounts below the breakpoint. Every class on it is a
+     churning CSS-modules hash, so anchor on the stable BEM ancestor plus the ARIA roles
+     the dialog has to keep. The sheet takes the page base and the strip the header tone,
+     mirroring the native white/#EFF1F5 pair. The rows' magnifiers are already lifted by
+     the `svg[color="var(--color-neutral-130)"]` rule further down. */
+  .olx-header__search [role="dialog"],
+  .olx-header__search [role="document"] {
+    background-color: #14181d !important;
+  }
+  .olx-header__search [role="document"] > div:first-child {
+    background-color: #0d1117 !important;
+    border-bottom: 1px solid #2d333b !important;
+  }
+  .olx-header__search [role="document"] button {
+    background-color: transparent !important;
+  }
+  .olx-header__search [role="document"] button:hover,
+  .olx-header__search [role="document"] button:focus {
+    background-color: #21262d !important;
+  }
+  .olx-header__search [role="document"] div,
+  .olx-header__search [role="document"] p,
+  .olx-header__search [role="document"] span { color: #c4cdd6 !important; }
+  .olx-header__search [role="document"] b,
+  .olx-header__search [role="document"] strong { color: #e6edf3 !important; }
   /* olx-core-singleselect — the custom dropdown behind the search-results
      "Tipo de Anúncio" / "Ordenar por" controls (and the header location
      picker). Its trigger ships a literal-white bg but is only 36px tall, so
@@ -309,15 +404,26 @@
      the lightness up slightly and the saturation down a touch so
      it reads cleanly on the near-black palette without glaring.
      ============================================================ */
+  /* `.olx-core-button` is `border: none` and draws its outline with
+     `box-shadow: inset 0 0 0 1px var(--button-border-color-default)`, so the
+     `border-color` here never paints. The primary variant's ring token is
+     `--color-primary-100`, which `body.look-feel` (now the whole site) redefines from
+     the OLX orange to the brand PURPLE — so every orange CTA shipped wearing a hard
+     #6E0AD6 outline. Natively the ring always equals the fill and is invisible;
+     repaint it to match ours, the way the secondary and tertiary variants already do. */
   .olx-core-button--primary,
   button.olx-core-button--primary,
   a.olx-core-button--primary {
     background-color: #f2901f !important;
     color: #1a1206 !important;
     border-color: #f2901f !important;
+    box-shadow: inset 0 0 0 1px #f2901f !important;
   }
   .olx-core-button--primary:hover,
-  a.olx-core-button--primary:hover { background-color: #ffa436 !important; }
+  a.olx-core-button--primary:hover {
+    background-color: #ffa436 !important;
+    box-shadow: inset 0 0 0 1px #ffa436 !important;
+  }
 
   /* Secondary button (peach bg / orange text) -> subtle dark-amber.
      `.olx-core-button` is `border: none` and draws its outline with
@@ -333,6 +439,16 @@
     border-color: #5a4220 !important;
     box-shadow: inset 0 0 0 1px #5a4220 !important;
   }
+  /* Every `.olx-core-button` variant lifts its fill on hover through
+     `--button-background-color-hover` (#FFF -> #EFF1F5 for the neutral-surfaced ones),
+     but our variant fills are `!important` with no hover counterpart, so the lift was
+     erased and only `--primary` and `--tertiary` — which do carry one — still responded
+     to the pointer. Restate the lift for the rest so every button still answers hover.
+     Placed before the `--disabled` rule below, which ties these at 0-2-0 and therefore
+     wins on source order: a disabled button stays inert. */
+  .olx-core-button--secondary:hover,
+  button.olx-core-button--secondary:hover,
+  a.olx-core-button--secondary:hover { background-color: #4a3519 !important; }
   /* Chips (the /cupons "Categorias" filter) are a white 32px pill — short
      enough to slip the audit's height floor. Every state is token-driven, so
      remap the tokens rather than hardcode each state; that keeps the hover /
@@ -376,6 +492,8 @@
     color: #e6edf3 !important;
     border-color: #2d333b !important;
   }
+  .olx-core-button--neutral:hover,
+  button.olx-core-button--neutral:hover { background-color: #2d333b !important; }
   /* `--link` is the TEXT-only variant (`--button-link-background-color-default:
      transparent`, brand-purple label): pagination numbers, the SEO footer's "Mostrar
      mais", the autos filter rail's "Todas as marcas" jump. Grouping it with `--neutral`
@@ -388,6 +506,7 @@
     color: #f6b35e !important;
     border-color: transparent !important;
   }
+  .olx-core-button--link:hover { color: #ffc98a !important; }
 
   /* The auth app and the results view-switcher reuse `--primary` on buttons
      that are NOT orange CTAs, so the blanket primary rule above repaints them:
@@ -467,22 +586,33 @@
     color: #f6b35e !important;
     border-color: #5a4220 !important;
   }
+  .olx-button--tertiary:hover { background-color: #4a3519 !important; }
   .olx-button--neutral {
     background-color: #21262d !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
   }
+  .olx-button--neutral:hover { background-color: #2d333b !important; }
   .olx-button--link {
     background-color: transparent !important;
     color: #f6b35e !important;
     border-color: transparent !important;
   }
+  .olx-button--link:hover { color: #ffc98a !important; }
   .olx-button--danger {
     background-color: #d93a3a !important;
     color: #ffffff !important;
     border-color: #d93a3a !important;
   }
-  .olx-button--disabled {
+  .olx-button--danger:hover {
+    background-color: #e85454 !important;
+    border-color: #e85454 !important;
+  }
+  /* Restated last, and with its own `:hover`, so a disabled button of any variant reads
+     inert: the variant hover rules above are 0-2-0 and would otherwise out-rank the
+     0-1-0 base disabled rule and light it up under the pointer. */
+  .olx-button--disabled,
+  .olx-button--disabled:hover {
     background-color: #21262d !important;
     color: #8b949e !important;
     border-color: #21262d !important;
@@ -601,15 +731,29 @@
   #layout-default-profile { background-color: #14181d !important; }
   #container-footer-profile { background-color: #0d1117 !important; }
   #layout-default-profile p { color: #c4cdd6 !important; }
-  /* "Entre em contato" phone-reveal: the masked digits are faded out by a
-     `linear-gradient(270deg, #fff …)` background-IMAGE on a hashed
-     styled-component div — same trick as the ad page's, but this app's classes
-     are `sc-*` (not `ad__sc-*`) and the ad-page rule is `#price-box-container`
-     scoped, so a white smear sat over the hidden number on the dark card. It is
-     the only background-image anywhere under the profile shell, so clearing it
-     on the app's styled-components is safe (the "Exibir telefone" button keeps
-     its own dark fill). */
+  /* "Entre em contato" phone-reveal: the masked digits are veiled by a
+     `linear-gradient(270deg, #fff 15%, transparent 100%)` background-IMAGE on a
+     hashed styled-component div — same trick as the ad page's, but this app's
+     classes are `sc-*` (not `ad__sc-*`) and the ad-page rule is
+     `#price-box-container` scoped, so a white smear sat over the hidden number on
+     the dark card. It is the only background-image anywhere under the profile
+     shell, so clearing it on the app's styled-components is safe. */
   #layout-default-profile [class*="sc-"] { background-image: none !important; }
+  /* …but that veil is also what keeps the digits from colliding with the
+     "Exibir telefone" label: the gradient div is an ABSOLUTE overlay sitting on
+     the exact box of the number, with the button as its only child, so removing
+     the veil renders "41 99103 - ****" and the label in the same 92px, both
+     illegible. The overlay itself is unreachable — hashed class, and selecting a
+     parent by its child needs the Level-4 parent pseudo-class, which the
+     userstyles.org parser strips — so put the veil on the BUTTON instead,
+     dark instead of white and hard enough
+     to blot the digits under the label while its left edge still fades. Only two
+     `--link` buttons exist here and the other ("Compartilhar") already sits on
+     this exact card colour, so the gradient is invisible on it. Outspecifies the
+     blanket `background-image: none` above (1-1-1 vs 1-1-0). */
+  #layout-default-profile button.olx-core-button--link {
+    background-image: linear-gradient(270deg, #1c2128 88%, rgba(28, 33, 40, 0) 100%) !important;
+  }
   .olx-avatar { background-color: #21262d !important; }
   /* Single-dash `olx-accordion` (distinct from the `olx-core-accordion`
      used by the header's Categorias sheet). */
@@ -742,6 +886,20 @@
     background-color: #1f7a4d !important;
     color: #ffffff !important;
     border-color: #1f7a4d !important;
+  }
+  /* Same trap, `--info` side: the ad-card "Frete grátis" badge inlines
+     `--badge-background-color: var(--color-feedback-success-80)` /
+     `--badge-color: var(--color-feedback-success-120)`, i.e. the SUBTLE green pair the
+     token block above already remaps. The explicit violet `--info` rule (0-1-0) beat
+     that token path, so free shipping rendered as the exact same chip as the natively
+     purple "Entrega Fácil" / "Parcele sem juros" sitting beside it on the same card —
+     three badges, one look, one meaning left. Restate the success pair through the
+     same inline-style hook (0-2-0). `audit-chroma` cannot see this: green -> violet is
+     a hue swap between two chromatic colours, not a flattening to grey. */
+  .olx-core-badge--info[style*="feedback-success"] {
+    background-color: #102a23 !important;
+    color: #6fd6a8 !important;
+    border-color: #1d4a3c !important;
   }
 
   /* ============================================================
@@ -927,30 +1085,53 @@
      the 0-1-1 button rules and erased their fill: "Enviar mensagem" rendered as
      near-black brown text on the page base inside an orange ring, and Chat /
      "Exibir telefone" lost their amber fill — in the price box AND in the fixed
-     top bar. Restate each variant from #adview with a tag qualifier (1-1-1). */
-  #adview button.olx-core-button--primary,
-  #adview a.olx-core-button--primary {
+     top bar. Restate each variant from #adview.
+     A tag qualifier alone reaches only 1-1-1, which was enough until the neutralizer
+     gained `:not([style*="rgb("])` and rose to 1-2-0 — after which these restores LOST
+     again and the two CTAs that currently carry a hashed `ad__sc-` class ("Chat" and
+     "Acessar perfil do anunciante") rendered as unfilled outlines in the price box.
+     Adding the component's own base class takes each restore to 1-2-1, which out-ranks
+     the neutralizer without depending on the shape of an inline style the way a
+     repeated `:not()` would. */
+  #adview button.olx-core-button.olx-core-button--primary,
+  #adview a.olx-core-button.olx-core-button--primary {
     background-color: #f2901f !important;
     color: #1a1206 !important;
+    box-shadow: inset 0 0 0 1px #f2901f !important;
   }
-  #adview button.olx-core-button--primary:hover,
-  #adview a.olx-core-button--primary:hover { background-color: #ffa436 !important; }
-  #adview button.olx-core-button--secondary,
-  #adview a.olx-core-button--secondary {
+  #adview button.olx-core-button.olx-core-button--primary:hover,
+  #adview a.olx-core-button.olx-core-button--primary:hover {
+    background-color: #ffa436 !important;
+    box-shadow: inset 0 0 0 1px #ffa436 !important;
+  }
+  #adview button.olx-core-button.olx-core-button--secondary,
+  #adview a.olx-core-button.olx-core-button--secondary {
     background-color: #3a2a14 !important;
     color: #f6b35e !important;
     box-shadow: inset 0 0 0 1px #5a4220 !important;
   }
-  #adview button.olx-core-button--neutral,
-  #adview a.olx-core-button--neutral {
+  #adview button.olx-core-button.olx-core-button--secondary:hover,
+  #adview a.olx-core-button.olx-core-button--secondary:hover {
+    background-color: #4a3519 !important;
+  }
+  #adview button.olx-core-button.olx-core-button--neutral,
+  #adview a.olx-core-button.olx-core-button--neutral {
     background-color: #21262d !important;
     color: #e6edf3 !important;
   }
-  #adview button.olx-core-button--tertiary,
-  #adview a.olx-core-button--tertiary {
+  #adview button.olx-core-button.olx-core-button--neutral:hover,
+  #adview a.olx-core-button.olx-core-button--neutral:hover {
+    background-color: #2d333b !important;
+  }
+  #adview button.olx-core-button.olx-core-button--tertiary,
+  #adview a.olx-core-button.olx-core-button--tertiary {
     background-color: transparent !important;
     color: #f6b35e !important;
     box-shadow: inset 0 0 0 1px #f2901f !important;
+  }
+  #adview button.olx-core-button.olx-core-button--tertiary:hover,
+  #adview a.olx-core-button.olx-core-button--tertiary:hover {
+    background-color: #3a2a14 !important;
   }
 
   /* `olx-icon-action` (the ad page's favourite / share controls and the photo
@@ -1019,6 +1200,22 @@
   #adview > div[class*="anz3cs"]:not([style*="rgb("]) {
     background-color: #0d1117 !important;
     border-bottom: 1px solid #2d333b !important;
+  }
+  /* Narrow viewports do not render that top bar at all — they get a FIXED BOTTOM action
+     bar instead (the Solicitar / Chat pair plus an ad slot), another opaque-white
+     `ad__sc-` child of #adview that the neutralizer blanks, so the listing photos and
+     section headings scrolled visibly through and between the two CTAs. Same shape as
+     the top-bar restore, including the repeated `:not()` needed to out-rank the 1-2-0
+     neutralizer. The bar's own hook is the styled-component id, which churns on a
+     rebuild; `#sticky-footer-buyer-actions` is the stable id of the button row inside
+     it, painted the same tone so a hash churn degrades to an opaque button band rather
+     than back to floating controls over live content. */
+  #adview > div[class*="1bi6ic6"]:not([style*="rgb("]),
+  #adview #sticky-footer-buyer-actions {
+    background-color: #0d1117 !important;
+  }
+  #adview > div[class*="1bi6ic6"]:not([style*="rgb("]) {
+    border-top: 1px solid #2d333b !important;
   }
   /* The masked phone number is faded out by a `linear-gradient(270deg, #fff …)`
      background-IMAGE strip — a bg-color neutralizer leaves it, so a white smear
@@ -1093,6 +1290,72 @@
   #adview button[aria-label*="vel do vendedor"] {
     --color-secondary-70: #c9b6f5 !important;
     --color-secondary-100: #7c3aed !important;
+  }
+
+  /* Seller rating strip: a single 96x27 SVG of five stars, each an EMPTY star
+     painted with the literal light-grey #CFD4DD (`--color-neutral-90`). On the
+     native white card that is a faint "no rating yet" ghost; on the dark card it
+     renders as five BRIGHT, apparently FILLED stars sitting directly above the
+     line "Este anunciante ainda não possui avaliações" — the page states a
+     five-star rating and no ratings at the same time. A FILLED star is orange
+     (verified on a rated seller's profile), so keying on the literal grey hex
+     touches only the empty state, and the hex is written into the markup so it
+     survives the hashed `ad__sc-*` churn. Settle them onto the same unfilled
+     tone the reputation bar and carousel track already use. Scoped to the two
+     shells that render seller ratings so no other grey glyph is caught. */
+  #adview path[fill="#CFD4DD"],
+  #layout-default-profile path[fill="#CFD4DD"] {
+    fill: #3a424c !important;
+  }
+  /* Same lie, other mechanism: the /perfil/ app's star widget paints each star
+     with a two-stop gradient — `--color-feedback-attention-100` (orange) up to the
+     fill fraction, then that same `--color-neutral-90` #CFD4DD for the remainder —
+     so a PARTIAL rating (3.5 of 5) leaves near-white star bodies that read as
+     filled, brighter than the orange ones beside them. The rule above cannot reach
+     them: the path's `fill` is `url(#…key-…)`, and the grey lives in a `<stop>`.
+     The stop writes the token name literally into its markup, so match that string
+     — only the unfilled tone uses it and the filled fraction is a different token,
+     so the orange is untouched. */
+  stop[stop-color="var(--color-neutral-90)"] {
+    stop-color: #3a424c !important;
+  }
+
+  /* The default seller avatar ships as TWO rasters, one per app. The main site
+     serves `static.olx.com.br/…/images/avatar.svg` — a #F5F5F5 square carrying a
+     grey figure — as the ~72px disc on the ad page's seller card. The /perfil/
+     Next app serves its OWN `…/_next/static/media/avatar.<buildhash>.png`, a
+     near-white (#FAFAFA disc, #D5DEE1 figure) circle, through the optimiser at
+     `/perfil/_next/image?url=<percent-encoded>` — once per review card plus the
+     seller card, so a profile carries five-plus of them. Every seller without a
+     photo therefore wears a near-white disc on a dark card, the brightest thing
+     on the page. No scanner reaches it: it is image PIXELS, so the element-bg
+     walk reads the (transparent) wrapper and `svgWhiteFills` never sees inside an
+     `<img>`. The artwork is achromatic, so inverting reproduces the native
+     placeholder in reverse (dark disc, legible grey figure) rather than erasing
+     anything; `brightness` lifts the inverted near-white off pure black so the
+     disc still reads as a disc.
+     Every hook ends at the `avatar.` DOT, before the extension and before the
+     Next build hash — the hash churns on every deploy, and a real seller PHOTO
+     (thumbs/graph.facebook/googleusercontent, none of which contain `avatar.`)
+     stays untouched, which is the whole point of not filtering `img` broadly.
+     The `%2F` forms cover the optimiser's percent-encoded url= parameter; both
+     letter cases are listed because attribute matching is case-sensitive. */
+  img[src*="/avatar."],
+  img[src*="%2Favatar."],
+  img[src*="%2favatar."] {
+    filter: grayscale(1) invert(1) brightness(2.2);
+  }
+  /* Same family, opposite polarity: when a Facebook-sourced photo is missing the
+     /perfil/ app falls back to `…/static/media/facebook-default-picture.<hash>.jpeg`,
+     a #D3D6DB tile with a WHITE silhouette — light enough to leak the same way, but
+     its figure is LIGHTER than its background, so the invert above would leave a
+     black silhouette on a mid-grey tile. Darken in place instead: brightness then
+     contrast maps the native 214-255 range onto a ~#212121 tile with a ~#8c8c8c
+     figure, keeping the silhouette the lighter of the two. */
+  img[src*="/facebook-default-picture."],
+  img[src*="%2Ffacebook-default-picture."],
+  img[src*="%2ffacebook-default-picture."] {
+    filter: grayscale(1) brightness(0.51) contrast(5.12);
   }
 
   /* Seller reputation bar: four 70x8 segments whose colours come from INLINE
@@ -1181,6 +1444,17 @@
   svg {
     --color-neutral-120: #c4cdd6;
     --color-neutral-130: #c4cdd6;
+    /* olx-ui's "spot" illustrations (empty states — /cupons' "Não há cupons
+       disponíveis", no-results panels) draw a ~100px disc behind the artwork from
+       `--spots-background-neutral`, a literal #fff, so the page carries a bright
+       white circle no element-bg audit can see. This is the ACHROMATIC variant of
+       the family: its artwork is only `--spots-color-neutral` (#cfd4dd) and
+       `--spots-border-color-neutral` (#8994a9), both of which stay legible once the
+       disc goes dark — unlike the FeaturedBrands raster tiles, there is no baked
+       dark ink to erase. The COLOURED spots (the ad page's lavender location
+       building, the account-level spot) paint from their own `--spots-*` tokens and
+       keep their hues. Declared on `svg` so it can never reach an HTML surface. */
+    --spots-background-neutral: #21262d;
   }
   /* The `svg` scope above only reaches glyphs whose colour rule is written AGAINST the
      SVG. Icon-only CONTROLS declare `color: var(--color-neutral-1x0)` on the button and
@@ -1220,6 +1494,21 @@
   .olx-icon-action:hover svg {
     --color-neutral-130: #e6edf3;
   }
+  /* …and the tooltip PIN is the one SVG in the site that must keep the DARK end of the
+     scale: the tooltip is natively a dark chip already (`bg-neutral-120` #3C4453 with
+     #EFF1F5 copy, so the theme leaves it alone), and its pointer is a Tailwind
+     `fill-neutral-120` triangle meant to read as the chip's own corner. The `svg` remap
+     above lifts that token to the icon ink, so the pointer rendered as a bright #c4cdd6
+     wedge hanging off a dark chip — visible only while a tooltip is open, e.g. the ad
+     page's "Solicite ao vendedor a ativação do pagamento online" bubble over the mobile
+     price bar. Put the surface value back on the pin. `--color-neutral-130` is listed
+     too: the BEM `olx-tooltip__floating--secondary` variant draws its chip from that
+     token instead. */
+  .tooltip-pin,
+  [class*="tooltip"] svg[class*="fill-neutral-"] {
+    --color-neutral-120: #3c4453;
+    --color-neutral-130: #1a1d23;
+  }
 
   /* The ad view redefines `--color-primary-100` from the OLX orange to the brand
      purple on `body`, so the price box's "Simular empréstimo" glyph paints #6E0AD6
@@ -1232,14 +1521,19 @@
     fill: #b794f6 !important;
     color: #b794f6 !important;
   }
-  /* Same split on the listing page's transactional-seller rating: the star is
-     `fill="var(--color-primary-100)"` resolving to #6E0AD6 while its rating number is
-     lifted. Its CSS-modules class is hashed on BOTH sides of the name, so match the
-     stable middle rather than the churning build hash. */
+  /* The listing page's transactional-seller rating star is
+     `fill="var(--color-primary-100)"`, and OUTSIDE `#adview` that token is the OLX
+     ORANGE — the site paints this star the same amber it paints a Google review star
+     two cards down. A flat violet here is a hue swap, not a lift: it makes the rating
+     read as brand chrome and matches nothing else on the card. Keep it in the amber
+     family. Both scanners are blind to this (native and themed are each chromatic, so
+     `audit-chroma` sees no flattening, and an SVG fill carries no text node). Its
+     CSS-modules class is hashed on BOTH sides of the name, so match the stable middle
+     rather than the churning build hash. */
   [class*="__transactionalSellerStar"],
   [class*="__transactionalSellerStar"] path {
-    fill: #b794f6 !important;
-    color: #b794f6 !important;
+    fill: #f2901f !important;
+    color: #f2901f !important;
   }
 
   /* OLX secondary accent is a saturated purple (#6E0AD6) that fails
@@ -1270,18 +1564,28 @@
      to a readable lifted violet of the same hue. The generic `.olx-core-link
      --main` fallback further down covers the rest of the page. NOTE: this
      block also carried `#root` selectors; the Next.js App Router rewrite
-     dropped that wrapper, so they matched nothing and were removed. */
+     dropped that wrapper, so they matched nothing and were removed.
+     `#layout-default-profile` is the /perfil/ app's shell: its one body-level
+     `--main` link ("Exibir todas as avaliações") was falling through to the
+     generic fallback and rendering as plain near-white body copy — no link
+     affordance at all, and visibly out of step with the violet header links
+     right above it. Its ad-card titles do NOT carry `--main`, so scoping the
+     lift to the shell reaches that action link and nothing else. */
   #header .olx-link--main,
   #header .olx-core-link--main,
   #adview .olx-link--main,
-  #adview .olx-core-link--main {
+  #adview .olx-core-link--main,
+  #layout-default-profile .olx-link--main,
+  #layout-default-profile .olx-core-link--main {
     color: #b794f6 !important;
     -webkit-text-fill-color: #b794f6 !important;
   }
   #header .olx-link--main:hover,
   #header .olx-core-link--main:hover,
   #adview .olx-link--main:hover,
-  #adview .olx-core-link--main:hover {
+  #adview .olx-core-link--main:hover,
+  #layout-default-profile .olx-link--main:hover,
+  #layout-default-profile .olx-core-link--main:hover {
     color: #d2bdff !important;
     -webkit-text-fill-color: #d2bdff !important;
   }
@@ -1323,8 +1627,22 @@
      footer tab strip lost its "you are here" underline. Restore the pair (the
      accent matches the selected label above). */
   .olx-tabs__tab { border-bottom-color: transparent !important; }
+  /* The component also answers the pointer: `:hover` repaints both the label and that
+     bottom border to `--tab-font-color-hover` / `--tab-border-color-hover` (both the
+     OLX purple). Our `color` and `border-bottom-color` pins above are `!important` with
+     no hover counterpart, so the SEO footer's tab strip lost every trace of feedback —
+     an unselected tab looked identical whether or not the pointer was on it. Give the
+     cue back on the dark palette. The `--active` rules that follow restate `:hover` so
+     they still tie-break above these (0-2-0 / 0-3-0) and the selected tab keeps its
+     amber marker under the pointer. */
+  .olx-tabs__tab:hover { border-bottom-color: #6b7681 !important; }
+  .olx-tabs__tab:hover,
+  .olx-tabs__tab:hover .olx-tabs__tab-label { color: #e6edf3 !important; }
   .olx-tabs__tab--active,
+  .olx-tabs__tab--active:hover,
   .olx-tabs__tab[aria-selected="true"] { border-bottom-color: #f6b35e !important; }
+  .olx-tabs__tab--active:hover .olx-tabs__tab-label,
+  .olx-tabs__tab[aria-selected="true"]:hover .olx-tabs__tab-label { color: #f6b35e !important; }
   /* An overflowing tab strip gets a scroll-fade at each end, painted as a
      `background-IMAGE` gradient running to `--color-neutral-70` (#FFF). A
      background-COLOR override can never reach it, so a white smear survives at
@@ -1559,6 +1877,19 @@
     color: #e6edf3 !important;
   }
   .olx-modal-close:hover { background-color: #2d333b !important; }
+  /* Sheet lists mark the CURRENT choice with a tick drawn straight from the raw brand
+     purple — `<svg color="var(--color-secondary-100)">` with a `fill` of the same token
+     (the mobile header's Localização sheet, whose "Todos os estados" tick is the only
+     thing distinguishing the selected row). At #6E0AD6 that is ~2.2:1 on the dark sheet,
+     so the selection signal all but disappears. Lift the markup hook itself rather than
+     the token: `--color-secondary-100` is also the ad page's seller-medal outline and
+     the `--spots-*` illustration hues, which must keep their values, and the modal scope
+     reaches none of those. */
+  .olx-modal-body svg[color="var(--color-secondary-100)"],
+  .olx-modal-body path[fill="var(--color-secondary-100)"] {
+    fill: #b794f6 !important;
+    color: #b794f6 !important;
+  }
 
   /* ============================================================
      Dividers
@@ -1611,9 +1942,21 @@
 
   /* ============================================================
      Scrollbar polish
+     ------------------------------------------------------------
+     The COLOURS carry `!important` because olx-ui styles its own panel
+     scrollbars from a nested `&::-webkit-scrollbar-thumb { background-color:
+     var(--color-neutral-90) }` (#CFD4DD) inside the component class — that
+     compiles to a 0-1-1 selector, so these unscoped 0-0-0 rules tie nothing
+     and lose, leaving a bright light-grey thumb down the search-autocomplete
+     panel, the Categorias side-sheet body, every open singleselect menu and
+     the mobile Filtros sheet. `!important` wins regardless of specificity.
+     The thumb is #484f58 rather than the hairline tone: a #2d333b thumb is
+     invisible against the #1c2128 those panels are painted, so the scroll
+     position would be lost. WIDTH stays non-important on purpose — the site
+     draws a narrower bar inside its panels and that geometry is fine.
      ============================================================ */
   ::-webkit-scrollbar { width: 12px; height: 12px; }
-  ::-webkit-scrollbar-track { background: #0d1117; }
-  ::-webkit-scrollbar-thumb { background: #2d333b; border-radius: 6px; }
-  ::-webkit-scrollbar-thumb:hover { background: #3a424c; }
+  ::-webkit-scrollbar-track { background: #0d1117 !important; }
+  ::-webkit-scrollbar-thumb { background: #484f58 !important; border-radius: 6px; }
+  ::-webkit-scrollbar-thumb:hover { background: #6b7681 !important; }
 }
