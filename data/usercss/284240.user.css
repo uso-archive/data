@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark mode for the SCP Foundation Wiki: articles, sidebar, tables, tabs, ratings, forums and search all get a comfortable night palette.
-@version      20260730.14.40
+@version      20260803.01.43
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -78,16 +78,13 @@
     background-color: transparent;
   }
 
-  /* The Sigma-9 masthead art is already dark, so it stays. Its 140-162px
-     top-bar stripe is a mid-grey band, which glares on a dark page — a first
-     background layer repaints just that stripe. */
+  /* The masthead art is already dark on both skins, so only the paper under it
+     is stated. The image is deliberately NOT restated: naming Sigma-9's own
+     body_bg.svg here paints it onto Black Highlighter pages too, where it lands
+     as a stray block because the article theme's background-size and -repeat
+     still apply to it. */
   div#container-wrap {
     background-color: #14181d !important;
-    background-image:
-      linear-gradient(to bottom, rgba(0, 0, 0, 0) 140px, #2b3138 140px, #1f242a 162px, rgba(0, 0, 0, 0) 162px),
-      url("https://cdn.scpwiki.com/theme/en/sigma/images/body_bg.svg") !important;
-    background-repeat: no-repeat, repeat-x !important;
-    background-position: top left, top left !important;
   }
 
   /* iframes default to a 2px inset border in currentColor, which turns light
@@ -280,7 +277,40 @@
   /* Sigma-9 already paints the tagline #f0f0c0, and Black Highlighter HIDES this
      span with `color: transparent` while drawing its own copy from a ::before —
      so a colour here does not improve Sigma and un-hides a second tagline on
-     every Black Highlighter page. Deliberately left unstyled. */
+     every Black Highlighter page. Deliberately left unstyled.
+
+     That Black Highlighter copy reads two tokens that mean nothing but "masthead
+     ink", and article themes pitch them at their own accent for a light page —
+     /scp-1730 lands the whole title at 1.8:1. Rebinding the tokens matches
+     Sigma-9's own pair, and a theme whose masthead is knocked-out artwork
+     (djkaktus paints its gold through background-clip) is untouched because
+     `color` is not what draws it. */
+  #header {
+    --swatch-headerh1-color: 238, 238, 238;
+    --swatch-headerh2-color: 240, 240, 192;
+  }
+
+  /* The themes that skip the token and name the pseudo's colour outright: the
+     "R&C Site-43" family states #000, which on a dark masthead is nothing at
+     all. Sigma-9 gives these pseudos no content, so they have no box there and
+     the rule costs nothing; a theme that paints its title as knocked-out
+     artwork keeps it, because `color` is not what draws that. The cost is the
+     handful of themes whose masthead is already a legible cream or gold — those
+     land on the site's own pair instead of their own.
+     Only `color` is taken. -webkit-text-fill-color is what a background-clip
+     title sets to transparent so its artwork shows through the glyphs, and
+     naming it here would paint over that artwork. */
+  #header h1 a::before,
+  #header h1 a::after {
+    color: #eee !important;
+  }
+
+  #header h2::before,
+  #header h2::after,
+  #header h2 span::before,
+  #header h2 span::after {
+    color: #f0f0c0 !important;
+  }
 
   /* Article themes derived from Black Highlighter repaint the masthead from
      their own palette, so the chrome states its ink rather than relying on the
@@ -364,31 +394,68 @@
     color: #ff8f97;
   }
 
-  /* Mobile hamburger */
+  /* Mobile hamburger. The glyph is the anchor's own "≡" character, and the
+     article themes derived from Black Highlighter hold its `color` at a
+     near-black pitched for their light bar — no specificity or !important on
+     `color` dislodges it (/scp-1730 keeps 15, 15, 15 against a two-id
+     !important rule). -webkit-text-fill-color is what actually paints the
+     glyph and nothing claims it, so stating it is what makes the bars show. */
   #top-bar .open-menu a {
     background-color: #1c2128 !important;
     border-color: #4a5058 !important;
     color: #c4cdd6 !important;
+    -webkit-text-fill-color: #c4cdd6 !important;
   }
 
   #top-bar .open-menu a:hover {
     box-shadow: 0 0 16px 2px rgba(0, 0, 0, .8);
   }
 
-  /* Search button — keep the maroon brand gradient, soften the border */
-  #search-top-box-form input[type="submit"] {
-    border-color: #6d4a4a !important;
-    color: #e4d6d6 !important;
-    background-color: #5a2f2f !important;
-    background-image: linear-gradient(to bottom, #7d4444, #5a2f2f, #2c1414) !important;
+  /* Below the desktop breakpoint the article themes swap the menu for their own
+     bar and fill it with a background-IMAGE, so a colour alone leaves a near-white
+     band across the top of every phone viewport. The hamburger inside it reads
+     the theme's ink, which is pitched for that light band. */
+  #top-bar .mobile-top-bar {
+    background-color: #1c2128 !important;
+    background-image: none !important;
+    border-color: #3a4048 !important;
   }
 
+  #top-bar .mobile-top-bar a {
+    color: #eaeaea !important;
+  }
+
+  /* Search button. Black Highlighter clips this input to a magnifier mask and
+     paints the GLYPH with the element's own BACKGROUND, so a fill stated here
+     becomes the icon's colour, and the skins want opposite values: a masked skin
+     needs it LIGHT to read on our bar, while the ones that leave a real "Search"
+     button — Sigma-9, and article themes like /scp-8007 that drop its gradient —
+     need it DARK under their own near-white label. The .user.css picks the side
+     per skin by reading the theme's own token, which userstyles.org's parser
+     cannot accept (its rgb() wants three numbers and dies on `var(`, taking the
+     whole upload down with a 502). DELIBERATE DIVERGENCE FROM THE .user.css,
+     ONE OF TWO IN THIS FILE (the other is the `[name="search"]` exclusion on the
+     `input.btn` group further down, which this fill depends on): no selector
+     distinguishes the two skin families — the markup is identical and only the
+     imported theme CSS differs — so this build states a single mid maroon that
+     clears 3:1 both ways (glyph 3.1:1 on the top bar, near-white label 3.2:1 on
+     the fill) instead of serving one family and blanking the other. Any value
+     stated here must stay a mid tone for that reason. No background-IMAGE is
+     stated, so Sigma-9's own opaque brand gradient covers this colour entirely
+     and is unaffected. */
+  #search-top-box-form input[type="submit"] {
+    background-color: #a05a5a !important;
+    border-color: #6d4a4a !important;
+  }
+
+  /* The base fill above is !important and would otherwise freeze the skin's own
+     hover swap on the button skins. Lifted far enough to stay visible against the
+     dark red panel Black Highlighter slides in behind the glyph on hover, while
+     the label the skins switch to #fff here keeps 3.4:1. */
   #search-top-box-form input[type="submit"]:hover,
   #search-top-box-form input[type="submit"]:focus {
+    background-color: #c07878 !important;
     border-color: #b98a8a !important;
-    color: #fff !important;
-    background-color: #7d4444 !important;
-    background-image: linear-gradient(to bottom, #a06767, #7d4444, #5a2f2f) !important;
   }
 
   #search-top-box-input,
@@ -585,17 +652,24 @@
 
   #page-content .footnotes-footer {
     background-color: #1a1f26 !important;
-
-    /* Black Highlighter draws the back-reference digit from --link-color, which
-       article themes pitch near-black for a light panel. */
-    --footnotes-footer-num-color: 232, 98, 110;
-    --footnotes-footer-num-hover-color: 255, 143, 151;
   }
 
-  /* That digit is drawn by a ::before and the anchor's own text is hidden with
-     `color: transparent`, so a link colour here prints a second digit under it. */
-  #main-content #page-content .footnotes-footer a[href*="javascript"] {
-    color: transparent;
+  /* The "Footnotes" tab. Article themes state its ink near-black for their light
+     panel and keep it when they repaint the tab in their accent, so the words
+     vanish on the dark panel. Only the ink is taken — the accent fill is theirs. */
+  #page-content .footnotes-footer .title {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+
+  /* Every skin puts the back-reference digit in the anchor's own text, and Black
+     Highlighter draws a SECOND copy from a ::before counter — it hides its own
+     anchor to compensate, but the article-link rule above beats that and both
+     print. Emptying the counter leaves exactly one digit on either skin. Hiding
+     the anchor instead is not an option: Sigma-9 has no ::before to fall back on
+     and the number disappears entirely. */
+  #main-content #page-content .footnotes-footer a[href*="javascript"]::before {
+    content: none !important;
   }
 
   /* The inline footnote popup. It is white-on-transparent and only
@@ -631,10 +705,21 @@
     box-shadow: 0 1px 6px rgba(0, 0, 0, .5);
   }
 
+  /* Sigma-9 draws only the caption's top rule; the article themes frame all four
+     sides in their paper colour, which is a 4px white band on a dark page. Every
+     side is stated — the three Sigma-9 leaves at zero width cost nothing. */
   .scp-image-block .scp-image-caption {
     background-color: #1c2128 !important;
-    border-top-color: #3a4048 !important;
+    border-color: #3a4048 !important;
     color: #c4cdd6 !important;
+  }
+
+  /* The ACS bar's diamond plate. It is drawn from whichever end of the article
+     theme's own paper/ink pair suits its light page, so it lands as a glaring
+     white slab on some themes and an invisible black one on others; an elevated
+     grey keeps it a separator on every one. */
+  #page-content .anom-bar .diamond-part::before {
+    background-color: #2d333b !important;
   }
 
   div.sexy-box {
@@ -686,6 +771,16 @@
     color: #e05f6b !important;
   }
 
+  /* The gate's two actions are drawn in the site's near-black crimson, which the
+     bare `a` rule cannot outweigh; on the dark panel they land at 2.4:1. */
+  div#u-adult-warning .choice a {
+    color: #e8626e !important;
+  }
+
+  div#u-adult-warning .choice a:hover {
+    color: #ff8f97 !important;
+  }
+
   .unflad-user-abusive,
   .unflag-user-abusive {
     color: #e08a8a !important;
@@ -718,15 +813,31 @@
     box-shadow: -1px -1px 2px #14181d !important;
   }
 
+  /* Sigma-9 draws the rule above the tag list on the inner span; article themes
+     move it to the container and keep their light hex there. */
+  #main-content .page-tags,
   #main-content .page-tags span {
     border-top-color: #2d333b !important;
   }
 
   /* Tag list and the prev/next wikiwalk rail are furniture, not author prose,
-     so their link colour is pinned against article themes that darken it. */
+     so their link colour is pinned against article themes that darken it.
+     The paper has to come with it: a theme that fills each tag with a mid-grey
+     chip states a knocked-out near-white ink to sit on it (/scp-8007 pairs
+     #454545 with #f2f2f2), and taking only the ink leaves crimson on grey at
+     2.9:1. Clearing the fill puts the pinned ink back on the page, where it
+     measures 5.4:1; Sigma-9 never fills these, so it is unchanged. */
   #main-content .page-tags span a,
   #page-content .footer-wikiwalk-nav a {
+    background-color: transparent !important;
     color: #e8626e !important;
+  }
+
+  /* That chip's left point is a CSS triangle drawn in the same fill, so it has
+     to go with it or a stray grey arrow is left in front of every tag. Sigma-9
+     gives this pseudo no border at all, so the rule costs nothing there. */
+  #main-content .page-tags span a::before {
+    border-color: transparent !important;
   }
 
   #main-content .page-tags span a:hover,
@@ -817,18 +928,29 @@
     color: var(--scp-lift-purple) !important;
   }
 
+  /* #990000 is the clearance-level red the standard "Level n/xxxx — Classified"
+     header snippet ships with, so it turns up on a large share of articles and
+     lands at 2.0:1 here. */
   #page-content span[style*="color:maroon"],
   #page-content span[style*="color: maroon"],
   #page-content span[style*="color:darkred"],
   #page-content span[style*="color: darkred"],
   #page-content span[style*="color:#800000"],
   #page-content span[style*="color: #800000"],
+  #page-content span[style*="color:#990000"],
+  #page-content span[style*="color: #990000"],
   #page-content a[style*="color:maroon"],
   #page-content a[style*="color: maroon"],
+  #page-content a[style*="color:#990000"],
+  #page-content a[style*="color: #990000"],
   #page-content strong[style*="color:maroon"],
   #page-content strong[style*="color: maroon"],
+  #page-content strong[style*="color:#990000"],
+  #page-content strong[style*="color: #990000"],
   #page-content em[style*="color:maroon"],
-  #page-content em[style*="color: maroon"] {
+  #page-content em[style*="color: maroon"],
+  #page-content em[style*="color:#990000"],
+  #page-content em[style*="color: #990000"] {
     color: var(--scp-lift-maroon) !important;
   }
 
@@ -1055,10 +1177,21 @@
     color: #e6edf3 !important;
   }
 
-  /* Wikidot's `.btn*` classes are bare text links here (the page-options bar,
-     forum Reply/Fold/Options), never button chrome — style only real buttons. */
+  /* Wikidot's `.btn*` classes are bare text links on ANCHORS here (the page-options
+     bar, forum Reply/Fold/Options), so `a.btn` is deliberately absent. On an INPUT
+     the same class is a real submit — the forum's "Update" filter button carries
+     `.buttons.btn` and nothing else, so it needs `input.btn` to be reached.
+     The masthead search submit carries `.button.btn` too and is the site's only
+     `[name="search"]`, but it is not one of these buttons: Black Highlighter
+     masks it to a magnifier and relies on its own `color: transparent` to keep
+     the "Search" value from punching through the glyph, so a light ink stated
+     here would print the word across the icon. That exclusion is the second
+     deliberate divergence from the .user.css — it is what lets the mid-tone
+     search fill above render a clean glyph, and the .user.css does not need it
+     because the token it reads is near-white on every masked skin. */
   div.buttons input,
-  input.button,
+  input.button:not([name="search"]),
+  input.btn:not([name="search"]),
   button,
   a.button {
     background-color: #262c33 !important;
@@ -1066,8 +1199,15 @@
     color: #e6edf3 !important;
   }
 
+  /* That button keeps the UA's `outset` bevel, which draws its own light/dark
+     pair from the border colour and ignores the one set above. */
+  input.btn:not([name="search"]) {
+    border-style: solid !important;
+  }
+
   div.buttons input:hover,
-  input.button:hover,
+  input.button:not([name="search"]):hover,
+  input.btn:not([name="search"]):hover,
   button:hover,
   a.button:hover {
     background-color: #333a42 !important;
@@ -1356,6 +1496,36 @@
     color: #8b949e !important;
   }
 
+  /* The feed pages the sidebar and front page link to (New Pages, Most Recently
+     Edited) render their list inside a shared content-box widget whose panel the
+     site paints white. Everything the box holds is transparent, so the panel's
+     own fill is the whole of it — the row separator is a 10%-black hairline that
+     needs restating once the paper is dark. */
+  #page-content .content-box {
+    background-color: #1c2128 !important;
+  }
+
+  #page-content .content-type-description .wiki-content-table tr {
+    border-bottom-color: #2d333b !important;
+  }
+
+  #page-content .content-type-description .wiki-content-table tr:hover {
+    background-color: #262c33 !important;
+  }
+
+  /* The row lifts under the cursor whether or not the cursor is on the link
+     itself, and the resting crimson only reaches 4.3:1 once it has. */
+  #page-content .content-type-description .wiki-content-table tr:hover a {
+    color: #ff8f97 !important;
+  }
+
+  /* The box's title and footer strips are knocked-out white on the accent fill
+     they carry, so their links keep that white instead of the page's crimson. */
+  #page-content .content-type-title a,
+  #page-content .content-type-footer a {
+    color: #fff !important;
+  }
+
   /* ============================================================
      FORUM
      ============================================================ */
@@ -1640,8 +1810,13 @@
     color: #ff8f97 !important;
   }
 
+  /* Article themes repaint this strip from their own palette and pitch its ink
+     near-white to suit — djkaktus lands an olive band, scp-1730 a grey one — so a
+     muted grey alone measures 2.0:1 there. The paper is stated alongside the ink
+     so the pair is always known, and it matches the footer directly above it. */
   #license-area,
   .license-area {
+    background-color: #0d1117 !important;
     color: #8b949e !important;
   }
 
@@ -1893,6 +2068,14 @@
   #interwiki body,
   body#interwiki {
     background-color: transparent !important;
+  }
+
+  /* The frame ELEMENT's own fill, which the article themes set from their
+     resources-block green (/scp-8007 leaves it #e8f7ea). The frame's document
+     normally paints over it, so it only shows while that document loads — or
+     for good, when a blocker stops the third-party frame from loading at all. */
+  iframe.scpnet-interwiki-frame {
+    background-color: #14181d !important;
   }
 
   #interwiki .menu-item a {
