@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260803.00.35
+@version      20260804.13.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -235,6 +235,19 @@
     color: #121213 !important; -webkit-text-fill-color: #121213 !important; }
   .button.button--flagship:hover, .button.button--disneyPlus-watch:hover {
     background-color: #7aa1ea !important; }
+  /* "Watch" CTA on the legacy scoreboard cards (.cscore_button on the home score strip,
+     and the bare .button.sm variant in the one-feed game-strip card): ESPN fills it with
+     the brand blue #3772df/white as the card's PRIMARY action, sitting beside the
+     blue-OUTLINE Gamecast / Box Score secondaries. The neutral .button rule above
+     swallowed the fill, so the primary read as a third grey pill and the whole
+     action hierarchy collapsed. `.watch-link` alone is NOT a safe hook — the
+     .cscore_header-link variant of the same class is a plain grey text link — so both
+     classes are required. Same dark-on-blue pairing as the other filled CTAs. */
+  .button.watch-link, .button.cscore_button {
+    background-color: #588ae4 !important; border-color: #588ae4 !important;
+    color: #121213 !important; -webkit-text-fill-color: #121213 !important; }
+  .button.watch-link:hover, .button.cscore_button:hover {
+    background-color: #7aa1ea !important; }
   /* Fantasy sign-up rail: already dark by design, with a per-sport brand fill on the
      first CTA and white-outline secondaries. We flattened all three to one grey pill. */
   .fantasySignupV2 .button {
@@ -307,11 +320,16 @@
   .Button.Button--disabled {
     background-color: transparent !important; border-color: #4a525b !important;
     color: #6e7681 !important; -webkit-text-fill-color: #6e7681 !important; }
-  /* Where-to-Watch row CTA: a filled brand-blue <a> whose only classes are hashed, so the
-     `a` link rule painted its label #5fb0e6 on the site's own #5990f6 fill (~1.2:1). The
-     data-testid is the one stable hook; reuse the theme's dark-on-blue CTA pairing. */
+  /* Where-to-Watch row CTA + the scoreboard game-card "Watch" button: a filled brand-blue
+     <a> whose only classes are hashed, so the `a` link rule painted its label #5fb0e6 on
+     the site's own fill (~1.2:1). The data-testid is the one stable hook; reuse the
+     theme's dark-on-blue CTA pairing. The fill MUST be pinned too — ESPN ships this same
+     testid over two different blues (#5990f6 on Where-to-Watch, the darker #3772df on the
+     scoreboard) and the dark label only clears 4.5:1 on the lighter one. */
   [data-testid="watchButton"] {
+    background-color: #588ae4 !important; border-color: #588ae4 !important;
     color: #121213 !important; -webkit-text-fill-color: #121213 !important; }
+  [data-testid="watchButton"]:hover { background-color: #7aa1ea !important; }
   /* Shot-map filter row (soccer match report / gamecast "SHOT MAP"): the shot-type pills
      and the All-Periods / All-Players dropdowns are built on `.Button--default`, so the
      filled brand-blue PRIMARY rule above turned the whole filter bank into a row of blue
@@ -954,6 +972,27 @@
      filter and the white was masked on the native white panel. ---- */
   .PitchCount__Orb:not(.PitchCount__Orb--filled) {
     background-color: transparent !important; border-color: #4a525b !important; }
+  /* Same indicator one component over — the SCOREBOARD's .BaseballSituation widget uses
+     .pitches .circle, not .PitchCount__Orb. ESPN fills a lit orb through a design token
+     (#dd0000 outs/strikes, #009944 balls); the theme's token block remaps that token to
+     the card surface, so a lit orb rendered IDENTICAL to an unlit one and the whole
+     ball/strike/out count disappeared. The .green modifier needs three classes to clear
+     the two-class red rule. The unlit orb's #cbccce ring is flattened by the blanket `*`
+     border reset to #262c33 (~1.05:1 on the card) — lift it so the empty slots still
+     read as slots. Audit-blind: 10px, and the loss is semantic, not luminance. */
+  .pitches .circle.active {
+    background-color: #dd0000 !important; border-color: #dd0000 !important; }
+  .pitches .circle.active.green {
+    background-color: #009944 !important; border-color: #009944 !important; }
+  .pitches .circle:not(.active) { border-color: #4a525b !important; }
+  /* Base-occupancy diamonds in the same widget: ESPN encodes a runner on base with its
+     link-blue border utility (.brdr-clr-link) against the empty base's .brdr-clr-gray-06,
+     and the `*` border reset collapsed both to one grey — every base read as empty. The
+     home page's legacy .cscore diamonds carry neither utility class (they colour a single
+     border-bottom from a .base-<n>-<n>-<n> parent, with !important, so they survive), which
+     is why this only breaks on the SPA scoreboard. */
+  .diamond.brdr-clr-gray-06 { border-color: #4a525b !important; }
+  .diamond.brdr-clr-link { border-color: #5fb0e6 !important; }
   /* the StatusBar carousel transition panes paint a full-size white ::before */
   .StatusBar__TransitionPane::before, .StatusBar__TransitionPane::after {
     background-color: #1c2128 !important; }
@@ -996,6 +1035,28 @@
        a light bar image, so no background rule can touch it. Invert it into a dark
        rule that reads as a divider on our base. ---- */
   img[src*="greyline"] { filter: invert(1) !important; }
+
+  /* ---- Story "Share" flyout (.share-popup, opened by the byline Share button): a
+       solid #fff card with #1d1e1f ink, `display:none` until the button adds
+       .popup-active — invisible to every load-time scan. Our light body ink then
+       rendered Email / Print as pale grey ON WHITE while the li dividers went black.
+       ESPN ships its own dark half ([data-appearance='dark'] → #2b2c2d/#f9f9fb), so
+       mirror it at the theme's floating-surface colour. The item anchors are
+       `color: inherit !important` in ESPN's sheet, so setting the PANEL's colour is
+       what actually repaints them — a rule on .share-popup-link loses the tie. The
+       copy-link success state hardcodes #0D830F (3.3:1 on our card); lift it. ---- */
+  .share-button-wrapper .share-popup {
+    background-color: #1c2128 !important; color: #e6edf3 !important; }
+  .share-button-wrapper .share-popup .copy-link.active-copy-link .copy-link-inner {
+    color: #4ac76a !important; -webkit-text-fill-color: #4ac76a !important; }
+
+  /* ---- One-feed game-strip out count: ESPN paints the LIVE clock (.game-time) red and
+       leaves the "0 Outs" span inside it neutral ink. Our live-red rule sets
+       -webkit-text-fill-color, which INHERITS into that child and overrides its own
+       `color`, so the out count rendered as a second red live badge. A direct
+       declaration on the child beats the inherited fill. ---- */
+  .game-strip__outs {
+    color: #c4cdd6 !important; -webkit-text-fill-color: #c4cdd6 !important; }
 
   /* ---- Batter hot/cold zone (.HitMap, MLB gamecast): each cell paints a saturated
        blue/red brand fill with a WHITE batting average in a bare unclassed <span>.

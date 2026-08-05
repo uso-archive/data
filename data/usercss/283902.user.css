@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260803.00.35
+@version      20260804.13.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -693,9 +693,14 @@
   .leaderboard-sort_value, .leaderboard-sort_value *,
   .leaderboard-user, .leaderboard-user *,
   .header_with_cover_art-pyongs_count { color: #9aa7f0 !important; }
-  /* the periwinkle-filled count pill carries a 2px border in its OWN fill colour (so it
-     reads as a solid pill); the blanket border reset draws a dark ring around it */
+  /* the filled count pills carry a 2px border in their OWN fill colour (so each reads as a
+     solid pill); the blanket border reset draws a dark ring around them. genius ships three
+     variants and they must all be restated or the ring comes back on the ones left out:
+     "--purple_filled" #99a7ee, "--pink_filled" #ff1464, and the unfilled "--gray" whose
+     edge IS the pill (it has no background at all). */
   .numbered_indicator--purple_filled { border-color: #99a7ee !important; }
+  .numbered_indicator--pink_filled { border-color: #ff1464 !important; }
+  .numbered_indicator--gray { border-color: #9a9a9a !important; color: #9a9a9a !important; }
 
   /* legacy buttons / tags */
   .normal_button, .text_button, .quinary_button, .tag,
@@ -726,6 +731,37 @@
      rule above flattens to the same light grey as every other button */
   .square_button.square_button--purple,
   .square_button.square_button--purple * { color: #9aa7f0 !important; fill: #9aa7f0 !important; }
+  /* The rest of the ".square_button" family is not a fill family at all: bagon_desktop.css
+     draws it as an OUTLINE control (transparent background, `border-color` + `color` +
+     `.inline_icon{fill}` all set to one hue) and puts the whole meaning in that hue —
+     #ff1414 destructive, #0ecb27 the affirmative "Submit", #ffff64 / #fff emphasis,
+     #9a9a9a muted and the "--waiting" in-flight state. The neutral surface rule above is
+     the same specificity and comes first, so every variant collapses into one identical
+     grey box and the family stops telling destructive from affirmative. Re-assert each
+     hue on the edge, the label and the glyph with a two-class selector, lifted to clear
+     4.5:1 on the #21262d fill (#ff1414 is only 3.8:1 there). Enumerated from
+     bagon_desktop.css, same as the .text_label--* block below. */
+  .square_button.square_button--red, .square_button.square_button--red *,
+  .square_button.square_button--red .inline_icon {
+    color: #ff4d4d !important; fill: #ff4d4d !important; border-color: #ff4d4d !important; }
+  .square_button.square_button--green, .square_button.square_button--green *,
+  .square_button.square_button--green .inline_icon {
+    color: #0ecb27 !important; fill: #0ecb27 !important; border-color: #0ecb27 !important; }
+  .square_button.square_button--yellow, .square_button.square_button--yellow *,
+  .square_button.square_button--yellow .inline_icon {
+    color: #ffff64 !important; fill: #ffff64 !important; border-color: #ffff64 !important; }
+  .square_button.square_button--white, .square_button.square_button--white *,
+  .square_button.square_button--white .inline_icon {
+    color: #ffffff !important; fill: #ffffff !important; border-color: #ffffff !important; }
+  /* "--gray" / "--waiting" are the DE-emphasised end of the same family (genius draws the
+     default variant with a black edge and these with a grey one). Only the label and glyph
+     move: pinning their edge to #9a9a9a too would make the muted variant louder than the
+     default #2d333b edge and invert the hierarchy. */
+  .square_button.square_button--gray, .square_button.square_button--gray *,
+  .square_button.square_button--gray .inline_icon,
+  .square_button.square_button--waiting, .square_button.square_button--waiting *,
+  .square_button.square_button--waiting .inline_icon {
+    color: #9a9a9a !important; fill: #9a9a9a !important; }
   .square_button--facebook *, .square_button--twitter *, .square_button--google *,
   .square_button--instagram *, .square_button--spotify *, .square_button--apple *,
   .square_button--email * { color: #ffffff !important; }
@@ -807,7 +843,36 @@
      accent still wins. */
   .referent, a.referent {
     background-color: #1c2128 !important; color: #e6edf3 !important; box-shadow: none !important; }
-  .referent--yellow, .referent.referent--yellow { background-color: #21262d !important; box-shadow: inset 3px 0 0 #ed4337 !important; }
+  /* ...and the STATE the fill encoded has to come back, or every annotation looks alike.
+     genius keeps an annotation's state entirely in that background-color — #ff9 for
+     "--green", #ff7070 for "--red" — and marks the one currently open by swapping it for a
+     saturated "--highlighted" tone (#ffff64, or #ff1414 on a red one). The base rule above
+     repaints all of them, so an artist page's contributions feed renders every annotated
+     excerpt identically and the open one is unmarked: measured on /artists/Kendrick-lamar,
+     three "--green" excerpts all resolving to the same #1c2128 as a plain referent.
+     Re-tint the fill rather than draw an inset bar — ".referent" is display:inline with
+     `padding:.2em 0`, i.e. NO horizontal padding, so an inset edge lands on top of the
+     excerpt's first glyph instead of beside it. Each tone keeps the light copy above 9:1.
+     ".referent--yellow" is deliberately NOT in this list: bagon_desktop.css ships no bare
+     "--yellow" fill at all (only "--yellow.--highlighted"), so at rest it IS the base chip
+     and giving it its own surface invented a distinction genius never draws. */
+  .referent.referent--green { background-color: #1b2a1e !important; }
+  .referent.referent--red { background-color: #2e1c1f !important; }
+  .referent.referent--highlighted { background-color: #3d3d1a !important; }
+  .referent.referent--red.referent--highlighted { background-color: #4a1e1e !important; }
+  /* The excerpt WRAPPER has the same three states as a full-bleed panel
+     ("referent_container--inverse" / "--green" #ffff64, "--red" #ff1414) plus a
+     scroll-fade ::before that ramps to the same colour. Nothing in this file matched them,
+     so both would paint a brand-yellow (or red) slab across the column. Match the chip
+     tones and drop the fade to the panel colour. */
+  .referent_container--inverse, .referent_container--green {
+    background-color: #3d3d1a !important; }
+  .referent_container--red { background-color: #4a1e1e !important; }
+  .referent_container--inverse .referent_container-excerpt_container::before,
+  .referent_container--green .referent_container-excerpt_container::before {
+    background-image: linear-gradient(rgba(61, 61, 26, 0), #3d3d1a 85%) !important; }
+  .referent_container--red .referent_container-excerpt_container::before {
+    background-image: linear-gradient(rgba(74, 30, 30, 0), #4a1e1e 85%) !important; }
   /* standalone annotation (artist profile contributions): the caret pointing to the
      card is a rotated ::before square painted pure white -> match the card surface.
      Its top+left borders are the only two edges the rotation leaves visible and the

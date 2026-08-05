@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for OLX Brasil.
-@version      20260803.00.38
+@version      20260804.13.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -1357,6 +1357,44 @@
   img[src*="%2ffacebook-default-picture."] {
     filter: grayscale(1) brightness(0.51) contrast(5.12);
   }
+  /* An ad with no photo renders the site's ONE shared listing placeholder,
+     `static.olx.com.br/cd/listing/notFound.png`, as the whole 249x180 card media —
+     `olx-image-carousel` pushes it in whenever the photo list is empty, so an SRP,
+     a home rail, a "Também podem te interessar" strip or a /perfil/ grid can each
+     carry several. The file is fully OPAQUE and entirely light grey (a #DEDEDE plate
+     under a #EBEBEB category-glyph pattern; no pixel darker than 220), so the dark
+     background `.olx-adcard__media` / `picture` already carries sits behind it and
+     corrects nothing.
+     Darken in place instead of inverting: the glyphs are LIGHTER than the plate, so
+     an invert flips the pattern into dark holes. `brightness` then `contrast` maps
+     the 220-236 source range onto a #1f1f1f plate (just under the #21262d card) with
+     a #363636 pattern, keeping the native polarity. Keyed on the filename before the
+     extension so a format swap survives; the `%2F` forms cover Next's
+     `/_next/image?url=` optimiser, both cases because attribute matching is
+     case-sensitive. */
+  img[src*="/notFound."],
+  img[src*="%2FnotFound."],
+  img[src*="%2fnotFound."] {
+    filter: grayscale(1) brightness(0.46) contrast(3.81);
+  }
+  /* Same family, dark ink: a seller/store with no picture gets
+     `static.olx.com.br/upr/img/photo-off.png` in the 80px `.olx-avatar` disc. The
+     file is 95% transparent with #4A4A4A linework, so there is no plate to darken —
+     on the disc's #21262d the glyph sits at 1.7:1 and the avatar reads as empty.
+     Inverting lands the ink at #929292 (4.9:1). The disc is transparent in the file,
+     so it comes from the `.olx-avatar` background — and a `filter` applies to
+     everything the element paints, its own background included, which would turn
+     #21262d into a near-white plate. The background declared here is therefore the
+     PRE-IMAGE of the disc tone under this exact chain: (255 - 0xD6/0xD0/0xC7) * 0.8
+     lands back on #21262d. Both halves move together — retune one and the other must
+     be recomputed. The `%2F` forms cover the /perfil/ app, which requests the SAME
+     file through `/_next/image?url=`. */
+  img[src*="/photo-off."],
+  img[src*="%2Fphoto-off."],
+  img[src*="%2fphoto-off."] {
+    background-color: #d6d0c7 !important;
+    filter: invert(1) brightness(0.8);
+  }
 
   /* Seller reputation bar: four 70x8 segments whose colours come from INLINE
      `background-color: var(--color-*)`, so no class rule can reach them. The
@@ -1892,6 +1930,83 @@
   }
 
   /* ============================================================
+     Home "Produtos / Tipo de imóveis mais buscados" carousel
+     ------------------------------------------------------------
+     Each card is an `<a>` whose only surface rule paints the literal
+     `--color-neutral-70` white — no shared card class reaches it, so the
+     whole strip stays white on the dark home page and the product name
+     (`text-neutral-130`, lifted to near-white by the ink rules) renders
+     white-on-white. The product artwork is transparent-cutout webp, so a
+     dark card leaves it intact. Two selector forms because olx-ui migrates
+     module class names between `Component_element__hash` and
+     `Component-module-scss-module__hash__element` component by component.
+     ============================================================ */
+  [class*="most-searched-item__card"],
+  [class*="MostSearchedItem"][class*="card"] {
+    background-color: #1c2128 !important;
+    border: 1px solid #2d333b !important;
+  }
+
+  /* ============================================================
+     Filter option side-sheet (Marca / Modelo "Todas as marcas")
+     ------------------------------------------------------------
+     Two literal-light surfaces inside an otherwise dark side sheet:
+     the STICKY search band (`inputContent`, `--color-neutral-70` = #FFF)
+     and the ROW HOVER (`itemWrapper a:hover`, `--color-neutral-80`), whose
+     label is near-white here, so the hovered brand becomes unreadable.
+     ============================================================ */
+  [class*="FilterOptionsModal"][class*="inputContent"] {
+    background-color: #1c2128 !important;
+  }
+  [class*="FilterOptionsModal"][class*="itemWrapper"] a:hover {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+
+  /* ============================================================
+     Photo-lightbox safety-tip slide
+     ------------------------------------------------------------
+     The last slide of the ad gallery lightbox is a "#dica-de-segurança"
+     panel: two nested literal-white DS-Flex boxes filling the whole stage.
+     Their classes are churning styled-components hashes, so anchor on the
+     stable BEM wrapper plus the `data-ds-component` contract.
+     ============================================================ */
+  .advc-slide-show__wrap-security-tip > [data-ds-component="DS-Flex"],
+  .advc-slide-show__wrap-security-tip > [data-ds-component="DS-Flex"] > [data-ds-component="DS-Flex"] {
+    background-color: #14181d !important;
+  }
+
+  /* ============================================================
+     Seller "Nível de cadastro" meter medal
+     ------------------------------------------------------------
+     The end-cap medal is a two-path SVG: an inner shape and an outline.
+     In the NOT-YET-REACHED state the site fills the inner shape with an
+     inline literal white, which is invisible on the native white card but
+     renders a solid white disc — the brightest object on the page — once
+     the card is dark. Dropping the fill reproduces the native outline-only
+     ribbon. The REACHED state fills that path with a brand colour instead,
+     so keying on the literal white leaves it untouched.
+     ============================================================ */
+  #reputation-bar svg path[style*="fill: rgb(255, 255, 255)"] {
+    fill: none !important;
+  }
+
+  /* ============================================================
+     Listing-rail breadcrumb
+     ------------------------------------------------------------
+     Each crumb is an `<a>` wrapping a `<p class="…colorSecondary">` that
+     the site paints the raw action purple; the paragraph's own colour wins
+     over the anchor's, so the muted-text rules flattened every crumb to
+     plain grey and the rail lost its only link affordance. Lift to the same
+     violet the header/ad-view action links use.
+     ============================================================ */
+  [class*="CategoryLink"][class*="colorSecondary"] {
+    color: #b794f6 !important;
+    -webkit-text-fill-color: #b794f6 !important;
+  }
+
+  /* ============================================================
      Dividers
      ============================================================ */
   hr, .olx-divider, [data-ds-component="DS-Divider"] {
@@ -1935,6 +2050,10 @@
     background-color: #1c2128 !important;
   }
   .trc_exclude_overlay { background-color: transparent !important; }
+  /* The popover's own heading strip is a CHILD element carrying its own
+     literal #F7F7F7, so darkening `.trc_popover` alone leaves a white band
+     across the top of the panel with the lifted label invisible on it. */
+  .trc_popover_title_wrapper { background-color: #1c2128 !important; }
   .videoCube .video-title, .videoCube .video-label,
   .trc_spotlight_item .video-title, .trc-main-label,
   .trc_spotlight_item .trc-main-label *,

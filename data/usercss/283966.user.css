@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Pikabu.
-@version      20260803.00.38
+@version      20260804.13.19
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -467,6 +467,9 @@
     --s-icon-primary: #b6b8bf;
     --c-btnIcon-primary-textIcon: #909299;
     --c-btnIcon-tertiary-textIcon: #b6b8bf;
+    /* label + loader of the ghost `.pkb-normal-btn_secondary-text` variant; same
+       mid-grey and the same Pikabu night value as the two icon tokens above */
+    --c-btn-secondaryText-textIcon: #909299;
     --sidebar-link-default: #909299;
     --sidebar-link-click: #aaacb2;
     --tabbar-contentDefault: #aaacb2;
@@ -698,6 +701,15 @@
   .header-menu__item_current a,
   .header-menu__item_active,
   .header-menu__item_active a { color: var(--pk-green) !important; font-weight: 600 !important; }
+  /* Pikabu's own `.header-menu__item:hover` paints a background ONLY — the current item
+     keeps its brand-green label throughout. Our hover rule above is (0,2,0) and outranks
+     the `_current` rule (0,1,0), so hovering the feed you are already on repainted its
+     label plain white: pixel-identical to its neighbours, with the green underline left
+     as the only surviving "you are here" signal. */
+  .header-menu__item_current:hover,
+  .header-menu__item_current:hover a,
+  .header-menu__item_active:hover,
+  .header-menu__item_active:hover a { color: var(--pk-green) !important; }
 
   /* Search result tabs (Посты / Пользователи / Теги / Сообщества) */
   [class*="TabItem__tab"],
@@ -746,6 +758,16 @@
      green, which is the only one of our greens that carries white text above 4.5:1 */
   [class*="SelectBtn__button_active"],
   [class*="SelectBtn__button_active"] span {
+    background-color: var(--pk-green-shade) !important;
+    color: #ffffff !important;
+    border-color: var(--pk-green-shade) !important;
+  }
+  /* Pikabu draws NO hover state for this component, so the `:hover` rule above (0,2,0)
+     outranks the `_active` fill (0,1,0): hovering a selected chip stripped the pill back
+     to the neutral surface while the `… span` half kept the green, rendering a green band
+     the width of the label inside a dark chip. Restate the pill at hover specificity. */
+  [class*="SelectBtn__button_active"]:hover,
+  [class*="SelectBtn__button_active"]:hover span {
     background-color: var(--pk-green-shade) !important;
     color: #ffffff !important;
     border-color: var(--pk-green-shade) !important;
@@ -1266,6 +1288,17 @@
      selected marker (the tick inside it is opacity-driven), so a grey ring leaves the
      row with no indication of which theme is active. */
   .theme-picker__button_current { border-color: var(--pk-green) !important; }
+
+  /* LEGACY `.checkbox` / `.radio` (theme-picker options, login/registration forms). Their
+     UNCHECKED state is `background: transparent` + `color: transparent`, so the 1px
+     --color-black-600 ring IS the whole control; the blanket reset drops it to --pk-border
+     (1.3:1 on a card) and the box vanishes. #5e6066 is the same grey the ui-kit checkbox
+     uses for its own unchecked fill. The CHECKED variants must follow at equal specificity
+     or this rule would flatten their brand-green ring in turn. */
+  .checkbox,
+  .radio { border-color: #5e6066 !important; }
+  .checkbox_checked,
+  .radio_checked { border-color: var(--pk-green) !important; }
 
   /* Green-variant tooltip card: the ring is what makes it read as the "positive" variant
      rather than the neutral one. */

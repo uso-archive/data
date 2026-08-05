@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260803.00.36
+@version      20260804.13.16
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -461,6 +461,23 @@
      separate white strip — the drawer under it already resolves dark, so at 390
      the header alone stayed white above a dark menu. */
   .nav_desktop_contain, .nav_mobile_layout { background-color: #0d1117 !important; }
+  /* The header's dropdown carets ("For schools ▾", "Explore ▾", "About ▾") are inline
+     <svg>s whose path is `fill="currentColor"`, and the desktop variant class sets that
+     colour to the light page's pure black — so on the dark bar each caret renders #000
+     on #0d1117 (~1.2:1) and the only "this opens a menu" affordance disappears. The
+     narrow-width twin of the same markup uses a mid grey and reads fine; restating the
+     nav's own link ink covers both without touching any coloured mark. The variant sets
+     that black on the <svg> ITSELF, so an inherited value from the wrapper never reaches
+     it — the fill has to be restated on the path. */
+  .nav_links_svg svg { color: #c4cdd6 !important; }
+  .nav_links_svg svg path { fill: #c4cdd6 !important; }
+  /* The Khan wordmark in that header (plus its narrow-width twin and the footer lockup)
+     is a single-colour `currentColor` mark Webflow paints the page ink. Nothing in this
+     block reached it, so the plain `a { color }` rule tinted the whole mark the link
+     blue — and `a:hover` out-specifies a bare class, so it also flipped shade under the
+     cursor. Khan never draws its logo in either tone; the app's own header renders it
+     near-white, so match that. */
+  .nav_desktop_logo, .nav_mobile_logo, .footer_logo_wrap { color: #e6edf3 !important; }
   .nav_dropdown_main_content, .nav_dropdown_main_scroll, .nav_skip_wrap,
   .tab_button_item, .tab_content_list, .card_testimonial_inner,
   .card_primary_element { background-color: #1c2128 !important; }
@@ -563,6 +580,21 @@
     mix-blend-mode: lighten !important;
   }
 
+  /* The "Students are falling behind" bar chart on /about is a flat alpha-ground
+     raster (75% transparent) whose two axis TITLES — "Student proficiency" and
+     "Grade level" — are baked bold black, so they vanish on the dark page while the
+     bars and the "Grade level proficiency" rule stay legible. It lives on the Webflow
+     build, outside `#main-content`, so the content-image invert further down cannot
+     reach it. Inverting is faithful here rather than destructive: the chart's whole
+     point is a ramp of bars fading INTO the page (native #1f9dff down to a near-white
+     #f4f9fe that is already all but invisible on white), and inverting preserves that
+     relationship exactly while lifting the black titles to near-white. Matched on the
+     Webflow asset stem, which is anchored at the end so it cannot also swallow the
+     `…_graphic.avif` photo collage in the next section. */
+  img[src$="_graph.avif"] {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+
   /* ====================================================================
      Hardcoded light surfaces that bypass the design tokens
      (some cards/sections set white or pale-grey directly, not via a var)
@@ -630,12 +662,39 @@
      answer tiles. Keying on `data-kind` reproduces the native backgrounds exactly.
      This can never leak a light surface: the neutralizer above has already flattened
      everything, so a button we no longer paint renders on the dark page. */
+  /* `a[data-kind="secondary"]` for the same reason the primary rule above matches on the
+     attribute: Khan renders the secondary kind as an <a> wherever the CTA navigates
+     ("Explore teacher tools", "Learn about our mission" on the home page), so keying on
+     `button` alone left the navigating half of one component unfilled beside its filled
+     twin. Natively both are the same pale-blue pill. */
   #main-content button[data-kind="secondary"],
+  #main-content a[data-kind="secondary"],
   #main-content a[class][role],
   #main-content [role="button"] { background-color: #1c2128; }
   #main-content button[data-kind="secondary"]:hover,
+  #main-content a[data-kind="secondary"]:hover,
   #main-content a[class][role]:hover,
   #main-content [role="button"]:hover { background-color: #232a32; }
+
+  /* Home "What learning looks like in practice." testimonial trio. Khan colour-codes the
+     three cards gold / green / orange and sets the light-page ink on top; the
+     `#main-content [class]` neutralizer above flattens all three to transparent, so they
+     render as identical grey boxes and the colour code is gone. Restore each fill and
+     restate the authored ink for the whole subtree — the same treatment the marketing
+     stat tiles (`.card_stat_inner`) get, and for the same reason: on a coloured tile
+     near-black is still the RIGHT colour, and the global `h1-h6` / `p, li, …` block
+     would otherwise repaint it near-white. The cards hold only a heading, a quote and an
+     attribution, no link or button whose label needs a different colour. Hashed
+     vanilla-extract classes, so degrade-safe: a re-hash returns them to today's grey. */
+  #main-content li._14s0xxx { background-color: #fcc539; }   /* Administrator */
+  #main-content li._186c56yx { background-color: #72bb82; }  /* Teacher */
+  #main-content li._1yar44ex { background-color: #f97b4f; }  /* Families */
+  #main-content li._14s0xxx, #main-content li._14s0xxx *,
+  #main-content li._186c56yx, #main-content li._186c56yx *,
+  #main-content li._1yar44ex, #main-content li._1yar44ex * {
+    color: #151521 !important;
+    -webkit-text-fill-color: #151521 !important;
+  }
 
   /* Mastery colour key (course-page legend + progress grid). Khan replaced the
      old `--tile-color` custom property with a literal per-state background /
@@ -798,20 +857,46 @@
 
      1. Home "Explore our content" subject chips: thirteen 32px icons, each a white
      square with a coloured glyph, rendering as a grid of bright tiles — the brightest
-     thing on the page. Scoped to the grid's stable accessible name. */
+     thing on the page. Scoped to the grid's stable accessible name.
+
+     Eleven of the thirteen are OPAQUE plates (measured: 0% transparent, 30-61%
+     white), so the inversion lands their ground on pure #000 — DARKER than the page,
+     i.e. a hard black square framing each glyph. `mix-blend-mode: lighten` snaps every
+     pixel the inversion pushed below the page colour back to the page and leaves the
+     bright glyph untouched. Blending resolves against the nearest stacking context,
+     and this `<nav>` is one (`position:relative; z-index:0`), so its backdrop is empty
+     unless the page colour is painted INSIDE it — hence the fill on the nav itself,
+     which restates the colour it already sits on and is invisible alone. Verified by
+     sampling: plate pixels render exactly rgb(20,24,29). */
+  nav[aria-labelledby="course-list-section-heading"] { background-color: #14181d !important; }
   nav[aria-labelledby="course-list-section-heading"] img {
     filter: invert(1) hue-rotate(180deg) !important;
+    mix-blend-mode: lighten !important;
   }
-  /* …except two of the thirteen, which are NOT white squares at all: the
+  /* …except two of the thirteen, which are NOT white plates at all: the
      Science flask and the ELA speech bubble ship with a transparent
      background, so there is nothing to knock out and the inversion only
      mangles the glyph — the flask's yellow (#e8b839) came out a muddy brown
      (#8f5000) and stopped reading as Khan's science colour. Left as authored
-     they sit on the dark chip exactly as intended. Matched on the filename
-     stem, which is stable across the CDN's content hash. */
+     they sit on the dark chip exactly as intended, and with no inversion there is
+     no black ground for the blend to lift, so it is switched off with it. Matched
+     on the filename stem, which is stable across the CDN's content hash. */
   nav[aria-labelledby="course-list-section-heading"] img[src*="flask"],
   nav[aria-labelledby="course-list-section-heading"] img[src*="message_bubble"] {
     filter: none !important;
+    mix-blend-mode: normal !important;
+  }
+  /* Yellow is the one hue `hue-rotate(180deg)` cannot round-trip — it is a linear
+     matrix approximation, and yellow's inverse (blue) maps back to orange-brown, not
+     yellow. That is the same damage the flask exception above avoids by not inverting,
+     but the Partner-courses starburst has no alpha to fall back on: it is a plate, so
+     it must invert. Correct the hue on the way back instead. Tuned against the native
+     pixels, measured AFTER the blend (which floors blue at the page's 29): the glyph
+     lands rgb(255,184,29) against a native rgb(253,185,0) — the straight 180deg chain
+     left it rgb(151,72,0), a brown starburst. The plate is achromatic, so saturate and
+     brightness leave it at #000 and the blend still clears it. */
+  nav[aria-labelledby="course-list-section-heading"] img[src*="badge"] {
+    filter: invert(1) hue-rotate(195deg) saturate(2) brightness(2.2) !important;
   }
   /*  2. The logged-out home hero (one responsive asset, whose every srcset entry shares
      the `lohp_hero_graphic_mobile` stem). Its cream "graph paper" ramp is the largest

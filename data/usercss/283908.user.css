@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Vinted with the homepage, catalog and search, item pages and seller profiles in a comfortable dark look that's easy on the eyes for late-night browsing.  Works on every country version of Vinted (vinted.fr, .de, .com, .co.uk, .es, .it, .nl, .be, .pl and more).   Prices, ratings and Vinted's teal stay clear and recognizable.
-@version      20260803.00.40
+@version      20260804.13.21
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -400,6 +400,15 @@
   [class*="Validation__warning"] {
     color: #f2707a !important; fill: #f2707a !important; }
 
+  /* `Text__inherit` is web_ui's explicit "take the parent's colour" theme
+     variant — the pattern every icon+label link uses, so that the label and the
+     sibling Icon (which really does inherit) stay one colour. It always carries
+     a TYPE variant too (title/subtitle/body), and those rules above overrode the
+     inherit: the help-centre "Voir tout" label went white while its arrow stayed
+     teal. Give the parent's colour back, after every rule that could steal it.
+     `inherit` is CSS1 — safe in the old userstyles.org parser. */
+  .web_ui__Text__inherit, [class*="Text__inherit"] { color: inherit !important; }
+
   /* Ghost / outlined / tertiary buttons render teal text on a dark
      surface — lift it for AA. Filled CTAs keep white-on-teal. */
   .web_ui__Button__tertiary .web_ui__Button__label,
@@ -667,11 +676,18 @@
      follow win the source-order tie on the nested nodes. */
   [class*="complaints-image-carousel"] {
     background-color: rgba(6, 8, 10, 0.72) !important; }
-  .image-carousel__image-wrapper,
+  /* The item-page photo lightbox (web_ui DeprecatedImageCarousel) is a CSS
+     module too, so its class is `DeprecatedImageCarousel-module-scss-module__
+     <hash>__image-carousel__…` and the exact `.image-carousel__*` selectors are
+     dead. Both of its surfaces read greyscale-level-1, which we inverted for
+     text duty: the letterbox wrapper turned into a near-white 600x600 panel
+     around the photo, and the close/prev/next discs (rgba(level-1, .3)) went
+     light — carrying an equally light glyph, so the close X was invisible.
+     Match the substring; it also covers the complaints carousel's icon disc. */
+  [class*="image-carousel__image-wrapper"],
   [class*="complaints-image-carousel__wrapper"] {
     background-color: #0d1117 !important; }
-  .image-carousel__icon-wrapper,
-  [class*="complaints-image-carousel__icon-wrapper"] {
+  [class*="image-carousel__icon-wrapper"] {
     background-color: rgba(13, 17, 23, 0.55) !important; }
   /* web_ui paints "icon on a dark/photo surface" as Icon__greyscale-level-6,
      i.e. the white-surface token. Inverting that token to an elevated dark
@@ -722,6 +738,7 @@
   [class*="Box__box-theme-primary-medium"],
   [class*="Box__box-theme-primary-extra-dark"],
   section[class*="item-verification"][class*="closing"],
+  [class*="hc-"][class*="search-header"],
   [class*="advertising-module"][class*="__hero"] {
     background-color: #0e3b42 !important; }
   /* The /advertising hero artwork is a TRANSPARENT PNG carried by a web_ui
@@ -797,6 +814,12 @@
      is 3.0:1 on our base. Lift the whole link, inner spans included. */
   [class*="new-about__paragraph"] a,
   [class*="new-about__paragraph"] a * { color: #4db8c4 !important; }
+  /* …but the same CMS block also renders solid-fill CTAs as `a.btn`, whose fill
+     is the site's own bright teal under a WHITE label. The link rule above
+     flattened that label to the same teal family (1.1:1 — the words vanished
+     into the button). Filled CTA keeps white ink. */
+  [class*="new-about__paragraph"] a.btn,
+  [class*="new-about__paragraph"] a.btn * { color: #ffffff !important; }
 
   /* The item-verification testimonial stars ship as <img> SVGs with a baked
      near-black fill, so CSS cannot reach the path and all five vanished on the

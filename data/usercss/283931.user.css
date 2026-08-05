@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for Slashdot, easy-on-the-eyes story feed and threaded comment discussions, with the classic Slashdot green kept intact.
-@version      20260803.00.39
+@version      20260804.13.19
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -720,6 +720,16 @@
     color: #c4cdd6 !important;
   }
   .sticky-cta a, .sticky-wrapper a { color: #5fb0e6 !important; }
+  /* Each sponsor variant of that bar ships its OWN `.sticky-cta:hover` fill and declares
+     it `!important` — `#c2eb53` lime (zendesk), `#f0f0f0` (viktor), `hsla(0,0%,100%,.9)`
+     (auth0/newrelic/grafana), `#00c853` (default). Those beat the dark rest fill above
+     the moment the pointer lands, and the CTA's label — which is `::before` content, not
+     a text node — is our light #e6edf3, so it drops to ~1.1:1 on the near-white ones.
+     Their selectors are (0,3,0) `!important`, so the restatement has to outrank that. */
+  .sticky-wrapper .sticky-right .sticky-cta:hover,
+  .sticky-wrapper .sticky-cta:hover,
+  .sticky-right .sticky-cta:hover,
+  #mdb-sticky-cta:hover { background: #2d333b !important; }
 
   /* native-ad "Sponsored / Featured Content" label (Nativo classes) */
   .ntv-ad-label, .ntv-sponsored, .nel-sponsored,
@@ -905,6 +915,35 @@
   .faq-listing > div i, .faq-listing div i,
   .faq-listing > div i:hover, .faq-listing div i:hover { color: #6fd8be !important; }
 
+  /* ---------- /videos ---------- */
+  /* Every video thumbnail sits in a container the site fills #ecf2f2, and the raster
+     never covers the whole box, so each of the ~30 tiles down the page renders a bright
+     strip under its frame. The `<img>` itself is untouched — only the plate behind it. */
+  .card-img > a, .featured-card-img, .video-card-img, .river-card-img,
+  .related-card-img, .video-rail-tile, .video-rail-tile-img,
+  .video-related-tile, .video-related-tile-img, .adwrap-railad-sticky {
+    background-color: #1c2128 !important;
+  }
+
+  /* ---------- /newsletter ---------- */
+  /* The subscribe form is a Mailchimp embed — a THIRD-PARTY sheet plus a page <style>,
+     neither of which any earlier rule here reaches: `#mc_embed_signup` is a hardcoded
+     #fff card and every field's helper text carries an `rgba(255,255,255,.85)` chip, so
+     the whole form rendered as a white panel under our light-grey labels. The inline
+     error keeps its own red — only its chip is darkened. */
+  #mc_embed_signup, div#mc_embed_signup {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
+  #mc_embed_signup h2, #mc_embed_signup label,
+  #mc_embed_signup .mc-field-group label { color: #e6edf3 !important; }
+  #mc_embed_signup .helper_text {
+    background-color: #21262d !important;
+    color: #c4cdd6 !important;
+  }
+  #mc_embed_signup div.mce_inline_error { background-color: #21262d !important; }
+  #mc_embed_signup #mce-success-response { color: #6fd8be !important; }
+
   /* ---------- comment-search results (search.pl?op=…) ---------- */
   /* the "Search Results" section heading is a bare #3c4040 <h2> — 1.3:1 on our
      dark results panel (the result-item <h2>s below stay readable because their
@@ -1025,6 +1064,13 @@
   .sandiego .default.hollow.button:focus svg { fill: #e6edf3 !important; }
   /* breadcrumb " > " separators are ::before content at #666 (3.1:1) */
   #breadcrumbs li::before, nav#breadcrumbs ul li::before { color: #8b949e !important; }
+  /* the shell's own sticky masthead is a bare `<nav>` of three links (News / Business
+     Software / Thought Leadership) sitting on its brand teal #006665 bar, natively white
+     at 5.6:1. `.l-header-nav nav a` is the only rule the site gives them and nothing here
+     reached it, so the global link colour landed mid-blue on the teal at 2.9:1. */
+  .l-header-nav nav a, .l-header-nav nav a:link,
+  .l-header-nav nav a:visited { color: #ffffff !important; }
+  .l-header-nav nav a:hover { color: #9be7d6 !important; }
   /* the mobile off-canvas menu keeps the site's own teal panel (#006665) and paints its
      items #fefefe; the global link colour landed mid-blue on that teal at 2.7:1. Only
      reachable by opening the hamburger at a narrow viewport. */
@@ -1109,7 +1155,12 @@
      dark bar it renders at 1.1:1, i.e. an invisible call-to-action */
   .sticky-cta::before, .sticky-wrapper .sticky-cta::before,
   .sticky-right .sticky-cta::before { color: #e6edf3 !important; }
-  .m-heat-gradient .axis span, .m-heat-gradient .axis span.active { color: #e6edf3 !important; }
+  /* the recommendation bar's axis runs 1..10 and marks the product's actual score with
+     `span.active`. The site encodes that purely as value — #333 for the score against
+     #98a3a2 for the plain ticks — and this rule listed BOTH forms at one colour, so all
+     ten numbers came out identical and the readout was gone. Keep the site's encoding. */
+  .m-heat-gradient .axis span { color: #8b949e !important; }
+  .m-heat-gradient .axis span.active { color: #e6edf3 !important; }
   /* the directory search box and its typeahead are `<input>` with NO type attribute,
      so every `input[type=…]` rule above missed them: white field, white placeholder */
   form.directory-search-box, .directory-search-box,

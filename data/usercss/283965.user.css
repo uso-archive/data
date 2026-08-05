@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for Syosetu (小説家になろう). Easy-on-the-eyes reading for novel chapters, plus the home, rankings, search and bookmark controls.
-@version      20260803.00.37
+@version      20260804.13.17
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -323,17 +323,26 @@
     color: #ffb877 !important;
   }
 
-  /* Red menu accent (login / bookmark) -> refined warm red.
-     The sticky header sits over the page, so keep its items opaque. */
+  /* Reader header nav. Only --login is natively red (--color-link-login #d00);
+     every other item — --headnav (作品情報/感想/レビュー), --bookmark, --favep,
+     --xpost — is the neutral --color-link-globalnav #666, and --disabled is #ccc.
+     A blanket red here paints plain nav links in the danger hue, so the neutral
+     items take the body colour and only login keeps the warm red. The sticky
+     header sits over the page, so keep its items opaque. */
   .c-menu__item,
-  .c-menu__item--login,
   .c-menu__item--headnav,
   .c-menu__item--bookmark {
     background-color: #0d1117 !important;
-    color: #ff7b72 !important;
+    color: #c4cdd6 !important;
   }
   .c-menu__item a {
+    color: #c4cdd6 !important;
+  }
+  .c-menu__item--login {
     color: #ff7b72 !important;
+  }
+  .c-menu__item--disabled {
+    color: #6e7681 !important;
   }
 
   /* ============================================================
@@ -2290,6 +2299,18 @@
   img[src*="mnlt_index_entrance_line"] {
     filter: invert(0.92) hue-rotate(180deg);
   }
+  /* ムーンライト is the one R18 site whose header WORDMARK is an opaque plate:
+     both mnlt_titlelogo.gif (desktop) and mnltk_logo.gif (phone) bake a #f3f3f3
+     background into the pixels, so the mark ships as a bright rectangle in the
+     dark header of every mnlt page. No element-bg scan sees it — it is an <img>.
+     Its ink is PASTEL (pink wordmark, cyan crescent), so a partial invert leaves
+     the plate visible; a full invert lands it on rgb(20,13,28) — within a few
+     units of the #0d1117 header — and hue-rotate restores both brand hues.
+     ノクターン's and ミッドナイト's own wordmarks are already dark; leave them. */
+  img[src*="mnlt_titlelogo"],
+  img[src*="mnltk_logo"] {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
 
   /* Ad / PR slots: neutral dark so blank slots don't flash white */
   .c-ad,
@@ -2306,6 +2327,10 @@
      it also reads if a light creative loads behind it. The mobile sheet serves the
      same control under a DIFFERENT id (#flexible-sticky-wiped-button) with the same
      inline black polygon, so the desktop-only id left the SP dismiss unusable. */
+  /* A THIRD sticky-ad network (Geniee) serves the same dismiss under
+     #geniee_overlay_close — same 512-viewBox polygon with inline
+     style="fill:#000;stroke:#000". Its own bg is transparent, so leave the
+     chip off and repaint the glyph only. */
   #flexible-sticky-ov-close-button,
   #flexible-sticky-wiped-button {
     background-color: #1c2128 !important;
@@ -2313,7 +2338,9 @@
   #flexible-sticky-ov-close-button svg polygon,
   #flexible-sticky-ov-close-button svg path,
   #flexible-sticky-wiped-button svg polygon,
-  #flexible-sticky-wiped-button svg path {
+  #flexible-sticky-wiped-button svg path,
+  #geniee_overlay_close svg polygon,
+  #geniee_overlay_close svg path {
     fill: #c4cdd6 !important;
     stroke: #c4cdd6 !important;
   }

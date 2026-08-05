@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A full dark theme for Thingiverse: browse the feed, model pages, search and profiles in comfortable dark while 3D model previews stay true to color.
-@version      20260803.00.40
+@version      20260804.13.21
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -482,6 +482,17 @@
     border-color: transparent !important; }
   .tv-button--secondary[disabled] { border-color: #262c33 !important; }
 
+  /* Tailwind's `text-white` / `text-white!` utilities compile to
+     `color: var(--tv-white)`, and `--tv-white` is the alias retoned above to the
+     elevated dark surface (it is what turns the site's `bg-white` panels dark) — so a
+     utility asking for WHITE TEXT resolves to that dark surface colour instead. The
+     bang form's `!important` sits in a Tailwind utility cascade layer, which outranks
+     any unlayered `!important` we can write, so a `color:` override cannot win here;
+     redefining the variable does, because custom-property resolution is layer-agnostic.
+     The site spends this on the orange "Remove ads" CTA — header, mobile menu and every
+     ad card — whose label must read white on that chip. */
+  [class*="text-white"] { --tv-white: #ffffff !important; }
+
   /* ====================================================================
      Inputs — stable `tv-input` class (search box, email fields, filters)
      ==================================================================== */
@@ -707,6 +718,17 @@
      themeable surface, so it's intentionally left as-is to avoid tinting.) */
   img.mediaItem--image, [class*="mediaItem"] img, [class*="Carousel"] img,
   [class*="carousel"] img { background-color: #1c2128 !important; }
+
+  /* The site's "no image" fallback is a RASTER — `/site/img/default/Gears_*`, a #e8ebfb
+     plate served at card size (292x264 on the legacy /apps grid), plus the
+     grey-on-white default avatar. No background rule can reach pixels, and no DOM scan
+     can see them either: audit-theme skips <img>, the element background is transparent
+     and there is no text node. Neither asset carries dark ink — the Gears plate's
+     DARKEST pixel is Y=156 of 255 — so inverting cannot bury linework; the hue-rotate
+     keeps the result in the asset's own blue-lavender family rather than flipping it to
+     brown. The `default/` path scope is load-bearing: real model previews and app logos
+     must never be filtered. */
+  img[src*="/site/img/default/"] { filter: invert(1) hue-rotate(180deg) !important; }
 
   /* ====================================================================
      Ad surrounds: dark frame + dark loading slot (don't theme iframe

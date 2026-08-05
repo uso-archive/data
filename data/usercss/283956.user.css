@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260803.00.41
+@version      20260804.13.21
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -356,6 +356,14 @@
   [class*="CalendarDateCell--label"] {
     color: var(--wx-text-muted) !important;
   }
+  /* ...but the SELECTED day is a brand-blue #1b4de4 chip that weather.com labels in
+     WHITE, and it carries `CalendarDateCell--date` too -- so the muted lift above landed
+     grey-on-blue at 2.11:1 and the one cell the calendar is pointing at became the
+     hardest to read. The chip is a real semantic fill, so keep it and put its white label
+     back; compounded with the base class to out-rank it whatever the source order. */
+  [class*="CalendarDateCell--date"][class*="CalendarDateCell--selected"] {
+    color: #ffffff !important;
+  }
   /* the legacy Monthly "Almanac" card title ships a hardcoded near-black #2b2b2b
      module color (Almanac--header) -> dark-on-dark and vanishes on our dark card;
      the record-year parentheticals ("(1934)" / "(1919)") ship a dim #6f7585
@@ -366,6 +374,53 @@
     color: var(--wx-text) !important;
   }
   [class*="Almanac--recordYear"] {
+    color: var(--wx-text-muted) !important;
+  }
+
+  /* EVERY legacy Helios icon (`Icon--icon--<hash>`) paints its glyph with the design
+     system's INK -- #252422 or #2b2b2b -- reaching it three different ways: as a literal
+     `fill` attribute, as a CSS `fill` on a path with no attribute at all, and as
+     `currentColor` inherited from a wrapper our text rules never touch. On the site's
+     white chrome that is correct ink; on ours it is 1.04-1.22:1, so the WHOLE icon set
+     went invisible on every legacy route at once -- the left rail (Home / Today / Hourly /
+     10 Day / Monthly / Radar / Video / Explore), the header magnifier and globe, the
+     Monthly day-part table's Record High / Average High / Sunrise / Sunset marks, the
+     calendar close button and the Cold-&-Flu allergen glyphs. Nothing is a background
+     colour and nothing is text, so no bucket sees any of it.
+     The COLOURED icons are safe from all three rules: `WxIcon--*` condition icons paint
+     from `fill="var(--sun-lightning)"`-style ATTRIBUTES (so `path:not([fill])` skips
+     them, and `color` is not in their chain), and the knockout Weather Company wordmark
+     is excluded outright -- one of its paths is currentColor, so lifting it would bleach
+     the mark. `Icon--lightTheme` is Helios for "drawn for a dark backdrop" and is
+     natively WHITE (the play glyphs over video thumbnails), so it is put back; the header
+     search magnifier carries that class but overrides it with its own ink, so it is
+     re-darkened after. */
+  svg[class*="Icon--icon"]:not([class*="logoIcon"]) {
+    color: var(--wx-text-2) !important;
+  }
+  svg[class*="Icon--icon"]:not([class*="logoIcon"]):not([class*="WxIcon"]) path:not([fill]) {
+    fill: var(--wx-text-2) !important;
+  }
+  svg[class*="Icon--icon"] path[fill="#252422"],
+  svg[class*="Icon--icon"] path[fill="#2B2B2B"],
+  svg[class*="Icon--icon"] path[fill="#2b2b2b"] {
+    fill: var(--wx-text-2) !important;
+  }
+  svg[class*="Icon--icon"][class*="Icon--lightTheme"] {
+    color: #ffffff !important;
+  }
+  svg[class*="Icon--icon"][class*="SearchInput--searchIcon"] {
+    color: var(--wx-text-2) !important;
+  }
+
+  /* the legacy sign-in page separates the Google button from the email form with a
+     literal `<span>or</span>` that carries a #ffffff fill and no class of its own (its
+     only hook is the `SocialLogin--divider` parent) -- a bright chip punched through the
+     hairline. Our text rules lift the word to body light, so it landed light-on-white at
+     ~1.7:1 and the chip read as a blank white rectangle. Sink it into the page base so
+     the divider reads as one continuous rule. */
+  [class*="SocialLogin--divider"] span {
+    background-color: var(--wx-base) !important;
     color: var(--wx-text-muted) !important;
   }
 
@@ -476,6 +531,27 @@
   .bg-black {
     background-color: var(--wx-chrome) !important;
   }
+  /* ...but the Sign-in CTA is a `bg-gray-900` plate that SITS ON the chrome, in both of
+     the SPA's two header layouts, and each lost it a different way:
+     - in the left rail it is an `<a>`, so the rail's own
+       `[data-testid="sidebar-navigation"] a { background: transparent }` blanked it
+       outright and the only account entry point rendered as bare text between the nav
+       links;
+     - at <=md it is a `<button>` in the `<header>`, where the rule above resolves it to
+       --wx-chrome -- the exact colour of the header behind it, so the plate vanished
+       just the same.
+     Neither shows up in any bucket: a dark control on a dark bar reads fine, it just
+     stops being a button. Give the CTA the elevated surface so its plate reads against
+     the chrome; the location pill already resolves there, so this is a no-op for it. */
+  [data-testid="sidebar-navigation"] a.bg-gray-900,
+  [data-testid="sidebar-navigation"] a.bg-black,
+  header .bg-gray-900,
+  header .bg-black {
+    background-color: var(--wx-surface) !important;
+  }
+  [data-testid="sidebar-navigation"] a.bg-gray-900:hover {
+    background-color: var(--wx-border-2) !important;
+  }
   /* Tailwind HOVER-VARIANT grey fills (hover:bg-gray-100 / -200 / -50) compile to
      variant-prefixed class names (`hover:bg-gray-100`) that our plain .bg-gray-100
      rule doesn't match. The forecast-type nav tabs (Today / Hourly / 10 Day /
@@ -534,6 +610,15 @@
   .text-neutral-800 {
     color: var(--wx-text-2) !important;
   }
+  /* article and product-review bodies are mostly lists, and their BULLETS and ORDERED
+     NUMBERS come from `::marker`, which no `li { color }` rule reaches -- the marker keeps
+     the site's #252422 ink at 1.04:1 while the list text beside it is lifted, so a
+     30-bullet page renders as text with no bullets and a numbered list loses its numbers
+     entirely. A pseudo-element with no text node: invisible to every colour walk. */
+  li::marker {
+    color: var(--wx-text-2) !important;
+  }
+
   /* muted / secondary greys the app uses for metadata + captions */
   .text-gray-400,
   .text-gray-500,
@@ -849,6 +934,16 @@
      of those fills. The alert / brand background colors are never touched. */
   .text-white {
     color: #ffffff !important;
+  }
+  /* `text-primary-foreground` is the same convention one token further in: the near-white
+     label the design system puts on a SOLID CTA (the header Sign-in button and the Today
+     "Next 10 Days" link are its only two users; nothing on the site paints `bg-primary`).
+     It reached the page as link-blue anyway, because `button { color: inherit }` below is
+     UNLAYERED and so outranks the utility inside Tailwind's cascade layer -- the button
+     took the colour of the `<a>` wrapping it. Pin the white the site actually paints. */
+  .text-primary-foreground {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
   }
 
   /* ---- data tables (hourly / 10-day details) ---------------------------- */
@@ -1200,6 +1295,32 @@
   .trc_rbox .branding,
   .trc_rbox_header_span {
     color: var(--wx-text-2) !important;
+  }
+  /* Taboola now ships a "brand kit": it writes its palette as INLINE custom properties on
+     <html> (`--brand-color-text-primary: #252422`, `--brand-color-bg-base: #FFFFFF`) and
+     its own late-injected rules read them at (0,4,0) --
+     `.tbl-feed-card:not([class*="rec-reel"]) .videoCube .video-title { color:
+     var(--brand-color-text-primary) !important }` -- which out-specifies the single-class
+     rule above, so EVERY card title in the feed computed #252422 on our card (1.04:1) and
+     the whole "Sponsored Content" block rendered as thumbnails with no captions. Only the
+     first card escapes, because its title overlays the image and is white. Redefining the
+     token on the widget root is specificity-agnostic and reaches every consumer at once
+     (an !important author declaration also beats the NORMAL inline one on <html>).
+     The advertiser name is a separate `.brand-name` at #0a0a0a that no token feeds, and
+     it renders through `-webkit-text-fill-color`, so pin both properties. The cream "AD"
+     disclosure badge is left exactly as the site paints it. */
+  .trc_rbox,
+  [id*="taboola"] {
+    --brand-color-text-primary: var(--wx-text-2) !important;
+  }
+  .tbl-brand-kit-branding-row .brand-name {
+    color: var(--wx-text-muted) !important;
+    -webkit-text-fill-color: var(--wx-text-muted) !important;
+  }
+  /* the "hide this ad" overlay's Undo affordance is a <div>, not an <a>, so the link rules
+     never reached it and it kept Taboola's #3366cc at 3.02:1 on the darkened card. */
+  .trc_exclude_undo_btn {
+    color: var(--wx-link) !important;
   }
   /* Taboola's popover points at its trigger with a CSS-triangle: a 0/11/11/11
      border box whose left/right/top edges are transparent. The blanket

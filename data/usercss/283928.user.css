@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Depop, easy on the eyes across home, search, categories and product pages, with prices, sale tags and the Depop red kept readable.
-@version      20260803.00.34
+@version      20260804.13.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -177,11 +177,16 @@
      only exists once the drawer is opened, so no load-time scan reaches it.
      appDownloadBox is the <a> wrapper; the gradient sits on an inner card div,
      and the label/badge boxes inside it are *Container elements that the
-     header-container rule above would otherwise paint a second, darker tone —
-     cover all three so the promo reads as one flat surface. */
+     banner-container rule below would otherwise paint a second, darker tone —
+     cover all of them so the promo reads as one flat surface.
+     The banner-scoped form is load-bearing, not redundant: the drawer sits inside
+     [role="banner"], and `[role="banner"] div[class*="Container"]` scores (0,2,1),
+     above the (0,2,0) of a plain two-attribute descendant selector. Without it the
+     promo splits into a #1c2128 card with a darker inset plate behind its label. */
   [class*="appDownloadBox"],
   [class*="appDownloadBox"] [class*="card"],
-  [class*="appDownloadBox"] [class*="Container"] {
+  [class*="appDownloadBox"] [class*="Container"],
+  [role="banner"] [class*="appDownloadBox"] [class*="Container"] {
     background-image: none !important;
     background-color: #1c2128 !important;
   }
@@ -311,6 +316,21 @@
     border-color: transparent !important;
   }
 
+  /* The autocomplete's highlighted row fills solid #3d37bd, and the site flips its
+     category suffix ("...in Men's Footwear") off that same indigo to WHITE so it
+     stays legible on the fill. Our unconditional categorySuggestionText accent rule
+     further down is !important, which the site's plain rule cannot beat, so the
+     suffix on the hovered row drops from 7.0:1 to 3.3:1 and reads blue-on-blue.
+     Cover :focus/:active — the site fills those identically. Qualify with `li`: the
+     panel wrapper is `searchSuggestionsContainer`, which CONTAINS the substring
+     `searchSuggestion`, so a bare attribute selector makes the whole list :hover
+     whenever any one row is and whitens every suffix at once. */
+  li[class*="searchSuggestion"]:hover [class*="categorySuggestionText"],
+  li[class*="searchSuggestion"]:focus [class*="categorySuggestionText"],
+  li[class*="searchSuggestion"]:active [class*="categorySuggestionText"] {
+    color: #ffffff !important;
+  }
+
   /* Search autocomplete / suggestion dropdown — keep opaque */
   [role="listbox"],
   [role="menu"],
@@ -397,6 +417,40 @@
 
   button[class*="navButton"]:hover {
     background-color: #262c33 !important;
+  }
+
+  /* The homepage's rotating hero slideshow lays each slide out as ONE rounded
+     tile: a solid #43484d copy panel butted flush against the photo. The panel is
+     a plain <div> inside <main>, so the blanket `main div` transparent reset above
+     erases it — headline, body and "Shop now" then float on the page base beside a
+     hard vertical seam where the photo starts, and the tile stops reading as a
+     tile. Scope through slidesWrapper: contentWrapper is a module name the site
+     reuses for unpainted layout wrappers elsewhere. */
+  [class*="slidesWrapper"] [class*="contentWrapper"] {
+    background-color: #262c33 !important;
+  }
+
+  /* ...and that slideshow's position indicators are 8px discs filled #d7d7d7
+     (inactive) / #ffffff (current). Both are <div>s inside <main>, so the same
+     reset wipes them and the carousel ships with no indicator at all — neither how
+     many slides exist nor which one is up. They overlay the product photo rather
+     than our chrome, so light values are the faithful restore; widen the
+     inactive/current gap since #d7d7d7-vs-#fff barely reads. `indicatorDot` is
+     case-sensitive and does not match `activeIndicatorDot`, but the current dot
+     carries both classes, so the active rule must stay below to win the tie. */
+  [class*="indicatorDot"] {
+    background-color: #8b949e !important;
+  }
+
+  /* ...but NOT the row that holds them: `indicatorDotsContainer` contains the
+     substring `indicatorDot`, so the rule above fills the 56x8 wrapper as one
+     solid grey bar with the dots lost inside it. */
+  [class*="indicatorDotsContainer"] {
+    background-color: transparent !important;
+  }
+
+  [class*="activeIndicatorDot"] {
+    background-color: #ffffff !important;
   }
 
   /* Filter / sort trigger pills and dropdown buttons.

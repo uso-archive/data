@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for FanFiction.Net and FictionPress, with an easy-on-the-eyes story reader, dark browse filters, profiles and forums.
-@version      20260803.00.35
+@version      20260804.13.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -274,6 +274,19 @@
   a:hover strong {
     color: var(--ff-link-hover) !important;
   }
+  /* Every muted metadata block — `.xgray` story-row lines on the desktop hosts,
+     `.gray` listing lines on the m. hosts — ends in bare `<span data-xutime>` date
+     children that carry no colour of their own and inherit the block's grey. The
+     blanket `span { color }` rule below is a DIRECT declaration, so it beats that
+     inheritance and lights only the dates up, inventing an emphasis the site never
+     had. Keep this ABOVE the `span._thread` / brand-glyph rules that follow: they
+     tie it on specificity, so order is what lets them win. */
+  .xgray span,
+  .gray span,
+  .z-list .z-padtop2 span {
+    color: var(--ff-muted) !important;
+  }
+
   /* forum topic rows carry a clickable "jump to latest post" chevron painted
      #0033cc — a plain <span> wrapping the glyph <span>, so the body-text rule
      below greys out both */
@@ -336,9 +349,14 @@
   .z-list .stitle {
     color: var(--ff-link) !important;
   }
+  /* Every story row stacks a summary (#000 natively) over a `.z-padtop2.xgray`
+     metadata line (#686868) — the site's only ranking of the two. Promoting the
+     metadata to body text collapses them into one block of identical grey on every
+     browse / search / profile / community / review page. --ff-muted keeps the step
+     and still clears 6.4:1 on the row surface. */
   .z-list .xgray,
   .z-list .z-padtop2 {
-    color: var(--ff-body) !important;
+    color: var(--ff-muted) !important;
   }
 
   /* ---- Story reader (#storytext core long-text surface) ---------------- */
@@ -371,6 +389,14 @@
   #profile_top .xcontrast_txt {
     color: var(--ff-text) !important;
   }
+  /* The metadata line under the summary is `<span class="xgray xcontrast_txt">`
+     (#686868 natively, a step BELOW the black summary). The rule above matches it on
+     `.xcontrast_txt` at (1,1,0), so the dimmest run in the box came out as the
+     brightest — the site's hierarchy inverted. */
+  #profile_top .xgray.xcontrast_txt,
+  #profile_top .xgray {
+    color: var(--ff-muted) !important;
+  }
 
   /* ---- Reading-options bar + chapter select ---------------------------- */
   select,
@@ -382,6 +408,14 @@
   }
   select option {
     background-color: var(--ff-surface-2) !important;
+    color: var(--ff-text) !important;
+  }
+  /* The search page's "Narrow Results" rails are `<select size="7">` list boxes whose
+     rows are always visible, so the UA highlight on the clicked row is the only
+     acknowledgement a filter was picked. The blanket option fill above outranks it and
+     the row stays identical to its siblings. */
+  select[size] option:checked {
+    background-color: var(--ff-brand) !important;
     color: var(--ff-text) !important;
   }
   /* FFN marks every filter dropdown that carries a non-default value with
@@ -457,6 +491,14 @@
   thead th {
     background-color: var(--ff-header) !important;
     color: var(--ff-text) !important;
+  }
+  /* Forum boards label their columns with `<th class="thead">`, which the site dims
+     to grey against the black rows — the only thing that reads the row as a header,
+     since its background matches the body rows. `table.table th` above is (0,1,2) and
+     outranks both `.thead` and the `thead th` arm, so the labels came out as content. */
+  table.table th.thead,
+  th.thead {
+    color: var(--ff-muted) !important;
   }
   .table-striped > tbody > tr:nth-of-type(even) > td {
     background-color: var(--ff-surface-2) !important;
@@ -538,6 +580,14 @@
     background-color: transparent !important;
     color: var(--ff-link) !important;
   }
+  /* Bootstrap gives an inactive tab `border: 1px solid transparent`, so only the
+     selected tab draws the folder outline — and that outline is the whole cue, since
+     the active tab's fill matches the panel behind it on FFN as it does natively.
+     The blanket `* { border-color }` reset paints all four sides of every tab, so each
+     one renders as a closed box and selection collapses to the label colour alone. */
+  .nav-tabs > li > a {
+    border-color: transparent !important;
+  }
   .nav-tabs > li.active > a,
   .nav-tabs > .active > a:hover,
   .nav-tabs > .active > a:focus {
@@ -546,8 +596,12 @@
     border-color: var(--ff-border-2) !important;
     border-bottom-color: var(--ff-surface) !important;
   }
+  /* native hover restores an outline (`border-color: #eee #eee #ddd`), so the tab under
+     the cursor must box up again — otherwise the transparent rule above eats the
+     hover affordance the site draws. Bottom stays the line colour, not the link accent. */
   .nav-tabs > li > a:hover {
     background-color: var(--ff-surface-2) !important;
+    border-color: var(--ff-border-2) var(--ff-border-2) var(--ff-border) !important;
   }
 
   /* ---- Advanced-filter modal ------------------------------------------- */

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for HeadHunter (hh.ru / hh.kz / hh.uz / hh.by / rabota.by). Job search, vacancies and companies in an easy-on-the-eyes dark UI.
-@version      20260803.00.35
+@version      20260804.13.16
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -1307,6 +1307,22 @@
     background-color: #2d333b !important; }
   button[class*="magritte-chip___"][class*="checked"]:hover {
     background-color: #24406b !important; }
+  /* The employer landing ("Ищу сотрудника") hero has its own "Часто ищут" quick
+     pills — a CSS-module `chips-item--<hash>` button with a hardcoded
+     `background-color:#fff`, natively a white pill on hh's light #f1f4f9 hero
+     card. We darken the card but nothing reached the pill, and the label (a
+     `magritte-text_style-primary` span) is lifted to #e6edf3 → white on white,
+     the words vanish. The pill's own `:hover` already resolves
+     `--magritte-color-background-tertiary`, which is dark under this theme, so
+     the resting state was the only light one left; give the hover a matching
+     lift so it still answers the pointer. `data-qa` is the stable hook; the
+     class arm covers the same node if the attribute is dropped. */
+  [data-qa="employer-index-search-frequently-item"],
+  [class*="chips-item--"] {
+    background-color: #2d333b !important; }
+  [data-qa="employer-index-search-frequently-item"]:hover,
+  [class*="chips-item--"]:hover {
+    background-color: #3a424c !important; }
   /* On the SERP, once you scroll the filter-chip bar re-mounts as a FIXED
      glass strip (CSS-module `sticky--<hash>`) with a hardcoded near-white
      `color(srgb 1 1 1 / 0.68)` background + backdrop blur — a white band under
@@ -1464,6 +1480,22 @@
      lifting `color` alone recolours them without flattening any brand logo
      that ships an explicit fill. */
   [class*="magritte-branded-button"] svg {
+    color: #e6edf3 !important; }
+  /* Every provider also ships a SECONDARY and a TERTIARY variant whose surface
+     is a neutral light grey, not a brand colour (`…-t-bank-secondary` #f1f1f1,
+     `…-apple/google/vk/ok/mail/esia/yandex-tertiary` #f1f1f1/#f5f5f5, the light
+     brand tints #e6f1ff/#ffece8/…). Those tokens ship light and we never
+     declared them, so e.g. the "Т-Банк" pill on the employer login/price pages
+     rendered a near-white slab between two dark buttons with its label lifted
+     light — unreadable. Anchor on `-secondary___` / `-tertiary___`: the triple
+     underscore is the Magritte module separator, so this matches ONLY the
+     variant class and never the PRIMARY buttons (`magritte-vk___`,
+     `magritte-google___`, …) whose brand fills must survive. */
+  [class*="magritte-branded-button"][class*="-secondary___"],
+  [class*="magritte-branded-button"][class*="-tertiary___"] {
+    background-color: #21262d !important; border-color: #2d333b !important; }
+  [class*="magritte-branded-button"][class*="-secondary___"] span,
+  [class*="magritte-branded-button"][class*="-tertiary___"] span {
     color: #e6edf3 !important; }
 
   /* ---- Checkboxes / radios: keep checked accent visible ---- */
@@ -1685,7 +1717,13 @@
     background-color: #1c2128 !important; border-color: #2d333b !important; }
 
   /* ---- Footer ---- */
-  [class*="footer-nav"], [class*="footer-app-banner"], .supernova-footer,
+  /* `footer-services--<hash>` is a full-width promo band nested INSIDE the
+     <footer> (employer pages, /catalogs, /employers_rating, /price pages) carrying
+     its own hardcoded #eef1f7. A child's own background wins over the ancestor
+     footer rule, so it stayed a 1280×233 white stripe with our light body copy
+     on it — the descriptions were near-invisible. */
+  [class*="footer-nav"], [class*="footer-app-banner"], [class*="footer-services"],
+  .supernova-footer,
   footer, .footer, [data-qa="footer"] {
     background-color: #0d1117 !important; border-color: #2d333b !important; }
   [class*="footer-nav"] a, .supernova-footer a, footer a { color: #8ab4d8 !important; }

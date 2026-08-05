@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for DaFont. Browse fonts late at night without the  glare: the homepage, font categories, search, font pages and author pages all get an  easy-on-the-eyes dark look.
-@version      20260803.00.34
+@version      20260804.13.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -280,8 +280,10 @@
      on dark. The safety net at the end of this sheet matches the literal `#fff`, not the
      rgb() form the DOM ends up with, so it never reaches this one. */
   #glyph-hide { background: transparent !important; }
-  /* The "Copied!" confirmation is `color:grey` — 4.1:1 on that sheet. */
-  #infoGlyph_copy { color: #8b949e !important; }
+  /* The "Copied!" confirmation is `color:grey` — 4.1:1 on that sheet. Must out-specify
+     the `#glyph-full div` rule above (1,0,1), or it renders at full body strength and
+     the transient toast stops reading as secondary. */
+  #glyph-full #infoGlyph_copy { color: #8b949e !important; }
   /* Page pills (only built for fonts over 3000 glyphs) are bare <div>s, so the base
      `div {color:#000}` leaves them black on dark, and the blanket border reset above
      greys out the `1px solid #c00` ring that is their whole hover affordance. */
@@ -539,8 +541,12 @@
   }
 
   /* ---- Ad slots: darken empty/white iframes so they don't glare ---- */
+  /* `syndicatedsearch.goog` is the AdSense-for-Search frame nested inside the forum
+     CSE widget. Once an ad is served its document is opaque white and cross-origin,
+     i.e. unreachable — this only keeps the UNFILLED slot from glaring. */
   ins.adsbygoogle, .adsbygoogle, iframe[id*="google_ads"],
-  iframe[src*="googlesyndication"], iframe[src*="doubleclick"] {
+  iframe[src*="googlesyndication"], iframe[src*="doubleclick"],
+  iframe[src*="syndicatedsearch.goog"] {
     background-color: #14181d !important;
   }
 
@@ -635,6 +641,73 @@
   #chart_div svg g.google-visualization-tooltip path {
     fill: #1c2128 !important;
     stroke: #2d333b !important;
+  }
+
+  /* ---- Forum search results (`/forum/search.php`) ---- */
+  /* The results are a Google Programmable Search (CSE) widget rendered into a same-origin
+     `srcdoc` iframe (`iframe[name="googleSearchFrame"]`), so NOTHING in the top document
+     sees it — every scanner reports total=0 while an 800px-wide pure-white slab fills the
+     page. The page is reachable only by submitting the forum's search box, which is why
+     eight href-enumeration passes never found it: enumerate FORM ACTIONS too.
+     Google's `default.css` paints the panel and every result `#fff`, urls `#202124`,
+     snippets `#4d5156` and links `#1a0dab` — none of which our selectors named.
+     Each result's `border: 1px solid #fff` is an invisible spacer on the white page; the
+     blanket border reset already turns it into a visible card edge, and this keeps it —
+     a deliberate gain, like the `tr{background:#fff}` zebra on `/forum/?f=2`. */
+  .gsc-control-cse, .gsc-results-wrapper-overlay, .gsc-refinementsArea,
+  .gsc-webResult.gsc-result, .gsc-webResult.gsc-result:hover,
+  .gsc-tabHeader, .gsc-tabHeader.gsc-tabhActive, .gsc-tabHeader.gsc-tabhInactive,
+  .gsc-completion-container, .gsc-input-box,
+  .gsc-results .gsc-cursor-box .gsc-cursor-page,
+  .gsc-results .gsc-cursor-box .gsc-cursor-current-page {
+    background-color: #14181d !important;
+    border-color: #2d333b !important;
+  }
+  /* A sponsored result is tinted `#f6f6f6` against the organic `#fff` — that tint is the
+     only ad disclosure the widget draws, so keep the two surfaces apart on dark too. */
+  .gsc-webResult.gsc-result.gsc-promotion { background-color: #1c2128 !important; }
+  /* The url line is the site's STRONGEST grey (#202124) and the snippet the mid one
+     (#4d5156); preserve that order instead of collapsing both to body text. */
+  .gs-webResult .gs-visibleUrl, .gs-promotion .gs-visibleUrl,
+  .gs-visibleUrl, .gs-visibleUrl b { color: #e6edf3 !important; }
+  .gs-webResult .gs-snippet, .gs-promotion .gs-snippet, .gs-snippet,
+  .gs-fileFormatType, .gs-previewSnippet, .gs-previewDescription,
+  .gs-spelling {
+    color: #c4cdd6 !important;
+  }
+  .gsc-result-info, .gsc-results .gsc-cursor, .gsc-snippet-metadata,
+  .gsc-location, .gsc-tel, .gsc-org, .gsc-author, .gsc-reviewer, .gsc-role {
+    color: #8b949e !important;
+  }
+  /* Google's `#1a0dab` link blue is 1.3:1 here. `.gs-title b` matters twice over: the
+     matched query term inside a result title is a <b>, which our own `b, strong` rule
+     repaints body-grey — half of every title rendering as prose. */
+  .gs-result .gs-title, .gs-result .gs-title *,
+  .gs-webResult.gs-result a.gs-title, .gs-webResult.gs-result a.gs-title b,
+  .gs-imageResult a.gs-title, .gs-imageResult a.gs-title b,
+  .gs-spelling a, .gs-spelling a b, .gs-spelling a i,
+  .gs-previewLink, .gs-previewTitle,
+  .gcsc-find-more-on-google, .gcsc-find-more-on-google-text,
+  .gcsc-find-more-on-google-query {
+    color: #5fb0e6 !important;
+  }
+  /* The magnifier beside "Search <query> on Google" is an inline <svg> whose paint is a
+     `fill`, not a `color` — the rule above leaves it navy-on-near-black at 1.3:1. */
+  .gcsc-find-more-on-google-magnifier,
+  .gcsc-find-more-on-google-magnifier path { fill: #5fb0e6 !important; }
+  .gsc-results .gsc-cursor { fill: #8b949e !important; }
+  /* "You are here" in the pager and the tab strip is a blue-vs-grey split; the active
+     tab's cue is a 3px `#1a0dab` underline the blanket border reset greys out. */
+  .gsc-results .gsc-cursor-box .gsc-cursor-page { color: #c4cdd6 !important; }
+  .gsc-results .gsc-cursor-box .gsc-cursor-current-page,
+  .gsc-tabHeader.gsc-tabhActive, .gsc-refinementHeader.gsc-refinementhActive {
+    color: #5fb0e6 !important;
+  }
+  .gsc-tabHeader.gsc-tabhActive, .gsc-refinementHeader.gsc-refinementhActive {
+    border-bottom-color: #5fb0e6 !important;
+  }
+  .gsc-tabHeader.gsc-tabhInactive, .gsc-refinementHeader.gsc-refinementhInactive {
+    color: #c4cdd6 !important;
   }
 
   /* ---- Tables / generic light cells safety net ---- */

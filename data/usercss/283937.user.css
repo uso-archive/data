@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Weather Underground. Darkens forecasts, hourly and 10-day pages and data tables while keeping radar, maps and weather icons intact.
-@version      20260803.00.41
+@version      20260804.13.21
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -352,6 +352,11 @@
   /* Other saturated high-temp scale values are kept as authored. */
 
   /* Muted / secondary labels (greys #696969 etc.). */
+  /* `.show-for-medium` is deliberately NOT in this list: it is a Foundation
+     responsive-visibility utility, not a colour role. WU puts it on the hourly
+     table's whole Conditions column, the page heading and a .module-header
+     .component-title, all of which are the SAME #4c4c4c as their neighbours --
+     muting it invented a hierarchy the site does not have. */
   .subheading,
   .split,
   .date,
@@ -359,7 +364,6 @@
   .phases-date,
   .small-4,
   .wind-north,
-  .show-for-medium,
   .module-title-small,
   .timestamp {
     color: var(--wu-text-muted) !important;
@@ -479,6 +483,21 @@
   }
   tbody tr:hover,
   .mat-mdc-row:hover {
+    background-color: #232a33 !important;
+  }
+  /* The city page's Nearby Weather Stations table paints its row hover with WU's
+     own `#station-list tr:hover { rgba(142,209,233,.5) !important }` -- an id
+     selector plus `!important`, so it out-specifies the (0,1,1) rule above and
+     the wash survives. Composited over the card that is a ~rgb(85,121,136) steel
+     blue: the row's link drops to ~2.0:1 and its muted timestamp to ~2.4:1, so
+     the one row you are pointing at is the one you cannot read. Hover-gated, so
+     no load-time scan reaches it. Angular compiles WU's rule with its own
+     `_ngcontent-*` attribute, putting it at (1,2,2), so the id alone is not
+     enough -- the `[id]` attribute is load-bearing, it is what clears that
+     column, and the `> td` pair keeps the fill even if a future build adds
+     another qualifier to the row. */
+  #station-list[id] tbody tr:hover,
+  #station-list[id] tbody tr:hover > td {
     background-color: #232a33 !important;
   }
 
@@ -1757,6 +1776,45 @@
   .feature-menu .mat-mdc-button.wunder-v,
   .menu-wrapper .mat-mdc-menu-item:hover.wunder-v {
     border-left-color: #ac54a0 !important;
+  }
+  /* The DESKTOP header nav is the odd one out: WU marks its hovered/active item
+     with a 6px border-TOP (`.feature-menu .mat-mdc-button:hover.wunder-r
+     { border-top-color }`), not the left bar the sidenav and the flyout use. The
+     rules above only restore border-LEFT-color, and these buttons have
+     border-left-width 0, so that restoration never paints -- meanwhile the `*`
+     reset flattened the top bar to the line colour and the item's background
+     does not change at all, leaving the top-level nav with NO hover affordance.
+     Colour the top edge too; at rest its width is 0, so this only shows on
+     hover/active exactly as WU intends. */
+  .feature-menu .mat-mdc-button:hover.wunder-r,
+  .feature-menu .mat-mdc-button.active.wunder-r {
+    border-top-color: #d5202a !important;
+  }
+  .feature-menu .mat-mdc-button:hover.wunder-o,
+  .feature-menu .mat-mdc-button.active.wunder-o {
+    border-top-color: #ff8833 !important;
+  }
+  .feature-menu .mat-mdc-button:hover.wunder-y,
+  .feature-menu .mat-mdc-button.active.wunder-y {
+    border-top-color: #ffb92f !important;
+  }
+  .feature-menu .mat-mdc-button:hover.wunder-g,
+  .feature-menu .mat-mdc-button.active.wunder-g {
+    border-top-color: #5b9f49 !important;
+  }
+  .feature-menu .mat-mdc-button:hover.wunder-b,
+  .feature-menu .mat-mdc-button.active.wunder-b {
+    border-top-color: #15aadc !important;
+  }
+  .feature-menu .mat-mdc-button:hover.wunder-i,
+  .feature-menu .mat-mdc-button.active.wunder-i,
+  .feature-menu .mat-mdc-button:hover.more,
+  .feature-menu .mat-mdc-button.active.more {
+    border-top-color: #2f7fd6 !important;   /* WU's #0053ae, lifted for dark */
+  }
+  .feature-menu .mat-mdc-button:hover.wunder-v,
+  .feature-menu .mat-mdc-button.active.wunder-v {
+    border-top-color: #ac54a0 !important;
   }
 
   /* ---- (d) Popular Cities bar: hover chip (audit-blind, hover-gated) ----- */

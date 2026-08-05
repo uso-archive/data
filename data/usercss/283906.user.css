@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for OLX that turns the bright marketplace into an easy-on-the-eyes dark interface, perfect for late-night browsing.
-@version      20260803.00.38
+@version      20260804.13.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -769,6 +769,19 @@
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
   }
+  /* Natively the SPONSOROWANE card is a white panel exactly like the organic
+     l-cards it sits between, but nothing ever gave it a surface here — so it was
+     the one row of the results grid with no card at all, reading as loose text on
+     the page while every neighbour kept its raised box. The root carries the whole
+     card (there is no inner wrapper on this desktop template), and it sits under
+     the blanket `#mainContent div` neutraliser (1,0,1), so the rule has to be
+     anchored on a page container to win. Same surface as the l-card rule. */
+  #mainContent [id^="baxter-native-listing"],
+  #searchmain-container [id^="baxter-native-listing"] {
+    background-color: #1c2128 !important;
+    border: 1px solid #2d333b !important;
+    border-radius: 8px !important;
+  }
   /* These surfaces sit inside #mainContent, so the blanket neutraliser
      (`#mainContent div`, specificity 1,0,1) out-specifies a bare
      [id^=…] [class*=…] (0,2,0) and the background never landed: the ad's
@@ -1048,6 +1061,16 @@
   [data-nx-name="Pagination"] button {
     color: #c4cdd6 !important;
     -webkit-text-fill-color: #c4cdd6 !important;
+  }
+  /* …and this component marks its CURRENT page with a 2px `outline` (not a border,
+     not a box-shadow) in the literal near-black #02282c — 1.14:1 on the page base,
+     so "you are here" disappeared and page 1 read exactly like 2-15 once the labels
+     above were all lifted to the same grey. Nothing else on any page type draws a
+     low-contrast outline, so this is the theme's only outline rule. Note the hook:
+     the listing pagination publishes aria-current="page" and gets an accent FILL a
+     few rules up; this legacy one publishes aria-current="true". */
+  [data-nx-name="Pagination"] button[aria-current="true"] {
+    outline-color: #1fcabf !important;
   }
 
   /* Search-results heading (h1[data-testid="heading"], "Sprzedaż
@@ -1876,9 +1899,11 @@
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
   }
-  /* The template's own card panel (`…__wrapper`) carries the literal white. */
+  /* The template's own card panel (`…__wrapper`) carries the literal white. It is
+     the mobile twin of the desktop ad root above, and its `[data-testid="ad-card"]`
+     neighbours sit at the card elevation, so it takes the same one. */
   [class*="baxter-native"][class*="wrapper"] {
-    background-color: #14181d !important;
+    background-color: #1c2128 !important;
   }
   /* …and `…__state` is its condition chip ("Nowe" / "Używane"), a #F2F4F5 pill — the
      mobile twin of the desktop `_spnu`, so it takes the same neutral raised surface. */
@@ -2279,6 +2304,78 @@
     --colorsForegroundPrimary: #2d333b;
     --color-background-primary: #e6edf3;
     background-color: #2d333b !important;
+  }
+
+  /* ============================================================
+     Laquesis in-product survey (#laq-survey-root)
+
+     OLX's own feedback widget ("Cześć! Czy możemy zająć Ci minutę?" →
+     NPS bar → free text → thank-you). It mounts as a direct child of
+     <body>, so NOTHING scoped to #mainContent / #hydrate-root / the
+     mobile shell reaches it, and it is frequency-capped by the
+     `lqstatus` cookie — clear that cookie and call
+     window.laquesisShowSurvey(<id from localStorage.laquesissu>) to
+     make it render on demand.
+
+     Its stylesheet (ninja.data.olxcdn.com/laquesis-survey-cee.css) is
+     entirely token-driven off --surveys-* declared on `.laq-survey`,
+     and its own rules are long descendant chains, so redefining those
+     tokens one specificity step up is the whole fix. Two exceptions
+     below need literal declarations because the blanket
+     `* { border-color }` reset carries !important and beats them.
+     ============================================================ */
+  #laq-survey-root .laq-survey {
+    --surveys-bg-color: #1c2128;
+    --surveys-font-color: #e6edf3;
+    --surveys-hint-color: #9aa6b0;
+    --surveys-border-color: #2d333b;
+    --surveys-input-border-color: #2d333b;
+    --surveys-input-bg-color: #14181d;
+    --surveys-hover-color: #21262d;
+    --surveys-list-item-active-bg-color: #103c3b;
+    --surveys-item-inactive-text-color: #6b7681;
+    --surveys-item-active-bg-color: #1fcabf;
+    --surveys-item-active-text-color: #07232a;
+    --surveys-mask-color: rgba(0, 0, 0, 0.6);
+    /* The NPS bar keeps its red→green gradient: it IS the answer scale.
+       Both of these default to tokens flipped light above, so pin them
+       back to their native values or the 0-10 digits and the selected
+       marker land light-on-pastel. */
+    --surveys-rating-text-color: #07232a;
+    --surveys-rating-selected-bg-color: #ffffff;
+    /* Welcome popup CTAs: the accept button is OLX's near-black primary
+       and the decline its outline twin — same ladder as the offer-page
+       contact CTAs, so give them the same accent/secondary pair. */
+    --surveys-popup-action-accept-bg-color: #1fcabf;
+    --surveys-popup-action-accept-text-color: #07232a;
+    --surveys-popup-action-accept-border-color: #1fcabf;
+    --surveys-popup-action-decline-bg-color: transparent;
+    --surveys-popup-action-decline-text-color: #5fd0c6;
+    --surveys-popup-action-decline-border-color: #5fd0c6;
+  }
+  #laq-survey-root .laq-layout__actions--accept {
+    border-color: #1fcabf !important;
+  }
+  #laq-survey-root .laq-layout__actions--decline {
+    border-color: #5fd0c6 !important;
+  }
+  /* The radio/checkbox rings are 2px borders the reset flattens to the
+     #2d333b hairline (1.4:1 on the panel), and the checked ring is the
+     only thing separating a picked answer from an unpicked one. */
+  #laq-survey-root input[type="radio"],
+  #laq-survey-root input[type="checkbox"] {
+    border-color: #6b7681 !important;
+  }
+  #laq-survey-root input[type="radio"]:checked,
+  #laq-survey-root input[type="checkbox"]:checked {
+    border-color: #1fcabf !important;
+  }
+  /* The free-text answer box: the generic textarea/input fill further up is
+     also !important and ties the --surveys-input-bg-color token, so the field
+     landed flush with the panel it sits on. Sink it one step. */
+  #laq-survey-root textarea,
+  #laq-survey-root input[type="text"] {
+    background-color: #14181d !important;
   }
 
   /* ============================================================

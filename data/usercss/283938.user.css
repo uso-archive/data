@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Neoseeker, easy-on-the-eyes walkthroughs, guides, cheats and FAQs, plus the home, game hubs, wikis, search and forums.
-@version      20260803.00.37
+@version      20260804.13.18
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -239,6 +239,28 @@
   #footer-navbar .navbar-inner {
     background-color: var(--neo-head) !important;
     background-image: none !important;
+  }
+
+  /* The search page's "other similar searches:" row is a `div.navbar.subnavbar`
+     — no `.navbar-inverse`, no id — so neither exception above reached it and
+     the bare rule flew a second brand-blue header band directly under the dark
+     keyword toolbar. It is natively a near-white #fafafa strip whose entries
+     are #0088cc LINKS; `.navbar-inner a` painted them the same #eaf2f8 as the
+     "other similar searches:" label, so the row read as one flat sentence.
+     Dark strip + accent links restores both. Same shape as `#spotlight_forums`. */
+  .subnavbar .navbar-inner {
+    background-color: var(--neo-head) !important;
+    background-image: none !important;
+  }
+
+  .subnavbar .navbar-inner a,
+  .subnavbar .navbar-inner a:link,
+  .subnavbar .navbar-inner a:visited {
+    color: var(--neo-link) !important;
+  }
+
+  .subnavbar .navbar-inner a:hover {
+    color: var(--neo-link-hover) !important;
   }
 
   .navbar-inner,
@@ -694,9 +716,17 @@
        The game-hub description (`article#wiki-description`) embeds the SAME
      `- Advertisement -` band, but that container is neither `#wiki-content` nor
      `#mw-content-text`, so the band shipped as a bright #efefef panel (~740x373)
-     mid-hub. Cover it with the same three attribute forms. */
+     mid-hub. Cover it with the same three attribute forms.
+       The cheats page drops the band a fourth time, into `#cheats .cheat_box`
+     between two cheat entries — so `#maincolumn` (the www content column that
+     wraps every one of these page types) carries the three forms as well; the
+     per-container copies stay for the MediaWiki subdomains, whose skin has no
+     `#maincolumn`. */
   #ad336_atf,
   div.alt,
+  #maincolumn div[style*="#efefef"],
+  #maincolumn div[style*="#EFEFEF"],
+  #maincolumn div[style*="rgb(239, 239, 239)"],
   #wiki-content div[style*="#efefef"],
   #wiki-content div[style*="#EFEFEF"],
   #wiki-content div[style*="rgb(239, 239, 239)"],
@@ -898,6 +928,42 @@
     background-color: var(--neo-head) !important;
   }
 
+  /* `.label-new` / `.label-updated` / `.counter` are a SECOND chip family the
+     site declares beside `.label` (their own padding/font/`color:#fff`), so
+     they turn up both bare and combined with `.label`. Combined, the base rule
+     above swallowed the red "NEW" and the amber "UPDATED"/count into one
+     neutral grey; bare, they kept the site's raw #8a1f11 / #f89406 while our
+     generic span ink greyed the digits on them to ~1.6:1. Re-assert both the
+     fill and the white glyph so the state reads either way. */
+  .label-new {
+    background-color: #8c3b3f !important;
+  }
+
+  .label-updated,
+  .counter {
+    background-color: #8a6d1f !important;
+  }
+
+  .label-new,
+  .label-updated,
+  .counter {
+    color: #ffffff !important;
+    text-shadow: none !important;
+  }
+
+  /* Search-result keyword highlight. The site paints `background:#FFFFA8` and
+     leaves the ink to inherit — on its white page that is near-black, on ours
+     it is the light body grey, so the matched word rendered at 1.42:1 INSIDE
+     its own highlight: the one word the reader searched for became the only
+     unreadable one. A dark amber highlight keeps the "this is the hit" signal.
+     `-webkit-text-fill-color` too: our wiki-cell remaps set one that inherits
+     down and would override `color` alone. */
+  .text-matched {
+    background-color: #5c4a12 !important;
+    color: #ffe9a8 !important;
+    -webkit-text-fill-color: #ffe9a8 !important;
+  }
+
   /* The game-hub product-info well (`.well.product-info.well-dark`) heads each
      field group with a GOLD `span.list-header` (#ffc40d) — the site accent that
      sets "Release Dates"/"Developer"/… apart from the data rows beneath. Our
@@ -1057,6 +1123,13 @@
   }
 
   /* ---- Forms / inputs / search ------------------------------ */
+  /* `border-style` matters as much as the colour here: the forum's header
+     search (`input[type=search]` + the "Go" submit, on EVERY forum page) and
+     the search page's keyword field carry NO class, so they keep the UA
+     defaults `inset` / `outset`. A bevel border derives its own light and dark
+     edges from `border-color`, so recolouring alone leaves a bright grey rim
+     drawn round the control — the brightest chrome on the brand-blue bar.
+     Force flat `solid` on every input and button. */
   input,
   textarea,
   select,
@@ -1067,6 +1140,7 @@
   .uneditable-input {
     background-color: #0f141a !important;
     border-color: var(--neo-border) !important;
+    border-style: solid !important;
     color: var(--neo-text) !important;
     box-shadow: none !important;
   }
@@ -1097,6 +1171,7 @@
     background-color: var(--neo-elev2) !important;
     background-image: none !important;
     border-color: var(--neo-border) !important;
+    border-style: solid !important;
     color: var(--neo-text) !important;
     box-shadow: none !important;
     text-shadow: none !important;
@@ -1273,6 +1348,17 @@
     color: #c9d1d9 !important;
   }
 
+  /* A forum `[code]` block is a `<div class="code">`, not a `<code>` element, so
+     the tag rule above never reaches it and it keeps the site's #F9F9F9 plate.
+     Only the surface is remapped: the site's #009933 green ink is this block's
+     identity and still reads 5.05:1 on the code background. Matched as
+     `div.code` rather than the site's bare `.code`, which is loose enough to
+     catch an unrelated label on another page type. */
+  div.code {
+    background-color: #0d1117 !important;
+    border-color: var(--neo-border) !important;
+  }
+
   /* ---- Dropdowns / menus / floating surfaces ---------------- */
   .dropdown-menu {
     background-color: var(--neo-elev) !important;
@@ -1398,6 +1484,20 @@
     color: #ffffff !important;
   }
 
+  /* A `.nav` strip can open with a NON-clickable label: the cheats page's
+     "Jump to:" heads its Easter Egg / Glitch / Tip pills as `li.disabled > a`,
+     which the site greys to #999 while the real pills stay #0088cc. The chip
+     the rule above hands every pill landed on the label too, so all four read
+     as identical buttons and the strip lost its "these three are the links"
+     shape. Mute the disabled one and drop its chip. */
+  .nav > li.disabled > a,
+  .nav > li.disabled > a:hover,
+  .nav > li.disabled > a:focus {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    color: var(--neo-muted) !important;
+  }
+
   /* The search-results scope tabs ("All Neoseeker | Hardware | Games | …") and
      the community feed tabs mark the current one with a bare `a.active` inside
      `.pagenav_pages` / `.tabs`, not a `li.active` — so the rules above never
@@ -1488,6 +1588,16 @@
      tall — under the audit's height floor, so the element scan walks past it
      while it renders as a bright band under every thread list. */
   div.visitors {
+    background-color: var(--neo-elev) !important;
+    color: var(--neo-text-2) !important;
+  }
+
+  /* Same shape one row up: `#bug_status` is the thread status strip under the
+     title ("Bug"), a bare `<div>` the site inline-styles `background:#f9f9f9`
+     inside a #999 frame. Full-width but 29px tall, so it is under the audit's
+     height floor and only the screenshot shows the white band. It hangs off
+     `<body>`, not `#maincolumn`, so none of the container rules reach it. */
+  #bug_status {
     background-color: var(--neo-elev) !important;
     color: var(--neo-text-2) !important;
   }
@@ -1866,8 +1976,27 @@
   .mw-parser-output td[style*="background"]:not([style*="transparent"]):not([style*="background:none"]):not([style*="background-color:none"]):not([style*="#e3f6fb"]):not([style*="#E3F6FB"]):not([style*="#cdf1c7"]):not([style*="#CDF1C7"]) div,
   .mw-parser-output th[style*="background"]:not([style*="transparent"]):not([style*="background:none"]):not([style*="background-color:none"]):not([style*="#e3f6fb"]):not([style*="#E3F6FB"]):not([style*="#cdf1c7"]):not([style*="#CDF1C7"]) b,
   .mw-parser-output th[style*="background"]:not([style*="transparent"]):not([style*="background:none"]):not([style*="background-color:none"]):not([style*="#e3f6fb"]):not([style*="#E3F6FB"]):not([style*="#cdf1c7"]):not([style*="#CDF1C7"]) a,
-  .mw-parser-output th[style*="background"]:not([style*="transparent"]):not([style*="background:none"]):not([style*="background-color:none"]):not([style*="#e3f6fb"]):not([style*="#E3F6FB"]):not([style*="#cdf1c7"]):not([style*="#CDF1C7"]) small {
+  .mw-parser-output th[style*="background"]:not([style*="transparent"]):not([style*="background:none"]):not([style*="background-color:none"]):not([style*="#e3f6fb"]):not([style*="#E3F6FB"]):not([style*="#cdf1c7"]):not([style*="#CDF1C7"]) small,
+  .mw-parser-output td[style*="background"]:not([style*="transparent"]):not([style*="background:none"]):not([style*="background-color:none"]):not([style*="#e3f6fb"]):not([style*="#E3F6FB"]):not([style*="#cdf1c7"]):not([style*="#CDF1C7"]) p,
+  .mw-parser-output td[style*="background"]:not([style*="transparent"]):not([style*="background:none"]):not([style*="background-color:none"]):not([style*="#e3f6fb"]):not([style*="#E3F6FB"]):not([style*="#cdf1c7"]):not([style*="#CDF1C7"]) li,
+  .mw-parser-output th[style*="background"]:not([style*="transparent"]):not([style*="background:none"]):not([style*="background-color:none"]):not([style*="#e3f6fb"]):not([style*="#E3F6FB"]):not([style*="#cdf1c7"]):not([style*="#CDF1C7"]) p,
+  .mw-parser-output th[style*="background"]:not([style*="transparent"]):not([style*="background:none"]):not([style*="background-color:none"]):not([style*="#e3f6fb"]):not([style*="#E3F6FB"]):not([style*="#cdf1c7"]):not([style*="#CDF1C7"]) li {
     color: #14181d !important;
+  }
+
+  /* `p` and `li` above are the tags whose text sits DIRECTLY on the kept panel with
+     no inline wrapper at all — PES's whole "Welcome to the PES NeoWiki" and "How Can
+     You Help?" body copy is bare `<p>`/`<li>`, and only the `<b>` fragments inside it
+     were being darkened, so the paragraphs read at 1.06:1 while the bold words in the
+     MIDDLE of them read fine. A screenshot shows that instantly; no scan does, because
+     the panel is a colour we deliberately keep.
+       A MediaWiki red link (`a.new`) needs its own arm: the theme lifts it to salmon
+     #f08b80 for the dark article body, and the generic `a` arm above cannot reach it
+     (`a.new` is 0,1,1 against `a`'s 0,0,1). Give it the dark-panel equivalent. */
+  .mw-parser-output td[style*="background"]:not([style*="transparent"]):not([style*="#e3f6fb"]):not([style*="#E3F6FB"]):not([style*="#cdf1c7"]):not([style*="#CDF1C7"]) a.new,
+  .mw-parser-output th[style*="background"]:not([style*="transparent"]):not([style*="#e3f6fb"]):not([style*="#E3F6FB"]):not([style*="#cdf1c7"]):not([style*="#CDF1C7"]) a.new {
+    color: #8c1d12 !important;
+    -webkit-text-fill-color: #8c1d12 !important;
   }
 
   /* Inline-COLORED infobox wrappers — Pokemon "Type Matchups", the main
@@ -1899,6 +2028,24 @@
   .mw-parser-output td[style*="#f8f7c9"] *,
   .mw-parser-output td[style*="#F8F7C9"] * {
     color: #14181d !important;
+  }
+
+  /* The list above reaches inline text only through a `td` — but the evolution-line
+     tiles put it DIRECTLY in the wrapper: `div[style*="background:#F8F7C9"] > small`
+     ("Level up + 220 Happiness", "(Alola)") and `> span > a` (Pichu / Pikachu /
+     Raichu). Those kept our body grey and accent blue on the pale yellow at 1.47:1
+     and 2.17:1 — the captions all but vanished. Child combinators, no exclusion
+     chain: the four wrappers we remap to DARK surfaces hold only tables and divs,
+     never a bare `small`/`a`, so they cannot be reached by these arms. */
+  #mw-content-text div[style*="background"] > small,
+  #mw-content-text div[style*="background"] > p,
+  #mw-content-text div[style*="background"] > li,
+  #mw-content-text div[style*="background"] > a,
+  #mw-content-text div[style*="background"] > span > a,
+  #mw-content-text div[style*="background"] > span > small,
+  #mw-content-text div[style*="background"] > small > a {
+    color: #14181d !important;
+    -webkit-text-fill-color: #14181d !important;
   }
 
   /* Move/level/breeding tables inside those same wrappers head their columns
@@ -2094,6 +2241,67 @@
     -webkit-text-fill-color: #ffffff !important;
   }
 
+  /* …and the `color:white` need not be on the CELL at all. PES's main page heads
+     each panel with `td[style="background:#800080"] > h4[style="color:white"] >
+     span.mw-headline > div`, so the white sits on the HEADING and the saturated-cell
+     rule's `… div` arm painted the visible node #14181d at 1.87:1 on the purple.
+     Honour an inline `color:white` wherever it is declared, plus the span/div/b it
+     wraps — `a` is left out so a link inside keeps its accent. The
+     `:not([style*="background"])` guard is load-bearing: `[style*="color:white"]`
+     also substring-matches `background-color:white`, and painting THAT white would
+     be white-on-white. Cells declaring both are already covered by the rule above. */
+  #mw-content-text [style*="color:white"]:not([style*="background"]),
+  #mw-content-text [style*="color: white"]:not([style*="background"]),
+  #mw-content-text [style*="color:#fff"]:not([style*="background"]),
+  #mw-content-text [style*="color:white"]:not([style*="background"]) span,
+  #mw-content-text [style*="color:white"]:not([style*="background"]) div,
+  #mw-content-text [style*="color:white"]:not([style*="background"]) b,
+  #mw-content-text [style*="color: white"]:not([style*="background"]) span,
+  #mw-content-text [style*="color: white"]:not([style*="background"]) div,
+  #mw-content-text [style*="color: white"]:not([style*="background"]) b,
+  #mw-content-text [style*="color:#fff"]:not([style*="background"]) span,
+  #mw-content-text [style*="color:#fff"]:not([style*="background"]) div,
+  #mw-content-text [style*="color:#fff"]:not([style*="background"]) b {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  /* An inline-bg cell can hold a whole NESTED TABLE. The saturated-cell rules pin
+     `a`/`b`/`small` dark at ANY depth, but that nested table's cells are ones WE
+     painted `--neo-elev` — so PES's "Recent Forum Posts" list rendered #14181d
+     links and captions on #1c2128 at ~1.1:1. Restore the normal ink there.
+       Named by the cell CLASSES the theme darkens (`.row`/`.forum` above,
+     `.altrow` below) rather than by a bare `td td`: a nested cell with no class
+     and no inline bg is TRANSPARENT, so on a wrapper that kept a light panel
+     colour light ink would be light-on-light. The ID prefix is what beats the
+     pin's seven stacked `:not()`s. */
+  #mw-content-text td[style*="background"] td.row b,
+  #mw-content-text td[style*="background"] td.row small,
+  #mw-content-text td[style*="background"] td.row strong,
+  #mw-content-text td[style*="background"] td.forum b,
+  #mw-content-text td[style*="background"] td.forum small,
+  #mw-content-text td[style*="background"] td.altrow b,
+  #mw-content-text td[style*="background"] td.altrow small {
+    color: var(--neo-text-2) !important;
+    -webkit-text-fill-color: var(--neo-text-2) !important;
+  }
+
+  #mw-content-text td[style*="background"] td.row a,
+  #mw-content-text td[style*="background"] td.forum a,
+  #mw-content-text td[style*="background"] td.altrow a {
+    color: var(--neo-link) !important;
+    -webkit-text-fill-color: var(--neo-link) !important;
+  }
+
+  /* That nested table skins its rows with its own classes rather than inline
+     styles, and `td.altrow` is the same lavender #c6d0e7 the forum's `div.alt`
+     uses — light enough that our body ink sat on it at ~1.35:1. `td.row` and
+     `td.titlerow` already land on the generic cell/header fills. */
+  #mw-content-text td.altrow,
+  #mw-content-text th.altrow {
+    background-color: var(--neo-elev2) !important;
+  }
+
   /* Guide/wiki authors colour-code inline labels on the article's OWN surface —
      FF7 Rebirth affinity responses ship blue "Positive" / green "Neutral" /
      orange "Negative" as `<span style="color:#…"><b>…</b></span>` with NO inline
@@ -2147,15 +2355,71 @@
        `-webkit-text-fill-color` is NOT optional here: this span sits inside the
      NeoWiki `td[style*="#f5fffa"]` content cell, whose remap above pins a fill-color
      — and fill-color INHERITS and overrides `color` when painting text, so a
-     colour-only override computes correctly and still renders body grey. */
+     colour-only override computes correctly and still renders body grey.
+       The `div.threadmsg` arm covers forum post bodies. Arbitrary UGC colour is
+     still normalised (a post's `color:black` link must stay accent-blue, not go
+     black-on-dark) — only these three bright status KEYWORDS are honoured, and
+     each is REMAPPED to a palette value rather than re-asserted, so what the
+     author wrote can never decide the contrast. Without it the signal is
+     half-applied: thread 1124747 renders the same Inactive/Active/Limited
+     Activity list twice, once in the post and once in the `div.wikiembed` that
+     transcludes it, and only the embed would have carried the colour. */
   #wiki-content [style*="color:red"]:not([style*="background"]),
   #wiki-content [style*="color: red"]:not([style*="background"]),
   #wiki-content [style*="color:red"]:not([style*="background"]) *,
   #mw-content-text [style*="color:red"]:not([style*="background"]),
   #mw-content-text [style*="color: red"]:not([style*="background"]),
-  #mw-content-text [style*="color:red"]:not([style*="background"]) * {
+  #mw-content-text [style*="color:red"]:not([style*="background"]) *,
+  div.wikiembed [style*="color:red"]:not([style*="background"]),
+  div.wikiembed [style*="color: red"]:not([style*="background"]),
+  div.wikiembed [style*="color:red"]:not([style*="background"]) *,
+  div.threadmsg [style*="color:red"]:not([style*="background"]),
+  div.threadmsg [style*="color: red"]:not([style*="background"]),
+  div.threadmsg [style*="color:red"]:not([style*="background"]) * {
     color: #f08b80 !important;
     -webkit-text-fill-color: #f08b80 !important;
+  }
+
+  /* `red` never travels alone — the same editors write the rest of the status
+     scale as bare keywords too, and only `red` had an arm, so `green` and
+     `orange` collapsed into the surrounding grey and the scale read as one
+     value. (Live on the Super Moderator/Activity page transcluded into
+     ReQuests forum thread 1124747: Inactive / Active / Limited Activity.)
+     Pure `green` #008000 is only 3.15:1 on the elevated content surface, so it
+     is remapped to the palette green; `orange` already reads 8.2:1 and is
+     re-asserted verbatim. Same `:not([style*="background"])` guard as above — a
+     bare substring match on `color:green` also catches `background-color:green`,
+     whose cell belongs to the saturated-cell dark-text rules. */
+  #wiki-content [style*="color:green"]:not([style*="background"]),
+  #wiki-content [style*="color: green"]:not([style*="background"]),
+  #wiki-content [style*="color:green"]:not([style*="background"]) *,
+  #mw-content-text [style*="color:green"]:not([style*="background"]),
+  #mw-content-text [style*="color: green"]:not([style*="background"]),
+  #mw-content-text [style*="color:green"]:not([style*="background"]) *,
+  div.wikiembed [style*="color:green"]:not([style*="background"]),
+  div.wikiembed [style*="color: green"]:not([style*="background"]),
+  div.wikiembed [style*="color:green"]:not([style*="background"]) *,
+  div.threadmsg [style*="color:green"]:not([style*="background"]),
+  div.threadmsg [style*="color: green"]:not([style*="background"]),
+  div.threadmsg [style*="color:green"]:not([style*="background"]) * {
+    color: #3fb950 !important;
+    -webkit-text-fill-color: #3fb950 !important;
+  }
+
+  #wiki-content [style*="color:orange"]:not([style*="background"]),
+  #wiki-content [style*="color: orange"]:not([style*="background"]),
+  #wiki-content [style*="color:orange"]:not([style*="background"]) *,
+  #mw-content-text [style*="color:orange"]:not([style*="background"]),
+  #mw-content-text [style*="color: orange"]:not([style*="background"]),
+  #mw-content-text [style*="color:orange"]:not([style*="background"]) *,
+  div.wikiembed [style*="color:orange"]:not([style*="background"]),
+  div.wikiembed [style*="color: orange"]:not([style*="background"]),
+  div.wikiembed [style*="color:orange"]:not([style*="background"]) *,
+  div.threadmsg [style*="color:orange"]:not([style*="background"]),
+  div.threadmsg [style*="color: orange"]:not([style*="background"]),
+  div.threadmsg [style*="color:orange"]:not([style*="background"]) * {
+    color: #ffa500 !important;
+    -webkit-text-fill-color: #ffa500 !important;
   }
 
   /* NeoWiki (neowiki.) main-page templates hardcode near-white inline
@@ -2302,6 +2566,62 @@
     color: var(--neo-text) !important;
   }
 
+  /* ---- Wiki pages transcluded into forum posts (`div.wikiembed`) ----
+     `[[we.<wiki>:<Page>]]` in a forum post pulls a live MediaWiki page into the
+     thread; every wiki sidebar ships that snippet in a "WIKIEMBED CODE" box, so
+     any post on any forum can carry one. It renders in the SAME document (no
+     iframe) under its own class vocabulary, which the site paints for the white
+     forum it was designed for: a `#fff` plate, an #e3e3e3→#c8c8c8 header
+     gradient carrying #454545 ink plus a `0 1px 0 white` text-shadow, and
+     #f9f9f9 gallery cells.
+       None of the MediaWiki rules above reach in: they all hang off
+     `#mw-content-text` / `#wiki-content`, and an embed on www carries neither —
+     only the inner `.mw-parser-output`. That is why the article body alone was
+     already dark and the embed rendered as a dark island floating in a white
+     plate, with the transcluded page's `<h1>` white-on-white on top of it. */
+  div.wikiembed {
+    background-color: var(--neo-elev) !important;
+    border-color: var(--neo-border) !important;
+    color: var(--neo-text-2) !important;
+  }
+
+  div.wikiembed .wikiembed_header,
+  div.wikiembed .wikiembed_footer {
+    background-color: var(--neo-elev2) !important;
+    background-image: none !important;
+    border-color: var(--neo-border) !important;
+    color: var(--neo-text-2) !important;
+    text-shadow: none !important;
+  }
+
+  /* The header's `history`/`edit` affordances are dark-inked raster icons
+     (`w/icons/history.png`, `f/neo/edit_message.gif`) drawn for the light grey
+     bar — a transparent-PNG/GIF, so no CSS colour reaches them and they read as
+     smudges on the elevated header. Same treatment as `#wiki-logo img`: hand
+     each one back a small light plate so the glyph still reads. */
+  div.wikiembed .wikiembed_header img {
+    background-color: #eef2f7 !important;
+    border-radius: 2px !important;
+  }
+
+  /* Old-style `table.gallery` cells keep a #f9f9f9 plate of their own: the table
+     is cleared by the generic `table { background: transparent }` rule but its
+     cells are not (ours only sets their border-colour). */
+  div.wikiembed table.gallery td {
+    background-color: var(--neo-elev2) !important;
+  }
+
+  /* `.walkthrough-embed` is the wikiembed's sibling — the same transclusion
+     mechanism pointed at a walkthrough page instead of a wiki one — and the
+     forum stylesheet gives it the same treatment in one line
+     (`background-color:#f8f8f8`). Match the wikiembed plate so both forms of
+     embedded article read as the same component. */
+  .walkthrough-embed {
+    background-color: var(--neo-elev) !important;
+    border-color: var(--neo-border) !important;
+    color: var(--neo-text-2) !important;
+  }
+
   /* ---- Google Programmable Search (forum search results) ----
      `/forums/search.php` renders its whole result list through an embedded
      Google CSE (`div#___gcse_0`) in the MAIN document, under Google's own
@@ -2409,6 +2729,19 @@
   .footer i.icon-facebook,
   body.mediawiki footer i.icon-facebook {
     color: #1877f2 !important;
+  }
+
+  /* Quantcast leaves a fixed "Privacy" pill bottom-left on EVERY page once consent
+     is given — a `#368bd6` button whose label the site prints WHITE. Our blanket
+     link rule repainted it `--neo-link`, i.e. accent blue on brand blue at 1.52:1.
+     It is the CMP's own chip on the CMP's own fill: leave the fill, restore the
+     label (the gear glyph is an `<svg>` and already renders white). */
+  .qc-cmp2-persistent-link,
+  .qc-cmp2-persistent-link:link,
+  .qc-cmp2-persistent-link:visited,
+  .qc-cmp2-persistent-link:hover {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
   }
 
   /* ---- Misc: horizontal rules, selection -------------------- */
