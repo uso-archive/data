@@ -3,11 +3,11 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260804.13.19
+@version      20260807.22.33
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
-@-moz-document domain("ozon.ru"), domain("www.ozon.ru") {
+@-moz-document domain("ozon.ru"), domain("www.ozon.ru"), domain("ozon.kz"), domain("ozon.by") {
 /* ============================================================
      Ozon ships a full design-token system on :root — light
      tokens (--ozTextPrimary, --ozBGSecondary, --ozGray*, --ozWhite*
@@ -775,15 +775,28 @@
 
      KNOWN LIMIT: this neutraliser, together with the widget-wide
      `[data-widget="searchBarDesktop"] div { transparent }` above, also flattens the
-     SEARCH-SCOPE CHIP ("Ozon fresh ✕" — the pill shown when a query is restricted to
-     a store or category), whose applied state is natively a solid #005bff fill. Idle
-     it is only rgba(0,48,120,.04), so idle-vs-flat is a non-difference; applied loses
-     its brand fill. Active and idle differ ONLY by a content-hashed modifier class,
-     and an !important background cannot be handed back to the site once declared, so
-     restoring it would mean betting on a hash that rotates every build. Left as is:
-     the applied scope is still carried by the label plus its ✕ remove button. */
+     IDLE search-scope chip ("Везде"), whose ground is only rgba(0,48,120,.04) — a
+     non-difference on dark. The APPLIED state is restored below. */
   .search-bar-wrapper div[class*="search_"] {
     background-color: var(--d-bg) !important;
+  }
+  /* APPLIED SEARCH-SCOPE CHIP ("Смартфоны ✕" — the pill shown when a query is
+     restricted to a store or category). Natively a solid #005bff fill with a white
+     label; the neutraliser above flattens it, so the scope reads as bare white words
+     sitting in the search field, indistinguishable from the typed query. The label
+     stays white either way, so every contrast check passes.
+
+     Named by SHAPE, not by hash: the applied chip carries a modifier class on top of
+     its base class, while its only sibling in the field row (the input wrapper) ships
+     one class alone — so `[class*=" "]` (a class attribute holding more than one name)
+     picks it out at any build. Both combinators are load-bearing. Without the `form`,
+     the shape match reaches the suggest flyout, whose dozen suggestion rows are all
+     multi-class, and paints the whole open autocomplete brand-blue; without the
+     child chain it reaches the camera-search button's 40x40 wrapper, which is also
+     multi-class and sits one level deeper. Native #005bff rather than the lifted
+     --d-blue: this is a FILL under white text (5.4:1). */
+  .search-bar-wrapper form > div > div[class*="search_"][class*=" "] {
+    background-color: #005bff !important;
   }
   /* COUNTRY-CODE SELECTOR (OZON ID login modal — a same-origin
      www.ozon.ru/ozonid-lite iframe, so the theme applies inside it).
@@ -930,24 +943,6 @@
     background-color: transparent !important;
   }
 
-  /* OZON-CARD PRICE PILL — the buybox headline price sits on a solid GREEN pill
-     (#00c451, white text): Ozon's "this is the price with an Ozon card" signal,
-     and the single most prominent semantic colour on the PDP. It carries NO
-     inline style and no stable class (its `pdp_gb2` hash rotates every build),
-     so the neutraliser above flattened it and the price became plain light text
-     on the dark panel — indistinguishable from the ordinary bank price beneath
-     it. Its price <span> IS uniquely reachable: it is the only
-     tsHeadline600Large in the widget. Repaint the pill on that span, mirroring
-     the native geometry (radius 8px, padding 2px 8px) and cancelling the added
-     box with an equal negative margin so nothing shifts. */
-  [data-widget="webPrice"] span[class*="tsHeadline600Large"] {
-    background-color: #00c451 !important;
-    color: #ffffff !important;
-    border-radius: 8px;
-    padding: 2px 8px;
-    margin: -2px -8px;
-  }
-
   /* PDP title truncation "…ещё" pill ships `background: var(--graphicLightKey)`
      = literal #fff, so it renders a WHITE box on the dark product title.
      --graphicLightKey is NOT remapped at :root on purpose: it is a CONTEXT-named
@@ -966,6 +961,24 @@
      one handle in this component that does not rotate with the build. */
   [data-widget="webProductHeading"] {
     --graphicLightKey: var(--d-bg) !important;
+  }
+
+  /* INSTALMENT AMOUNT ("1 115 ₸ × 12 месяцев") — the regional storefronts put this
+     chip on a solid YELLOW plate the site paints itself, through an inline
+     `background: var(--bgInstalmentSecondary)`, and label it with an inline
+     `color: var(--textDarkKey)`. "DarkKey" names the near-black key INK, i.e. the
+     colour a component uses when it paints on a light ground it owns — the same
+     context-named family as the "…OnLight" tokens excluded from the remap above. Our
+     :root lift turns it near-white, which lands at 1.20:1 on the site's own yellow.
+     The plate is site-owned and untouched by us, so the ink has to go back: native
+     #070707 reads 14.24:1 on it.
+
+     Scoped to the widget rather than dropped from :root, so the defensive lift stays
+     available to any use of the token on a ground WE darken. Measured live across
+     both markets, this widget's amount is the token's only use anywhere reachable,
+     and the .ru variant of the same chip is a violet plate that never uses it. */
+  [data-widget="webInstallmentPurchase"] {
+    --textDarkKey: #070707 !important;
   }
 
   /* MAIN CTA BUTTON (В корзину) — a genuine brand-coloured button; keep
@@ -1127,6 +1140,32 @@
   [data-widget="webDescription"] [class*="RA-"] {
     color: var(--d-text-2) !important;
   }
+  /* …and the RA module also paints its own spec CARDS a hardcoded pale
+     rgb(239,243,246) — a literal, so no token remap reaches it, and the ONLY light
+     ground left anywhere in the block. The text lift above then puts our body grey on
+     that pale card at 1.44:1: a row of cards whose headings and copy are all but gone,
+     while the same lift is right for the ~50 text nodes that DO sit on the darkened
+     canvas. A blanket reset is the only handle — every class in this module is a
+     rotating hash and its palette is a fixed set of literals no selector can match on.
+     Transparent rather than an elevated surface, because that is the one value that is
+     a no-op on the hundred RA elements carrying no background at all. The trade is the
+     module's dark decorative plates (its navy/slate fills, its 8% blue callout tint),
+     which are cleared too — a lost tint on a dark canvas, never a lost word. */
+  [data-widget="webDescription"] [class*="RA-"]:not([style*="background"]) {
+    background-color: transparent !important;
+  }
+  /* The RA text lift is a blanket, so it also swallows the module's LINKS — the
+     seller's inline references and the titles of any product block embedded in the
+     description. They ship the raw brand blue #005bff outside the token system, so
+     the lift repaints them the same grey as the surrounding body copy and the block
+     ships with nothing marking what is clickable. Every contrast check passes either
+     way; only a native-vs-themed colour diff sees it. Lifted to our blue rather than
+     handed back the raw #005bff, which is ~2.9:1 on the canvas. Both anchor forms are
+     matched because the module puts its class on some links and not others. */
+  [data-widget="webDescription"] [class*="RA-"] a,
+  [data-widget="webDescription"] a[class*="RA-"] {
+    color: var(--d-blue) !important;
+  }
 
   /* GALLERY: the stage + thumbnail tiles are white CONTAINERS
      behind/around the photo. Darken the container, not the <img>.
@@ -1167,11 +1206,15 @@
     background-color: #f3f5f8 !important;
     border-radius: 6px;
   }
-  /* Gallery media-count label ("+2 видео") under the video thumbnail hardcodes the
-     raw brand blue #005bff (~2.9:1 on the base, below the WCAG floor); the token
-     lift never reaches it. Lift to our refined blue. */
-  [data-widget="webGallery"] div.pdp_s4a {
-    color: var(--d-blue) !important;
+  /* Gallery media-count label ("+2 видео") under the video thumbnail colours itself
+     with `color: var(--bgActionPrimary)` — a token NAMED for the blue CTA fill but
+     used here as text, so it stays the raw #005bff at ~2.9:1 on the base, below the
+     WCAG floor. --bgActionPrimary cannot be lifted at :root (most of its uses are
+     button FILLS, where white-on-#2e78ff drops to 3.4:1), so rebind it inside this
+     widget only: measured live, the label is its ONLY use anywhere in the gallery.
+     It renders on video-bearing PDPs alone, so a gallery of stills never shows it. */
+  [data-widget="webGallery"] {
+    --bgActionPrimary: var(--d-blue) !important;
   }
 
   /* ============================================================
@@ -1477,6 +1520,22 @@
     color: var(--d-text) !important;
     border-color: var(--d-border) !important;
   }
+  /* COOKIE PANEL DISMISS GLYPH — the other cookie component (a wide rgba(0,0,0,.9)
+     panel, not the bubble) draws its ✕ with `fill: currentColor` off
+     --ozWhiteOverlay. Despite the "Overlay" name that token is an INK here, natively
+     rgba(255,255,255,.8) = white-on-near-black; our :root value treats it as a white
+     SCRIM to be darkened, which composites the ✕ to rgb(17,20,24) on rgb(2,2,3) —
+     1.11:1, an invisible close button.
+
+     Rebound in the widget instead of corrected at :root, because the :root value is
+     the defensive reading for any use of the token as a light surface, and its uses
+     cannot be fully enumerated logged out — measured live it has exactly two, both
+     `color` on this button. Nothing else in the theme reaches this: the panel is
+     near-black on the LIGHT site too, so there is no light surface anywhere in the
+     component and every luminance and light-surface scan passes clean. */
+  [data-widget="cookiePopup"] {
+    --ozWhiteOverlay: rgba(255, 255, 255, 0.8) !important;
+  }
 
   /* HEADER / FOOTER / SEARCH-BAR ACTION ICONS — account, orders,
      favourites, cart, camera, magnifier, social glyphs. All are
@@ -1499,27 +1558,18 @@
     color: var(--d-text-3) !important;
   }
 
-  /* SELECTED variant swatch (colour/model picker) — Ozon rings the
-     currently-chosen aspect with a 2px brand-blue border; unselected
-     swatches carry a light grey border. Our blanket `* { border-color }`
-     softener flattens BOTH to the same dark grey, so the selected variant
-     becomes indistinguishable from the others (a lost selection indicator
-     no contrast/DOM scan catches — chroma flagged the native blue chroma
-     255 -> grey). Ozon renders the current selection as a <div> (not a
-     navigable <a> like the unselected ones), so `div[title] > span`
-     uniquely reaches each group's selected swatch without any hashed
-     class. Restore the blue ring. */
-  [data-widget="webAspects"] div[title] > span {
-    border-color: var(--d-blue) !important;
-  }
-  /* The non-swatch aspect chips (processor model, RAM, SSD …) follow the SAME
-     selected-vs-unselected convention — the current choice is a <div>, the
-     alternatives navigable <a> — but ship NO title, so the swatch rule above
-     misses them. The blanket border softener then flattens the selected chip's
-     brand-blue ring to grey, erasing which option is chosen (chroma flagged the
-     native blue -> grey). pdp_e7 is the chip's border-bearing class; scoping to a
-     <div> parent uniquely reaches the selected one without a rotating hash. */
-  [data-widget="webAspects"] div > span.pdp_e7 {
+  /* SELECTED aspect (colour swatch, and the text chips for RAM / storage / model)
+     — Ozon rings the currently-chosen option with a 2px brand-blue border while the
+     unselected ones carry a light grey ring. Our blanket `* { border-color }`
+     softener flattens BOTH to the same dark grey, so the chosen variant becomes
+     indistinguishable from the others (a lost selection indicator no contrast/DOM
+     scan catches — chroma flagged the native blue chroma 255 -> grey). Ozon renders
+     the current selection as a <div> and every alternative as a navigable <a>, so
+     `div > span` reaches exactly the selected option in every group, swatch or chip,
+     with no hashed class. The only other element it takes is the group's own label
+     ("Цвет: Черный титан"), whose border-width is 0 — a border colour on a border
+     that is not drawn paints nothing. */
+  [data-widget="webAspects"] div > span {
     border-color: var(--d-blue) !important;
   }
   /* HOVERING an UNSELECTED aspect chip / swatch natively lifts its ring to the pale
@@ -1589,5 +1639,25 @@
   font,
   [color] {
     color: var(--d-text-2) !important;
+  }
+}
+
+@-moz-document domain("ozon.ru"), domain("www.ozon.ru") {
+/* OZON-CARD PRICE PILL — the buybox headline price sits on a solid GREEN pill
+     (#00c451, white text): Ozon's "this is the price with an Ozon card" signal,
+     and the single most prominent semantic colour on the PDP. It carries NO
+     inline style and no stable class (its `pdp_gb2` hash rotates every build),
+     so the PDP-grid neutraliser flattened it and the price became plain light text
+     on the dark panel — indistinguishable from the ordinary bank price beneath
+     it. Its price <span> IS uniquely reachable: it is the only
+     tsHeadline600Large in the widget. Repaint the pill on that span, mirroring
+     the native geometry (radius 8px, padding 2px 8px) and cancelling the added
+     box with an equal negative margin so nothing shifts. */
+  [data-widget="webPrice"] span[class*="tsHeadline600Large"] {
+    background-color: #00c451 !important;
+    color: #ffffff !important;
+    border-radius: 8px;
+    padding: 2px 8px;
+    margin: -2px -8px;
   }
 }
