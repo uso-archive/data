@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Neoseeker, easy-on-the-eyes walkthroughs, guides, cheats and FAQs, plus the home, game hubs, wikis, search and forums.
-@version      20260804.13.18
+@version      20260809.22.50
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -352,6 +352,15 @@
   #memberbar a,
   #memberbar .nav > li > a {
     color: var(--neo-text-2) !important;
+  }
+
+  /* The member bar's Login / Register / "Sign in with:" entries are
+     `<li class="module">`, and `.module` is in the card list below — so each one
+     drew an elevated chip on a bar the site leaves flat, cutting the strip into
+     three grey boxes with seams. The card meaning of `.module` is the community
+     hub's `div.module` widgets; this list form is nav chrome. */
+  ul.user_panel.nav > li.module {
+    background-color: transparent !important;
   }
 
   /* ---- Cards / sections / panels ---------------------------- */
@@ -779,6 +788,71 @@
   .seriestbl2 td.altrow {
     background-color: var(--neo-elev2) !important;
     color: var(--neo-text) !important;
+  }
+
+  /* The release calendar (`/Games/releases/`) groups its rows with `<th>`s in
+     TBODY, not a `<thead>`: `th.release_month` is a full-width #efefef month band
+     and `th.release_day` the #efefef date gutter beside every row. No `thead`/
+     `.table-list` selector reaches either, so both shipped as bright bars — the
+     month label at 1.2:1 and the date, which the site prints a deliberately faded
+     #abb4c0, at 1.05:1. Darken the surfaces; the generic cell ink then reads and
+     keeps the site's date-quieter-than-title hierarchy. */
+  table.releases_list th.release_month {
+    background-color: var(--neo-elev2) !important;
+    color: var(--neo-text) !important;
+  }
+
+  table.releases_list th.release_day {
+    background-color: var(--neo-elev2) !important;
+  }
+
+  /* The N+ membership page (`/nplus/`) styles its two plan cards from a page-local
+     `<style>`: `background:#f8f8f8; color:#000`, on which our light `<strong>` plan
+     name ("Yearly" / "Monthly") reads 1.05:1. Their 5px `darkorange` / `#486B38`
+     frames are the only thing separating the two plans, and the blanket `*` border
+     reset collapses both to one grey unless each is named. The orange reads on the
+     dark card verbatim; the site's dark green is lifted to the palette's so the pair
+     carries the same weight. */
+  .nplus-yearly,
+  .nplus-monthly {
+    background-color: var(--neo-elev2) !important;
+    color: var(--neo-text-2) !important;
+  }
+
+  .nplus-yearly {
+    border-color: #ff8c00 !important;
+  }
+
+  .nplus-monthly {
+    border-color: #6fbf73 !important;
+  }
+
+  /* The hardware/reviews index (`/Articles/`) wraps its whole "Archive:" listing —
+     96 pages of review teasers — in an unclassed `<div>` inline-styled
+     `background:url('…/neo2k7/games_featured_bg.png') repeat-x #fff`. No card or
+     container selector names it, and the raster is a light header fade, so the
+     colour override needs the image cleared too. The filename is the only stable
+     hook. */
+  #container div[style*="games_featured_bg"],
+  #maincolumn div[style*="games_featured_bg"] {
+    background-color: var(--neo-base) !important;
+    background-image: none !important;
+  }
+
+  /* ---- Default placeholder rasters --------------------------
+     The site's two "nothing here yet" images are near-WHITE bitmaps — the release
+     calendar's `neo_logo_faded_bg.gif` cover slot and `no_avatar.png`, which every
+     guest commenter, forum postbit and fanart profile falls back to. No colour rule
+     can reach a raster, so each renders as a bright tile. Flip their luminance and
+     keep the hue. Matched by filename: real cover art and real avatars must stay
+     untouched.
+       `.avatar` carries the placeholder as a background-IMAGE in the fanart skin —
+     a `filter` also filters the element's own background, so this element must NOT
+     be given a dark `background-color` anywhere else in the sheet. */
+  img[src*="neo_logo_faded_bg"],
+  img[src*="no_avatar"],
+  div.avatar[style*="no_avatar"] {
+    filter: invert(1) hue-rotate(180deg) !important;
   }
 
   /* ---- Alerts / callouts (recolored, semantics kept) -------- */
@@ -1253,16 +1327,41 @@
     color: #ffffff !important;
   }
 
-  /* `a.btn-inverse` is the same anchor-vs-class clash, but its native label is
-     the site's GOLD (#ffc40d on the near-black #2d2d2d chip, 8.6:1) — the
-     "Create a walkthrough page" CTA. `a:link` painted it accent-blue while the
-     nested `span` kept body grey, so it rendered two-tone. Keep the gold; it
-     reads 9.5:1 on our elevated chip. */
+  /* `.btn-inverse` is the site's neutral dark chip (`color:#fff` on #2d2d2d): the
+     guide CTAs and the fourteen genre filters heading `/walkthroughs/` all use it.
+     `a:link` (0,1,1) out-specifies `.btn` (0,1,0), so the ANCHOR form has to be
+     named or it keeps the accent-blue link colour on the chip. */
   a.btn-inverse,
   a.btn-inverse:link,
-  a.btn-inverse:visited,
-  a.btn-inverse:hover {
+  a.btn-inverse:visited {
+    color: var(--neo-text) !important;
+  }
+
+  /* The "Create a walkthrough page" CTA is the one instance the site golds, and it
+     does so with an INLINE `color:#ffc40d` that our `!important` link rule outranks.
+     Re-assert it from that same inline hook — keying on the class instead would
+     paint the whole genre-filter strip an accent it does not carry. Both spacings
+     and cases are listed because the attribute is matched as raw text. */
+  a.btn-inverse[style*="color:#ffc40d"],
+  a.btn-inverse[style*="color: #ffc40d"],
+  a.btn-inverse[style*="color:#FFC40D"],
+  a.btn-inverse[style*="color: #FFC40D"] {
     color: #ffc40d !important;
+  }
+
+  /* The site marks the applied filter `.btn-inverse.active` and distinguishes it
+     from its siblings with a FLAT #0b0b0b fill and an inset shadow, against the
+     unselected chip's #444→#0b0b0b gradient. The base `.btn` rule clears both the
+     gradient and the shadow, so the two states compute an identical chip unless the
+     selected one is given the accent the theme's other selected tabs carry. */
+  .btn-inverse.active,
+  a.btn-inverse.active,
+  a.btn-inverse.active:link,
+  a.btn-inverse.active:visited,
+  a.btn-inverse.active:hover {
+    background-color: var(--neo-blue) !important;
+    border-color: #265572 !important;
+    color: #ffffff !important;
   }
 
   /* Modifiers the base `.btn` rule above swallowed.
@@ -1357,6 +1456,28 @@
   div.code {
     background-color: #0d1117 !important;
     border-color: var(--neo-border) !important;
+  }
+
+  /* ---- Plain-text FAQ pages (`/<game>/faqs/<id>-<slug>.html`) ----
+     These render under the legacy `neo2k7` skin, which heads them with its own
+     chrome instead of the `.navbar-inner` every other page type uses. Under the
+     brand-blue title band sits `#resource_wrapper_bottom`, a #d5e5f4 strip only
+     25px tall — below the audit's height floor — carrying the "would you
+     recommend this guide?" label at 1.35:1 and its more-guides / forums /
+     view-source links at 1.8:1.
+       The band ABOVE it must keep the skin's own lighter blue: its wordmark is an
+     opaque GIF (`neo2k7/logo_resource.gif`) with that exact blue baked into the
+     raster, so retoning the band to `--neo-blue` only frames the logo in a
+     lighter rectangle. */
+  #resource_wrapper_bottom {
+    background-color: var(--neo-elev2) !important;
+  }
+
+  /* Same skin closes the guide with a #efefef copyright plate, on which our light
+     body ink sits at ~1.2:1 — the attribution line is the one part of the page
+     the author is entitled to have read. */
+  #markupfaq .copyright {
+    background-color: var(--neo-elev) !important;
   }
 
   /* ---- Dropdowns / menus / floating surfaces ---------------- */
@@ -1582,6 +1703,20 @@
      is a 2.0:1 smudge on the elevated bar. */
   .forum_pinned i {
     color: var(--neo-text-2) !important;
+  }
+
+  /* Every forum BOARD page (`/forums/<id>/`) opens with a row of five
+     `div.navblock` help panels ("I Need Help!", "File A Complaint/Report", …),
+     each a #efefef card the site fills with link-blue entries — on our palette
+     that is accent blue at ~1.9:1 on a bright panel, the largest light surface
+     left in the forum. Their `li.head` strip keeps the site's own #336699, the
+     same header blue `tr.header` uses, so it takes the same white label. */
+  div.navblock {
+    background-color: var(--neo-elev) !important;
+  }
+
+  div.navblock li.head {
+    color: #ffffff !important;
   }
 
   /* "Recent forum visitors:" is a full-width pure-WHITE bar, but only 27px
@@ -2076,6 +2211,55 @@
     background-color: var(--neo-elev2) !important;
   }
 
+  /* `Special:Search` (reachable from the search box on every wiki subdomain) heads
+     its results with a profile-tab strip the skin paints for a white page: a
+     `.mw-search-profile-tabs` #f8f9fa band holding an #e5e5e5 `.search-types` group,
+     with the current profile marked ONLY by `li.current`'s white fill — which is
+     invisible against a light group and carries our accent link at ~2:1. Darken both
+     surfaces and give the current tab the accent chip the theme's other tabs use. */
+  .mw-search-profile-tabs {
+    background-color: var(--neo-elev) !important;
+    border-color: var(--neo-border) !important;
+  }
+
+  .mw-search-profile-tabs .search-types {
+    background-color: var(--neo-elev2) !important;
+    border-color: var(--neo-border) !important;
+  }
+
+  .search-types li.current,
+  .search-types li.current a,
+  .search-types li.current a:link,
+  .search-types li.current a:visited {
+    background-color: var(--neo-blue) !important;
+    color: #ffffff !important;
+  }
+
+  /* The result count beside the field is a hardcoded #555, and each result's snippet
+     is a bare `<div class="searchresult">` keeping MediaWiki's `gray` (4.27:1) — no
+     tag rule of ours reaches a `div`. */
+  .results-info {
+    color: var(--neo-muted) !important;
+  }
+
+  div.searchresult {
+    color: var(--neo-text-2) !important;
+  }
+
+  /* MediaWiki's Codex message box (the `?printable=yes` deprecation notice) is a
+     #fdf2d5 panel with near-black ink — a bright island on the dark article column.
+     Remap it onto the theme's warning alert; the amber `.cdx-message__icon` square
+     is the severity cue and stays. */
+  .cdx-message--warning {
+    background-color: #3a2f12 !important;
+    border-color: #8a6d1f !important;
+    color: #f0dca0 !important;
+  }
+
+  .cdx-message--warning .cdx-message__content {
+    color: #f0dca0 !important;
+  }
+
   /* The wiki "statistics" card heads itself with an <h3> plate that each
      wiki's own MediaWiki:Common.css fills with its skin accent (#9d9de1 on
      pokemon., #757575 on neowiki.) under WHITE text — 2.5:1, and a lone
@@ -2182,6 +2366,7 @@
   .mw-parser-output tr[style*="background"]:not([style*="transparent"]) > th:not([style*="background"]) > b {
     color: #14181d !important;
   }
+
 
   /* Inline-coloured wiki chips (game/version cells) label themselves with an
      author `<span style="color:#000000">` on a light saturated cell and
@@ -2699,6 +2884,171 @@
     color: #ffffff !important;
   }
 
+  /* ---- Hardware-review benchmark charts (Highcharts 4) ------
+     Every `/Articles/Hardware/Reviews/…` results page draws six 640x300
+     `div.highcharts-container` charts, each an inline SVG: a `#efefef`
+     `rect.highcharts-background` plate with a #333 title, #000 category labels and
+     #555 axis numbers. SVG paint is `fill`, not `color`/`background-color`, so no
+     card or text rule in this theme could ever have reached them and they shipped
+     as the brightest surfaces left in it. The coloured series bars are the DATA and
+     are left verbatim. */
+  .highcharts-container rect.highcharts-background {
+    fill: var(--neo-elev) !important;
+  }
+
+  .highcharts-container .highcharts-title,
+  .highcharts-container .highcharts-title tspan {
+    fill: var(--neo-text) !important;
+  }
+
+  .highcharts-container .highcharts-axis-labels text,
+  .highcharts-container .highcharts-axis-labels tspan {
+    fill: var(--neo-text-2) !important;
+  }
+
+  .highcharts-container .highcharts-grid path {
+    stroke: var(--neo-border) !important;
+  }
+
+  /* Every bar value label is configured white; Highcharts 4's `contrast` mode re-inks
+     the ones too wide to fit inside their bar to #333 for the plate they spill onto,
+     which is now dark. Nothing structural separates the two — the labels carry no
+     class and no `data-` attribute, only `x`/`zIndex`/`style`/`transform` — so the
+     only hook is the re-inked value itself, and BOTH spellings must be listed:
+     re-inking goes through the CSSOM, which re-serialises `fill` to spaced `rgb()`,
+     while an untouched label keeps the authored hex. Matching only one form matches
+     nothing. Labels that do fit keep the white the site gave them. */
+  .highcharts-container g.highcharts-data-labels text[style*="fill: rgb(51, 51, 51)"],
+  .highcharts-container g.highcharts-data-labels text[style*="fill:#333333"] {
+    fill: #ffffff !important;
+  }
+
+  /* Hover tooltip: an #f9f9f9 rounded `path` box with #333 text, drawn inside the
+     chart SVG and only reachable by pointing at a bar. Its two drop-shadow clones
+     carry the same `d`, so filling every path of the group is filling the box. The
+     series-colour bullet is an inline-styled `tspan` and outranks the inherited
+     text fill, so it survives. */
+  .highcharts-container g.highcharts-tooltip path {
+    fill: var(--neo-elev2) !important;
+  }
+
+  .highcharts-container g.highcharts-tooltip text {
+    fill: var(--neo-text) !important;
+  }
+
+  /* The export/context button is a white `rect` with a #E0E0E0 hamburger on it —
+     a bright tile in the chart's top-right corner. */
+  .highcharts-container .highcharts-button rect {
+    fill: var(--neo-elev2) !important;
+  }
+
+  .highcharts-container .highcharts-button path {
+    fill: var(--neo-text-2) !important;
+    stroke: var(--neo-text-2) !important;
+  }
+
+  /* That button opens an HTML panel, not SVG: an unclassed div inside
+     `.highcharts-contextmenu` carrying a white background, a light grey border and
+     a #888 drop shadow as inline styles, with #303030 rows. Row backgrounds are
+     left alone — Highcharts writes the hover fill inline, so an !important
+     background here would erase the only cue the menu has. */
+  .highcharts-contextmenu > div {
+    background: var(--neo-elev2) !important;
+    border-color: var(--neo-border) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .highcharts-contextmenu > div > div {
+    color: var(--neo-text) !important;
+  }
+
+  .highcharts-contextmenu > div > div:hover {
+    color: #ffffff !important;
+  }
+
+  /* Each chart stamps the neoseeker wordmark and a faded watermark as SVG
+     `<image>`s, both inked near-BLACK for the light plate. They are rasters, so
+     flip their luminance and keep the hue rather than trying to recolour them.
+     Matched structurally: Highcharts writes the source into the XLINK-namespaced
+     `href`, which a plain `[href*=…]` attribute selector cannot see, and the only
+     `<image>`s these charts carry are the two logos. */
+  .highcharts-container image {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+
+  /* ---- fanart.neoseeker.com ---------------------------------
+     The fanart subdomain has its own stylesheet and class vocabulary
+     (`cdn.staticneo.com/style/fanart.css`) that none of the card/section
+     selectors reach: an #f5f5f5 masthead and tab bar, #fff active tab chips,
+     #f5f5f5 A-Z filter chips, an #ecf3f4 "more artwork" rail and #f3f3f3 stream
+     boxes — and `#fanart { color:#444 }`, which every bare `<div>` inside
+     inherits (artwork descriptions, the comment gate, the `em.timeago` date on
+     every thumbnail) for dark-on-dark. Everything is scoped under `#fanart`:
+     `.tab_bar`, `.filters`, `.detail_bar` and `.content_stream` are far too
+     generic to claim site-wide. */
+  #fanart {
+    color: var(--neo-text-2) !important;
+  }
+
+  #fanart #fanart_header,
+  #fanart .tab_bar,
+  #fanart .fanart_stream_info,
+  #fanart .content_stream,
+  #fanart .tied_to,
+  #fanart_browse_artists .entry h3 {
+    background-color: var(--neo-elev) !important;
+    border-color: var(--neo-border) !important;
+  }
+
+  #fanart .fanart_sidebar,
+  #fanart .detail_bar,
+  #fanart_view_right,
+  #fanart em.timeago {
+    color: var(--neo-muted) !important;
+  }
+
+  /* Chips: the filter letters and the pager keep a light fill, and an ACTIVE tab
+     is marked with a pure-white chip the site pairs with black ink — our accent
+     link on it reads 1.8:1. Give the whole set the theme's chip, and the selected
+     one the accent chip its tabs get everywhere else. */
+  #fanart .filters a,
+  #fanart .detail_bar .pagenav_nextprev a {
+    background-color: var(--neo-elev2) !important;
+  }
+
+  #fanart .tab_bar a.active,
+  #fanart .filters a.active,
+  #fanart .tab_box .tabs .active,
+  #fanart .tab_box .tabs a.trigger.active {
+    background-color: var(--neo-blue) !important;
+    border-color: var(--neo-border) !important;
+    color: #ffffff !important;
+  }
+
+  #fanart .tab_bar a:hover {
+    background-color: var(--neo-elev2) !important;
+  }
+
+  /* `a.view_more` shares the widget's `div.tabs` strip but is a plain "View more »"
+     LINK, not a tab — the theme's `.tabs a` rule handed it the same grey chip as
+     the unselected tabs, so the one clickable thing on that row read as a third,
+     disabled-looking tab. */
+  #fanart .tabs a.view_more {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    color: var(--neo-link) !important;
+  }
+
+  #fanart .tabs a.view_more:hover {
+    color: var(--neo-link-hover) !important;
+  }
+
+  /* The rail heading keeps the skin's teal #006666, 1.6:1 on the elevated panel.
+     Lift it to a readable tone of the same hue. */
+  #fanart .content_stream h4 {
+    color: #5ccfe6 !important;
+  }
+
   /* ---- Footer ----------------------------------------------- */
   /* The MediaWiki skin ships a BARE `<footer>` (no id, no class) painted a
      mid-blue #2c5885 — none of the id/class selectors reached it, so our
@@ -2729,6 +3079,32 @@
   .footer i.icon-facebook,
   body.mediawiki footer i.icon-facebook {
     color: #1877f2 !important;
+  }
+
+  /* Quantcast's CMP is the first surface every visitor meets, and it renders in the
+     MAIN document under a stable `qc-cmp2-*` vocabulary. Its plate is white with a
+     near-black #141e23 ink, but its purpose rows and its REJECT/ACCEPT/SAVE actions
+     are `<button>`s the theme's button rule already darkens, and the theme's `h1-h6`
+     rule leaves the panel heading at 1.9:1 on that white. Give the plate — and the
+     full-bleed `::before` that backs it — the dark surface the rest of the panel
+     already assumes, plus light ink for the copy the CMP colours itself. */
+  #qc-cmp2-ui,
+  #qc-cmp2-ui::before {
+    background-color: var(--neo-elev) !important;
+  }
+
+  #qc-cmp2-ui,
+  #qc-cmp2-ui div,
+  #qc-cmp2-ui p,
+  #qc-cmp2-ui span,
+  #qc-cmp2-ui li {
+    color: var(--neo-text-2) !important;
+  }
+
+  #qc-cmp2-ui h1,
+  #qc-cmp2-ui h2,
+  #qc-cmp2-ui h3 {
+    color: var(--neo-text) !important;
   }
 
   /* Quantcast leaves a fixed "Privacy" pill bottom-left on EVERY page once consent

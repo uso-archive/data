@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Stack Overflow and the whole Stack Exchange network: easy-on-the-eyes questions, answers, code blocks, comments and sidebar.
-@version      20260804.13.20
+@version      20260809.22.53
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -135,6 +135,10 @@
     background-color: #2b2545 !important;
   }
 
+  [class~="h:fc-black-300"]:hover,
+  [class~="h:fc-black-350"]:hover,
+  [class~="h:fc-black-400"]:hover,
+  [class~="h:fc-black-450"]:hover,
   [class~="h:fc-black-500"]:hover,
   [class~="h:fc-black-600"]:hover,
   [class~="h:fc-dark"]:hover,
@@ -148,7 +152,15 @@
   }
 
   /* ---- Headings & text -------------------------------------- */
-  h1, h2, h3, h4, h5, h6,
+  /* `h2:not([style*="color"])` spares the network hub's /sites grid: each of
+     its 183 tiles is a community's brand colour with a hand-paired ink set
+     INLINE on the <h2> (#444 on Stack Overflow's #eaeaea, #1c69a4 on
+     Webmasters' #9ce4fe, white on the dark ones). We keep the brand tiles, so
+     forcing one light ink over all of them makes every pale tile's name
+     invisible — and an `!important` cannot yield to a plain inline value, so
+     the arm has to not match. Measured 2026-08-09: /sites is the only page in
+     the network with an inline-coloured heading. */
+  h1, h2:not([style*="color"]), h3, h4, h5, h6,
   .fs-headline1, .fs-headline2, .fs-title, .fs-subheading,
   .s-prose h1, .s-prose h2, .s-prose h3, .s-prose h4 {
     color: #e6edf3 !important;
@@ -183,6 +195,33 @@
   .s-prose .fc-light,
   .revision-comment, span.revision-comment {
     color: #9198a1 !important;
+  }
+
+  /* `.fc-black` carries NO numeric step: it is pure #000, Stacks' darkest ink,
+     and a separate utility from the `.fc-black-NNN` scale above. The network
+     home (stackexchange.com) is built on it — the featured-user names, the "Top
+     sites" list and the hero's inline links all carry it, so without this ~45
+     labels render invisible on the dark cards. Declared AFTER the muted scale
+     because Stacks declares it last too: elements carrying both must resolve to
+     the prominent ink, not the metadata grey. The two-class
+     `.iconLogoNew.fc-black` rule further down still wins for the auth-page
+     wordmark. */
+  .fc-black {
+    color: #e6edf3 !important;
+  }
+
+  /* The `.fc-purple-*` scale runs dark like the blue one and is the only other
+     chromatic ink SE uses for real labels: `--purple-500` #393fac is 1.9:1 on a
+     card (the network home "Featured" chip) and `--purple-400` #555bce paints
+     the Collectives/Staging-Ground glyphs at 3.2:1. Steps 100-300 are already
+     light enough on dark and are left alone. */
+  .fc-purple-400,
+  .fc-purple-500,
+  .fc-purple-600,
+  .fc-purple-700,
+  .fc-purple-800,
+  .fc-purple-900 {
+    color: #a78bfa !important;
   }
 
   /* The "Skip to main content" link is clipped to 1px until it takes focus,
@@ -313,6 +352,17 @@
     color: #5fb0e6 !important;
   }
 
+  /* …but a `.relativetime` inside an anchor is HALF of that link's label —
+     the post signature's "edited <date>" is one <a> to the revision history,
+     and the blanket mute above greyed the date while the word "edited" beside
+     it stayed the accent, splitting one link into two colours. Inherit so the
+     span always matches whatever colour its anchor resolves to. */
+  a .relativetime,
+  a span.relativetime,
+  a .relativetime-clean {
+    color: inherit !important;
+  }
+
   /* Site-switcher "Or search from our full list:" hint and other
      plain body-size helper text default to SE's near-black #3b4045
      — lift to a legible muted grey on dark. */
@@ -358,6 +408,40 @@
   a:hover, .s-link:hover, .s-prose a:hover,
   .question-hyperlink:hover, .answer-hyperlink:hover {
     color: #9bd4ff;
+  }
+
+  /* VISITED links. The generic accent rule above carries no `!important`, so
+     SE's `:visited` rules — one pseudo-class more specific — win on every link a
+     returning reader has already opened: post bodies and comments drop to
+     `--theme-link-color-visited` (#155ca2 on Stack Overflow, 2.6:1 on the page
+     base) and every `.s-link` to `--_li-fc-visited` (`--purple-500` #393fac,
+     1.9:1). Two arms are needed because a `:visited` override is not reliable:
+     some engines refuse to let a later author rule repaint an already-visited
+     link, so the FLOOR below (no `:visited`, `!important`) guarantees the
+     accent, and the violet arm — Stacks' own default visited hue, lifted to read
+     on dark — takes over wherever `:visited` styling does apply and keeps the
+     read/unread signal. The `:not()` chain mirrors SE's own exclusions: tags,
+     badges and buttons are not link-coloured and must keep their own fill. */
+  .s-prose a:not(.s-tag):not(.post-tag):not(.badge-tag):not(.badge):not(.s-btn),
+  .comment-copy a:not(.badge):not(.s-btn) {
+    color: #5fb0e6 !important;
+  }
+
+  .s-prose a:not(.s-tag):not(.post-tag):not(.badge-tag):not(.badge):not(.s-btn):hover,
+  .comment-copy a:not(.badge):not(.s-btn):hover {
+    color: #9bd4ff !important;
+  }
+
+  .s-prose a:not(.s-tag):not(.post-tag):not(.badge-tag):not(.badge):not(.s-btn):visited,
+  .comment-copy a:not(.badge):not(.s-btn):visited,
+  .s-link:not(.s-btn):not(.post-tag):not(.badge-tag):visited {
+    color: #b09ae0 !important;
+  }
+
+  .s-prose a:not(.s-tag):not(.post-tag):not(.badge-tag):not(.badge):not(.s-btn):visited:hover,
+  .comment-copy a:not(.badge):not(.s-btn):visited:hover,
+  .s-link:not(.s-btn):not(.post-tag):not(.badge-tag):visited:hover {
+    color: #d3c4f5 !important;
   }
 
   /* The RSS "… questions feed" link at the foot of every list page. The Q&A
@@ -837,9 +921,18 @@
     color: inherit !important;
   }
 
+  /* Stacks draws a quote's left rule as a 4px `::before` filled with
+     `--black-300` (#c8ccd0), NOT as a border — `border-left-width` is 0, so a
+     border-colour override is a no-op and every quoted passage in every
+     answer keeps a bright bar down its left edge. */
   .s-prose blockquote {
     border-left-color: #2d333b !important;
     color: #9198a1 !important;
+  }
+
+  .s-prose blockquote::before,
+  blockquote::before {
+    background-color: #3d444d !important;
   }
 
   /* SE draws every <hr> as a 1px block with `background-color: #d6d9dc`
@@ -1049,8 +1142,13 @@
 
   /* tag count / multiplier badges. The sidebar "Recent tags" widget on the
      network Q&A sites (MathOverflow et al.) keeps SE's #636b74 for the
-     count next to each tag — 3.1:1 dark-on-dark. */
+     count next to each tag — 3.1:1 dark-on-dark. The `×` glyph is a
+     SEPARATE element (`.item-multiplier-x`) from the number beside it, so
+     lifting only the count leaves the two halves of one label at different
+     brightnesses. */
   .s-tag--count, .post-tag-count,
+  .item-multiplier,
+  .item-multiplier-x,
   .item-multiplier-count,
   .item-multiplier .item-multiplier-count { color: #9198a1 !important; }
 
@@ -1246,9 +1344,13 @@
     color: #5fb0e6 !important;
   }
 
+  /* Accepted-answer vote pill. SE fills it a solid green (#18864b) with white
+     text everywhere it appears; the list page's `.status.answered-accepted`
+     already keeps that solid treatment, so the sidebar's Linked/Related pills
+     must not render the same state as a faint tint — one semantic, one look. */
   #sidebar .answered-accepted, #sidebar .accepted {
-    background-color: #20382a !important;
-    color: #8fdc9e !important;
+    background-color: #1f7a45 !important;
+    color: #ffffff !important;
   }
 
   #sidebar .answered {
@@ -1281,6 +1383,22 @@
   .s-sidebarwidget .s-sidebarwidget--item {
     border-color: #2d333b !important;
     color: #c4cdd6 !important;
+  }
+
+  /* Stacks deliberately de-links plain anchors inside a sidebar widget
+     (`.s-sidebarwidget:not(.s-anchors) a:not(…)` → `--black-600`), i.e. they
+     are the widget's PROMINENT ink, not the accent. That reads 1.2:1 once the
+     widget is dark, and the rule's five-way `:not()` chain out-ranks the page
+     accent everywhere the `#sidebar` id is absent — the /legal pages, whose
+     whole navigation is such a widget. Map the ink, not the link colour. */
+  .s-sidebarwidget--item a,
+  .s-sidebarwidget--content a {
+    color: #e6edf3 !important;
+  }
+
+  .s-sidebarwidget--item a:hover,
+  .s-sidebarwidget--content a:hover {
+    color: #9bd4ff !important;
   }
 
   /* ============================================================
@@ -1375,8 +1493,28 @@
     color: #8fdc9e !important;
   }
 
-  /* Filter / sort tabs (segmented controls) */
-  .s-btn-group .s-btn,
+  /* The BOUNTY pill in the same stats column ("+50", "+100" — MathOverflow,
+     Meta and every *.stackexchange.com list page) is a solid `--blue-500`
+     #155ca2 chip that SE labels WHITE. It is a `.s-post-summary--stats-item`,
+     so the muted-grey rule at the top of the file flattened the label to
+     #9198a1 on that blue — 2.3:1, and the loudest "this question pays" signal
+     on a list page stopped reading as one. The fill is SE's own and stays. */
+  .s-post-summary--stats-item.has-bounty,
+  .s-post-summary--stats-item.has-bounty .s-post-summary--stats-item-number,
+  .s-post-summary--stats-item.has-bounty .s-post-summary--stats-item-unit {
+    color: #ffffff !important;
+  }
+
+  /* Filter / sort tabs (segmented controls). The GROUP has a real frame
+     natively (--black-300) and is recoloured with the other borders below;
+     its ITEMS carry `1px solid transparent` for layout only — the frame plus
+     the filled selected chip is the whole affordance — so only their label
+     colour belongs here. Giving each item a visible hairline draws a box the
+     site never draws and doubles up against the group frame. */
+  .s-btn-group .s-btn {
+    color: #c4cdd6 !important;
+  }
+
   .s-btn.s-btn__muted.s-btn__outlined,
   .youarehere,
   .js-filter-btn {
@@ -1488,8 +1626,13 @@
     color: #5fb0e6 !important;
   }
 
+  /* The post menu mixes `.s-btn__link` buttons with bare anchors — the /tour
+     mock post's "edit" is one, on SE's raw --black-400 (#636b74, 3.0:1). Both
+     shapes are the same control row and must read the same. */
   .js-post-menu .s-btn.s-btn__link,
-  .post-menu .s-btn.s-btn__link {
+  .post-menu .s-btn.s-btn__link,
+  .post-menu a.c-default,
+  .js-post-menu a.c-default {
     color: #9198a1 !important;
   }
 
@@ -1846,6 +1989,18 @@
     color: #c4cdd6 !important;
   }
 
+  /* A badge PILL that is also a link (`a.badge` — the Help Center's
+     Bronze/Silver/Gold explainers, the per-badge chips on a profile) sits on
+     SE's own `--black-500` #3b4045 fill, so the page accent lands at 4.4:1 on
+     it. The fill is a component surface we do not darken; brighten the label
+     instead so the pill still reads as a link and clears AA at 12px. The
+     `#sidebar` arm is required: the id-scoped `#sidebar a` accent above
+     out-specifies a bare `a.badge`, and the Help Center explainers live there. */
+  a.badge,
+  #sidebar a.badge {
+    color: #7cc0ea !important;
+  }
+
   .badgecount { color: #c4cdd6 !important; }
   .badge1, .badgecount .gold { color: #e8c98a !important; }
   .badge2, .badgecount .silver { color: #c0c6cc !important; }
@@ -1881,6 +2036,15 @@
   .user-details a:hover,
   .post-signature .user-details a:hover {
     color: #9bd4ff !important;
+  }
+
+  /* The moderator diamond beside a username is a `<span>`, so it never picked up
+     the anchor accent — it takes SE's raw `--theme-link-color` (#1b75d0 on the
+     blue sites, 3.3:1 on the page base). It is the one place the un-lifted link
+     colour still leaks. Match the accent the names around it already use. */
+  .mod-flair,
+  span.mod-flair {
+    color: #5fb0e6 !important;
   }
 
   /* SE tints ONLY the post OWNER's signature card (`.post-signature.owner`,
@@ -2071,6 +2235,55 @@
   }
 
   /* ============================================================
+     /tour — the "welcome" walkthrough
+     ------------------------------------------------------------
+     Every network site serves it, it is linked from the footer and the
+     top-bar help menu, and it is the only page family built from the
+     `.about-page .new-about-content-page` markup in `secondary.css`.
+     None of the Stacks card rules reach it: it stages a mock question in
+     `var(--white)` panels, so the theme's ink lift rendered the whole
+     walkthrough light-grey-on-white (~1.6:1), and its section headings
+     take `--black-600` behind a 3-class `!important` that out-ranks the
+     network-wide h1-h6 lift, leaving them 1.1:1 on the dark base.
+     ============================================================ */
+  .qa-block,
+  .content-block,
+  .on-topic-examples,
+  .off-topic-examples,
+  .user-info-rep {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    box-shadow: none !important;
+  }
+
+  .about-page .new-about-content-page h2.about-title {
+    color: #e6edf3 !important;
+  }
+
+  /* The mock post fades out under a white-to-transparent gradient that
+     stands in for "there is more text below". Its background-COLOR is
+     never set, so no surface audit sees it; on dark it is a bright band
+     across the foot of the example. */
+  .about-post-body-gradient {
+    background: linear-gradient(to top, #1c2128 15%, rgba(28, 33, 40, 0)) !important;
+  }
+
+  .new-about-content-page .user-details,
+  .new-about-content-page .rep-block,
+  .new-about-content-page .comments,
+  .new-about-content-page .rep-up-off {
+    color: #9198a1 !important;
+  }
+
+  .new-about-content-page .rep-up {
+    color: #3fb950 !important;
+  }
+
+  .new-about-content-page hr {
+    background-color: #262c33 !important;
+  }
+
+  /* ============================================================
      Search results page
      ============================================================ */
   .search-results,
@@ -2093,14 +2306,19 @@
   }
 
   /* ============================================================
-     Network home (stackexchange.com) — LEGACY layout
+     Network home (stackexchange.com) — bespoke layout
      ------------------------------------------------------------
-     The network landing page is NOT the Stacks "unified-theme"
-     frontend: it keeps an old bespoke markup (.hero-box promo,
-     #question-list hot rows, #sideBar .module widgets, .navMain)
-     that none of the Stacks class rules above reach. So it shipped
-     a light-blue hero panel, white row dividers, and dark-on-dark
-     headings / site names. Theme those legacy classes explicitly.
+     The network landing page mixes the shared Stacks components
+     with its own bespoke markup (#question-list hot rows,
+     #sideBar widgets, .featured-site card, the legacy pager),
+     which none of the Stacks class rules above reach. Its Stacks
+     half is covered by the utility remaps at the top of this file
+     — `.fc-black` in particular, which paints nearly every label
+     on this page and on no other. The hooks below cover the rest.
+     Several of them (.hero-box, .navMain, .subheader, .siteHeader
+     h1, .sb-siteName, .stats-label, .module .heading) match nothing
+     on the current page set and are kept only as a fallback for
+     network pages still serving the older markup.
      ============================================================ */
   /* The network home wordmark is an unclassed <h1> under
      header.siteHeader carrying a CDN background-image logo (dark
@@ -2185,6 +2403,39 @@
   #sideBar .module.featured-sidebar .featured-site,
   .featured-site {
     border-color: #2d333b !important;
+  }
+
+  /* The "Featured" tag above the featured-site name is a <span> with an INLINE
+     `background:#f1edfc` — a near-white lavender chip, too small for the
+     light-surface audit's size floor and unreachable by any class hook. Its ink
+     comes from the `.fc-purple-500` on the parent <h2>, so the two must move
+     together: lifting that scale for the dark page without darkening this chip
+     would put light purple on light lavender. */
+  .featured-site h2 span,
+  .featured-site h2 > span[style] {
+    background-color: #2b2545 !important;
+    background-image: none !important;
+    color: #c7b3f5 !important;
+  }
+
+  /* The hub's /leagues page ("Top 400 Users"). Its explainer aside is a
+     cornsilk `#fff8dc` panel with #444 body copy — the only bright surface
+     left on the network hub — and each site row is separated by a #f0f0f0
+     rule that shows as a bright line on dark. The per-site `.site-bubble`
+     tiles carry each community's own brand colour and are left alone. */
+  .module.newuser {
+    background-color: #221d14 !important;
+    border-color: #3a3320 !important;
+    color: #e8d4a0 !important;
+  }
+
+  .module.newuser strong,
+  .module.newuser b {
+    color: #f0e2bd !important;
+  }
+
+  .league-container {
+    border-bottom-color: #262c33 !important;
   }
 
   /* Legacy pager / page-sizer chips ("2 3 4 next", "15 30 50 per page").
@@ -2666,7 +2917,7 @@
   .bc-black-100, .bc-black-150, .bc-black-200,
   .bc-black-300, .bc-black-400, .bc-powder-300,
   .ba, .bb, .bt, .bl, .br,
-  .s-btn-group, .s-btn-group .s-btn,
+  .s-btn-group,
   .flush-left, .snippet-hidden,
   select, .s-select, .s-select select,
   .s-sidebarwidget--item, .s-sidebarwidget__item,
@@ -2674,8 +2925,13 @@
     border-color: #262c33 !important;
   }
 
-  /* default (non-filled) s-btn outline */
-  .s-btn.w100, .s-btn__outlined, .s-btn__muted {
+  /* Stacks gives EVERY `.s-btn` a `1px solid transparent` border for layout, so
+     a border-colour hook only belongs on variants that natively show one.
+     `__outlined` is the only such variant: `__muted`, `__filled` and the width
+     utility `.w100` all keep the border transparent, and colouring them draws a
+     box the site never draws (the topbar search trigger beside two bare icon
+     buttons, the modal close X, the white Google pill). */
+  .s-btn__outlined {
     border-color: #2d333b !important;
   }
 
@@ -3230,6 +3486,28 @@ header.site-header,
     color: #c4cdd6 !important;
   }
 
+  /* Onebox TITLES. Each preview type names its own title link and pins it to
+     an ink baked for the white card — `Black` for the wiki/amazon/manpage
+     family, a raw #0070c0 / #0077cc for the post and user ones (3.7:1 once
+     the card is dark). They are the card's primary link; give them the accent
+     the rest of the transcript uses. `.ob-exception-title`'s maroon is a
+     status colour, so it is lifted rather than replaced. */
+  .ob-post-title a,
+  .ob-wikipedia-title a,
+  .ob-amazon-title a,
+  .ob-lpadbug-title a,
+  .ob-manpage-title a,
+  .ob-blog-title a,
+  .ob-github-title a,
+  a.ob-user-username,
+  .ob-twitteruser .ob-realname a {
+    color: #5fb0e6 !important;
+  }
+
+  .ob-exception .ob-exception-title a {
+    color: #f0a8a8 !important;
+  }
+
   .ob-exception .ob-exception-detail {
     background-color: #26221a !important;
     color: #e3d9b0 !important;
@@ -3518,5 +3796,868 @@ header.site-header,
     background-color: #262c33 !important;
     border-color: #3d444d #2d333b #21262d #3d444d !important;
     color: #e6edf3 !important;
+  }
+}
+
+@-moz-document domain("api.stackexchange.com") {
+.content {
+    background-color: #14181d !important;
+    border-top-color: #262c33 !important;
+    border-bottom-color: #262c33 !important;
+  }
+
+  .module {
+    color: #c4cdd6 !important;
+  }
+
+  .module.help {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    box-shadow: none !important;
+  }
+
+  /* The method index in the right rail. Its rows are #6A737C and the
+     CURRENT one is `--black-800` #242729 — so the section you are reading
+     is the least legible entry in the list once the card goes dark. Its
+     orange `::before` accent bar already marks it; give it the bright ink
+     the site intends. */
+  .module.help a,
+  .module.help a:visited {
+    color: #9198a1 !important;
+  }
+
+  .module.help a:hover,
+  .module.help a.youarehere {
+    color: #e6edf3 !important;
+  }
+
+  .module.help ul li.list-separator {
+    background: #2d333b !important;
+  }
+
+  /* Method-level status callouts: `.deprecated` is a #FCFEC5 cream box
+     framed in pure black, `.beta` a `pink` box framed in red. Both are the
+     brightest things on a method page and both encode a status, so retone
+     each to its own tinted dark rather than a neutral. */
+  .deprecated {
+    background-color: #2a2114 !important;
+    border-color: #4a3a1c !important;
+    color: #e8c98a !important;
+  }
+
+  .beta {
+    background-color: #2a1718 !important;
+    border-color: #5a2a2c !important;
+    color: #f0a8a8 !important;
+  }
+
+  /* The interactive console: the request-URL bar, the filter/permalink
+     popovers (white panels framed in black, mounted only on click) and the
+     filter toolbar strip. */
+  .fetched-url {
+    background-color: #222831 !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+
+  .filter-popup,
+  .permalink-popup {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .filter-controls {
+    background-color: #20262d !important;
+  }
+
+  .console-header {
+    border-bottom-color: #2d333b !important;
+  }
+
+  .console-header-separator:after {
+    color: #3d444d !important;
+  }
+
+  /* "Run" is the console's only primary action and the only bare <button>
+     the sheet never styles, so under the forced color-scheme:dark it falls
+     back to the UA button — a #6b6b6b fill inside a 2px WHITE outset bevel,
+     the brightest thing on a method page. */
+  button.run-button {
+    background-color: #2f6f9f !important;
+    border: 1px solid #3b82b8 !important;
+    color: #ffffff !important;
+  }
+
+  button.run-button:hover {
+    background-color: #3b82b8 !important;
+  }
+
+  /* `.manual-filter` sets `background: url(funnel--pencil.png) … white` —
+     the colour rides in the shorthand, so it survives every bg-color reset
+     and paints a white plate behind the filter label. */
+  .manual-filter {
+    background-color: transparent !important;
+  }
+
+  .manual-filter-editing {
+    color: #9198a1 !important;
+  }
+
+  /* The auth flow dims the page with a 50%-opaque LIGHT grey scrim, which
+     washes the whole dark page out instead of dimming it. */
+  .auth-lightbox {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+  }
+
+  #tabs a {
+    color: #9198a1 !important;
+  }
+
+  /* Home page: the version chip beside the API version and the big
+     lowercase strapline, which carries a white text-shadow. */
+  .home-links-version-value {
+    background: #222831 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .home-links-version-label {
+    color: #9198a1 !important;
+  }
+
+  .introtext {
+    color: #7cb7dd !important;
+    text-shadow: none !important;
+  }
+
+  /* Response samples are highlighted from the Stacks syntax variables, and
+     this app pins them to the LIGHT set — including a hsl(0,0%,96.5%) plate
+     behind every code sample. Remap the variables rather than the tokens:
+     one declaration covers every `.hljs-*` class the sheet consumes. */
+  :root {
+    --highlight-bg: #222831 !important;
+    --highlight-color: #d9e0e7 !important;
+    --highlight-comment: #8b949e !important;
+    --highlight-punctuation: #c4cdd6 !important;
+    --highlight-namespace: #79c0ff !important;
+    --highlight-attribute: #a5d6ff !important;
+    --highlight-literal: #79c0ff !important;
+    --highlight-symbol: #ffa657 !important;
+    --highlight-keyword: #ff7b72 !important;
+    --highlight-variable: #a5d6ff !important;
+    --highlight-addition: #3fb950 !important;
+    --highlight-deletion: #ff7b72 !important;
+  }
+
+  /* The console's date pickers are jQuery UI widgets on the stock light
+     smoothness skin — a white calendar with #454545 day cells. */
+  .ui-widget-content {
+    background: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .ui-widget-content a,
+  .ui-widget-header a {
+    color: #c4cdd6 !important;
+  }
+
+  .ui-widget-header {
+    background: #20262d !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+
+  .ui-state-default,
+  .ui-widget-content .ui-state-default,
+  .ui-widget-header .ui-state-default {
+    background: #222831 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .ui-state-hover,
+  .ui-widget-content .ui-state-hover,
+  .ui-widget-header .ui-state-hover {
+    background: #2d333b !important;
+    border-color: #3d444d !important;
+    color: #e6edf3 !important;
+  }
+
+  .ui-state-highlight,
+  .ui-widget-content .ui-state-highlight {
+    background: #2a2114 !important;
+    border-color: #4a3a1c !important;
+    color: #e8c98a !important;
+  }
+
+  .ui-state-error,
+  .ui-widget-content .ui-state-error {
+    background: #2a1718 !important;
+    border-color: #5a2a2c !important;
+    color: #f0a8a8 !important;
+  }
+
+  .ui-widget-overlay {
+    background: #000000 !important;
+  }
+}
+
+@-moz-document domain("area51.stackexchange.com") {
+/* #FBF9E2 — the page plate and everything that sits flush on it. */
+  .category-content,
+  .content-page,
+  .sidebar,
+  .example-question-votes,
+  .comment-help,
+  .inner-tabs a,
+  tr.comment-hover,
+  a.category-tab-current,
+  .category-tab-current,
+  .tabs a.youarehere {
+    background-color: #1c2128 !important;
+    background-image: none !important;
+  }
+
+  /* Content links. Area 51 loads the shared `chrome.css` from the CDN, whose
+     link rule out-ranks the network-wide accent in the main block, so every
+     proposal title and inline link keeps SE's raw #1b75d0 — 3.5:1 once the
+     plate behind it is dark. Scoped to the content column so the cream-on-red
+     notify bar, the cream subheader links and the white nav keep their own
+     colours; the tab rules below carry two classes and still win. */
+  .category-content a,
+  .content-page a,
+  .welcome a,
+  .inner-tabs-content a,
+  .list-header a,
+  a.proposal-hyperlink {
+    color: #5fb0e6 !important;
+  }
+
+  .category-content a:hover,
+  .content-page a:hover,
+  .welcome a:hover,
+  a.proposal-hyperlink:hover {
+    color: #9bd4ff !important;
+  }
+
+  /* Area 51's navy ink #25304C. It paints the panel headings ("Greetings,
+     Earthling!"), the "Can't find what you're looking for?" footer prompt and
+     the orange greeting strip — all plain divs, so the network-wide h1-h6 lift
+     never reaches them and they read ~1.3:1 on the darkened panel. */
+  .category-title {
+    color: #e6edf3 !important;
+  }
+
+  .category-create-proposal {
+    color: #c4cdd6 !important;
+  }
+
+  /* #F2EFCC — the deeper cream used for headers, quoted blocks and the
+     selected inner tab. */
+  .list-header,
+  .inner-tabs-content,
+  .proposal-comments-container,
+  .possible-duplicate,
+  .date_brick,
+  blockquote,
+  #user-pane,
+  .inner-tabs a.youarehere,
+  .sidebar-tabs a.youarehere {
+    background-color: #222831 !important;
+  }
+
+  .inner-tabs a:hover {
+    background-color: #262c33 !important;
+    color: #e6edf3 !important;
+  }
+
+  /* The per-proposal beta-user stat tiles paint their cream from the
+     `.beta-user .a51-votes` descendant rule, not from `.a51-votes` — the
+     component class alone carries no fill, and overriding it flattens the
+     blue "days in beta" bubble on the proposal list. */
+  .beta-user .a51-votes {
+    background-color: #1c2128 !important;
+  }
+
+  .inner-tabs-content.beta-user {
+    border-bottom-color: #2d333b !important;
+  }
+
+  /* Area 51's own tab strip lives inside a `.subheader`, so the network
+     home's `.subheader .tabs a` mute (grey) and its brand-red `.youarehere`
+     accent both land on it: the unselected labels read 1.5:1 on the green
+     pills and the selected one turns red. Restore this app's own pairing. */
+  .subheader .tabs a {
+    color: #ffffff !important;
+  }
+
+  .subheader .tabs a.youarehere,
+  .subheader .tabs a.selected {
+    color: #8fdc9e !important;
+    border-bottom-color: transparent !important;
+  }
+
+  /* Sidebar module metadata ("238 users followed", the relative dates under
+     it) is #444 on the dark page base. */
+  .module p.label-value,
+  .module .label-value {
+    color: #c4cdd6 !important;
+  }
+
+  .site-health-visit-link,
+  a.site-health-visit-link {
+    color: #5fb0e6 !important;
+  }
+
+  .page-numbers.current,
+  span.page-numbers.current {
+    background-color: #3d444d !important;
+    border-color: #3d444d !important;
+    color: #ffffff !important;
+  }
+
+  .inner-tabs-container-green .inner-tabs-content {
+    background-color: #16221a !important;
+  }
+
+  .deleted-example-question,
+  .deleted-question {
+    background-color: #2a1718 !important;
+  }
+
+  /* The "Greetings, Earthling!" intro panel (#CBE2ED) and the grey rule
+     under the sidebar counts. */
+  .welcome {
+    background-color: #14222e !important;
+    border-color: #234055 !important;
+    color: #cfe0ef !important;
+  }
+
+  .grey-bar {
+    background-color: #2d333b !important;
+  }
+
+  /* The CURRENT category tile is the one painted the plate colour so it
+     merges into the panel; its label and count keep the blue the blue
+     tiles use for their own cream text, which lands at ~3.5:1 once the
+     tile is dark. */
+  .category-tab-current .category-tab-name,
+  .category-tab-current .category-tab-proposal-count,
+  a.category-tab-current .category-tab-name,
+  a.category-tab-current .category-tab-proposal-count {
+    color: #8ab8e8 !important;
+  }
+
+  .tabs a.youarehere {
+    color: #8fdc9e !important;
+  }
+
+  .inner-tabs a.youarehere {
+    color: #e6edf3 !important;
+  }
+
+  /* The hot/progress/beta/launched/newest sort strip. Area 51 marks the
+     selected one with a solid #808185 pill and WHITE text; the main
+     block's `.subtabs a` mute repaints that label grey-on-grey (1.34:1)
+     and the selected sort stops reading as selected. The mid-grey pill is
+     only 3.9:1 under white, so seat it on the theme's elevated surface —
+     still the only filled chip in the strip, so the state still reads. */
+  .subtabs a.youarehere,
+  .subtabs a.youarehere .s-btn--text {
+    background-color: #3d444d !important;
+    color: #ffffff !important;
+  }
+
+  /* The stat tiles' base ink is #666 — fine on cream, 2.8:1 on the dark
+     tile. The `.hot` / `.warm` / `.cool` tiers on top of it are their own
+     colours and stay. */
+  .a51-mini-counts,
+  .a51-votes .a51-mini-counts {
+    color: #9198a1 !important;
+  }
+
+  /* Legacy pager chips: #ccc frames on the numbers, and the prev/next/…
+     chips take the cream plate colour as a border so they show as bright
+     outlines once the plate behind them is dark. */
+  .page-numbers {
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .page-numbers.next,
+  .page-numbers.prev,
+  .page-numbers.dots {
+    border-color: transparent !important;
+  }
+
+  .module.phase {
+    border-bottom-color: #2d333b !important;
+  }
+
+  /* Revision history rows: #eee / #ddd / #E0EAF1 bands with a #FFFFCC
+     comment strip. The three tones encode ordinary / vote / owner, so
+     keep three distinguishable tones. */
+  .revision td {
+    background-color: #1c2128 !important;
+  }
+
+  .vote-revision td {
+    background-color: #222831 !important;
+  }
+
+  .owner-revision td {
+    background-color: #16202c !important;
+  }
+
+  .revision-comment {
+    background-color: #221d14 !important;
+    color: #e8c98a !important;
+  }
+
+  .search-highlight {
+    background-color: #4a3a1c !important;
+    color: #f0dfae !important;
+  }
+
+  /* Footer strip: #444 links on the dark page base (1.8:1) and the
+     build-stamp line under them. */
+  #footer-menu,
+  #footer-flair {
+    color: #9198a1 !important;
+  }
+}
+
+@-moz-document domain("data.stackexchange.com") {
+/* ---- query list --------------------------------------------- */
+  /* The view-count tile beside every query is #fbfbfb with #999 ink. */
+  .querylist .views {
+    background-color: #20262d !important;
+    color: #9198a1 !important;
+  }
+
+  .querylist li {
+    border-bottom-color: #2d333b !important;
+  }
+
+  /* The featured/recent/favorite/popular/everything strip is a row of
+     WHITE tabs; the selected one is white too and is distinguished only
+     by a #ccc top/side frame, so once the main block lifts its label the
+     current tab is the one you cannot read (1.3:1). */
+  #tabs a,
+  .miniTabs a {
+    background: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #9198a1 !important;
+  }
+
+  #tabs a:hover,
+  .miniTabs a:hover {
+    background: #222831 !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+
+  #tabs a.youarehere,
+  .miniTabs a.youarehere {
+    background: #222831 !important;
+    border-color: #3d444d !important;
+    color: #e6edf3 !important;
+  }
+
+  /* ---- query editor ------------------------------------------- */
+  .CodeMirror {
+    background: #222831 !important;
+    color: #d9e0e7 !important;
+  }
+
+  .CodeMirror,
+  .CodeMirror-wrapping {
+    border-color: #2d333b !important;
+  }
+
+  .CodeMirror-gutters {
+    background-color: #1c2128 !important;
+    border-right-color: #2d333b !important;
+  }
+
+  .CodeMirror-linenumber,
+  .CodeMirror-guttermarker-subtle {
+    color: #9198a1 !important;
+  }
+
+  .CodeMirror-guttermarker {
+    color: #e6edf3 !important;
+  }
+
+  .CodeMirror-scrollbar-filler,
+  .CodeMirror-gutter-filler {
+    background-color: #1c2128 !important;
+  }
+
+  .CodeMirror div.CodeMirror-cursor {
+    border-left-color: #e6edf3 !important;
+  }
+
+  .CodeMirror-selected {
+    background: #2d333b !important;
+  }
+
+  .CodeMirror-focused .CodeMirror-selected {
+    background: #2f4a63 !important;
+  }
+
+  .CodeMirror-activeline-background {
+    background: #20262d !important;
+  }
+
+  .cm-s-default .error-line {
+    background-color: #3a1d1f !important;
+  }
+
+  /* The SQL token palette. Grouped by meaning so the editor keeps the
+     same keyword / literal / identifier distinctions it draws on white. */
+  .cm-s-default span.cm-sql-keyword,
+  .cm-s-default .cm-keyword {
+    color: #ff7b72 !important;
+  }
+
+  .cm-s-default span.cm-sql-word,
+  .cm-s-default span.cm-property,
+  .cm-s-default .cm-variable-2 {
+    color: #d9e0e7 !important;
+  }
+
+  .cm-s-default span.cm-sql-var,
+  .cm-s-default .cm-def,
+  .cm-s-default span.cm-def {
+    color: #79c0ff !important;
+  }
+
+  .cm-s-default span.cm-sql-type,
+  .cm-s-default span.cm-sql-function,
+  .cm-s-default .cm-builtin,
+  .cm-s-default .cm-variable-3,
+  .cm-s-default span.cm-variable-3 {
+    color: #d2a8ff !important;
+  }
+
+  .cm-s-default span.cm-sql-number,
+  .cm-s-default .cm-number,
+  .cm-s-default .cm-atom,
+  .cm-s-default span.cm-atom {
+    color: #79c0ff !important;
+  }
+
+  .cm-s-default span.cm-sql-literal,
+  .cm-s-default .cm-string,
+  .cm-s-default span.cm-string,
+  .cm-s-default .cm-string-2,
+  .cm-s-default span.cm-string-2 {
+    color: #a5d6ff !important;
+  }
+
+  .cm-s-default span.cm-sql-comment,
+  .cm-s-default .cm-comment {
+    color: #8b949e !important;
+  }
+
+  .cm-s-default span.cm-sql-operators,
+  .cm-s-default span.cm-sql-operator,
+  .cm-s-default .cm-meta,
+  .cm-s-default span.cm-meta,
+  .cm-s-default .cm-qualifier,
+  .cm-s-default span.cm-qualifier,
+  .cm-s-default .cm-bracket,
+  .cm-s-default span.cm-bracket {
+    color: #c4cdd6 !important;
+  }
+
+  .cm-s-default span.cm-sql-special,
+  .cm-s-default .cm-attribute,
+  .cm-s-default span.cm-attribute,
+  .cm-s-default .cm-tag,
+  .cm-s-default span.cm-tag {
+    color: #ffa657 !important;
+  }
+
+  .cm-s-default .cm-error,
+  .cm-s-default span.cm-error,
+  .cm-invalidchar {
+    color: #f85149 !important;
+  }
+
+  div.CodeMirror span.CodeMirror-matchingbracket {
+    color: #3fb950 !important;
+  }
+
+  /* Every action in this app ("Run Query", "Cancel", "Save", the site
+     picker) is a bare `button.btn-normal` the sheet never gives a fill, so
+     under the forced color-scheme:dark they fall back to the UA button —
+     a #6b6b6b pill. The disabled state is the same pill at 30% alpha, so
+     the two must stay distinguishable after the fill is replaced. */
+  button.btn-normal {
+    background-color: #2f6f9f !important;
+    border-color: #3b82b8 !important;
+    color: #ffffff !important;
+  }
+
+  button.btn-normal:hover {
+    background-color: #3b82b8 !important;
+  }
+
+  button.btn-normal[disabled],
+  button.btn-normal:disabled {
+    background-color: #262c33 !important;
+    border-color: #2d333b !important;
+    color: #6e7681 !important;
+  }
+
+  /* The per-site wordmark in the query header is the same dark-ink logo
+     raster the network sites ship for their white pages; the main block's
+     invert only names the header/`.-logo` shapes, and this one is a bare
+     `img.site`. */
+  img.site {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+
+  /* The editor's checkbox row and the "Options:" caption beside it sit
+     directly on the page base: `#query-options label` is pure #000
+     (1.18:1) and the caption var is #606060. */
+  #query-options label,
+  .dialog label {
+    color: #c4cdd6 !important;
+  }
+
+  #query-options .options {
+    color: #9198a1 !important;
+  }
+
+  /* The editor toolbar's group divider (#ccc) and the rail's collapse
+     toggle, which keeps the raw #0077cc at 3.8:1 on the page base. */
+  span.button-group {
+    border-left-color: #2d333b !important;
+  }
+
+  #schema-toggle,
+  li#schema-toggle {
+    color: #5fb0e6 !important;
+  }
+
+  /* ---- schema browser + revision history rails ----------------- */
+  /* Both rails are `#query .right-group`, painted #fdfdfd under a
+     repeating `diagonal.png` hatch that survives any bg-colour reset. */
+  #query .right-group,
+  #schema.right-group,
+  #history.right-group {
+    background-color: #1c2128 !important;
+    background-image: none !important;
+    border-color: #2d333b !important;
+  }
+
+  #schema .heading,
+  #history .heading {
+    background-color: #20262d !important;
+    border-bottom-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  #schema .schema-table,
+  #schema .table-data-panel .schema-table,
+  #schema .table-data-panel th {
+    background-color: #20262d !important;
+    border-bottom-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* The expanded table's column list: a white `dd` carrying the type in
+     #800080, which is 1.6:1 the moment the panel goes dark. */
+  #schema dl dd {
+    background-color: #1c2128 !important;
+    border-bottom-color: #262c33 !important;
+    color: #d2a8ff !important;
+  }
+
+  #schema dl dt {
+    border-right-color: #2d333b !important;
+  }
+
+  /* The column panel slides over the table list on a 95%-opaque WHITE
+     backdrop — it must stay opaque, so darken it rather than clear it. */
+  #schema .table-data-panel {
+    background-color: rgba(28, 33, 40, 0.97) !important;
+  }
+
+  #schema .table-data-panel td {
+    border-bottom-color: #262c33 !important;
+    border-left-color: #262c33 !important;
+  }
+
+  #history li {
+    background: #1c2128 !important;
+    border-bottom-color: #2d333b !important;
+  }
+
+  #history li.selected {
+    background-color: #2a2417 !important;
+  }
+
+  #history li.empty {
+    color: #9198a1 !important;
+  }
+
+  #history li a.user {
+    color: #9198a1 !important;
+  }
+
+  /* The drag handle under each rail is a light sprite tile on #eee. */
+  div.grippie {
+    background-color: #20262d !important;
+    border-color: #2d333b !important;
+  }
+
+  /* ---- results, messages, dialogs ------------------------------ */
+  #query-results .panel {
+    border-color: #2d333b !important;
+  }
+
+  #query-results .download-button:hover {
+    background-color: #222831 !important;
+  }
+
+  #messages {
+    background-color: #20262d !important;
+  }
+
+  #queryBodyText,
+  .mainbar pre {
+    background-color: #222831 !important;
+    border-color: #2d333b !important;
+  }
+
+  .error-message {
+    background-color: #2a1718 !important;
+    border-color: #5a2a2c !important;
+    color: #f0a8a8 !important;
+  }
+
+  .error-message.notice {
+    background-color: #16221a !important;
+    border-color: #25402d !important;
+    color: #8fdc9e !important;
+  }
+
+  .input-validation-error {
+    background-color: #2a1718 !important;
+    border-color: #a03a40 !important;
+  }
+
+  /* Save / login dialogs: a white panel inside a 5px grey frame. */
+  .dialog {
+    background-color: #1c2128 !important;
+    border-color: #3d444d !important;
+    color: #c4cdd6 !important;
+  }
+
+  .graph-tooltip {
+    background-color: #2a1718 !important;
+    border-color: #5a2a2c !important;
+    color: #f0a8a8 !important;
+  }
+
+  /* ---- shared chrome ------------------------------------------- */
+  blockquote,
+  #user-about-me,
+  .tabular-list dt,
+  table.example-set th {
+    background-color: #222831 !important;
+    color: #c4cdd6 !important;
+  }
+
+  table.example-set,
+  table.example-set th,
+  table.example-set td,
+  fieldset {
+    border-color: #2d333b !important;
+  }
+
+  .date_brick {
+    background-color: #20262d !important;
+    color: #9198a1 !important;
+  }
+
+  /* The per-site blurb in the right rail and the site-list counts: #666 and
+     a raw --blue-500 #0c57a0, both around 3:1 on the page base. */
+  p.tagline,
+  .site-list li .stats li .desc,
+  .site-list li .stats li.link a,
+  .site-list li .stats li.link a:visited,
+  .info-wrapper .info,
+  .no-overflow {
+    color: #9198a1 !important;
+  }
+
+  .pretty-short,
+  span.pretty-short {
+    color: #7cc0ea !important;
+  }
+
+  .user-info.owner {
+    background-color: #16202c !important;
+  }
+
+  .user-info .relativetime {
+    color: #9198a1 !important;
+  }
+
+  input,
+  select,
+  button,
+  textarea {
+    border-color: #2d333b !important;
+  }
+
+  /* The site-switcher popup in the nav and the query-name autocomplete
+     share one `.ac_results` list: #f6f6f6 panels with a #d9e6f3 hover. */
+  .ac_results,
+  nav.primary .site-selector-popup {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .ac_odd.ac_over,
+  .ac_even.ac_over,
+  nav.primary .site-selector-popup .ac_results li.ac_over {
+    background-color: #222831 !important;
+    border-color: #3d444d !important;
+  }
+
+  nav.primary .nav .site-selector-arrow .site-icon-wrapper {
+    background-color: #2d333b !important;
+  }
+
+  .page-numbers {
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .page-numbers.current,
+  span.page-numbers.current {
+    background-color: #3d444d !important;
+    border-color: #3d444d !important;
+    color: #ffffff !important;
+  }
+
+  /* User-list card metadata (#777 on the page base). */
+  .user-saved-queries,
+  .user-created {
+    color: #9198a1 !important;
+  }
+
+  .search-highlight {
+    background-color: #4a3a1c !important;
+    color: #f0dfae !important;
   }
 }

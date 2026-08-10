@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for DaFont. Browse fonts late at night without the  glare: the homepage, font categories, search, font pages and author pages all get an  easy-on-the-eyes dark look.
-@version      20260804.13.15
+@version      20260809.22.46
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -29,9 +29,12 @@
 
   /* ---- Soften all default light/black borders ---- */
   * { border-color: #2d333b !important; }
-  /* DaFont uses fat `solid #fff` borders as invisible spacers on its white page.
-     The remap above turns those into visible grey slabs — keep them invisible. */
-  div[style*="solid #fff"] { border-color: transparent !important; }
+  /* DaFont uses `solid #fff` borders as invisible spacers on its white page — and the
+     font-detail page's author-banner wrapper spells the same trick `solid white`. The
+     remap above turns both into visible grey slabs; keep them invisible. */
+  div[style*="solid #fff"], div[style*="solid white"] {
+    border-color: transparent !important;
+  }
   /* The blanket reset above also swallows every BRAND-RED rule DaFont draws
      (`#menuthemes table` 4px frame, the .titlebar/h1/.headerpage hairlines, the
      current-page pagination pill, the new-fonts date divider). Give them back the
@@ -46,9 +49,11 @@
      on .thumb_cont (#d4d4d4 none / #fc3 has replies / #3d6 answered) and repeats the
      same three hues in the .square legend swatches below the list. Flattening them
      to grey drops the state AND breaks the legend, so keep the two chromatic ones
-     verbatim; the neutral #d4d4d4 stays the softened grey from the reset above. */
-  div.thumb_cont[style*="#fc3"] { border-color: #fc3 !important; }
-  div.thumb_cont[style*="#3d6"] { border-color: #3d6 !important; }
+     verbatim; the neutral #d4d4d4 ring stays the softened grey from the reset above.
+     `forum/requests.php?f=<slug>` draws the same key on `div.thumb` instead of
+     `.thumb_cont`, so both classes must be named. */
+  div.thumb_cont[style*="#fc3"], div.thumb[style*="#fc3"] { border-color: #fc3 !important; }
+  div.thumb_cont[style*="#3d6"], div.thumb[style*="#3d6"] { border-color: #3d6 !important; }
   /* Inside a thread, a solved font request gets an "Identified font:" callout drawn
      as a bare inline-styled element with `border:2px solid #3d6` — the same success green
      as the answered-thread ring — and its amber `#fc3` twin marks "Suggested font:".
@@ -208,8 +213,15 @@
      picking any other size shipped a full-width WHITE slab per font row on every
      listing, search, new and font-detail page. The class carries no shared hook and
      the raster is a background-IMAGE, so no colour scan sees it. */
+  /* `mix-blend-mode` is what keeps the raster's own field from becoming a visible plate:
+     inverting white lands it on rgb(20,20,20), a few points off the rgb(20,24,29) base, so
+     every preview draws a dark rectangle around its glyphs. Blending in `lighten` against the
+     base resolves that field back to the base exactly while the light glyphs, being brighter
+     than it, come through untouched. Requires the raster to be dark-on-light, as DaFont's
+     generated previews and character maps all are. */
   .preview, .preview_s, .preview_xs, .preview_l {
     filter: invert(0.92) !important;
+    mix-blend-mode: lighten !important;
     border-radius: 4px !important;
   }
   /* Font-page character map is a black-on-white <img> — invert it the same way */
@@ -217,6 +229,7 @@
   img[src*="/img/preview_s/"], img[src*="/img/preview_xs/"],
   img[src*="/img/preview_l/"] {
     filter: invert(0.92) !important;
+    mix-blend-mode: lighten !important;
     border-radius: 4px !important;
   }
 
@@ -247,6 +260,16 @@
   img[src*="/img/out3_black.gif"] {
     filter: invert(1) !important;
   }
+  /* Two of the glyph rasters are MID-grey rather than black: hide.gif (the ✖ beside
+     "Reinitialize" on the listing option bar, measured mean luminance 102) and back_list.gif
+     (the "Back to Font page" chevrons on the glyph browser, 78). On the white page they read
+     5.7:1 / 8.4:1 beside their labels; left alone on dark they drop to 2.8:1 / 1.8:1, dimmer
+     than the text they belong to. Inverting restores the site's ratio. */
+  img[src*="/img/hide.gif"], img[src*="/img/back_list.gif"] { filter: invert(1) !important; }
+  /* /img/top.gif is the pure-white arrow pair in the "Back to top" bar below, drawn for the
+     #e6e6e6 strip it sits on — 1.06:1 there, a deliberately faint affordance. On the darkened
+     strip it renders at 14:1 and becomes the loudest thing in the footer. */
+  img[src*="/img/top.gif"] { opacity: 0.22 !important; }
 
   /* ---- Glyph browser (`<font>.charmap` — the "View all glyphs (N)" page) ---- */
   /* A page served by its own stylesheet (`charmap.css`) and left entirely unthemed.
@@ -463,6 +486,12 @@
   .thumb_text { background-color: #1c2128 !important; color: #c4cdd6 !important; }
   .thumb_text[style*="#fff5af"] { background-color: #3a2f0c !important; }
   .thumb_text[style*="#cfb"] { background-color: #16361f !important; }
+  /* `forum/requests.php` hangs a hover tooltip off every thumbnail: `span.label`, a solid
+     #ccffbb callout the site fills with black text. Its content is a `.dfsmall` span, so the
+     muted-text rule further down repaints it #c4cdd6 on that pale green (1.4:1). Same shape as
+     the yellow div.notif banner — keep the site's colour, darken the ink. The tooltip is
+     parked at margin-left:-9999px until hover, so no load-time scan reaches it. */
+  span.label, span.label * { color: #14181d !important; }
 
   /* ---- Inline #e9e9e9 panels (comment zebra rows + "not a font" callout) ---- */
   /* `font-comment.php` zebra-stripes its comment list with an inline
@@ -526,6 +555,15 @@
     color: #8b949e !important;
   }
   .tdh, .black, td.black { color: #c4cdd6 !important; }
+  /* The SELECTED country on `authors.php?cc=NNN` is the one entry of that 200-item list
+     rendered as `<b style="color:#CC0000">` instead of a link — the red IS the "you are
+     here" cue. The `div[style*="color:#CC0000"]` rules above never reach it: the inline
+     style is on the <b> itself, not an ancestor div. Ties `.dfsmall b` (0,1,1), so it
+     has to stay after that rule to win on source order. */
+  b[style*="color:#CC0000"], b[style*="color:#cc0000"],
+  strong[style*="color:#CC0000"], strong[style*="color:#cc0000"] {
+    color: #e86a64 !important;
+  }
 
   /* ---- Pagination ---- */
   .noindex { color: #c4cdd6 !important; }
@@ -548,6 +586,16 @@
   iframe[src*="googlesyndication"], iframe[src*="doubleclick"],
   iframe[src*="syndicatedsearch.goog"] {
     background-color: #14181d !important;
+  }
+  /* AdSense's "Discover more" related-topics unit (`.google-aiuf`) is built in the TOP
+     document, not in a cross-origin frame: a row of white pills above the header, plus a
+     150x538 white side panel on font pages. Every node inside it carries a 200-property
+     inline `!important` style reset — inline importants outrank an author sheet, so no colour
+     declaration of ours can reach the pills. The widget root is the one node Google leaves
+     alone (its inline style is layout only: no filter, opacity or blend), so the fix has to
+     act on the rendered subtree; the hue-rotate keeps Google's link blue reading blue. */
+  ins.adsbygoogle .google-aiuf {
+    filter: invert(1) hue-rotate(180deg) !important;
   }
 
   /* ---- Horizontal rules drawn as repeating raster GIFs ---- */

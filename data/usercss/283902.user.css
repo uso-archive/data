@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260804.13.15
+@version      20260809.22.47
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -335,9 +335,12 @@
   [class*="PrimaryAlbum__Container"],
   [class*="AlbumTracklist__Container"] {
     background-color: transparent !important; color: #c4cdd6 !important; }
-  [class*="CommentForm__FakeTextField"],
-  [class*="SongCommentsWithAds__CTA"] {
+  [class*="CommentForm__FakeTextField"] {
     background-color: #1c2128 !important; color: #c4cdd6 !important; border-color: #2d333b !important; }
+  /* "SongCommentsWithAds__CTA" and its "__CTASubHeading" sibling are the sign-up prompt's
+     heading and paragraph, not a card — genius leaves both bare, so a surface here draws a
+     grey slab hugging each block of copy. Colour only. */
+  [class*="SongCommentsWithAds__CTA"] { color: #c4cdd6 !important; }
   /* Vote score ("+661" between the thumbs, on comments / annotations / Q&A answers): the
      site marks every running total with its own "background.<sign>Number" token attribute
      and paints the positive one green (#24c609) — the same sentiment cue the legacy
@@ -372,10 +375,14 @@
 
   /* ---- Apple Music player strip / media ---- */
   [class*="AppleMusicPlayer"] { background-color: #1c2128 !important; }
-  /* ...but "AppleMusicPlayer-desktop__PageGrid" and "MediaPlayersContainer__Container" are
-     the full-width LAYOUT grid around the 940px player, natively transparent (the grid is
-     even pointer-events:none). Painting them draws an elevated band bleeding 170px past
-     the player on each side. Only the IframeContainer is a real surface. */
+  /* ...but "__PositioningContainer", "__PageGrid" and "MediaPlayersContainer__Container" are
+     the full-width LAYOUT wrappers around the 940px player, natively transparent (the grid is
+     even pointer-events:none). Painting them draws an elevated band pinned across the bottom
+     of the viewport, bleeding 170px past the player on each side. The PositioningContainer
+     is the one that paints: it is fixed and 80px tall against the player's 64px, so it also
+     frames the strip along the bottom edge. Only the IframeContainer is a real surface. */
+  [class*="AppleMusicPlayer-desktop__PositioningContainer"],
+  [class*="AppleMusicPlayer-mobile__PositioningContainer"],
   [class*="AppleMusicPlayer-desktop__PageGrid"],
   [class*="AppleMusicPlayer-mobile__PageGrid"],
   [class*="MediaPlayersContainer__Container"] { background-color: transparent !important; }
@@ -406,6 +413,16 @@
   /* "SongTags__TagContainer" is the transparent flex wrapper AROUND the chips, not a chip;
      the substring above swallows it and paints a grey slab behind the whole tag row. */
   [class*="SongTags__TagContainer"] { background-color: transparent !important; }
+  /* The chart selector (home / charts) carries two inline SVGs that ship no fill attribute,
+     so they default to black — drawn for the white panel, invisible on the dark one. The
+     tick is the ONLY marker of which type / genre / period is selected, so it is lifted
+     brighter than the open/close chevron beside it. */
+  [class*="SquareSelectTitle__Arrow"] svg,
+  [class*="SquareSelectTitle__Arrow"] svg path {
+    fill: #c4cdd6 !important; }
+  [class*="SquareSelectOption__Container"] svg,
+  [class*="SquareSelectOption__Container"] svg path {
+    fill: #e6edf3 !important; }
 
   /* ---- Buttons ---- */
   [class*="Button__Container"], [class*="VotingActions__Button"],
@@ -421,7 +438,12 @@
   [class*="ExpandableContent__ButtonContainer"] {
     background-color: transparent !important; }
   [class*="SquareButton"] *, [class*="Charts__LoadMore"] * { color: #e6edf3 !important; }
-  [class*="Button__Container"]:hover, [class*="VotingActions__Button"]:hover {
+  /* "SquareButton" is the outline CTA of the React shell ("Load More", "Join Our Community",
+     "Show more songs"): the site gives it no resting fill and its whole affordance is a hover
+     that inverts to a solid #000 or #fff. The resting surface below is !important, so that
+     inversion cannot land — the family must be named here or it never answers the pointer. */
+  [class*="Button__Container"]:hover, [class*="VotingActions__Button"]:hover,
+  [class*="SquareButton"]:hover {
     background-color: #2d333b !important; }
   /* dropdown pointer: an 11px square rotated 45deg, painted pure white */
   [class*="DropdownList__Caret"] {
@@ -475,7 +497,11 @@
   [class*="Latest-desktop__Placement"], [class*="Videos-desktop__Hero"],
   [class*="CommunityRanking-desktop__Row"], [class*="Community-desktop__User"] {
     background-color: transparent !important; }
-  [class*="ChartItem-desktop__Row"]:hover, [class*="EditorialPlacement__Container"]:hover {
+  /* Both row families carry the same #e9e9e9 hover fill in the site's sheet; the community
+     leaderboard has to be named beside the chart rows or only one of the two answers the
+     pointer once the transparent-neutralizer above has run. */
+  [class*="ChartItem-desktop__Row"]:hover, [class*="EditorialPlacement__Container"]:hover,
+  [class*="CommunityRanking-desktop__Row"]:hover {
     background-color: #1c2128 !important; }
   [class*="ChartSong-desktop__Title"], [class*="EditorialPlacement__Title"] { color: #e6edf3 !important; }
   /* Homepage news cards repeat the article-link underline-skip trick on hover: a black
@@ -545,13 +571,24 @@
      elevated panels instead of the flat list the site draws. ".user_badge" is NOT a card
      — in genius's sheet it is a bare flex row with no background at all; filling it drew
      a lighter chip hugging the avatar+name of every leaderboard entry and stopping dead
-     mid-row. */
+     mid-row. ".leaderboard" is likewise bare (position/z-index/font only): it is the
+     contributor leaderboard, NOT an ad slot, and it always sits inside a ".white_container",
+     so any fill of its own cuts a differently-toned rectangle out of that card. */
   .white_container, .mini_card:not(.mini_card--transparent), .mini_article_card, .thumbnail_grid,
-  .standalone_annotation, .song_card, .vertical_album_card, .full_width_container--white,
-  .horizontal_album_card, .leaderboard, .feed_item, .annotation_sidebar_unit,
+  .standalone_annotation, .song_card, .full_width_container--white,
+  .horizontal_album_card, .feed_item, .annotation_sidebar_unit,
   .article_card, .text_card, .cosign_unit,
   .profile_contribution, .full_width_link, .full_width_card, .grid_video {
     background-color: #1c2128 !important; color: #c4cdd6 !important; border-color: #2d333b !important; }
+  /* ".vertical_album_card" is not a card either: bagon gives it colour and padding only and
+     puts its whole state vocabulary in a fill — #e9e9e9 while hovered, the same tone plus a
+     .5rem ring for the "--active" album. A resting surface here outranks both, so the album
+     grid stops answering the pointer and the current album goes unmarked. Keep the tile bare
+     and restate each state on the dark scale. */
+  .vertical_album_card { background-color: transparent !important; color: #c4cdd6 !important; }
+  .vertical_album_card:hover { background-color: #21262d !important; }
+  .vertical_album_card--active {
+    background-color: #21262d !important; box-shadow: 0 0 0 0.5rem #21262d !important; }
   .full_width_link, .full_width_link * { color: #c4cdd6 !important; }
   /* legacy "gray_container" (album/article comment boxes, the ellipsis menu, the
      bottom strip) paints rgba(204,204,204,.2) — a translucent light wash that turns
@@ -723,6 +760,23 @@
   .square_button.square_button--email { background-color: #9a9a9a !important; border-color: #9a9a9a !important; }
   .square_button.square_button--instagram,
   .square_button.square_button--apple { background-color: #000000 !important; border-color: #2d333b !important; }
+  /* Each brand fill above sits at the same specificity as (and after) the neutral
+     ".square_button:hover", so that hover cannot reach these buttons and each variant needs
+     its own. Genius lightens the fill by 20% on hover; carry that through. */
+  .square_button.square_button--facebook:hover { background-color: #4c70ba !important; border-color: #4c70ba !important; }
+  .square_button.square_button--twitter:hover { background-color: #83c3f3 !important; border-color: #83c3f3 !important; }
+  .square_button.square_button--google:hover { background-color: #e47265 !important; border-color: #e47265 !important; }
+  .square_button.square_button--instagram:hover { background-color: #4d4d4d !important; }
+  .square_button.square_button--apple:hover { background-color: #1a1a1a !important; }
+  .square_button.square_button--email:hover { background-color: #b4b4b4 !important; border-color: #b4b4b4 !important; }
+  /* "--transparent" is genius's opt-out of the family's chrome ("background:0 0;
+     border-color:transparent") and it is what the vote thumbs, their running total and the
+     comment/share actions all carry. The neutral surface is one class less specific but both
+     its fill and its edge still land, so the opt-out has to be restated here — otherwise every
+     bare glyph renders as a boxed cell and the row reads as a segmented control. */
+  .square_button.square_button--transparent {
+    background-color: transparent !important; border-color: transparent !important; }
+  .square_button.square_button--transparent:hover { background-color: #2d333b !important; }
   .square_button--facebook, .square_button--twitter, .square_button--google,
   .square_button--instagram, .square_button--spotify, .square_button--apple, .square_button--email {
     color: #ffffff !important; }
@@ -915,11 +969,31 @@
      the icon. Keep the field bare (its own 2px underline is the affordance) and lift
      the glyph, or the header shows an empty box with no search cue at all. */
   .search_form-text_input { background-color: transparent !important; }
+  /* Typing/focus MUST re-fill the field opaquely: genius flips it to #ffff64 there, and
+     that fill is what hides the magnifier sitting behind the input — left transparent,
+     the query text renders straight over the glyph. Restate it as an elevated surface
+     with the accent underline so the state still reads on the dark bar. */
+  .search_form-text_input:focus, .search_form-text_input:valid {
+    background-color: #21262d !important; border-bottom-color: #ed4337 !important; }
   .search_form-icon, .search_form-icon path {
     fill: #c4cdd6 !important; color: #c4cdd6 !important; }
   /* AMP accordion band ("TRANSLATIONS" on album pages) is a full-width white header
      between two dark sections. */
   .footer_accordion-header_with_arrow { background-color: #14181d !important; }
+  /* Album description teaser: genius wraps the WHOLE preview paragraph in a bare <a> (no
+     href, an AMP tap action) and carries the affordance only on the "-read_more" span, which
+     it alone paints periwinkle over #222 body copy. The shared link rule reaches the whole
+     paragraph, so the body has to be returned to the reading tone here or the description
+     reads as one long link and the "read more »" cue dissolves into it. */
+  .album_description_preview a { color: #c4cdd6 !important; }
+  .album_description_preview-read_more { color: #9aa7f0 !important; }
+  /* AMP tracklist "verified lyrics" badge. genius ships ONE ".checky path" black-fill rule
+     for both bundles: on desktop that path is the tick sitting on a yellow <circle>, but the
+     AMP variant draws the badge as two paths — a green square plus a white tick — so both go
+     black and the badge reads as a hole punched in the dark row. Restore each from its own
+     fill attribute; the desktop tick keys on "#000" and is left alone. */
+  .checky path[fill="#27F145"] { fill: #27f145 !important; }
+  .checky path[fill="#FFF"] { fill: #ffffff !important; }
   /* AMP sticky-ad chrome: the framework's own wrapper is white, so a 320px creative in
      a 390px viewport leaves white bands down both sides plus a white 4px rule above it.
      The close button is a white disc with a grey glyph baked into a data-URI SVG we
@@ -963,7 +1037,7 @@
   /* ---- Ad surrounds: dark frame + dark loading slot, don't theme iframe content ---- */
   [class*="SectionLeaderboard__Container"], [class*="ChartHeader-desktop__AdContainer"],
   [class*="LyricsSidebarAd__"], [class*="SongCommentsWithAds__Footer"],
-  .leaderboard, [id*="ad_"], [class*="dfp"], [class*="Leaderboard"] {
+  [id*="ad_"], [class*="dfp"], [class*="Leaderboard"] {
     background-color: #14181d !important; }
   /* Google DFP ad slots have stable ids — darken the empty/loading slot background */
   [id^="div-gpt-ad-"], [id*="google_ads_iframe"], [id$="__container__"], ins.adsbygoogle {
@@ -1034,4 +1108,20 @@
   [style*="background-color: rgb(255, 255, 255)"],
   [style*="background:#fff"], [style*="background: #fff"],
   [style*="background-color:#fff"] { background-color: #1c2128 !important; }
+}
+
+@-moz-document url-prefix("https://genius.com/amp_iframe_html/") {
+/* ============================================================
+     AMP header widgets embedded as same-origin <amp-iframe> documents
+     (currently only search.html, the header search field).
+     These are chrome fragments, not pages: they render INSIDE
+     ".page_header-header" and are natively fully transparent, so the
+     header colour is what shows through them. domain("genius.com")
+     matches inside the frame, so the base rule above paints their
+     document the page base (#14181d) and each widget cuts a lighter
+     rectangle into the darkened header bar. Restore transparency —
+     tracking the header hex here instead would desync the moment the
+     header rule changes.
+     ============================================================ */
+  html, body { background-color: transparent !important; }
 }

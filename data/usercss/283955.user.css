@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for ImgBB. Comfortable dark backgrounds across the upload page, image viewer, embed-code panel and albums, with brand blue kept readable.
-@version      20260804.13.16
+@version      20260809.22.48
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -155,6 +155,16 @@
     color: #8b949e !important;
   }
 
+  /* The caption under a form field (the API parameter descriptions, the plugin
+     builder's option hints, the GIF-resize note on the upload box) is the one
+     muted-text class ImgBB actually ships: #777, which the site pairs with a
+     white page for 4.5:1. On the dark base that same value drops to 4.0:1 —
+     a WCAG fail, and one the block above never reached because none of those
+     class names exist on this site. */
+  .input-below {
+    color: #8b949e !important;
+  }
+
   /* Every form validation message on the sign-in, create-account and contact
      pages is a <span class="input-warning red-warning"> the site paints #d74634 —
      the ONLY thing marking it as an error. The generic span colour above reaches
@@ -201,6 +211,17 @@
   .top-bar .pop-btn:hover .arrow-down,
   .top-bar .opened .arrow-down {
     border-top-color: #9bd4ff !important;
+  }
+
+  /* The leading glyph of every top-bar item is a bare <span class="icon"> the site
+     never colours — it inherits the item, so it tracks rest, hover, open and the
+     white-on-blue "Create account" chip. The generic span colour is a DIRECT
+     declaration and beats that inheritance, so the glyph froze grey while its own
+     label and caret moved. Keep this scoped to .top-btn-text: elsewhere (the
+     filmstrip's a.left-0 scroll arrow) the site's glyph is page ink, not the
+     link colour its anchor carries, and inheriting there would tint it blue. */
+  .top-btn-text .icon {
+    color: inherit !important;
   }
 
   /* ---------- Top bar / header ---------- */
@@ -590,15 +611,20 @@
     border-bottom-color: transparent !important;
   }
 
-  /* Guest / default user avatar is a flat #cccccc square (with a face-meh
-     glyph) that glares as a bright box beside every uploader name on image
-     and album pages. Give it an elevated dark surface; the icon stays a
-     muted light so it still reads as an avatar placeholder. Real users' photo
-     avatars paint via background-image and are unaffected. */
+  /* Guest / default user avatar is a flat #cccccc square whose whole face is one
+     solid glyph, painted #fff — barely a shade off its own tile, which is what
+     makes it read as a placeholder rather than content. Keep the glyph near the
+     3:1 floor for a non-text element: the generic span colour lands on it
+     directly and pushed it to 8:1, a bright blob beside every uploader name.
+     Real users' photo avatars paint via background-image and are unaffected. */
   .user-image.default-user-image,
   .default-user-image {
     background-color: #2d333b !important;
-    color: #8b949e !important;
+    color: #767f8b !important;
+  }
+
+  .default-user-image .icon {
+    color: inherit !important;
   }
 
   /* ---------- Image listing / thumbnail grid (albums, related) ---------- */
@@ -644,6 +670,22 @@
      .list-item group — the two selectors tie on specificity. */
   .viewer {
     background-color: #0d1117 !important;
+  }
+
+  /* An empty listing swaps in a JS template whose 90px inbox glyph is a #e5e5e5
+     ghost on the site's white page — a hint of a shape, not an object. The
+     generic span colour is a direct declaration and hands it full body ink, so
+     the placeholder becomes the loudest thing on the page while the heading
+     beside it says there is nothing here. The wrapper's own #444 is dark-on-dark
+     for the message line under that heading. The node only exists once a listing
+     comes back with zero items, so no load-time scan reaches it. */
+  .content-empty,
+  .content-empty .message {
+    color: #8b949e !important;
+  }
+
+  .content-empty .icon {
+    color: #262c33 !important;
   }
 
   /* Pagination only renders once a listing has a second page, so a short album
@@ -778,8 +820,14 @@
   }
 
   /* ---------- Buttons ---------- */
+  /* .imgbb-button is the /plugin page's LIVE PREVIEW of the button the visitor is
+     about to paste into their own site, and the whole page exists to pick its
+     colour: a page <style> gives each of the twelve palettes its own fill. It is
+     a real <button>, so a flat surface here renders all twelve identically and
+     the palette picker changes nothing on screen. Excluded so the page's own
+     palette rules paint it. */
   .btn,
-  button,
+  button:not(.imgbb-button),
   input[type="button"],
   input[type="submit"] {
     background-color: #21262d !important;
@@ -788,9 +836,24 @@
   }
 
   .btn:hover,
-  button:hover {
+  button:not(.imgbb-button):hover {
     background-color: #2d333b !important;
     color: #ffffff !important;
+  }
+
+  /* Its 1px rgba(0,0,0,.05) edge is meant to read as a hairline bevel on the
+     palette fill; the blanket border reset at the top turns it into an opaque
+     dark box around the swatch. */
+  .imgbb-button {
+    border-color: rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* Its label and glyph are bare spans the palette rules never name — they take
+     the button's colour, which flips to #000 on the two light-grey palettes.
+     The generic span colour is a direct declaration and beats that inheritance,
+     so those two swatches read light-on-light. */
+  .imgbb-button span {
+    color: inherit !important;
   }
 
   /* ImgBB marks its calls to action with semantic colour classes (.blue =

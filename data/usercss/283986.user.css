@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for OLX Brasil.
-@version      20260804.13.18
+@version      20260809.22.51
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -37,6 +37,66 @@
   /* ---- Soften every default light border into a dark hairline ---- */
   * { border-color: #2d333b !important; }
 
+  /* olx-ui draws the keyboard focus ring as `outline: 2px solid` off the palette's
+     near-black — fine on the white page it was designed for, invisible on every
+     surface here, so tabbing through the filter rail's checkboxes and radios showed
+     no ring at all. Only the COLOUR is remapped: controls the site leaves without an
+     outline stay without one, and the ones that already ring in a light tone or in
+     the browser's own `outline-style: auto` are unaffected. */
+  :focus { outline-color: #c4cdd6 !important; }
+
+  /* `domain("olx.com.br")` also matches OLX's marketing satellites, which are not
+     the marketplace app: the Unbounce landing pages (vender / garantia / lp, all
+     rooted at `body.lp-pom-body`) and the WordPress "Dicas" blog (`wp-theme-*` on
+     the body, also served as seguranca.olx.com.br). Neither loads a single olx-ui
+     component, so the only rules that reach them are the base paint, the heading
+     ink and the footer block — enough to darken the page while their own white
+     panels and near-black copy stay put, which is how the Unbounce FAQ questions
+     and the blog's section titles ended up near-white on white. Hand both shells
+     back to their native light rendering instead of half-theming them. */
+  body.lp-pom-body,
+  body[class*="wp-theme-"] {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+  }
+  body.lp-pom-body h1, body.lp-pom-body h2, body.lp-pom-body h3,
+  body[class*="wp-theme-"] h1, body[class*="wp-theme-"] h2, body[class*="wp-theme-"] h3,
+  body.lp-pom-body a:hover,
+  body[class*="wp-theme-"] a:hover { color: inherit !important; }
+  /* Unbounce only, classless anchors only, and not `!important`. Those pages hand
+     their inline "Aqui" / "clique aqui" links no colour at all, so the unqualified
+     `a` rule further down paints them the marketplace's near-white on white; every
+     other link there is a CTA whose own class rule has to keep winning. The blog
+     colours all of its links itself, including classless ones through context
+     rules, so the same override would flatten them. */
+  body.lp-pom-body a:not([class]) { color: inherit; }
+  /* Their forms — the blog's newsletter sign-up and its header search — are the
+     other place the marketplace paint lands: dark fields on a white page with the
+     field labels lifted to near-white. Submit inputs keep their own brand fill. */
+  body.lp-pom-body input:not([type="submit"]):not([type="button"]),
+  body.lp-pom-body textarea,
+  body.lp-pom-body select,
+  body[class*="wp-theme-"] input:not([type="submit"]):not([type="button"]),
+  body[class*="wp-theme-"] textarea,
+  body[class*="wp-theme-"] select {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+  }
+  body.lp-pom-body label, body.lp-pom-body legend,
+  body[class*="wp-theme-"] label, body[class*="wp-theme-"] legend {
+    color: inherit !important;
+  }
+  body.lp-pom-body footer,
+  body.lp-pom-body [class*="footer"],
+  body.lp-pom-body footer a,
+  body[class*="wp-theme-"] footer,
+  body[class*="wp-theme-"] [class*="footer"],
+  body[class*="wp-theme-"] footer a {
+    background-color: transparent !important;
+    color: inherit !important;
+    border-top-width: 0 !important;
+  }
+
   /* ============================================================
      Header / global nav (white bar -> deep neutral dark)
      ============================================================ */
@@ -65,6 +125,13 @@
   #header form > button * { color: #e6edf3 !important; }
   #header form > button:hover { background-color: #2d333b !important; }
   #header form > button::before { background-color: #2d333b !important; }
+  /* The three skip links are off-screen until tabbed to, then reveal themselves on
+     `--color-neutral-70` (#FFF) — a white slab in the header corner carrying the
+     lifted brand purple at ~2.2:1, and the first thing a keyboard user lands on. */
+  .olx-header__skip-links:focus {
+    background-color: #21262d !important;
+    color: #e6edf3 !important;
+  }
   /* The narrow-viewport shell opens with a smart-app banner ("Só no app da OLX")
      ABOVE the nav — `div.olx-header__app-banner`, a full-width literal #EFF1F5 strip
      that only exists at mobile widths, so no desktop pass ever saw it and no rule here
@@ -197,18 +264,14 @@
   /* The login flow's "Como podemos ajudar?" bottom sheet (Quero reativar minha conta /
      Esqueci a minha senha / Entrar sem senha / Preciso de mais ajuda) is a literal-white
      styled-components panel behind a dark scrim, so our lifted near-white heading ghosts
-     straight into it. It is pre-rendered hidden, which is why no load-time scan of
-     /acesso ever reported it. Every class on it is a churning `sc-*` hash, so anchor on
-     its position instead: it is the auth shell's only element at this depth that is an
-     only child, and on /cadastro the path matches nothing at all.
-     The auth app then DROPPED a nesting level — the panel is now the only child of a
-     fixed z-9999 scrim that is itself a direct child of `#__next`, i.e. one `> div`
-     shallower — so the three-deep path matched only two 0x0 wrappers and the sheet went
-     literal white again, with our lifted near-white heading ghosting into it. Cover both
-     depths: the two-deep form matches exactly this panel on /acesso and, like the
-     three-deep one, nothing at all on /cadastro (re-verify both whenever this moves). */
-  #__next > div > div[class*="sc-"]:only-child,
-  #__next > div > div > div[class*="sc-"]:only-child {
+     straight into it. It is pre-rendered hidden at 0x0, which is why no load-time scan of
+     /acesso reports it. Every class on it is a churning `sc-*` hash and its nesting depth
+     moves between builds; the only stable hook is the `open` attribute the scrim carries
+     while — and only while — the sheet is up, which is also the only moment the panel has
+     a size. Anchor there, never on depth alone: a `#__next > div > div:only-child` shape
+     also names transparent full-bleed layout containers stacked on the brand purple
+     (/tabela-fipe's hero and FAQ bands, ajuda's decorative squares). */
+  #__next div[open] > div[class*="sc-"] {
     background-color: #1c2128 !important;
   }
   /* Its close X — the sheet's only exit — is a `path fill="#4A4A4A"` literal in the
@@ -396,6 +459,14 @@
     background-color: #21262d !important;
     box-shadow: inset 0 0 0 1px #21262d !important;
   }
+  /* The chosen option is marked by a tick drawn from the raw brand purple (#6E0AD6),
+     ~1.9:1 on the elevated row. The row fill alone cannot carry the state: hover paints
+     the same tone, so without a legible tick the open menu shows no current selection.
+     The glyph is `fill="currentColor"`, so the colour on the SVG is enough. */
+  .olx-core-singleselect__option-check {
+    color: #b794f6 !important;
+    fill: #b794f6 !important;
+  }
 
   /* ============================================================
      OLX accent (raw #F28000 orange) refined for dark
@@ -411,6 +482,12 @@
      the OLX orange to the brand PURPLE — so every orange CTA shipped wearing a hard
      #6E0AD6 outline. Natively the ring always equals the fill and is invisible;
      repaint it to match ours, the way the secondary and tertiary variants already do. */
+  /* Icons inside a button arrive by two paint routes: most are `fill="currentColor"`
+     and follow the `color` below, but olx-ui writes the white token straight into the
+     SVG markup (`<svg color="var(--color-neutral-70)">` + `path fill=` the same token)
+     for some of them — the filter rail's magnifier stayed white at ~2:1 on the orange.
+     The token is remapped per fill, so every later rule that re-tunes this variant's
+     background restates it too. */
   .olx-core-button--primary,
   button.olx-core-button--primary,
   a.olx-core-button--primary {
@@ -418,10 +495,15 @@
     color: #1a1206 !important;
     border-color: #f2901f !important;
     box-shadow: inset 0 0 0 1px #f2901f !important;
+    --color-neutral-70: #1a1206;
   }
+  /* The ink is restated here because the generic `a:hover { color: #ffffff }` further
+     down ties `a.olx-core-button--primary` at 0-1-1 and wins on source order, so the
+     ANCHOR form of every orange CTA turned white-on-orange under the pointer. */
   .olx-core-button--primary:hover,
   a.olx-core-button--primary:hover {
     background-color: #ffa436 !important;
+    color: #1a1206 !important;
     box-shadow: inset 0 0 0 1px #ffa436 !important;
   }
 
@@ -505,6 +587,9 @@
     background-color: transparent !important;
     color: #f6b35e !important;
     border-color: transparent !important;
+    /* Its hover ring is `--button-border-color-hover` (#F0E6FF) drawn as an inset
+       box-shadow — invisible on the native white page, a lavender outline here. */
+    box-shadow: none !important;
   }
   .olx-core-button--link:hover { color: #ffc98a !important; }
 
@@ -518,6 +603,7 @@
     background-color: #21262d !important;
     color: #e6edf3 !important;
     box-shadow: inset 0 0 0 1px #2d333b !important;
+    --color-neutral-70: #e6edf3;
   }
   /* Facebook keeps its brand blue (#0866FF) with white copy. */
   .olx-core-button.olx-core-button-social--facebook {
@@ -537,6 +623,7 @@
     background-color: #21262d !important;
     color: #8b949e !important;
     box-shadow: inset 0 0 0 2px #21262d !important;
+    --color-neutral-70: #8b949e;
   }
   /* Search-results list/grid switcher: BOTH buttons ship `--primary`, and the
      CURRENT view is marked with `--disabled`. Natively the active one is the
@@ -548,12 +635,14 @@
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
     box-shadow: none !important;
+    --color-neutral-70: #c4cdd6;
   }
   [class*="ToggleLayoutButton"] .olx-core-button.olx-core-button--disabled {
     background-color: #2a2440 !important;
     color: #c9b6f5 !important;
     border-color: #3a3358 !important;
     box-shadow: none !important;
+    --color-neutral-70: #c9b6f5;
   }
 
   /* `.olx-button` is a SECOND button component (the Garantia OLX flow behind the
@@ -573,6 +662,7 @@
   }
   .olx-button--primary:hover {
     background-color: #ffa436 !important;
+    color: #1a1206 !important;
     border-color: #ffa436 !important;
   }
   .olx-button--secondary {
@@ -874,6 +964,19 @@
     background-color: #f2901f !important;
     color: #1a1206 !important;
     border-color: #f2901f !important;
+  }
+  /* The promotion badge "Destaque" is the same `--info` component overridden by a
+     `bg-secondary-100` utility that paints it SOLID brand purple with white copy — a
+     loud flag over the card photo — while the transactional badges beside it
+     ("Entrega Fácil", "Parcele sem juros") are the SUBTLE lavender-tint chip with
+     purple copy. Both tiers resolved to the one violet chip above, so a promoted
+     listing looked exactly like an ordinary one. Restore the solid tier on the same
+     lifted violet the coupon action uses; the subtle tier keeps the chip. */
+  .olx-core-badge--info.bg-secondary-100,
+  .olx-adcard__primary-badge.bg-secondary-100 {
+    background-color: #7c3aed !important;
+    color: #ffffff !important;
+    border-color: #7c3aed !important;
   }
   /* The autos "Histórico Veicular" trust badge (aria-label "Anúncio com histórico
      veicular") is an `--secondary` badge the site paints GREEN via an inline
@@ -1232,13 +1335,58 @@
     border-color: #2d333b !important;
     color: #e6edf3 !important;
   }
+  /* The `gallery` substring is scoped to the ad view on purpose: the home page names
+     its sponsored-ads strip `home-premium-gallery`, and an unscoped match painted that
+     whole section a tone DARKER than the page base, banding a surface the site leaves
+     bare. */
   #item-gallery-image,
   button#item-gallery-image,
-  [class*="gallery"] {
+  #adview [class*="gallery"] {
     background-color: #0d1117 !important;
   }
   /* Title + price */
   h1, h2, h3 { color: #e6edf3 !important; }
+  /* `/mapa-do-site` and its per-category sub-routes open on a Banner section the
+     site tints `--color-neutral-80`, with the palette's near-black for both the
+     page title and the strapline. `main, section, .olx-container` clears the tint
+     and nothing lifts that copy, so a 48px page title sat at 1.06:1. `Banner_` is
+     this route family's own component — no other page type carries the prefix. */
+  [class*="Banner_container"] { background-color: #1c2128 !important; }
+  [class*="Banner_title"] { color: #e6edf3 !important; }
+  [class*="Banner_subtitle"] { color: #9aa6b0 !important; }
+  /* `/tabela-fipe` is a separate `#__next` route whose section headings and
+     feature copy come off `--color-neutral-120` (#3C4453) — an ink meant for the
+     white page it was drawn on, ~1.7:1 here. styled-components keeps the component
+     name in the class and churns only the trailing hash, so match the prefix. */
+  #__next [class*="styles__TitleMedium"],
+  #__next [class*="styles__Title-"] { color: #e6edf3 !important; }
+  #__next [class*="styles__DiscoverItemText"] { color: #9aa6b0 !important; }
+  /* The glyph beside each of those lines is a monochrome path with no fill
+     attribute, so it renders UA black rather than following the host colour. */
+  #__next [class*="styles__DiscoverIcon"] path { fill: #8b949e !important; }
+  /* The two surfaces the route paints for itself, both drawn for a white page: the
+     vehicle-picker card is literal white, and the AI-search callout above the results
+     is the lavender brand tint (#F0E6FF) carrying the same #3C4453 copy. Everything
+     else here is a transparent layout container over the brand-purple hero and FAQ
+     bands, so these have to be named one by one rather than swept by depth. */
+  #__next [class*="DislocatedContainer"] { background-color: #1c2128 !important; }
+  #__next [class*="AiCtaBody"] { background-color: #2a2440 !important; }
+  #__next [class*="AiCtaText"] { color: #c4cdd6 !important; }
+  /* Its per-vehicle sub-routes (/tabela-fipe/carros, /motos, /caminhoes) add three more
+     surfaces of their own. The breadcrumb strip is an olx-ui `nav` tinted
+     `--color-neutral-90`; only this route hangs one straight off `#__next`, everywhere
+     else the component sits deeper and is transparent, so keep the child combinator. */
+  #__next > nav.olx-breadcrumb { background-color: transparent !important; }
+  /* The "Modelos mais buscados" tiles are literal-white cards holding a cut-out PNG of
+     the car, with the model name in the same #3C4453 page ink. */
+  #__next [class*="styles__Card-"] { background-color: #1c2128 !important; }
+  #__next [class*="styles__ModelTitle"] { color: #e6edf3 !important; }
+  #__next [class*="styles__BrandTitle"] { color: #9aa6b0 !important; }
+  /* Section headings and the brand-tile captions are the route's remaining
+     white-page inks (#3C4453 and the near-black #1A1D23). */
+  #__next [class*="styles__SectionTitle"],
+  #__next [class*="BrandsListTitle"] { color: #e6edf3 !important; }
+  #__next [class*="BrandName"] { color: #c4cdd6 !important; }
   [class*="price"] strong,
   [class*="price-box"] h2 { color: #ffffff !important; }
 
@@ -1881,14 +2029,24 @@
      control all but disappears. Distinct from `.olx-modal-close` (the newer
      single-dash side-sheet close, handled below). */
   .olx-modal__close-button { color: #e6edf3 !important; }
-  .olx-modal__close-button:hover { color: #ffffff !important; }
+  /* Both close controls fill their disc on hover from a light token
+     (`--modal-button-background-color-hover` / `--modal-close-button-hover-background-color`,
+     both #CFD4DD), which the ink-only rules cannot reach: the disc went bright and
+     swallowed the white X. Match `.olx-modal-close:hover` below. */
+  .olx-modal__close-button:hover {
+    background-color: #2d333b !important;
+    color: #ffffff !important;
+  }
   /* A THIRD close-control name — `olx-modal-close-button`, single-dash but with the
      `-button` suffix, so neither `.olx-modal__close-button` nor `.olx-modal-close`
      matches it (class selectors match whole tokens). It is the only way out of the
      /cupons "Categorias" filter dialog, and its `fill="currentColor"` X inherits the
      component's #3C4453 — 1.7:1 on the dark panel, effectively invisible. */
   .olx-modal-close-button { color: #e6edf3 !important; }
-  .olx-modal-close-button:hover { color: #ffffff !important; }
+  .olx-modal-close-button:hover {
+    background-color: #2d333b !important;
+    color: #ffffff !important;
+  }
 
   /* The header "Categorias" side-sheet uses the newer single-dash component
      names (olx-modal-content / -header / -body), which the BEM rules above
@@ -1988,8 +2146,19 @@
      ribbon. The REACHED state fills that path with a brand colour instead,
      so keying on the literal white leaves it untouched.
      ============================================================ */
-  #reputation-bar svg path[style*="fill: rgb(255, 255, 255)"] {
+  /* The two apps write that white two different ways — the ad view as an inline
+     `style`, the /perfil/ app as a `fill` markup attribute — so both forms are needed
+     or the profile keeps a solid white disc. */
+  #reputation-bar svg path[style*="fill: rgb(255, 255, 255)"],
+  #reputation-bar svg path[fill="#FFFFFF"] {
     fill: none !important;
+  }
+  /* Dropping the body leaves the OUTLINE path as the whole medal, and that path is
+     `fill="#CFD4DD"` — the same literal the empty-star rule darkens to the unfilled
+     tone, which erases the ribbon entirely. It is a shape, not a rating star: restate a
+     legible grey here (id + attribute + type out-ranks the shell-scoped star rule). */
+  #reputation-bar svg path[fill="#CFD4DD"] {
+    fill: #8b949e !important;
   }
 
   /* ============================================================
@@ -2078,4 +2247,115 @@
   ::-webkit-scrollbar-track { background: #0d1117 !important; }
   ::-webkit-scrollbar-thumb { background: #484f58 !important; border-radius: 6px; }
   ::-webkit-scrollbar-thumb:hover { background: #6b7681 !important; }
+}
+
+@-moz-document domain("ajuda.olx.com.br") {
+[class*="layout__Wrapper"] div,
+  [class*="layout__Wrapper"] p,
+  [class*="layout__Wrapper"] span,
+  [class*="layout__Wrapper"] li,
+  [class*="layout__Wrapper"] td,
+  [class*="layout__Wrapper"] th,
+  [class*="layout__Wrapper"] address,
+  [class*="layout__Wrapper"] strong { color: #c4cdd6 !important; }
+  [class*="layout__Wrapper"] h1,
+  [class*="layout__Wrapper"] h2,
+  [class*="layout__Wrapper"] h3,
+  [class*="layout__Wrapper"] h4,
+  [class*="layout__Wrapper"] [class*="Title"] { color: #e6edf3 !important; }
+  /* Article links, breadcrumb crumbs and the FAQ shortcut list are the page's
+     only chromatic ink; the marketplace lifts the same brand purple to #b794f6. */
+  [class*="layout__Wrapper"] a,
+  [class*="layout__Wrapper"] a [class*="Title"] { color: #b794f6 !important; }
+  /* The header's slide-in menu is a literal-white 300px panel behind a dark scrim.
+     It is in the DOM at every width, parked off-canvas, so it never shows up in a
+     desktop screenshot. */
+  [class*="SubHeaderWrap"] { background-color: #1c2128 !important; }
+  /* The article's "Esse artigo foi útil? Sim / Não" pair is outlined-only — its
+     orange border IS the button, and the blanket hairline reset erases it. */
+  [class*="iconButton__ButtonStyled"] {
+    border-color: #f2901f !important;
+    color: #f2901f !important;
+  }
+  /* The help search field carries no `type` attribute, so the marketplace block's
+     `input[type="text"]` rule — an ATTRIBUTE match — never reaches it: the field fell
+     through to the UA's own dark form control (#3B3B3B, from `color-scheme: dark`)
+     while the app's literal #4A4A4A ink stayed put, at 1.26:1 for anything typed. */
+  [class*="search-bar__InputSearch"] {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
+  /* The suggestion panel only mounts once a query is typed, so it never appears in a
+     load-time scan; it is a literal-white sheet under the lifted purple article links. */
+  [class*="WrapperAutoComplete"] {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    /* Its frame is the same #F7F1FD 4px shadow the search box wears, and a literal
+       white `::before` bridges the seam between the two. */
+    box-shadow: 0 4px 0 4px #b794f6 !important;
+  }
+  [class*="WrapperAutoComplete"]::before { background-color: #1c2128 !important; }
+  [class*="ItemLink"]:hover { background-color: #21262d !important; }
+  /* Both the search box and the category cards signal hover / focus with a 4px
+     `box-shadow` in the brand's palest lavender (#F7F1FD) — a soft wash on the white
+     page, a hard white ring here. The marketplace lifts the same brand purple to
+     #b794f6; carry the ring at the same weight. */
+  [class*="search-bar__Wrapper-sc"]:focus-within,
+  [class*="category-container__Container"]:hover {
+    box-shadow: 0 0 0 4px #b794f6 !important;
+  }
+  /* "Não encontrou o que procurava? Fale com a gente" is the app's own CTA, outside
+     the olx-ui button classes the marketplace block re-inks, so it kept white copy on
+     the raw #F28000 (2.7:1). Match the orange CTAs everywhere else. */
+  [class*="contact-us__Button"] {
+    background-color: #f2901f !important;
+    color: #1a1206 !important;
+  }
+  /* The narrow-width FAQ carousel hides its horizontal scrollbar behind a full-width
+     8px `::after` in literal white — invisible on the native page, a bright rule across
+     the column here. It only exists below the mobile breakpoint. */
+  [class*="faq-slider__HideScroll"]::after { background-color: #14181d !important; }
+}
+
+@-moz-document domain("planos.olx.com.br") {
+[data-testid="container"] { --color-neutral-80: #1c2128 !important; }
+  /* Only the RESTING fill comes from that token; the tile's hover state is a
+     literal pair — the brand lavender #F0E6FF fill plus a #6E0AD6 ring — that no
+     token remap reaches, and the blanket `* { border-color }` reset erases the
+     ring, so the whole hover cue was a white slab under near-white labels. The
+     tile carries only per-build styled-components hashes, so hook it by position
+     in the grid. Violet chip + lifted ring, matching the selected states in the
+     marketplace block. */
+  [data-testid="container"] > div:hover {
+    background-color: #2a2440 !important;
+    border-color: #b794f6 !important;
+  }
+}
+
+@-moz-document domain("financiamentos.olx.com.br"), domain("feiraoautos.olx.com.br") {
+[class^="sc-"],
+  [class*=" sc-"] { background-color: transparent !important; }
+  /* Each result card is a focusable span wrapping the photo and the price block. */
+  span[tabindex="0"] { background-color: #1c2128 !important; }
+  /* The hero band is the page's brand surface and carries the white headline; at
+     narrow widths its fill is the <header> itself, so the clear-out above drops it
+     and the copy lands on the page base. `DEFAULT_THEME` is the app's styled-
+     components theme marker and separates it from the filter rail's own headers. */
+  header.DEFAULT_THEME { background-color: #6e0ad6 !important; }
+  #filter-modal-container { background-color: #1c2128 !important; }
+  /* The rail's price and year ranges are `rc-slider`s whose UNFILLED track keeps the
+     library's #CFD4DD — a bright 168x5 bar under the audit's size floor. The filled
+     portion and the handles paint from the brand orange and stay. */
+  .rc-slider-rail { background-color: #3a424c !important; }
+  /* "Selecione a marca" opens the brand picker and is the rail's only raw
+     brand-purple ink (2:1 here); the marketplace lifts the same purple to
+     #b794f6. It is the one styled-components <p> in the rail with no typo-*
+     utility on it — every other <p> there is a label or a range read-out.
+     Its chevron is the adjacent svg, drawn from currentColor. */
+  #filter-modal-container p[class^="sc-"]:not([class*="typo-"]),
+  #filter-modal-container p[class^="sc-"]:not([class*="typo-"]) + svg,
+  #filter-modal-container p[class^="sc-"]:not([class*="typo-"]) + svg path {
+    color: #b794f6 !important;
+    fill: #b794f6 !important;
+  }
 }

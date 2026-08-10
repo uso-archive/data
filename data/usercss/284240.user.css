@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark mode for the SCP Foundation Wiki: articles, sidebar, tables, tabs, ratings, forums and search all get a comfortable night palette.
-@version      20260804.13.19
+@version      20260809.22.52
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -110,9 +110,20 @@
   h1,
   .meta-title {
     color: var(--scp-title) !important;
+  }
+
+  /* Sigma-9 draws the title's rule in #bbb. The pin stops at the title element:
+     an h1 framed in an accent inside the article body is stating the page's own
+     identity (the Site News red bars), not drawing chrome. */
+  #page-title,
+  .meta-title {
     border-color: #2d333b !important;
   }
 
+  /* No border-color here on purpose. Guide pages rule off their section
+     headings with a border that names no colour, so currentColor carries the
+     ink stated above and the separator keeps the weight it has natively;
+     pinning it to a chrome grey collapses it to nothing. */
   h2,
   h3,
   h4,
@@ -323,8 +334,10 @@
 
   /* Article themes derived from Black Highlighter repaint the masthead from
      their own palette, so the chrome states its ink rather than relying on the
-     cascade order. */
+     cascade order. The site's own skins leave this strip unfilled; the ones that
+     do fill it pitch a near-white for their light masthead. */
   #login-status {
+    background-color: transparent !important;
     color: #9aa4ae !important;
   }
 
@@ -367,11 +380,14 @@
   }
 
   /* The dropdown panel carries its own fill on Black Highlighter — the anchor
-     fills below only cover the rows, not the gaps between them. */
+     fills below only cover the rows, not the gaps between them.
+     Its elevation shadow is drawn from a token that means "ink", so the remap
+     above turns the article themes' accent-tinted halo into a pale one; the
+     panel's own rule out-specifies this one, hence the !important. */
   #top-bar ul li ul {
     background-color: #1c2128 !important;
     border-color: #3a4048 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .7);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .7) !important;
   }
 
   #top-bar ul li a {
@@ -712,6 +728,18 @@
     box-shadow: 0 4px 14px rgba(0, 0, 0, .6);
   }
 
+  /* Wikidot builds these cards in a container hung off the body, so every
+     link rule scoped to #page-content stops short of them and an article theme
+     that reaches links from a class chain keeps its light-page accent inside.
+     The id is what outweighs that chain; an author's inline colour still wins. */
+  #odialog-hovertips a {
+    color: var(--scp-link);
+  }
+
+  #odialog-hovertips a:hover {
+    color: var(--scp-link-hover);
+  }
+
   .keycap {
     background-color: #22282f !important;
     border-color: #3a4048 !important;
@@ -734,6 +762,14 @@
     background-color: #1c2128 !important;
     border-color: #3a4048 !important;
     color: #c4cdd6 !important;
+  }
+
+  /* The author-info rail's open panel. Article themes frame it in a near-white
+     hairline pitched for their light page, which is the whole outline of the
+     panel on a dark one. It exists only once the byline bar is expanded, so no
+     load-time scan reaches it. */
+  #page-content .info-container .collapsible-block-unfolded {
+    border-color: #2d333b !important;
   }
 
   /* The ACS bar's diamond plate. It is drawn from whichever end of the article
@@ -849,9 +885,18 @@
 
   /* Sigma-9 draws the rule above the tag list on the inner span; article themes
      move it to the container and keep their light hex there. */
-  #main-content .page-tags,
+  #main-content .page-tags {
+    border-top-color: #2d333b !important;
+  }
+
+  /* Sigma-9's own copy of that rule lives here, at 1px. The themes that moved it
+     to the container leave this span an 8px TRANSPARENT spacer instead, which the
+     colour alone fills as a slab across the page, so the width is clamped to the
+     hairline. Themes that draw no rule at either place are untouched: a width
+     cannot revive a `border-top-style: none`. */
   #main-content .page-tags span {
     border-top-color: #2d333b !important;
+    border-top-width: 1px !important;
   }
 
   /* Tag list and the prev/next wikiwalk rail are furniture, not author prose,
@@ -1152,8 +1197,19 @@
     border-color: #2d333b !important;
   }
 
+  /* Hub pages put the tab's label in this <em> and give it a near-black ink
+     with a white halo on all four sides — a sticker cut for a light strip,
+     which on a dark one prints hollow outlined letters. The label follows the
+     anchor instead, so the selected tab's knocked-out white comes with it. */
   .yui-navset .yui-nav a em,
   .yui-navset .yui-navset-top .yui-nav a em {
+    border-color: #2d333b !important;
+    color: inherit !important;
+    text-shadow: none !important;
+  }
+
+  /* The frame those hub pages draw around the whole tab widget. */
+  #page-content .tab-box {
     border-color: #2d333b !important;
   }
 
@@ -1854,6 +1910,18 @@
     color: #8b949e !important;
   }
 
+  /* The licence link is the site's crimson, and the article themes that repaint
+     this strip pitch their own accent at it for a light band. */
+  #license-area a,
+  .license-area a {
+    color: var(--scp-link) !important;
+  }
+
+  #license-area a:hover,
+  .license-area a:hover {
+    color: var(--scp-link-hover) !important;
+  }
+
   #navi-bar {
     background-color: #0d1117 !important;
     border-bottom-color: #262c33 !important;
@@ -2039,9 +2107,14 @@
     border-color: transparent !important;
   }
 
+  /* The seal's two inner rings are inset shadows, and the outer one is the paper
+     colour: on the site's white card it is the gap that sets the blue ring off
+     from the black frame, and on a dark one it is a white halo. It follows the
+     card. The blue ring is the brand and the widths are the site's. */
   #page-content .INT-box {
     background-color: #1a1f26 !important;
     border-color: #2d333b !important;
+    box-shadow: inset 0 0 0 .175rem #1a1f26, inset 0 0 0 .675rem #4b92db !important;
   }
 
   #page-content .INT-box > .collapsible-block .collapsible-block-link {
@@ -2055,6 +2128,46 @@
 
   #page-content .library {
     border-color: rgba(0, 0, 0, .65) !important;
+  }
+
+  /* ============================================================
+     NEWSPAPER THEME — the Site News family
+     ============================================================ */
+
+  /* One token paints every panel this theme owns: inline code, the disclaimer
+     placard, the rating strip, blockquotes, image captions, table headers, the
+     section-header rules and the divider ornaments. Its two uses as knocked-out
+     text — the selected tab's label and the unfolded collapsible's link — sit on
+     the theme's accent and are already pinned light by the rules above. */
+  :root {
+    --primaryBackgroundColor: #1a1f26;
+  }
+
+  /* The panels it fills with a literal cream instead of that token. */
+  #page-content .f-con,
+  #page-content .tocbox .toc-u {
+    background-color: #1a1f26 !important;
+  }
+
+  /* It fills the open state of a collapsible with its accent and knocks the
+     label out of that fill, which the article-link colour takes back — leaving
+     crimson on red. Clearing the fill leaves the accent ring the theme draws
+     around the same element, so the open state keeps its cue; no other skin
+     fills this element at all, so the reset is inert on them. */
+  #page-content .collapsible-block-unfolded-link {
+    background-color: transparent !important;
+  }
+
+  /* Its sidebar links are reached from a class chain the site-wide link rule
+     cannot outweigh, at an accent red pitched for a cream rail. */
+  #side-bar div.menu-item a,
+  #interwiki div.menu-item a {
+    color: var(--scp-link) !important;
+  }
+
+  #side-bar div.menu-item a:hover,
+  #interwiki div.menu-item a:hover {
+    color: var(--scp-link-hover) !important;
   }
 
   /* ============================================================

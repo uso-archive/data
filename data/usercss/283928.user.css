@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Depop, easy on the eyes across home, search, categories and product pages, with prices, sale tags and the Depop red kept readable.
-@version      20260804.13.15
+@version      20260809.22.46
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -83,6 +83,14 @@
   [data-testid="header"] {
     background-color: #0d1117 !important;
     border-color: #262c33 !important;
+  }
+
+  /* `header` is also a CONTENT tag: testimonial and promo cards inside <main>
+     wrap their title in one, and the chrome fill above then paints a dark plate
+     across each card behind the title. Only the page chrome lives outside
+     <main>, so scoping the reset there is enough to tell the two apart. */
+  main header {
+    background-color: transparent !important;
   }
 
   header a,
@@ -218,6 +226,17 @@
   [class*="featuredImageContainer"] [class*="descriptionText"] {
     color: #262626 !important;
     -webkit-text-fill-color: #262626 !important;
+  }
+
+  /* The mega-menu's category links (Tops / Jeans / Shoes...) carry no colour of
+     their own; a light #f3f3f3 row fill is their ONLY hover affordance, and the
+     blanket menu-descendant transparent rule above is !important, so it wins over
+     the site's plain :hover and the whole 13-link list ends up with no feedback at
+     all. The pseudo-class lifts this above that rule. `categoryListFooter` is the
+     "See all women's" row, which the site hovers the same way. */
+  [class*="categoryListLink"]:hover,
+  [class*="categoryListFooter"]:hover {
+    background-color: #262c33 !important;
   }
 
   /* ============================================================
@@ -373,8 +392,12 @@
   /* The homepage hero (and similar promo bands) paint a LIGHT
      linear-gradient via background-image — invisible to a plain
      background-color reset. Drop the light gradient so the band
-     sits on the dark page; keep its inner photo intact. */
-  main section[class*="ero"],
+     sits on the dark page; keep its inner photo intact. Depop reuses that
+     gradient family for every full-width promo <section> (the /start-to-sell/
+     "Keep fashion circular" slab is pink→cream), each under its own module
+     hash, so match the tag: no <section> inside <main> carries artwork of its
+     own, only these gradients. */
+  main section,
   [class*="homepageHero"],
   [class*="HomepageHero"],
   [class*="heroBanner"],
@@ -453,6 +476,27 @@
     background-color: #ffffff !important;
   }
 
+  /* Each slide's "Shop now" is the design system's `outline` variant, which on
+     this component means a SOLID WHITE pill with #262626 ink and border-width:0
+     — the high-emphasis CTA of the tile. The generic outline rule further down
+     gives it #1c2128 on the #262c33 copy panel (~1.2:1) and no border to fall
+     back on, so the pill vanishes and only its label reads. Mirror the native
+     inversion instead: a light pill with dark ink, distinct from the red the
+     page-level CTAs take. */
+  [class*="slidesWrapper"] button[class*="bannerButton"] {
+    background-color: #e6edf3 !important;
+    border-color: #e6edf3 !important;
+  }
+
+  [class*="slidesWrapper"] button[class*="bannerButton"]:hover {
+    background-color: #ffffff !important;
+  }
+
+  [class*="slidesWrapper"] button[class*="bannerButton"],
+  [class*="slidesWrapper"] button[class*="bannerButton"] * {
+    color: #262626 !important;
+  }
+
   /* Filter / sort trigger pills and dropdown buttons.
      NOT [aria-haspopup]: Depop puts aria-haspopup="dialog" on plain
      text and icon controls (every product card's heart, the profile
@@ -491,6 +535,31 @@
      light-on-light. Give the row a dark elevated hover instead. */
   [class*="collapsibleRow"]:hover {
     background-color: #262c33 !important;
+  }
+
+  /* The Size filter's chips encode "selected" purely as a #262626 fill (with white
+     ink) against a white cell — maximal contrast natively, ~1.05:1 against our
+     #1c2128 panel, so a chosen size is indistinguishable from the other twelve.
+     The state lives on an opacity:0 checkbox the site reads through `:has()`, which
+     sanitization strips, and the checkbox FOLLOWS the label text in the DOM, so no
+     sibling combinator reaches it either. Promote the checkbox itself into the
+     selected marker: it is absolutely positioned and the label is its offsetParent,
+     so a full-size ring lands exactly on the cell. Keep it click-transparent — the
+     wrapping label already forwards the toggle. */
+  label[class*="sizeButton"] input[type="checkbox"]:checked {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    opacity: 1 !important;
+    box-sizing: border-box !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    background-color: transparent !important;
+    border: 2px solid #e6edf3 !important;
+    border-radius: 4px !important;
+    pointer-events: none !important;
   }
 
   /* The MOBILE product page pins a position:fixed action bar (price + Make offer /
@@ -597,6 +666,24 @@
   button[class*="FilterButton"]:hover {
     background-color: #262c33 !important;
     color: #e6edf3 !important;
+  }
+
+  /* The "Popular brands" / "Shop by category" pill rows mark the applied one by
+     INVERTING it — the site's #fff pill with #262626 ink becomes a #262626 pill with
+     #fff ink. Both the base and the active pill carry `pill`, so the elevated fill
+     above ties with nothing to separate them and every pill in the row looks
+     unselected. Mirror the native inversion for dark. Must stay BELOW the base pill
+     rules: the rest state ties with them on specificity and wins only by order, and
+     the hover form ties with the pill hover the same way. */
+  main button[class*="pillActive"] {
+    background-color: #e6edf3 !important;
+    color: #14181d !important;
+    border-color: #e6edf3 !important;
+  }
+
+  main button[class*="pillActive"]:hover {
+    background-color: #ffffff !important;
+    color: #14181d !important;
   }
 
   /* Depop separates content with 1px #d7d7d7 <hr>s and 6px #d7d7d7
@@ -865,12 +952,16 @@
     fill: #8b949e !important;
   }
 
-  /* ...and the third signal ("Buy safely / Depop Protection") is a link the site
-     fills rgba(255,255,255,0.3) — invisible over its own white hero, a mid-grey
-     slab over the dark one. Translucent white never trips a near-white surface
-     scan, which reads the alpha-less channels only. Give it a real elevated
-     card so it still reads as the one tappable signal of the three. */
-  a[class*="trustSignalLink"] {
+  /* All THREE signals sit on the same rgba(255,255,255,0.3) plate — invisible
+     over the site's own white hero, a faint card over the dark one. Translucent
+     white never trips a near-white surface scan, which reads the alpha-less
+     channels only. Restoring only the tappable one (it is an <a>, the other two
+     are <div>s) leaves the row reading as one card beside two bare columns, an
+     emphasis the site does not have. Match on the parent instead so all three
+     children get the plate whatever tag they use; `trustSignal` alone would
+     also catch this container and its description <p>s. */
+  [class*="trustSignalContainer"] > div,
+  [class*="trustSignalContainer"] > a {
     background-color: #1c2128 !important;
   }
 

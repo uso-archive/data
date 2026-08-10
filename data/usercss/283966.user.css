@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Pikabu.
-@version      20260804.13.19
+@version      20260809.22.52
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -232,6 +232,11 @@
     --c-menu-item-hover: var(--pk-surface-2);
     --c-menu-item-click: var(--pk-border);
     --c-counter-bgTertiary: var(--pk-surface-2);
+    /* The tertiary counter's own label token was left at Pikabu's #757880 = 3.4:1 on the
+       dark-tuned pill above. Every instance we can reach is nested in a search Tab, where
+       our own `TabItem__tab span` rule happens to repaint it — the token is one selector
+       away from being visible. Pikabu's own night value. */
+    --c-counter-textTertiary: #dcdee5;
     /* filled counters keep a light brand/alert fill — flip their label dark to read */
     --c-counter-text: var(--pk-bg);
 
@@ -247,6 +252,38 @@
     --c-btnSocialIcon-bgHover: var(--pk-surface);
     --c-btnSocialIcon-bgClick: var(--pk-border);
     --c-social-bgWhite: var(--pk-surface);
+    /* Plate behind each glyph in the legacy `.social-icon_square` row ("Мы в социальных
+       сетях" on /about, the account pages). A legacy :root grey Pikabu never dark-tunes,
+       so the row shipped as pale tiles on the dark card — and at 30px with channels under
+       200 it clears every light-surface threshold a scan applies. The per-network hover
+       fills are separate tokens and still paint. */
+    --color-social-bg: var(--pk-surface-2);
+
+    /* Split button, neutral half. Its fill is pinned to Pikabu's own night grey above;
+       the LABEL token keeps the light-theme #5e6066, i.e. exactly the fill colour — the
+       button renders as a blank pill. Take Pikabu's night label and press tones too. */
+    --c-btnSplit-secondary-textIcon: #b6b8bf;
+    --c-btnSplit-secondary-bgHover: #757880;
+    --c-btnSplit-secondary-bgClick: #909299;
+
+    /* Captcha challenge block. Its panel is dark-tuned above, but the Pikabu wordmark
+       inside it (--c-logo-text) stays near-black and its links stay mid-grey, so the
+       widget's own branding and controls sit at 1-3.7:1 on the darkened panel. Pikabu's
+       night values for each; --c-captcha-test-btn-bg is a `color` on the video-direction
+       answer buttons despite the name, and Pikabu leaves it failing, so lift it. */
+    --c-logo-text: #dcdee5;
+    --c-captcha-block-link-default: #909299;
+    --c-captcha-block-link-hover: #aaacb2;
+    --c-captcha-block-link-click: #c2c5cc;
+    --c-captcha-test-btn-bg: #909299;
+
+    /* "Special" filled button: a cream #fdf0c3 pill under a #5e6066 label — a light
+       island on the dark canvas. Pikabu's own dark theme gives the whole family a dark
+       amber equivalent that keeps the warm identity. */
+    --c-btn-special-bgDefault: #4f4522;
+    --c-btn-special-bgHover: #705d1c;
+    --c-btn-special-bgClick: #937615;
+    --c-btn-special-textIcon: #ebedf2;
 
     /* ---- Pagination ---- */
     --c-pagination-defaultBg: var(--pk-surface-2);
@@ -363,6 +400,10 @@
     --c-btn-negativeOutline-textStrokeDefault: #ef6a5d;
     --c-btn-negativeOutline-textStrokeHover: #f4837a;
     --c-btn-negativeOutline-textStrokeClick: #d9483b;
+    /* The ghost sibling of that button (.Btn__btn_negative-text) reads its own label
+       token, left at Pikabu's #cc4235 = 3.4:1 while its hover/press washes above were
+       already dark-tuned. Same danger red as the outline variant. */
+    --c-btn-negativeText-textIcon: #ef6a5d;
 
     /* Remaining light control fills: tag press state, tertiary icon-button press,
        split-button neutral half, and the disabled small icon button. */
@@ -493,6 +534,19 @@
   body {
     background-color: var(--pk-bg) !important;
     color: var(--pk-text-soft) !important;
+  }
+
+  /* ===== Text selection =====
+     Pikabu paints the selection plate from --color-primary-400 (#c5e4ac), a legacy :root
+     token it never dark-tunes, and sets no selection colour — so a selected run keeps
+     this theme's light ink and lands ~1.2:1. Nothing that walks the DOM can see a
+     ::selection pseudo. The -webkit-text-fill-color half is required because several
+     components (marker runs, shop badges, counters) pin their own fill colour, which
+     otherwise survives into the selection. */
+  ::selection {
+    background-color: #3a4d2a !important;
+    color: var(--pk-text) !important;
+    -webkit-text-fill-color: var(--pk-text) !important;
   }
 
   /* ===== Borders ===== (colour only — never adds a border, safe everywhere) */
@@ -679,9 +733,11 @@
   /* ===== Login form — third-party provider buttons ===== */
   /* The provider buttons (VK / Yandex ID) keep their brand background, but their label
      is painted with --color-bright-900, which this theme remaps to a dark tone — on the
-     black Yandex button that is near-invisible. Pin the label light. */
+     black Yandex button that is near-invisible. Pin it to the pure white the brand fills
+     are designed around: the theme's off-white --pk-text measures a full step dimmer on
+     the VK blue than the site's own label does. */
   .auth__provider-text,
-  [class*="auth__provider"] .auth__provider-text { color: var(--pk-text) !important; }
+  [class*="auth__provider"] .auth__provider-text { color: #ffffff !important; }
 
   /* ===== Filter / sort / tab / segmented controls =====
      These interactive controls hardcode a near-black label colour (#292a2e /
@@ -1033,6 +1089,14 @@
     border-color: var(--pk-border) !important;
     color: var(--pk-text-soft) !important;
   }
+  /* The app-download landing (/applications) pins its OWN dark palette under
+     :root[data-theme-apps-landing], a (0,2,0) block that outranks our token flip, and its
+     hero pull-quote is a bare <blockquote> over that purple canvas. The generic quote
+     surface above lays an opaque slab across it and dims its white ink, so exempt it. */
+  [data-theme-apps-landing] blockquote {
+    background-color: transparent !important;
+    color: var(--base-text-color) !important;
+  }
 
   /* ===== Generic muted / hint text =====
      `.hint` is NOT a muted-text class on Pikabu — it marks "this element owns a
@@ -1084,6 +1148,9 @@
   .comment-external-video__state,
   .carousel_images .carousel__cur-slide,
   .dnd-overlay__content,
+  /* "the post author liked this comment" badge: the OP's avatar with a heart pinned to
+     its corner, where --color-bright-900 is the halo that lifts the heart off the photo */
+  .comment__author-like,
   [class*="player-block__state"] {
     --color-bright-900: #e9e9e9;
     --color-black-440: #e9e9e9;
@@ -1223,6 +1290,25 @@
   .power-rating-modal__btn:hover,
   .power-rating-modal__btn:active { background-color: var(--pk-border) !important; }
 
+  /* Round scroll arrows on every horizontal carousel (post series, games rail) and on the
+     image gallery viewer. At rest the disc is --color-bright-800 and the arrow paints from
+     --color-contrast-bg, which this theme lifts light so it reads on the dark disc; the
+     hover/press fill is the pale-green --color-primary-400, which leaves that same light
+     arrow at ~1.2:1 — the control disappears exactly while the cursor is on it. The token
+     is shared with poll-result bars and the community progress fill, so it must stay pale
+     there; restate the fill on the two round-button families instead. */
+  .carousel__scroll:hover,
+  .carousel__scroll:active,
+  .gallery-viewer__icon-button:hover,
+  .gallery-viewer__icon-button:active { background-color: #3a4d2a !important; }
+
+  /* Legacy social-icon tiles. The plate is dark-tuned at :root; the glyph paints from
+     --color-bright-900, this theme's DARK button ink, which is wrong on both the dark
+     plate and the per-network brand fill the tile takes on hover. Scope the token back to
+     a light foreground for these tiles only. */
+  .social-icon_square,
+  .social-icon_round { --color-bright-900: #e9e9e9; }
+
   /* Chip lists in the search filters (tag / author / community pickers) and the sidebar
      block dismiss control: the small action inside each chip turns pure white on hover. */
   .items-list__item a:hover,
@@ -1284,10 +1370,13 @@
   .pkb-normal-btn_negative-outline:hover { border-color: var(--c-btn-negativeOutline-textStrokeHover) !important; }
   .pkb-normal-btn_negative-outline:active { border-color: var(--c-btn-negativeOutline-textStrokeClick) !important; }
 
-  /* "Current theme" swatch in Pikabu's own theme picker. The ring is the swatch's ONLY
-     selected marker (the tick inside it is opacity-driven), so a grey ring leaves the
-     row with no indication of which theme is active. */
-  .theme-picker__button_current { border-color: var(--pk-green) !important; }
+  /* Green-outline sibling of the same component (`.pkb-normal-btn_border` — the outline
+     form of the primary action). Pikabu fills it transparent and draws
+     `border: 1px solid var(--text-color)`, so the whole affordance is the ring and the
+     blanket reset erases it, leaving a green label floating in a grey box. */
+  .pkb-normal-btn_border { border-color: var(--c-btn-primaryOutline-textStrokeDefault) !important; }
+  .pkb-normal-btn_border:hover { border-color: var(--c-btn-primaryOutline-textStrokeHover) !important; }
+  .pkb-normal-btn_border:active { border-color: var(--c-btn-primaryOutline-textStrokeClick) !important; }
 
   /* LEGACY `.checkbox` / `.radio` (theme-picker options, login/registration forms). Their
      UNCHECKED state is `background: transparent` + `color: transparent`, so the 1px
@@ -1299,6 +1388,18 @@
   .radio { border-color: #5e6066 !important; }
   .checkbox_checked,
   .radio_checked { border-color: var(--pk-green) !important; }
+
+  /* The LEGACY switch (mobile drawer "Микроанимации"/"Ночная тема", the feed sidebar's
+     "Скрыть просмотренные") is the same `.checkbox` element with a knob drawn in ::after.
+     Its OFF track reads --color-black-440 and its knob --color-bright-900, two tokens this
+     theme moves in the SAME direction — a --pk-surface knob on a --pk-border track, 1.19:1,
+     so the OFF switch renders as a featureless pill while the ON one keeps a crisp knob.
+     Drive it from the ui-kit Switch tokens so the site's two switch components match.
+     `_checked` must follow the base rule: equal specificity, last one wins. */
+  .checkbox_switch { background-color: var(--c-switch-mainDefault) !important; }
+  .checkbox_switch.checkbox_checked { background-color: var(--c-switch-activeDefault) !important; }
+  .checkbox_switch::after,
+  .checkbox_switch.checkbox_checked::after { background-color: var(--c-switch-toggle) !important; }
 
   /* Green-variant tooltip card: the ring is what makes it read as the "positive" variant
      rather than the neutral one. */
@@ -1340,6 +1441,20 @@
     background-color: var(--pk-surface-2) !important;
     color: var(--pk-text-muted) !important;
   }
+  /* The widget's CHAT view (the "Чат с Агентом Поддержки" bot conversation the page now
+     mounts) is a second surface family beside the request form above: `.uw__chat-content`
+     is the #f2f4fa message scroll area and `.uw__chat-form` the white composer bar. The
+     composer's own <textarea> carries only rotating styled-components hashes, so hook it
+     through the bar. Every glyph in that bar is dark linework, so it needs the same
+     inversion as the paperclip below. */
+  #usedesk-widget .uw__chat-content { background-color: var(--pk-bg) !important; }
+  #usedesk-widget .uw__chat-form { background-color: var(--pk-surface-2) !important; }
+  #usedesk-widget .uw__chat-form textarea {
+    background-color: transparent !important;
+    color: var(--pk-text) !important;
+  }
+  #usedesk-widget .uw__chat-form textarea::placeholder { color: var(--pk-text-muted) !important; }
+  #usedesk-widget .uw__chat-form .uw__icon { filter: invert(1) brightness(0.85) !important; }
   /* The attach-file paperclip is a remote black-linework SVG loaded as a background-image,
      so darkening the panel under it erases it. Invert it; the header's close glyph is a
      white inline data-URI on the green bar and must NOT be touched, hence the scope. */

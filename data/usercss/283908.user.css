@@ -3,11 +3,11 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Vinted with the homepage, catalog and search, item pages and seller profiles in a comfortable dark look that's easy on the eyes for late-night browsing.  Works on every country version of Vinted (vinted.fr, .de, .com, .co.uk, .es, .it, .nl, .be, .pl and more).   Prices, ratings and Vinted's teal stay clear and recognizable.
-@version      20260804.13.21
+@version      20260809.22.56
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
-@-moz-document domain("vinted.fr"), domain("vinted.de"), domain("vinted.com"), domain("vinted.co.uk"), domain("vinted.es"), domain("vinted.it"), domain("vinted.nl"), domain("vinted.be"), domain("vinted.pl"), domain("vinted.cz"), domain("vinted.sk"), domain("vinted.at"), domain("vinted.lt"), domain("vinted.lu"), domain("vinted.pt"), domain("vinted.ro"), domain("vinted.hu"), domain("vinted.se"), domain("vinted.fi"), domain("vinted.dk"), domain("vinted.gr"), domain("vinted.hr"), domain("vinted.ie"), domain("vinted.si"), domain("vinted.ee"), domain("vinted.lv"), domain("vinted.bg"), domain("vinted.com.au") {
+@-moz-document domain("vinted.fr"), domain("vinted.de"), domain("www.vinted.com"), domain("company.vinted.com"), domain("vinted.co.uk"), domain("vinted.es"), domain("vinted.it"), domain("vinted.nl"), domain("vinted.be"), domain("vinted.pl"), domain("vinted.cz"), domain("vinted.sk"), domain("vinted.at"), domain("vinted.lt"), domain("vinted.lu"), domain("vinted.pt"), domain("vinted.ro"), domain("vinted.hu"), domain("vinted.se"), domain("vinted.fi"), domain("vinted.dk"), domain("vinted.gr"), domain("vinted.hr"), domain("vinted.ie"), domain("vinted.si"), domain("vinted.ee"), domain("vinted.lv"), domain("vinted.bg"), domain("vinted.com.au") {
 /* ============================================================
      Vinted Dark
      Vinted's UI is built on a design-token system: CSS custom
@@ -194,9 +194,6 @@
      substring, which covers the header AND error-page header modules. Do NOT
      drop to `l-header`: that also matches `.modal-header`. */
   .l-header, [class*="__l-header"], .js-header { background-color: #0d1117 !important; }
-  /* The logo is a web_ui Image; the item-photo placeholder fill below would
-     otherwise paint a light box behind it on the darker header. */
-  [class*="__l-header__logo"] [class*="Image__image"] { background-color: transparent !important; }
   [class*="__l-header__main"] { border-bottom: 1px solid #262c33 !important; }
   .nav-links, .header-nav, [data-testid="nav-tabs"] { background-color: #0d1117 !important; }
   /* The Button variants must stay excluded from the header-link colour: an
@@ -264,7 +261,7 @@
   /* ============================================================
      Cells / cards / surfaces (web_ui)
      ============================================================ */
-  .web_ui__Cell__cell, .web_ui__Card__card, .web_ui__Card__overflow-auto,
+  .web_ui__Cell__cell, .web_ui__Card__card, .web_ui__Card__overflowAuto,
   [class*="Cell__cell"], [class*="Card__card"], .feed-grid__item,
   [data-testid="grid-item"], [data-testid="feed-item"] {
     background-color: #1c2128 !important; }
@@ -303,6 +300,12 @@
   [class*="Cell__success"] { background-color: #218056 !important; }
   [class*="Cell__warning"] { background-color: #a5343f !important; }
   [class*="Cell__expose"]  { background-color: #8a6a1e !important; }
+  /* `Cell__successLightExperimental` is a pale mint TINT, not a solid banner, but
+     it carries the `Cell__success` substring — the solid fill above swallowed it
+     and turned a quiet confirmation row into a loud green slab. Declared after,
+     so it wins the source-order tie; the white-label rule below still applies and
+     reads fine on the tint. */
+  [class*="Cell__successLightExperimental"] { background-color: #14281e !important; }
   [class*="Cell__cell"][class*="Cell__primary"], [class*="Cell__cell"][class*="Cell__primary"] *,
   [class*="Cell__cell"][class*="Cell__amplified"], [class*="Cell__cell"][class*="Cell__amplified"] *,
   [class*="Cell__cell"][class*="Cell__muted"], [class*="Cell__cell"][class*="Cell__muted"] *,
@@ -476,10 +479,13 @@
   [class*="Rating__half-full"] [class*="Rating__star-second-half"] {
     color: #4c5663 !important; }
 
-  /* Tabs (seller profile, item page sections) bake the dark literal */
+  /* Tabs (seller profile, item page sections) bake the dark literal.
+     web_ui marks the current tab `Tabs__is-active`, not `Tabs__tab--selected`;
+     the inactive titles are dimmed by opacity, so the selected one needs the
+     brighter ink to stay ahead of them. */
   .web_ui__Tabs__title, [class*="Tabs__title"] { color: #c4cdd6 !important; }
-  .web_ui__Tabs__tab--selected .web_ui__Tabs__title,
-  [class*="Tabs__tab--selected"] [class*="Tabs__title"] { color: #e6edf3 !important; }
+  .web_ui__Tabs__is-active .web_ui__Tabs__title,
+  [class*="Tabs__is-active"] [class*="Tabs__title"] { color: #e6edf3 !important; }
 
   /* ============================================================
      Item grid (homepage, catalog, search, profile, item page)
@@ -487,7 +493,13 @@
   [data-testid="grid-item"], [class*="feed-grid__item"],
   .new-item-box__container, .new-item-box__overlay {
     background-color: transparent !important; }
-  .new-item-box__image, .web_ui__Image__image {
+  /* A web_ui Image is natively TRANSPARENT; the item grid supplies the photo's
+     dominant colour as an inline `background-color` that shows until the file
+     loads. Match that inline placeholder only — a blanket fill on the component
+     boxes every transparent marketing illustration (help, safety, /app, the
+     landing pages) inside an elevated grey rectangle the design never has. */
+  [class*="new-item-box__image"],
+  [class*="Image__image"][style*="background-color"] {
     background-color: #1c2128 !important; }
   /* "+N more photos" overlay + status labels baked a light translucent
      scrim with dark text — flip to a dark scrim + light text so it reads
@@ -542,15 +554,23 @@
   [data-testid$="-filter--trigger"]:hover, [data-testid$="--trigger"]:hover {
     background-color: #232a32 !important;
     border-color: #4db8c4 !important; }
-  .web_ui__Chip__selected, [class*="Chip__selected"],
-  [class*="Chip__chip"][aria-pressed="true"] {
-    background-color: #12363d !important; border-color: #1a7d88 !important; }
   /* A `filled` Chip is the APPLIED state — the removable keyword/filter pills
      under the trigger row; `outlined` is the idle trigger. Both flattened to the
      same #1c2128, and the applied one even read dimmer than the triggers, so an
      active filter looked inactive. Elevate it above the idle chips. */
   [class*="Chip__chip"][class*="Chip__filled"] {
     background-color: #2a3139 !important; border-color: #39424e !important; }
+  /* A filled Chip's native hover cue is dropping its ring, which our opaque
+     ring above re-draws — swap the fill instead so the pill still reacts. */
+  [class*="Chip__chip"][class*="Chip__filled"]:hover {
+    background-color: #343d48 !important; }
+  /* web_ui names the ON state `Chip__activated`; the catalog trigger row also
+     mirrors it into aria-pressed. Declared after the filled/hover rules so an
+     activated pill of either variant keeps the teal, and matched with the base
+     class so it outranks them. */
+  .web_ui__Chip__activated, [class*="Chip__chip"][class*="Chip__activated"],
+  [class*="Chip__chip"][aria-pressed="true"] {
+    background-color: #12363d !important; border-color: #1a7d88 !important; }
 
   /* Pagination — natively the current page is near-black text against
      mid-grey siblings. Our page-link colour was so close to the active
@@ -630,6 +650,22 @@
   [data-testid="shipping-fees-applied-banner"],
   .web_ui__Notification__notification, [class*="Banner"] {
     background-color: #1c2128 !important; }
+  /* web_ui's InfoBanner puts its tint on the VARIANT class and its geometry on
+     `InfoBanner__banner`, which the neutral fill above matches — so info, success,
+     warning and error all rendered as the same grey slab and the notice lost its
+     severity. Re-assert the four tints from the theme's own semantic subtle set
+     (`expose` is the amber ramp, `error` the red one). Every structural part of
+     the component ALSO carries "Banner" in its class name, so the full-size
+     `__content` layer takes the neutral fill and paints straight over the tint —
+     clear the inner parts or only the 1px rim of the variant colour shows. */
+  [class*="InfoBanner__info"]    { background-color: #14181d !important; }
+  [class*="InfoBanner__success"] { background-color: #14281e !important; }
+  [class*="InfoBanner__warning"] { background-color: #302816 !important; }
+  [class*="InfoBanner__error"]   { background-color: #2e181b !important; }
+  [class*="InfoBanner__content"], [class*="InfoBanner__inner"],
+  [class*="InfoBanner__title"], [class*="InfoBanner__body"],
+  [class*="InfoBanner__prefix"], [class*="InfoBanner__suffix"],
+  [class*="InfoBanner__actions"] { background-color: transparent !important; }
 
   /* ============================================================
      Ad slots / blank iframes — never let them flash as bright
@@ -741,12 +777,6 @@
   [class*="hc-"][class*="search-header"],
   [class*="advertising-module"][class*="__hero"] {
     background-color: #0e3b42 !important; }
-  /* The /advertising hero artwork is a TRANSPARENT PNG carried by a web_ui
-     Image, whose wrapper takes the item-photo placeholder fill declared in the
-     item-grid block — that painted an opaque #1c2128 box over the right half of
-     the band and split it in two. The band colour must show through. */
-  [class*="advertising-module"][class*="__hero"] [class*="Image__image"] {
-    background-color: transparent !important; }
   .web_ui__Tooltip__tooltip, [class*="Tooltip__tooltip"],
   [class*="privacy-center__bottom-section"],
   [class*="privacy-center__bottom-cta"],
@@ -850,10 +880,16 @@
   img[src*="user-empty-state"] {
     filter: invert(1) hue-rotate(180deg) !important; }
 
-  /* The 404/error mascot is a <video> with white baked into its frames, so
-     no background rule can reach it. Invert it (hue-rotate restores the
-     teal laptop and blue collar) and screen the now-black field away. */
-  .fullpage-layout video {
+  /* The not-found page every bad URL serves is its own `gnf-*` component family,
+     outside web_ui and served from an inline <style>: the heading bakes the
+     near-black ink, the secondary CTA the raw brand teal for both ring and label,
+     and the mascot is a <video> with white baked into its frames, which no
+     background rule can reach. Invert the video (hue-rotate restores the teal
+     laptop and blue collar) and screen the now-black field away. */
+  .gnf-page h1 { color: #e6edf3 !important; }
+  .gnf-button--outlined {
+    color: #4db8c4 !important; border-color: #4db8c4 !important; }
+  .gnf-page video {
     filter: invert(1) hue-rotate(180deg) !important;
     mix-blend-mode: screen !important; }
 
@@ -862,6 +898,46 @@
   .web_ui__Input__input, [class*="Input__input"] {
     background-color: #1c2128 !important; color: #e6edf3 !important;
     border-color: #2d333b !important; }
+  /* A web_ui field draws its whole focus indicator as a border-colour swap on
+     the inner value element and gets no UA outline, so the rest-state border
+     above erased it on every text field. Re-assert it on the focused state,
+     lifted for dark. `:focus` (not `:focus-visible`) keeps the rule inside the
+     CSS2 subset the userstyles.org parser accepts. */
+  input:focus, textarea:focus, select:focus {
+    border-color: #4db8c4 !important; }
+
+  /* ============================================================
+     company.vinted.com — the corporate/newsroom site, a separate
+     Next.js app that domain("vinted.com") also matches. It shares
+     none of web_ui, so its own light surfaces need naming.
+     ============================================================ */
+  header[class*="Header_header-container"] { background-color: #0d1117 !important; }
+  /* `calypso` is this site's teal ramp and `greyscale-level-N` its neutral one,
+     both shipped as literal-valued utility classes, so no token remap reaches
+     them. None of these class names exist on the marketplace. */
+  .bg-calypso-10 { background-color: #12363d !important; }
+  .bg-greyscale-level-6 { background-color: #14181d !important; }
+  .bg-greyscale-level-7 { background-color: #1c2128 !important; }
+  .text-calypso-80 { color: #4db8c4 !important; }
+  .text-greyscale-level-3 { color: #9ca7b0 !important; }
+  /* The sustainability report's section bands and finding cards. Their copy
+     already reads our light ink, so only the surfaces need turning. */
+  [class*="InfoSection_infoSection"],
+  [class*="Findings_container"],
+  [class*="Findings_background"],
+  [class*="Findings_titleContainer"]::after {
+    background-color: #14181d !important; }
+  [class*="FindingsCard_card"],
+  [class*="FindingsCard_image"],
+  [class*="FindingsCard_content"] { background-color: #1c2128 !important; }
+  [class*="DisclaimerSection_text"] { color: #9ca7b0 !important; }
+  /* Newsroom article bodies are CMS-pasted HTML: every run of copy is a <span>
+     carrying an inline color:#000 (and occasionally background:#fff), which no
+     inherited ink can reach. */
+  [class*="Article_content"] span,
+  [class*="Article_content"] strong,
+  [class*="Article_content"] em {
+    color: #c4cdd6 !important; background-color: transparent !important; }
 
   /* ---- OneTrust cookie banner (until accepted) ---- */
   #onetrust-banner-sdk, #onetrust-pc-sdk,
@@ -879,6 +955,20 @@
   #onetrust-banner-sdk .ot-link-btn,
   #onetrust-banner-sdk .onetrust-vendors-list-handler,
   #onetrust-banner-sdk .ot-cookie-policy-link { color: #4db8c4 !important; }
+  /* Inside the preference centre, two panels only exist once you interact:
+     the accordion body a category expands into, and the vendor-list
+     "allow all" header block. Both keep OneTrust's own white fill, and
+     #ot-sel-blk carries a #4d4d4d label that needs the surrounding ink. */
+  #onetrust-pc-sdk .ot-acc-grpcntr,
+  #onetrust-pc-sdk .ot-acc-txt,
+  #ot-sel-blk { background-color: #1c2128 !important; }
+  #ot-sel-blk .ot-consent-hdr, #ot-sel-blk .ot-li-hdr,
+  #ot-sel-blk .ot-label-txt, #ot-sel-blk .ot-label-status {
+    color: #c4cdd6 !important; }
+  /* The "vendor details" handler is a <button>, so the anchor rule above
+     leaves it on the raw brand teal. */
+  #onetrust-pc-sdk .ot-link-btn,
+  #onetrust-pc-sdk .category-host-list-handler { color: #4db8c4 !important; }
   /* The secondary "Manage cookies" button bakes a solid-white surface with
      teal text — flip it to a dark elevated pill so it doesn't flash white. */
   #onetrust-pc-btn-handler, #onetrust-banner-sdk .ot-pc-btn-handler {

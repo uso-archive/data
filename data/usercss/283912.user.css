@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for HeadHunter (hh.ru / hh.kz / hh.uz / hh.by / rabota.by). Job search, vacancies and companies in an easy-on-the-eyes dark UI.
-@version      20260804.13.16
+@version      20260809.22.47
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -1053,6 +1053,18 @@
   [class*="tmpl-hh"] b:not([class]), [class*="tmpl_hh"] b:not([class]),
   [class*="tmpl-hh"] em:not([class]), [class*="tmpl_hh"] em:not([class]) {
     background-color: transparent !important; }
+  /* A chameleon tile (hh's constructor "about" / "benefits" section widgets) puts
+     its headline in a tmpl-classed element — which the blanket surface rule gives
+     an opaque dark plate, so it reads — but its body copy in a bare class-LESS <p>
+     the blanket never matches. The tile's own surface is an employer-uploaded JPG
+     (an img.hhcdn.ru/ichameleon asset), which paints OVER our background-color, so
+     that paragraph ends up as our forced light grey directly on near-white art:
+     unreadable, while every bg-COLOR scan reads the tile as #1c2128.
+     Give the paragraph the SAME plate the headline beside it already has. Scoped
+     to <p> so it only reaches body copy; on a tile that is genuinely dark the
+     plate matches its container and is invisible. */
+  [class*="tmpl-hh"] p:not([class]), [class*="tmpl_hh"] p:not([class]) {
+    background-color: #1c2128 !important; }
   /* SERP "branded snippet" promo cards ship the employer's OWN brand colour as an
      INLINE background-color on the outer wrapper (e.g. a light-blue #deeaff). The
      inner content is a dark magritte-card, but the wrapper's frame + the wide
@@ -1075,7 +1087,7 @@
   [data-qa="title"], [data-qa$="-title"], [data-qa="company-header-title-name"],
   [data-qa="bloko-header-1"], [data-qa="bloko-header-2"], [data-qa="bloko-header-3"] {
     color: #e6edf3 !important; }
-  p, li, span:not(.metro-point), dd, dt, td, th, label, figcaption, time, small, b, strong, em,
+  p, li, span:not(.metro-point), dd, dt, td, th, caption, label, figcaption, time, small, b, strong, em,
   div, [class*="magritte-text"] {
     color: #c4cdd6 !important; }
   /* metro-line dots in vacancy addresses: an empty <span class="metro-point">
@@ -1216,8 +1228,13 @@
   /* primary CTA → hh blue accent, kept vivid. NB: don't paint the <button>
      element of the current Magritte component — its rounded surface is the
      inner `-view` span (fed by the accent token), so a bg here would leak a
-     square blue slab past the rounded corners. */
-  [class*="magritte-button-style-primary"], .bloko-button_kind-primary {
+     square blue slab past the rounded corners.
+     The bloko arm is compounded with `.bloko-button` so it clears 0-2-0: the
+     blanket button reset above matches it as `button[class*="button"]` (0-1-1)
+     and would otherwise win the border, ringing the blue pill (the cookie bar's
+     "Понятно") in grey where hh paints the border its own fill colour. */
+  [class*="magritte-button-style-primary"],
+  .bloko-button.bloko-button_kind-primary {
     background-color: #2f81f7 !important; color: #ffffff !important;
     border-color: #2f81f7 !important; }
   [class*="magritte-button-style-primary"]:hover,
@@ -1245,10 +1262,21 @@
      region-confirm tooltip, image overlays): their primary variant is a WHITE
      pill that must keep dark text, while their secondary/tertiary variants sit
      on #303030 and keep white text. Our blanket `span` colour would paint the
-     white pill's label light-on-white. */
-  [class*="magritte-button_style-constant"][class*="magritte-button_mode-primary"] span {
+     white pill's label light-on-white.
+     A `span` arm alone is not enough: a rich CTA (the hh PRO hero "Подключить ?
+     799 ₽ в месяц") renders its label as `magritte-text` DIVs inside a layout div,
+     and its crown as an inline SVG — the span chain above them takes the dark ink
+     while the leaves keep the blanket light one. The `div` / `magritte-text` /
+     `svg` arms clear the 0-2-0 of the primary-text and heading rules. */
+  [class*="magritte-button_style-constant"][class*="magritte-button_mode-primary"] span,
+  [class*="magritte-button_style-constant"][class*="magritte-button_mode-primary"] div,
+  [class*="magritte-button_style-constant"][class*="magritte-button_mode-primary"] svg,
+  [class*="magritte-button_style-constant"][class*="magritte-button_mode-primary"] [class*="magritte-text"] {
     color: #111111 !important; }
-  [class*="magritte-button_style-inverse"][class*="magritte-button_mode-primary"] span {
+  [class*="magritte-button_style-inverse"][class*="magritte-button_mode-primary"] span,
+  [class*="magritte-button_style-inverse"][class*="magritte-button_mode-primary"] div,
+  [class*="magritte-button_style-inverse"][class*="magritte-button_mode-primary"] svg,
+  [class*="magritte-button_style-inverse"][class*="magritte-button_mode-primary"] [class*="magritte-text"] {
     color: #0d1115 !important; }
   [class*="magritte-button_style-constant"][class*="magritte-button_mode-secondary"] span,
   [class*="magritte-button_style-constant"][class*="magritte-button_mode-tertiary"] span {
@@ -1429,6 +1457,15 @@
      picker on hh.kz/uz/by). Keep them opaque dark + lift their close glyph. */
   [class*="magritte-modal"], [role="dialog"][class*="magritte"] {
     background-color: #1c2128 !important; border-color: #2d333b !important; }
+  /* `magritte-modal-overlay` is the full-viewport SCRIM, not a panel, and the
+     prefix match above painted it OPAQUE — opening the SERP "Фильтры" side panel,
+     a select modal or the ccTLD language picker replaced the whole page behind it
+     with a flat slab a shade LIGHTER than the page base. hh's own scrim is already
+     dark and translucent (rgba(32,38,43,.68)); keep that shape so the page dims
+     instead of disappearing. Same 0-1-0 as the rule above, so order decides —
+     this must stay below it. */
+  [class*="magritte-modal-overlay"] {
+    background-color: rgba(13, 17, 23, 0.72) !important; }
   [class*="magritte-modal"] [class*="magritte-modal-close"] svg,
   [class*="magritte-modal"] [class*="magritte-modal-close"] svg path {
     color: #c4cdd6 !important; fill: currentColor !important; }
@@ -1589,7 +1626,7 @@
   [class*="rating-stars"] { color: inherit; }
 
   /* ---- Tabs ---- */
-  [data-qa="tab-list"], [class*="magritte-tab"], .bloko-tabs-item {
+  [data-qa="tab-list"], [class*="magritte-tab"], .bloko-tabs__item {
     background-color: transparent !important; border-color: #2d333b !important; }
   /* Magritte tabs are PILLS now: the current tab carries `magritte-tab_selected`
      and ships a solid dark pill + white label — not an `-active` class with a
@@ -1601,10 +1638,24 @@
   [class*="magritte-tab_selected"] [class*="magritte-tab-content"],
   [class*="magritte-tab_selected"] [class*="magritte-tab-label"] {
     color: #ffffff !important; }
-  .bloko-tabs-item_active {
-    color: #e6edf3 !important; border-bottom-color: #2f81f7 !important; }
-  [class*="magritte-tab"]:not([class*="selected"]), .bloko-tabs-item:not(.bloko-tabs-item_active) {
+  /* Legacy bloko tabs (the /partners "Варианты партнёрства" switcher) ride in a
+     rounded `bloko-tabs-holder` strip painted a light #edeff0, and the component
+     marks the current tab with hh blue on both the label and a ::after underline
+     that the blanket `* { border-color }` cannot reach. The unselected labels are
+     a near-black #2a3137 our typography never touches (they are <button>s), so
+     darkening the strip alone would hide them. Take all four together, and lift
+     the blue to the theme's readable accent. The scroll-affordance glares are
+     light gradients keyed to the strip's own colour. */
+  .bloko-tabs-holder { background-color: #21262d !important; }
+  .bloko-tabs-left-glare, .bloko-tabs-right-glare {
+    background-image: none !important; }
+  .bloko-tabs__item_active { color: #5fb0e6 !important; }
+  .bloko-tabs__item_active::after { border-bottom-color: #5fb0e6 !important; }
+  [class*="magritte-tab"]:not([class*="selected"]), .bloko-tabs__item:not(.bloko-tabs__item_active) {
     color: #c4cdd6 !important; }
+  /* below the resting arm above, which it ties at 0-2-0 */
+  .bloko-tabs__item:hover, .bloko-tabs__item:focus, .bloko-tabs__item:active {
+    color: #9bd4ff !important; }
   /* A tab's LABEL is a `magritte-text_style-primary` span whichever state the tab
      is in — the component, not the class, carries the state (selected #fff /
      unselected #6a7885). Our heading rule matches `magritte-text` + `primary` and
@@ -1703,6 +1754,25 @@
      inversion leaves. */
   [class*="careerhhru--"] {
     filter: invert(1) hue-rotate(180deg) saturate(3) !important; }
+  /* the two product mockups in the /employer landing's "Выбирайте, как искать"
+     section are hh's own UI screenshots shipped as a raster on the card
+     (`vacancies-{sm,md,lg}` / `candidates-*` webp): ~85% pure white carrying
+     near-black ink. The element's own background-color is already dark, so every
+     surface scan passes while two 470x175 white slabs glare off the page. The
+     ink is the mockup's content, so nothing that only darkens the plate works —
+     multiply/darken/brightness all take the ink down with it. Inverting
+     lightness in place is the only treatment that keeps the mockup legible; the
+     hue-rotate cancels the hue flip so its green/blue/gold accents survive, and
+     the reduced contrast stops the ink blowing out to pure white.
+     `contain` letterboxes the raster, so the element's own background must go
+     transparent or the filter would invert it into a light band at the edges.
+     The A/B `alt-image` variant swaps in flat blue SVG art that already reads on
+     dark and must stay OUT of the filter — inverting it pales the brand blue and
+     turns black hair white. Both class names carry a per-build hash, so the
+     match is on the un-hashed CSS-module prefix. */
+  [class*="price-card-image--"]:not([class*="alt-image--"]) {
+    filter: invert(1) hue-rotate(180deg) contrast(0.75) brightness(1.1) !important;
+    background-color: transparent !important; }
 
   /* ---- Cookie / consent informer (kill the bright bar; click-dismiss in real use) ---- */
   [data-qa="cookies-policy-informer"], .cookies-policy-informer {
@@ -1842,6 +1912,103 @@
   [class*="tag--"][class*="tag-violet--"], [class*="tag--"][class*="tag-violet--"] * { color: #c3a6f5 !important; }
   [class*="tag--"][class*="tag-grey--"] { background-color: #21262d !important; }
   [class*="tag--"][class*="tag-grey--"], [class*="tag--"][class*="tag-grey--"] * { color: #c4cdd6 !important; }
+
+  /* ---- Производственный календарь (/calendar) ----
+     A legacy page whose whole stylesheet is inlined in the body and written for a
+     white sheet, so almost none of it goes through Magritte tokens.
+     (1) `_other` is the empty leading/trailing filler cell, painted #fff so it
+     disappears natively — on dark it is a grid of bright squares. Clear it.
+     (2) `_day-off` (#ffbebe) and `_shortened` (#feef7b) are the pale fills that
+     ARE the calendar's colour key, and they carry a black day number our
+     typography rules lift to light grey → light-on-pale, unreadable. Give each a
+     dark tint of the same hue with a matching readable number, and re-tint the
+     legend swatches to the identical fills so the key still matches the grid.
+     (3) The overview label sits on a dotted leader rule and masks it with a #fff
+     span — a white bar behind every "Календарных дней" line. It has to match the
+     page base, not a card.
+     (4) The per-day tooltip and the norms-table row hover are white panels that
+     only exist under the pointer, so no load-time scan reaches them; the
+     quarter/heading rows re-assert #fff with their own !important, hence the
+     `tr` compound, and they must stay below the row-hover arm to win on order. */
+  .calendar-list__numbers__item_other {
+    background-color: transparent !important; }
+  .calendar-list__numbers__item_day-off,
+  .calendar-info-explanation__color_red {
+    background-color: #4a2c25 !important; }
+  .calendar-list__numbers__item_day-off { color: #ff8a7a !important; }
+  .calendar-list__numbers__item_day-off:hover {
+    background-color: #5c3830 !important; }
+  .calendar-list__numbers__item_shortened,
+  .calendar-info-explanation__color_yellow {
+    background-color: #4a3a12 !important; }
+  .calendar-list__numbers__item_shortened { color: #f0d58a !important; }
+  .calendar-list__numbers__item_shortened:hover {
+    background-color: #5c4917 !important; }
+  .calendar-list__overview-label > span {
+    background-color: #14181d !important; }
+  .calendar-hint { background-color: #21262d !important; }
+  .calendar-norms tr:hover { background-color: #21262d !important; }
+  tr.calendar-norms-heading:hover, tr.calendar-norms-separator:hover {
+    background-color: transparent !important; }
+  .calendar-norms-separator td::before {
+    background-color: #2d333b !important; }
+
+  /* ---- Legal / rules documents (/conditions, /terms) ----
+     The `hh-rules` sidebar is a stack of white cards — the "new edition" banner,
+     the expand-all toggle card and the archive/nav links — and our forced light
+     body text sits on every one of them. The toggle's off track is a light grey
+     pill; its knob and the ON track's green are correct as-is. */
+  .hh-rules__banner, .hh-rules__all, .hh-rules__button, .hh-rules__archive-link {
+    background-color: #1c2128 !important; }
+  .hh-rules__banner-button { background-color: #21262d !important; }
+  .hh-rules__banner-button:hover { background-color: #2d333b !important; }
+  a.hh-rules__banner-button--blue {
+    background-color: #1f3550 !important; color: #5fb0e6 !important; }
+  a.hh-rules__banner-button--blue:hover { background-color: #24406b !important; }
+  .hh-rules__control:not(.hh-rules__control--active) {
+    background-color: #3a424c !important; }
+
+  /* ---- "Безопасный HeadHunter" (/safety) ----
+     A bespoke marketing page (its own `cx_` module) drawn entirely for a white
+     sheet: a full-bleed pale-blue band and the article sheet are both painted by
+     PSEUDO-elements, so an element-bg scan reads the page as themed while every
+     word of it renders on white. The four advice cards rotate green / blue /
+     violet by position, not by class, so the rotation has to be restored through
+     the same nth-child arithmetic; the screenshot frames and carousel arrows are
+     white chrome, and the media fade is a light gradient that would smear across
+     the artwork on dark. */
+  .cx_content::before, .cx_insetContent, .cx_insetContent::before {
+    background-color: #14181d !important; }
+  .cx_signsItem { background-color: #1f3550 !important; }
+  .cx_signsItem:nth-child(4n+1) { background-color: #16301f !important; }
+  .cx_signsItem:nth-child(4n+3) { background-color: #241d33 !important; }
+  .cx_signsItem_example_block, .cx_scammersItems .slick-arrow {
+    background-color: #21262d !important; }
+  .cx_scammersItem_media::after { background-image: none !important; }
+
+  /* ---- Блог (/blog) ----
+     The blog is a separate Next.js app with its own chrome, so none of the
+     supernova header rules reach it: its sticky `Header_header--<hash>` bar stays
+     white while the nav labels above it are already lifted light. The app also
+     runs an older Magritte token set (`-v24-3-0`), where `icon-primary` is #000,
+     so the search magnifier is a black glyph — scoped to the header's magritte
+     icons so the brand logo's own fills are untouched. */
+  header[class*="Header_header"],
+  [class*="Header_mobileMenuContent"] {
+    background-color: #0d1117 !important; border-color: #2d333b !important; }
+  header[class*="Header_header"] [class*="magritte-icon"] {
+    color: #c4cdd6 !important; }
+  [class*="Footer_separator"] { background-color: #2d333b !important; }
+
+  /* ---- Партнёрам (/partners) ----
+     Another white-sheet marketing page with its own module: the "кто мы" keyword
+     pills and the "Инструменты для сотрудничества" cards are light panels our
+     forced light body copy sits on, and each full-width section band is painted
+     by a `::before` an element-bg scan cannot see. */
+  .partners-tips__tip { background-color: #21262d !important; }
+  .partners-tools__tool { background-color: #1c2128 !important; }
+  .partners-tools::before, .partners-howto::before {
+    background-color: #14181d !important; }
 
   /* ---- Misc surfaces hh paints white directly ---- */
   [style*="background-color: rgb(255, 255, 255)"],

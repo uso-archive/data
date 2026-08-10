@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A full dark theme for Thingiverse: browse the feed, model pages, search and profiles in comfortable dark while 3D model previews stay true to color.
-@version      20260804.13.21
+@version      20260809.22.54
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -221,6 +221,13 @@
   [class*="HomePageBanner__homeBanner--"] .carousel .control-dots .dot.selected {
     background-color: #ffffff !important; }
 
+  /* The membership hero is a brand gradient that runs MakerBot blue down to
+     #f6f7fa — drawn to hand off into the white page below it. On dark it ends in
+     a near-white band butted against the page base. Keep the blue top and land
+     the gradient on the page colour instead. */
+  [class*="AboutMembershipPage__aboutMembershipHero"] {
+    background-image: linear-gradient(#1e42df 14%, #3a5fe0 41%, #24304f 84%, #1a1f28 93%, #14181d 100%) !important; }
+
   /* ====================================================================
      Card / panel surfaces — Thingiverse wraps the model-page gallery,
      description and most content blocks in `Card__card` / `Card__layer--NN`
@@ -360,14 +367,17 @@
     background-color: #2d333b !important; }
 
   /* IconBadge: a status-tinted disc under a status-coloured glyph, one tint per
-     variant, every one a single-class `background-color`. The neutralizer left all
-     five as bare glyphs with no badge behind them. Same tints as the Notification
-     panels so the two components keep reading as the same status. */
+     variant, every one a single-class `background-color` the neutralizer eats,
+     leaving a bare glyph with no badge behind it. Same tints as the Notification
+     panels so the two components keep reading as the same status. `neutral` is the
+     sixth member of the set; it needs the same one-step lift off the page as the five
+     tints, not `--tv-bg-layer-02`, which equals the page base and shows nothing. */
   [class*="IconBadge__success"] { background-color: #122a25 !important; }
   [class*="IconBadge__error"] { background-color: #2a1419 !important; }
   [class*="IconBadge__warning"] { background-color: #2a2410 !important; }
   [class*="IconBadge__info"] { background-color: #18222f !important; }
   [class*="IconBadge__highlight"] { background-color: #221833 !important; }
+  [class*="IconBadge__neutral"] { background-color: #262c33 !important; }
 
   /* Inline text highlight (matched search terms): the tint IS the highlight, so
      flattening it erases the marking entirely. */
@@ -389,15 +399,18 @@
 
   /* Thing-page status banners (Banner__banner): the site paints these as a
      SOLID status bar — the WIP banner ("Hey! This Thing is still a Work in
-     Progress") is bold amber #ffc402, moderation/error banners red, etc. The
-     neutralizer flattened the fill to transparent, so the whole bar collapsed
-     to bare text on the page and the status identity was lost. Restore each as
-     the dark status tint (matching the Notification treatment) with its own
-     hue for text, so the warning/error/info meaning survives on dark. */
+     Progress") is bold amber #ffc402, moderation banners red #ff385c, etc. The
+     neutralizer eats the fill, so the whole bar collapses to bare text on the
+     page and the status identity is lost. Restore each as the dark status tint
+     (matching the Notification treatment) with its own hue for text, so the
+     warning/error/info meaning survives on dark. The variant set is exactly
+     `default | primary | danger | warning | success` — these names ARE the
+     component's API, so a rule keyed to any other word matches nothing. */
   [class*="Banner__warning"] { background-color: #2a2410 !important; color: #ffd75c !important; }
-  [class*="Banner__problem"], [class*="Banner__error"] { background-color: #2a1419 !important; color: #ff8fa3 !important; }
-  [class*="Banner__ok"], [class*="Banner__success"] { background-color: #122a25 !important; color: #6fd8c9 !important; }
-  [class*="Banner__info"] { background-color: #18222f !important; color: #9bd4ff !important; }
+  [class*="Banner__danger"] { background-color: #2a1419 !important; color: #ff8fa3 !important; }
+  [class*="Banner__success"] { background-color: #122a25 !important; color: #6fd8c9 !important; }
+  [class*="Banner__primary"] { background-color: #18222f !important; color: #9bd4ff !important; }
+  [class*="Banner__default"] { background-color: #2d333b !important; color: #c4cdd6 !important; }
 
   /* Site-wide alert bars keep their native status colours */
   [class*="SiteWideNotification__ok"] { background-color: #018071 !important; }
@@ -545,6 +558,13 @@
   [class*="HomePageTagline__badgeIcon"] path[stroke="#EEEFF1"] { stroke: #2d333b !important; }
   [class*="HomePageTagline__badgeIcon"] path[fill="black"] { fill: #e6edf3 !important; }
 
+  /* The footer newsletter wordmark is an inline SVG: "Thingiverse" is
+     fill="currentColor" and follows the footer ink, but "Club" is a hardcoded
+     #2B52FE drawn for the white page and reads 3.4:1 on the #0d1117 footer bar.
+     Lift it to the same brand blue the rest of the theme uses on dark. The
+     aria-label is the only stable hook — the SVG carries no class. */
+  svg[aria-label="Thingiverse Club Logo"] path[fill="#2B52FE"] { fill: #5fb0e6 !important; }
+
   /* small muted card labels ("Featured", "Ad", metadata) -> readable grey */
   [class*="itemCardMeta"], [class*="ItemCardMeta"],
   [class*="adCardCaption"], [class*="AdCardCaption"] { color: #9aa4af !important; }
@@ -603,6 +623,10 @@
     color: #e6edf3 !important; background-color: transparent !important; }
   [role="menuitem"]:hover, [role="option"]:hover,
   [class*="MenuItem"]:hover, [class*="menuItem"]:hover { background-color: #2d333b !important; }
+  /* Recent-search rows in the header search panel carry their whole hover cue in a
+     single-class `:hover` fill, which the neutralizer outranks — the row under the
+     pointer is then identical to the rest of the list. */
+  [class*="RecentSearches__recentSearchWrapper"]:hover { background-color: #18222f !important; }
   /* react-select marks the current choice with an accent fill; the blanket
      `[role="option"]` reset above would erase it, so it has to come after and
      out-specify it. */
@@ -730,6 +754,36 @@
      must never be filtered. */
   img[src*="/site/img/default/"] { filter: invert(1) hue-rotate(180deg) !important; }
 
+  /* /developers illustrates its three feature columns with greyscale rasters that
+     bake an opaque #f5f5f5 plate into the file (three bright squares on the dark
+     page), and its Thing Apps illustration is transparent line art whose brightest
+     pixel is Y=102 (invisible on it). Both are greyscale, so inverting lifts the
+     linework without shifting any hue; the fractional amount is what lands the
+     #f5f5f5 plate on Y=24 — the page base is Y=23, so the plate stops reading as a
+     square. The `developers-arrow` chevron is deliberately excluded: it is the
+     brand blue and already reads. */
+  img[src*="developers-explore"], img[src*="developers-community"],
+  img[src*="developers-environment"], img[src*="developers-apps"] {
+    filter: invert(0.94) !important; }
+
+  /* /legal's card icons are greyscale rasters whose whole plate is dark (policy
+     tops out at Y=51, terms at Y=153) — they were the figure against the white
+     page and are now near-invisible on the card. Inverting keeps the plate/glyph
+     relationship and puts the figure back. `privacy-policy` is already a light
+     plate and is left alone; its path does not contain `/images/policy`. */
+  img[src*="/site/assets/images/policy"], img[src*="/site/assets/images/terms"] {
+    filter: invert(1) !important; }
+
+  /* /about/advertising's "Our Previous Partners" strip shows third-party
+     wordmarks as transparent PNGs drawn for the white page; three of the five
+     currently listed are solid black (Y max 2) and vanish on the dark tile. The
+     partner list rotates, so give the tile the light ground the logos are drawn
+     for rather than filtering individual files — the same treatment the Google
+     sign-in button gets above. `logoBadge` is the modifier that separates these
+     tiles from the stat and CTA badges sharing the `aboutAdvertisingBadge` base. */
+  [class*="AboutAdvertisingPage__logoBadge--"] {
+    background-color: #e6edf3 !important; border-color: #e6edf3 !important; }
+
   /* ====================================================================
      Ad surrounds: dark frame + dark loading slot (don't theme iframe
      content). Google DFP slots have stable id prefixes.
@@ -738,12 +792,57 @@
   [id^="div-gpt-ad-"], [id*="google_ads_iframe"], ins.adsbygoogle {
     background-color: #14181d !important; }
 
+  /* Publift's sticky footer ad wraps the creative in chrome of its own, present on
+     every page: a full-width #efefef plate at opacity .3 (invisible on white, a
+     bright band over the dark page) and an opaque #efefef collapse tab whose
+     chevron is two #053067 bars. The plate and tab are the widget's surfaces, not
+     the ad creative, so they follow the page; the chevron follows the tab. */
+  [class*="publift-widget"][class*="container-background"] { background-color: #14181d !important; }
+  [class*="publift-widget"][class*="-button"] { background-color: #1c2128 !important; }
+  [class*="publift-widget"][class*="-button"] > div { background-color: #c4cdd6 !important; }
+
+  /* ====================================================================
+     Blog (/blog and /blog?p=<slug>) — the posts are a third-party Dropinblog
+     embed with its own light palette under `#dib-posts` / `#dib-template-2` /
+     `#dib-search-dialog`. It resolves no `--tv-*` token, and the `#react-app`
+     neutralizer only reaches its `background-color`s, so its hairlines, its
+     #333 ink and its dialog survive untouched. Its own rules are `#id`-scoped
+     (several `!important`), so each override matches or beats that specificity.
+     ==================================================================== */
+  #dib-template-2 a.dib-post, .dib-related .dib-related-post,
+  #dib-posts blockquote, #dib-search-box, #dib-search-dialog .dib-search-hits-item,
+  #dib-posts .dib-faq-item { border-color: #2d333b !important; }
+  #dib-posts .dib-related .dib-related-post h2 a.dib-post-title-link {
+    color: #e6edf3 !important; }
+  /* the in-post divider is a background stripe, not a border */
+  #dib-posts .dib-post-content hr { background: #2d333b !important; }
+  /* featured-image loading shimmer: a white->#eef1f4 sweep, animated by the
+     widget's own `background-size`/`animation`, so only the image layer changes */
+  img.dib-img-loading {
+    background-image: linear-gradient(90deg, #1c2128 35%, #262c33 48%, #262c33 52%, #1c2128 65%) !important; }
+  /* Blog search (the `dib-search-toggle` magnifier) opens a <dialog> outside
+     #react-app with a hardcoded white panel and white result rows. */
+  #dib-search-dialog { background-color: #1c2128 !important; }
+  #dib-search-dialog .dib-search-hits-item a, #dib-search-dialog .ais-Hits--empty {
+    background-color: #1c2128 !important; color: #e6edf3 !important; }
+  #dib-search-dialog .dib-search-hits-item a:hover { background-color: #2d333b !important; }
+  #dib-search-dialog .dib-search-hits-item mark {
+    background-color: #3d3410 !important; color: #ffd75c !important; }
+  #dib-posts #dib-search-close { color: #c4cdd6 !important; }
+
   /* ====================================================================
      Footer
      ==================================================================== */
-  footer, [class*="Footer"], [class*="footer"] {
+  /* A lowercase `[class*="footer"]` is deliberately absent here: the legacy shell
+     carries `fixed-footer` on <body>, so that substring matches the entire page —
+     the descendant `a` form then outranks `.tv-button--primary` and repaints every
+     header CTA label the footer link blue. The React footer is `Footer__footer*`;
+     the legacy one is `.site-footer` / `.footer-links` inside `.page-container`. */
+  footer, [class*="Footer"], .page-container .site-footer,
+  .page-container .footer-links {
     background-color: #0d1117 !important; border-color: #2d333b !important; color: #c4cdd6 !important; }
-  footer a, [class*="Footer"] a, [class*="footer"] a { color: #9bd4ff !important; }
+  footer a, [class*="Footer"] a, .page-container .site-footer a,
+  .page-container .footer-links a { color: #9bd4ff !important; }
 
   /* ====================================================================
      Legacy (non-React) pages — /challenges, /challenges/<slug>, /apps and
@@ -802,6 +901,9 @@
   .page-container section h1, .page-container .app-info, .page-container .select-menu,
   .page-container .item-name, .page-container .inline-upload p {
     color: #c4cdd6 !important; }
+  /* The app-card title is an <a> carrying its own legacy #333, so `.item-name`
+     above reaches it only by inheritance — which a direct declaration beats. */
+  .page-container .item-name a { color: #c4cdd6 !important; }
   /* `.white-button` is a white slab (APP INFO / LAUNCH APP) floating on the app
      card's dark cover — keep it a raised, clearly-clickable control, just dark.
      It has no border natively, so give it one or it melts into that cover. */
@@ -816,6 +918,25 @@
      dark the wordmark disappears, so invert the raster instead. */
   .page-container .site-footer { background-image: none !important; }
   .page-container .site-footer .site-logo img { filter: invert(1) !important; }
+
+  /* /customizer is a legacy page of its own (`#top.customizer-page`), built from
+     `customizer.css` rather than the `.content-box`/`.item` vocabulary above. Two
+     of its bands are white — the "Explore Customizers" section and the pair of
+     `.cta` boxes at the foot — and the page-wide light ink lands on both, so every
+     heading and paragraph there is white on white. */
+  .page-container .customizer-explore { background-color: #14181d !important; }
+  .page-container .customizer-page .cta {
+    background-color: #1c2128 !important; border-color: #3a424c !important;
+    color: #c4cdd6 !important; }
+  /* Its other three bands are native brand colour (blue #10469c, green #72b878,
+     grey #666) and each sets `color:#fff` on itself — which reaches the copy only
+     by inheritance, so the blanket `p` ink above takes it (1.5:1 on the green).
+     Pin the copy back to the white these bands are drawn for. */
+  .page-container .customizer-page > header,
+  .page-container .customizer-page > header p,
+  .page-container .customizer-what-is, .page-container .customizer-what-is p,
+  .page-container .customizer-contribute, .page-container .customizer-contribute p,
+  .page-container .customizer-contribute h4 { color: #ffffff !important; }
 
   /* ====================================================================
      Scrollbars + selection

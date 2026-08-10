@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Weather Underground. Darkens forecasts, hourly and 10-day pages and data tables while keeping radar, maps and weather icons intact.
-@version      20260804.13.21
+@version      20260809.22.55
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -380,6 +380,14 @@
   .data-module .mini-map .mapPlay {
     background-color: rgba(247, 247, 247, 0.9) !important;
   }
+  /* Those chips are outlined in WU's cyan and separated by a cyan divider; the
+     blanket `*` reset flattens both to the theme line colour, so the pad we
+     deliberately keep native loses the one thing that made it look native. */
+  .zoomControl,
+  .zoomControl .zoomOut,
+  lib-animator-buttons .mapPlay {
+    border-color: #15aadc !important;
+  }
 
   /* Mapbox attribution overlay (white text on white pill) on the mini-map. */
   .__wxmap_MapboxAttribution,
@@ -499,6 +507,25 @@
   #station-list[id] tbody tr:hover,
   #station-list[id] tbody tr:hover > td {
     background-color: #232a33 !important;
+  }
+  /* The Nearby Weather Stations table is paged by a Material paginator whose
+     range label is `rgba(0,0,0,.87)` from a rule more specific than the
+     `.data-module *` colour:inherit above, and whose chevrons are SVGs painted
+     through `fill` (not `color`), so no text-colour rule reaches them: the
+     "1 - 10 of 33" readout and all four page buttons render near-black on the
+     dark card. Material encodes enabled/disabled in that fill alone
+     (`rgba(0,0,0,.54)` vs `.12`) -- keep the two apart. Note every button also
+     carries `mat-mdc-button-disabled-interactive`, so the state token must be
+     matched as a whole class, never as a substring. */
+  .mat-mdc-paginator-range-label,
+  .mat-mdc-paginator-page-size-label {
+    color: var(--wu-text-2) !important;
+  }
+  .mat-mdc-paginator-icon {
+    fill: var(--wu-text-2) !important;
+  }
+  .mat-mdc-paginator .mat-mdc-button-disabled .mat-mdc-paginator-icon {
+    fill: var(--wu-border-2) !important;
   }
 
   /* ---- forms / search --------------------------------------------------- */
@@ -883,6 +910,19 @@
     color: var(--wu-text-2) !important;
   }
 
+  /* The Infographics index builds its grid from `.cta-module` cards, a class
+     none of the news/blog selectors above reach: they keep WU's #f7f7f7 panel,
+     so the lifted white title lands white-on-white. Each card is wrapped in a
+     single <a>, which makes our link lift claim the description paragraph --
+     WU's body copy, and the only prose on the card. */
+  .cta-module {
+    background-color: var(--wu-surface) !important;
+    color: var(--wu-text-2) !important;
+  }
+  .cta-module p {
+    color: var(--wu-text-2) !important;
+  }
+
   /* The Category 6 blog separates its sections with <span class="cat-six-line">, a
      2px #bdbdbd rule painted as a background-COLOR rather than a border, so the
      blanket `*` border reset never touches it and it is far below the light-surface
@@ -966,6 +1006,18 @@
   .alert-inner a,
   .alert-wrapper .alert-inner a {
     color: #ffffff !important;
+  }
+  /* WU draws the band's 1px border in the SAME severity colour as its fill, so
+     natively it is invisible; the blanket `*` reset turns it into a dark
+     hairline boxing in the alert. Transparent shows the fill through the
+     border box, which is exactly what WU renders -- and it needs no per-level
+     hex, so DF4/DF5 stay correct too. */
+  .DF1,
+  .DF2,
+  .DF3,
+  .DF4,
+  .DF5 {
+    border-color: transparent !important;
   }
 
   /* ---- wundermap page --------------------------------------------------- */
@@ -1103,6 +1155,15 @@
   .sidebar-tab-container .items-list li:nth-child(5),
   .mobile-wundermap-wrapper .items-list li:nth-child(5) {
     border-left-color: #15aadc !important;
+  }
+  /* WU marks the open pane by lifting that tab one step above the rail
+     (#4c4c4c on its native #3d3d3d). We darkened the rail to the chrome tone
+     and left the lift at #4c4c4c, so the subtle native step became a mid-grey
+     slab on near-black. Neither scan sees it: it is dark-on-dark and
+     achromatic. Re-state the step in the theme's own elevation. */
+  .sidebar-tab-container .items-list li.active,
+  .mobile-wundermap-wrapper .items-list li.active {
+    background-color: var(--wu-surface) !important;
   }
   /* Below the desktop breakpoint the whole rail collapses into
      `.mobile-wundermap-wrapper`, a component none of the desktop wundermap
@@ -1376,6 +1437,36 @@
   .trc_related_container .video-title {
     color: var(--wu-text-2) !important;
   }
+  /* Dismissing a recommendation opens Taboola's feedback flow: a full-cover
+     white wash over the card (.trc_exclude_overlay) plus a white popover of
+     reasons whose ink Taboola pins on the CHILDREN, so a colour set on the
+     panel alone never reaches it. Both ship `visibility:hidden` and are two
+     interactions deep (hover the card, click its "x"), so no scan sees them.
+     The caret the eye reads is a pseudo-element border, which the blanket
+     border reset cannot reach either. */
+  .trc_exclude_overlay,
+  .trc_popover,
+  .trc_popover_title_wrapper,
+  .trc_popover_content_wrapper,
+  .popupContentWrapper {
+    background-color: var(--wu-surface) !important;
+    color: var(--wu-text-2) !important;
+  }
+  .trc_popover_title_wrapper,
+  .trc_popover_content_wrapper span,
+  .trc_popover_content_wrapper div,
+  .trc_popover_content_wrapper label,
+  .popupContentWrapper span,
+  .popupContentWrapper div,
+  .popupContentWrapper label {
+    color: var(--wu-text-2) !important;
+  }
+  .trc_popover_arrow::after,
+  .trc_popover_arrow::before {
+    border-bottom-color: var(--wu-surface) !important;
+    border-top-color: var(--wu-surface) !important;
+  }
+
   .trc_rbox_header_span,
   .trc_desktop_attribution_link span,
   .trc_desktop_disclosure_link span,
@@ -1904,5 +1995,324 @@
      Restore the accent (the ring's width is WU's, we only recolour it). */
   .thumbnail-img.selected {
     border-color: #15aadc !important;
+  }
+
+  /* ---- (i) Foundation callouts (hurricane basin activity) --------------- */
+  /* `.callout` is Foundation's message box: a #fff panel with near-black ink
+     plus five tinted variants that ENCODE severity. Nothing above reaches it,
+     so /hurricane's six Basin Activity rows shipped as full-width white bands
+     carrying our lifted white heading. Darken the base and restate each tint as
+     a dark wash of the same hue so success/warning/alert still read apart. */
+  .callout {
+    background-color: var(--wu-surface) !important;
+    color: var(--wu-text-2) !important;
+  }
+  .callout.primary {
+    background-color: #16303d !important;
+  }
+  .callout.secondary {
+    background-color: var(--wu-surface-2) !important;
+  }
+  .callout.success {
+    background-color: #17301b !important;
+  }
+  .callout.warning {
+    background-color: #3a2a17 !important;
+  }
+  .callout.alert {
+    background-color: #3a1b1e !important;
+  }
+  /* WU's #696969 inside the callout is ~3:1 on the darkened panel. The
+     `.activity` variant is the other half of a two-state pair -- WU paints it
+     orange to say this basin HAS storms -- so the mute must stop short of it. */
+  .callout .storm-status,
+  .callout .storm-status span {
+    color: var(--wu-text-muted) !important;
+  }
+  .callout .storm-status.activity,
+  .callout .storm-status.activity span {
+    color: #ff8833 !important;
+  }
+
+  /* ---- (j) Material expansion panels ------------------------------------ */
+  /* mat-expansion-panel keeps Material's own #fff surface and rgba(0,0,0,.87)
+     ink, and its chevron is an inline SVG painted through `fill`. The
+     /hurricane "Hurricane Resources" accordion is two white slabs on the dark
+     page whose bodies are already dark, so the closed panel is the worst case. */
+  mat-expansion-panel,
+  .mat-expansion-panel,
+  mat-expansion-panel-header,
+  .mat-expansion-panel-header,
+  .mat-expansion-panel-body {
+    background-color: var(--wu-surface) !important;
+    color: var(--wu-text-2) !important;
+  }
+  .mat-expansion-panel-header:hover,
+  .mat-expansion-panel-header:focus {
+    background-color: var(--wu-surface-2) !important;
+  }
+  .mat-expansion-panel-header-title,
+  .mat-expansion-panel-header-description {
+    color: var(--wu-text) !important;
+  }
+  .mat-expansion-indicator,
+  .mat-expansion-indicator svg,
+  .mat-expansion-indicator svg path {
+    color: var(--wu-text-2) !important;
+    fill: var(--wu-text-2) !important;
+  }
+  /* The indicator's <svg> is display:none -- the chevron actually drawn is the
+     ::after, a rotated 8px box with only its right and bottom borders, in
+     rgba(0,0,0,.54). `*` never matches a pseudo, so the reset misses it. */
+  .mat-expansion-indicator::after {
+    border-color: var(--wu-text-2) !important;
+  }
+
+  /* ---- (k) module footer CTA -------------------------------------------- */
+  /* WU gives every `.basic-module` / `.data-module` a `.footer` strip holding
+     the module's one CTA ("Learn More", "View More ..."). It is geometry only
+     natively -- transparent, with a #006f9e link. Our page-footer rules match on
+     the bare class, so the strip took the chrome fill and the link took plain
+     body ink: the CTA reads as a sentence, not a control. */
+  .basic-module > .footer,
+  .data-module > .footer {
+    background-color: transparent !important;
+  }
+  .basic-module .footer a,
+  .data-module .footer a {
+    color: var(--wu-link) !important;
+  }
+  .basic-module .footer a:hover,
+  .data-module .footer a:hover {
+    color: var(--wu-link-hover) !important;
+  }
+
+  /* ---- (l) blockquote --------------------------------------------------- */
+  /* WU sets `blockquote, blockquote p { color:#4c4c4c }` globally, so every
+     quoted block (the /about/contact-us press + postal addresses) lands
+     ~1.3:1 on the dark base. */
+  blockquote,
+  blockquote p {
+    color: var(--wu-text-2) !important;
+  }
+
+  /* ---- (m) sign-up opt-in checkbox -------------------------------------- */
+  /* The /signup marketing opt-in is the third instance of WU's sprite
+     checkbox: a `label.checkbox` whose box is the label's ::before cell of
+     wu4Form_sprite.png (solid white when unchecked, a cyan tick when checked)
+     and whose own text keeps WU's #1e2023. Both are invisible-class faults --
+     the sprite is a bg-image on a pseudo, the label ink is dark-on-dark. */
+  label.checkbox,
+  label.checkbox span {
+    color: var(--wu-text-2) !important;
+  }
+  label.checkbox::before {
+    filter: invert(1) brightness(2.2) !important;
+  }
+  input:checked + label.checkbox::before {
+    filter: none !important;
+  }
+
+  /* ---- (n) posters / infographics gallery ------------------------------- */
+  /* `.region-content-main` carries an INLINE pastel background WU derives from
+     the poster art (`style="background-color:#cedae9"`), so the whole gallery
+     column is a pale panel under our lifted light text. The Popular Cities bar
+     on these pages is a different component from the city page's
+     `.favoritesBar` -- `.favs-wrapper`, an opaque white plate over the poster
+     banner -- and keeps its white behind the same light text. */
+  .region-content-main {
+    background-color: var(--wu-base) !important;
+  }
+  .favs-container .favs-wrapper,
+  .favs-wrapper {
+    background-color: var(--wu-chrome) !important;
+  }
+
+  /* ---- (o) storm-detail Saffir-Simpson scale ---------------------------- */
+  /* The tracker's Storm Category legend is a seven-band colour scale: each
+     `.storm-range` cell is filled with WU's category hue and labelled in
+     near-black ON that fill. `.storm-range` is also a Foundation `.row`, so the
+     grid neutralizer zeroed every fill -- the scale went blank and its labels
+     became near-black on the dark card, taking the whole reading with them. The
+     `.row.storm-range` prelude is what clears the neutralizer; hexes are WU's. */
+  .row.storm-range .trop-depression {
+    background-color: #10eefc !important;
+  }
+  .row.storm-range .trop-storm {
+    background-color: #7afc00 !important;
+  }
+  .row.storm-range .cat-1 {
+    background-color: #fcfc00 !important;
+  }
+  .row.storm-range .cat-2 {
+    background-color: #fcab00 !important;
+  }
+  .row.storm-range .cat-3 {
+    background-color: #fa0000 !important;
+  }
+  .row.storm-range .cat-4 {
+    background-color: #fc00fc !important;
+  }
+  .row.storm-range .cat-5 {
+    background-color: #ffc2ff !important;
+  }
+
+  /* ====================================================================== */
+  /* The second, custom-element frontend ("the new Weather Underground       */
+  /* website", currently the /history/* pages).                              */
+  /*                                                                         */
+  /* It shares nothing with the Angular tree above: its chrome is <header>,   */
+  /* action-bar-wc, location-header-view, mobile-nav-wc, search-wc,           */
+  /* scale-change-wc and footer-view, so not one selector above reaches it.   */
+  /* It ships BOTH palettes behind `prefers-color-scheme`, which our          */
+  /* `color-scheme: dark` cannot flip -- under a light OS every surface here  */
+  /* is white while our text rules have already lifted the ink off it, so the */
+  /* page must be reviewed under both schemes.                                */
+  /* ====================================================================== */
+  body > header,
+  action-bar-wc,
+  mobile-nav-wc,
+  mobile-nav-wc ol,
+  body > header details ol,
+  action-bar-wc details ol,
+  search-wc ul {
+    background-color: var(--wu-chrome) !important;
+    color: var(--wu-text-2) !important;
+  }
+  mobile-nav-wc li,
+  mobile-nav-wc a {
+    color: var(--wu-text-2) !important;
+  }
+  /* The narrow-viewport hamburger / close cross is three <span> bars whose
+     colour is a background-COLOR keyed to the OS scheme: white under a dark
+     OS, #1e2023 under a light one, where it disappears into the header we
+     just darkened. It is the only way to open or close the drawer. */
+  header-menu-wc .hamburger span {
+    background-color: var(--wu-text) !important;
+  }
+  location-header-view {
+    background-color: var(--wu-base) !important;
+  }
+  location-header-view .elevation-coordinates,
+  .high-low-item .label {
+    color: var(--wu-text-muted) !important;
+  }
+  /* Both nav rows keep their accent bar transparent at rest and colour it on
+     hover / for the selected tab. The blanket `*` reset paints it at REST too,
+     so six permanent grey chips sit above the header nav and the cyan on the
+     selected page tab is gone. The header items carry no class -- their hue is
+     positional. WU's own hexes, except the last: its #2152a8 is too dark here,
+     so it takes the same lift the Angular header's indigo gets. */
+  body > header nav details,
+  location-header-view nav a {
+    border-top-color: transparent !important;
+  }
+  body > header nav details:nth-of-type(1):hover {
+    border-top-color: #c43533 !important;
+  }
+  body > header nav details:nth-of-type(2):hover {
+    border-top-color: #ef8e48 !important;
+  }
+  body > header nav details:nth-of-type(3):hover {
+    border-top-color: #f5bc4f !important;
+  }
+  body > header nav details:nth-of-type(4):hover {
+    border-top-color: #6b9d53 !important;
+  }
+  body > header nav details:nth-of-type(5):hover {
+    border-top-color: #4fa7d7 !important;
+  }
+  body > header nav details:nth-of-type(6):hover {
+    border-top-color: #2f7fd6 !important;
+  }
+  location-header-view nav a.selected {
+    background-color: var(--wu-surface) !important;
+    border-top-color: #15aadc !important;
+  }
+  /* search-wc paints the pill; its <input> only fills the interior. Darkening
+     the input alone leaves the host's #e7e7e7 as a light rim, and the
+     geolocate button inside is transparent, so it reads as a light chip. */
+  search-wc {
+    background-color: var(--wu-surface-2) !important;
+    border-color: var(--wu-border-2) !important;
+  }
+  /* The °F/°C scale toggle stays a light #e7e7e7 chip in BOTH palettes, so our
+     light button ink lands white-on-white and the selected/unselected pair
+     (black vs #4fa7d7) collapses into one blank chip. */
+  scale-change-wc button {
+    background-color: var(--wu-surface-2) !important;
+    color: var(--wu-text-2) !important;
+    border-color: var(--wu-border-2) !important;
+  }
+  scale-change-wc button.selected {
+    background-color: #15aadc !important;
+    color: #ffffff !important;
+    border-color: #15aadc !important;
+  }
+  /* Daily / Weekly / Monthly: the active pill is white in the light palette,
+     which our light button ink erases. */
+  .segmented-control {
+    background-color: var(--wu-surface-2) !important;
+  }
+  .segmented-control .toggle-btn {
+    color: var(--wu-text-muted) !important;
+  }
+  .segmented-control .toggle-btn.active {
+    background-color: var(--wu-surface) !important;
+    color: var(--wu-text) !important;
+  }
+  /* Its primary buttons ("View", "Go Ad Free") size themselves with
+     `border: 3px solid transparent` over the cyan fill, so the blanket `*`
+     reset stamps a dark band across the top and bottom of every one. */
+  button.blue {
+    border-color: transparent !important;
+  }
+  /* The Glossary is a native <dialog> that ships closed on every /history page.
+     It follows the OS scheme like the rest of this frontend, so under a light
+     OS it opens as a full white sheet with near-black ink -- and a closed
+     dialog has no box, so no load-time scan reaches it. */
+  glossary-overlay-view dialog {
+    background-color: var(--wu-surface) !important;
+    color: var(--wu-text-2) !important;
+  }
+  glossary-overlay-view .top {
+    background-color: var(--wu-surface-2) !important;
+  }
+  glossary-overlay-view .title,
+  glossary-overlay-view .selected {
+    color: var(--wu-text) !important;
+  }
+  glossary-overlay-view li,
+  glossary-overlay-view .explanation {
+    color: var(--wu-text-2) !important;
+  }
+  /* The observation cells carry their own fill, which covers the row zebra. */
+  .observations-table tbody td {
+    background-color: transparent !important;
+  }
+  /* The Day High / Low readouts are the page's headline numbers and WU ships
+     them in its light-page red and blue (#c43533 / #2152a8) in both palettes:
+     ~3.3:1 and ~2.4:1 here. Lift to the pair the rest of the theme uses. */
+  .high-low-item.high .value {
+    color: #ff6b6b !important;
+  }
+  .high-low-item.low .value {
+    color: #4d9fe6 !important;
+  }
+  /* This frontend swaps to a `-dark` suffixed copy of every monochrome icon
+     under `prefers-color-scheme: dark` only, and that media query answers to
+     the OS, not to our `color-scheme`. So under a LIGHT OS it keeps serving
+     the near-black glyph set as background-IMAGES -- unreachable by any fill
+     or colour rule -- on the chrome we just darkened. Each of these elements
+     is empty, so inverting the box only inverts the glyph. `mobile-nav-wc
+     li.settings` is deliberately absent: its glyph shares the box with the
+     row's label, so a filter there would flip the text too. */
+  @media (prefers-color-scheme: light) {
+    action-bar-wc details.settings summary,
+    span.icon.airport,
+    span.chart-section-toggle,
+    glossary-overlay-view .close {
+      filter: invert(1) !important;
+    }
   }
 }

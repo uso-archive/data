@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260804.13.16
+@version      20260809.22.48
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -63,8 +63,13 @@
     --wb-semanticColor-chonky-progressive-background-secondary-press: #1d2a3a !important;
     --wb-semanticColor-chonky-progressive-background-secondary-selected: #1d2a3a !important;
 
-    /* Text */
+    /* Text. The neutral ink scale runs strong (darkest) -> default -> subtle
+       (lightest) on Khan's light page, so on dark it has to run the other way:
+       strong is the lightest and subtle the dimmest, with `default` between them.
+       `default` is not only text — it is the fill of the unit-progress grid's
+       Quiz/Unit-test mask glyphs, which is where a too-dark value shows first. */
     --wb-semanticColor-core-foreground-neutral-strong: #e6edf3 !important;
+    --wb-semanticColor-core-foreground-neutral-default: #c4cdd6 !important;
     --wb-semanticColor-core-foreground-neutral-subtle: #9aa4af !important;
     --wb-semanticColor-feedback-neutral-subtle-text: #c4cdd6 !important;
     --wb-semanticColor-feedback-info-subtle-text: #c4cdd6 !important;
@@ -148,6 +153,18 @@
      stay near-white and only real links turn blue. */
   #main-content a { color: #5fb0e6 !important; }
   #main-content a:hover { color: #9bd4ff !important; }
+  /* Wonder Blocks draws a link's leading/trailing glyph as an EMPTY <span> whose
+     `mask-image` is filled by the span's own `background-color: currentColor` —
+     so the glyph is the link's colour, not a separate paint. The shell's `span`
+     rule above hits that span directly and pins it near-white, which splits one
+     component into two colours: the breadcrumb house sits white beside a blue
+     "Math", and the same external-link arrow renders blue in one place and white
+     in another. Give the glyph the anchor's colour back. `> span:empty` is the
+     precise shape of a mask icon — a label span has text, and the nested icon
+     spans of the mastery grid and the onboarding cards are grandchildren, so
+     neither is touched. The CTA rules further down restate their own label
+     colour and win on order. */
+  #main-content a > span:empty { color: inherit !important; }
   /* Wonder Blocks' `tertiary` kind IS a link rendered as a button ("See our
      Google-powered results", the "What's this?" beside an exercise Hint). Khan
      paints it the brand blue; the shell's span rule flattened its label to the
@@ -341,6 +358,15 @@
      alongside `color` or it silently renders this ink instead (the `mathcolor`
      and inline-`color` math remaps further down all pair the two). */
   b, strong { color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
+  /* …but a bold run INSIDE a link is part of the link, not body emphasis, and the rule
+     above outranks every un-important link colour. Khan's CMS wraps some entries of a
+     single menu or list in <strong> and not others (the marketing mega-menu's "Life
+     skills" / "Test prep" / "Partner content" sit beside eleven plain siblings), so the
+     same list renders in two colours where the site draws one. Follow the link instead.
+     `currentColor` rather than `inherit` for the fill, so it tracks whatever colour the
+     surrounding rules resolve for the anchor; a coloured marketing card still wins,
+     `.card_stat_inner *` and friends being a class selector. */
+  a b, a strong { color: inherit !important; -webkit-text-fill-color: currentColor !important; }
   /* Home "Get started as a…" audience tablist (Teachers / Students / Families):
      Khan hardcodes every tab label to the same light-page ink (+ text-fill), so
      all three render invisible on the dark band and only the selected tab's
@@ -585,14 +611,19 @@
      "Grade level" — are baked bold black, so they vanish on the dark page while the
      bars and the "Grade level proficiency" rule stay legible. It lives on the Webflow
      build, outside `#main-content`, so the content-image invert further down cannot
-     reach it. Inverting is faithful here rather than destructive: the chart's whole
-     point is a ramp of bars fading INTO the page (native #1f9dff down to a near-white
-     #f4f9fe that is already all but invisible on white), and inverting preserves that
-     relationship exactly while lifting the black titles to near-white. Matched on the
-     Webflow asset stem, which is anchored at the end so it cannot also swallow the
-     `…_graphic.avif` photo collage in the next section. */
+     reach it. The invert is what lifts those titles, but the four bars are a
+     SEQUENTIAL blue ramp (#28a9ff · #87cbfc · #cce9fd · #eef7fe) and inverting maps
+     its palest step to near-black — below the #14181d page ground, where a bar reads
+     as a hole. The trailing chain is the floor that prevents that: `contrast()` pulls
+     the inverted range in towards mid, `brightness()` re-seats it above the ground,
+     `saturate()` gives back the blue the compression costs. The invariant to hold on
+     any retune is per-step pixels, not eyeballing: every one of the four bars above
+     the page ground, ordered, and adjacent steps at least as far apart as they are
+     natively (1.47 / 1.38 / 1.16). Matched on the Webflow asset stem, which is
+     anchored at the end so it cannot also swallow the `…_graphic.avif` photo
+     collage in the next section. */
   img[src$="_graph.avif"] {
-    filter: invert(1) hue-rotate(180deg) !important;
+    filter: invert(1) hue-rotate(180deg) contrast(0.62) brightness(1.2) saturate(1.4) !important;
   }
 
   /* ====================================================================
@@ -774,19 +805,19 @@
 
   /* Problem-progress dots (`ul.indicatorContainer`, under every article's practice
      block and along the foot of an exercise): each problem is a
-     `button[aria-label="Problem N"]` holding a ring <div> whose 2px border Khan paints
-     the raw brand blue, plus an inner <div> filled the same blue on the problem you are
-     currently on. TWO of our broad rules between them erased the entire indicator: the
-     blanket `* { border-color }` reset at the end of this file greyed every ring, and the
-     `#main-content [class]` neutralizer flattened the inner disc to transparent — so all
-     nine dots rendered as identical hollow grey circles and nothing on screen said which
-     problem you were on. Restore both cues in the theme's refined Khan blue. The inner
-     disc needs no `!important` (it only has to outrank the neutralizer), the ring does
-     (the border reset is `!important`). */
+     `button[aria-label="Problem N"]` holding a single ring <div> whose 2px border Khan
+     paints the raw brand blue and which it FILLS the same blue on the problem you are
+     currently on. Two broad rules in this file each erase one of those cues — the
+     blanket `* { border-color }` reset at the end greys every ring, and the
+     `#main-content [class]` neutralizer flattens the current dot's fill to transparent,
+     leaving every dot an identical hollow circle with nothing saying which problem you
+     are on. Which dot is current lives ONLY in `aria-current`; the class list is
+     identical either way. The fill needs no `!important` (it only has to outrank the
+     neutralizer), the ring does (the border reset is `!important`). */
   #main-content ul.indicatorContainer button[aria-label] > div {
     border-color: #5fb0e6 !important;
   }
-  #main-content ul.indicatorContainer button[aria-label] > div > div {
+  #main-content ul.indicatorContainer button[aria-current="true"] > div {
     background-color: #5fb0e6;
   }
   /* The exercise page itself draws a SECOND, newer progress strip ("Do 4 problems"
@@ -832,6 +863,11 @@
      alone. */
   #main-content [fill="#21242c"] { fill: #c4cdd6 !important; }
   #main-content [fill="rgba(33,36,44,0.50)"] { fill: rgba(196, 205, 214, 0.5) !important; }
+  /* The "Community questions" section marker at the foot of a course page is a
+     third hardcoded ink in the same family — a speech-bubble <svg> at #3B3E40,
+     which is a strong ink on the white page and ~1.6:1 here, so the glyph
+     disappears beside its (near-white) heading. */
+  #main-content [fill="#3B3E40"] { fill: #c4cdd6 !important; }
 
   /* The home page's "Key supporters" band is not an HTML box at all: Khan paints
      it with a full-bleed <svg> whose single <path fill="#F5F5F5"> draws the
@@ -1305,9 +1341,27 @@
   #main-content .perseus-renderer fieldset li > button[aria-pressed="true"][aria-disabled="false"]:hover {
     background-color: #2f6fd6 !important;
   }
+  /* Perseus's second cue is the choice TEXT, which it recolours to match the
+     picked tile. The choice body is a nested stack of <div>s, and the page-shell
+     rule near the top of this file paints every one of them near-white
+     `!important` — so colouring the wrapper alone leaves the rendered words
+     identical to an unpicked choice and the cue never appears on screen. Restate
+     it on the descendants that carry the words. Only `div`/`span`/`b`/`strong`:
+     MathML and MathJax emit custom elements, and KaTeX carries Perseus's
+     `\blueD`-style term colours as an inline `color` on a span — none of which
+     this reaches, so colour-coded math inside a choice keeps its hue. */
   #main-content .framework-perseus fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div,
-  #main-content .perseus-renderer fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div {
+  #main-content .perseus-renderer fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div,
+  #main-content .framework-perseus fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div div,
+  #main-content .perseus-renderer fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div div,
+  #main-content .framework-perseus fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div span:not([style*="color"]),
+  #main-content .perseus-renderer fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div span:not([style*="color"]),
+  #main-content .framework-perseus fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div b,
+  #main-content .perseus-renderer fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div b,
+  #main-content .framework-perseus fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div strong,
+  #main-content .perseus-renderer fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div strong {
     color: #9bd4ff !important;
+    -webkit-text-fill-color: #9bd4ff !important;
   }
   #main-content .framework-perseus fieldset li > button[aria-pressed="true"][aria-disabled="true"],
   #main-content .perseus-renderer fieldset li > button[aria-pressed="true"][aria-disabled="true"] {

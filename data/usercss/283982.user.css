@@ -3,11 +3,11 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260807.22.33
+@version      20260809.22.51
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
-@-moz-document domain("ozon.ru"), domain("www.ozon.ru"), domain("ozon.kz"), domain("ozon.by") {
+@-moz-document regexp("https?://(www\.)?ozon\.(ru|kz|by)(/(?!travel(/|$)|fintech(/|$)).*)?") {
 /* ============================================================
      Ozon ships a full design-token system on :root — light
      tokens (--ozTextPrimary, --ozBGSecondary, --ozGray*, --ozWhite*
@@ -45,7 +45,11 @@
     --d-text-2: #c4cdd6;      /* body text */
     --d-text-3: #9aa6b2;      /* muted / secondary */
     --d-text-4: #7d8893;      /* quaternary / hints */
-    --d-blue: #2e78ff;        /* refined Ozon blue */
+    --d-blue: #2e78ff;        /* refined Ozon blue — FILLS (white label needs a
+                                 ground this dark; lifting it dims the label) */
+    --d-blue-ink: #4d8dff;    /* the same accent as TEXT: a blue that clears 4.5:1
+                                 on the base and on cards, where the fill blue is
+                                 4.4:1 and every link on the site is body-size */
     --d-blue-hover: #5b96ff;
     --d-red: #ff3c75;         /* refined sale red */
     --d-green: #19c560;       /* positive */
@@ -135,7 +139,7 @@
     /* ---- accents: keep brand identity, tune for dark ---- */
     --ozCtrlPrimary: var(--d-blue) !important;
     --ozAccentPrimary: var(--d-blue) !important;
-    --ozTextAction: var(--d-blue) !important;
+    --ozTextAction: var(--d-blue-ink) !important;
     --ozHoverPrimary: var(--d-blue-hover) !important;
     --ozAccentPrimaryHover: var(--d-blue-hover) !important;
     --ozBlue: var(--d-blue) !important;
@@ -211,8 +215,8 @@
        exactly this). Lifting them turned that chip into white-on-white. */
 
     /* -- brand accents: identity kept, lifted to clear contrast -- */
-    --textAction: var(--d-blue) !important;
-    --textOzon: var(--d-blue) !important;
+    --textAction: var(--d-blue-ink) !important;
+    --textOzon: var(--d-blue-ink) !important;
     --textActiveAction: var(--d-blue-hover) !important;
     --textActiveOzon: var(--d-blue-hover) !important;
     --graphicActionPrimary: var(--d-blue) !important;
@@ -369,7 +373,7 @@
     color: var(--d-text) !important;
   }
   .vue-portal-target a:hover {
-    color: var(--d-blue) !important;
+    color: var(--d-blue-ink) !important;
   }
   /* Both rules below are scoped, because .vue-portal-target is a SHARED mount point:
      Ozon also portals the review media viewer (a separate `*_24` bundle) into it. An
@@ -387,11 +391,11 @@
   .vue-portal-target button[class*="uw_"],
   .vue-portal-target button[class*="uw_"] span,
   .vue-portal-target button[class*="uw_"] svg {
-    color: var(--d-blue) !important;
+    color: var(--d-blue-ink) !important;
   }
   .vue-portal-target a[isload="true"],
   .vue-portal-target a[isload="true"] svg {
-    color: var(--d-blue) !important;
+    color: var(--d-blue-ink) !important;
   }
   /* Ozon also renders its DROPDOWN LISTS (the search-results sort menu, …) into
      this portal, and marks the currently-chosen option with a brand-blue tick it
@@ -401,7 +405,7 @@
      signal, reduced to the same muted grey as every idle glyph. Match the inline
      token by name and give those glyphs the action blue back. */
   .vue-portal-target [style*="graphicActionPrimary"] {
-    color: var(--d-blue) !important;
+    color: var(--d-blue-ink) !important;
   }
   /* the currently-selected left-rail category paints a near-white pill
      (#f5f7fa via a hashed class, NOT a token) as its active highlight —
@@ -556,6 +560,15 @@
      panel (thumbnails rendered as blank dark boxes). Only the affixed
      bar's own ::before is ever white, and it is a grandchild of the
      widget, so scope there. */
+  /* The RU/language button is the one <button> in that group, and the group rule paints
+     it the bar colour, which also pins its hover: natively it carries a faint
+     rgba(0,48,120,.04) plate that deepens to rgba(0,26,53,.12) under the cursor — the
+     only feedback the control has, since neither its label nor its flag changes. An
+     opaque !important fill answers the pointer with nothing. A state that is not
+     rendered cannot be scanned; found by a native-vs-themed hover diff. */
+  [data-widget="selectedCurrencyLanguage"]:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+  }
   [data-widget="header"]::before,
   [data-widget="header"]::after,
   [data-widget="header"] > div::before,
@@ -813,6 +826,17 @@
      text still shows light on the button's dark surface. */
   input[role="combobox"][name="filter"] {
     background-color: transparent !important;
+  }
+  /* OZON ID WORDMARK in that same login modal — a two-tone SVG served as an <img>
+     (`.cls-1 { fill:#005bff }` on "OZON", `.cls-2 { fill:#001a34 }` on "ID"), so no
+     selector can reach the halves and the token remap never applies. The blue half
+     reads on the darkened panel; the near-black "ID" is ~1.2:1 and disappears, leaving
+     the wordmark looking truncated. Inverting the luminance while rotating the hue back
+     keeps the two-tone relationship — blue "OZON", light "ID" — instead of flattening
+     both to white, which is what a plain brightness/invert would do. Keyed on the asset
+     name so it survives the file's version suffix rotating. */
+  img[src*="ozon-id"] {
+    filter: invert(1) hue-rotate(180deg) !important;
   }
   /* SEARCH-RESULTS SORT CONTROL ("Популярные" / "Сначала дешёвые" …). The
      control is a readonly text <input> that fills the full height of a 230px
@@ -1130,6 +1154,21 @@
     background-color: var(--d-blue) !important;
   }
 
+  /* PRODUCT-DESCRIPTION CLAMP FADE — when the description is long enough to clip, Ozon
+     lays a 70px `linear-gradient(to bottom, transparent, var(--layerFloor1))` over its
+     last lines. --layerFloor1 is a CARD surface token, but the description sits directly
+     on the page canvas, so our :root value ends the fade one step lighter than the ground
+     it fades into: a hard 912px-wide seam across the full width of the block, right above
+     the "Показать полностью" toggle. Both colours are legitimate theme values and the
+     element has no background of its own, so every light-surface and contrast check
+     passes — only a pixel read across the boundary shows it.
+     Rebound on the section rather than the fade's own rotating hash. Measured live, the
+     fade is the ONLY --layerFloor1 use anywhere inside #section-description, so nothing
+     else in the block loses its card surface; the id is the PDP's own anchor target. */
+  #section-description {
+    --layerFloor1: var(--d-bg) !important;
+  }
+
   /* SELLER RICH-CONTENT DESCRIPTION (data-widget="webDescription", built from the
      "Rich Annotation" RA-* module) hardcodes a near-black navy (rgb(0,26,52)) on its
      body copy, outside the token system — so the whole product-description paragraph
@@ -1164,7 +1203,7 @@
      matched because the module puts its class on some links and not others. */
   [data-widget="webDescription"] [class*="RA-"] a,
   [data-widget="webDescription"] a[class*="RA-"] {
-    color: var(--d-blue) !important;
+    color: var(--d-blue-ink) !important;
   }
 
   /* GALLERY: the stage + thumbnail tiles are white CONTAINERS
@@ -1333,6 +1372,32 @@
   [data-widget="filtersDesktop"] input:checked + div {
     background-color: #005bff !important;
   }
+  /* …and both of those fills are !important, so they also pin the control's HOVER: a
+     switch track natively tints rgba(11,152,253,.17) under the cursor and a checked
+     radio/checkbox deepens #005bff -> #0050e0, and with the rest state forced neither
+     answers the pointer. Every row in the rail is wrapped in a <label>, so the hover is
+     read there. Order is load-bearing: both rules sit at (0,3,3) and the CHECKED one
+     comes second so it wins for a checked switch, which matches both. The checked hover
+     goes BRIGHTER, not darker like the light site: a deeper blue on near-black reads as
+     less prominent, i.e. backwards feedback. */
+  [data-widget="filtersDesktop"] label:hover input:not([name]) + div {
+    background-color: rgba(255, 255, 255, 0.26) !important;
+  }
+  [data-widget="filtersDesktop"] label:hover input:checked + div {
+    background-color: var(--d-blue) !important;
+  }
+  /* "Все фильтры" is the one shared-component <button> in the rail, and that component
+     shows its hover as a full-size absolutely-positioned veil DIV whose colour is set at
+     rest and whose OPACITY the site animates 0 -> .1. The rail's `div { transparent }`
+     neutraliser clears the colour, so the animation composites nothing and the rail's
+     primary CTA is the only button on the site with no hover at all. Hand the veil a
+     colour back and the site's own opacity does the rest, exactly as it does for every
+     b25 button outside the rail. Reached by shape: the veil is the only div in the rail
+     that FOLLOWS a div sibling inside a button (the other rail buttons ship a single
+     label child), so no rotating hash is involved. */
+  [data-widget="filtersDesktop"] button > div + div {
+    background-color: var(--d-blue) !important;
+  }
   /* RANGE SLIDERS (Цена, Диагональ экрана …) — the same neutraliser erases BOTH
      bars the slider is made of: its grey rail (#b3bcc5) and the light-blue
      selected span (#99bdff). The slider then renders as two blue handles
@@ -1388,6 +1453,13 @@
   [data-widget="footer"] > div {
     background-color: var(--d-header) !important;
   }
+  /* Ozon's link component carries a literal #005bff on the <a> itself, from a
+     cross-origin sheet no token remap can reach. Every other footer link wraps
+     its text in a <span> that our tokens do recolour, so only the bare-text
+     legal link at the very bottom renders it — 3.55:1 on the footer ground. */
+  [data-widget="footer"] a {
+    color: var(--d-blue-ink) !important;
+  }
 
   /* ============================================================
      CART  (logged-out cart renders the same widget shell)
@@ -1398,6 +1470,58 @@
   [data-widget="cartFooter"],
   [data-widget="cartEmpty"] {
     background-color: transparent !important;
+  }
+
+  /* ============================================================
+     ERROR PAGE  ("Такой страницы не существует")
+     ============================================================ */
+  /* The minimal error template — served for /reviews/ of a product with none,
+     and for other dead routes — is the one page whose <h2> is pinned outside
+     the token system, at rgb(45,49,51): 1.36:1, so the page reads as empty
+     apart from its subtitle. The heading is the shell's own grandchild, which
+     no content heading on any other page type is. */
+  .container > div > h2 {
+    color: var(--d-text) !important;
+  }
+
+  /* ============================================================
+     GIFT-CERTIFICATE BUILDER  (/landing/giftcertificates)
+     ============================================================ */
+  /* The whole builder is one widget whose typography sits OUTSIDE the token
+     system: its four step headings ("1. Выберите дизайн" …) and the upload
+     button are pinned at a literal rgb(7,7,7), so on the dark page the form
+     reads as four unlabelled control groups (1.13:1). The button's label is a
+     bare <span> with no colour of its own, so lifting the button carries it.
+     The delivery note beside step 2 is the widget's only tinted plate — a
+     literal #f5f7fa slab that stays light-on-dark. */
+  [data-widget="webCustomizedCertificate"] div[class*="tsHeadline"],
+  [data-widget="webCustomizedCertificate"] button {
+    color: var(--d-text) !important;
+  }
+  [data-widget="webCustomizedCertificate"] div[class*="tsBody300XSmall"] {
+    background-color: var(--d-surface) !important;
+    color: var(--d-text-3) !important;
+  }
+
+  /* ============================================================
+     ACCOUNT / HELP PAGE FAMILY (/my/*) — the left side-nav
+     ============================================================ */
+  /* data-widget="menu" is the rail down the left of every /my/ page (Пункты выдачи,
+     Сравнение товаров, Условия оплаты, Настройки cookies …). Its whole text layer —
+     nine link labels plus the "Акции и подписки" / "Помощь" section headings — is pinned
+     at a literal rgb(7,7,7) outside the token system, so on the darkened card the entire
+     rail renders near-black on near-black and the page looks like it has an empty
+     sidebar. Reachable logged out on the .kz/.by storefronts, where /my/cookies is also
+     the cookie preference centre; .ru gates the same route behind a login wall.
+     Measured live, rgb(7,7,7) is the widget's ONLY text colour, so nothing semantic is
+     flattened. The headings are the only DIVs carrying it — the labels are <span> inside
+     <a> — so a tag split restores the rail's own hierarchy. */
+  [data-widget="menu"] a,
+  [data-widget="menu"] a span {
+    color: var(--d-text-2) !important;
+  }
+  [data-widget="menu"] div[class*="tsBody"] {
+    color: var(--d-text) !important;
   }
 
   /* ============================================================
@@ -1421,7 +1545,7 @@
      only handle is a rotating hash — see the caveat in the review notes; it keeps
      the raw blue.) */
   [data-widget="webListReviews"] a {
-    color: var(--d-blue) !important;
+    color: var(--d-blue-ink) !important;
   }
 
   /* VIDEO-DURATION TIMECODE PILL ("00:46") on review (and gallery) video
@@ -1501,6 +1625,29 @@
      "Б" badge carry their OWN inline colour, so they are untouched. */
   [data-widget="webMarketingLabels"] div[style*="bgOpaqueMarketingSecondary"] {
     color: var(--textMarketing) !important;
+  }
+
+  /* VERIFIED-SELLER REPLY BADGE — the pill carrying the shop name above a seller's
+     answer under a review (and inside the review media viewer's comment column). Ozon
+     paints it with an INLINE `background-image: linear-gradient(90deg, #E3F8EB, #E6FCFD);
+     color: var(--textPrimary)` — a pale mint-to-cyan plate whose label deliberately
+     reuses the page's primary INK. Our :root lift turns that ink near-white, so the shop
+     name sits at ~1.1:1 on a plate we never darkened: the badge renders as an empty pale
+     lozenge with the verified tick floating in it. It is a background-IMAGE, so the
+     element-bg neutralisers and every light-surface walk pass clean, and it only mounts
+     where a seller has answered — never at page load.
+     Inverted to the theme's own positive/fresh tints rather than flattened, so the plate
+     keeps its two-hue identity and the already-light label reads at ~13:1. Both
+     serialisations are matched for the same reason the "Новинка" chip needs them: the
+     server ships the author's hex and a client re-render rewrites it through the CSSOM
+     as rgb(). */
+  [style*="#E3F8EB"],
+  [style*="rgb(227, 248, 235)"] {
+    background-image: linear-gradient(
+      90deg,
+      var(--bgOpaquePositiveSecondary) 0%,
+      var(--bgOpaqueFreshSecondary) 100%
+    ) !important;
   }
 
   /* SCROLL-TO-TOP DISC (data-widget="homeButton") — a position:fixed
@@ -1597,7 +1744,7 @@
   /* Spec-rating verdicts ("среднее" / "высокая" / "хороший") ship the
      raw brand blue #005bff (~2.9:1 on the base); lift to our blue. */
   [data-widget="contextQuestionsStatistic"] span {
-    color: var(--d-blue) !important;
+    color: var(--d-blue-ink) !important;
   }
 
   /* "Есть дешевле" cross-sell label (data-widget="webBestSeller") ships a
@@ -1642,7 +1789,7 @@
   }
 }
 
-@-moz-document domain("ozon.ru"), domain("www.ozon.ru") {
+@-moz-document regexp("https?://(www\.)?ozon\.ru(/(?!travel(/|$)|fintech(/|$)).*)?") {
 /* OZON-CARD PRICE PILL — the buybox headline price sits on a solid GREEN pill
      (#00c451, white text): Ozon's "this is the price with an Ozon card" signal,
      and the single most prominent semantic colour on the PDP. It carries NO
@@ -1659,5 +1806,149 @@
     border-radius: 8px;
     padding: 2px 8px;
     margin: -2px -8px;
+  }
+}
+
+@-moz-document domain("docs.ozon.ru"), domain("docs.ozon.kz"), domain("docs.ozon.by") {
+:root {
+    color-scheme: dark;
+
+    --d-bg: #14181d;
+    --d-surface: #1c2128;
+    --d-surface-2: #1a1f26;
+    --d-header: #0d1117;
+    --d-border: #2a313a;
+    --d-text: #e6edf3;
+    --d-text-2: #c4cdd6;
+    --d-text-3: #9aa6b2;
+    --d-blue: #2e78ff;
+    --d-blue-ink: #4d8dff;
+    --d-blue-hover: #5b96ff;
+
+    /* -- page + panel surfaces -- */
+    --body-background: var(--d-bg) !important;
+    --ozi-bg-primary: var(--d-surface) !important;
+    --color-modal: var(--d-surface) !important;
+    --main-50: var(--d-surface-2) !important;
+    --main-100: var(--d-surface-2) !important;
+    --main-100-active: #232a32 !important;
+    --oz-white-2: var(--d-surface-2) !important;
+    --gray-100: var(--d-surface-2) !important;
+    --gray-200: var(--d-border) !important;
+    --oz-gray-90: var(--d-border) !important;
+    --oz-gray-95: var(--d-surface-2) !important;
+    --oz-neutral: var(--d-border) !important;
+    --oz-neutral-50: var(--d-surface-2) !important;
+    --oz-neutral-200: var(--d-border) !important;
+    --oz-neutral-300: #3d4650 !important;
+    --border-flag: var(--d-border) !important;
+    --color-search-results: var(--d-surface) !important;
+
+    /* -- callout plates: keep the info/success/warning/danger hues,
+       drop them to a tint that carries light text -- */
+    --action-50-opaque: #16233a !important;
+    --success-50-opaque: #14291d !important;
+    --alert-50-opaque: #2e1620 !important;
+    --warning-50-opaque: #2b2415 !important;
+
+    /* -- ink: dark -> light -- */
+    --body-font-color: var(--d-text) !important;
+    --main-font-color: var(--d-text) !important;
+    --oz-black: var(--d-text) !important;
+    --oz-main-black: var(--d-text) !important;
+    --main-900: var(--d-text) !important;
+    --text-500: var(--d-text) !important;
+    --text-300: var(--d-text-2) !important;
+    --text-200: var(--d-text-3) !important;
+    --gray-500: var(--d-text-3) !important;
+    --search-result-section: var(--d-text-3) !important;
+    --ozi-text-primary-transparent: var(--d-text) !important;
+    --ozi-text-secondary-transparent: var(--d-text-3) !important;
+    --icon-500: var(--d-text-3) !important;
+    --icon-600: var(--d-text-2) !important;
+    --oz-gray-40: var(--d-text-2) !important;
+    --oz-gray-60: var(--d-text-3) !important;
+    --oz-gray-70: var(--d-text-3) !important;
+
+    /* -- accents lifted for near-black, brand hue kept -- */
+    --oz-blue: var(--d-blue-ink) !important;
+    --oz-blue-hover: var(--d-blue-hover) !important;
+    --action-500: var(--d-blue-ink) !important;
+    --ozi-text-action: var(--d-blue-ink) !important;
+    --ozi-bg-action-primary: var(--d-blue) !important;
+    --color-visited-link: #b18cf5 !important;
+
+    /* -- translucent tints authored dark-on-light: invert the ink -- */
+    --oz-parandja: rgba(255, 255, 255, 0.05) !important;
+    --oz-parandja-hover: rgba(255, 255, 255, 0.09) !important;
+    --oz-separator-dark: rgba(160, 175, 195, 0.22) !important;
+    --ozi-bg-tertiary-transparent: rgba(255, 255, 255, 0.06) !important;
+    --ozi-active-bg-tertiary-transparent: rgba(255, 255, 255, 0.11) !important;
+    --ozi-graphic-quaternary-transparent: rgba(255, 255, 255, 0.16) !important;
+    --ozi-graphic-tertiary-transparent: rgba(255, 255, 255, 0.32) !important;
+    --ozi-graphic-secondary-transparent: rgba(255, 255, 255, 0.42) !important;
+  }
+
+  /* Header and the tree side-nav are the two full-height surfaces the token
+     layer paints from --oz-white rather than --body-background. */
+  .page-header,
+  .page-header__mobile-back-link,
+  .page-header__close,
+  .page-header__user-info-wrapper {
+    background-color: var(--d-header) !important;
+  }
+  .menu,
+  .menu__wrapper,
+  .menu__nav {
+    background-color: var(--d-bg) !important;
+  }
+  /* Below 800px the page ground is re-declared from --oz-white, which this
+     block deliberately leaves alone. */
+  body {
+    background-color: var(--d-bg) !important;
+  }
+
+  /* Floating surfaces — each must stay opaque or the article scrolls through it. */
+  .modal__box,
+  .modal--scroll,
+  .modal--video-island .modal__box,
+  .modal--video-island .modal__content,
+  .country-modal__wrapper,
+  .dropdown__options,
+  .select__options,
+  .select__trigger,
+  .contract-menu__select-options,
+  .code__notification-message,
+  .search-results {
+    background-color: var(--d-surface) !important;
+  }
+  .select__custom--active .select__trigger,
+  .select__trigger:hover,
+  .tabs__button--active {
+    background-color: var(--d-surface-2) !important;
+  }
+
+  /* Header search: idle it is a translucent tint, but hover and focus swap in
+     the opaque page-white token — and the field's own ink is white, so a
+     focused search box swallowed what you were typing. */
+  .search__wrapper:hover,
+  .search__wrapper:focus-within {
+    background-color: var(--d-surface-2) !important;
+  }
+
+  /* Scroll-to-top disc: a literal #f0f2f5 puck fixed over the article. */
+  .page__up {
+    background-color: var(--d-surface) !important;
+    color: var(--d-text) !important;
+  }
+
+  /* Radio/checkbox rings and the feedback textarea are literal light greys. */
+  .radio__box,
+  .checkbox__box {
+    border-color: var(--d-border) !important;
+  }
+  textarea {
+    background-color: var(--d-surface-2) !important;
+    color: var(--d-text) !important;
   }
 }

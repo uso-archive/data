@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean dark theme for itch.io's homepage, browse, jams, community and profiles that keeps game art, sale ribbons and creators' own page designs untouched.
-@version      20260804.13.16
+@version      20260809.22.48
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -27,6 +27,11 @@
     --itchio_body_color_light: #8b949e;
     --itchio_body_color_lighter: #8b949e;
     --itchio_body_color_gray: #8b949e;
+    /* itch drives EVERY focus ring through `:focus { outline-color: var(--itchio_input_focus_color) }`
+       and sets it to a deep purple built for the white page — 1.35:1 on this one, i.e. keyboard
+       navigation has no visible indicator anywhere on the site. No text or surface scan reads an
+       outline colour, and it takes a real Tab to reach the state. */
+    --itchio_input_focus_color: #e6edf3;
   }
   /* The only place --itchio_body_color_med is a BACKGROUND rather than ink: the "Play in
      browser" chip in a game cell. Keep it the dark chip itch draws, not the rebound ink. */
@@ -262,16 +267,41 @@
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
-  /* Filter-row links paint a light grey (#666) hover bar natively — dark elevated instead */
-  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget a:hover {
+  /* Filter rows and the More/Fewer Options toggle paint a light grey (#666) hover bar
+     natively — dark elevated instead. The toggle is a <button>, so an anchor-only rule
+     leaves itch's #666 under our muted label at 1.9:1. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget a:hover,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget .toggle_more_btn:hover,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget .filter_append:hover {
     background-color: #21262d !important;
   }
-  /* The applied filter's row keeps itch's link-red glyph as its "this filter is on" cue;
-     the monochrome-glyph rule below greys it while the star on the neighbouring row (no
-     rule) stays accent, so the column reads half-selected. Hand the glyph back to the row. */
-  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget li.active .icon,
-  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget li.active .svgicon {
-    color: inherit !important;
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget .toggle_more_btn:hover {
+    color: #e6edf3 !important;
+  }
+  /* itch leaves an unselected filter row at the page's body ink (`color: inherit`) and marks
+     the SELECTED one with link red plus bold — colour is the primary cue and its dark theme
+     keeps the same split. The blanket accent paints every row pink, so selected and
+     unselected become indistinguishable, and the monochrome-glyph rule below mutes only the
+     platform glyphs, splitting one list into two tiers. Both label and glyph move together;
+     the row's glyph is an icon FONT, so it rides `color`. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget > ul li > a,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget > ul li > button,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget > ul li > a .icon,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget > ul li > a .svgicon {
+    color: #c4cdd6 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget > ul li.active > a,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget > ul li.active > button,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget > ul li.active > a .icon,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget > ul li.active > a .svgicon {
+    color: #fa7d8c !important;
+  }
+  /* Ties the active rule on specificity, so it must stay after it to reach an active row */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget > ul li > a:hover,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget > ul li > button:hover,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget > ul li > a:hover .icon,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_filter_group_widget > ul li > a:hover .svgicon {
+    color: #e6edf3 !important;
   }
   /* Selected-tag info card in the browse sidebar ships a full white var(--itchio_white_back)
      panel with #434343 body copy — a big white card mid-column on every tag-filtered page. */
@@ -454,6 +484,10 @@
     background-color: #f65a7d !important;
     color: #ffffff !important;
   }
+  /* .button is the one control that hardcodes the focus purple instead of reading the token */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .button:focus {
+    outline-color: #e6edf3 !important;
+  }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .button.outline,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .subscribe_button {
     background-color: #1c2128 !important;
@@ -468,6 +502,18 @@
      rule leaves accent-on-accent (~1.9:1) where itch ships white. Same class as .post_type a. */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .tag_segmented_btn > a:hover,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_chip {
+    color: #ffffff !important;
+  }
+  /* The no-entry button beside every facet count is a muted affordance that fills brand red
+     with a white glyph once hovered or applied. The blanket accent gives ~19 of them the same
+     pink as the facet links they sit next to, and leaves the filled states accent-on-accent
+     at 2:1. Its glyph strokes currentColor, so `color` drives both. The :hover rule must be
+     explicit — the blanket `a:hover` outranks a plain `.facet_exclude`. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_exclude {
+    color: #8b949e !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_exclude:hover,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .facet_exclude.active {
     color: #ffffff !important;
   }
   /* The negated facet chip is the inverse: itch fills it var(--itchio_white_back) (#fff)
@@ -649,6 +695,45 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .post_header {
     box-shadow: 0 0 0 10px #1c2128 !important;
   }
+  /* That byline is position:sticky over the scrolling post and itch fills it a 95%-opaque plate
+     so the body copy passes behind it. The transparent rule above leaves only the shadow ring,
+     so the post text runs straight through the author name as the thread scrolls. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .community_post .post_header {
+    background-color: #1c2128 !important;
+  }
+  /* The plate is meant to be invisible — itch matches it to whatever the post sits on. In a topic
+     that is the elevated .content_frame, but a profile's activity feed sits straight on the page
+     base, where the elevated tone would read as a band across every byline. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .community_profile_page .community_post .post_header,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .community_profile_page .community_post .avatar_container {
+    background-color: #14181d !important;
+    box-shadow: 0 0 0 10px #14181d !important;
+  }
+  /* itch writes the whole post byline and footer in its muted greys — author #606060, date
+     #858585, Like #434343, Reply #606060, no link colour anywhere — so the blanket accent turns
+     the meta row into one flat wall of pink and drops the hierarchy between the four. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .community_post .post_header .post_date a,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .community_post .post_footer .post_action,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .community_post .post_footer .vote_btn {
+    color: #8b949e !important;
+  }
+  /* Reply carries both classes, and itch gives it the stronger of the two tones */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .community_post .post_author a,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .community_post .post_footer .reply_btn {
+    color: #c4cdd6 !important;
+  }
+  /* Like signals through colour alone: brand red on hover, white on a red fill once voted. The
+     accent already painted its rest state red, so hovering changed nothing and a voted button
+     read accent-on-accent. Its border carries the same states and the blanket reset greys it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .community_post .post_footer .vote_btn:hover {
+    color: #fa7d8c !important;
+    border-color: #fa7d8c !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .community_post .post_footer .vote_btn.voted {
+    background-color: #e8446a !important;
+    border-color: #e8446a !important;
+    color: #ffffff !important;
+  }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .post_body,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .post_body *,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .topic_posts_footer,
@@ -783,6 +868,32 @@
   }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .day_marker,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .day_marker * { color: #8b949e !important; }
+  /* The featured-jam strip and the jam calendar both scroll horizontally behind a CUSTOM
+     scrollbar whose track is var(--itchio_gray_back) and whose thumb is var(--itchio_border_color)
+     — a full-width near-white rail across the page. Scrollbar pseudo-elements are not in the DOM,
+     so no element walk reaches them, and on an overlay-scrollbar OS the rail only paints while
+     the strip is actually being scrolled. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jams_page .featured_jams .jam_grid_widget::-webkit-scrollbar-track,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jams_page .jam_jam_calendar_widget::-webkit-scrollbar-track {
+    background-color: #1a1f26 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jams_page .featured_jams .jam_grid_widget::-webkit-scrollbar-thumb,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jams_page .jam_jam_calendar_widget::-webkit-scrollbar-thumb {
+    background-color: #3c444d !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jams_page .featured_jams .jam_grid_widget::-webkit-scrollbar-thumb:hover,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jams_page .jam_jam_calendar_widget::-webkit-scrollbar-thumb:hover {
+    background-color: #565e68 !important;
+  }
+  /* The browse filter rail scrolls behind a rgba(0,0,0,0.1) track and thumb — a light-page tint
+     that leaves the rail's scroll affordance invisible here. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_column_base_page .sticky_wrapper::-webkit-scrollbar-track {
+    background-color: #1a1f26 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .browse_column_base_page .sticky_wrapper::-webkit-scrollbar-thumb {
+    background-color: #3c444d !important;
+  }
+
   /* jam-vote progress track (fill colour left intact) */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .progress_bar { background-color: #30363d !important; }
   /* elapsed-days shade band in the jam calendar */
@@ -1172,6 +1283,10 @@
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
+  /* A pill's only hover cue is its border lightening; the pinned border above outranks it */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page .filter:hover {
+    border-color: #565e68 !important;
+  }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page .filter.selected {
     background-color: #1d3327 !important;
     border-color: #45b976 !important;
@@ -1226,6 +1341,13 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .developers_page .guide_nav .outline_button {
     background-color: #1c2128 !important;
     border-color: rgba(250, 125, 140, 0.45) !important;
+  }
+  /* Hovering one fills it brand red with a white label; the pinned dark fill and border above
+     are !important, so without this the chip has no hover feedback beyond a shade of pink. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .developers_page .guide_nav .outline_button:hover {
+    background-color: #e8446a !important;
+    border-color: #e8446a !important;
+    color: #ffffff !important;
   }
   /* Each section heading leads with an icon-FONT glyph left at itch's #434343 (1.8:1). It is
      drawn by a ::before, so no text-colour walk reads it. */
@@ -1345,5 +1467,18 @@
      the grid scroll through it. Must stay opaque. */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_mobile_banner_widget {
     background-color: #0d1117 !important;
+  }
+  /* Its gradient is a per-video accent, so itch writes the whole bar white and gives Subscribe a
+     white-outlined glass pill. The blanket accent puts pink on the pale end of that gradient at
+     ~1.7:1, and the generic .subscribe_button rule swaps the glass pill for a dark chip. Below
+     itch's 650px breakpoint only, so a desktop pass never renders it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_mobile_banner_widget,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_mobile_banner_widget a,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_mobile_banner_widget .subscribe_button {
+    color: #ffffff !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_mobile_banner_widget .subscribe_button {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    border: 2px solid rgba(255, 255, 255, 0.85) !important;
   }
 }

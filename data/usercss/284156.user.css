@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Substack (the hub, discovery, and every publication and post) while keeping each newsletter's own accent color intact.
-@version      20260804.13.20
+@version      20260809.22.54
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -283,13 +283,43 @@
   }
 
   /* --- Archive month dividers ---
-     The grouped-archive month header takes the pub accent as INK. Accent-as-ink
-     is kept everywhere it carries brand meaning (links, CTAs), but this is an
-     11px uppercase date label that fails AA even on a bright accent (4.46:1 on
-     #ea410b) and is unreadable on a dark one (1.11:1 on #1e1b4b). It shares the
-     `meta-` family with the byline dates below it, so it takes their muted grey. --- */
+     The grouped-archive month header takes the pub accent as INK. It shares the
+     `meta-` family with the byline dates below it, so it takes their muted grey
+     rather than the neutral used by the accent-ink block below. --- */
   [class*="monthHeader"] {
     color: #8b949e !important;
+  }
+
+  /* --- Accent used as INK ---
+     A publication configures ONE accent, emitted as both a fill (--background_pop)
+     and an ink (--print_pop, and the --color-accent-text token every Pencraft
+     accent-ink consumer reads). The fill is left alone — that is where the brand
+     lives — but the ink is pub-configured and may be arbitrarily dark, and no
+     static CSS can lighten only the dark ones: post-body links measure 1.76:1 on
+     #6c0095 and the comment `Author` tag 1.11:1 on #1e1b4b, both on #14181d.
+     Prose links get a neutral ink and an underline as their only remaining
+     affordance, so the underline has to be legible on every pub: an accent-
+     coloured one is invisible on exactly the dark accents that forced the ink
+     to go neutral (#1e1b4b measures 1.2:1 against this canvas), and the accent
+     is unreachable as a decoration colour for those pubs at any thickness.
+     `.button` (accent-FILLED CTA) and `.image-link` (image wrapper) are
+     text-less and stay out.
+     `a[class*="color-accent-"]` is the Pencraft accent-ink utility, restricted to
+     anchors so it cannot reach the month header above. --- */
+  .body.markup a:not(.button):not(.image-link),
+  a.linkified {
+    color: #e6edf3 !important;
+    text-decoration-line: underline !important;
+    text-decoration-color: currentColor !important;
+  }
+  a[class*="color-accent-"],
+  a.thread-head-cta {
+    color: #e6edf3 !important;
+  }
+  /* Comment `Author` / `Liked by …` tags feed the accent into the Tag component's
+     own --color-theme-fg; the outline stays accent-tinted. */
+  [class*="tag-"][class*="theme_accent"] {
+    --color-theme-fg: #c4cdd6 !important;
   }
 
   /* --- Sticky publication nav spacer (inline-styled hardcoded white block
@@ -396,6 +426,34 @@
   #substack-home .resource-icon {
     stroke: #8b949e !important;
   }
+  /* Hairlines across the marketing pages are hardcoded light greys
+     (#cacaca/#d8d8d8/#e3e3e3/#e5e5e5/#e6e6e6/#e8e8e8): resource cards and their
+     row rules, the guide's sticky section rail, the secondary-CTA outline, the
+     cohort section dividers, the per-cookie boxes on /privacy, the comparison
+     table rows and the FAQ dividers.
+     `tr` is safe unqualified here — `#substack-home` is absent from every
+     Pencraft app page. */
+  #substack-home .featured-resource,
+  #substack-home .resource,
+  #substack-home .floating-navigator,
+  #substack-home .button.big-button.secondary,
+  #substack-home .cohort-hero,
+  #substack-home .cohort-big-benefits,
+  #substack-home .cohort-examples,
+  #substack-home .cohort-substack-benefits,
+  #substack-home .blogger-hero,
+  #substack-home .case-study-section,
+  #substack-home section.cookie,
+  #substack-home [class*="containerBorderBottom"],
+  #substack-home [class*="containerBorderTop"],
+  #substack-home [class*="faqItem"],
+  #substack-home tr,
+  #substack-home hr {
+    border-color: #2d333b !important;
+  }
+  #substack-home .featured-byline {
+    color: #8b949e !important;
+  }
   /* The /features closing CTA paints its body copy with the light-scheme
      SURFACE primitive (`color: var(--color-light-bg-primary)`) so that it
      reads white on the green band. We remap that primitive to #14181d, which
@@ -412,8 +470,15 @@
 
   /* Full-bleed light section fills. The tinted/who/gradient members also paint
      a peach wash as background-IMAGE over the fill, which a background-color
-     override alone does not clear. */
+     override alone does not clear.
+     The three `^=` members are /jobs bands whose whole fill is a cream RASTER
+     (no CSS gradient to read, so the bg-image scan is blind to them). They must
+     be prefix-matched: `[class*="jobsHero"]` would also swallow the orange
+     jobsHeroButton and the jobsHeroImage that sit inside the band. */
   #substack-home [class*="statsStrip"],
+  #substack-home [class^="jobsHero-"],
+  #substack-home [class^="buildSection-"],
+  #substack-home [class^="marqueeBackground-"],
   #substack-home [class*="sectionTinted"],
   #substack-home [class*="sectionWhite"],
   #substack-home [class*="sectionWho"],
@@ -478,5 +543,118 @@
   /* --- Text selection --- */
   ::selection {
     background-color: rgba(95, 176, 230, 0.3);
+  }
+}
+
+@-moz-document domain("support.substack.com") {
+/* --gray-lightest and --gray-lighter are consumed only as background and
+     border colours (breadcrumb bar, article box, vote footer, blockquotes,
+     search filter rail), so both move to surfaces. --gray-light is left alone:
+     it is used for BOTH roles and its #818a91 still measures 4.6:1 as ink. */
+  :root {
+    --gray-lighter: #262c33 !important;
+    --gray-lightest: #1c2128 !important;
+    --meta-text-color: #8b949e !important;
+    --input-border-color: #2d333b !important;
+    --input-focus-border-color: #4a515a !important;
+  }
+
+  /* `body { color: #282f48 }` is what every heading, paragraph and article
+     inherits; the rest of the list is each place the theme restates that ink
+     (or the footer's #101010) on a component of its own. */
+  body,
+  .lt-skip-navigation,
+  .lt-topbar__link,
+  .lt-topbar__controls,
+  .lt-btn--topbar,
+  .lt-btn--print,
+  .breadcrumbs > li:last-child a,
+  .lt-contact-box,
+  .lt-contact-box__title,
+  .lt-custom-block__title,
+  .lt-custom-block__link,
+  .lt-section-link,
+  .lt-article-box,
+  .lt-search-filter__link,
+  .lt-profile-stats__value,
+  .lt-profile-nav__item a,
+  .lt-promoted-articles-accordion-item__title,
+  .lt-my-activities-menu--main .lt-my-activities-menu-item.is-active,
+  .lt-vote__control--active,
+  .lt-post-status--not-planned,
+  .lt-status-label--not-planned,
+  .recent-articles ul > li a,
+  .related-articles ul > li a,
+  .tabs-link,
+  .upload-dropzone span,
+  .lt-footer,
+  .lt-footer__social-link,
+  .callout {
+    color: #e6edf3 !important;
+  }
+
+  /* The theme's link green (#006f5c) measures 2.8:1 on this canvas. #0c9 is
+     the site's own brighter green, the one its "solved" label uses. The bare
+     `a` carries no !important on purpose: the white-on-brand links
+     (hero, orange block-list tiles, primary buttons) then keep winning on
+     specificity, exactly as they do natively. */
+  a {
+    color: #00cc99;
+  }
+  .lt-footer__copyright a,
+  .lt-topbar__link:hover,
+  .lt-topbar__link:focus,
+  .lt-topbar__link:active,
+  .lt-btn--topbar:hover,
+  .lt-btn--topbar:focus,
+  .lt-btn--topbar:active {
+    color: #00cc99 !important;
+  }
+
+  /* Light surfaces the theme hardcodes; the --gray-* remap above already
+     carries the breadcrumb bar, article box, vote footer and blockquotes. */
+  .lt-topbar,
+  .lt-footer {
+    background-color: #14181d !important;
+  }
+  .lt-skip-navigation,
+  .lt-topbar__controls,
+  .lt-dropdown-menu,
+  .table .table {
+    background-color: #1c2128 !important;
+  }
+  .lt-dropdown-menu [role="menuitem"]:hover,
+  .lt-dropdown-menu [role="menuitem"]:focus,
+  .accordion--default .accordion__item-title--active {
+    background-color: #262c33 !important;
+    color: #e6edf3 !important;
+  }
+
+  /* Focused search field: the theme repaints it solid white on focus, which
+     with the light ink above leaves the query invisible while it is typed. */
+  .lt-search-box #query:focus {
+    background-color: #1c2128 !important;
+    border-color: #4a515a !important;
+  }
+
+  /* Callouts and notifications carry their meaning in the left/edge border
+     colour, which stays; only the pale fill moves to an elevated surface. */
+  .callout--success,
+  .callout--info,
+  .callout--warning,
+  .callout--danger,
+  .callout--primary,
+  .notification-error,
+  .notification-notice,
+  .notification-alert,
+  .notification-inline {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
+
+  /* Search hit highlight is a background-only rule, so the light ink above
+     would land on its pale yellow. */
+  .lt-search-result__text em {
+    color: #14181d !important;
   }
 }

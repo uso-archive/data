@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Avito that's easy on the eyes, perfect for late-night browsing.
-@version      20260804.13.11
+@version      20260809.22.45
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -148,30 +148,32 @@
     background-color: var(--av-bg) !important;
     border-color: var(--av-border) !important;
   }
-  /* Item page's own `position:fixed` title bar (thumbnail, price, title,
-     favourite + phone/message CTAs). Its classes are pure build hashes — no
-     `sticky`/`topPanel` substring to hook — and Avito rebuilt the item page so the
-     bar no longer sits under `.js-item-view-title-info` either: the neutraliser
-     left it transparent, the description and the right-hand ad banner scrolled
-     straight through it, and the viewport strips either side of the 980px bar
-     rendered pure WHITE.
-     The bar itself is unreachable, but it carries a `transform`, which makes it
-     the containing block for `position:fixed` descendants — so a fixed pseudo hung
-     on the one uniquely-identifiable node inside it (the bar's title is an `h4`;
-     the page's own title is the `h1`) anchors to the bar's own box and, with a
-     viewport-wide negative inset, also covers the white side strips. `z-index:-1`
-     keeps it behind the bar's own content, and the bar is `opacity:0` while parked
-     off-screen, so nothing shows at scroll 0. The height is stated explicitly
-     rather than as `bottom:0`: should Avito ever drop the transform, the pseudo
-     falls back to a viewport-anchored 88px strip in the same place instead of a
-     full-screen slab. */
-  h4[data-marker="item-view/title-info"]::before {
+  /* The item page's `position:fixed` title bar (thumbnail, price, title, favourite +
+     delivery/phone/message CTAs) is a natively WHITE viewport-wide 48px strip; without a
+     fill the description and the right-hand ad banner scroll straight through it.
+     The bar itself is unreachable, but it carries a `transform`, which makes it the
+     containing block for `position:fixed` descendants — so a fixed pseudo hung on a
+     node inside it anchors to the bar's own box. The hook is the bar's favourite
+     button scoped to `.js-item-view-title-info` (the one non-hash class on the
+     ancestor chain): the same marker also names the buy-box heart, and only the bar's
+     copy sits inside that wrapper.
+     Which node hosts the pseudo is load-bearing, not arbitrary. `z-index:-1` resolves
+     inside the nearest STACKING CONTEXT, and the bar's price container is
+     `position:relative; z-index:15` — a pseudo hung there paints above every sibling in
+     the bar and hides the title, thumbnail and CTAs behind the strip. The favourite
+     button is `position:relative; z-index:auto`, so it creates no context and the strip
+     lands in the bar's own negative layer, behind all of the bar's content.
+     The bar is `opacity:0` and translated off-screen while parked, so nothing shows at
+     scroll 0. The height is stated explicitly rather than as `bottom:0`: should Avito
+     drop the transform, the pseudo falls back to a viewport-anchored 48px strip in the
+     same place instead of a full-screen slab. */
+  .js-item-view-title-info [data-marker="item-view/favorite-button"]::before {
     content: "";
     position: fixed;
     top: 0;
-    height: 88px;
-    left: -100vw;
-    right: -100vw;
+    height: 48px;
+    left: 0;
+    right: 0;
     z-index: -1;
     background-color: var(--av-header) !important;
   }
@@ -255,6 +257,23 @@
   [style*="color:#E50965"], [style*="color:#e50965"],
   [style*="color: rgb(229, 9, 101)"], [style*="color:rgb(229, 9, 101)"] {
     color: #c41f66 !important;
+  }
+  /* The item page's stock line ("В наличии: несколько") wraps its QUANTITY in a span
+     carrying an inline `color: rgb(0, 194, 87)` — Avito's in-stock green, and the only
+     thing separating the quantity from the "В наличии:" label beside it. The broad text
+     rule's `!important` reaches it, so the inline value needs restating; native #00c257
+     clears 7:1 on the dark surfaces, so keep the exact hue. Listed with the cap rules
+     rather than in the text block below because "background-color:#00C257" contains the
+     substring "color:#00C257" — anything painting that fill must be able to re-override
+     this label colour, and only a rule LATER in source order can.
+     The descendant arm is required, not defensive: the coloured span wraps a second,
+     un-coloured span that holds the actual text node, and the broad rule reaches that
+     one through its own `span` match rather than through inheritance. */
+  [style*="color: rgb(0, 194, 87)"], [style*="color: rgb(0, 194, 87)"] *,
+  [style*="color:rgb(0, 194, 87)"], [style*="color:rgb(0, 194, 87)"] *,
+  [style*="color:#00C257"], [style*="color:#00C257"] *,
+  [style*="color:#00c257"], [style*="color:#00c257"] * {
+    color: #00c257 !important;
   }
   /* The NEUTRAL ribbon ("Скидка на доставку", "14 дней на возврат", "Рассрочка"):
      body is an inline `background-color:#EBEAE8`, cap is an inline `color:#EBEAE8`
@@ -420,10 +439,16 @@
      the fill only returns them to the dark canvas — it can never leak a light
      surface. The recommendation carousels' scroll arrows are the same shape of
      hit zone but ship as real `<button>`s, so they need naming too: a 36×302
-     `--av-surface` bar was covering the card it floats over. */
+     `--av-surface` bar was covering the card it floats over.
+     The marker belongs to the CALL SITE, not to the control: the `/all/<category>`
+     hubs' top-sellers rail ships the identical scroll button with `data-marker`
+     absent and only its hashed module class (`styles-module-scrollButton-<hash>`)
+     to name it, so the class hook is required alongside the markers. Every
+     instance of it, on every page family, is natively transparent. */
   div[data-marker$="-button"],
   [data-marker$="/scroll-button-back"],
-  [data-marker$="/scroll-button-forward"] {
+  [data-marker$="/scroll-button-forward"],
+  button[class*="styles-module-scrollButton"] {
     background-color: transparent !important;
   }
   /* And on the LIST side: the results pagination is a `<ul data-marker="pagination-button">`
@@ -442,15 +467,21 @@
   [data-marker="pagination-button"] button {
     background-color: transparent !important;
   }
-  /* Filter-rail CHECKBOX rows. Avito builds each one as a design-system
-     `<label class="styles-module-root-…" data-marker="params[N]/checkbox/M">`, so the
-     button rule's `label[class*="styles-module-root"]` arm — meant for button-style
-     labels — gave all eight of them a full-width `--av-surface` band. Natively the
-     label paints nothing (its class only declares a hover TOKEN), so every option in
-     "Акции" / "Дополнительно" read as a pre-selected row, square-cornered against the
-     rounded fields beside it. The Input-component labels the arm exists for
-     (`price-from`, `price-to`, `search-form/suggest`) carry no `/checkbox/` marker. */
-  label[data-marker*="/checkbox/"] {
+  /* Design-system CHECKBOX and SWITCH labels — the filter rail's option rows
+     (`params[N]/checkbox/M`) and the results toolbar's "Сначала из Москвы"
+     (`filters/localPriority/localPriority`). Both are
+     `<label class="styles-module-root-… styles-module-root_preset_default-…">`, which the
+     button rule's `label[class*="styles-module-root"]` arm also matches — but natively
+     they paint nothing (the class only declares a hover TOKEN), so a fill reads as a
+     pre-selected row / an active chip. The Input-component labels that arm exists for
+     (`price-from`, `price-to`, `search-form/suggest`) carry `root_size-*` / `root_empty`
+     / `root_preset_overlay` instead, never `root_preset_default`.
+     The trailing hyphen is the discriminator: the DS emits `root_preset_default-<hash>`
+     for this label and `root_preset_default_priority_primary-<hash>` for the Button, so
+     `root_preset_default-` excludes the Button preset exactly. Same specificity (0,1,1)
+     as the button arm, so source order is what un-paints these. */
+  label[data-marker*="/checkbox/"],
+  label[class*="styles-module-root_preset_default-"] {
     background-color: transparent !important;
   }
   /* The item gallery's prev/next chevrons. The 50×456 hit ZONES are un-painted above,
@@ -465,17 +496,16 @@
   [data-marker^="extended-gallery-frame/"] button {
     background-color: transparent !important;
   }
-  /* The item page's FIXED title bar wraps its thumbnail and its price+title in two
-     "reset" `<button>`s — Avito's own rule for them is
-     `appearance:none; background:inherit; border:0; padding:0`, i.e. a click target
-     that is meant to be invisible chrome. The generic button surface gave each one an
-     `--av-surface` slab on the near-black bar, so the price read as a filled chip the
-     site never draws. They carry a single build-hash class and nothing else — no
-     marker, no role, and every ancestor up to the fixed bar is pure hash too — so the
-     hash is the only hook there is. Written to fail SAFE: a rebuilt hash simply
-     restores today's slab, never a light surface. */
-  button[class*="_6a9117bb1fcd1b61"] {
+  /* The buy-box heart is natively bare, so the generic `-button` surface gave it a
+     44px grey disc the site never draws. The FIXED title bar ships the same marker on
+     its own copy, and that one IS a light `#f2f1f0` chip — `.js-item-view-title-info`
+     is the one non-hash class separating them, and that copy also hosts the bar's
+     background pseudo, so it must keep a fill. */
+  [data-marker="item-view/favorite-button"] {
     background-color: transparent !important;
+  }
+  .js-item-view-title-info [data-marker="item-view/favorite-button"] {
+    background-color: var(--av-surface) !important;
   }
   /* Seller-profile badge rows ("Данные подтверждены", "Компания проверена", …) and the
      "Показать все" row below them are `<button>`s laid out as bare icon+label lines —
@@ -532,6 +562,13 @@
     color: #0b1620 !important;
   }
   [class*="root_preset_secondary"] {
+    background-color: #262c35 !important;
+  }
+  /* `root_preset_overlay` is the DS's float-over-imagery button: a solid WHITE pill the
+     site uses on banners and photos. The generic surface sank it to the same tone as the
+     panels it sits on (promo strips, hover cards), so it lost its button shape entirely.
+     The secondary tone separates from both the canvas and an elevated panel. */
+  [class*="root_preset_overlay"] {
     background-color: #262c35 !important;
   }
   /* `root_preset_accent` is the DS's OTHER solid primary — Avito's brand blue
@@ -627,10 +664,6 @@
   button[type="submit"] {
     background-color: var(--av-accent) !important;
     color: #0b1620 !important;
-  }
-  [data-marker="search-form/submit-button"]:hover,
-  [data-marker="top-rubricator/all-categories"]:hover {
-    background-color: var(--av-accent-hover) !important;
   }
   /* The item page pairs TWO solid primaries: "Показать телефон" is Avito's call
      green `#02D15C` and "Написать" its brand blue `#00AAFF` — the colour is the
@@ -1259,6 +1292,20 @@
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
   }
+  /* `role="listbox"` above is a floating-panel hook, but Avito's design-system List
+     component also hangs the role on IN-FLOW horizontal carousels — the seller
+     profile's "Группы объявлений" (`item_selections/items-list`) and the category
+     hub's stories rail — so the panel fill stamps an elevated slab behind them that
+     the site never draws and that ends abruptly at the carousel's scroll edge.
+     Orientation is the durable discriminator: a floating dropdown listbox is vertical.
+     The ARIA arm is the general one — the item page's "Другие объявления компании" rail
+     (`i2i-carousel`) carries the role and the orientation but neither the DS class nor
+     the `/items-list` marker. All three arms outrank the (0,1,0) panel arm. */
+  [role="listbox"][aria-orientation="horizontal"],
+  [role="listbox"][class*="_orientation_horizontal"],
+  ul[data-marker$="/items-list"] {
+    background-color: transparent !important;
+  }
   /* Header nav fly-out menus ("Ещё", "Для бизнеса", "Каталоги") — hashed-class
      absolutely-positioned panels nested in the nav. Stable hook: the
      nav-container-HEADER wrapper. Each such `li` holds exactly two child divs — the
@@ -1316,6 +1363,18 @@
   [class*="uxs-"] button,
   [class*="uxs-"] button * {
     color: #0b1620 !important;
+  }
+  /* The card's dismiss control is the widget's only `type="button"` — its submit CTA
+     carries no `type` — and it is bare chrome: a 20×20 icon-only button with no fill
+     of its own, holding an `<svg>` whose path has a hard `fill="#B5B8C2"`. The accent
+     rule above must not reach it, and its `color` is reset so a build that switches the
+     glyph to `currentColor` still renders it light rather than near-black. */
+  [class*="uxs-"] button[type="button"] {
+    background-color: transparent !important;
+  }
+  [class*="uxs-"] button[type="button"],
+  [class*="uxs-"] button[type="button"] * {
+    color: var(--av-text-soft) !important;
   }
   /* The card's Avito wordmark is an `<img>` of a black-on-transparent SVG, and the
      vendor watermark below the CTA is a mask-image glyph painted by its own
@@ -1437,12 +1496,52 @@
   [data-marker="adv-badge-tag"] * {
     color: #fff !important;
   }
-  /* Promotional showcase banner (`_preset_orange`, a cream `#ffecc9` card). Losing
-     its fill entirely dissolved the banner into the page; keep it a distinct — and
-     still warm — promo surface. */
+  /* ---- Design-system Banner ---- */
+  /* The Banner paints its card on a child layer (`styles-module-background_color`)
+     whose fill is `var(--kitty-banner-backgroundColor)` — a token the preset class on
+     the Banner ROOT sets, so no `[style*=…]` or literal-colour selector can reach it and
+     the div-neutraliser wipes the card entirely: the banner's heading, fields and CTA
+     end up floating on the bare canvas with no card at all.
+     The component's whole preset vocabulary is eight names, read off Avito's own
+     stylesheet; each is a semantic bg token, so each keeps its hue and sinks to the tone
+     the theme already uses for that meaning. `beige`/`warmGray`/`white` are the neutral
+     ones and take the plain elevated surface. */
+  [class*="root_preset_blue"] [class*="styles-module-background_color"] {
+    background-color: #1d2c3a !important;
+    border-color: #2f4a63 !important;
+  }
+  [class*="root_preset_green"] [class*="styles-module-background_color"] {
+    background-color: #16291d !important;
+    border-color: #24452e !important;
+  }
+  [class*="root_preset_red"] [class*="styles-module-background_color"] {
+    background-color: #2e1a1d !important;
+    border-color: #4a2a2f !important;
+  }
   [class*="root_preset_orange"] [class*="styles-module-background_color"] {
     background-color: #2a2116 !important;
     border-color: #3d3120 !important;
+  }
+  [class*="root_preset_violet"] [class*="styles-module-background_color"] {
+    background-color: #2b2140 !important;
+    border-color: #40325e !important;
+  }
+  [class*="root_preset_beige"] [class*="styles-module-background_color"],
+  [class*="root_preset_warmGray"] [class*="styles-module-background_color"],
+  [class*="root_preset_white"] [class*="styles-module-background_color"] {
+    background-color: var(--av-surface) !important;
+    border-color: var(--av-border) !important;
+  }
+  /* The Beduin Gradient component (promo strips such as the vacancies hub's "В отпуск
+     перед новой работой") paints a pastel `linear-gradient` as its background-IMAGE, fed
+     by an inline `--beduin-gradient`. The div-neutraliser only clears background-COLOR,
+     so the strip stayed near-white while the broad text rule inked its heading and
+     subtitle light grey — around 1.3:1. Both the component class and the token are
+     matched so either spelling reaches it. */
+  [class*="Gradient-module-root"],
+  [style*="--beduin-gradient"] {
+    background-image: none !important;
+    background-color: var(--av-surface) !important;
   }
 
   /* ---- Model-rating badge (item page) ---- */
@@ -1523,8 +1622,33 @@
     background-color: var(--av-accent) !important;
     color: #0b1620 !important;
   }
-  [data-marker="search-form/submit-button"]:hover {
-    background-color: var(--av-accent-hover) !important;
+
+  /* ---- Hover feedback on painted controls ---- */
+  /* Avito's design system marks button, chip and card-CTA hover by swapping a
+     background token. Every fill this theme paints is `!important`, so that swap lost
+     the cascade on every control at once: buttons, filter chips and the search cards'
+     phone/message CTAs all rendered pixel-identical at rest and under the pointer.
+     A `brightness()` lift is used instead of per-variant hover fills because the fill a
+     control ends up with depends on which of the rules above won it — the accent, the
+     call green, the delivery purple, the soft-blue chip and the plain surface each need
+     a different hover tone, and a filter derives it from whatever is actually painted.
+     It also cannot invent a surface: a natively bare control has nothing to lighten.
+     Excluded: `filter` makes an element the containing block for its `position:fixed`
+     descendants, so lifting the fixed title bar's favourite button would drag that bar's
+     background pseudo out of the viewport and collapse it onto the button's own box. */
+  button:hover,
+  a[class*="styles-module-root"]:hover,
+  [class*="style-module-wrapper"]:hover {
+    filter: brightness(1.3);
+  }
+  .js-item-view-title-info [data-marker="item-view/favorite-button"]:hover {
+    filter: none;
+  }
+  /* Pagination page numbers are natively bare and mark hover with a grey pill, so a
+     brightness lift has nothing to act on. The current page carries the accent from the
+     rule above and is a `<span>`, so only the other pages match here. */
+  [data-marker^="pagination-button"] a:hover {
+    background-color: var(--av-surface) !important;
   }
 
   /* ---- Search-result card hover highlight (pseudo-element panels) ---- */
@@ -1553,14 +1677,31 @@
   /* The "other listings" / recommendation carousels render their round scroll
      buttons as an SVG `<rect fill=#fff>` disc with a black `<path>` arrow — a
      bright white circle glaring on the dark page (element-bg scans miss SVG
-     fills). Darken the disc to the elevated surface and lighten the arrow. */
+     fills). Darken the disc to the elevated surface and lighten the arrow.
+     The hub rails' marker-less copy ships the OPPOSITE polarity — a `#141414`
+     disc with a white arrow, which collapses into the near-black canvas — so the
+     pair is normalised in both directions to the same surface/ink values. */
   [data-marker$="/scroll-button-back"] svg rect,
-  [data-marker$="/scroll-button-forward"] svg rect {
+  [data-marker$="/scroll-button-forward"] svg rect,
+  button[class*="styles-module-scrollButton"] svg rect {
     fill: var(--av-surface) !important;
   }
   [data-marker$="/scroll-button-back"] svg path,
-  [data-marker$="/scroll-button-forward"] svg path {
+  [data-marker$="/scroll-button-forward"] svg path,
+  button[class*="styles-module-scrollButton"] svg path {
     fill: var(--av-text) !important;
+  }
+
+  /* ---- Gallery thumbnail strip: the SELECTED photo ---- */
+  /* Both strips — the item page's inline row (`image-preview/item`) and the fullscreen
+     lightbox's rail (`extended-image-preview/item`) — mark the current photo with a
+     brand-blue `::after` ring and nothing else, so the blanket `*::after` border reset
+     collapses it to the generic line colour and every thumbnail reads the same. The
+     pseudo has `content: none` on the unselected thumbnails, so painting it
+     unconditionally cannot draw a ring on them. */
+  [data-marker="image-preview/item"]::after,
+  [data-marker="extended-image-preview/item"]::after {
+    border-color: var(--av-accent) !important;
   }
 
   /* ---- Favorite (add-to-wishlist) heart outline (SVG stroke, audit-blind) ---- */
@@ -1587,6 +1728,29 @@
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
   }
+  /* One tile per grid is the FEATURED one: the class fill is a neutral `#f2f1f0`, and
+     the highlight arrives as an inline soft-blue `background:` shorthand, so the rule
+     above flattened it into the row and the grid lost its lead tile. Take the theme's
+     soft-blue chip tone. Scoped to the tile class — the search rail's colour swatches
+     spell their hue the same way and must keep it verbatim. Both hex cases and both
+     `rgb()` spellings are listed: a server-rendered load and a client re-render
+     serialise the same inline value differently. */
+  [class*="visual-rubricator-gridItem"][style*="background:#cfedff"],
+  [class*="visual-rubricator-gridItem"][style*="background:#CFEDFF"],
+  [class*="visual-rubricator-gridItem"][style*="background: rgb(207, 237, 255)"],
+  [class*="visual-rubricator-gridItem"][style*="background:rgb(207, 237, 255)"] {
+    background-color: #1d2c3a !important;
+    border-color: #2f4a63 !important;
+  }
+
+  /* Stories-rail scroll arrow. It is an empty DIV whose glyph is a background-IMAGE
+     (`avito.st/.../*.svg`, a single `stroke="black"` path), so the div-neutraliser —
+     which only clears background-COLOR — leaves a black arrow on the dark canvas and
+     no `color`/`fill` rule can reach it. The asset is monochrome, so inverting its
+     lightness cannot distort a hue. */
+  [class*="story-previewer-arrow"] {
+    filter: invert(1);
+  }
 
   /* ---- Loading skeletons ---- */
   /* While a result list re-fetches (pagination, sort change, the home grid's lazy
@@ -1599,6 +1763,25 @@
      elevated-surface tone. */
   [class*="placeholder-one"] {
     opacity: 0.25;
+  }
+  /* The buyer-pages micro-frontend draws its own hydration skeletons — the home
+     recommendation grid, the ad-mimicry cards seeded through it and the side-block
+     stub — with a near-white SVG (#F5F5F5 / #EBEAE8 / #FFF artwork) served as a
+     background-IMAGE, so the div-neutraliser, which only clears background-COLOR,
+     leaves them at full brightness for the second or two before the feed mounts.
+     `opacity` is not available as the dimmer here: their pulse ANIMATES opacity, so
+     an unimportant value never applies and an important one kills the pulse. The
+     artwork is achromatic, so inverting its lightness cannot shift a hue, and 0.86
+     lands #F5F5F5 on ~#2b2b2b — a step above the elevated surface.
+
+     The grid skeleton is a hash-only twin of the REAL recommendations grid (same
+     `styles-root-`/`styles-compactGrid-`/`styles-main-` shape): the real one carries
+     `id="bx_recommendations"` and its cards as children, so both guards are what
+     keeps this filter off live listing photos. */
+  div[class*="styles-compactGrid-"]:not([id]):empty,
+  div[class*="advert-mimicry-block-skeleton"],
+  div[class*="placeholder-loading"] {
+    filter: invert(0.86);
   }
 
   /* ---- Price (semantic, kept prominent and light) ---- */
@@ -1629,5 +1812,13 @@
   }
   footer a, [data-marker*="footer"] a {
     color: var(--av-text-soft) !important;
+  }
+  /* The page footer is a `<div data-marker="footer">`; every semantic `<footer>` Avito
+     ships inside a dialog is a COMPONENT action row, natively transparent, so the
+     element arm above stamps a near-black slab across the panel it sits on. The bare
+     arm has to stay — a `<footer>` is outside the div-neutraliser, so dropping it would
+     let a natively light one through on a template not covered here. */
+  [role="dialog"] footer {
+    background-color: transparent !important;
   }
 }

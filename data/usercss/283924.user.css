@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for FanFiction.Net and FictionPress, with an easy-on-the-eyes story reader, dark browse filters, profiles and forums.
-@version      20260804.13.15
+@version      20260809.22.47
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -103,7 +103,16 @@
   #content_wrapper_inner,
   #content_parent,
   .zui,
+  /* FFN emits its status panels from a per-page inline <style>, never from
+     xss26.css, as five identically-painted classes (#f6f7ee paper, #000 ink,
+     `border: 1px outset`). All five must be listed: `.panel_normal` carries the
+     "Message Type" notices (dead topic / user / review), `.panel_warning` the
+     "Story Not Found" page on both hosts. */
   .panel_normal,
+  .panel_warning,
+  .panel_error,
+  .panel_success,
+  .panel_plain,
   .lc,
   .lc-wrapper,
   .lc-lg,
@@ -274,6 +283,18 @@
   a:hover strong {
     color: var(--ff-link-hover) !important;
   }
+  /* The forum post-admin row (opened by the cog beside a post) is the one place
+     FFN puts an entry's LABEL inside the anchor's glyph span instead of in the
+     anchor itself, so the blanket `span` rule below strips the link colour from
+     `Report Abuse` while every sibling entry beside it stays blue. Its glyph
+     siblings (`.icon-reply`, `.icon-cog`, `.icon-lock`) carry an inline
+     `color:black` and must keep the body tone they get today. */
+  a span.icon-cr-warning {
+    color: var(--ff-link) !important;
+  }
+  a:hover span.icon-cr-warning {
+    color: var(--ff-link-hover) !important;
+  }
   /* Every muted metadata block — `.xgray` story-row lines on the desktop hosts,
      `.gray` listing lines on the m. hosts — ends in bare `<span data-xutime>` date
      children that carry no colour of their own and inherit the block's grey. The
@@ -322,6 +343,15 @@
   span.icon-shuffle {
     color: #6d86f0 !important;
   }
+  /* Two more glyphs the blanket `span` rule promotes to full body ink, both of
+     which FFN keeps a step UNDER its body copy: the section chevron beside every
+     breadcrumb and story title (`.xicon-section-arrow`, #5a5a5a in the site CSS)
+     and the footer X/Twitter mark (inline #686464). Both source values are
+     unreadable on the dark surface, so the muted tone is what carries the step. */
+  span.xicon-section-arrow,
+  span.icon-twitter-3 {
+    color: var(--ff-muted) !important;
+  }
 
   /* ---- Headings & general text ----------------------------------------- */
   h1, h2, h3, h4, h5, h6, b, strong {
@@ -333,6 +363,32 @@
     color: var(--ff-body) !important;
   }
   .xgray, .gray, small {
+    color: var(--ff-muted) !important;
+  }
+  /* `small` covers two unrelated things on FFN. Inside a table cell it is forum
+     fine print (post dates, natively #686868) and belongs on the muted tone; as a
+     direct child of a div it is the "Narrow Results" rail heading on /search/ and
+     /betareaders/ (natively #000, the strongest ink in that panel) and the header
+     separator pipe (natively #fff). Muting those two puts a heading below the
+     controls it labels. */
+  div > small {
+    color: var(--ff-body) !important;
+  }
+  /* FFN writes its fine print as an inline grey one step under the black body copy:
+     `color:gray` (the profile Sort bar, the sign-up disclaimer), `#8c8c8c` (the bio
+     toggle), `#c4c4c4` (the footer ray id). The blanket text rule above is a direct
+     declaration and outranks every one of them, which on the Sort bar puts the inert
+     `Sort:` label ABOVE the `.gray` options it labels.
+     The substring also matches an inline `background-color:` of the same value — FFN
+     ships none, and this rule only sets `color`, so a stray match costs nothing. Keep a
+     literal `;` OUT of these selectors: `parse-check.js` finds a rule's prelude by
+     scanning back to the previous `;`, and reports a valid rule as dead.
+     Anchors stay out on purpose: the disclaimer greys its links too, and those keep the
+     link accent. */
+  div[style*="color:gray"],
+  span[style*="color:gray"],
+  span[style*="color:#8c8c8c"],
+  div[style*="color:#c4c4c4"] {
     color: var(--ff-muted) !important;
   }
 
@@ -621,7 +677,6 @@
   .modal-header {
     box-shadow: none !important;
   }
-  .modal-backdrop { background-color: rgba(0,0,0,.6) !important; }
 
   /* ---- Semantic cues: keep status / completed green readable ----------- */
   /* FFN uses dark greens (e.g. #04761c "Complete"/"Plus") that vanish on
@@ -694,5 +749,16 @@
      element itself is transparent, so every bucket passes on it. */
   img[src*="d_60_90"] {
     filter: brightness(.35) !important;
+  }
+  /* The m. hosts mark each story row with a 16px document raster —
+     fcons/script-text.png (FictionPress) and fcons/script-attribute-c.png
+     (FanFiction), up to 48 per Just In page. Roughly a third of their opaque
+     pixels are pure white: the sheet of paper, invisible against the site's own
+     white page and a glaring chip here. Inverting turns the paper into the row
+     surface; the hue-rotate puts the coloured outline and letter back on their
+     own hue. The other fcons/ficons rasters are coloured line art with no white
+     plate (measured) and must not be filtered. */
+  img[src*="fcons/script-"] {
+    filter: invert(1) hue-rotate(180deg) !important;
   }
 }

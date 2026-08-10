@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for TechPowerUp: easy on the eyes across news, reviews, the GPU/CPU spec databases and the forums, with readable tables and code.
-@version      20260804.13.20
+@version      20260809.22.54
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -377,9 +377,14 @@
     color: #ffffff !important;
   }
 
+  /* `.pager a:hover` above is (0,2,1) — one step ABOVE a bare `.pager .current`
+     (0,2,0) — so the current page has to claim its own hover or it flattens
+     into an ordinary pill exactly while the pointer is on it. */
   .pager .current,
+  .pager .current:hover,
   .pager a.active,
-  .pagination .current {
+  .pagination .current,
+  .pagination .current:hover {
     background-color: #2563a8 !important;
     color: #ffffff !important;
   }
@@ -422,6 +427,12 @@
   .discuss:hover {
     background-color: #21303f !important;
     border-color: #3d4450 !important;
+  }
+
+  /* The strip that closes every review article page ("View as single page", the
+     page picker and the Next Page CTA) is a #fafafa slab under a dotted rule. */
+  .review .contnt > footer {
+    background-color: #1c2128 !important;
   }
 
   /* Review "one page" nav strip + the image-comparison widget's white controls */
@@ -694,11 +705,13 @@
   }
 
   /* News-article on-page comments (TPU's native .forumpost markup, distinct
-     from the XenForo .message posts) — the comment card (#f0f0f0) and its
-     .posttext body (#fdfdfd) shipped white with washed-out text */
+     from the XenForo .message posts) — the comment card (#f0f0f0), its
+     .posttext body (#fdfdfd) and the `<footer>` carrying the post time (#fdfdfd)
+     shipped white with washed-out text */
   section.comments article.forumpost,
   article.forumpost.clearfix,
   .forumpost,
+  .forumpost > footer,
   .forumpost .posttext,
   .posttext {
     background-color: #1c2128 !important;
@@ -768,6 +781,15 @@
     background-color: #161d27 !important;
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
+  }
+
+  /* On the news side a quote's 4px left bar is its marker — the panel tint the
+     site pairs it with (#f6f6f6 / #f2f2f2) is a hair off the surface once dark,
+     so the greyed bar leaves the quote reading as plain body copy. XenForo's
+     quote block has no such bar and keeps the amber attribution row instead. */
+  .newspost blockquote,
+  .posttext blockquote {
+    border-left-color: #2f74c0 !important;
   }
 
   /* ---- Links (navy #115 → readable accent blue) ---- */
@@ -1319,11 +1341,13 @@
 
   /* The sidebar search's submit is a 25px TRANSPARENT hit-area absolutely
      positioned over the magnifier glyph, which the site paints as a
-     background-image on the INPUT. The `input[type="submit"]` button rule below
-     is (0,1,1) and paints it into a solid grey plate that juts past the field
-     and hides the glyph — reclaim it at (0,2,1) so it wins regardless of source
-     order, and the site's magnifier reads through again. */
-  .s--search__form input.s--search__submit {
+     background-image on the INPUT. The button rules below fill it with a solid
+     grey plate that juts past the field and hides the glyph. This selector is
+     (0,2,1): it out-ranks the resting `input[type="submit"]` (0,1,1) but only
+     TIES `input[type="submit"]:hover`, so the hover state must be named
+     explicitly rather than relying on source order. */
+  .s--search__form input.s--search__submit,
+  .s--search__form input.s--search__submit:hover {
     background-color: transparent !important;
     border: 0 !important;
   }
@@ -1356,6 +1380,19 @@
   input::-webkit-input-placeholder,
   textarea::-webkit-input-placeholder {
     color: #8b949e !important;
+  }
+
+  /* The forum's password-strength bar is a native <meter>: its TRACK is painted
+     by a UA shadow pseudo, not by the element's own background, so no
+     background-color rule reaches it and XenForo's light-style trough renders as
+     a full-width near-white strip across the register / password forms. The
+     value fill (green / yellow / red) is the strength signal and stays theirs. */
+  meter.meterBar {
+    background-color: #21262d !important;
+  }
+
+  meter.meterBar::-webkit-meter-bar {
+    background-color: #21262d !important;
   }
 
   /* ---- Buttons ----
@@ -1439,6 +1476,21 @@
     color: #ffffff !important;
   }
 
+  /* The BBCode spoiler reveal is a FILLED blue control in both of the forum's
+     own schemes (#165988), not the plateless base `.button` — the base rule
+     above flattens it into the neutral chip. */
+  .button.bbCodeSpoiler-button {
+    background-color: #2563a8 !important;
+    border-color: #2f74c0 !important;
+    color: #ffffff !important;
+  }
+
+  .button.bbCodeSpoiler-button:hover,
+  .button.bbCodeSpoiler-button:focus {
+    background-color: #2f74c0 !important;
+    color: #ffffff !important;
+  }
+
   /* `--plain` is a plate-less text/glyph button — the mobile nav trigger is one.
      Giving it the neutral chip boxes a bare hamburger into a grey square. */
   .button.button--plain {
@@ -1499,6 +1551,63 @@
   pre,
   .bbCodeBlock {
     border: 1px solid #2d333b !important;
+  }
+
+  /* Prism syntax tokens are <span>s, so the blanket `span` body rule (0,0,1
+     !important) beats every token colour the forum ships and a code block
+     renders as one flat grey. These are the values XenForo's own dark style
+     uses, restated at (0,3,0) so they hold under either OS colour scheme.
+     `prism-important` belongs to the yellow group: the site declares it twice
+     and its later rule wins. */
+  .bbCodeCode .prism-token.prism-comment,
+  .bbCodeCode .prism-token.prism-prolog,
+  .bbCodeCode .prism-token.prism-doctype,
+  .bbCodeCode .prism-token.prism-cdata {
+    color: #8292a2 !important;
+  }
+
+  .bbCodeCode .prism-token.prism-constant,
+  .bbCodeCode .prism-token.prism-tag,
+  .bbCodeCode .prism-token.prism-italic {
+    color: #f92672 !important;
+  }
+
+  .bbCodeCode .prism-token.prism-boolean,
+  .bbCodeCode .prism-token.prism-number {
+    color: #ae81ff !important;
+  }
+
+  .bbCodeCode .prism-token.prism-symbol,
+  .bbCodeCode .prism-token.prism-atrule,
+  .bbCodeCode .prism-token.prism-keyword,
+  .bbCodeCode .prism-token.prism-selector,
+  .bbCodeCode .prism-token.prism-function,
+  .bbCodeCode .prism-token.prism-class-name,
+  .bbCodeCode .prism-token.prism-important,
+  .bbCodeCode .prism-token.prism-bold {
+    color: #e6db74 !important;
+  }
+
+  .bbCodeCode .prism-token.prism-string,
+  .bbCodeCode .prism-token.prism-attr-value,
+  .bbCodeCode .prism-token.prism-attr-name,
+  .bbCodeCode .prism-token.prism-char,
+  .bbCodeCode .prism-token.prism-builtin {
+    color: #a6e22e !important;
+  }
+
+  .bbCodeCode .prism-token.prism-regex,
+  .bbCodeCode .prism-token.prism-variable,
+  .bbCodeCode .prism-token.prism-package {
+    color: #fd971f !important;
+  }
+
+  .bbCodeCode .prism-token.prism-deleted {
+    color: #ff7b72 !important;
+  }
+
+  .bbCodeCode .prism-token.prism-inserted {
+    color: #7ee787 !important;
   }
 
   /* ============================================================
@@ -1801,8 +1910,12 @@
     color: #c4cdd6 !important;
   }
 
-  /* ---- Footer ---- */
-  footer,
+  /* ---- Footer ----
+     `<footer>` is a CONTENT tag here as much as page chrome: TPU wraps every news
+     comment's timestamp row, the review article's bottom page-nav strip and the
+     front-page poll's vote bar in a bare `<footer>`, so a tag-level plate cuts a
+     near-black band through three in-page components. Match the footer CLASSES. */
+  footer.site-footer,
   #footer,
   .page-footer,
   .footer,
@@ -1812,13 +1925,13 @@
     border-top: 1px solid #21262d !important;
   }
 
-  footer a,
+  footer.site-footer a,
   #footer a,
   .p-footer a {
     color: #8b949e !important;
   }
 
-  footer a:hover,
+  footer.site-footer a:hover,
   #footer a:hover,
   .p-footer a:hover {
     color: #c4cdd6 !important;
@@ -2111,6 +2224,19 @@
     background-color: transparent !important;
   }
 
+  /* Narrow viewports stack the user cell above the post and join them with a
+     CSS-triangle pointer: an outer border-toned triangle on the element and an
+     inner post-toned one on its ::after, each three transparent sides plus one
+     coloured. The blanket border reset fills all eight, turning the pointer into
+     a solid grey block; only a narrow viewport renders it at all. */
+  .message-userArrow {
+    border-color: transparent transparent #2d333b !important;
+  }
+
+  .message-userArrow::after {
+    border-color: transparent transparent #1c2128 !important;
+  }
+
   .message-userContent,
   .bbWrapper {
     color: #c4cdd6 !important;
@@ -2297,6 +2423,13 @@
     border-color: #2d333b !important;
   }
 
+  /* The quote attribution row is an accent in both of the forum's own schemes
+     (#d48311 dark / #f2930d light), not body ink; the shared rule above would
+     sink it into the quoted text. The username inside stays an `a:link` blue. */
+  .bbCodeBlock-title {
+    color: #e3a008 !important;
+  }
+
   /* Action bar (reactions / reply) */
   .actionBar,
   .actionBar-set {
@@ -2364,7 +2497,11 @@
     background-color: #2d333b !important;
   }
 
-  .pageNav-page--current {
+  /* Ties `.pageNav-page:hover` above on specificity and wins on source order —
+     without the `:hover` half the current page loses its fill under the pointer
+     and only the accent border is left to mark it. */
+  .pageNav-page--current,
+  .pageNav-page--current:hover {
     background-color: #2563a8 !important;
     border-color: #2f74c0 !important;
   }
@@ -2644,8 +2781,8 @@
     color: #e6edf3 !important;
   }
 
-  /* The page's own <footer> inherits the sitewide footer plate, which cuts a
-     near-black band across the panel */
+  /* The panel's own footer + meta rows are muted text ON the card, with no plate
+     and no rule above them */
   main.card footer,
   main.card dl.meta,
   main.card .muted {

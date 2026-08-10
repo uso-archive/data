@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for KHInsider's game-music archive: easy on the eyes across album pages, song lists, the audio player, search and comments.
-@version      20260804.13.17
+@version      20260809.22.49
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -56,6 +56,16 @@
     background-image: none !important;
     color: #e6edf3 !important;
     border-color: #262c33 !important;
+  }
+  /* Every list row is bulleted by a `list-style-image` raster bevel drawn for a light
+     surface: `key.gif` (mean luminance 192) in the sidebar, `key_content.gif` (mean
+     152) in the homepage series column. A list marker takes no colour and no filter,
+     so the only way to retint one is to substitute another image; this data URI keeps
+     the 13x7 footprint so the 22px text indent still lines up. Around 300 markers
+     render on the homepage between the two. */
+  #leftColumn ul,
+  #homepagePopularSeries ul {
+    list-style-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='7'%3E%3Crect width='13' height='7' rx='1' fill='%2339424d'/%3E%3Crect x='1' y='1' width='11' height='2' rx='1' fill='%234c5866'/%3E%3C/svg%3E") !important;
   }
   #leftColumn ul li a { color: #c4cdd6 !important; }
   #leftColumn ul li a:hover { color: #9bd4ff !important; }
@@ -183,6 +193,15 @@
   .albumImage img, .albumImage a,
   td.albumIcon img, td.albumIconLarge img,
   .albumIconDefaultSmall, .albumIconDefaultLarge { border-color: #2d333b !important; }
+  /* Albums whose cover is withheld get the site's stand-in raster: a flat #bdbdbd
+     plate carrying pure-black lettering, which blends into the native #ebebeb column
+     and glares as a lit tile in an otherwise dark cover grid. It is image data, so it
+     can only be remapped photometrically — inverting the greyscale plate and scaling
+     the result lands the tile near #262626 with its lettering at a muted #949494.
+     Scoped by path so real cover art (all off-site) is never touched. Two sizes ship
+     under that path — `nsfw.png` (117px, cover grids) and `nsfw_small.png` (60px, list
+     tables) — and both are the same plate, so match the stem. */
+  img[src*="/images/nsfw"] { filter: invert(1) brightness(0.58) !important; }
 
   /* ---- Native <audio> element (per-song download page) ----
      The song download page uses a real HTML5 <audio controls> that
@@ -377,17 +396,19 @@
     color: #c4d3e8 !important;
     border-color: #2d333b !important;
   }
+  /* Every navgroup pill signals hover with `rgba(8, 8, 8, .15)` — a 15%-black wash
+     sized for the skin's blue header. Over our near-black one it composites to a
+     one-level shift, so the two pills a logged-out visitor actually needs answer the
+     pointer with nothing. Give them the same chip the nav tabs use. */
+  .p-navgroup .p-navgroup-link:hover { background-color: #1c232c !important; }
 
   /* ---- Section-links bar under the header ---- */
   .p-sectionLinks {
     background-color: #161b22 !important;
     border-color: #20262e !important;
   }
-  .p-sectionLinks-list > li > a { color: #c4d3e8 !important; }
-  .p-sectionLinks-list > li.is-selected > a {
-    color: #ffffff !important;
-    background-color: #1c232c !important;
-  }
+  /* Each section link is `li > div.p-navEl > a.p-navEl-link`, so the rest, hover and
+     selected states all come from the unscoped `.p-navEl*` rules above. */
 
   /* ---- Breadcrumbs / page title ---- */
   .p-breadcrumbs li, .p-breadcrumbs a, .p-breadcrumbs:before { color: #aab4bf !important; }
@@ -529,6 +550,14 @@
     border-color: #2d333b !important;
   }
   .button:hover { background-color: #2a313a !important; color: #ffffff !important; }
+  /* Half of these controls are anchors. `.p-body-content a` (0,1,1) outranks the
+     `.button` ink (0,1,0) and its hover outranks `.button:hover`, so an anchor button
+     carried the link blue while the <button> beside it carried the button ink — two
+     identical chips, two label colours. XenForo writes every button rule as
+     `.button, a.button` for this reason; match it. Both stay under the (0,2,x)
+     variants below, so primary / cta / bookmarked keep their own ink. */
+  a.button { color: #cdd6e0 !important; }
+  a.button:hover { color: #ffffff !important; }
   /* XenForo ships TWO filled action variants and paints them different hues on
      purpose: `button--primary` is blue (#47a7eb) and `button--cta` is amber
      (#f2930d), so a page carrying both still reads which action is which. We were
@@ -559,6 +588,13 @@
     background-color: transparent !important;
     border-color: transparent !important;
   }
+  /* `button--link` is the quiet variant: where the base button is filled blue, this
+     one is a pale chip carrying the brand blue as its LABEL. Our neutral base repaints
+     the chip, so the ink is all that is left to tell the two apart — and it was going
+     to the same #cdd6e0, making a link button indistinguishable from a solid one.
+     Keep the blue on the label. */
+  .button.button--link, a.button.button--link { color: #5fb0e6 !important; }
+  .button.button--link:hover, a.button.button--link:hover { color: #9bd4ff !important; }
   /* `is-bookmarked` is a STATE, not a style: the skin signals it by turning the
      bookmark button's glyph amber (#f2930d) and nothing else. Our base `.button`
      colour is !important and outranks it, so a bookmarked thread looked exactly like
@@ -571,10 +607,19 @@
 
   /* ---- Floating surfaces — keep opaque (no bleed-through) ---- */
   .menu, .menu-content, .tooltip-content, .overlay,
-  .autoComplete {
+  .autoComplete, .autoCompleteList {
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
+  }
+  /* The member autocomplete list is appended to <body>, outside every wrapper the
+     rules above reach, and only exists while you type — it ships #ffffff rows of
+     #141414 text with an #e8f4fc keyboard highlight. Guest-reachable from the
+     thread-list "Filters > Started by" field. */
+  .autoCompleteList > li.is-selected,
+  .autoCompleteList > li:hover {
+    background-color: #232a33 !important;
+    color: #ffffff !important;
   }
   /* Every flyout hangs a pointer triangle off its top edge: a 0x0 box whose ONLY
      opaque side is painted with the skin's accent (#47a7eb), the neighbours staying
@@ -607,6 +652,17 @@
      sides, so each row grew a grey stripe AND the current row lost its accent — every
      row in an open menu looked identical. Put the channel back. */
   .menu-linkRow { border-left-color: transparent !important; }
+  /* The two TINTED row variants: `--alt` is a #f5f5f5 band (the style chooser's
+     "Use default style" row, light-on-light under the ink above whenever it is not
+     also the current style) and `--highlighted` is an #e8f4fc band. Both must stay
+     ABOVE the hover/selected block below so a pointer still answers on them. */
+  .menu-row.menu-row--alt,
+  .menu-linkRow.menu-linkRow--alt { background-color: #161b22 !important; }
+  .menu-row.menu-row--highlighted {
+    background-color: #16263a !important;
+    color: #a5d6ff !important;
+    -webkit-text-fill-color: #a5d6ff !important;
+  }
   /* hover AND keyboard/split-trigger focus + selected states — XenForo paints the
      highlighted row a light #e8f4fc, so the focused first row was light-on-light */
   .menu-row:hover, .menu-linkRow:hover,
@@ -784,14 +840,24 @@
     border-color: #2d333b !important;
   }
   /* The bbcode block WRAPPER is #f5f5f5 and only its quote/code CONTENT was themed
-     above, so a code block showed a light frame around a dark body. Its left stripe is
-     the skin's amber code marker (blue for --feature) and stays. */
+     above, so a code block showed a light frame around a dark body. Only the three
+     neutral sides are repainted — the left stripe is the skin's amber block marker
+     (blue for --feature) and stays. */
   .bbCodeBlock {
     background-color: #181d24 !important;
     border-top-color: #2d333b !important;
     border-right-color: #2d333b !important;
     border-bottom-color: #2d333b !important;
   }
+  /* Every bbcode block marks its type with an amber left stripe AND an amber title,
+     one marker in two parts. `.bbCodeBlock--quote` is matched by the four-side
+     border-color reset above, and `.bbCodeBlock-title` by its ink, so the quote lost
+     the stripe its code sibling kept and every block lost the label. Amber is 2.1:1
+     on the native white panel and 6.9:1 on ours, so it carries the marker better here
+     than it does natively. The quote block is a blockquote element, so its restore
+     must clear `blockquote.bbCodeBlock` (0,1,1), not just the bare modifier. */
+  .bbCodeBlock.bbCodeBlock--quote { border-left-color: #f2930d !important; }
+  .bbCodeBlock .bbCodeBlock-title { color: #e3b341 !important; }
   /* a long code block masks its clipped tail with a fade to #f5f5f5 */
   .bbCodeBlock-expandLink {
     background-image: linear-gradient(rgba(13, 17, 23, 0) 0%, #0d1117 80%) !important;

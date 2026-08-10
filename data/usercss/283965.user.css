@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for Syosetu (小説家になろう). Easy-on-the-eyes reading for novel chapters, plus the home, rankings, search and bookmark controls.
-@version      20260804.13.17
+@version      20260809.22.49
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -56,6 +56,34 @@
        legacy markup that hardcodes the same hexes. */
     --color-text-headline: #e6c9a8 !important;
     --color-site-text-headline: #e6c9a8 !important;
+    /* The "well" callout family (`.c-application__well` on every /inquire/,
+       /appinquire/, /businessinquire/, /informationinquire/ form and
+       `.c-document-well` on /site/browser/, /site/syoseki/, /site/media/,
+       /site/publishing/) is painted entirely from these three tokens and
+       nothing else reads them as a text or border colour. --default is the
+       neutral note, --danger the "we do not reply to this" warning and
+       --success the permitted-usage box: keep the three apart or the page
+       loses the only cue that distinguishes a caution from a permission. */
+    --color-bg-theme-default: #1c2128 !important;
+    --color-bg-theme-danger: #2d1d1f !important;
+    --color-bg-theme-success: #1b2519 !important;
+    /* `.c-faq dt` — the QUESTION half of every Q&A block (/site/tieup/,
+       /site/aboutwriter/, /site/syoseki/, and the チアーズ/パートナー guides).
+       Its bg token is a translucent black overlay that already reads dark, so
+       only the ink was wrong: #445576 on the dark row left every question
+       illegible while its answer stayed light. */
+    --color-faq-dt-text: #c4cdd6 !important;
+    /* The チアーズ / パートナー programme guides paint their full-width
+       section slabs from four near-white tokens (#f3fcfd, #fffbf0, #e3fafc,
+       #f8f9fa). The dark step cards sit ON these slabs, so the slab is the
+       page's elevated surface, not its base. The teal
+       --color-site-cherrs-eyecatch-bg (#22b8cf) hero is brand colour and
+       stays. */
+    --color-site-cheers-color-bg: #1c2128 !important;
+    --color-site-partner-color-bg: #1c2128 !important;
+    --color-site-partner-eyecatch-bg: #1c2128 !important;
+    --color-site-partner-headline-bg: #21262d !important;
+    --color-site-partner-notes-bg: #1c2128 !important;
   }
 
   /* ---- Base surfaces ---- */
@@ -118,6 +146,7 @@
     background-color: #21262d !important;
   }
   .c-card-cluster-title,
+  .c-application-cluster-title,
   .p-review-control__title {
     border-left-color: #e6c9a8 !important;
   }
@@ -128,6 +157,18 @@
     background-color: #4a2e1c !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
+  }
+  /* The step nav on the ユーザ登録 / お問い合わせ flows marks its current step by
+     making that label the DARKEST thing in the row — #333 on the current
+     <span>, #999 on the rest. That ink order inverts on dark: the step you are
+     ON drops to 1.4:1 while every step you have not reached reads at 5.5:1.
+     The <span> carries its colour directly, so nothing inherited reaches it.
+     Amber marks the current step, as it does on the tabs and the pager. */
+  .c-stepnav__item span {
+    color: #8b949e !important;
+  }
+  .c-stepnav__item--current span {
+    color: #e6c9a8 !important;
   }
 
   /* ============================================================
@@ -226,7 +267,13 @@
   /* ============================================================
      Header / global navigation
      ============================================================ */
+  /* .p-login-header is the login / logout / password-reset family's own
+     header — a full-width band painted straight from --color-site, i.e. the
+     brand cyan, with the white wordmark on it. Those pages carry no .p-header
+     at all, so the band was the one bright strip on an otherwise dark page;
+     the wordmark is the white variant and still reads once the band is dark. */
   .p-header,
+  .p-login-header,
   .l-header,
   .c-menu,
   .c-menu__body {
@@ -238,10 +285,17 @@
   .p-header__logo,
   .p-header__description,
   .p-header__description-data,
-  .p-header__count,
   .p-header__subnav-item,
   .p-header__subnav-item a {
     color: #c4cdd6 !important;
+  }
+  /* The two figures in 作品掲載数 N / 登録ユーザ数 N are the only thing in that
+     line the site emphasises — bold and brand cyan, against the plain grey of
+     their labels. Giving them the body colour merged the numbers into the
+     sentence. Pinned rather than left to the native token: that token is the
+     brown #823f1c on yomou (2.1:1 on the dark header). */
+  .p-header__count {
+    color: #18b7cd !important;
   }
 
   /* Main nav bar. Each site paints this from its own --color-ui-accent:
@@ -602,6 +656,11 @@
     background-color: #1c2128 !important;
     color: #9bd4ff !important;
     border-color: #2d333b !important;
+    /* The arrow glyph carries `text-shadow: #fff 1px 1px 0` — an emboss that
+       vanishes on the site's pale pill and rings the arrow with a white
+       fringe on the dark chip (measured: 0.6% of the control's pixels go
+       pure white). It is a shadow, so no colour rule reaches it. */
+    text-shadow: none !important;
   }
   .c-navigater a {
     color: #9bd4ff !important;
@@ -941,6 +1000,15 @@
     color: #e6edf3 !important;
     border-color: #2d333b !important;
   }
+  /* The open listbox is the one surface `color-scheme: dark` repaints for us —
+     which turns the R18 base sheets' `* { color:#333 }` into dark-on-dark, since
+     a universal selector matches <option> DIRECTLY and no colour inherited from
+     the <select> can beat it. Colour only: an `option` background-color would
+     paint over the browser's own selected-row highlight, the listbox's only
+     "you are here" cue. */
+  option {
+    color: #e6edf3 !important;
+  }
 
   /* Every control the network leaves UNstyled keeps the UA's
      `border: 2px inset|outset`, and Chromium draws that 3D bevel by
@@ -989,6 +1057,19 @@
     background-size: 0.85em !important;
     -webkit-appearance: none !important;
     appearance: none !important;
+  }
+
+  /* Every .c-form control across the network replaces its focus outline with
+     `outline: 0; box-shadow: 0 0 0 2px var(--color-form-shadow-focus)` — so
+     this token is the ONLY keyboard-focus affordance on the header search,
+     the search-builder fields, the filter radios/checkboxes and the feedback
+     textarea. At its native 25% alpha it composites to ~1.5:1 against the
+     page base, well under the 3:1 non-text floor, and the ring is invisible.
+     The token is defined per site (blue on the portal, orange on yomou) and
+     has no consumer other than those :focus rules, so one opaque accent
+     value covers every control. */
+  :root {
+    --color-form-shadow-focus: rgba(88, 166, 255, 0.75) !important;
   }
 
   ::placeholder {
@@ -1095,6 +1176,14 @@
   .word_content label {
     color: #c4cdd6 !important;
   }
+  /* The builder's 検索ワード / 除外ワード fields are recessed with
+     `box-shadow: inset 0 2px 0 0 #eee`. On the site's white page that grey is
+     the inner edge of the well; on the dark field it is a solid white 2px rule
+     across the top of both inputs. Keep the recess, invert its direction. */
+  .search_text {
+    box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.4) !important;
+  }
+
   /* Keyword-suggestion links / tabs in the legacy search builder */
   .pointer,
   .select.pointer,
@@ -1441,6 +1530,17 @@
   .xtop-syuppan__body {
     background-color: transparent !important;
     background-image: none !important;
+    color: #c4cdd6 !important;
+  }
+  /* .info_messagebox is the R18 group's ERROR box (its own #cc6666 headline is the
+     only cue that the page failed), so it needs the danger tone the group rule above
+     flattens. Its detail line is a bare <div> with no colour of its own, so the R18
+     base sheet's universal `* { color:#333 }` matches it DIRECTLY and no inherited
+     ink reaches it — it is the line that says WHAT went wrong. */
+  .info_messagebox {
+    color: #ff7b72 !important;
+  }
+  .info_messagebox .info_error {
     color: #c4cdd6 !important;
   }
   /* The R18 top mixes more bare #333 legacy text: the in_box2 section
@@ -1876,6 +1976,19 @@
   ul.rank_noveltypelist li.on a {
     color: #3ac9b4 !important;
   }
+  /* mid's 総合ポイント figure is the green counterpart of noc's red .attention —
+     the emphasised number on every search row. Its #228855 clears 4.5:1 on mid's
+     own near-white card but only reaches 4.0:1 on our base, so shift it up the
+     same green the チアーズ text uses and keep the emphasis. */
+  span.globalpoint,
+  span.globalpoint .number {
+    color: #3fbf95 !important;
+  }
+  /* mid's section lead paragraph is a #777 grey tuned for its white content
+     column; on our base it drops under 4:1. */
+  p.contents_description {
+    color: #9aa3ad !important;
+  }
 
   /* The R18 group serves its OWN phone sheets (smp_base / smp_noc / the mnlt and mid
      equivalents) — a fifth family none of the desktop selectors above touch, and one
@@ -1980,6 +2093,13 @@
   .rankList p.rank {
     color: #33bbdd !important;
   }
+  /* mid's phone results pager drops the <a> on the page you are on and leaves a
+     bare <span>, which the R18 base sheet's universal `* { color:#333 }` then
+     matches DIRECTLY — 1.4:1, beside ten bright blue page links, so the one
+     number that carries state is the only one you cannot read. */
+  .pager-search span {
+    color: #e6c9a8 !important;
+  }
   div#entry_link > a,
   .genre_list.content-bg,
   .toggle-next-tab {
@@ -2034,6 +2154,15 @@
   .c-announce--note a,
   .help-link {
     color: #5fb0e6 !important;
+  }
+
+  /* Hovering a 関連作品 title paints a cream --color-recommend-title-bg (#ffe)
+     bar the full width of the list and darkens the label to #000 — on dark that
+     is a white strip carrying our accent blue at ~1.7:1, and it is the list's
+     only pointer feedback. The token is defined only on the reader/index pages,
+     and the row exists only under the pointer, so no load-time scan reaches it. */
+  .p-recommend__title-link:hover {
+    background-color: #2d333b !important;
   }
 
   /* Recommendation "NNNNN user" bookmark-count badge — was green text
@@ -2164,9 +2293,34 @@
     background-color: transparent !important;
     color: #c4cdd6 !important;
   }
+  /* The same authors put their headings and body copy in <h3>/<p>/<span> with an
+     inline colour of their own — an inline declaration on the element beats the
+     wrapper's lifted ink, so once the light paper below it is neutralized those
+     near-black maroons sit on the dark footer at ~1.1:1. <a> is deliberately
+     absent: the Amazon / FANZA / support-site buttons keep their brand hues. */
+  .p-rankingtag div h1,
+  .p-rankingtag div h2,
+  .p-rankingtag div h3,
+  .p-rankingtag div h4,
+  .p-rankingtag div h5,
+  .p-rankingtag div h6,
+  .p-rankingtag div p,
+  .p-rankingtag div span,
+  .p-rankingtag div li,
+  .p-rankingtag div td,
+  .p-rankingtag div b,
+  .p-rankingtag div strong,
+  .p-rankingtag div small,
+  .p-rankingtag div font {
+    color: #c4cdd6 !important;
+  }
 
-  /* SNS share buttons - keep brand fills but ensure text legible */
-  .c-sns__button {
+  /* SNS share buttons - keep brand fills but ensure text legible.
+     On the reader and story index the row sits inside .l-foot-contents, whose
+     `a` rule (0,1,1) out-specifies a bare .c-sns__button (0,1,0) and repainted
+     the LINE button's white label footer-link blue on its brand green — qualify
+     through the item wrapper (0,2,0) so the label wins wherever the row lands. */
+  .c-sns__item .c-sns__button {
     color: #e6edf3 !important;
   }
 
@@ -2318,6 +2472,13 @@
   .c-pr {
     background-color: transparent !important;
   }
+  /* The "PR" label is the ad DISCLOSURE — it must stay readable. Its own ink is
+     rgba(73,80,87,.5), a half-transparent dark grey that composites to a legible
+     mid-grey on the site's light body and to near-invisible on ours. Opaque so
+     the alpha cannot re-darken it against the page base. */
+  .c-pr {
+    color: #8b949e !important;
+  }
   /* The floating "flexible sticky" ad's close button is an inline SVG whose
      polygon carries style="fill:#000;stroke:#000" — a pure-black X. It sits on
      the ad's own light creative natively, but on our dark page it renders as a
@@ -2343,6 +2504,65 @@
   #geniee_overlay_close svg path {
     fill: #c4cdd6 !important;
     stroke: #c4cdd6 !important;
+  }
+
+  /* ============================================================
+     なろうデベロッパー (dev.syosetu.com)
+     A frontend of its own under the same domain — the technical manuals,
+     the API / Atom references and the widget guide — built on a token set
+     that exists NOWHERE else: every name below is undefined on the portal,
+     yomou, mypage, the reader, novelcom, the blog and all three R18 hosts,
+     so remapping them at :root lands on dev alone. They paint the
+     full-height #f1f3f5 nav column, the #f8f9fa document/notice boxes, the
+     mint #e6fcf5 tips callouts and the #f1f3f5 / #e8ebef inline-code chips
+     — thirty of those on a single manual page. --color-accent (the cyan
+     bullet + heading rule) and --color-button-primaly already read on dark
+     and stay.
+     ============================================================ */
+  :root {
+    --color-gnav-bg: #0d1117 !important;
+    --color-box-bg: #1c2128 !important;
+    --color-code-bg: #21262d !important;
+    --color-tips-bg: #16241f !important;
+    --color-tips-inline-bg: #2b3138 !important;
+    --color-site-tips: #16241f !important;
+    /* the manuals' warning box paints its label AND its edge from this one */
+    --color-site-notice: #ff7b72 !important;
+  }
+  /* ...but that box is fill-less, so the edge IS the box, and the blanket
+     border reset crushes it to the divider grey ahead of the token. */
+  .c-attention {
+    border-color: #ff7b72 !important;
+  }
+  /* The two manual cards on the dev top are white plates painted from
+     --color-site-base, which the rest of the network also consumes, so they
+     take a selector instead. Their body copy is the #343a40 --color-site-text
+     declared on the anchor itself, so it needs lifting with the fill. */
+  .p-index-nav__item a {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
+  /* Each card's icon is a PNG whose document silhouette is drawn in the same
+     #343a40 as the copy — 1.4:1 once the plate behind it is dark, i.e. only
+     the coloured gear survives. Inverting restores the outline; hue-rotate
+     keeps the gear on its own brand hue (cyan for 技術マニュアル, pink for R18)
+     instead of the complement a bare inversion produces. */
+  .p-index-nav__item-icon img {
+    filter: invert(1) hue-rotate(180deg);
+  }
+  /* The インラインサーチ widget (dev.syosetu.com/nish/sh/, embedded as an
+     <iframe> four times on its own manual page and on any site that uses it)
+     is a bare document whose only chrome is a #fff attribution bar. It exists
+     only inside that frame — `#narou` and `.novel_list` match zero elements on
+     every other page of the network. */
+  #narou {
+    background-color: #1c2128 !important;
+    border-bottom-color: rgba(24, 183, 205, 0.5) !important;
+  }
+  /* Every dev section heading is marked by a 2px cyan border-left and nothing
+     else; the blanket border reset flattened it to the divider grey. */
+  .c-title--md {
+    border-left-color: #18b7cd !important;
   }
 
   /* ============================================================

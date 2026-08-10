@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260804.13.21
+@version      20260809.22.55
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -424,6 +424,59 @@
     color: var(--wx-text-muted) !important;
   }
 
+  /* a few legacy link components pin their ink to the Helios `var(--Panther)`
+     with `!important` at (0,1,0), which out-ranks the (0,0,1) anchor rule, so
+     they render near-black while the plain links beside them stay blue: the
+     /data-vendors in-paragraph opt-out links, and the section CTA that is the
+     only control on /privacy-settings' "Manage Data Rights" block. `--Panther`
+     also feeds legacy button FILLS and borders, so restore the link colour
+     rather than remap the token, with a second simple selector to clear the
+     site's !important. */
+  [dir] [class*="DataVendors--anchorParagraphLink"],
+  [dir] [class*="LinkSection--sectionLink"] {
+    color: var(--wx-link) !important;
+  }
+  [dir] [class*="DataVendors--anchorParagraphLink"]:hover,
+  [dir] [class*="LinkSection--sectionLink"]:hover {
+    color: var(--wx-link-hover) !important;
+  }
+  /* three legacy page templates paint a full-page WHITE container of their own
+     that no card / module / well selector reaches, so the whole page renders
+     as our lifted light text on white: /privacy-settings (the consent control
+     page, including its own inner header band), /data-rights (the DSR request
+     accordion) and /storm-radar (the app promo page, whose feature sheet is
+     1248x2891). All three sit directly on the page. */
+  [class*="PrivacySettings--container"],
+  [class*="PrivacySettings--container"] [class*="Header--headerSection"],
+  [class*="DsrForm--dsrContainer"],
+  [class*="PromoFeaturePage--featurePage"],
+  [class*="PromoFeaturePage--featuresSection"] {
+    background-color: var(--wx-base) !important;
+  }
+  [class*="PromoFeaturePage--featuresTitle"] {
+    color: var(--wx-text) !important;
+  }
+  /* the Helios Disclosure accordion titles ship #2b2b2b. Inside the header's
+     units panel they are already lifted by the ExpandableMenu rule; standalone
+     -- as the four /data-rights sections -- nothing reached them. */
+  [class*="Disclosure--Summary"] {
+    color: var(--wx-text) !important;
+  }
+  /* the legacy plain-text button is the brand `--Ocean` #1b4de4, 2.74:1 on the
+     page base (it reads 8:1 on the site's white). */
+  [class*="Button--plainText"] {
+    color: var(--wx-link) !important;
+  }
+
+  /* /mission's "Better Decisions" panels drop to a pure-black heading + legal
+     disclaimer in their lower sections (the upper ones are brand blue). */
+  [class*="BetterDecisions--heading"] {
+    color: var(--wx-text) !important;
+  }
+  [class*="BetterDecisions--disclaimerText"] {
+    color: var(--wx-text-muted) !important;
+  }
+
   /* sub-nav pill row sits in a white rounded bar */
   [data-testid="subnavigation"] a,
   [data-testid="subnavigation"] button {
@@ -467,6 +520,18 @@
   [class*="pointer-events-none"][class*="absolute"][class*="inset-y-0"][class*="right-0"] {
     background-image: linear-gradient(to left, var(--wx-base) 36px, rgba(20, 24, 29, 0) 100%) !important;
   }
+  /* the LEGACY equivalent is the Helios Carousel arrow button, whose own
+     background IS the fade (`linear-gradient(90deg, transparent, #fff)`) -- an
+     89x46 white blob at the end of every scrollable strip. The Carousel is a
+     card component, so the fade resolves to the card surface. The site writes
+     it `!important` from a `[dir="ltr"] .class` rule, so the override needs a
+     third simple selector to out-rank it. */
+  [dir] [class*="Carousel--arrowContainer"][class*="Left"] {
+    background-image: linear-gradient(270deg, rgba(28, 33, 40, 0), var(--wx-surface)) !important;
+  }
+  [dir] [class*="Carousel--arrowContainer"][class*="Right"] {
+    background-image: linear-gradient(90deg, rgba(28, 33, 40, 0), var(--wx-surface)) !important;
+  }
 
   /* ---- Tailwind surface utilities (stable, non-hashed) ----------------- */
   /* These ship literally as bg-white / bg-gray-100 / bg-gray-50 on content
@@ -487,6 +552,38 @@
   .bg-secondary,
   .bg-accent {
     background-color: var(--wx-surface-2) !important;
+  }
+  /* -200/-300 are one step STRONGER than -100 on the site's white page, so one step
+     LIGHTER than the -100 surface here. They are rail/track fills, not card surfaces
+     (the Cold & Flu extended-forecast scrubber rail, switch tracks), which is why they
+     take the border tone rather than an elevated surface. */
+  .bg-gray-200,
+  .bg-gray-300,
+  .bg-neutral-200,
+  .bg-neutral-300 {
+    background-color: var(--wx-border) !important;
+  }
+  /* Tailwind's `bg-black/N` veils are the design system's "subtle plate": a few percent
+     of BLACK over a white page. On our dark surfaces they are invisible, which is what
+     emptied the chart tab strip's unselected pills and the video-thumbnail placeholders.
+     Mirror the veil to white so a plate keeps the weight the site gave it. Only the LOW
+     alphas are plates -- /30 and up are scrims over photos and must stay black.
+     `[class~=]` matches a whole class token, so `bg-black/5` cannot also catch
+     `bg-black/50`. */
+  [class~="bg-black/5"],
+  [class~="bg-black/8"],
+  [class~="bg-black/10"] {
+    background-color: rgba(230, 237, 243, 0.06) !important;
+  }
+  [class~="hover:bg-black/5"]:hover,
+  [class~="hover:bg-black/14"]:hover,
+  [class~="hover:bg-black/20"]:hover,
+  [class~="hover:bg-black/[0.12]"]:hover {
+    background-color: rgba(230, 237, 243, 0.12) !important;
+  }
+  [class~="active:bg-black/5"]:active,
+  [class~="active:bg-black/[0.2]"]:active {
+    background-color: rgba(230, 237, 243, 0.2) !important;
   }
   /* the MOBILE header nav drawer paints each expanded section's sub-item list
      (Weather Forecasts -> Today / Hourly / 10 Day, Radar & Maps -> ..., etc.) as a
@@ -574,6 +671,72 @@
   [class*="bg-gray-100"][class*="hover:bg-gray-200"]:hover,
   [class*="bg-gray-50"][class*="hover:bg-gray-100"]:hover {
     background-color: var(--wx-border-2) !important;
+  }
+  /* the same light greys also arrive through the FOCUS and ACTIVE variants, which the
+     hover list above does not match: `focus-visible:bg-gray-100` is the keyboard
+     indicator on the rail items and the video-category tabs, `active:bg-gray-200` the
+     press state on most pills -- both painted #f2f2f2 under our lifted light text.
+     Matched on plain `:focus`, a superset of `:focus-visible` and the CSS2 form the
+     userstyles.org parser accepts. */
+  [class~="focus:bg-gray-100"]:focus,
+  [class~="focus-visible:bg-gray-100"]:focus,
+  [class~="active:bg-gray-100"]:active,
+  [class~="active:bg-gray-200"]:active,
+  [class~="active:bg-gray-300"]:active,
+  [class~="max-sm:active:bg-gray-100"]:active {
+    background-color: var(--wx-surface-2) !important;
+  }
+
+  /* ---- segmented tab strips --------------------------------------------- */
+  /* The chart tab strip (Overview / Temperature / Feels Like / ... on Hourly) marks its
+     SELECTED tab with `!bg-gray-900`: a Tailwind `!`-suffixed utility, so its !important
+     sits inside the utilities cascade LAYER and beats our unlayered `.bg-gray-900`
+     override whatever the specificity. The pill therefore kept the raw #252422 token,
+     which is the same luminance as our card -- and with the unselected `bg-black/5`
+     plates invisible too, the whole control read as twelve identical labels with no
+     sign of which chart was open. `!bg-gray-900` resolves `var(--color-gray-900)`, and
+     variable resolution is layer-agnostic, so redefining the token ON the tab computes
+     our value while their rule still "wins" the cascade. The site's own move is to
+     invert the selected pill against the page, so invert it the other way here: a light
+     plate with chrome-dark ink.
+     Keyed to the `!` utility rather than to aria-selected, because the LEGACY
+     `role="tab"` unit picker (deg-F / deg-C / Hybrid) is a transparent tab marked by an
+     underline -- dark ink there would erase the label. */
+  [role="tab"][class~="!bg-gray-900"] {
+    --color-gray-900: var(--wx-text) !important;
+    color: var(--wx-chrome) !important;
+    -webkit-text-fill-color: var(--wx-chrome) !important;
+  }
+  /* the video-category strip (Viral Videos / Latest Weather / News / ...) is `md:hidden`,
+     so it exists ONLY below 768px -- a desktop scan never renders it. It fills its
+     UNSELECTED tabs through the state variant `data-[state=inactive]:bg-gray-100`, a
+     class token no plain `.bg-gray-*` selector matches, so they stayed #f2f2f2 pills
+     under our lifted light labels: light-on-light, every inactive category unreadable.
+     The variant class is in the list in BOTH states, so it must be paired with the state
+     attribute or every tab takes the fill. Muting the inactive label restores the
+     weight the site gets from #f2f2f2 against the active navy pill. */
+  [class~="data-[state=inactive]:bg-gray-100"][data-state="inactive"] {
+    background-color: var(--wx-surface-2) !important;
+  }
+  [class~="data-[state=inactive]:text-gray-600"][data-state="inactive"] {
+    color: var(--wx-text-muted) !important;
+  }
+  /* the focus RING is a box-shadow, so the blanket border reset never reached it -- but
+     weather.com rings in #3a61cc, 5.5:1 on its white page and 2.9:1 on ours, under the
+     3:1 a non-text indicator needs. The ring colour is a custom property, so redefining
+     it on the ringed element is enough. */
+  [class*="ring-blue-500"] {
+    --tw-ring-color: var(--wx-link) !important;
+  }
+  /* ...and the app's OTHER keyboard indicator is an `outline-blue-600` outline,
+     a plain `outline-color` no ring token feeds: #204794 is 10:1 on the site's
+     white page and 1.73:1 on the base, so Tab moves an invisible marker. The
+     outline's width and style only exist in the focus-visible state, so
+     recolouring the utility unconditionally touches nothing at rest. */
+  [class*="outline-blue-500"],
+  [class*="outline-blue-600"],
+  [class*="outline-blue-700"] {
+    outline-color: var(--wx-link) !important;
   }
 
   /* ---- cards / modules / wells ----------------------------------------- */
@@ -719,6 +882,7 @@
   [class*="LanguageSelector--unitDisplay"],
   [class*="LanguageSelector--LanguageSelectorStatus"],
   [data-testid="ContentMediaTitle"],
+  [class*="ContentMedia--listItemTitle"],
   [class*="MediaObject--mediaCaptionCTA"] {
     color: var(--wx-text) !important;
   }
@@ -740,6 +904,11 @@
   [class*="MediaObject--mediaCaption"]:not([class*="mediaCaptionCTA"]) {
     color: var(--wx-text-2) !important;
   }
+  /* the same teaser's dateline is its own #686c74 -- a grey the muted-token list
+     does not carry, and 3.07:1 at 14px on the card. */
+  [class*="MediaObject--mediaPublishDate"] {
+    color: var(--wx-text-muted) !important;
+  }
   /* the content-media / promo thumbnails (news strips, "Stay Safe" fallback,
      "Spring Is Here", sidebar teasers) paint a LIGHT #f3f3f3 -> #e5e5e5 gradient
      placeholder (Image--gradient) behind the lazy-loaded <img>. It's a
@@ -750,6 +919,27 @@
      paints over it unchanged (imgs already keep a transparent bg below). */
   [class*="Image--gradient"] {
     background-image: linear-gradient(135deg, var(--wx-surface-2), var(--wx-surface)) !important;
+  }
+
+  /* the SPA content hubs (/news, /health, /travel, /pets, /home-garden, ...)
+     ship the SAME placeholder as an INLINE `background:` shorthand with no
+     class, on the card <div> or directly on the <img>. Match the literal
+     attribute text -- an inline shorthand is beaten by an !important
+     background-image, and the loaded thumbnail still paints over it. */
+  [style*="linear-gradient(135deg, rgb(243, 243, 243)"] {
+    background-image: linear-gradient(135deg, var(--wx-surface-2), var(--wx-surface)) !important;
+  }
+  /* the legacy Classic Maps pages (/maps/*) size every map thumbnail with an
+     `--imagePlaceholder--` wrapper filled #dee0e3, so a 613x345 light plate
+     stands behind the primary map (and one per collection tile) until the
+     raster arrives. The map raster itself paints over it untouched. */
+  [class*="imagePlaceholder"] {
+    background-color: var(--wx-surface-2) !important;
+  }
+  /* legacy section breaks are <hr> with zero border and a light #dedede FILL,
+     so the blanket border reset never reaches them. */
+  hr {
+    background-color: var(--wx-border) !important;
   }
 
   /* ---- temperature scale (semantic, NEUTRAL ends only) ------------------ */
@@ -1026,19 +1216,17 @@
   [style*="background-color: rgb(245, 245, 245)"] {
     background-color: var(--wx-border) !important;
   }
-  /* the EXPANDED 10-day row marks its day-name (Tonight / Fri 24 / ...) with brand
-     blue via a `group-data-[state=open]:text-blue-500` variant, to signal which row is
-     open. That span ALSO ships `text-gray-900`, so our `.text-gray-900` !important
-     flattened it to plain light and the open row read identically to the closed ones
-     (only the up-chevron distinguished it). The variant class is present in every state,
-     so scope the accent to the expanded button; only the day-name span carries the
-     variant (the high/low temps are plain `text-gray-900`), so the range values stay
-     light. weather.com's own #3a61cc is only ~2.9:1 on the dark row, so use the theme
-     link blue. */
-  [data-testid="daily-forecast"] button[aria-expanded="true"] [class*="group-data-[state=open]:text-blue-500"] {
-    color: var(--wx-link) !important;
+  /* the Cold & Flu extended-forecast scrubber paints one segment per day from the
+     flu-risk ramp as an INLINE background-color, same shape as the track above. The
+     ramp's bottom step is achromatic #f2f2f2 -- invisible on the site's white card,
+     which is the point ("nothing here") -- but on our dark card it is the brightest
+     thing on the page and the ramp reads INVERTED: very low shouts, very high whispers.
+     Sink the bottom step to the track tone so the ordering survives. Every chromatic
+     step (#d9dcfd -> #17007e) is data and is untouched, and the legend swatch starts at
+     #d9dcfd, so nothing in the legend disagrees with this. */
+  [style*="background-color: rgb(242, 242, 242)"] {
+    background-color: var(--wx-border) !important;
   }
-
   /* ---- forms / location search ----------------------------------------- */
   input,
   textarea,
@@ -1220,6 +1408,16 @@
     fill: var(--wx-text-2) !important;
   }
 
+  /* the legacy Helios Popover (the AQI / UV "Levels" legend behind the module
+     footers' Info button, and its siblings) is a white panel that only exists
+     as `visibility: hidden` until clicked, and its pointer notch is a rotated
+     square painted by the arrow's ::before. Both need the dark surface; the
+     legend's colour swatches are inline fills and stay as the site paints. */
+  [class*="Popover--popover"],
+  [class*="Popover--popover"] [data-popper-arrow]::before {
+    background-color: var(--wx-surface-2) !important;
+  }
+
   /* ---- footer ----------------------------------------------------------- */
   footer,
   [data-testid="footer"],
@@ -1295,6 +1493,15 @@
   .trc_rbox .branding,
   .trc_rbox_header_span {
     color: var(--wx-text-2) !important;
+  }
+  /* the widget FOOTER carries the ad disclosure ("Sponsored Links by Taboola",
+     "Promoted Links"). Its spans are pure black and sit outside every `.trc_*`
+     surface class above, so the disclosure vanishes on the darkened card. */
+  .trc-widget-footer,
+  .trc-widget-footer span,
+  .trc-widget-header,
+  .trc-widget-header span {
+    color: var(--wx-text-muted) !important;
   }
   /* Taboola now ships a "brand kit": it writes its palette as INLINE custom properties on
      <html> (`--brand-color-text-primary: #252422`, `--brand-color-bg-base: #FFFFFF`) and
@@ -1548,6 +1755,13 @@
   [class*="TabList--tabSelected"] {
     border-bottom-color: var(--wx-text) !important;
   }
+  /* ...and every tab LABEL in that component ships the Helios ink #252422, so
+     the category strips on the legacy content hubs (/safety, /storms/*) go
+     dark-on-dark. The site marks the current tab only by the underline above,
+     never by colour, so one uniform lift keeps the distinction intact. */
+  [class*="TabList--tab"] {
+    color: var(--wx-text-2) !important;
+  }
   /* Map Options radio groups (Map Style, Main map layer, radar speed): the
      visual control IS the appearance:none <input>, and its selected dot is an
      `::after` filled with the Helios ink #252422. On the site's white ring that
@@ -1782,6 +1996,80 @@
      the button keeps floating and clicking. */
   div[data-spot-im-shadow-host="floating-bell"] {
     opacity: 0.35 !important;
+  }
+
+  /* ---- support.weather.com help centre ---------------------------------- */
+  /* `domain("weather.com")` also matches the support subdomain, which runs a
+     separate Salesforce Experience Cloud app (`slds-*` plus its own
+     `cFeedbackCommunityV2*` components). Our text lifts reach it but none of
+     its surfaces do, so its section headings land light-on-white and the
+     article list is a 920x1363 white panel. Darken the app's own surfaces --
+     its navy hero band, brand logos and the blue/white filter chips (blue =
+     selected) are the site's own and stay. */
+  .cFeedbackCommunityV2HomeContent,
+  .cFeedbackCommunityV2Article,
+  .brands,
+  .articles-list,
+  .article-card,
+  .alert-detail-card,
+  .sidebar,
+  .search-form,
+  .footer-v2,
+  .slds-modal__content,
+  .slds-modal__header,
+  .slds-modal__footer {
+    background-color: var(--wx-surface) !important;
+  }
+  /* its headline links are the Salesforce navy #0a3fa8, ~2:1 on that surface */
+  .brand-title,
+  .article-title {
+    color: var(--wx-link) !important;
+  }
+  .brand-title:hover,
+  .article-title:hover {
+    color: var(--wx-link-hover) !important;
+  }
+  /* the footer's own #333 / #666 labels sit outside every text rule above */
+  .footer-v2 .connect-label,
+  .footer-v2 .footer-copyright {
+    color: var(--wx-text-2) !important;
+  }
+  /* the current nav item is marked by a WHITE pill on the navy header bar, so
+     it has to keep dark ink -- the anchor rule paints it our link blue at
+     2.4:1 on its own fill. */
+  .nav-pill-active {
+    color: #204794 !important;
+  }
+  /* the help centre's own accents are Salesforce-dark and drop below 3:1 once
+     the surface behind them is: the AI-help heading, the muted brand badge,
+     and the three platform badges (keyed on data-platform, since all three
+     share one class). Keep each hue, lift the lightness. */
+  .ai-help-title {
+    color: var(--wx-text) !important;
+  }
+  /* the announcement strip's copy is an `oklch()` grey -- a colour syntax no
+     rgb-parsing scan resolves -- at 2.38:1 on the page base. */
+  .banner-text .text-gray {
+    color: var(--wx-text-2) !important;
+  }
+  .brand-badge {
+    color: var(--wx-text-muted) !important;
+  }
+  .platform-badge[data-platform="iOS"] {
+    color: #6ea8f0 !important;
+  }
+  .platform-badge[data-platform="Android"] {
+    color: #57bb7e !important;
+  }
+  .platform-badge[data-platform="Web"] {
+    color: #b18ce0 !important;
+  }
+  /* Knowledge article bodies are authored rich text: every paragraph is a
+     <span style="...color: #000000"> pasted from the editor, so the tag-level
+     text rules never reach it and the article body renders black on black. */
+  .article-body [style*="color: #000000"],
+  .alert-detail-card [style*="color: #000000"] {
+    color: var(--wx-text-2) !important;
   }
 
   /* ====================================================================== */

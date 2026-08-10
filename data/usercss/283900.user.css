@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260804.13.15
+@version      20260809.22.46
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -116,6 +116,10 @@
   .contentItem--featured, .contentCollection--hero { background-color: #1a1f26 !important; }
   .contentItem:hover, .scoreEvent__content:hover, .cscore_link:hover,
   .news-feed-item:hover { background-color: #21262d !important; }
+  /* Quick-Links rail rows ("Watch on ESPN", "Quick Links", the 404 link columns) hardcode
+     a solid #fff on :hover — not token-driven, and a hover state so invisible to a
+     load-time scan. Match the card hover surface. */
+  .QuickLinks__Item:hover { background-color: #21262d !important; }
 
   /* ---- Typography ---- */
   h1, h2, h3, h4, h5, h6, .contentItem__subhead, .Card__Header__Title,
@@ -409,6 +413,36 @@
   /* ---- Footer legal / OneTrust settings strip (default near-white) ---- */
   .PageFooter__Legal, .PageFooter__Legal__Copyright, .ot-sdk-show-settings,
   #onetrust-consent-sdk .ot-sdk-row, .legal { color: #8b949e !important; }
+  /* ---- OneTrust / Disney consent SDK, shown on a first visit (the international editions
+       raise it again on every fresh context). The banner and the "Show Purposes" preference
+       centre are solid #fff panels the site never darkens: every heading, partner count and
+       accordion label our generic text rules light up renders white-on-white, while ESPN's
+       own near-black body copy stays black. Dark the two panels and lift the black copy;
+       everything between them is transparent, except the footer, which paints its own #fff.
+       .onetrust-pc-dark-filter is the scrim, not a surface — forcing it opaque would hide
+       the panel it sits behind. ---- */
+  #onetrust-banner-sdk, #onetrust-pc-sdk, #onetrust-pc-sdk .ot-pc-footer {
+    background-color: #1c2128 !important; }
+  #onetrust-policy-text, #onetrust-policy-text *, #ot-pc-desc, #ot-pc-desc *,
+  #onetrust-pc-sdk .ot-acc-txt, #onetrust-pc-sdk .ot-accordion-layout button {
+    color: #c4cdd6 !important; }
+  #onetrust-pc-btn-handler {
+    background-color: transparent !important; color: #e6edf3 !important;
+    border-color: #8b949e !important; }
+  /* The brand wordmark and the close control are black artwork on transparent, so no colour
+     rule reaches either. The wordmark is a REPLACED-content image (`content: url(data:…)`)
+     on the .ot-pc-logo box itself — its nested <img> is 0x0 and inverting that paints
+     nothing. */
+  #onetrust-pc-sdk .ot-pc-logo, #onetrust-banner-sdk .banner_logo,
+  #onetrust-pc-sdk .ot-close-icon { filter: invert(1) !important; }
+  /* The purpose-accordion chevron is a data-URI SVG background-image whose <path> declares
+     no fill, so it paints pure black — 1.1:1 on the darked panel. The box behind it is
+     transparent, so inverting the box only flips the glyph. */
+  #onetrust-pc-sdk .ot-plus-minus { filter: invert(1) !important; }
+  /* The banner's button-group rule is a `border-top` on a ::before, which the blanket `*`
+     border reset cannot reach — a #dcdddf hairline the full width of the dark panel. */
+  #onetrust-banner-sdk #onetrust-button-group-parent::before {
+    border-top-color: #2d333b !important; }
 
   /* ---- Catch-all: any element ESPN paints white/near-white inline ---- */
   [style*="background-color: rgb(255, 255, 255)"],
@@ -431,6 +465,11 @@
      both to readable-on-dark equivalents so the signal survives. */
   .clr-negative { color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
   .clr-positive { color: #4ac76a !important; -webkit-text-fill-color: #4ac76a !important; }
+  /* .clr-brand-ESPN resolves to the same ESPN red as .clr-negative and marks an in-progress
+     game ("LIVE!" in the team-page schedule rail). It is a single class, so it ties with the
+     .Schedule__Time / .ScoreCell__Time metadata greys above and only wins by coming later —
+     keep it below them. */
+  .clr-brand-ESPN { color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
   /* Module / section / panel titles ESPN colors with a dark grey (#2b2c2d) */
   .Stats__LeadersTitle, .Table__Title, .Card__Header__Title, .module-header,
   .headerCell__title, .pageHeader__title, .Wrapper__Header, .ContentList__Title,
@@ -533,6 +572,14 @@
   .search_results__header { color: #e6edf3 !important; }
   .search_results__cat { color: #9aa4ae !important; }
   .search_results__item:hover, .search_results__link:hover { background-color: #21262d !important; }
+  /* Keyboard traversal marks the current row with .focused, not :hover — a #f1f2f3 tint in
+     the results list and a full #fff in the suggestions list. Rows also separate with a
+     #dcdddf dotted ::before, and each section header hangs a 1px #dcdddf ::before bar; both
+     are pseudo-drawn, so the blanket border reset cannot reach either. */
+  .search_results__item.focused,
+  .search_results__suggestions .search_results__item.focused { background-color: #21262d !important; }
+  .search_results__item + .search_results__item .search_results__details::before,
+  .search_results__header::before { border-top-color: #2d333b !important; background-color: #2d333b !important; }
   /* The panel's "View all results for '<q>'" strip is an UNCLASSED <footer> (#f9f9fb) —
      no search_results__* class reaches it, and the footer rule above deliberately drops
      the bare `footer` selector, so it is the one light band left in the flyout. */
@@ -630,6 +677,13 @@
      scan; remap to our divider grey. ---- */
   .PageFooter__QuickLinks::after, .news-feed-item::before,
   .mediaList__link::after { background-color: #2d333b !important; }
+  /* The one-feed draws its intra-card rules as pseudo-element BORDERS in the same #dcdddf
+     (quick-links rows, the underline below a card heading, the rule above a card's action
+     strip, and the separator between mobile score cards) — the blanket `*` border reset
+     cannot reach a pseudo, so each renders as a bright hairline across the dark card. */
+  .quicklinks_list__item::after, .contentItem__header::after,
+  .contentItem__footer::before, .cscore::before {
+    border-color: #2d333b !important; }
   ::selection { background-color: #2f6fb8 !important; color: #ffffff !important; }
 
   /* ---- Filter controls (season / round / view dropdowns, segmented ButtonGroup) ---- */
@@ -649,6 +703,13 @@
      blue: reuse the theme's dark-appropriate ESPN-blue pairing (#588ae4 on near-black),
      matching the sideLogin / flagship CTAs. */
   .PlayerHeader__Follow, .ClubhouseHeader__Follow {
+    background-color: #588ae4 !important; border-color: #588ae4 !important;
+    color: #121213 !important; -webkit-text-fill-color: #121213 !important; }
+  /* Shortstop-card "Follow" CTA. ESPN writes it `var(--bg-surface-raised, <brand blue>)` and
+     leaves --bg-surface-raised undefined outside .theme-espnDS_v2, so the fallback IS the
+     paint; the token block below defines that token on .theme-light too, which swaps the
+     brand fill for the card surface and turns the card's only action into a ghost pill. */
+  .ctaButton {
     background-color: #588ae4 !important; border-color: #588ae4 !important;
     color: #121213 !important; -webkit-text-fill-color: #121213 !important; }
   /* Game-note strip ("NBA Finals - Game 5, NY wins series") paints pure black → muted grey. */
@@ -679,6 +740,9 @@
        the search field + filter-pill row (content cards cover the rest, so a bg-color
        scan of the cards passes while the header band glares white). Dark to base. ---- */
   #themeProvider > div, .SearchBar { background-color: #14181d !important; }
+  /* The search field's edge is a two-sided inset #eeeff1 bevel (box-shadow, not a border):
+     invisible on ESPN's white bar, a hard bright corner on ours. Even it out. */
+  .SearchBar { box-shadow: 0 0 0 1px #2d333b inset !important; }
   /* ---- Search results: filter pills + video duration badge ---- */
   .Pill { background-color: #21262d !important; border-color: #2d333b !important; color: #c4cdd6 !important; }
   .Pill--selected { background-color: #2d333b !important; color: #e6edf3 !important; }
@@ -999,7 +1063,16 @@
   /* win-probability chart legend team names + gamecast weather temp hardcode
      near-black text (dark-on-dark once their surface is darked). */
   .CustomLegend__TeamName { color: #e6edf3 !important; }
+  /* The .CustomLegend container hands its children a near-black #121213; the team name is
+     lifted above, but the percentage label beside it is a <div> and inherits it. */
+  .CustomLegend__Team__Percent { color: #c4cdd6 !important; }
   .Weather__Temp, .Weather__Items, .Weather__HiLow { color: #c4cdd6 !important; }
+  /* Recharts axis tick labels (win-probability graph, drive charts) paint #5a5c5d through a
+     `fill` presentation attribute, so neither the token remaps nor any `color` rule reaches
+     them — ~2.4:1 on the card. Only the axis scale is targeted; the data series keep their
+     team colours. */
+  .recharts-cartesian-axis-tick text, .recharts-cartesian-axis-tick tspan,
+  .recharts-cartesian-axis-tick-value { fill: #9aa4ae !important; }
   /* light-grey divider in the top scoreboard-strip ScoreCells (#cecfcf ::after); the
      mobile scoreboard score cell draws the same #cecfcf rule as .ScoreCell__Overview::before
      between the score and the status/Highlights column. */
@@ -1173,6 +1246,10 @@
        byline mugshot — same white disc, different class, and at 40px both duck the
        audit's size floor. */
   .headshot, .headshot-md, .author-img { background-color: #1c2128 !important; }
+  /* The disc's outline is an inset #dcdddf box-shadow, not a border, so the blanket border
+     reset leaves a bright ring around every avatar. */
+  .headshot, .headshot-sm, .headshot-md, .author-img {
+    box-shadow: 0 0 0 1px #2d333b inset !important; }
 
   /* News-item fallback thumbnail (.News__Item__Thumbnail.no-img): when a headline has no
      image ESPN paints a light #edeef0 rounded box holding a faint grey ESPN wordmark. On
@@ -1245,6 +1322,19 @@
      misses it. Dark to the page base. ---- */
   ul.fav-menu.strip, .fav-menu.strip.mobile { background-color: #14181d !important; }
   ul.fav-menu.strip li:hover, .fav-menu.strip.mobile li:hover { background-color: #1c2128 !important; }
+  /* Mobile one-feed score-card odds strip: .oddsStripWrapper hardcodes #fff and the
+     .oddsStrip row inside it #f4f4f4 (ESPN ships a [data-appearance='dark'] half at
+     #1d1e1f/#2b2c2d that never applies for us), and the accordion caret is a pure-black
+     ESPNIcons pseudo. The betting rows are natively transparent — the theme's
+     [class*="betting"] surface rule fills them, which reads as an inset box once the
+     strip itself is dark, so clear them in this scope. The strip only mounts on cards
+     whose market has odds enabled; a disabled card renders it at 0px. ---- */
+  .oddsStripContent .oddsStripWrapper { background-color: #1c2128 !important; }
+  .oddsStripContent .oddsStrip { background-color: #21262d !important; }
+  .oddsStrip .bettingWrapper, .oddsStrip .betting, .oddsStrip .bettingLabel,
+  .oddsStrip .bettingPrimary, .oddsStrip .bettingSecondary,
+  .oddsStrip .bettingTeamSeparator { background-color: transparent !important; }
+  .oddsStripCaret, .oddsStripCaret::before { color: #c4cdd6 !important; }
 
   /* ---- Taboola "why this ad" fade / popover panels are solid white and only exist
        once the widget's exclude control is used — invisible to a load-time scan. ---- */
@@ -1262,6 +1352,9 @@
   .slick-prev, .slick-next, .CarouselArrow, button.CarouselArrow {
     background-color: rgba(20,24,29,0.7) !important; border-color: #2d333b !important; }
   .slick-prev::before, .slick-next::before { color: #e6edf3 !important; }
+  /* Unlike the borderless slick arrows, .CarouselArrow draws a 2px brand-blue ring that
+     matches its chevron; the shared reset above greys it into the thumbnail. */
+  .CarouselArrow, button.CarouselArrow { border-color: #4c99e6 !important; }
 
   /* ---- Video-playlist "Now Playing" marker (.MediaList__item__playing): ESPN paints
        this label native red #dd0000 to flag the currently-playing clip in a video rail;
@@ -1282,15 +1375,18 @@
   .SoccerPerformers__RedCardIcon { fill: #ff5a5a !important; }
 
   /* ---- Match-stats comparison bars (prism ProgressBar, gamecast "Team Stats"): the
-       first team's segment carries a hardcoded near-black #1d1e1f INLINE — ESPN's
-       neutral, not a team colour (every bar on the page ships the same value) — while
-       the second team's segment is a grey diagonal hatch. On our dark card the solid
-       segment is invisible at ~1.0:1, so a 44%-vs-56% split renders as one bar and the
-       12px legend swatch beside the home team's abbreviation disappears too. Both nodes
-       carry only hashed classes, so the inline value is the only stable hook. ---- */
+       first team's segment carries its fill INLINE and the second's is a diagonal hatch.
+       Two inline values land invisible (~1.0:1) on our dark card: ESPN's own near-black
+       neutral #1d1e1f, and pure #000000 for a genuinely black-kitted club (Juventus).
+       A 44%-vs-56% split then renders as one bar, and the 12px legend swatch beside the
+       team abbreviation disappears with it. Both nodes carry only hashed classes, so the
+       inline value is the only stable hook; the swatch is a <span>, the bar the testid. ---- */
   [data-test-id="prism-progress-bar"][style*="rgb(29, 30, 31)"],
   [data-test-id="prism-progress-bar"][style*="#1d1e1f"],
-  span[style*="background:#1d1e1f"] { background-color: #c4cdd6 !important; }
+  [data-test-id="prism-progress-bar"][style*="rgb(0, 0, 0)"],
+  [data-test-id="prism-progress-bar"][style*="#000000"],
+  span[style*="background:#1d1e1f"],
+  span[style*="background:#000000"] { background-color: #c4cdd6 !important; }
 
   /* ---- Form-guide result badges (.GameResults — "Last Five Matches" table + the
        head-to-head "Last 5 Matchups" panel on a match report): ESPN paints each W/L/D

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for Slashdot, easy-on-the-eyes story feed and threaded comment discussions, with the classic Slashdot green kept intact.
-@version      20260804.13.19
+@version      20260809.22.53
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -137,8 +137,22 @@
   }
   .story-byline a, .details a, .by a { color: #5fb0e6 !important; }
 
-  /* topic / type icons + popularity beaker — keep popularity red semantic but soften */
-  .icon-beaker.pop1, span.icon-beaker { color: #e06c6c !important; }
+  /* the popularity beaker is a NINE-STEP scale, not one icon: the site inks it
+     pop0 #cde, pop1 #c00, pop2 #f93, pop3 #ff6, pop4 #0c3, pop5 #06f, pop6 #609,
+     pop7 #306, pop8 #000. A single `span.icon-beaker` colour paints every step the
+     same, which is the firehose's whole at-a-glance ranking cue gone (/recent runs
+     five distinct steps down one column). Keep each step's hue and lift the four
+     that are too dark to read on the dark page. */
+  span.icon-beaker { color: #c4cdd6 !important; }
+  .icon-beaker.pop0, span.icon-beaker.pop0 { color: #cddeee !important; }
+  .icon-beaker.pop1, span.icon-beaker.pop1 { color: #e06c6c !important; }
+  .icon-beaker.pop2, span.icon-beaker.pop2 { color: #ff9933 !important; }
+  .icon-beaker.pop3, span.icon-beaker.pop3 { color: #ffff66 !important; }
+  .icon-beaker.pop4, span.icon-beaker.pop4 { color: #00cc33 !important; }
+  .icon-beaker.pop5, span.icon-beaker.pop5 { color: #4d94ff !important; }
+  .icon-beaker.pop6, span.icon-beaker.pop6 { color: #d07ae0 !important; }
+  .icon-beaker.pop7, span.icon-beaker.pop7 { color: #9a7ae0 !important; }
+  .icon-beaker.pop8, span.icon-beaker.pop8 { color: #e6edf3 !important; }
   .type, .topic, .sd-info-block, .sd-key-firehose-id { color: #8b949e !important; }
 
   /* story body copy */
@@ -366,6 +380,24 @@
     background-repeat: no-repeat !important;
     padding-right: 28px !important;
   }
+  /* the ONLY focus affordance either frontend gives a field is a colour change on the
+     border plus a glow (classic: #007575 -> #227777 + an inset light fill; the
+     SourceForge shell: #cacaca -> #76b6b6 + a 5px halo). The blanket `border` and
+     `box-shadow: none` above are !important and erase both, so every text field, textarea
+     and <select> site-wide renders byte-identical focused and unfocused. Restate at
+     (0,2,1) — one notch above the resting rule — with the brand teal as the ring.
+     `#search input:focus` is separate because the masthead box takes its resting border
+     from the id-scoped `#search input` entry above (1,0,1), which no class-level focus
+     selector can outrank. */
+  input[type="text"]:focus, input[type="search"]:focus, input[type="password"]:focus,
+  input[type="email"]:focus, input[name="fhfilter"]:focus,
+  textarea:focus, select:focus,
+  .typeahead__container input:focus, .typeahead__query input:focus,
+  #search input:focus {
+    border-color: #6fd8be !important;
+    box-shadow: 0 0 0 2px rgba(111, 216, 190, 0.35) !important;
+  }
+
   /* buttons — text-shadow:none clears the site's `text-shadow: white 0 1px`
      on submit inputs and .btn, which outlines every glyph on a dark fill */
   input[type="submit"], input[type="button"], button, .btn, a.button {
@@ -720,16 +752,26 @@
     color: #c4cdd6 !important;
   }
   .sticky-cta a, .sticky-wrapper a { color: #5fb0e6 !important; }
-  /* Each sponsor variant of that bar ships its OWN `.sticky-cta:hover` fill and declares
-     it `!important` — `#c2eb53` lime (zendesk), `#f0f0f0` (viktor), `hsla(0,0%,100%,.9)`
-     (auth0/newrelic/grafana), `#00c853` (default). Those beat the dark rest fill above
-     the moment the pointer lands, and the CTA's label — which is `::before` content, not
-     a text node — is our light #e6edf3, so it drops to ~1.1:1 on the near-white ones.
-     Their selectors are (0,3,0) `!important`, so the restatement has to outrank that. */
+  /* The sponsor's call-to-action is a `.sticky-cta` pill INSIDE that bar, natively a
+     brand fill (zendesk `#d1f470` lime, others near-white or `#00c853`) with dark ink.
+     The rest rule above paints the pill and the bar the SAME #1c2128, so the CTA has no
+     edge at all and reads as a run of plain text. Keep the label legible — it is
+     `::before` content, so a near-white sponsor fill would put our #e6edf3 on it at
+     ~1.1:1 — by giving the pill the theme's own brand-primary teal instead of the
+     sponsor's. Stay at (0,2,0) so the hover below still outranks this. */
+  .sticky-wrapper .sticky-cta, .sticky-right .sticky-cta, span.sticky-cta {
+    background-color: #0b7c7c !important;
+    border-color: #0e9494 !important;
+  }
+  /* Each sponsor variant also ships its OWN `.sticky-cta:hover` fill and declares it
+     `!important` — `#c2eb53` lime (zendesk), `#f0f0f0` (viktor), `hsla(0,0%,100%,.9)`
+     (auth0/newrelic/grafana), `#00c853` (default). Those beat the fill above the moment
+     the pointer lands. Their selectors are (0,3,0) `!important`, so the restatement has
+     to outrank that. */
   .sticky-wrapper .sticky-right .sticky-cta:hover,
   .sticky-wrapper .sticky-cta:hover,
   .sticky-right .sticky-cta:hover,
-  #mdb-sticky-cta:hover { background: #2d333b !important; }
+  #mdb-sticky-cta:hover { background: #0e9494 !important; }
 
   /* native-ad "Sponsored / Featured Content" label (Nativo classes) */
   .ntv-ad-label, .ntv-sponsored, .nel-sponsored,
@@ -911,9 +953,12 @@
   #accordion li a.about:hover, .aboutOver { background-color: #262c33 !important; }
   /* the "^ Top" back-links: the caret is an <i> the site colours #006666 (1.9:1 on
      our base) with a #1e2329 hover — the anchor rule never reaches it, an <i> is not
-     an <a>. Same story for the FAQ answer-body carets. */
-  .faq-listing > div i, .faq-listing div i,
-  .faq-listing > div i:hover, .faq-listing div i:hover { color: #6fd8be !important; }
+     an <a>. Every one of them sits INSIDE the "Top" anchor, so it has to move with the
+     label: a separate colour here splits one link into two, and only the label answers
+     the hover (`i:hover` needs the pointer on the 8px glyph itself). */
+  .faq-listing > div i, .faq-listing div i { color: #5fb0e6 !important; }
+  .faq-listing > div a:hover i, .faq-listing div a:hover i,
+  .faq-listing > div i:hover, .faq-listing div i:hover { color: #9bd4ff !important; }
 
   /* ---------- /videos ---------- */
   /* Every video thumbnail sits in a container the site fills #ecf2f2, and the raster
@@ -1062,6 +1107,27 @@
   }
   .sandiego .default.hollow.button:hover svg,
   .sandiego .default.hollow.button:focus svg { fill: #e6edf3 !important; }
+  /* every inline icon in the shell is an SVG whose shapes carry a hardcoded black
+     `fill`/`stroke` attribute — and `question-circle`'s paths carry none at all, which
+     resolves to the SVG default black. That is the ⓘ / $ / integrations / media mark
+     beside each section heading, the accordion carets and the review-source tooltips,
+     all rendering black on the dark card. A DOM scan only ever checks SVGs for WHITE
+     fills, so a black one is invisible to it as well as to the reader. */
+  .off-canvas-content svg [fill="#000000"], .off-canvas-content svg [fill="#000"],
+  .off-canvas-content svg [fill="#080404"], .off-canvas-content svg [fill="#040404"],
+  .off-canvas-content svg[data-name="down_carret"] polygon,
+  .off-canvas-content svg[data-name="question-circle"] path,
+  .off-canvas-content svg[data-name="software-pricing"] path {
+    fill: #c4cdd6 !important;
+  }
+  .off-canvas-content svg [stroke="#000000"], .off-canvas-content svg [stroke="#000"] {
+    stroke: #c4cdd6 !important;
+  }
+  /* the directory's filter-rail marks (`icon-location`, `icon-corp-type`, the tooltip
+     `info-circle`) declare no fill at all, which resolves to the SVG default black.
+     `fill` inherits, so seeding it on the root reaches exactly the shapes that carry
+     no value of their own and leaves every explicitly-coloured one untouched. */
+  .off-canvas-content svg[data-name] { fill: #c4cdd6 !important; }
   /* breadcrumb " > " separators are ::before content at #666 (3.1:1) */
   #breadcrumbs li::before, nav#breadcrumbs ul li::before { color: #8b949e !important; }
   /* the shell's own sticky masthead is a bare `<nav>` of three links (News / Business
@@ -1152,9 +1218,10 @@
     background: transparent !important;
   }
   /* the sponsor bar's CTA label is also ::before content, hardcoded #001e2b — on the
-     dark bar it renders at 1.1:1, i.e. an invisible call-to-action */
+     dark bar it renders at 1.1:1, i.e. an invisible call-to-action. White, not the body
+     ink, so it clears 4.5:1 on the pill's brand-primary teal. */
   .sticky-cta::before, .sticky-wrapper .sticky-cta::before,
-  .sticky-right .sticky-cta::before { color: #e6edf3 !important; }
+  .sticky-right .sticky-cta::before { color: #ffffff !important; }
   /* the recommendation bar's axis runs 1..10 and marks the product's actual score with
      `span.active`. The site encodes that purely as value — #333 for the score against
      #98a3a2 for the plain ticks — and this rule listed BOTH forms at one colour, so all
@@ -1222,5 +1289,151 @@
   a.button.hollow-opaque, .button.hollow-opaque {
     background-color: #1c2128 !important;
     color: #6fd8be !important;
+  }
+
+  /* ---------- m.slashdot.org (the mobile frontend) ----------
+     `domain("slashdot.org")` covers m.slashdot.org, and the classic footer's "Mobile
+     View" link moves the reader onto it, but it is a THIRD template with its own
+     stylesheet that nothing above reached: the page canvas, the story column and the
+     entire discussion ship white / #ececec under #313f40 copy, so those pages rendered
+     essentially unthemed. Each of these surfaces paints its fill TWICE — a
+     background-color plus a repeating `white_background2X.png` / `light_background2X.png`
+     tile — so a background-color override alone leaves the light raster on top. */
+  .stages .stage-center, .river-prop, #filler.white, #filler.light,
+  #content.phone .story-prop, #content.tablet .story-prop,
+  #content.phone .preview-submission-prop, #content.phone .submission-prop,
+  #content.tablet .preview-submission-prop, #content.tablet .submission-prop,
+  .river-submission, #content.tablet ul.submissions,
+  #content.tablet .river-prop .content-columns .left-column,
+  #discussion, .thread-prop, .activity-river ul,
+  #content ul#user-comments-in-profile, .profile-prop .comments.tab,
+  .profile-prop .submissions.tab, .profile-prop .the-grey-area,
+  .profile-prop .the-light-area, .profile-prop .black-area-filler,
+  .no-profile-comments, .flag-abuse-prop, .notifications-prop,
+  #notifications .notifications, li.ad, div.ad-1, div.ad-2,
+  #river_bottom.ad-on, #story_slot2.ad-on {
+    background-color: #14181d !important;
+    background-image: none !important;
+  }
+  /* the fixed top bar, the river's date dividers and the carousel dot rail are chrome */
+  .slashbar, #content.phone .river-story-header > h3,
+  #content.tablet .river-prop .river-tab, .river-prop #nav {
+    background-color: #0d1117 !important;
+    background-image: none !important;
+  }
+  .slashbar h1, .slashbar .dark h1, #modal .popup .header h1 { color: #e6edf3 !important; }
+  /* the bar's back button is a light-grey chip baked into `preload-sprites.png`, so its
+     label lands on light at ~2.4:1 once the bar is dark. The site already ships the dark
+     chip as a standalone asset for its own `.slashbar .dark` variant — point at that. */
+  .slashbar a.back, .slashbar a.back-to-river, .slashbar a.back-to-discussable {
+    background-image: url("https://a.fsdn.com/sd/m/assets/button_BackDark2X.png") !important;
+    background-position: 0 0 !important;
+    background-size: 73px 32px !important;
+    color: #ffffff !important;
+  }
+  /* panels, cards and the floating surfaces (each display:none until opened) */
+  .poll-prop .poll, #modal .popup,
+  .bubble-floater .bubble-container .bubble-bubble,
+  #discussion .discussion-details .comment-total > .comment-bubble-right .show-popup.help .popup-bubble,
+  .poll-prop .poll ul.choices li.answer,
+  #discussion .discussion .comment.highlight > .content,
+  .comment .comment-links .moderation-popup.show-popup .popup-bubble > ul a.moderate-as,
+  .newcomment-prop .new-comment, .new-submission .submit-box,
+  .login-prop .slashdot-login form, .signup-prop .slashdot-signup form,
+  .forgot-password-prop form, .preview-submission-prop .action-container {
+    background-color: #1c2128 !important;
+    background-image: none !important;
+  }
+  .bubble-floater .bubble-container .bubble-beak:before,
+  .bubble-floater .bubble-container .bubble-beak-mask:before,
+  #discussion .discussion-details .comment-total > .comment-bubble-right .show-popup.help .popup-beak:before {
+    background: #1c2128 !important;
+  }
+  .load_more > a.button {
+    background: #21262d !important;
+    color: #9bd4ff !important;
+  }
+  /* the template inks its body copy #313f40 and its metadata #666 */
+  #content.phone .story-prop .article, #content.tablet .story-prop .article,
+  #content.phone .preview-submission-prop .article, #content.phone .submission-prop .article,
+  .river-story h4, .river-submission h4,
+  #content.tablet .river-story, #content.tablet .river-submission,
+  .comment .comment-body, .comment .subject, .comment span.points,
+  .flag-abuse-prop .flagged-comment .comment-body,
+  .poll-prop .poll ul.results li, .poll-prop .poll ul.choices li.answer a,
+  .loading div, .login-prop .slashdot-login, .signup-prop .slashdot-signup,
+  .forgot-password-prop, .flag-abuse-prop,
+  .no-profile-comments p, .profile-prop .tabs li a {
+    color: #c4cdd6 !important;
+  }
+  #content.phone .story-prop .details h1, #content.tablet .story-prop .details h1,
+  #content.phone .preview-submission-prop .details h1, #content.phone .submission-prop .details h1,
+  .poll-prop .poll h1, .profile-prop .the-grey-area h3,
+  #content ul#user-comments-in-profile .subject,
+  #discussion .discussion-details .comment-total > .comment-bubble-right > h5,
+  .thread-prop .discussion-details .comment-total > .comment-bubble-right > h5 {
+    color: #e6edf3 !important;
+  }
+  .river-story span.time, .river-submission span.time,
+  .river-story span.nickname, .river-submission span.nickname,
+  #content.phone td.details span.time, #content.phone td.details span.nickname,
+  #content.phone td.details div.votes,
+  #content.tablet td.details span.time, #content.tablet td.details span.nickname,
+  #content.tablet td.details div.votes,
+  .comment .meta span.nickname, .comment .meta span.time,
+  .story-prop .authoring, .story-prop .authoring span.time,
+  .poll-prop .poll .votes, .poll-prop .poll ul.results li div .percentage,
+  #content.phone .story-prop .department, #content.tablet .story-prop .department,
+  #content.phone #footer .bottom .copyright,
+  #content.phone #footer .bottom .follow > .follow-us,
+  #content.tablet #footer .copyright, #content.tablet #footer .follow .follow-us {
+    color: #8b949e !important;
+  }
+  /* both headings are drawn with a white text-shadow halo for the light page */
+  .load_more > a.button,
+  #discussion .discussion-details .comment-total > .comment-bubble-right > h5,
+  .thread-prop .discussion-details .comment-total > .comment-bubble-right > h5 {
+    text-shadow: none !important;
+  }
+  /* the discussion's All / Outstanding / Funny selector: the SELECTED tab is the only
+     one the site fills (#ececec) and it inks that label #000, so on a dark strip the
+     current filter is the one unreadable tab. The #f26522 indicator bar stays the cue. */
+  #discussion .discussion-details .comment-selection ul.discussion-options li.active,
+  .thread-prop .discussion-details .comment-selection ul.discussion-options li.active {
+    background-color: #21262d !important;
+  }
+  #discussion .discussion-details .comment-selection ul.discussion-options li.active a,
+  .thread-prop .discussion-details .comment-selection ul.discussion-options li.active a {
+    color: #e6edf3 !important;
+  }
+  /* poll answers: the radio well and its empty dot are hardcoded light. The chosen row
+     is `.highlight`, one class more than the row fill above — restate it or the dark
+     fill swallows the site's orange selection. */
+  .poll-prop .poll ul.choices li.answer .radio-container { background: #21262d !important; }
+  .poll-prop .poll ul.choices li.answer .radio-container .radio { background-color: #0d1117 !important; }
+  .poll-prop .poll ul.choices li.answer.highlight,
+  .poll-prop .poll ul.choices li.answer.highlight .radio-container {
+    background-color: #f26522 !important;
+  }
+  .poll-prop .poll ul.choices li.answer.highlight a { color: #ffffff !important; }
+  .poll-prop .poll ul.results li .bar-container { background-color: #21262d !important; }
+  /* the river's hero carousel and its "Slashdot Poll" teaser lay their text straight on
+     the hero raster over a transparent `td.details`, so the classic `.details` fill
+     above draws an opaque box across part of each row. The poll teaser's own headings
+     are #313f40, which then land on that box at ~1.2:1. */
+  li.featured-story td.details, li.river-poll td.details,
+  li.river-story td.details, li.river-submission td.details,
+  #featured-poll td.details, #carousel td.details {
+    background: transparent !important;
+  }
+  .river-poll h4, .river-poll h5,
+  li.river-poll td.details h4, li.river-poll td.details h5 { color: #e6edf3 !important; }
+  /* tapping a river row flashes an #eee fill */
+  .river-story:active, .river-submission:active { background-color: #21262d !important; }
+  /* the mobile `.info` banner shares the `.error` panel rule with only its border and a
+     #dadada fill changed, so the classic .error/.notice/.success block never covered it */
+  #content.phone .info, #content.tablet .info {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
   }
 }
