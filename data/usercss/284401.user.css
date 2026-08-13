@@ -1,0 +1,2834 @@
+/* ==UserStyle==
+@name         SCP Foundation RU Dark 2026
+@namespace    USO Archive
+@author       Reza Rahemtola
+@description  A dark theme for the Russian SCP Foundation wiki (articles, sidebar, tag search, forum)
+@version      20260811.23.46
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("scpfoundation.net"), domain("scpfoundation.ru"), domain("scp-ru.wikidot.com") {
+/* ============================================================
+     BASE
+
+     Articles may ship their own <style> block, which the browser sees AFTER
+     this sheet — equal specificity there loses. Article-body rules therefore
+     carry !important, and the ones an article theme is most likely to claim
+     are written with two ids so an author's inline colour still wins.
+     ============================================================ */
+
+  /* Headings and links state a colour directly on the element, so they cannot
+     reach an author's callout box by inheritance the way body ink does. They
+     read these instead, and a light author box rebinds them for its subtree. */
+  :root {
+    color-scheme: dark;
+    --scpru-title: #e05f6b;
+    --scpru-heading: #e6edf3;
+    --scpru-link: #e8626e;
+    --scpru-link-visited: #cf90a8;
+    --scpru-link-hover: #ff8f97;
+    --scpru-lift-black: #c4cdd6;
+    --scpru-lift-blue: #79c0ff;
+    --scpru-lift-green: #7ee787;
+    --scpru-lift-purple: #d2a8ff;
+    --scpru-lift-maroon: #ff9492;
+    --scpru-lift-red: #ff453a;
+    --scpru-lift-brown: #d4a373;
+    --scpru-lift-teal: #56d4dd;
+
+    /* The 2023 sidebar redesign draws its corner brackets, its folded-section
+       wipe and its section rules from one crimson. */
+    --new-side-bar-color: #8a2f2f;
+  }
+
+  html,
+  body {
+    background-color: #14181d !important;
+    color: #c4cdd6 !important;
+  }
+
+  #html-body,
+  #skrollr-body,
+  #container-wrap-wrap,
+  #container,
+  #content-wrap,
+  #main-content,
+  #page-content,
+  #action-area {
+    background-color: transparent;
+  }
+
+  /* The masthead art is a black-to-maroon band with a mid-grey stripe at
+     140-165px (the top menu) and nothing below it — the PNG is transparent
+     there, so only that stripe has to be repainted. A first background layer
+     covers it; the artwork stays as the second layer and keeps the identity.
+     The artwork URL must stay absolute: userstyles.org rejects any relative
+     url() reference at upload. */
+  div#container-wrap {
+    background-color: #14181d !important;
+    background-image:
+      linear-gradient(transparent 140px, #1c2128 140px, #1c2128 165px, transparent 165px),
+      url("https://scpfoundation.net/-/static/images/scp-bg.png") !important;
+    background-repeat: repeat-x, repeat-x !important;
+    background-position: top left, top left !important;
+  }
+
+  /* iframes default to a 2px inset border in currentColor, which turns light
+     the moment the page text does. */
+  iframe {
+    border-color: #2d333b;
+  }
+
+  hr {
+    color: #2d333b !important;
+    background-color: #2d333b !important;
+    border-color: #2d333b !important;
+  }
+
+  /* The front page's own divider carries a light drop shadow. */
+  .hr-main {
+    background-color: #3a4048 !important;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, .5) !important;
+  }
+
+  /* ============================================================
+     TYPOGRAPHY
+     ============================================================ */
+
+  /* Site chrome — always on the page floor, so the colour is pinned. */
+  #page-title,
+  .meta-title,
+  .sub-page-title,
+  .sub-page-title h1 {
+    color: var(--scpru-title) !important;
+    border-color: #2d333b !important;
+  }
+
+  /* An in-article h1 is not pinned: an article that states a heading colour has
+     a surface of its own in mind for it, and this only has to beat the site's
+     base #901, which document order already does. Pinning it strips the light
+     ink off headings on author-painted dark panels. */
+  h1 {
+    color: var(--scpru-title);
+    border-color: #2d333b;
+  }
+
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--scpru-heading);
+  }
+
+  /* Declared on the article root ONLY, so the ink reaches the text by
+     inheritance. A copy of this on p/li/dd/dt/td is a direct declaration and
+     beats any colour an author put on a wrapping callout box, however specific
+     or inline that wrapper's colour was — which erases the author's ink while
+     leaving their light paper behind. */
+  #page-content,
+  .thread-container .post .content,
+  .forum-thread-box .description-block {
+    color: #c4cdd6;
+  }
+
+  /* Authors build callout boxes as [[div style="background:#EEE"]] and let the
+     site's near-black body ink carry the words — the wrapper names a paper
+     colour and no ink. That paper survives the theme, so the box has to hand
+     the ink back. Matched on the VALUE (an inline background alongside a light
+     hex or `white`), never on a class: the classes are page-local and differ
+     per article.
+     The `white` keyword is matched only where a background PROPERTY precedes
+     it, because a malformed author style — `background: #white` — names no
+     colour at all, paints nothing, and would take the dark ink onto the page
+     floor. The hex forms stay loose so a gradient stop still matches.
+     The saturated colour KEYWORDS listed last are the ones whose luminance
+     carries near-black ink better than light ink — `red` reads at 5.3:1 dark
+     and 2.5:1 light. `blue`, `navy`, `purple` and `maroon` are deliberately
+     absent for the same reason in reverse, and the `dark` guard keeps their
+     `darkred`/`darkorange` relatives out of the list.
+     Deliberately NOT !important — an author who did name their own colour
+     still wins, so this can never read worse than the unstyled site. */
+  #page-content [style*="background"][style*="#c"],
+  #page-content [style*="background"][style*="#d"],
+  #page-content [style*="background"][style*="#e"],
+  #page-content [style*="background"][style*="#f"],
+  #page-content [style*="background"][style*="#C"],
+  #page-content [style*="background"][style*="#D"],
+  #page-content [style*="background"][style*="#E"],
+  #page-content [style*="background"][style*="#F"],
+  #page-content [style*="background:white"],
+  #page-content [style*="background: white"],
+  #page-content [style*="background-color:white"],
+  #page-content [style*="background-color: white"],
+  #page-content [style*="background"][style*="red"]:not([style*="dark"]),
+  #page-content [style*="background"][style*="yellow"]:not([style*="dark"]),
+  #page-content [style*="background"][style*="orange"]:not([style*="dark"]),
+  #page-content [style*="background"][style*="gold"]:not([style*="dark"]),
+  #page-content [style*="background"][style*="lime"]:not([style*="dark"]),
+  #page-content [style*="background"][style*="aqua"]:not([style*="dark"]),
+  #page-content [style*="background"][style*="cyan"]:not([style*="dark"]),
+  #page-content [style*="background"][style*="pink"]:not([style*="dark"]),
+  #page-content [style*="background"][style*="magenta"]:not([style*="dark"]) {
+    color: #140f0c;
+    --scpru-title: #7a1d24;
+    --scpru-heading: #140f0c;
+    --scpru-link: #a4161a;
+    --scpru-link-visited: #6d3550;
+    --scpru-link-hover: #d21414;
+    /* On paper the author's own dark end of the ##blue|…## palette reads, and
+       the lifted end does not. */
+    --scpru-lift-black: #140f0c;
+    --scpru-lift-blue: #0000cd;
+    --scpru-lift-green: #046307;
+    --scpru-lift-purple: #800080;
+    --scpru-lift-maroon: #800000;
+    --scpru-lift-red: #c30000;
+    --scpru-lift-brown: #6b4423;
+    --scpru-lift-teal: #006a6a;
+  }
+
+  /* ============================================================
+     LINKS — the crimson identity, lifted for dark
+     ============================================================ */
+
+  a,
+  #interwiki a,
+  #side-bar a,
+  #side-bar a:visited,
+  #page-content a {
+    color: var(--scpru-link);
+  }
+
+  a:visited,
+  #page-content a:visited {
+    color: var(--scpru-link-visited);
+  }
+
+  a:hover,
+  #page-content a:hover {
+    color: var(--scpru-link-hover);
+  }
+
+  /* Article themes reach the body links from their own page-scoped rules, which
+     out-specify a single-id selector — on the themes that pitch their links
+     near-black for a light page, that leaves them invisible here. Two ids win
+     on the id count alone, so no !important is needed and an author's inline
+     colour (and the ##name|text## lifts further down) still take precedence. */
+  #main-content #page-content a {
+    color: var(--scpru-link);
+  }
+
+  #main-content #page-content a:visited {
+    color: var(--scpru-link-visited);
+  }
+
+  #main-content #page-content a:hover {
+    color: var(--scpru-link-hover);
+  }
+
+  /* Wikidot paints a light hover fill on every link. Kept at low specificity
+     so component rules (the rating buttons) can still fill their own hover. */
+  a:hover {
+    background-color: transparent !important;
+  }
+
+  a.newpage,
+  a.newpage:visited,
+  #main-content #page-content a.newpage,
+  #main-content #page-content a.newpage:visited {
+    color: #e8944a;
+  }
+
+  #page-content a.collapsible-block-link {
+    color: var(--scpru-link);
+  }
+
+  /* ============================================================
+     MASTHEAD / TOP BAR / SEARCH
+     ============================================================ */
+
+  #header h1 a {
+    color: #eee;
+  }
+
+  #header h2 span {
+    color: #f0f0c0;
+  }
+
+  /* Article themes hide the masthead's real text with `color: transparent` and
+     draw their own copy from a pseudo-element, pitched near-black for a light
+     bar. Only the pseudo is coloured: touching the anchor itself would print a
+     second title over the first on every theme that does this.
+     `color` alone is taken — a theme whose title is knocked-out artwork sets
+     -webkit-text-fill-color to transparent so the artwork shows through the
+     glyphs, and naming it here would paint over that artwork. */
+  #header h1 a::before,
+  #header h1 a::after {
+    color: #eee !important;
+  }
+
+  #header h2::before,
+  #header h2::after,
+  #header h2 span::before,
+  #header h2 span::after {
+    color: #f0f0c0 !important;
+  }
+
+  #login-status {
+    color: #9aa4ae !important;
+  }
+
+  #login-status a,
+  #login-status a.btn,
+  #login-status a.btn-primary {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    color: #dde3e9 !important;
+  }
+
+  #login-status a:hover {
+    color: #ff8f97 !important;
+  }
+
+  #login-status ul a,
+  #account-options li a {
+    color: #e8626e !important;
+  }
+
+  #account-options {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .6);
+  }
+
+  #account-options li a:hover {
+    color: #ff8f97 !important;
+    background-color: #262c33 !important;
+  }
+
+  #account-topbutton {
+    background-color: #2d333b !important;
+    color: #e8626e !important;
+    border-color: #3a4048 !important;
+  }
+
+  #top-bar a {
+    color: #eaeaea !important;
+  }
+
+  /* The dropdown panel carries its own border and shadow; the anchor fills
+     below only cover the rows, not the gaps between them. */
+  #top-bar ul li ul {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .7);
+  }
+
+  /* Only the left and right sides are drawn. Stating all four keeps the two at
+     zero width off currentColor, which is now light. */
+  #top-bar ul li a {
+    border-color: rgba(255, 255, 255, .06) !important;
+  }
+
+  /* Open dropdown: the site paints these #eee / #fff */
+  #top-bar ul li.sfhover a,
+  #top-bar ul li:hover a,
+  #top-bar li ul li a,
+  #top-bar a:hover {
+    background-color: #1c2128 !important;
+    color: #ff8f97 !important;
+    border-left-color: #3a4048 !important;
+    border-right-color: #3a4048 !important;
+  }
+
+  #top-bar ul li.sfhover a:hover,
+  #top-bar ul li:hover a:hover {
+    background-color: #262c33 !important;
+  }
+
+  #top-bar ul li.sfhover ul li a,
+  #top-bar ul li:hover ul li a {
+    border-top-color: #2d333b !important;
+  }
+
+  #top-bar ul li ul a {
+    color: #ff8f97;
+  }
+
+  /* Mobile hamburger — a white disc with a grey rule and a grey glyph. */
+  #top-bar .open-menu a {
+    background-color: #1c2128 !important;
+    border-color: #4a5058 !important;
+    color: #eaeaea !important;
+    -webkit-text-fill-color: #eaeaea !important;
+  }
+
+  #top-bar .open-menu a:hover {
+    box-shadow: 0 0 16px 2px rgba(0, 0, 0, .8) !important;
+  }
+
+  #top-bar .mobile-top-bar {
+    background-color: #1c2128 !important;
+    background-image: none !important;
+    border-color: #3a4048 !important;
+  }
+
+  /* The glyph is the anchor's own "≡" character, and an article theme can hold
+     its `color` at a near-black pitched for its light bar that no specificity
+     dislodges. -webkit-text-fill-color is what actually paints the glyph. */
+  #top-bar .mobile-top-bar a {
+    color: #eaeaea !important;
+    -webkit-text-fill-color: #eaeaea !important;
+  }
+
+  /* The search field and its button already sit on the site's own dark maroon,
+     so only the ink and the light focus outline are re-pitched.
+     Article themes repaint this input white with black ink from a rule of the
+     same single-id weight, and theirs is later in the document, so the second
+     id is what decides it. */
+  #header #search-top-box-input,
+  #header #search-top-box input.text {
+    background-color: #22181a !important;
+    color: #e6edf3 !important;
+    border-color: #6d4a4a !important;
+  }
+
+  #header #search-top-box-input:hover,
+  #header #search-top-box-input:focus {
+    background-color: #33272a !important;
+    border-color: #b98a8a !important;
+    color: #fff !important;
+  }
+
+  #search-top-box input.empty {
+    color: #a08a8a !important;
+  }
+
+  #search-top-box-form input[type="submit"] {
+    background-color: #5a2f2f !important;
+    background-image: linear-gradient(to bottom, #7d4444, #5a2f2f, #33272a) !important;
+    border-color: #6d4a4a !important;
+    color: #e8d8d8 !important;
+  }
+
+  #search-top-box-form input[type="submit"]:hover,
+  #search-top-box-form input[type="submit"]:focus {
+    background-color: #7d4444 !important;
+    background-image: linear-gradient(to bottom, #a06666, #7d4444, #5a2f2f) !important;
+    border-color: #b98a8a !important;
+    color: #fff !important;
+  }
+
+  /* ============================================================
+     SIDE BAR
+     ============================================================ */
+
+  /* Every rule that names a sidebar SURFACE carries the wrapper id as well.
+     Article themes repaint these blocks white from `#side-bar .side-block`
+     with !important — the same weight as ours, and later in the document, so
+     nothing but a second id decides it. The `#interwiki` half lives in a
+     separate frame document that has no wrapper and is never contested. */
+  #container-wrap #side-bar {
+    background-color: #14181d !important;
+    border-color: #2d333b !important;
+  }
+
+  #container-wrap #side-bar .side-block,
+  #container-wrap #side-bar #u-side-footer,
+  #interwiki .side-block {
+    background-color: #1c2128 !important;
+    border-color: #7d3030 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .55) !important;
+  }
+
+  /* The site tints two panels — keep those hues, at dark-surface lightness */
+  #container-wrap #side-bar .side-block.media,
+  #interwiki .side-block.media {
+    background-color: #1e2133 !important;
+  }
+
+  #container-wrap #side-bar .side-block.resources,
+  #interwiki .side-block.resources {
+    background-color: #2a1c1c !important;
+  }
+
+  #container-wrap #side-bar .heading,
+  #interwiki .heading {
+    color: #e07b83 !important;
+    border-bottom-color: #7d3030 !important;
+  }
+
+  /* The sidebar's own ink. Article themes state `#side-bar a` near-black for
+     the white blocks they paint, and once the block above is ours instead, the
+     ink has to come with the surface — so every rule in this group carries the
+     wrapper id too, and the component rules below carry it as well so the two
+     ids do not steal their labels. */
+  #container-wrap #side-bar a,
+  #container-wrap #side-bar a:visited,
+  #interwiki a {
+    color: var(--scpru-link) !important;
+  }
+
+  #container-wrap #side-bar a:hover,
+  #interwiki a:hover {
+    color: var(--scpru-link-hover) !important;
+  }
+
+  #container-wrap #side-bar .menu-item.inactive a,
+  #interwiki .menu-item.inactive a {
+    color: #7d858e !important;
+  }
+
+  #side-bar .menu-item .sub-text,
+  #interwiki .menu-item .sub-text {
+    color: #8b949e !important;
+  }
+
+  /* The row separator carries no colour of its own, so it takes the link/body
+     ink — a bright hairline under every entry once that ink is light. */
+  #side-bar .menu-item,
+  #interwiki .menu-item {
+    border-color: #2d333b !important;
+  }
+
+  /* --- the 2023 sidebar redesign --- */
+
+  #container-wrap #side-bar .new-side-block {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  #container-wrap #side-bar .new-heading {
+    color: #e07b83 !important;
+    border-top-color: #7d3030 !important;
+  }
+
+  #container-wrap #side-bar .new-side-block h6 a {
+    color: #c4cdd6 !important;
+  }
+
+  /* "Случайная статья" / "Поиск по тегам" — a near-white gradient plate with
+     grey uppercase labels, and a crimson gradient under the cursor. */
+  #container-wrap #side-bar .random-article-block {
+    background: linear-gradient(to top, #1c2128 0%, #1c2128 80%, #262c33 100%) !important;
+    border-color: #3a4048 !important;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, .5) !important;
+  }
+
+  #container-wrap #side-bar .random-article-block .menu-item:first-child {
+    border-bottom-color: #3a4048 !important;
+  }
+
+  #container-wrap #side-bar .random-article-block > .menu-item a {
+    color: #c4cdd6 !important;
+  }
+
+  #container-wrap #side-bar .random-article-block .menu-item:first-child:hover,
+  #container-wrap #side-bar .random-article-block .menu-item:last-child:hover {
+    background: linear-gradient(to top, #7d3030 0%, #7d3030 80%, #a03636 100%) !important;
+  }
+
+  #container-wrap #side-bar .random-article-block > .menu-item:hover a {
+    color: #fff !important;
+  }
+
+  /* "Об организации" and its siblings. Folded, the block is a half-crimson,
+     half-WHITE gradient that slides across on hover — only the white half is
+     restated, so the wipe still reads as a wipe. */
+  #container-wrap #side-bar .collapsible-side .collapsible-block-folded {
+    background: linear-gradient(to left, #1c2128 50%, var(--new-side-bar-color) 50%) right !important;
+    background-size: 200% 100% !important;
+  }
+
+  #container-wrap #side-bar .collapsible-side .collapsible-block-folded:hover {
+    background-position: left !important;
+  }
+
+  #container-wrap #side-bar .collapsible-block-link {
+    color: #e07b83 !important;
+  }
+
+  #container-wrap #side-bar .collapsible-side .collapsible-block-folded:hover .collapsible-block-link,
+  #container-wrap #side-bar .collapsible-side .collapsible-block-unfolded-link a {
+    color: #fff !important;
+  }
+
+  #side-bar .collapsible-block-unfolded-link {
+    border-color: #7d3030 !important;
+  }
+
+  /* Mobile slide-out drawer. Below 768px the site fills it dusty rose. */
+  @media (max-width: 767px) {
+    #container-wrap #side-bar {
+      background-color: #0d1117 !important;
+    }
+
+    #side-bar:target .close-menu {
+      background: rgba(0, 0, 0, .6) !important;
+    }
+  }
+
+  /* ============================================================
+     TABLES
+     ============================================================ */
+
+  /* No ink here: td would beat an author box's inherited colour the same way
+     the page-content copy did. The cell text inherits; th states its own. */
+  table.wiki-content-table td,
+  table.wiki-content-table th {
+    border-color: #2d333b !important;
+  }
+
+  table.wiki-content-table th {
+    background-color: #22282f !important;
+    color: #e6edf3 !important;
+  }
+
+  table.page-compare td,
+  table.page-compare th,
+  table.form.grid td,
+  table.form.grid th,
+  .gallery-item,
+  table.page-history td.optionstd a {
+    border-color: #2d333b !important;
+  }
+
+  .alternate:nth-child(2n) {
+    background-color: rgba(255, 255, 255, .04) !important;
+  }
+
+  table.page-files .highlight {
+    background-color: #22282f !important;
+  }
+
+  /* ============================================================
+     CODE / TOC / NOTES / QUOTES
+     ============================================================ */
+
+  /* An element that names its own paper inline is left as authored — these
+     fills are !important and would otherwise strip the author's box down to
+     our surface while the ink rebind above hands its contents a DARK colour,
+     leaving the text on the page floor at no contrast at all. */
+  .code:not([style*="background"]),
+  #toc:not([style*="background"]),
+  .page-source:not([style*="background"]),
+  div.note:not([style*="background"]) {
+    background-color: #1a1f26 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  div.note-block:not([style*="background"]) {
+    border-color: #7d3030 !important;
+    background-color: #1a1f26 !important;
+  }
+
+  blockquote:not([style*="background"]),
+  div.blockquote:not([style*="background"]) {
+    background-color: #1a1f26 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6;
+  }
+
+  /* Wikidot's own syntax palette */
+  .hl-default,
+  .hl-code,
+  .hl-brackets,
+  .hl-identifier,
+  .hl-main {
+    color: #c9d1d9 !important;
+  }
+
+  .hl-comment {
+    color: #8b949e !important;
+  }
+
+  .hl-quotes,
+  .hl-string {
+    color: #a5d6ff !important;
+  }
+
+  .hl-reserved {
+    color: #ff7b72 !important;
+  }
+
+  .hl-var {
+    color: #79c0ff !important;
+  }
+
+  .hl-inlinetags {
+    color: #d2a8ff !important;
+  }
+
+  .hl-gutter {
+    background-color: #22282f !important;
+    color: #8b949e !important;
+  }
+
+  /* highlight.js, which the site ships in its GitHub LIGHT theme */
+  .hljs {
+    background-color: #1a1f26 !important;
+    color: #c9d1d9 !important;
+  }
+
+  .hljs-doctag,
+  .hljs-keyword,
+  .hljs-meta .hljs-keyword,
+  .hljs-template-tag,
+  .hljs-template-variable,
+  .hljs-type,
+  .hljs-variable.language_ {
+    color: #ff7b72 !important;
+  }
+
+  .hljs-title,
+  .hljs-title.class_,
+  .hljs-title.class_.inherited__,
+  .hljs-title.function_ {
+    color: #d2a8ff !important;
+  }
+
+  .hljs-attr,
+  .hljs-attribute,
+  .hljs-literal,
+  .hljs-meta,
+  .hljs-number,
+  .hljs-operator,
+  .hljs-variable,
+  .hljs-selector-attr,
+  .hljs-selector-class,
+  .hljs-selector-id {
+    color: #79c0ff !important;
+  }
+
+  .hljs-regexp,
+  .hljs-string,
+  .hljs-meta .hljs-string {
+    color: #a5d6ff !important;
+  }
+
+  .hljs-built_in,
+  .hljs-symbol {
+    color: #ffa657 !important;
+  }
+
+  .hljs-comment,
+  .hljs-code,
+  .hljs-formula {
+    color: #8b949e !important;
+  }
+
+  .hljs-name,
+  .hljs-quote,
+  .hljs-selector-tag,
+  .hljs-selector-pseudo {
+    color: #7ee787 !important;
+  }
+
+  .hljs-subst,
+  .hljs-emphasis,
+  .hljs-strong {
+    color: #c9d1d9 !important;
+  }
+
+  .hljs-section {
+    color: #79c0ff !important;
+  }
+
+  .hljs-bullet {
+    color: #e3b341 !important;
+  }
+
+  .hljs-addition {
+    color: #9be6a8 !important;
+    background-color: #16351f !important;
+  }
+
+  .hljs-deletion {
+    color: #f0a0a0 !important;
+    background-color: #3a1a1c !important;
+  }
+
+  /* Footnote / bibliography rails */
+  .footnotes-footer,
+  .bibitems,
+  .footnote-footer,
+  .footnote .f-content,
+  .reference .r-content {
+    border-color: #2d333b !important;
+    color: #c4cdd6;
+  }
+
+  #page-content .footnotes-footer {
+    background-color: #1a1f26 !important;
+  }
+
+  #page-content .footnotes-footer .title {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
+
+  /* The inline footnote popup. It is white-on-transparent and only
+     `visibility: hidden` until hovered, so a load-time surface scan sees a
+     white box that never moves. */
+  #page-content .fncon {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  div.wiki-note,
+  .hovertip {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .6) !important;
+  }
+
+  .keycap {
+    background-color: #22282f !important;
+    border-color: #3a4048 !important;
+    color: #e6edf3 !important;
+  }
+
+  /* ============================================================
+     ARTICLE FURNITURE
+     ============================================================ */
+
+  .scp-image-block {
+    border-color: #3a4048 !important;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .5) !important;
+  }
+
+  /* Sigma-9 draws only the caption's top rule; article themes frame all four
+     sides in their paper colour, which is a 4px white band on a dark page.
+     Every side is stated — the three at zero width cost nothing. */
+  .scp-image-block .scp-image-caption {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* The wiki-syntax image frames, which carry their caption on a child span. */
+  .rimg,
+  .limg,
+  .cimg {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .5) !important;
+  }
+
+  .rimg span,
+  .limg span,
+  .cimg span {
+    border-top-color: #3a4048 !important;
+  }
+
+  /* The `.hover` component's pop-out caption */
+  .hover:hover span {
+    background-color: #1c2128 !important;
+    border-color: #4a5058 !important;
+    color: #c4cdd6 !important;
+  }
+
+  div.sexy-box {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  div.sexy-box div.image-container img {
+    border-color: #3a4048 !important;
+  }
+
+  .content-panel {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .5) !important;
+  }
+
+  .content-panel.standalone {
+    background-color: #1a1f26 !important;
+  }
+
+  /* The body is a background-IMAGE (a cream field with a gradient strip along
+     the bottom), so a colour alone never reaches it. */
+  .content-panel .panel-body {
+    background-color: #1c2128 !important;
+    background-image: none !important;
+    color: #c4cdd6;
+  }
+
+  .content-panel .panel-heading {
+    color: #f0f0f0;
+  }
+
+  .content-panel .panel-footer {
+    color: #d8d4c8;
+  }
+
+  .content-panel .content-toc {
+    background-color: #1a1f26 !important;
+    border-color: #2d333b !important;
+    box-shadow: inset 1px 2px 6px rgba(0, 0, 0, .4) !important;
+  }
+
+  /* The join-us call-out on the front page and in the sidebar */
+  #u-become-member {
+    background-color: #17251d !important;
+    border-color: #2c5c36 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .5) !important;
+  }
+
+  /* The Heritage strip is already a dark maroon; only its cream rule is
+     pitched down so it stops glaring. */
+  .heritage-rating-module {
+    border-color: #8a7a3a !important;
+  }
+
+  div#u-adult-warning {
+    background-color: #1c2128 !important;
+    border-color: #4a5058 !important;
+    color: #c4cdd6 !important;
+  }
+
+  div#u-adult-warning > div#u-adult-header {
+    color: #e05f6b !important;
+  }
+
+  div#u-adult-warning .choice a {
+    color: #e8626e !important;
+  }
+
+  div#u-adult-warning .choice a:hover {
+    color: #ff8f97 !important;
+  }
+
+  /* The page-status banners. Both are loud on purpose and stay loud; only the
+     white frame around them and the ink they inherit are restated, because the
+     page ink is now light and would vanish on either fill. */
+  .archieved-message {
+    border-color: #6d5a2a !important;
+    box-shadow: 0 0 0 2px #d4b820 !important;
+    background: #d4b820 !important;
+    color: #140f0c !important;
+  }
+
+  .broken-message {
+    border-color: #7a4a20 !important;
+    box-shadow: 0 0 0 2px #d67a2a !important;
+    background: #d67a2a !important;
+    color: #140f0c !important;
+  }
+
+  .archieved-message a,
+  .broken-message a {
+    color: #7a1d24 !important;
+  }
+
+  .scpnet-progress-bar {
+    background-color: #22282f !important;
+  }
+
+  .scpnet-progress-bar__tick {
+    background-color: #6b737c !important;
+  }
+
+  .scpru-copyright-notice,
+  .scpru-copyright-notice a,
+  .lil-text {
+    color: #8b949e !important;
+  }
+
+  .more-author-articles {
+    border-top-color: #2d333b !important;
+  }
+
+  .ny2017-link a {
+    background-color: #1a5c2a !important;
+    color: #fff !important;
+  }
+
+  /* Wikidot tag pill */
+  .tags {
+    background-color: #3a4048 !important;
+    color: #e6edf3 !important;
+  }
+
+  .tags::before {
+    border-right-color: #3a4048 !important;
+  }
+
+  .tags::after {
+    background-color: #c4cdd6 !important;
+    box-shadow: -1px -1px 2px #14181d !important;
+  }
+
+  #main-content .page-tags,
+  #main-content .page-tags span {
+    border-top-color: #2d333b !important;
+  }
+
+  #main-content .page-tags strong {
+    color: #8b949e !important;
+  }
+
+  /* The tag rail and the prev/next wikiwalk rail are furniture, not author
+     prose, so their link colour is pinned against article themes that darken
+     it, and any chip fill an article theme puts behind them is cleared. */
+  #main-content .page-tags a,
+  #page-content .footer-wikiwalk-nav a {
+    background-color: transparent !important;
+    color: #e8626e !important;
+  }
+
+  #main-content .page-tags a::before {
+    border-color: transparent !important;
+  }
+
+  #main-content .page-tags a:hover,
+  #page-content .footer-wikiwalk-nav a:hover {
+    color: #ff8f97 !important;
+  }
+
+  /* The tag cloud writes its frequency gradient as inline per-tag colours, and
+     the whole range — periwinkle through crimson — falls below AA on a dark
+     page. Font size encodes the same frequency, so the tags take the site link
+     colour and the size keeps the signal. */
+  #page-content a.tag {
+    color: #e8626e !important;
+  }
+
+  #page-content a.tag:hover {
+    color: #ff8f97 !important;
+  }
+
+  #page-content a.tag.active {
+    color: #ffb3b8 !important;
+  }
+
+  /* Redacted / blackout spans keep working on dark */
+  .bblock,
+  .dblock {
+    color: #000 !important;
+    background-color: #000 !important;
+  }
+
+  .bblock:hover {
+    color: #060 !important;
+  }
+
+  /* ============================================================
+     STAR RATING MODULE
+
+     The RU branch replaced Wikidot's ± widget with a five-star control whose
+     stars are Font Awesome GLYPHS, so both star rows are text colours.
+     ============================================================ */
+
+  .w-stars-rate-module {
+    color: #c4cdd6 !important;
+  }
+
+  .w-stars-rate-module .w-stars-rate-rating,
+  .w-stars-rate-module .w-stars-rate-votes {
+    background-color: #2d333b !important;
+  }
+
+  /* The site's own #4e6b6b is unreadable on a dark plate; same hue, lifted. */
+  .w-stars-rate-module .w-stars-rate-number,
+  .w-stars-rate-module .w-stars-rate-votes {
+    color: #6fb6b6 !important;
+  }
+
+  .w-stars-rate-module .w-stars-rate-control {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    box-shadow: 0 0 4px rgba(0, 0, 0, .5) !important;
+  }
+
+  /* The unfilled row is drawn at #eee on white — barely visible on purpose. A
+     legible "off" star would read as a lit one and invert the rating, so this
+     stays low-contrast; it is decorative state, not text. */
+  .w-stars-rate-module .w-stars-rate-stars-wrapper::before {
+    color: #4a525b !important;
+  }
+
+  /* The filled row's colour is an INLINE custom property on the element, so an
+     ancestor rebind cannot reach it. Rebinding the property itself — rather
+     than stating `color` on the pseudo — leaves the hover rule below free to
+     paint its amber preview. */
+  .w-stars-rate-module .w-stars-rate-stars-view {
+    --rated-var: #6fb6b6 !important;
+  }
+
+  /* The score histogram behind the "Оценки" page option. Its bars carry the
+     same teal as the stars, so both move together. */
+  .w-rate-bar {
+    background-color: #2d333b !important;
+  }
+
+  .w-bar-fill {
+    background-color: #6fb6b6 !important;
+  }
+
+  .w-rate-num,
+  .w-rate-stat,
+  .w-v-count {
+    color: #c4cdd6 !important;
+  }
+
+  .w-stars-rate-module .w-stars-rate-cancel {
+    background-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .w-stars-rate-module .w-stars-rate-cancel:hover {
+    background-color: #ec3f3f !important;
+    color: #fff !important;
+  }
+
+  /* Wikidot's ± widget, still used by the forum and by older pages */
+  .page-rate-widget-box {
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, .6) !important;
+  }
+
+  div.page-rate-widget-box .rate-points {
+    background-color: #5a2f2f !important;
+    border-color: #5a2f2f !important;
+    color: #f0e2e2 !important;
+  }
+
+  .page-rate-widget-box .rateup,
+  .page-rate-widget-box .ratedown {
+    background-color: #22282f !important;
+    border-top-color: #5a2f2f !important;
+    border-bottom-color: #5a2f2f !important;
+  }
+
+  .page-rate-widget-box .rateup a,
+  .page-rate-widget-box .ratedown a {
+    color: #e8949a !important;
+  }
+
+  .page-rate-widget-box .rateup a:hover,
+  .page-rate-widget-box .ratedown a:hover {
+    background-color: #5a2f2f !important;
+    color: #fff6f0 !important;
+  }
+
+  .page-rate-widget-box .cancel {
+    background-color: #5a2f2f !important;
+    border-color: #5a2f2f !important;
+  }
+
+  .page-rate-widget-box .cancel a {
+    color: #c99a9a !important;
+  }
+
+  .page-rate-widget-box .cancel a:hover {
+    background-color: #7d4444 !important;
+    color: #fff6f0 !important;
+  }
+
+  /* ============================================================
+     YUI TABS
+     ============================================================ */
+
+  .yui-navset .yui-content,
+  .yui-navset .yui-navset-top .yui-content {
+    background-color: #1a1f26 !important;
+    border-color: #2d333b !important;
+    border-top-color: #7d3030 !important;
+    color: #c4cdd6;
+  }
+
+  .yui-navset-left .yui-content {
+    border-color: #2d333b !important;
+    border-left-color: #7d3030 !important;
+  }
+
+  .yui-navset-bottom .yui-content,
+  .yui-navset .yui-navset-bottom .yui-content {
+    border-color: #2d333b !important;
+    border-bottom-color: #7d3030 !important;
+  }
+
+  .yui-navset .yui-nav,
+  .yui-navset .yui-navset-top .yui-nav {
+    border-color: #7d3030 !important;
+  }
+
+  /* The tab strip's fill is a sprite background-IMAGE, so it has to be dropped
+     rather than covered. */
+  .yui-navset .yui-nav a,
+  .yui-navset .yui-navset-top .yui-nav a {
+    background-color: #22282f !important;
+    background-image: none !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+
+  .yui-navset .yui-nav a em,
+  .yui-navset .yui-navset-top .yui-nav a em {
+    border-color: #2d333b !important;
+  }
+
+  .yui-navset .yui-nav a:hover,
+  .yui-navset .yui-nav a:focus {
+    background-color: #33272a !important;
+    background-image: none !important;
+    color: #ff8f97 !important;
+  }
+
+  .yui-navset .yui-nav .selected a,
+  .yui-navset .yui-nav .selected a:focus,
+  .yui-navset .yui-nav .selected a:hover {
+    background-color: #8a2f2f !important;
+    background-image: none !important;
+    color: #fff !important;
+  }
+
+  .yui-navset .yui-nav .selected a,
+  .yui-navset .yui-nav .selected a em {
+    border-color: #8a2f2f !important;
+  }
+
+  /* Some articles put the tab's label in a pseudo-element with a hardcoded
+     black fill, which disappears once the tab strip goes dark. */
+  .yui-navset .yui-nav a::before,
+  .yui-navset .yui-nav a::after {
+    color: inherit !important;
+  }
+
+  /* ============================================================
+     FORMS / BUTTONS / DIALOGS
+     ============================================================ */
+
+  input.text,
+  input[type="text"],
+  input[type="search"],
+  input[type="password"],
+  input[type="email"],
+  input[type="number"],
+  input[type="datetime-local"],
+  textarea,
+  select {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+    border-color: #3a4048 !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #8b949e !important;
+    opacity: 1;
+  }
+
+  input.checkbox {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
+
+  /* Wikidot's `.btn*` classes are bare text links on ANCHORS here (the
+     page-options bar, forum Reply/Fold/Options), so `a.btn` is deliberately
+     absent. On an INPUT the same class is a real submit. */
+  div.buttons input,
+  input.button,
+  input.btn,
+  button,
+  a.button {
+    background-color: #262c33 !important;
+    border-color: #3a4048 !important;
+    color: #e6edf3 !important;
+  }
+
+  /* That button keeps the UA's `outset` bevel, which draws its own light/dark
+     pair from the border colour and ignores the one set above. */
+  input.btn {
+    border-style: solid !important;
+  }
+
+  div.buttons input:hover,
+  input.button:hover,
+  input.btn:hover,
+  button:hover,
+  a.button:hover {
+    background-color: #333a42 !important;
+    color: #fff !important;
+  }
+
+  .page-options-bottom a,
+  a.btn.btn-default {
+    color: #e8626e;
+  }
+
+  .page-options-bottom a:hover,
+  a.btn.btn-default:hover {
+    color: #ff8f97;
+  }
+
+  input.button.disabled,
+  div.buttons input.disabled,
+  input.button.disabled:hover,
+  div.buttons input.disabled:hover {
+    background-color: #1a1f26 !important;
+    color: #6b737c !important;
+  }
+
+  table.form td div.sub,
+  form div.sub,
+  .form-table .form-hinted,
+  table.guest-commenting td label.hint {
+    color: #8b949e !important;
+  }
+
+  table.form tr.invalid-value-row td {
+    background-color: #33301a !important;
+  }
+
+  table.form div.field-error-message,
+  table.form tr.invalid-value-row div.field-error-message {
+    color: #f08a8a !important;
+  }
+
+  /* Pure red, which the page floor leaves a hair under AA. */
+  .error-inline {
+    color: #ff453a !important;
+  }
+
+  .error-block {
+    color: #f08a8a !important;
+    background-color: #2a1618 !important;
+    border-color: #6d3436 !important;
+  }
+
+  .warning-block {
+    color: #e0c07a !important;
+    background-color: #2a2313 !important;
+    border-color: #6d5a2a !important;
+  }
+
+  .help-block {
+    color: #7ee787 !important;
+    background-color: #14251a !important;
+    border-color: #2c5c36 !important;
+  }
+
+  .preview-message {
+    background-color: #2a1618 !important;
+    border-color: #6d3436 !important;
+    color: #e8b0b0 !important;
+  }
+
+  #page-version-info {
+    background-color: #191d2e !important;
+    border-color: #3a4058 !important;
+    color: #b9c2d8 !important;
+  }
+
+  #lock-info {
+    background-color: #1a1f26 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .change-textarea-size a {
+    background-color: #262c33 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .edit-section-button {
+    background-color: #1c2128 !important;
+  }
+
+  #edit-section-content {
+    border-color: #3a4058 !important;
+  }
+
+  a.action-area-close:hover {
+    background-color: #262c33 !important;
+  }
+
+  /* Modal dialogs */
+  .odialog-shader {
+    background-color: #05070a !important;
+  }
+
+  .owindow,
+  .box444 {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .owindow .title {
+    background-color: #22282f !important;
+    color: #e6edf3 !important;
+  }
+
+  .owindow .button-bar a,
+  .box444 .button-bar {
+    background-color: #262c33 !important;
+    border-color: #3a4048 !important;
+    color: #e6edf3 !important;
+  }
+
+  .owindow .button-bar a:hover {
+    background-color: #333a42 !important;
+  }
+
+  /* Autocomplete */
+  .autocomplete-list,
+  .yui-ac-content {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .autocomplete-list li.yui-ac-highlight {
+    background-color: #333a42 !important;
+    color: #fff !important;
+  }
+
+  /* Editor toolbar */
+  .wd-editor-toolbar-panel a {
+    background-color: #1c2128 !important;
+  }
+
+  .wd-editor-toolbar-panel a:hover {
+    border-color: #6b737c !important;
+  }
+
+  .wd-editor-toolbar-panel ul li ul,
+  .wd-editor-toolbar-panel ul li:hover ul,
+  .wd-editor-toolbar-panel ul li.sfhover ul {
+    background-color: #14181d !important;
+    border-color: #3a4048 !important;
+  }
+
+  .wd-editor-toolbar-panel li.hseparator {
+    background-color: #3a4048 !important;
+  }
+
+  #upload-file-list table .progress .progress-bar {
+    background-color: #3a4048 !important;
+  }
+
+  /* Lightbox */
+  #lightbox-container-image-box,
+  #lightbox-container-image-data-box {
+    background-color: #1c2128 !important;
+  }
+
+  #lightbox-container-image-data {
+    color: #c4cdd6 !important;
+  }
+
+  /* The site's own hover tooltip, appended to <body> */
+  .w-tooltip {
+    background-color: #22282f !important;
+    border-color: #4a5058 !important;
+    color: #e6edf3 !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .6) !important;
+  }
+
+  /* ============================================================
+     PAGER / HISTORY / DIFFS
+     ============================================================ */
+
+  .pager a {
+    border-color: #2d333b !important;
+    color: #e8626e !important;
+  }
+
+  .pager .current {
+    background-color: #5a2f2f !important;
+    border-color: #7d3030 !important;
+    color: #fff !important;
+  }
+
+  .page-source {
+    border-color: #3a4048 !important;
+  }
+
+  .diff-table td.from,
+  .diff-table td.to {
+    border-color: #3a4048 !important;
+  }
+
+  .inline-diff ins {
+    background-color: #16351f !important;
+    color: #9be6a8 !important;
+  }
+
+  .inline-diff del {
+    background-color: #3a1a1c !important;
+    color: #f0a0a0 !important;
+  }
+
+  .Differences thead th {
+    background-color: #262c33 !important;
+    color: #e6edf3 !important;
+    border-bottom-color: #4a5058 !important;
+  }
+
+  .Differences tbody th {
+    background-color: #22282f !important;
+    color: #c4cdd6 !important;
+    border-right-color: #4a5058 !important;
+  }
+
+  .Differences .Skipped {
+    background-color: #1a1f26 !important;
+  }
+
+  .DifferencesSideBySide .ChangeInsert td.Left,
+  .DifferencesInline .ChangeInsert .Right {
+    background-color: #14291b !important;
+  }
+
+  .DifferencesSideBySide .ChangeInsert td.Right {
+    background-color: #1a3524 !important;
+  }
+
+  .DifferencesSideBySide .ChangeDelete td.Left,
+  .DifferencesInline .ChangeDelete .Left {
+    background-color: #3d1b1d !important;
+  }
+
+  .DifferencesSideBySide .ChangeDelete td.Right {
+    background-color: #4a2124 !important;
+  }
+
+  .DifferencesSideBySide .ChangeReplace .Left,
+  .DifferencesInline .ChangeReplace .Left {
+    background-color: #33290f !important;
+  }
+
+  .DifferencesSideBySide .ChangeReplace .Right,
+  .DifferencesInline .ChangeReplace .Right {
+    background-color: #3d3013 !important;
+  }
+
+  .DifferencesSideBySide .ChangeReplace ins,
+  .DifferencesSideBySide .ChangeReplace del {
+    background-color: #5c4a10 !important;
+    color: #ffe9a8 !important;
+  }
+
+  .DifferencesInline .ChangeReplace ins {
+    background-color: #235c30 !important;
+    color: #d6ffdd !important;
+  }
+
+  .DifferencesInline .ChangeReplace del {
+    background-color: #5c2528 !important;
+    color: #ffd6d8 !important;
+  }
+
+  .Differences td,
+  .Differences th {
+    color: #c4cdd6;
+  }
+
+  /* ============================================================
+     CHANGE LISTS / ARTICLE LISTINGS
+     ============================================================ */
+
+  #site-changes-list .changes-list-item:hover {
+    background-color: #1c2128 !important;
+  }
+
+  #site-changes-list .changes-list-item .comments {
+    color: #8b949e !important;
+  }
+
+  .changes-list-item td {
+    border-color: #2d333b !important;
+  }
+
+  /* The card the tag-search results, author pages and index listings share.
+     Its ink is stated `black !important` on the card itself, so the ink has to
+     be stated back at the same weight. */
+  /* The card states `color: black !important` on itself, so the ink has to be
+     handed back at a weight above that — everything the card holds inherits
+     from it. */
+  #page-content .author-single {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .45) !important;
+  }
+
+  #page-content .author-single:hover {
+    background-color: #22282f !important;
+  }
+
+  #page-content .author-single .title {
+    color: #e8626e !important;
+  }
+
+  #page-content .author-single .rating {
+    background-color: #262c33 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  #page-content .author-single .date,
+  #page-content .author-single .index {
+    color: #8b949e !important;
+  }
+
+  /* ============================================================
+     FORUM — the Wikidot half
+     ============================================================ */
+
+  .forum-group div.head {
+    background-color: #22282f !important;
+    color: #e6edf3 !important;
+    border-color: #3a4048 !important;
+  }
+
+  .forum-group table td,
+  .forum-category-box table td,
+  .forum-category-box table {
+    border-color: #2d333b !important;
+  }
+
+  .forum-group table tr.head td,
+  .forum-category-box table tr.head td {
+    background-color: #22282f !important;
+    color: #e6edf3 !important;
+  }
+
+  .forum-group table td.name .description,
+  .forum-category-box table td.name .description,
+  .forum-category-box .description-block .statistics,
+  .forum-new-thread-box .description .statistics,
+  .forum-thread-box .description-block .statistics,
+  .forum-thread-box .description-block .head,
+  .thread-container .post .long .changes,
+  .forum-mini-stat .item .info {
+    color: #8b949e !important;
+  }
+
+  .forum-category-box .description-block,
+  .forum-new-thread-box .description,
+  .forum-thread-box .description-block {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, .5) !important;
+  }
+
+  .forum-thread-box .action-area {
+    border-color: #2d333b !important;
+  }
+
+  .thread-container .post .head {
+    background-color: #22282f !important;
+    background-image: linear-gradient(to right, #22282f, #242a30) !important;
+    box-shadow: inset 2px 3px 6px rgba(0, 0, 0, .35) !important;
+    color: #e6edf3 !important;
+  }
+
+  .thread-container .post .short {
+    background-color: #1a1f26 !important;
+  }
+
+  .thread-container .post .options a,
+  .thread-container .post .short .options,
+  .thread-container .post .long .changes a {
+    color: #8ab4d8 !important;
+  }
+
+  .thread-container .post .long .revisions table tr.active td {
+    background-color: #22282f !important;
+  }
+
+  .post-container .post-container {
+    border-color: rgba(255, 255, 255, .18) !important;
+  }
+
+  .post-container.fordelete {
+    border-color: #a04446 !important;
+  }
+
+  div.new-post a {
+    background-color: #262c33 !important;
+    border-color: #3a4048 !important;
+    color: #ff8f97 !important;
+  }
+
+  /* The per-post star rating in a thread head */
+  .thread-container .post .long .head .vote,
+  .thread-container .post .long .head .rate::before {
+    color: #8b949e !important;
+  }
+
+  /* ============================================================
+     FORUM — the 2025 app layer
+
+     Reactions, per-post menus, the date scrubber rail, pinned posts, user
+     popovers and @-mentions. None of it exists until the thread renders, and
+     most of it only until something is opened.
+     ============================================================ */
+
+  .forum-infinite-sentinel {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .forum-infinite-sentinel:hover,
+  .forum-infinite-sentinel:focus {
+    background-color: #262c33 !important;
+    border-color: #4a5058 !important;
+  }
+
+  .forum-date-rail-track {
+    background-color: rgba(196, 205, 214, .22) !important;
+  }
+
+  .forum-date-rail-marker {
+    background-color: #6f86ad !important;
+    border-color: #14181d !important;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, .5) !important;
+  }
+
+  .forum-date-rail-marker:hover,
+  .forum-date-rail-marker:focus {
+    background-color: #8fa6cd !important;
+  }
+
+  .forum-date-rail-label {
+    background-color: #22282f !important;
+    border-color: #4a5058 !important;
+    color: #e6edf3 !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .55) !important;
+  }
+
+  /* A pinned post keeps its olive stripe; only the pale wash behind it moves. */
+  .thread-container .post .long .head.pinned-post {
+    background-color: #1e2a1c !important;
+    border-left-color: #6f984c !important;
+  }
+
+  .forum-pinned-post-preview .long {
+    background-color: #1a201a !important;
+    border-color: #35442c !important;
+  }
+
+  /* The "in reply to" line is dimmed to 58% opacity, a fraction calibrated
+     against near-black text on a white head. Nothing survives it on a dark
+     one — not even white — so the de-emphasis is carried by colour instead. */
+  .thread-container .post .long .head .forum-reply-target {
+    opacity: 1 !important;
+    color: #8b949e !important;
+  }
+
+  .thread-container .post .long .head .forum-reply-target:hover,
+  .thread-container .post .long .head .forum-reply-target:focus {
+    opacity: 1 !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* The quoted author's name is the branch crimson, which the head's elevated
+     surface drops below AA even at the page link's lightness. */
+  .forum-reply-target .printuser .printuser-name {
+    color: #ee7079 !important;
+  }
+
+  .forum-post-edit-meta,
+  .forum-post-menu-button {
+    color: #8b949e !important;
+  }
+
+  .forum-post-edit-meta:hover,
+  .forum-post-edit-meta:focus,
+  .forum-post-edit-meta:focus-within,
+  .forum-post-menu-button:hover,
+  .forum-post-menu-button:focus {
+    color: #e6edf3 !important;
+  }
+
+  .forum-author-mark {
+    color: #8bbf62 !important;
+  }
+
+  .forum-post-pin-indicator {
+    color: #8bbf62 !important;
+  }
+
+  .forum-post-menu-dropdown {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .6) !important;
+  }
+
+  .thread-container .post .forum-post-menu-dropdown a,
+  .thread-container .post .forum-post-menu-dropdown button {
+    color: #c4cdd6 !important;
+  }
+
+  .thread-container .post .forum-post-menu-dropdown a:hover,
+  .thread-container .post .forum-post-menu-dropdown button:hover {
+    background-color: #262c33 !important;
+    color: #fff !important;
+  }
+
+  .forum-post-reply-button,
+  .forum-post-replies-toggle,
+  .forum-reaction-chip-static,
+  .forum-reaction-chip-main,
+  .forum-reaction-add {
+    color: #8ab4d8 !important;
+  }
+
+  /* These are bare <button>s the site leaves unfilled, so the blanket button
+     fill boxes each one into a chip that is not part of the design. */
+  .forum-post-menu-button,
+  .forum-post-menu-button:hover,
+  .forum-post-menu-button:focus,
+  .forum-post-replies-toggle,
+  .forum-reaction-chip-main,
+  .forum-reaction-picker-item {
+    background-color: transparent !important;
+  }
+
+  .forum-post-reply-button:hover,
+  .forum-post-reply-button:focus,
+  .forum-post-replies-toggle:hover,
+  .forum-post-replies-toggle:focus {
+    color: #cfe3f5 !important;
+  }
+
+  .forum-reaction-chip-count.is-mine {
+    color: #79c0ff !important;
+  }
+
+  .forum-reaction-chip-main:hover,
+  .forum-reaction-add:hover {
+    background-color: rgba(138, 180, 216, .18) !important;
+  }
+
+  .forum-reaction-add {
+    background-color: #1c2128 !important;
+    border-color: #4a5058 !important;
+  }
+
+  .forum-reaction-picker {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .6) !important;
+  }
+
+  .forum-reaction-picker-item {
+    color: #c4cdd6 !important;
+  }
+
+  .forum-reaction-picker-item:hover,
+  .forum-reaction-picker-item.is-selected {
+    background-color: #262c33 !important;
+    border-color: #4a5058 !important;
+  }
+
+  .forum-reaction-picker-empty,
+  .forum-reaction-table-empty {
+    color: #8b949e !important;
+  }
+
+  .forum-reaction-image-fallback {
+    background-color: #4a5058 !important;
+    color: #e6edf3 !important;
+  }
+
+  .forum-reaction-tab {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .forum-reaction-tab:hover,
+  .forum-reaction-tab.is-active {
+    background-color: #262c33 !important;
+    border-color: #6f86ad !important;
+  }
+
+  .forum-reaction-tab strong,
+  .forum-reaction-panel-title strong {
+    background-color: #3a4048 !important;
+    color: #e6edf3 !important;
+  }
+
+  .forum-reaction-tab-panel {
+    background-color: #1a1f26 !important;
+    border-color: #2d333b !important;
+  }
+
+  .forum-reaction-panel-head {
+    background-color: #22282f !important;
+    border-bottom-color: #2d333b !important;
+  }
+
+  .forum-reaction-user-row + .forum-reaction-user-row {
+    border-top-color: #2d333b !important;
+  }
+
+  /* The user popover, its moderation half, and the badge/status chips that
+     also appear on a profile page. */
+  .profile-popover-card {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .w-user-popover a:not(.profile-mod-button) {
+    color: #e8626e !important;
+  }
+
+  .profile-popover-head {
+    background-color: #22282f !important;
+    border-bottom-color: #2d333b !important;
+  }
+
+  .profile-popover-avatar img {
+    border-color: #3a4048 !important;
+  }
+
+  .profile-popover-name {
+    color: #e6edf3 !important;
+  }
+
+  .profile-popover-subtitle,
+  .profile-popover-line span,
+  .profile-popover-loading {
+    color: #8b949e !important;
+  }
+
+  .profile-popover-line strong,
+  .profile-popover-bio {
+    color: #c4cdd6 !important;
+  }
+
+  .profile-popover-error {
+    color: #f08a8a !important;
+  }
+
+  .profile-popover-close {
+    background-color: #262c33 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .profile-popover-close:hover,
+  .profile-popover-close:focus {
+    background-color: #333a42 !important;
+    color: #fff !important;
+  }
+
+  .profile-popover-note {
+    background-color: #2a2313 !important;
+    border-color: #6d5a2a !important;
+    color: #e0c07a !important;
+  }
+
+  .profile-popover-mod {
+    background-color: #1a1f26 !important;
+    border-top-color: #2d333b !important;
+  }
+
+  .profile-popover-mod-title {
+    color: #e6edf3 !important;
+  }
+
+  .profile-mod-button {
+    background-color: #262c33 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .profile-mod-button:hover,
+  .profile-mod-button:focus {
+    background-color: #333a42 !important;
+    border-color: #6b737c !important;
+    color: #fff !important;
+  }
+
+  /* The two variants encode outcome, so their hues are kept and only lifted. */
+  .profile-mod-button.is-danger {
+    border-color: #8a4444 !important;
+    color: #f08a8a !important;
+  }
+
+  .profile-mod-button.is-good {
+    border-color: #46703f !important;
+    color: #7ee787 !important;
+  }
+
+  .profile-status-chip {
+    background-color: #262c33 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .profile-status-chip.is-ok {
+    background-color: #14251a !important;
+    border-color: #2c5c36 !important;
+    color: #7ee787 !important;
+  }
+
+  .profile-status-chip.is-warning {
+    background-color: #2a2313 !important;
+    border-color: #6d5a2a !important;
+    color: #e0c07a !important;
+  }
+
+  .profile-status-chip.is-danger {
+    background-color: #2a1618 !important;
+    border-color: #6d3436 !important;
+    color: #f08a8a !important;
+  }
+
+  /* Username flair. The site colours the LABEL from server-side role data, as
+     an inline colour on a mid-grey chip; the hues are left alone and only the
+     chip is pitched down, far enough that the dimmest role hue shipped (an
+     orange at 1.9:1 on the site's own grey) clears AA. */
+  .printuser .badge {
+    background-color: #2a3038 !important;
+  }
+
+  .printuser.avatarhover img.small {
+    border-color: #4a5058 !important;
+  }
+
+  /* The wrapper carries the site's near-black body ink of its own, which shows
+     wherever a name is not a link — a deleted or anonymous account. Left
+     un-!important so a role's inline colour on the name still wins. */
+  .printuser {
+    color: #c4cdd6;
+  }
+
+  .w-user-mention {
+    color: #79c0ff !important;
+    background-color: rgba(121, 192, 255, .12) !important;
+  }
+
+  /* ============================================================
+     FRONT PAGE
+
+     The branch's own block layout: gradient plates, #ccc drop shadows and
+     half-opacity black line-art icons.
+     ============================================================ */
+
+  .scp-front-block,
+  #page-content .collapsible-block {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, .5) !important;
+  }
+
+  .scp-front-block:hover,
+  #page-content .collapsible-block:hover {
+    border-color: #6b737c !important;
+  }
+
+  .banner-block {
+    background: linear-gradient(0deg, #1a1f26 0%, #22282f 12%) !important;
+    border-color: #2d333b !important;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, .5) !important;
+  }
+
+  /* The banner's own paper is white behind a translucent watermark PNG, so
+     the fill is restated while the artwork is kept. */
+  .classified-banner {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, .5) !important;
+    color: #e8949a !important;
+  }
+
+  .classified-banner:hover {
+    border-color: #6b737c !important;
+  }
+
+  .scp-front-title,
+  .lb-title,
+  .tb-title {
+    background: linear-gradient(to top, #1a1f26, #262c33) !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+
+  /* The title plate's notch is two clipped pseudo-elements — one the plate's
+     own fill, one the rule under it. */
+  .lb-title::before {
+    background-color: #262c33 !important;
+  }
+
+  /* The ::after is the diagonal continuation of the plate's bottom rule, so
+     the two have to carry the same colour or the notch breaks. */
+  .lb-title::after {
+    background-color: #6b737c !important;
+  }
+
+  .lb-title {
+    border-bottom-color: #6b737c !important;
+  }
+
+  .lb-right-block,
+  .fb-new-translation,
+  .lb-single-article {
+    border-color: #2d333b !important;
+  }
+
+  /* The object-class plates. The hues ARE the classification, so each is kept
+     in its own family and only pitched to sit on a dark page — Euclid's amber
+     could not carry its knocked-out white label at the site's own lightness. */
+  .lb-article-class.lb-euclid {
+    background-color: #c98f00 !important;
+  }
+
+  .lb-article-class.lb-neutralized {
+    background-color: #767d86 !important;
+  }
+
+  /* The CTA row. At rest the icons are black line art dimmed for a light
+     plate; the site already inverts them on hover for its crimson fill, so the
+     two states swap rather than one being invented. */
+  .scp-front-button,
+  .scp-front-button:visited,
+  .scp-front-button:link {
+    background: linear-gradient(to top, #1c2128 0%, #1c2128 80%, #262c33 100%) !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, .5) !important;
+  }
+
+  .scp-front-button img {
+    filter: invert(1) !important;
+    opacity: .75 !important;
+  }
+
+  .scp-front-button:hover {
+    background: linear-gradient(to top, #7d3030 0%, #7d3030 80%, #a03636 100%) !important;
+    border-color: #a03636 !important;
+    color: #fff !important;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, .6) !important;
+  }
+
+  .scp-front-button:hover img {
+    filter: none !important;
+    opacity: 1 !important;
+  }
+
+  .scp-featured__block {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .5) !important;
+  }
+
+  .scp-featured__block_type_daily {
+    background-color: #17251d !important;
+  }
+
+  .scp-featured__block_type_gold {
+    background-color: #26230f !important;
+  }
+
+  .scp-featured__title,
+  .scp-featured__previous {
+    color: #8b949e !important;
+  }
+
+  .scp-other-branches {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .5) !important;
+  }
+
+  /* Already a dark chip; only its white hairline is softened. */
+  .tooltip .tooltiptext {
+    background-color: #22282f !important;
+    border-color: #4a5058 !important;
+  }
+
+  /* ============================================================
+     TAG SEARCH — the /tags builder panel
+
+     A same-origin srcdoc iframe, so nothing on the host page reaches it and no
+     host-page scan sees it.
+     ============================================================ */
+
+  .autocomplete-container {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .autocomplete-container::before,
+  .autocomplete-container::after {
+    border-color: #a03636 !important;
+  }
+
+  .autocomplete-tag-category {
+    color: #8b949e !important;
+  }
+
+  .tags-input-wrapper {
+    background-color: #14181d !important;
+    border-color: #3a4048 !important;
+  }
+
+  .tags-input-wrapper:focus-within {
+    border-bottom-color: #e8626e !important;
+    box-shadow: 0 0 5px rgba(232, 98, 110, .35) !important;
+  }
+
+  .tags-input {
+    color: #e6edf3 !important;
+  }
+
+  .tag-chip {
+    background-color: #1a1f26 !important;
+    border-color: #3a4048 !important;
+    color: #e8626e !important;
+  }
+
+  .tag-chip.invalid {
+    background-color: #2a1618 !important;
+    border-color: #a04446 !important;
+    color: #f08a8a !important;
+  }
+
+  /* The chip's remove button is a bare <button> the site leaves unfilled; the
+     blanket button fill would box it into a plate of its own inside the chip. */
+  .tag-chip button {
+    background-color: transparent !important;
+    color: #e8626e !important;
+  }
+
+  .tag-chip button:hover {
+    background-color: #8a2f2f !important;
+    color: #fff !important;
+  }
+
+  .autocomplete-item,
+  .autocomplete-list div,
+  .dropdown-list li {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+
+  .autocomplete-item:hover,
+  .autocomplete-list .active,
+  .autocomplete-list div.autocomplete-active,
+  .autocomplete-list div:hover,
+  .dropdown-list li:hover,
+  .dropdown-list li.active {
+    background-color: #33272a !important;
+    color: #ff8f97 !important;
+  }
+
+  .autocomplete-item button {
+    background-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .autocomplete-item button:hover {
+    background-color: #6b737c !important;
+    color: #fff !important;
+  }
+
+  .input-group label {
+    color: #c4cdd6 !important;
+  }
+
+  .input-group input {
+    background-color: #14181d !important;
+    border-color: #3a4048 !important;
+    color: #e6edf3 !important;
+  }
+
+  .input-group input:focus-visible {
+    border-bottom-color: #e8626e !important;
+    box-shadow: 0 0 5px rgba(232, 98, 110, .35) !important;
+  }
+
+  .dropdown-selected {
+    background-color: #14181d !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .dropdown-selected:hover {
+    border-bottom-color: #e8626e !important;
+    box-shadow: 0 0 8px rgba(232, 98, 110, .35) !important;
+  }
+
+  .dropdown-list {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .55) !important;
+  }
+
+  #submit-link {
+    background-color: #8a2f2f !important;
+    border-color: #8a2f2f !important;
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .45) !important;
+  }
+
+  #submit-link:hover:not([aria-disabled="true"]) {
+    background-color: #1c2128 !important;
+    border-color: #e8626e !important;
+    color: #e8626e !important;
+  }
+
+  .clear-link {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .45) !important;
+  }
+
+  .clear-link:hover:not([disabled]) {
+    background-color: #8a2f2f !important;
+    border-color: #8a2f2f !important;
+    color: #fff !important;
+  }
+
+  #submit-link[aria-disabled="true"],
+  .clear-link[disabled] {
+    background-color: #1a1f26 !important;
+    border-color: #2d333b !important;
+    color: #6b737c !important;
+  }
+
+  /* ============================================================
+     REGISTRATION PAGE
+
+     `/system:join` carries its own page CSS rather than an article theme's,
+     with a white card per membership tier and a crimson alert banner framed in
+     white. Its classes are page-local but the page is site chrome, not an
+     author's article, so they are named directly.
+     ============================================================ */
+
+  #page-content .user-block {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, .5) !important;
+  }
+
+  #page-content .deleted-message {
+    border-color: rgba(255, 255, 255, .35) !important;
+  }
+
+  #page-content .input-example {
+    border-color: transparent !important;
+    border-bottom-color: #8a2f2f !important;
+  }
+
+  #page-content .heading-p,
+  #page-content .heading-rules {
+    color: var(--scpru-title) !important;
+  }
+
+  /* The tier lists encode permitted / forbidden in the marker glyph alone. */
+  #page-content .green-ul li::marker {
+    color: #3fb950 !important;
+  }
+
+  #page-content .red-ul li::marker {
+    color: #ff7b72 !important;
+  }
+
+  #page-content .scp-front-block ul li::marker {
+    color: #e8626e !important;
+  }
+
+  /* ============================================================
+     SITE SEARCH — the /search:site results
+
+     Google Custom Search, in a second same-origin srcdoc frame. Its own
+     stylesheet is loaded from google.com and out-specifies everything, so the
+     whole block is stated !important.
+     ============================================================ */
+
+  .gsc-control-cse,
+  .gsc-control-wrapper-cse,
+  .gsc-results,
+  .gsc-webResult,
+  .gsc-result,
+  .gsc-above-wrapper-area,
+  .gsc-adBlock,
+  .gsc-table-result,
+  .gsc-thumbnail-inside,
+  .gsc-url-top,
+  .gsc-cursor-box {
+    background-color: transparent !important;
+    border-color: #2d333b !important;
+  }
+
+  .gsc-input-box,
+  .gsc-completion-container,
+  .gssb_c .gssb_e {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .gsc-input,
+  .gsc-input-box input,
+  .gsib_a,
+  .gsib_b {
+    background-color: transparent !important;
+    color: #e6edf3 !important;
+  }
+
+  .gsc-search-button,
+  .gsc-search-button-v2 {
+    background-color: #8a2f2f !important;
+    border-color: #8a2f2f !important;
+  }
+
+  .gsc-search-button-v2:hover {
+    background-color: #a03636 !important;
+    border-color: #a03636 !important;
+  }
+
+  /* The embed's configured link red is #d52c1f, stated !important from a
+     two-class rule that reaches the anchor and every element inside it. Three
+     classes are what it takes to out-specify; the hue is kept and lifted. */
+  .gsc-control-cse .gs-result .gs-title,
+  .gsc-control-cse .gs-result .gs-title *,
+  .gsc-control-cse .gs-per-result-labels a.gs-label,
+  .gsc-control-cse .gsc-cursor-page,
+  .gsc-control-cse .gcsc-find-more-on-google-text,
+  .gsc-control-cse .gcsc-find-more-on-google-query {
+    color: #e8626e !important;
+  }
+
+  .gsc-control-cse .gs-result a.gs-title:hover,
+  .gsc-control-cse .gs-result a.gs-title:hover *,
+  .gsc-control-cse .gsc-cursor-page:hover,
+  .gsc-control-cse .gsc-cursor-current-page {
+    color: #ff8f97 !important;
+  }
+
+  .gs-snippet,
+  .gs-snippet b,
+  .gsc-option,
+  .gsc-option-menu-item {
+    color: #c4cdd6 !important;
+  }
+
+  /* Google's result URL green sits at 3.3:1 on the dark page; same hue, lifted. */
+  .gs-visibleUrl,
+  .gs-visibleUrl-short,
+  .gs-visibleUrl-long,
+  .gs-visibleUrl-breadcrumb,
+  .gs-visibleUrl span {
+    color: #7ee787 !important;
+  }
+
+  .gsc-result-info,
+  .gsc-orderby-label,
+  .gsc-clear-button,
+  .gs-fileFormat,
+  .gs-fileFormatType,
+  .gcsc-find-more-on-google {
+    color: #8b949e !important;
+  }
+
+  .gsc-tabHeader {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .gsc-tabHeader.gsc-tabhActive {
+    background-color: #22282f !important;
+    border-bottom-color: #8a2f2f !important;
+    color: #e6edf3 !important;
+  }
+
+  .gsc-option-menu-container,
+  .gsc-selected-option-container {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .gsc-option-menu-item-highlighted,
+  .gsc-webResult.gsc-result:hover {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  .gsc-webResult-divider {
+    border-color: #2d333b !important;
+  }
+
+  /* Each pager digit carries its own white plate. */
+  .gsc-control-cse .gsc-cursor-page {
+    background-color: transparent !important;
+  }
+
+  /* ============================================================
+     SYSTEM PAGES — login, join, profile, preferences
+
+     A separate `body.system` layout with its own token set. The tokens are
+     declared on :root by a stylesheet only these pages load; they are rebound
+     on the body instead, so a page that never loads that sheet is untouched.
+     ============================================================ */
+
+  body.system {
+    --background-color: #14181d;
+    --input-background: #1c2128;
+    --icon-color: #8b949e;
+    --hover-color: #ff8f97;
+    --btn-background: #262c33;
+    --btn-color: #e6edf3;
+    --under-text-color: #8b949e;
+    --error-color: #f08a8a;
+    --error-border: #6d3436;
+    --error-background: #2a1618;
+  }
+
+  .system-container {
+    background-color: #0d1117 !important;
+  }
+
+  .system-content {
+    background-color: #1c2128 !important;
+    border-color: #3a4048 !important;
+    box-shadow:
+      0 0 0 1px #2d333b inset,
+      2px 2px 8px rgba(0, 0, 0, .6) !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* The heading band is already a black-to-teal gradient; its pinstripe overlay
+     is a white one, which only lifts the band on a dark page. */
+  .system-content .heading {
+    background-image:
+      repeating-linear-gradient(45deg, rgba(0, 0, 0, .14), transparent 4px),
+      linear-gradient(to bottom, #000, #23383a) !important;
+  }
+
+  .system-content .error {
+    background-color: #2a1618 !important;
+    border-color: #6d3436 !important;
+    color: #f08a8a !important;
+  }
+
+  .system-message {
+    background-color: #22282f !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .system-message.success {
+    background-color: #14251a !important;
+    border-color: #2c5c36 !important;
+    color: #7ee787 !important;
+  }
+
+  .system-message.error {
+    background-color: #2a1618 !important;
+    border-color: #6d3436 !important;
+    color: #f08a8a !important;
+  }
+
+  .system-content .content input[type="text"],
+  .system-content .content input[type="password"],
+  .system-content .content input[type="email"],
+  .system-content .content textarea,
+  .system-content .content .profile-mod-until input[type="datetime-local"],
+  .system-content .content .profile-public-field input[type="file"],
+  .system-content .content .profile-public-field select,
+  .preferences-form select {
+    background-color: #14181d !important;
+    border-color: #4a5058 !important;
+    color: #e6edf3 !important;
+  }
+
+  .system-content .content button,
+  .system-content .content input[type="submit"] {
+    background-color: #2a3c3c !important;
+    color: #e6edf3 !important;
+  }
+
+  .system-content .content button:hover,
+  .system-content .content input[type="submit"]:hover {
+    background-color: #3d5757 !important;
+  }
+
+  .system-content .content button:active,
+  .system-content .content input[type="submit"]:active {
+    background-color: #16211f !important;
+    color: #6fb6b6 !important;
+  }
+
+  .system-content .profile-actions a,
+  .profile-notices p,
+  .profile-mod-section,
+  .preferences-sidebar {
+    background-color: #22282f !important;
+    border-color: #3a4048 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .system-content .profile-actions a:hover {
+    background-color: #333a42 !important;
+    color: #fff !important;
+  }
+
+  .profile-details dt,
+  .profile-mod-until,
+  .profile-mod-choice small,
+  .profile-public-field small,
+  .preferences-form .helptext {
+    color: #8b949e !important;
+  }
+
+  .profile-mod-panel {
+    border-top-color: #3a4048 !important;
+  }
+
+  .profile-mod-panel.is-locked {
+    background-color: #2a2313 !important;
+    border-color: #6d5a2a !important;
+    color: #e0c07a !important;
+  }
+
+  .profile-mod-header a,
+  .profile-mod-section summary,
+  .profile-mod-grid legend,
+  .profile-public-field label,
+  .preferences-sections a,
+  .preferences-form label {
+    color: #e6edf3 !important;
+  }
+
+  .preferences-sections a:hover {
+    color: #ff8f97 !important;
+  }
+
+  .profile-mod-grid fieldset {
+    background-color: #1a1f26 !important;
+    border-color: #3a4048 !important;
+  }
+
+  .profile-mod-choice,
+  .system-content .content form .profile-mod-choice {
+    background-color: #1a1f26 !important;
+    border-color: #3a4048 !important;
+  }
+
+  .preferences-form .errorlist,
+  .profile-form-errors,
+  .profile-mod-section .errorlist {
+    color: #f08a8a !important;
+  }
+
+  a.manage-user:hover {
+    color: #ff8f97 !important;
+  }
+
+  /* ============================================================
+     AUTHOR-WRITTEN INLINE COLOURS
+
+     Wiki syntax like ##blue|text## emits a literal inline `color:`. The dark
+     end of that palette is unreadable on a dark page, so lift the common names
+     and hexes to the same hue at a legible lightness. Every selector is
+     guarded against `background-color: red`, which contains the substring
+     `color:red` — unguarded, a span that named only a FILL has its ink
+     repainted the same hue and vanishes.
+     ============================================================ */
+
+  #page-content [style*="color:black"]:not([style*="background"]),
+  #page-content [style*="color: black"]:not([style*="background"]),
+  #page-content [style*="color:#000"]:not([style*="background"]),
+  #page-content [style*="color: #000"]:not([style*="background"]) {
+    color: var(--scpru-lift-black) !important;
+  }
+
+  #page-content [style*="color:blue"]:not([style*="background"]),
+  #page-content [style*="color: blue"]:not([style*="background"]),
+  #page-content [style*="color:navy"]:not([style*="background"]),
+  #page-content [style*="color: navy"]:not([style*="background"]),
+  #page-content [style*="color:#0000ff"]:not([style*="background"]),
+  #page-content [style*="color: #0000ff"]:not([style*="background"]) {
+    color: var(--scpru-lift-blue) !important;
+  }
+
+  #page-content [style*="color:green"]:not([style*="background"]),
+  #page-content [style*="color: green"]:not([style*="background"]),
+  #page-content [style*="color:#008000"]:not([style*="background"]),
+  #page-content [style*="color: #008000"]:not([style*="background"]) {
+    color: var(--scpru-lift-green) !important;
+  }
+
+  #page-content [style*="color:purple"]:not([style*="background"]),
+  #page-content [style*="color: purple"]:not([style*="background"]),
+  #page-content [style*="color:indigo"]:not([style*="background"]),
+  #page-content [style*="color: indigo"]:not([style*="background"]),
+  #page-content [style*="color:#800080"]:not([style*="background"]),
+  #page-content [style*="color: #800080"]:not([style*="background"]) {
+    color: var(--scpru-lift-purple) !important;
+  }
+
+  #page-content [style*="color:maroon"]:not([style*="background"]),
+  #page-content [style*="color: maroon"]:not([style*="background"]),
+  #page-content [style*="color:darkred"]:not([style*="background"]),
+  #page-content [style*="color: darkred"]:not([style*="background"]),
+  #page-content [style*="color:#800000"]:not([style*="background"]),
+  #page-content [style*="color: #800000"]:not([style*="background"]),
+  #page-content [style*="color:#990000"]:not([style*="background"]),
+  #page-content [style*="color: #990000"]:not([style*="background"]) {
+    color: var(--scpru-lift-maroon) !important;
+  }
+
+  /* Pure red lands at 4.46:1 — a hair under AA. Softened just enough to pass
+     while staying unmistakably the same red. */
+  #page-content [style*="color:red"]:not([style*="background"]),
+  #page-content [style*="color: red"]:not([style*="background"]),
+  #page-content [style*="color:#ff0000"]:not([style*="background"]),
+  #page-content [style*="color: #ff0000"]:not([style*="background"]) {
+    color: var(--scpru-lift-red) !important;
+  }
+
+  #page-content [style*="color:brown"]:not([style*="background"]),
+  #page-content [style*="color: brown"]:not([style*="background"]) {
+    color: var(--scpru-lift-brown) !important;
+  }
+
+  #page-content [style*="color:teal"]:not([style*="background"]),
+  #page-content [style*="color: teal"]:not([style*="background"]),
+  #page-content [style*="color:#008080"]:not([style*="background"]),
+  #page-content [style*="color: #008080"]:not([style*="background"]) {
+    color: var(--scpru-lift-teal) !important;
+  }
+
+  /* The branch's own title and link crimsons. Authors paste them into
+     style="color:…" on fake page titles and section heads, where they are
+     near-black on a dark page. */
+  #page-content [style*="color:#901"]:not([style*="background"]),
+  #page-content [style*="color: #901"]:not([style*="background"]),
+  #page-content [style*="color:#b01"]:not([style*="background"]),
+  #page-content [style*="color: #b01"]:not([style*="background"]),
+  #page-content [style*="color:#a01"]:not([style*="background"]),
+  #page-content [style*="color: #a01"]:not([style*="background"]),
+  #page-content [style*="color:#700"]:not([style*="background"]),
+  #page-content [style*="color: #700"]:not([style*="background"]),
+  #page-content [style*="color:#600"]:not([style*="background"]),
+  #page-content [style*="color: #600"]:not([style*="background"]) {
+    color: var(--scpru-lift-maroon) !important;
+  }
+
+  /* ============================================================
+     FOOTER / LICENSE / NAVI
+     ============================================================ */
+
+  #container-wrap #footer {
+    background-color: #0d1117 !important;
+    color: #8b949e !important;
+    border-top: 1px solid #262c33;
+  }
+
+  #footer a,
+  #license-area a,
+  .license-area a {
+    color: #c4cdd6 !important;
+  }
+
+  #footer a:hover,
+  #license-area a:hover,
+  .license-area a:hover {
+    color: #ff8f97 !important;
+  }
+
+  #container-wrap #license-area,
+  .license-area {
+    background-color: #0d1117 !important;
+    color: #8b949e !important;
+  }
+
+  #navi-bar {
+    background-color: #0d1117 !important;
+    border-bottom-color: #262c33 !important;
+    color: #c4cdd6 !important;
+  }
+
+  #navi-bar a,
+  #navi-bar .action-buttons,
+  #navi-bar .action-buttons a,
+  #navi-bar .join,
+  #navi-bar .random-site {
+    color: #8ab4d8 !important;
+  }
+
+  #navi-bar .new-site input.empty {
+    color: #8b949e !important;
+  }
+
+  #footer-bar {
+    border-top-color: #262c33 !important;
+  }
+
+  /* Wikidot's own house ad slot, which punches a white hole in the page */
+  #house-ad-1 {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+
+  #house-ad-1 .close {
+    background-color: #3a4048 !important;
+    color: #e6edf3 !important;
+  }
+
+  .self-ads {
+    border-color: #2d333b !important;
+  }
+
+  /* ============================================================
+     SCROLLBAR
+     ============================================================ */
+
+  ::-webkit-scrollbar {
+    border-color: rgba(255, 255, 255, .08) !important;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #0d1117 !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #3a4048 !important;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #4a5058 !important;
+  }
+
+  /* ============================================================
+     INTERWIKI FRAME (other-languages box)
+     ============================================================ */
+
+  #interwiki body,
+  body#interwiki {
+    background-color: transparent !important;
+  }
+
+  iframe.scpnet-interwiki-frame {
+    background-color: #14181d !important;
+  }
+
+  #interwiki .menu-item a {
+    color: #e8626e !important;
+  }
+}
