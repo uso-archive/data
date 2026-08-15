@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for KHInsider's game-music archive: easy on the eyes across album pages, song lists, the audio player, search and comments.
-@version      20260809.22.49
+@version      20260814.23.05
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -527,9 +527,31 @@
     background-color: #161b22 !important;
     border-color: #2d333b !important;
   }
+  /* Contact form: the Spaminator add-on ships its own code-verification widget, styled
+     entirely outside the skin — an #e8f4fc plate wrapping a #ffffff code panel and a
+     #ffffff answer panel, all carrying #141414 labels. Its form row is display:none
+     until the add-on asks for the code, so no load-time scan reaches it, but the markup
+     and the code are already in the page. `#CaptchaDiv` also names a texture raster
+     that currently 404s; it is left alone rather than guessed at. */
+  .capbox {
+    background-color: #16263a !important;
+    border-color: #2d4a6b !important;
+  }
+  .capbox-inner, #CaptchaDiv {
+    background-color: #161b22 !important;
+    color: #e6edf3 !important;
+  }
+  .CaptchaText { color: #c4cdd6 !important; }
 
   /* ---- Inputs / buttons / placeholders ---- */
-  .input, .input--date, .js-editor {
+  /* The archive block above is scoped by domain(), so its `input[type="text"]` /
+     `[type="search"]` / `[type="password"]` / `[type="email"]` field rule (0,1,1) also
+     lands here and outranks a bare `.input` (0,1,0) — every forum TEXT field took the
+     archive's #1c2128 while the selects beside it took this #161b22, and a field on a
+     #1c2128 form row lost its well entirely. `input.input` / `textarea.input` tie those
+     attribute selectors at (0,1,1) and land later, so the whole form matches again. */
+  .input, .input--date, .js-editor,
+  input.input, textarea.input {
     background-color: #161b22 !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
@@ -650,8 +672,11 @@
   /* Every flyout row carries `border-left: 3px solid transparent` that XenForo turns
      blue on the hovered/current row. The blanket border colour above painted all four
      sides, so each row grew a grey stripe AND the current row lost its accent — every
-     row in an open menu looked identical. Put the channel back. */
-  .menu-linkRow { border-left-color: transparent !important; }
+     row in an open menu looked identical. Put the channel back. Every row IS an anchor,
+     so this must name `a.menu-linkRow` too: the blanket above carries that branch at
+     (0,1,1) and would otherwise outrank a bare `.menu-linkRow` (0,1,0) here. The
+     hover/selected accent below is (0,2,x) and still wins over both. */
+  .menu-linkRow, a.menu-linkRow { border-left-color: transparent !important; }
   /* The two TINTED row variants: `--alt` is a #f5f5f5 band (the style chooser's
      "Use default style" row, light-on-light under the ink above whenever it is not
      also the current style) and `--highlighted` is an #e8f4fc band. Both must stay
@@ -814,6 +839,15 @@
   .blockMessage.blockMessage--success a,
   .blockMessage.blockMessage--warning a { color: inherit !important; }
   .blockMessage.blockMessage--important a { color: #f2930d !important; }
+  /* XenForo's toast: a `position: fixed` bar pinned across the top of the viewport,
+     shown after a style change, a form redirect or any `XF.flashMessage()` call. Core
+     paints it rgba(227,227,227,.9) with #212121 text and nothing overrides it, so it
+     drops a full-width near-white slab over the dark header. Keep it opaque — it floats
+     over scrolling content. */
+  .flashMessage {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
   /* inline field-validation tooltip bubble */
   .inputValidationError, .js-validationError {
     background-color: #3a1d1f !important;

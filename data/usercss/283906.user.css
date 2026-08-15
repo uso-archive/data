@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for OLX that turns the bright marketplace into an easy-on-the-eyes dark interface, perfect for late-night browsing.
-@version      20260809.22.51
+@version      20260814.23.07
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -406,7 +406,15 @@
     -webkit-text-fill-color: #e6edf3 !important;
     border-color: #2d333b !important;
   }
-  ::placeholder { color: #7d8893 !important; opacity: 1 !important; }
+  /* The rule above pins -webkit-text-fill-color on the input, and that channel
+     inherits into ::placeholder and outranks its `color` — so the muted grey has
+     to be restated on BOTH channels or every empty field's ghost text paints at
+     full value-ink strength and an empty picker looks identical to a chosen one. */
+  ::placeholder {
+    color: #7d8893 !important;
+    -webkit-text-fill-color: #7d8893 !important;
+    opacity: 1 !important;
+  }
   /* Nexus text fields draw the field surface on the WRAPPER and leave the <input>
      transparent — the same contract as the price-range fields further down. The
      generic rule above filled only the input, so each of these rendered two-tone: a
@@ -2847,12 +2855,18 @@
      ============================================================ */
   #innerLayout .lp-box,
   #innerLayout .lp-bundles-intro__content,
-  #innerLayout .lp-bundles-options-intro__box,
-  #innerLayout .bundle-item,
-  #innerLayout .bundles-about,
   #innerLayout .bundles-about__img,
   #innerLayout .container > ul > li {
     background-color: transparent !important;
+  }
+  /* These three are CARDS, not full-bleed bands: the white panel is the only
+     thing separating one promotion package (or option tile) from the next, so
+     flattening them with the bands above left the pricing table as loose text
+     on the page. Give them the elevated surface every other card gets. */
+  #innerLayout .lp-bundles-options-intro__box,
+  #innerLayout .bundle-item,
+  #innerLayout .bundles-about {
+    background-color: #1c2128 !important;
   }
   #innerLayout h1, #innerLayout h2, #innerLayout h3,
   #innerLayout h4, #innerLayout h5, #innerLayout h6 {
@@ -2879,23 +2893,38 @@
     color: #6b7681 !important;
     -webkit-text-fill-color: #6b7681 !important;
   }
+  /* The tick is an SVG painted through `fill`, which the ink lift above does not
+     reach: its #D8DFE0 is a near-invisible ghost on the white card but the
+     BRIGHTEST mark on the row once the card is dark, so the excluded feature
+     ends up shouting louder than the included one. Sink it below the label. */
+  #innerLayout li.disabled svg,
+  #innerLayout li.disabled path {
+    fill: #2d333b !important;
+  }
   /* Same near-black-primary ladder as the React CTAs: on white #002F34 IS
      the strongest button, on our base it is a 1.2:1 slab. The secondary is
-     its ghost twin (text + hairline only), so it only needs the ink. */
+     its ghost twin (text + hairline only), so it only needs the ink.
+     Every label also needs -webkit-text-fill-color: these buttons sit inside
+     the template's `<li>`/`<p>` content, whose lift above sets that channel,
+     and it inherits into the button and outranks the `color` set here — the
+     primary otherwise paints a light grey label on the mint fill at ~1.9:1. */
   #innerLayout .olx-button--primary,
   #innerLayout .postnewlink,
   #innerLayout .login-button:not(.login-button--facebook) {
     background-color: #1fcabf !important;
     color: #07232a !important;
+    -webkit-text-fill-color: #07232a !important;
     border-color: #1fcabf !important;
   }
   #innerLayout .olx-button--secondary {
     color: #5fd0c6 !important;
+    -webkit-text-fill-color: #5fd0c6 !important;
     border-color: #5fd0c6 !important;
   }
   #innerLayout .login-button--facebook {
     background-color: #21262d !important;
     color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
   }
   #innerLayout footer a,
   #innerLayout footer a span,

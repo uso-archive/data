@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Weather Underground. Darkens forecasts, hourly and 10-day pages and data tables while keeping radar, maps and weather icons intact.
-@version      20260809.22.55
+@version      20260814.23.11
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -910,14 +910,36 @@
     color: var(--wu-text-2) !important;
   }
 
+  /* Every teaser card is wrapped in a single <a>, so WU's two roles land on the
+     wrong elements and swap: the HEADLINE is the site's #006f9e link but our
+     `h1..h6` lift repaints it plain white, while the summary PARAGRAPH is WU's
+     #1e2023 body copy but inherits the anchor's link blue. The card still reads
+     legibly, so no contrast or background audit sees it -- what is gone is the
+     cue for which line you are clicking. Put both roles back. */
+  .news-item .title,
+  .news-item h3.title {
+    color: var(--wu-link) !important;
+  }
+  .news-item a:hover .title {
+    color: var(--wu-link-hover) !important;
+  }
+  .news-item p {
+    color: var(--wu-text-2) !important;
+  }
+
   /* The Infographics index builds its grid from `.cta-module` cards, a class
      none of the news/blog selectors above reach: they keep WU's #f7f7f7 panel,
-     so the lifted white title lands white-on-white. Each card is wrapped in a
-     single <a>, which makes our link lift claim the description paragraph --
-     WU's body copy, and the only prose on the card. */
+     so the lifted white title lands white-on-white. Its heading and paragraph
+     carry the same swapped pair as `.news-item` above. */
   .cta-module {
     background-color: var(--wu-surface) !important;
     color: var(--wu-text-2) !important;
+  }
+  .cta-module h3 {
+    color: var(--wu-link) !important;
+  }
+  .cta-module a:hover h3 {
+    color: var(--wu-link-hover) !important;
   }
   .cta-module p {
     color: var(--wu-text-2) !important;
@@ -996,6 +1018,13 @@
   .infoBox a,
   .msgWrapper a {
     color: #ffffff !important;
+  }
+  /* WU rims that band with a 2px #008fbf, a darker shade of its own cyan, so it
+     reads as one solid chip. The blanket `*` reset repaints it the theme line
+     colour, which on the dark page draws a hard dark box around the ribbon. */
+  .infoBox,
+  .msgWrapper {
+    border-color: #008fbf !important;
   }
 
   /* Severe-weather alert banner (.DF1 red / .DF2 orange / .DF3 amber / .DF4-5
@@ -1425,10 +1454,11 @@
   }
 
   /* ---- sponsored "You May Like" widget (Taboola) ------------------------ */
-  /* The recommendation widget renders its header, attribution and item titles
-     in near-black -- readable on its original white page, dark-on-dark once
-     the base is dark. Lift its text to readable light; ad thumbnails/creatives
-     are untouched (they are <img> / advertiser markup). */
+  /* The recommendation widget's ink is chosen per placement, not per site: the
+     city-page unit ships item titles at pure #000 (dark-on-dark, invisible)
+     while the /news unit ships them in its own #1690bd. Pin the whole family to
+     the theme's body ink so no placement can serve an unreadable title; ad
+     thumbnails/creatives are untouched (they are <img> / advertiser markup). */
   div[id^="trc_"] .video-title,
   div[id^="trc_"] .video-label,
   .videoCube .video-title,
@@ -2299,6 +2329,15 @@
   .high-low-item.low .value {
     color: #4d9fe6 !important;
   }
+  /* A `position: fixed` full-viewport overlay that ships hidden and is shown
+     for slow date navigations. It takes its fill from the OS palette, so under
+     a light OS it flashes the entire page white. Its spinner is a
+     background-IMAGE with no dark variant under a light OS, which is what the
+     invert below is for -- that invert only reads as a spinner because this
+     rule puts a dark ground under it in both schemes. */
+  long-load-view {
+    background-color: var(--wu-base) !important;
+  }
   /* This frontend swaps to a `-dark` suffixed copy of every monochrome icon
      under `prefers-color-scheme: dark` only, and that media query answers to
      the OS, not to our `color-scheme`. So under a LIGHT OS it keeps serving
@@ -2311,8 +2350,33 @@
     action-bar-wc details.settings summary,
     span.icon.airport,
     span.chart-section-toggle,
-    glossary-overlay-view .close {
+    glossary-overlay-view .close,
+    long-load-view .loader {
       filter: invert(1) !important;
+    }
+    /* The header logo is one box carrying BOTH the rainbow WU mark and the
+       wordmark, and only the wordmark changes between the two assets: the
+       light copy paints it #1e2023, which is 1.1:1 on the header we darkened,
+       so the brand name is simply absent. A filter on the box recolours the
+       mark too (invert alone turns the red W cyan; adding hue-rotate turns it
+       brown), so overlay an inverted copy of the SAME image clipped to the
+       wordmark. `background-image: inherit` resolves to whatever hashed URL
+       the current build serves, so no asset URL is pinned here. */
+    body > header a.logo {
+      position: relative;
+    }
+    body > header a.logo::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 28%;                      /* starts clear of the rainbow WU mark */
+      background-image: inherit;
+      background-repeat: no-repeat;
+      background-size: 138.9% 100%;   /* 1/0.72: redraw at the host's scale */
+      background-position: right center;
+      filter: invert(1);
     }
   }
 }

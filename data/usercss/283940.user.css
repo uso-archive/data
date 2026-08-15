@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Stack Overflow and the whole Stack Exchange network: easy-on-the-eyes questions, answers, code blocks, comments and sidebar.
-@version      20260809.22.53
+@version      20260814.23.09
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -375,6 +375,17 @@
     color: #9198a1 !important;
   }
 
+  /* `.ps-relative` is a layout utility, so the helper-text mute above reaches
+     any body-size text inside a positioned box. An explicit dark-ink utility
+     marks a heading, not helper text — the "Try Stack Overflow for Agents"
+     sidebar widget rendered its title greyer than its own subtitle. */
+  .ps-relative .fs-body2.fc-black-700,
+  .s-popover .fs-body2.fc-black-700,
+  .modal-content .fs-body2.fc-black-700,
+  .grid--cell > .fs-body2.fc-black-700 {
+    color: #e6edf3 !important;
+  }
+
   /* Labels, strong metadata, user-card rows: dark #3b4045 by
      default — lift so they read on dark surfaces. */
   .s-label,
@@ -441,6 +452,29 @@
   .s-prose a:not(.s-tag):not(.post-tag):not(.badge-tag):not(.badge):not(.s-btn):visited:hover,
   .comment-copy a:not(.badge):not(.s-btn):visited:hover,
   .s-link:not(.s-btn):not(.post-tag):not(.badge-tag):visited:hover {
+    color: #d3c4f5 !important;
+  }
+
+  /* Same two arms for the Help Center index. Its FAQ lists are
+     `.wiki-ph-content`, not `.s-prose`, so the floor above never reached
+     them and every link a returning reader has opened drops to SE's
+     `a:not([class*="s-"]):visited` colour — #155ca2, 2.6:1 on the page base.
+     (Chromium refuses to repaint an already-visited link from an injected
+     sheet, so this is only observable in the computed cascade there; the
+     floor is what guarantees the accent either way.) */
+  .wiki-ph-content a:not(.s-tag):not(.post-tag):not(.badge-tag):not(.badge):not(.s-btn) {
+    color: #5fb0e6 !important;
+  }
+
+  .wiki-ph-content a:not(.s-tag):not(.post-tag):not(.badge-tag):not(.badge):not(.s-btn):hover {
+    color: #9bd4ff !important;
+  }
+
+  .wiki-ph-content a:not(.s-tag):not(.post-tag):not(.badge-tag):not(.badge):not(.s-btn):visited {
+    color: #b09ae0 !important;
+  }
+
+  .wiki-ph-content a:not(.s-tag):not(.post-tag):not(.badge-tag):not(.badge):not(.s-btn):visited:hover {
     color: #d3c4f5 !important;
   }
 
@@ -1085,6 +1119,17 @@
   .comment .comment-user.owner,
   .comment a.comment-user.owner {
     background-color: #16202c !important;
+  }
+
+  /* The comment timestamp. SE pins `.comment-date` and its anchor to
+     `var(--black-400)` #636b74 with its OWN `!important` at 2-class
+     specificity, and the `a .relativetime-clean { color: inherit }` rule
+     above hands that value straight to the date span — 3.3:1 on the post
+     surface. Mirror SE's specificity so the mute lands on the anchor too. */
+  .comment-date,
+  .comment-date > a,
+  .comment-date a.comment-link {
+    color: #9198a1 !important;
   }
 
   .comment-score, .comment-score b {
@@ -2910,6 +2955,19 @@
     border-color: #2d333b !important;
   }
 
+  /* /collectives ships its own in-page <style> for the section nav that
+     scroll-spies the marketing blocks: `.p-collectives-nav { background:
+     rgba(250,250,251,.8); backdrop-filter: blur(10px) }`. It is `ps-sticky`
+     under the topbar, so it rides the whole page as a full-width near-white
+     band. The sheet's `body.theme-dark` arm never applies — anonymous
+     visitors are on `unified-theme`. Kill the blur too: over a dark page it
+     only smears the content scrolling under the bar. */
+  .p-collectives-nav,
+  nav#feature-nav {
+    background: #1c2128 !important;
+    backdrop-filter: none !important;
+  }
+
   /* ============================================================
      Misc light leftovers
      ============================================================ */
@@ -2923,6 +2981,19 @@
   .s-sidebarwidget--item, .s-sidebarwidget__item,
   .s-card.bc-black-100 {
     border-color: #262c33 !important;
+  }
+
+  /* A Stacks tab strip encodes its current tab in the border-colour utility —
+     `bc-black-600` on the selected item, `bc-transparent` on the rest — so the
+     bare `.bb` arm above paints both the same rule and the indicator vanishes
+     (the network home's Questions/Sites/Moderators strip). Scoped to the
+     navigation component: elsewhere `bc-transparent` can be a hover hook. */
+  .s-navigation--item.bc-transparent {
+    border-color: transparent !important;
+  }
+
+  .s-navigation--item.bc-black-600 {
+    border-color: #e6edf3 !important;
   }
 
   /* Stacks gives EVERY `.s-btn` a `1px solid transparent` border for layout, so
@@ -2989,6 +3060,23 @@
   .s-banner .s-link,
   .js-dismissable-hero a {
     color: #cfe0ef !important;
+  }
+
+  /* `.bg-blue-500` is not only the banner tint: Stacks also stamps it on SOLID
+     controls, where the retone above flattens a brand fill to a near-black
+     plate. The network home carries two — its "Take a tour" CTA and the
+     selected pill of the Hot/Real-time strip, which then reads as unselected. */
+  a.s-navigation--item.bg-blue-500,
+  .s-navigation--item.bg-blue-500 {
+    background-color: #2f6f9f !important;
+    color: #ffffff !important;
+    border-color: #3b82b8 !important;
+  }
+
+  a.s-navigation--item.bg-blue-500:hover,
+  .s-navigation--item.bg-blue-500:hover {
+    background-color: #3b82b8 !important;
+    color: #ffffff !important;
   }
 
   /* tinted info / callout boxes (purple / green / yellow / red
@@ -3808,6 +3896,16 @@ header.site-header,
 
   .module {
     color: #c4cdd6 !important;
+  }
+
+  /* Every row of the method index (`/docs`, and each category page) draws its
+     own #e4e6e7 bottom rule — over a hundred bright white lines down the
+     longest page on the host. `.method-name` carries the same rule on its
+     right edge in the two-column layout. */
+  .method,
+  .method-name,
+  .method-description {
+    border-color: #262c33 !important;
   }
 
   .module.help {

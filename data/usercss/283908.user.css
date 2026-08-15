@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Vinted with the homepage, catalog and search, item pages and seller profiles in a comfortable dark look that's easy on the eyes for late-night browsing.  Works on every country version of Vinted (vinted.fr, .de, .com, .co.uk, .es, .it, .nl, .be, .pl and more).   Prices, ratings and Vinted's teal stay clear and recognizable.
-@version      20260809.22.56
+@version      20260814.23.10
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -184,6 +184,21 @@
      button. Filled primary is untouched — its fill IS this colour. */
   [class*="Button__outlined"][class*="Button__primary"],
   [class*="Button__flat"][class*="Button__primary"] { color: #4db8c4 !important; }
+  /* The other outlined variants carry meaning the same way — ring, label and icon
+     all read the button's own `color` — but their literals were authored for a
+     white page: `amplified` bakes the near-black ink, so its ring disappeared into
+     our surfaces. Lift each one to its dark-legible twin, matching the flat-button
+     set below, so the ring and the label always move together. */
+  [class*="Button__outlined"][class*="Button__amplified"] { color: #e6edf3 !important; }
+  [class*="Button__outlined"][class*="Button__muted"]     { color: #9ca7b0 !important; }
+  [class*="Button__outlined"][class*="Button__success"]   { color: #57c98a !important; }
+  [class*="Button__outlined"][class*="Button__warning"]   { color: #f2707a !important; }
+  [class*="Button__outlined"][class*="Button__expose"]    { color: #f9bb42 !important; }
+  /* expose is the exception in web_ui too: it pins its outlined CONTENT to
+     --foreground-action-neutral-static-prominent-idle, a deliberately theme-proof
+     near-black, so the label alone stayed invisible inside the amber ring. */
+  [class*="Button__outlined"][class*="Button__expose"]
+    [class*="Button__label"] { color: #f9bb42 !important; }
 
   /* ============================================================
      Header / global nav
@@ -306,6 +321,10 @@
      so it wins the source-order tie; the white-label rule below still applies and
      reads fine on the tint. */
   [class*="Cell__successLightExperimental"] { background-color: #14281e !important; }
+  /* Its brand-tinted sibling: a pale-mint (`--primary-extra-dark`) row that the
+     solid-fill block above left on the plain elevated grey, so the "this row is
+     the branded one" cue was gone. Same deep teal the brand bands take. */
+  [class*="Cell__calypsoLightExperimental"] { background-color: #12363d !important; }
   [class*="Cell__cell"][class*="Cell__primary"], [class*="Cell__cell"][class*="Cell__primary"] *,
   [class*="Cell__cell"][class*="Cell__amplified"], [class*="Cell__cell"][class*="Cell__amplified"] *,
   [class*="Cell__cell"][class*="Cell__muted"], [class*="Cell__cell"][class*="Cell__muted"] *,
@@ -327,8 +346,9 @@
      `expose` is the odd one out both here and in web_ui: its label reads
      greyscale-level-1 (near-black natively, near-WHITE for us) over the amber
      fill, which we leave at Vinted's value — so it needs dark ink, not white.
-     Navigation__expose is left alone entirely: it is the notification dot,
-     whose label is deliberately `transparent`. */
+     Navigation's expose keeps its amber fill; only its `__body` needs the dark
+     ink, because the variant class itself carries `color: transparent` (the
+     notification dot) and the body overrides that with greyscale-level-1. */
   [class*="Badge__filled"][class*="Badge__primary"],
   [class*="Navigation__primary"]   { background-color: #0f7d84 !important; }
   [class*="Badge__filled"][class*="Badge__success"],
@@ -352,7 +372,8 @@
   [class*="Navigation__amplified"], [class*="Navigation__amplified"] *,
   [class*="Navigation__muted"], [class*="Navigation__muted"] * {
     color: #ffffff !important; fill: #ffffff !important; }
-  [class*="Badge__filled"][class*="Badge__expose"], [class*="Badge__filled"][class*="Badge__expose"] * {
+  [class*="Badge__filled"][class*="Badge__expose"], [class*="Badge__filled"][class*="Badge__expose"] *,
+  [class*="Navigation__expose"] [class*="Navigation__body"] {
     color: #14181d !important; fill: #14181d !important; }
 
   /* web_ui Text colours are baked as literal light-theme hex inside
@@ -402,6 +423,12 @@
   [class*="Text__highlight-warning"] > b, [class*="Cell__validation"],
   [class*="Validation__warning"] {
     color: #f2707a !important; fill: #f2707a !important; }
+  /* `expose` is the third status ramp (amber "heads up"), and it needs the same
+     rescue: --expose-default keeps Vinted's value, but a span carrying
+     Text__body alongside it was flattened to plain grey by the type rule above.
+     `Text__highlight-expose` is a different class and keeps its own <b>. */
+  [class*="Text__expose"], [class*="Icon__expose-default"] svg {
+    color: #f9bb42 !important; fill: #f9bb42 !important; }
 
   /* `Text__inherit` is web_ui's explicit "take the parent's colour" theme
      variant — the pattern every icon+label link uses, so that the label and the
@@ -413,12 +440,16 @@
   .web_ui__Text__inherit, [class*="Text__inherit"] { color: inherit !important; }
 
   /* Ghost / outlined / tertiary buttons render teal text on a dark
-     surface — lift it for AA. Filled CTAs keep white-on-teal. */
+     surface — lift it for AA. Filled CTAs keep white-on-teal.
+     Scoped to `primary`: an outlined button's label is native `inherit`, so a
+     variant-blind rule here painted a danger button's red ring around a teal
+     word. The variant colours set on the button above reach the label on their
+     own. */
   .web_ui__Button__tertiary .web_ui__Button__label,
-  .web_ui__Button__outlined .web_ui__Button__label,
   .web_ui__Button__transparent .web_ui__Button__label,
   a[class*="Button__tertiary"] [class*="Button__label"],
-  a[class*="Button__outlined"] [class*="Button__label"] { color: #4db8c4 !important; }
+  [class*="Button__outlined"][class*="Button__primary"]
+    [class*="Button__label"] { color: #4db8c4 !important; }
   /* Flat/text buttons (e.g. the search-type "Articles" selector) bake
      a muted grey label — lift it to the primary text colour. A flat
      PRIMARY button ("Ton guide Vinted") is a teal text link, though. */
@@ -441,6 +472,22 @@
   /* Filled primary CTA keeps the teal fill — pure white label for AA */
   .web_ui__Button__filled .web_ui__Button__label,
   [class*="Button__filled"] [class*="Button__label"] { color: #ffffff !important; }
+  /* A filled button takes its FILL from `currentColor`, so the variant token is
+     both the surface and (via the label rule above) the thing white sits on.
+     Two of the six break on dark:
+       `primary` on company.vinted.com's older web_ui reads --primary-default —
+       the teal we lift for foreground duty — dropping white to 2.7:1 where the
+       native deep teal gives 5.3:1. Pinning the fill is a no-op on the
+       marketplace, whose newer web_ui already fills from the prominent token.
+       `amplified` is the black CTA: its baked #15191a fill is invisible against
+       our page, so the button loses its shape. Use the elevated grey the Cell
+       and Badge amplified variants already take.
+     `expose` is the amber fill, and web_ui pairs it with greyscale-level-1 —
+     near-black natively, near-WHITE for us — so it needs dark ink, not white. */
+  [class*="Button__filled"][class*="Button__primary"] { background-color: #007782 !important; }
+  [class*="Button__filled"][class*="Button__amplified"] { background-color: #39424e !important; }
+  [class*="Button__filled"][class*="Button__expose"]
+    [class*="Button__label"] { color: #14181d !important; }
   /* An INVERSE filled button is the light pill used on brand/photo surfaces:
      the fill is neutral and the LABEL carries the variant colour (teal /
      green / red / grey). The white rule above flattened all four to white.
@@ -457,6 +504,10 @@
     [class*="Button__label"] { color: #f2707a !important; }
   [class*="Button__inverse"][class*="Button__filled"][class*="Button__muted"]
     [class*="Button__label"] { color: #9ca7b0 !important; }
+  /* The inverse pill is dark for us, so expose reverses again: amber label,
+     not the dark ink the non-inverse rule above gives it. */
+  [class*="Button__inverse"][class*="Button__filled"][class*="Button__expose"]
+    [class*="Button__label"] { color: #f9bb42 !important; }
 
   /* The Apple social-login glyph is an SVG <path fill="#000"> baked black, so it
      vanishes on our dark outlined button. Google/Facebook logos are multicolour
@@ -748,6 +799,10 @@
   [class*="Radio__inverse"] [class*="Radio__label"],
   [class*="Toggle__inverse"] [class*="Toggle__label"] {
     color: #e6edf3 !important; }
+  /* Divider is the same family drawn as a surface: the inverse rule is a 24%
+     WHITE hairline for photos and the teal bands, and the level-6 remap turned
+     it into a 24% dark one that vanishes on both. */
+  [class*="Divider__inverse"] { background-color: rgba(230, 237, 243, 0.24) !important; }
 
   /* ============================================================
      Marketing / help landing pages
@@ -861,6 +916,14 @@
      header row that goes light-on-light under our text colours. */
   .table-wrapper thead tr, .user-created-content thead tr {
     background-color: #2f3742 !important; }
+
+  /* Help-centre FAQ callouts carry their severity in a 2px left rule only:
+     `.important-note` draws it from --expose-default (amber), `.default-note`
+     from --greyscale-level-5. The blanket `* { border-color }` reset flattened
+     both to the divider grey, so an "Important" block read as an ordinary quote.
+     Only the amber one is restored — level-5 is our page background, so
+     `.default-note` is actually more visible left on the reset grey. */
+  blockquote.important-note { border-left-color: #f9bb42 !important; }
 
   /* CMS ordered lists draw their marker as a numbered disc on a ::before:
      `background: rgba(var(--greyscale-level-2))` with `color: level-6`. Both

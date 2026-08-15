@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260809.22.47
+@version      20260814.23.04
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -264,18 +264,21 @@
 
   /* Annotated (referent) words. The site paints the whole chip on the inner Highlight
      span and encodes its state ONLY in that span's colour: light grey (#e9e9e9) at rest,
-     inverted near-black (#070707) while hovered OR while its annotation is open. Both are
+     brand red #ca4e45 while hovered OR while its annotation is open. Both are
      single-class styled-components rules whose hash changes every build, so no selector
      can name the open one — setting background-color here flattens hover AND the "you are
      reading this one" cue into one identical chip across the whole song.
-     Blend a dark layer over whatever the site painted instead: darken() maps the light
-     resting chip down to the elevated tone and leaves the near-black active/hover chip
-     alone, so the states stay apart without naming either. Do NOT add a background-color
-     to this rule — the blend needs the site's own value underneath. */
+     Blend a dark layer over whatever the site painted instead. The blend mode must be
+     luminosity, NOT darken: darken() takes the per-channel minimum, and every channel of
+     #ca4e45 (202,78,69) is above the layer's (28,33,40), so both states collapse onto the
+     exact same #1c2128 chip. luminosity keeps the backdrop's hue and takes the layer's
+     lightness — the achromatic resting chip lands on a neutral dark grey, the red one on
+     a dark brand red, so the states stay apart without naming either. Do NOT add a
+     background-color to this rule — the blend needs the site's own value underneath. */
   [class*="ReferentFragment-desktop__Highlight"],
   [class*="ReferentFragment"][class*="Highlight"] {
     background-image: linear-gradient(#1c2128, #1c2128) !important;
-    background-blend-mode: darken !important;
+    background-blend-mode: luminosity !important;
     color: #e6edf3 !important; }
   /* the ClickTarget anchor around it is natively bare; painting it draws an elevated
      rectangle in the chip's padding that the blended span no longer matches */
@@ -324,6 +327,12 @@
   [class^="QuestionTemplate__Container"] [class*="ExpandButton"] path {
     color: #f26659 !important; fill: #f26659 !important;
     -webkit-text-fill-color: #f26659 !important; }
+  /* The metadata Q&A rows ("Who produced …?") are an <a> wrapping a "__QuestionBody" span.
+     The site paints the whole row its plain body black — it is an accordion heading, not a
+     hyperlink — but the shared "a span" rule repaints the span periwinkle, so the row reads
+     as an inline link and no longer matches the community Q&A titles it sits under. Return
+     the descendants to the heading tone; the <a> itself is already covered above. */
+  [class*="MetadataQuestionTemplate__Title"] * { color: #e6edf3 !important; }
   [class*="QuestionTemplate__Container"],
   [class*="MetadataQuestionTemplate__Container"],
   [class*="Answer__Container"],
@@ -438,6 +447,13 @@
   [class*="ExpandableContent__ButtonContainer"] {
     background-color: transparent !important; }
   [class*="SquareButton"] *, [class*="Charts__LoadMore"] * { color: #e6edf3 !important; }
+  /* "VotingActions__Button" is not a button surface: genius ships it with no fill and no
+     edge at all (border-width 0), because it is the bare thumb / running-total row that sits
+     inline in the annotation, comment and Q&A copy. The neutral surface above boxes each
+     glyph, and the running total — the one item wide enough to show it — ends up a lighter
+     chip that reads as pressed. Same opt-out the legacy ".square_button--transparent" twin
+     already gets; the hover below still answers the pointer. */
+  [class*="VotingActions__Button"] { background-color: transparent !important; }
   /* "SquareButton" is the outline CTA of the React shell ("Load More", "Join Our Community",
      "Show more songs"): the site gives it no resting fill and its whole affordance is a hover
      that inverts to a solid #000 or #fff. The resting surface below is !important, so that

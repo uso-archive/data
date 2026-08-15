@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Depop, easy on the eyes across home, search, categories and product pages, with prices, sale tags and the Depop red kept readable.
-@version      20260809.22.46
+@version      20260814.23.03
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -216,16 +216,20 @@
     background-color: transparent !important;
   }
 
-  /* The mega-menu's "Featured" tiles overlay their caption ('80s,
-     Carhartt, Crochet...) directly ON a light product photo, where
-     the site paints it #262626. The blanket menu-text rule above
-     re-lights it to #c4cdd6 → light-on-light, unreadable. Photos are
-     image content we must not touch, so restore the original dark
-     caption for captions inside an image container only (the plain
-     dark-panel menu links keep the light colour). */
+  /* The mega-menu's "Featured" tiles overlay their caption ('80s, Carhartt,
+     Crochet...) directly ON a product photo: the site paints the caption #262626
+     and guarantees it against any shot by backing it with an rgba(255,255,255,.7)
+     plate. The blanket menu-text rule above re-lights the ink to #c4cdd6 →
+     light-on-light, and the blanket menu-descendant transparent rule strips the
+     plate, so on a dark photo (the '00s bag tile) the caption disappears
+     outright. Translucent white never trips a near-white surface scan, which
+     reads the alpha-less channels only. Photos are image content we must not
+     touch, so restore BOTH the dark caption and its plate — but only inside an
+     image container; the plain dark-panel menu links keep the light colour. */
   [class*="featuredImageContainer"] [class*="descriptionText"] {
     color: #262626 !important;
     -webkit-text-fill-color: #262626 !important;
+    background-color: rgba(255, 255, 255, 0.7) !important;
   }
 
   /* The mega-menu's category links (Tops / Jeans / Shoes...) carry no colour of
@@ -333,6 +337,18 @@
      has focus/content, which is why a load-time scan never framed it. */
   [class*="searchBarButtons"] [class*="submitButton"] {
     border-color: transparent !important;
+  }
+
+  /* ...and the arrow's only affordance is that hovering/focusing it fills the
+     disc with the design system's indigo (#3d37bd) and flips the glyph white.
+     The blanket `[role="banner"] button` transparent reset is !important and
+     outranks the site's plain :hover, so the control gives no feedback at all.
+     Keep the site's indigo — it is the same accent the autocomplete's active row
+     uses, so the search bar stays internally consistent. */
+  [class*="searchBarButtons"] [class*="submitButton"]:hover,
+  [class*="searchBarButtons"] [class*="submitButton"]:focus {
+    background-color: #3d37bd !important;
+    color: #ffffff !important;
   }
 
   /* The autocomplete's highlighted row fills solid #3d37bd, and the site flips its
@@ -534,6 +550,15 @@
      surface no load-time scan reaches. On dark, the pale label then sits
      light-on-light. Give the row a dark elevated hover instead. */
   [class*="collapsibleRow"]:hover {
+    background-color: #262c33 !important;
+  }
+
+  /* The Size filter's chips hover to a #eaeaea fill, which the site pairs with
+     #000 ink. Nothing of ours paints the <label>, so the near-white fill survives
+     under our #c4cdd6 chip text: ~1.4:1, the hovered size is the one you cannot
+     read. The chips only exist three collapsible levels deep (Men > Tops > UK),
+     so no load-time scan renders them. */
+  label[class*="sizeButton"]:hover {
     background-color: #262c33 !important;
   }
 
@@ -910,6 +935,14 @@
   [class*="buttonLinkTextVariant"],
   [class*="buttonLinkTextVariant"] * {
     color: #6ea8fe !important;
+  }
+
+  /* The link-button's one hover cue is a lighter blue (#2960af → #6495db); the
+     rule above is !important and pins both states to the same tone, so /login's
+     "Continue with email" — the only way into the email flow — reads as inert. */
+  [class*="buttonLinkWrapperVariant"]:hover,
+  [class*="buttonLinkWrapperVariant"]:hover * {
+    color: #9ec5fe !important;
   }
 
   /* Like / save / interaction buttons (icon + count) */

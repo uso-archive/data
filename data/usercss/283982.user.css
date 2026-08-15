@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260809.22.51
+@version      20260814.23.07
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -436,6 +436,15 @@
   .vue-portal-target > div > div > div > div[class*="uw_"] {
     background-color: var(--d-bg) !important;
   }
+  /* The four-tile OZON mark on that picker is a CMS <img>, and the SVG behind it
+     paints `fill="currentColor"`. An SVG loaded as an image resolves currentColor
+     against its OWN document, i.e. black — it reads as black-on-black once the
+     plate above is dark, and no colour rule can reach inside an <img>. Invert it.
+     Keyed on the file, not the wrapper's hash; the hover swap is a second, blue
+     asset (menuhover.svg), which this selector deliberately misses. */
+  img[src$="/menu.svg"] {
+    filter: invert(1) !important;
+  }
   /* REVIEW MEDIA VIEWER "Отзыв" BADGE — the pill laid over the top-left of each
      slide in the lightbox, carrying the label plus the reviewer's gold stars. Its
      label is a fourth --layerFloor1-as-WHITE-TEXT use (on the native rgba(7,7,7,.48)
@@ -596,6 +605,21 @@
      background keeps its own art everywhere the header does not overlap. */
   [data-widget="header"] > div[style*="background-image"] {
     box-shadow: inset 0 25px 0 var(--d-header) !important;
+  }
+  /* Campaigns that hang the same artwork on an <img> instead need the cover to
+     come from the other side: an inset shadow paints UNDER an element's content,
+     so on an image-backed banner it lands behind the bitmap and shows nothing.
+     The nav row is the thing that already hides the band across the middle, so
+     extend its own paint sideways by the header's 24px inner padding with two
+     offset (not spread) shadows — a spread would also grow it vertically and cut
+     a dark line into the artwork below the row. The row carries z-index 1 and the
+     banner row does not, so this paints above the art.
+
+     The row is the header's second child on every page; the banner row after it
+     is the only optional one. A mis-hit is inert: every header child sits on the
+     header ground, and the shadow is that same colour. */
+  [data-widget="header"] > div:nth-child(2) {
+    box-shadow: -24px 0 0 var(--d-header), 24px 0 0 var(--d-header);
   }
 
   /* MAIN-NAV ROW (data-widget="horizontalMenu") — Ozon renders each
@@ -1311,9 +1335,21 @@
      blanked every brand tile to an empty dark square (the logo bitmap still
      paints — canvas-samples orange for Xiaomi — it is simply covered). The
      ::after is a positioned pseudo, so lift the logo images into their own
-     positive stacking layer to paint above it. Filter images are only these
-     brand/store logos, which carry their own light ground, so no mat needed. */
+     positive stacking layer to paint above it.
+
+     Not every mark is an opaque tile: the transparent PNGs among them (Apple,
+     Samsung, Honor, realme …) are drawn in the brand's own near-black, so on the
+     dark plate they go invisible. Give the image the same light mat the product
+     photos get — it is hidden behind the opaque marks and only surfaces under the
+     cut-outs, which is exactly the white tile they were drawn for.
+
+     A wordmark keeps its own aspect, so its box can be as short as 36x6 inside the
+     36x36 wrapper and the mat alone would read as a floating strip. The spread
+     shadow fills the rest of the wrapper without moving the bitmap; the wrapper
+     clips it to an 8px radius, so neither needs a radius of its own. */
   [data-widget="filtersDesktop"] img {
+    background-color: #f3f5f8 !important;
+    box-shadow: 0 0 0 18px #f3f5f8 !important;
     position: relative !important;
     z-index: 1 !important;
   }
@@ -1950,5 +1986,20 @@
   textarea {
     background-color: var(--d-surface-2) !important;
     color: var(--d-text) !important;
+  }
+
+  /* "Помогла ли вам статья?" — the empty-star strip is a pale grey-blue SVG tiled
+     as the GROUP's background, chosen to sit almost invisibly on white; on the
+     dark page the same pixels become the brightest thing in the block, so an
+     unrated article reads as rated five. The five <label>s over it are bare until
+     one is hovered or checked, when that label tiles the GOLD file instead.
+
+     So the dimmer has to sit on the group and stay off the labels: a filter or an
+     opacity there would take the gold down with it. An inset shadow paints above
+     the element's own background and below its children, so it reaches the empty
+     strip only. Its colour is the page ground, which is also what shows between
+     the stars — the gaps composite back to themselves. */
+  .rating__group {
+    box-shadow: inset 0 0 0 40px rgba(20, 24, 29, 0.72) !important;
   }
 }

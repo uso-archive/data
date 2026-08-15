@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260809.22.48
+@version      20260814.23.05
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -679,7 +679,23 @@
      learning states to the same grey square, erasing the colour code. Khan defines
      `--tile-color` only on these mastery tiles, so every other surface resolves the
      fallback and still flattens dark exactly as before. */
-  #main-content [class]:not(span) { background-color: var(--tile-color, transparent); background-image: none; }
+  #main-content [class]:not(span) { background-color: var(--tile-color, transparent); }
+  /* The `background-image` half is split off so it can carve out ONE case: the CS
+     scratchpad's Documentation panel draws its ~100 shape previews as a CSS sprite,
+     one `background-image` shared by every thumbnail with a per-entry offset in an
+     inline `background-position-y`. Blanking the image there erases every preview
+     and leaves the list a column of labels beside empty gaps. The inline offset is
+     the sprite's signature — no decorative gradient in `#main-content` carries one. */
+  #main-content [class]:not(span):not([style*="background-position"]) { background-image: none; }
+  /* That sprite is black line art with pale fills on an OPAQUE white sheet, drawn for
+     the white panel, so it needs the same lightness inversion the CDN diagrams get
+     further down: strokes go light, the fills keep their hue. 0.92 rather than a full
+     invert because the sheet is what dominates each 66x40 tile — a full invert lands
+     it on pure #000 and punches a hundred black rectangles out of the page, while
+     0.92 lands it on #141414, within a shade of the page base. */
+  #main-content [style*="background-position"] {
+    filter: invert(0.92) hue-rotate(180deg);
+  }
   /* Re-surface the elements that NATIVELY carry a background, and only those.
      An earlier version painted every `#main-content button[class]`, which is a
      rule about an element TYPE rather than about what the element actually looks
@@ -706,6 +722,24 @@
   #main-content a[data-kind="secondary"]:hover,
   #main-content a[class][role]:hover,
   #main-content [role="button"]:hover { background-color: #232a32; }
+
+  /* Khan's list ROWS — the course-unit rail, the lesson rail beside a video /
+     article / exercise, and a search result card — are anchors whose only hover
+     affordance is a fill: white at rest, #edf3fe (`…-background-instructive-subtle`)
+     on hover. The neutralizer above flattens BOTH states, so the whole row family
+     hovers to nothing; the anchor's own `color` does change, but every one of these
+     rows keeps its label in a child <div>/<span> that the page-shell rule pins
+     near-white, so nothing visible moves. Restore the hover fill only — at rest the
+     rows must stay flat on the dark page. Needs `!important`: the neutralizer carries
+     `#main-content`, so two of the three selectors below lose the cascade otherwise.
+     Scoped to the three row containers because a blanket `a:hover` would put a grey
+     plate behind every inline text link. The search card has no test id of its own,
+     so it is reached through `.search_results`, the un-hashed class on the results
+     <article>; `ul > li > div > a` alone also matches the CS scratchpad's sprite
+     thumbnails, which Khan does not give a hover fill. */
+  nav[data-testid="course-unit-sidebar"] a:hover,
+  [data-testid="learnable-content-cells"] a:hover,
+  .search_results ul > li > div > a:hover { background-color: #1c2128 !important; }
 
   /* Home "What learning looks like in practice." testimonial trio. Khan colour-codes the
      three cards gold / green / orange and sets the light-page ink on top; the
@@ -822,15 +856,28 @@
   }
   /* The exercise page itself draws a SECOND, newer progress strip ("Do 4 problems"
      in the sticky footer bar) that the list above does not cover: each problem is a
-     `div[role="img"]` with a `data-testid` of `exercise-progress-N-<state>`, a
-     transparent fill and a 2px ring Khan paints its light-page ink (#21242c). The
-     blanket `* { border-color }` reset near the end of this file drops that ring to
-     #2d333b — about 1.3:1 on the page base, so the "how far through am I" strip is
-     effectively invisible. Only the unfinished markers need the ring: a solved one is
-     filled with Khan's status green, which carries the signal on its own. Size (12px
-     current vs 8px pending) is the only cue Khan draws natively, and it survives. */
+     `div[role="img"]` with a `data-testid` of `exercise-progress-N-<state>`. The
+     strip is MONOCHROME — Khan paints every marker its light-page ink (#21242c) and
+     encodes state by shape alone: an unanswered problem is a hollow 2px ring, an
+     answered one a solid disc, and the one you are on is 12px instead of 8px. Both
+     halves need restating on dark, and they are two different properties.
+     The ring: the blanket `* { border-color }` reset near the end of this file drops
+     it to #2d333b, about 1.3:1 on the page base. */
   [data-testid^="exercise-progress-"][data-testid*="-incomplete"] {
     border-color: #5fb0e6 !important;
+  }
+  /* The disc: an answered marker has NO border, so the `#main-content [class]`
+     neutralizer flattening its fill to transparent leaves it rendering as nothing
+     at all — the strip loses every problem you have already done. Same blue as the
+     ring, so filled = done / hollow = to do survives exactly as Khan draws it.
+     Every state that is not `-incomplete` is a disc, so the four suffixes below are
+     the whole set; `-incorrect` cannot match `$="-correct"` because the character
+     before `correct` is `n`, which keeps the two selectors disjoint. */
+  [data-testid^="exercise-progress-"][data-testid$="-correct"],
+  [data-testid^="exercise-progress-"][data-testid$="-correct-current"],
+  [data-testid^="exercise-progress-"][data-testid$="-incorrect"],
+  [data-testid^="exercise-progress-"][data-testid$="-incorrect-current"] {
+    background-color: #5fb0e6 !important;
   }
 
   /* Wonder Blocks renders a button's leading icon as an EMPTY <span> whose
@@ -1061,6 +1108,12 @@
      four, turning "nothing" into a solid 24px diamond floating in the cookie-list
      panel. Keep it invisible. */
   #onetrust-consent-sdk #ot-anchor { border-color: transparent !important; }
+  /* The weekly-streak counter in the "Start leveling up" banner above every lesson
+     page is a `border: 1px solid transparent` box, so the same blanket rule paints
+     all four sides and draws a grey rectangle around the flame that Khan never
+     draws. `div[tabindex]` is the counter's shape inside that banner — its only
+     focusable siblings there are an <h2> and an icon <span>. */
+  .stp-animated-banner div[tabindex] { border-color: transparent !important; }
 
   /* ====================================================================
      Soften any remaining bright borders across the app

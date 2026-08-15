@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean dark theme for itch.io's homepage, browse, jams, community and profiles that keeps game art, sale ribbons and creators' own page designs untouched.
-@version      20260809.22.48
+@version      20260814.23.05
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -407,6 +407,12 @@
     background-color: #30363d !important;
     color: #c4cdd6 !important;
   }
+  /* Two shapes, one class: `div.post_comments` is the count pill in a devlog/blog card, but on
+     a blog post page `section.post_comments` is the whole comment thread (1060x1842), where the
+     pill fill reads LIGHTER than the #1c2128 post cards stacked inside it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) section.post_comments {
+    background-color: transparent !important;
+  }
   /* Bundle / sale rows */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .sale_row,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .sale_footer {
@@ -463,6 +469,14 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .next_page a { color: #fa7d8c !important; }
   /* Keep header nav buttons borderless (blanket rule adds a faint box otherwise) */
   .primary_header .header_buttons a.header_button { border-color: transparent !important; }
+  /* Each nav item carries `border-top/bottom: 4px solid transparent` as a spacer and itch
+     colours the BOTTOM one #FF2449 on :hover and on the current section's tab — the rule above
+     pins all four sides transparent, so the desktop nav has no hover feedback and no
+     "you are here" mark. Must stay after it (and above the blanket reset on specificity). */
+  .primary_header .header_buttons a.header_button:hover,
+  .primary_header .header_buttons a.header_button.active {
+    border-bottom-color: #fa7d8c !important;
+  }
   /* Preserve the add-to-collection button's brand-red outline */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .action_btn.add_to_collection_btn { border-color: rgba(218, 44, 73, 0.7) !important; }
   /* The hover tools sit on a translucent plate over arbitrary cover art, which is why itch
@@ -497,6 +511,17 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .button.outline:hover {
     background-color: #21262d !important;
     color: #ffa2ad !important;
+  }
+  /* `.outline_button` (a different class from `.button.outline`) fills brand red with a white
+     label on hover EVERYWHERE itch uses it — /directory, /tags, the community stat header, the
+     home app banner, the /developers guide nav. The blanket accent-hover only shifts the label
+     one shade, and where we pin a dark fill (the directory's "See all …") that is the whole
+     feedback. The second selector matches the pinned-fill scope's specificity plus :hover. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .outline_button:hover,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .content_type .outline_button:hover {
+    background-color: #e8446a !important;
+    border-color: #e8446a !important;
+    color: #ffffff !important;
   }
   /* More links that BECOME a filled itch-red pill on hover/selection: the blanket accent
      rule leaves accent-on-accent (~1.9:1) where itch ships white. Same class as .post_type a. */
@@ -1305,6 +1330,19 @@
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
   }
+  /* "I like it" / "I don't like it" carry their whole hover AND selected state in a green
+     (#45B976) / blue (#5E88A0) border plus a 10% tint — the pinned fill and border above are
+     !important, so without these the two buttons look identical to each other and to rest. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page .rating_btn.positive_btn:hover,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page .rating_btn.positive_btn.selected {
+    background-color: #1d3327 !important;
+    border-color: #45b976 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page .rating_btn.negative_btn:hover,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .randomizer_page .rating_btn.negative_btn.selected {
+    background-color: #1b2831 !important;
+    border-color: #5e88a0 !important;
+  }
 
   /* ==== Directory (itch.io/directory) ==== */
   /* Another whole page type: the facet grid is a #fff sheet holding dark cards, and each
@@ -1453,9 +1491,25 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_link a {
     color: #ffffff !important;
   }
+  /* The app banner is a mid-tone rgb(73,88,103) gradient band, so itch labels its "Download app"
+     button white inside a translucent-white ring. The blanket accent lands at 2.9:1 on the band
+     and the border reset draws a near-black ring around it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .app_banner .outline_button {
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+  }
   /* The app banner's "Download app" outline button flips to a solid brand-red fill on hover,
      where itch writes the label white; the blanket accent-hover leaves accent-on-red at 2.3:1. */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .app_banner .outline_button:hover {
+    color: #ffffff !important;
+  }
+  /* The browse pages' "itch.io is now on YouTube!" promo is a saturated rgb(15,136,228) band
+     with a #FF2449 offset shadow; itch writes every line on it white. The blanket accent drops
+     the subtitle to 1.5:1 on that blue. Its `.button.outline` child keeps our chip styling —
+     that rule outranks these on specificity. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_banner,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_banner p,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .youtube_banner h4 {
     color: #ffffff !important;
   }
   /* Featured-game promo panel ships a 30% white overlay -> washed grey on dark; darken it */

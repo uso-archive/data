@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260809.22.55
+@version      20260814.23.10
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -377,6 +377,54 @@
     color: var(--wx-text-muted) !important;
   }
 
+  /* the INTERNATIONAL locales (/de-DE/, /fr-FR/, ... -- the same domain, so inside this
+     block) never migrated to the SPA: their Today page is the legacy Daybreak
+     TodayDetailsCard, whose whole details grid paints BOTH the label and the value with
+     the Helios ink #252422 -- Max/Min, Wind, Humidity, Dew point, Pressure, UV index,
+     Visibility, Moon phase, eight rows at ~1.1:1 on our dark card, i.e. the entire block
+     of numbers a forecast exists to show. The US routes never render this module (a US
+     /weather/today redirects to the SPA), so sampling page TYPES on a US location cannot
+     reach it. Both inks are achromatic natively (checked against the detached sheet), so
+     one uniform lift restores the grid without inventing a hue. Wind and Pressure format
+     their value through their own wrapper span, which carries the ink directly, so a
+     matched rule beats the colour inherited from the row. */
+  [data-testid="WeatherDetailsListItem"] [class*="WeatherDetailsListItem--label"],
+  [data-testid="WeatherDetailsListItem"] [class*="WeatherDetailsListItem--wxData"],
+  [data-testid="WeatherDetailsListItem"] [class*="Wind--windWrapper"],
+  [data-testid="WeatherDetailsListItem"] [class*="Pressure--pressureWrapper"],
+  /* the day-part table under it (Morgens / Nachmittags / Abends / Nachts) puts the
+     chance-of-rain cell at #2b2b2b, so the one number in that row that varies is the
+     one that disappears. */
+  [class*="Column--precip"],
+  /* and the legacy Air Quality page (/xx-XX/forecast/air-quality/l/...) ships the same
+     ink on its "Air Quality Index" info link and on the "Source" title inside the
+     legend popover. */
+  [class*="AirQuality--moreDetailsText"],
+  [class*="AirQuality--popoverTitle"] {
+    color: var(--wx-text-2) !important;
+  }
+  /* that page's per-pollutant concentration (19.36 ug/m3) is the dimmer #6f7585, which
+     reads on the site's white card and 3.4:1 on ours -- an AA fail at 14px. */
+  [class*="AirQualityText--measurement"] {
+    color: var(--wx-text-muted) !important;
+  }
+  /* the same locales' news hubs (/de-DE/neuigkeiten/*, /de-DE/wissen/*) list their
+     stories through the legacy `CollectionMediaList`, whose headline AND standfirst are
+     both #252422 on the anchor's own wrapper -- so the entire article list rendered as
+     ten thumbnails, ten timestamps and nothing else. The `Ellipsis--ellipsis` span that
+     holds the words is a truncation utility with no colour of its own, so the two
+     wrappers are what has to be lifted; the timestamp beside them is the dimmer #6f7585
+     (3.4:1) and takes the muted token. */
+  [class*="CollectionMediaList--title"] {
+    color: var(--wx-text) !important;
+  }
+  [class*="CollectionMediaList--caption"] {
+    color: var(--wx-text-2) !important;
+  }
+  [class*="CollectionMediaList--date"] {
+    color: var(--wx-text-muted) !important;
+  }
+
   /* EVERY legacy Helios icon (`Icon--icon--<hash>`) paints its glyph with the design
      system's INK -- #252422 or #2b2b2b -- reaching it three different ways: as a literal
      `fill` attribute, as a CSS `fill` on a path with no attribute at all, and as
@@ -421,6 +469,13 @@
      the divider reads as one continuous rule. */
   [class*="SocialLogin--divider"] span {
     background-color: var(--wx-base) !important;
+    color: var(--wx-text-muted) !important;
+  }
+  /* the same form's footer separates "Terms of Use" from "Privacy Policy" with a
+     literal `<span> | </span>` carrying the Helios ink #2b2b2b -- 13:1 on the site's
+     white page, 1.24:1 on ours, so the two links run together. It is punctuation, not
+     a link, so it takes the muted ink rather than the link colour. */
+  [class*="MemberLoginForm--separator"] {
     color: var(--wx-text-muted) !important;
   }
 
@@ -1039,6 +1094,17 @@
   a[class*="Button--default"]:hover h1,
   a[class*="Button--default"]:hover h2,
   a[class*="Button--default"]:hover h3 {
+    color: var(--wx-link-hover) !important;
+  }
+  /* the /video rail's card titles are <h2 class="text-gray-900 group-hover:text-[#1B4DE4]">:
+     the whole card is the `.group`, and hovering it is the rail's ONLY affordance. That
+     class is a Tailwind GROUP-variant, so it compiles to a variant-prefixed name no plain
+     selector reaches, while `h1..h6 / .text-gray-900` above matches the same <h2> with
+     !important -- so all ten titles stayed white and hovering a card changed nothing.
+     Scope the restore to the hovered .group: the variant class sits in the class list at
+     rest too, so unconditionally it would paint every title blue. #1b4de4 itself is 2.7:1
+     on our base, so use the theme's hover blue as the headings above do. */
+  .group:hover [class*="group-hover:text-[#1B4DE4]"] {
     color: var(--wx-link-hover) !important;
   }
   /* weather.com's solid brand CTAs ("See Details", ...) are `bg-brand-400`/`-300`
@@ -1854,17 +1920,19 @@
     stop-opacity: 1 !important;
   }
 
-  /* the article Share popover draws its pointer notch as two stacked
+  /* EVERY shadcn popover draws its pointer notch as two stacked
      `<svg class="fill-white">` polygons (a shadow layer under a fill layer)
      rather than a bordered CSS triangle, so the blanket border reset never
      touches it and the popover body's own dark fill never reaches it: a bright
-     white arrowhead hung off the bottom edge of an otherwise dark panel. The
-     notch must match the popover surface, so scope it to the popover -- a global
-     `fill-white` remap would blacken the play/overlay glyphs the site paints
-     white on top of photo thumbnails. */
-  [data-testid="share-popover-content"] svg[class*="fill-white"],
-  [data-testid="share-popover-content"] svg[class*="fill-white"] polygon,
-  [data-testid="share-popover-content"] svg[class*="fill-white"] path {
+     white arrowhead hung off the edge of an otherwise dark panel. Both the
+     article Share popover and the AQI / UV "Levels" legend behind each module's
+     info button use it. The notch must match the popover surface, so scope it to
+     `[data-slot="popover-content"]` (the design-system's own wrapper, which every
+     one of them carries) -- a global `fill-white` remap would blacken the
+     play/overlay glyphs the site paints white on top of photo thumbnails. */
+  [data-slot="popover-content"] svg[class*="fill-white"],
+  [data-slot="popover-content"] svg[class*="fill-white"] polygon,
+  [data-slot="popover-content"] svg[class*="fill-white"] path {
     fill: var(--wx-surface) !important;
   }
 
@@ -2039,6 +2107,19 @@
      2.4:1 on its own fill. */
   .nav-pill-active {
     color: #204794 !important;
+  }
+  /* its SIBLINGS (Topics / Privacy / Alerts / What's New) sit directly on that same
+     navy #204794 band, where the site paints them white at 72% alpha. The anchor rule
+     repainted them --wx-link, which is 3.68:1 on the navy (an AA fail) and reads as a
+     row of body links rather than a nav bar. The band is the site's own brand colour
+     and is never darkened, so the label has to go back to white. `.link-style` is
+     used ONLY by these four. The site gives them no hover state at all; brightening
+     to full white keeps the nav's own hue instead of the blue our `a:hover` forces. */
+  .link-style {
+    color: rgba(255, 255, 255, 0.72) !important;
+  }
+  .link-style:hover {
+    color: #ffffff !important;
   }
   /* the help centre's own accents are Salesforce-dark and drop below 3:1 once
      the surface behind them is: the AI-help heading, the muted brand badge,

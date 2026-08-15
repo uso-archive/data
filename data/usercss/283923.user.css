@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Avito that's easy on the eyes, perfect for late-night browsing.
-@version      20260809.22.45
+@version      20260814.23.03
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -637,6 +637,35 @@
   [class*="root_preset_paySecondary"],
   [class*="root_preset_paySecondary"] * {
     color: #c3a3f5 !important;
+  }
+  /* Avito's ad blocks now build their "Подробнее" CTA from the DS Button's NEUTRAL
+     `secondary` preset — a `#f2f1f0` fill with a black label, not the soft-blue
+     `accentSecondary` the container arm above was written for — so that arm invented
+     a brand tint on twenty CTAs the site paints grey. An explicit preset must outrank
+     the container, hence the (0,2,1) pairing. */
+  [class*="avito-ads-container"] button[class*="root_preset_secondary"] {
+    background-color: #262c35 !important;
+    border-color: var(--av-border) !important;
+  }
+  [class*="avito-ads-container"] button[class*="root_preset_secondary"],
+  [class*="avito-ads-container"] button[class*="root_preset_secondary"] * {
+    color: var(--av-text-soft) !important;
+  }
+  /* Design-system BADGE. Both of its presets paint through
+     `--module-badge-backgroundColor` (`primary` is the sale red `#ff4053` with a white
+     label; `secondary` is a near-black chip, already covered by the preset rule above),
+     so the div-neutraliser wipes them — the category mega-menu's "Новое" flag rendered
+     as bare grey text with no pill at all.
+     `root_preset_primary` is shared with the Button (a `<button>`, promoted to the
+     accent above) and the Spinner (a div), so both properties are read from the badge's
+     OWN tokens with a fallback: a Spinner leaves them unset and keeps today's flat
+     treatment, while a Badge resolves them. Redefining the sale token on the same
+     element lands the pill on the refined red the theme uses for every other red fill
+     (5.0:1 against the white label) rather than the raw brand hue. */
+  div[class*="root_preset_primary"] {
+    --theme-semantics-components-badge-bg-sale: #c8323f;
+    background-color: var(--module-badge-backgroundColor, transparent) !important;
+    color: var(--module-badge-color, var(--av-text-soft)) !important;
   }
   /* Search / company-card "Показать телефон" reveal CTA (marker
      `item-phone-button/undefined`) is natively a SOFT light-blue button
@@ -1505,31 +1534,41 @@
      The component's whole preset vocabulary is eight names, read off Avito's own
      stylesheet; each is a semantic bg token, so each keeps its hue and sinks to the tone
      the theme already uses for that meaning. `beige`/`warmGray`/`white` are the neutral
-     ones and take the plain elevated surface. */
+     ones and take the plain elevated surface.
+     `background-image` must be cleared on the same layer: a caller can hand the card an
+     inline stack of pastel `radial-gradient`s (the seller profile's "Лучшие предложения"
+     showcase cards ship three of them), which layers over any background-COLOR and left
+     those cards near-white with the theme's light-grey ink on top at about 1.2:1. */
   [class*="root_preset_blue"] [class*="styles-module-background_color"] {
     background-color: #1d2c3a !important;
+    background-image: none !important;
     border-color: #2f4a63 !important;
   }
   [class*="root_preset_green"] [class*="styles-module-background_color"] {
     background-color: #16291d !important;
+    background-image: none !important;
     border-color: #24452e !important;
   }
   [class*="root_preset_red"] [class*="styles-module-background_color"] {
     background-color: #2e1a1d !important;
+    background-image: none !important;
     border-color: #4a2a2f !important;
   }
   [class*="root_preset_orange"] [class*="styles-module-background_color"] {
     background-color: #2a2116 !important;
+    background-image: none !important;
     border-color: #3d3120 !important;
   }
   [class*="root_preset_violet"] [class*="styles-module-background_color"] {
     background-color: #2b2140 !important;
+    background-image: none !important;
     border-color: #40325e !important;
   }
   [class*="root_preset_beige"] [class*="styles-module-background_color"],
   [class*="root_preset_warmGray"] [class*="styles-module-background_color"],
   [class*="root_preset_white"] [class*="styles-module-background_color"] {
     background-color: var(--av-surface) !important;
+    background-image: none !important;
     border-color: var(--av-border) !important;
   }
   /* The Beduin Gradient component (promo strips such as the vacancies hub's "В отпуск
@@ -1542,6 +1581,19 @@
   [style*="--beduin-gradient"] {
     background-image: none !important;
     background-color: var(--av-surface) !important;
+  }
+  /* Partner promo card on the item page ("Получите кешбэк от Альфа‑Банка"): a soft-red
+     `#ffe0e0` panel whose fill arrives as an inline `background:` SHORTHAND on a
+     hash-classed div, so no class hook and no `background-color:` selector reaches it
+     and the div-neutraliser wiped the card outright — heading, body and CTA floated on
+     the bare canvas with no panel behind them. Takes the same red-tinted surface as the
+     Banner's `red` preset. Both `rgb()` spellings and both hex cases are listed for the
+     reason the badge rules list them. */
+  [style*="background: rgb(255, 224, 224)"],
+  [style*="background:rgb(255, 224, 224)"],
+  [style*="background:#FFE0E0"], [style*="background:#ffe0e0"] {
+    background-color: #2e1a1d !important;
+    border-color: #4a2a2f !important;
   }
 
   /* ---- Model-rating badge (item page) ---- */
@@ -1806,7 +1858,18 @@
   }
 
   /* ---- Footer ---- */
-  footer, [data-marker*="footer"] {
+  /* Only the legacy error/404 template ships a real `<footer>`, and there it IS the
+     full-width page footer, so it takes the header tone.
+     The modern template has no `<footer>` at all: `[data-marker="footer"]` is just the
+     1200px CONTENT COLUMN, and the full-width band around it lives on a wrapper under
+     pure build hashes. Painting the marker therefore stamped a hard-edged near-black
+     slab into the middle of the page — canvas showing 40px either side and 80px below
+     it. The band is unreachable, and natively it is `#f7f7f5` against a `#fff` page: a
+     3% step with no meaningful dark counterpart, so the column is left on the canvas
+     rather than given an edge the site never draws. The `*=` arm still carries the link
+     ink, and must not carry a fill — it also matches every descendant marker
+     (`footer/regions/seo-link`, `footer/more/toggle`, …), not just the column. */
+  footer {
     background-color: var(--av-header) !important;
     border-color: var(--av-border) !important;
   }

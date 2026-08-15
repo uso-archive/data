@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260809.22.46
+@version      20260814.23.03
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -349,6 +349,11 @@
   .ShotMapFilterButtons__Pill--active.Button--default {
     background-color: #2d333b !important; border-color: #4a525b !important;
     color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
+  /* The panel those All-Periods / All-Players dropdowns open is a separate component:
+     .FilterOptions ships a #f9f9fb body while its .FilterOptions__Heading strip is already
+     token-driven and darks, so the popover rendered as a dark title bar over a white sheet
+     with our light option labels on it (~1.6:1). Only rendered once a dropdown is clicked. */
+  .FilterOptions { background-color: #1c2128 !important; }
 
   /* ---- Tabs ---- */
   .tabs__list, .Tabs, .mod-tabs, .ui-tabs-nav, .ContentList__Tabs {
@@ -429,6 +434,21 @@
   #onetrust-pc-btn-handler {
     background-color: transparent !important; color: #e6edf3 !important;
     border-color: #8b949e !important; }
+  /* The panels' inline links ("Cookie Policy", "List of Partners (vendors)") keep OneTrust's
+     tenant blue #0079bc — 4.7:1 on the original white, 3.4:1 once the panel is dark. The
+     token it resolves (--ot-action-blue on #onetrust-consent-sdk) also fills the Accept /
+     Reject buttons, where white-on-#0079bc still passes, so the token must stay put and the
+     links be repainted instead. OneTrust's own rule is `!important` at (2,0,1), so the
+     leading `body` is what wins the tie — and the `[href]` has to be carried too, because
+     OneTrust's winning selector is `#onetrust-consent-sdk #onetrust-banner-sdk a[href]`,
+     whose attribute selector out-specifies a plain `a`. */
+  body #onetrust-consent-sdk #onetrust-banner-sdk a[href],
+  body #onetrust-consent-sdk #onetrust-banner-sdk .ot-link-btn,
+  body #onetrust-consent-sdk #onetrust-pc-sdk a[href],
+  body #onetrust-consent-sdk #onetrust-pc-sdk .ot-link-btn,
+  body #onetrust-consent-sdk #onetrust-pc-sdk .ot-ven-link,
+  body #onetrust-consent-sdk #onetrust-pc-sdk .privacy-notice-link {
+    color: #5fb0e6 !important; }
   /* The brand wordmark and the close control are black artwork on transparent, so no colour
      rule reaches either. The wordmark is a REPLACED-content image (`content: url(data:…)`)
      on the .ot-pc-logo box itself — its nested <img> is 0x0 and inverting that paints
@@ -561,6 +581,23 @@
   /* division / conference group headings inside the Teams mega-panel */
   #global-nav-secondary li.has-sub > div .label,
   #global-nav-secondary li.has-sub > div .conference { color: #9aa4ae !important; }
+  /* The Teams / Leagues-&-Teams entry of a sport flyout opens a SECOND panel to its right
+     (soccer, cricket, eredivisie, fantasy). ESPN paints its 416px board #f1f2f3 and its row
+     hover #fff, both on an unclassed `div` reachable only by excluding its two classed
+     siblings — no .submenu-wrapper / .dropdown-container rule of ours reaches it, so it shipped
+     as a light frame around the (already darked) team list. ESPN's own
+     [data-appearance='dark'] half is #1d1e1f board / #48494a hover; mirror it in the
+     theme's palette. Two levels of closed state: the flyout, then the nested board. ---- */
+  #global-nav ul > li.teams div:not(.link-text):not(.nav-logo-wrap),
+  #global-nav ul > li.leagues-teams div:not(.link-text):not(.nav-logo-wrap),
+  #global-nav-secondary ul li.teams div:not(.link-text):not(.nav-logo-wrap) {
+    background-color: #1c2128 !important; }
+  #global-nav ul > li.teams div:not(.link-text):not(.nav-logo-wrap) > ul > li > a:hover,
+  #global-nav ul > li.leagues-teams div:not(.link-text):not(.nav-logo-wrap) > ul > li > a:hover,
+  #global-nav-secondary ul li.teams div:not(.link-text):not(.nav-logo-wrap) > ul > li > a:hover,
+  #global-nav ul > li.teams.fantasy > div > ul li > a:hover,
+  #global-nav ul > li.leagues-teams.fantasy > div > ul li > a:hover {
+    background-color: #21262d !important; }
 
   /* ---- Header search autocomplete flyout (.search_results): opens over the nav
        as a solid white panel with dark section headers. Closed at load, so the
@@ -628,6 +665,24 @@
   .button.open-favs:hover, .global-user .button.open-favs:hover {
     background-color: #7aa1ea !important; }
 
+  /* ---- espnfitt Lightbox modal (the "Select Edition" picker the account flyout opens,
+       the mobile video playlist, the watch-provider chooser). Its shell hardcodes #fff on
+       four boxes — .lightbox__contentBox, .lightbox__content, .lightbox__header and the
+       --fullWindow/--mobile overlay — and ESPN only swaps them via `--dark` modifier
+       classes it never adds here. The title rides --text-default, which our token block
+       makes light, so the heading rendered white-on-white and the content's 20px padding
+       framed the dark list in a white band. The picker also lives in a LATE-MOUNTED
+       same-origin <iframe> (/editions?platform=iframe), so it exists in no load-time scan.
+       Only the two white overlay modifiers are named — the base .lightbox__overlay is a
+       translucent black scrim that must stay translucent. ---- */
+  .lightbox__contentBox, .lightbox__content, .lightbox__header {
+    background-color: #1c2128 !important; }
+  .lightbox__overlay--fullWindow, .lightbox__overlay--mobile {
+    background-color: #14181d !important; }
+  .lightbox__header .lightboxTitle { color: #e6edf3 !important; }
+  .lightbox__closebtn, .lightbox__closebtn svg, .lightbox__closebtn path {
+    color: #c4cdd6 !important; fill: #c4cdd6 !important; }
+
   /* ---- Video-playlist modules ("Top Videos" / "NBA Videos") — white tiles ---- */
   .mediaList, .mediaList__content, .mediaList__link, .video-playlist,
   .video-playlist-item, li.video-playlist-item, .MediaList, .MediaList--highlights,
@@ -669,6 +724,12 @@
   /* Schedule group header band (team page left rail) hardcodes a near-white
      bg-clr-gray-10 (#f9f9fb) under our already-light title text → light-on-light. */
   .Schedule__Group__Title { background-color: #1c2128 !important; }
+  /* Empty-state panel ("No Odds Available" on an out-of-season odds page, and the same
+     component wherever a Card has no rows): a solid #fff block the full width of the main
+     column with #6c6d6f copy. It only renders when the feed is empty, so a scan of a
+     populated page never sees it. */
+  .NoDataAvailable__Msg { background-color: #1c2128 !important; }
+  .NoDataAvailable__Msg__Content { color: #9aa4ae !important; }
   /* Story-body <hr> is painted by its BACKGROUND (#dcdddf), not its border, so a
      border-only override left a bright white hairline across the article. */
   hr { border-color: #2d333b !important; background-color: #2d333b !important; }
@@ -733,6 +794,15 @@
      #1c2128 chip (readable at ~5:1 on the site's original white). Lift to a brighter
      red so it clears AA while staying a live-red accent. ---- */
   .HeaderEvent--in .HeaderEvent__Headline {
+    color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
+  /* Where-to-Watch groups its schedule into sections whose <h2> is the group label —
+     "Favorites", "8:30 PM" … and "LIVE", which ESPN paints live-red through
+     --text-status-live. The blanket heading rule whitens it, so the one section header
+     that carries a state read like an ordinary time slot, while the same LIVE label on
+     every event row below it stayed red. The h2's classes are hashed; the preceding
+     sibling icon's data-icon is the stable hook (the other sections ship a different
+     icon or none). */
+  svg[data-icon="indicators-liveUpdates"] + h2 {
     color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
 
   /* ---- Search results page: the React page wrapper (#themeProvider > breakpoint
@@ -1098,8 +1168,10 @@
   .cscore_link::after { background-color: #2d333b !important; }
 
   /* ---- 404 page ships its own white hero panel + near-white quick-links block
-       (with our already-light headline text on top → light-on-light). ---- */
-  .Error404, .Error404__Wrapper, .Error404__QuickLinks {
+       (with our already-light headline text on top → light-on-light). .Error404__Footer
+       is the page's own #f9f9fb legal band — a <footer>, and the theme deliberately drops
+       the bare `footer` selector, so nothing else reaches it. ---- */
+  .Error404, .Error404__Wrapper, .Error404__QuickLinks, .Error404__Footer {
     background-color: #14181d !important; border-color: #2d333b !important; }
   .Error404__QuickLinks::before, .Error404__QuickLinks::after {
     background-color: #2d333b !important; }
@@ -1108,6 +1180,11 @@
        a light bar image, so no background rule can touch it. Invert it into a dark
        rule that reads as a divider on our base. ---- */
   img[src*="greyline"] { filter: invert(1) !important; }
+  /* The other raster divider a story body embeds (`.../charts/_end_rule.png`, used to close
+     an editorial section) is the opposite case: a solid PURE-BLACK 1296x15 bitmap with no
+     alpha, so on the dark page it renders as a black gash instead of a rule. A plain invert
+     would flip it to full white; invert then dim to the theme's divider grey. ---- */
+  img[src*="_end_rule"] { filter: invert(1) brightness(0.2) !important; }
 
   /* ---- Story "Share" flyout (.share-popup, opened by the byline Share button): a
        solid #fff card with #1d1e1f ink, `display:none` until the button adds

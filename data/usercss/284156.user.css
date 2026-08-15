@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Substack (the hub, discovery, and every publication and post) while keeping each newsletter's own accent color intact.
-@version      20260809.22.54
+@version      20260814.23.09
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -238,8 +238,13 @@
      `emailInputOnAccentBackground` sits inside the "Ready for more?" band that
      the pub's accent already paints, and takes that accent as its own fill with
      white ink + a white hairline; filling it dark drops a navy box into the
-     accent band, so it keeps the site's fill, ink AND placeholder. --- */
-  input:not([class*="emailInputOnAccentBackground"]),
+     accent band, so it keeps the site's fill, ink AND placeholder.
+     Checkboxes and radios are excluded: they render with `appearance: auto`,
+     so a background-color override replaces the whole native widget paint —
+     including the tick/dot — and a checked box becomes indistinguishable from
+     an unchecked one (the /sponsorships-signup vertical pickers). Left alone
+     they follow the `color-scheme: dark` set on :root. --- */
+  input:not([class*="emailInputOnAccentBackground"]):not([type="checkbox"]):not([type="radio"]),
   textarea,
   select {
     background-color: #1c2128 !important;
@@ -251,7 +256,7 @@
      leaves only a 20%-alpha glow as the focus cue. Skipping the focused state
      hands the border back to the site rather than restating it — elements the
      site leaves border-less on focus (the comment textarea) stay border-less. */
-  input:not([class*="emailInput"]):not([class*="email-input"]):not(:focus),
+  input:not([class*="emailInput"]):not([class*="email-input"]):not([type="checkbox"]):not([type="radio"]):not(:focus),
   textarea:not(:focus),
   select:not(:focus) {
     border-color: #2d333b !important;
@@ -304,18 +309,34 @@
      is unreachable as a decoration colour for those pubs at any thickness.
      `.button` (accent-FILLED CTA) and `.image-link` (image wrapper) are
      text-less and stay out.
-     `a[class*="color-accent-"]` is the Pencraft accent-ink utility, restricted to
-     anchors so it cannot reach the month header above. --- */
+     `[class*="color-accent-"]` is the Pencraft accent-ink utility. It lands on
+     whatever element owns the text, not always an anchor: the hub's leaderboard
+     rank line ("#24 Rising in Technology" on every /@handle) carries it on a
+     SPAN wrapping the link, so an anchor-only selector never reaches it. The
+     month header is the one carrier that must keep the muted grey set above,
+     and it wears both classes, so it is excluded here rather than relying on
+     source order. --- */
   .body.markup a:not(.button):not(.image-link),
   a.linkified {
     color: #e6edf3 !important;
     text-decoration-line: underline !important;
     text-decoration-color: currentColor !important;
   }
-  a[class*="color-accent-"],
+  [class*="color-accent-"]:not([class*="monthHeader"]),
   a.thread-head-cta {
     color: #e6edf3 !important;
   }
+  /* Search-autocomplete match highlight. It paints --color-link-fg over a
+     20%-alpha wash of the same colour, so the MATCHED word ends up less legible
+     than the plain result text around it (2.7:1 on a #9a6600 pub). The wash
+     stays — that is the hit cue. Scoped to `pubAccentTheme-`, the wrapper the
+     publication's search panel is portalled into: outside it, on the hub, the
+     same class resolves --color-link-fg from the semantic-highlight blue set
+     above, which is already the right colour and must not be flattened. */
+  [class*="pubAccentTheme"] [class*="highlight-"] {
+    color: #e6edf3 !important;
+  }
+
   /* Comment `Author` / `Liked by …` tags feed the accent into the Tag component's
      own --color-theme-fg; the outline stays accent-tinted. */
   [class*="tag-"][class*="theme_accent"] {
@@ -454,6 +475,69 @@
   #substack-home .featured-byline {
     color: #8b949e !important;
   }
+
+  /* Muted body copy on the brand-partnership routes (/sponsorships and its
+     /sponsorships-signup flow), which hardcode #777 / #6b6b6b — greys picked
+     against a cream band, so they measure 3.3-4.0:1 once the band goes dark.
+     Everything is anchored to the route's own `page-` wrapper: the module
+     stems are NOT unique to these routes (`heroSubtitle-` is white-on-orange
+     in the /about hero, `statLabel-` is already-light copy on /about), and an
+     unanchored stem repaints those grey. The loose `[class*="page-"]` is safe
+     as an ANCESTOR — it also matches the `homepage-nav*` family, but none of
+     these stems live in the nav.
+     Each stem carries its trailing `-` so the hash-suffixed base class is hit
+     without swallowing a longer sibling: `categoryTab-` must not reach
+     `categoryTabActive-`, whose #eee-on-#161718 selected state is correct.
+     `statLabel` appears in both capitalisations across the two modules. --- */
+  #substack-home [class*="page-"] [class*="heroSubtitle-"],
+  #substack-home [class*="page-"] [class*="heroDescription-"],
+  #substack-home [class*="page-"] [class*="sectionDescription-"],
+  #substack-home [class*="page-"] [class*="bulletText-"],
+  #substack-home [class*="page-"] [class*="statLabel-"],
+  #substack-home [class*="page-"] [class*="StatLabel-"],
+  #substack-home [class*="page-"] [class*="testimonialCardPub-"],
+  #substack-home [class*="page-"] [class*="testimonialCardQuote-"],
+  #substack-home [class*="page-"] [class*="bottomCtaDescription-"],
+  #substack-home [class*="page-"] [class*="categoryTab-"],
+  #substack-home [class*="page-"] [class*="campaignPromptDescription-"],
+  #substack-home [class*="page-"] [class*="stepIndicator-"],
+  #substack-home [class*="page-"] [class*="legalText-"],
+  #substack-home [class*="page-"] [class*="legalLink-"],
+  #substack-home [class*="page-"] [class*="waysToPartnerSubtitle-"],
+  #substack-home [class*="page-"] [class*="waysToPartnerCaption-"],
+  #substack-home [class*="page-"] [class*="partnerCardDescription-"],
+  #substack-home [class*="page-"] [class*="valuePropCopy-"] p,
+  #substack-home [class*="page-"] [class*="becomeSponsorSubtitle-"],
+  #substack-home [class*="page-"] [class*="becomeSponsorSectionLabel-"],
+  #substack-home [class*="page-"] [class*="becomeSponsorLegal-"],
+  #substack-home .calculator-fineprint,
+  #substack-home .borderless-calculator-fineprint,
+  #substack-home .cohort-page .form-info {
+    color: #8b949e !important;
+  }
+
+  /* /sponsorships-signup splits the viewport into a photo panel and a form
+     panel; the form panel and the page behind it keep a hardcoded #f8f6f1,
+     so every label takes our light fg and lands at ~1.1:1. The photo panel is
+     already #1a1a1a and stays.
+     The `page-` stems are matched at a word boundary — a bare `[class*="page-"]`
+     would also swallow the whole `homepage-nav*` family. --- */
+  #substack-home [class^="page-"],
+  #substack-home [class*=" page-"],
+  #substack-home [class*="page-"] [class*="rightPanel-"] {
+    background-color: #14181d !important;
+  }
+  /* Its "Back" button is drawn for that cream: #1a1a1a ink inside a 15%-black
+     hairline, and a 4%-black hover wash. All three vanish once the panel is
+     dark, leaving an invisible control beside the orange submit. */
+  #substack-home [class*="page-"] [class*="secondaryButton-"] {
+    color: #e6edf3 !important;
+    border-color: #2d333b !important;
+  }
+  #substack-home [class*="page-"] [class*="secondaryButton-"]:hover {
+    background-color: #262c33 !important;
+  }
+
   /* The /features closing CTA paints its body copy with the light-scheme
      SURFACE primitive (`color: var(--color-light-bg-primary)`) so that it
      reads white on the green band. We remap that primitive to #14181d, which
@@ -601,6 +685,31 @@
   a {
     color: #00cc99;
   }
+  /* The floating "return to top" control is the one place the theme spends the
+     green as INK rather than as a fill: glyph and outline both #006f5c (2.9:1
+     here), and its hover goes DARKER still (#003229, 1.4:1) because on white
+     that reads as pressed. It is a `button`, so the `a` rule above misses it,
+     and it only enters the viewport once the theme's own JS adds `.is-active`
+     (it parks at `bottom: -50px`). Hover moves up the ramp, not down. */
+  .lt-scroll-to-top {
+    color: #00cc99 !important;
+    border-color: #00cc99 !important;
+  }
+  .lt-scroll-to-top:hover,
+  .lt-scroll-to-top:focus {
+    color: #66e0bd !important;
+    border-color: #66e0bd !important;
+  }
+
+  /* Breadcrumb ancestors are a hardcoded #6b7280 (3.7:1 on this canvas) rather
+     than the --meta-text-color the rest of the metadata uses. The current crumb
+     keeps the bright ink from the list above — its `:last-child` selector
+     outranks this one. The `›` separators are a pseudo carrying the same grey. */
+  .breadcrumbs > li a,
+  .breadcrumbs > li + li::before {
+    color: #8b949e !important;
+  }
+
   .lt-footer__copyright a,
   .lt-topbar__link:hover,
   .lt-topbar__link:focus,

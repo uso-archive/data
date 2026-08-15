@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A full dark theme for Thingiverse: browse the feed, model pages, search and profiles in comfortable dark while 3D model previews stay true to color.
-@version      20260809.22.54
+@version      20260814.23.10
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -220,6 +220,14 @@
   [class*="HomePageBanner__homeBanner--"] .carousel .control-dots .dot,
   [class*="HomePageBanner__homeBanner--"] .carousel .control-dots .dot.selected {
     background-color: #ffffff !important; }
+
+  /* A group's header bar is `background: no-repeat #248bfb` with a decorative
+     gif laid over the left of it at the gif's own natural width. The
+     neutralizer eats the colour but not the image, so the band stops where the
+     gif does and the rest of the row falls through to the page. Keep the site's
+     own blue verbatim: the gif is painted in that exact hue, so any other value
+     seams down the middle of the bar. */
+  [class*="GroupHeader__groupHeader--"] { background-color: #248bfb !important; }
 
   /* The membership hero is a brand gradient that runs MakerBot blue down to
      #f6f7fa — drawn to hand off into the white page below it. On dark it ends in
@@ -545,6 +553,17 @@
   h1, h2, h3, h4, h5, h6 { color: #e6edf3 !important; }
   p, li, dd, dt, blockquote, figcaption, td, th, caption, label, time, small {
     color: #c4cdd6 !important; }
+  /* A group forum row wraps its <h3> in a bare <a>, so the accent reaches the
+     title only by inheritance and the h1-h6 ink above beats it — the title, which
+     IS the row's click target, then renders as static copy. Both members of the
+     family need it: topics and comment hits are separate components. (Sibling
+     headings inside anchors that the site DOES colour itself stay as they are:
+     `GroupCard__groupTitle` is `--tv-content-secondary` by rule, the collection
+     card title is `--tv-content-inverse` white on its indigo panel, and the blog's
+     `dib-post-title` inherits Dropinblog's #333 — that one NEEDS the light ink.) */
+  [class*="GroupTopic__groupTopicTitle"],
+  [class*="GroupSearchComment__groupSearchCommentTitle"] { color: #5fb0e6 !important; }
+
   /* Homepage hero tagline: the dark-navy "Thingiverse" brand word -> light */
   [class*="HomePageTagline"], [class*="HomePageTagline"] [class*="brand"] {
     color: #e6edf3 !important; }
@@ -766,12 +785,14 @@
   img[src*="developers-environment"], img[src*="developers-apps"] {
     filter: invert(0.94) !important; }
 
-  /* /legal's card icons are greyscale rasters whose whole plate is dark (policy
-     tops out at Y=51, terms at Y=153) — they were the figure against the white
-     page and are now near-invisible on the card. Inverting keeps the plate/glyph
-     relationship and puts the figure back. `privacy-policy` is already a light
-     plate and is left alone; its path does not contain `/images/policy`. */
-  img[src*="/site/assets/images/policy"], img[src*="/site/assets/images/terms"] {
+  /* /legal's card icons are greyscale rasters whose plate is dark (policy tops out
+     at Y=51, terms at Y=153, the privacy shield's median is Y=51 with white
+     detailing on top) — they were the figure against the white page and read
+     ~1.3:1 on the card. Inverting keeps the plate/glyph relationship and puts the
+     figure back. All three must be listed: `privacy-policy` sits in the same card
+     grid, so leaving it out left one near-invisible icon beside two bright ones. */
+  img[src*="/site/assets/images/policy"], img[src*="/site/assets/images/terms"],
+  img[src*="/site/assets/images/privacy-policy"] {
     filter: invert(1) !important; }
 
   /* /about/advertising's "Our Previous Partners" strip shows third-party
@@ -833,15 +854,22 @@
   /* ====================================================================
      Footer
      ==================================================================== */
-  /* A lowercase `[class*="footer"]` is deliberately absent here: the legacy shell
-     carries `fixed-footer` on <body>, so that substring matches the entire page —
-     the descendant `a` form then outranks `.tv-button--primary` and repaints every
-     header CTA label the footer link blue. The React footer is `Footer__footer*`;
-     the legacy one is `.site-footer` / `.footer-links` inside `.page-container`. */
-  footer, [class*="Footer"], .page-container .site-footer,
+  /* The hook must carry the component prefix, not the bare word: a lowercase
+     `[class*="footer"]` matches the whole legacy page (<body class="… fixed-footer">),
+     and a bare `[class*="Footer"]` matches every OTHER component with a footer
+     region — `GroupTopic__groupTopicFooter` (each forum-list card),
+     `SearchFilterModal__searchFiltersModalFooter` (the Filters modal action bar),
+     `PreviewModal__modalFooter`, `Footer__subscriptionCardFooter` — dropping the
+     footer BAR's #0d1117 into the middle of a card or modal. The descendant `a`
+     form is the worse half: at (0,2,0) it outranks `.tv-button--primary`, so any
+     anchor CTA inside one of those regions loses its white label to the footer
+     link blue. The React footer is `Footer__footer*` (root, sections, socials,
+     newsletter and nav links all carry that prefix); the legacy one is
+     `.site-footer` / `.footer-links` inside `.page-container`. */
+  footer, [class*="Footer__footer"], .page-container .site-footer,
   .page-container .footer-links {
     background-color: #0d1117 !important; border-color: #2d333b !important; color: #c4cdd6 !important; }
-  footer a, [class*="Footer"] a, .page-container .site-footer a,
+  footer a, [class*="Footer__footer"] a, .page-container .site-footer a,
   .page-container .footer-links a { color: #9bd4ff !important; }
 
   /* ====================================================================

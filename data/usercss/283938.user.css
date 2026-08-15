@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Neoseeker, easy-on-the-eyes walkthroughs, guides, cheats and FAQs, plus the home, game hubs, wikis, search and forums.
-@version      20260809.22.50
+@version      20260814.23.06
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -533,6 +533,27 @@
     color: var(--neo-link-hover) !important;
   }
 
+  /* AdSense's keyword annotation wraps a word of the site's OWN section-header text
+     ("Popular Games" on the platform hubs) in `a.google-anno` and pins it with an
+     INLINE `color:#000 !important` — which no author rule can outrank, so that word
+     goes black on the dark strip and the heading reads with a hole in it. The one
+     lever left is inheritance: the annotation also inlines
+     `-webkit-text-fill-color:unset`, and text-fill wins over `color` when painting.
+     `unset` resolves to the PARENT's computed fill, so an explicit fill on the strip
+     is what the annotation renders in. Only an explicit colour works — the default
+     `currentcolor` is inherited as the keyword and re-resolves against the
+     annotation's own black. Every real descendant is handed `currentcolor` back so
+     it keeps painting its OWN colour — the strip's links, and the activity byline's
+     quieter `.timeago` — while the annotation, which inlines the property away,
+     cannot take it and falls through to the strip's explicit value. */
+  .section-header {
+    -webkit-text-fill-color: var(--neo-text) !important;
+  }
+
+  .section-header * {
+    -webkit-text-fill-color: currentColor !important;
+  }
+
   /* Every news article closes with a "Related news stories" box whose body,
      `div.related_box div.related_content`, is painted by a WHITE
      `linear-gradient(#dadada 1%, #ffffff 11%)` background-IMAGE over a transparent
@@ -804,6 +825,41 @@
 
   table.releases_list th.release_day {
     background-color: var(--neo-elev2) !important;
+  }
+
+  /* Each row's platform cell is a vendor COLOUR CODE, not a list of links: the site
+     prints `a.sony` #0054c4, `a.nintendo` #a40000, `a.microsoft` #538401 and `a.pc`
+     a neutral #585a63, deliberately outside its link blue. The blanket link rule
+     painted all four the same accent, so "PC, Xbox Series X, PS5" read as one run.
+     Re-assert the four hues at dark-theme luminance. Scoped to the row cell: the
+     same classes are also the `#releases_tabs` filter chips, whose signal is the
+     active chip's fill and whose label must stay legible on it. */
+  td.releases_item_platforms a.sony,
+  td.releases_item_platforms a.sony:link,
+  td.releases_item_platforms a.sony:visited {
+    color: #6aa9f0 !important;
+  }
+
+  td.releases_item_platforms a.nintendo,
+  td.releases_item_platforms a.nintendo:link,
+  td.releases_item_platforms a.nintendo:visited {
+    color: #f0665f !important;
+  }
+
+  td.releases_item_platforms a.microsoft,
+  td.releases_item_platforms a.microsoft:link,
+  td.releases_item_platforms a.microsoft:visited {
+    color: #7ec850 !important;
+  }
+
+  td.releases_item_platforms a.pc,
+  td.releases_item_platforms a.pc:link,
+  td.releases_item_platforms a.pc:visited {
+    color: #a8adb8 !important;
+  }
+
+  td.releases_item_platforms a:hover {
+    color: var(--neo-link-hover) !important;
   }
 
   /* The N+ membership page (`/nplus/`) styles its two plan cards from a page-local
@@ -1237,11 +1293,15 @@
   }
 
   /* ---- Buttons ---------------------------------------------- */
+  /* `.add-on` is Bootstrap 2's name for `.input-group-addon` — the chip glued to
+     an `.input-append`/`.input-prepend` field (the genre pages' "in <Genre>" scope
+     tag on `#game_finder`). It keeps Bootstrap's `#eee` fill under our light ink. */
   .btn,
   button,
   input[type="submit"],
   input[type="button"],
-  .input-group-addon {
+  .input-group-addon,
+  .add-on {
     background-color: var(--neo-elev2) !important;
     background-image: none !important;
     border-color: var(--neo-border) !important;
@@ -1361,6 +1421,25 @@
   a.btn-inverse.active:hover {
     background-color: var(--neo-blue) !important;
     border-color: #265572 !important;
+    color: #ffffff !important;
+  }
+
+  /* Same erasure on the UNMODIFIED chip: Bootstrap's default `.btn` toggles mark the
+     pressed one with a flat #e6e6e6 fill plus an inset shadow, against the #f5f5f5
+     gradient of the rest — both cleared by the base rule. That is the release-year
+     `.btn-toolbar` on every genre listing, where every year then looks selected.
+     `:hover` above shares this specificity, so the chip must be named after it and
+     carry its own hover step or a pointer over the selected year would unset it. */
+  .btn.active,
+  button.btn.active {
+    background-color: var(--neo-blue) !important;
+    border-color: #265572 !important;
+    color: #ffffff !important;
+  }
+
+  .btn.active:hover,
+  button.btn.active:hover {
+    background-color: #3a80ad !important;
     color: #ffffff !important;
   }
 
@@ -2246,6 +2325,21 @@
     color: var(--neo-text-2) !important;
   }
 
+  /* The strip that closes the results list — `.mw-search-pager-bottom`, holding
+     "previous 20 | next 20 (20 | 50 | 100 …)" — is an #e5e5e5 band the skin only
+     paints on the BOTTOM copy (`.mw-search-pager-top` is bare), so it lands as a
+     bright bar carrying our light ink and accent links at ~1.3:1. It is 30px tall,
+     under the scan's light-surface floor. Its per-result "N KB (N words)" byline is
+     MediaWiki's #558f64, 4.4:1 here — lift it and keep the green. */
+  .mw-search-pager-bottom {
+    background-color: var(--neo-elev) !important;
+    border-color: var(--neo-border) !important;
+  }
+
+  .mw-search-result-data {
+    color: #63a874 !important;
+  }
+
   /* MediaWiki's Codex message box (the `?printable=yes` deprecation notice) is a
      #fdf2d5 panel with near-black ink — a bright island on the dark article column.
      Remap it onto the theme's warning alert; the amber `.cdx-message__icon` square
@@ -3105,6 +3199,25 @@
   #qc-cmp2-ui h2,
   #qc-cmp2-ui h3 {
     color: var(--neo-text) !important;
+  }
+
+  /* The panel's dismiss control is an empty `<button>` whose ONLY glyph is a data-URI
+     ✕ carried as `background-image`, over a transparent fill and a `border-style:none`
+     3px border. The theme's button rule clears `background-image`, fills the box and
+     turns every border solid, so the control renders as a blank grey square. The
+     native glyph is stroked `#000` and would be invisible here anyway — restore the
+     box and draw the ✕ as text instead. */
+  button.qc-cmp2-close-icon {
+    background-color: transparent !important;
+    border-width: 0 !important;
+    color: var(--neo-text) !important;
+    font-size: 26px !important;
+    line-height: 32px !important;
+    text-align: center !important;
+  }
+
+  button.qc-cmp2-close-icon::before {
+    content: "\00D7";
   }
 
   /* Quantcast leaves a fixed "Privacy" pill bottom-left on EVERY page once consent
