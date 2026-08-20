@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Pikabu.
-@version      20260814.23.08
+@version      20260820.00.12
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -638,6 +638,15 @@
   .b-story-block__text { color: var(--pk-text-soft) !important; }
   .story__title-link:hover { color: var(--pk-green-hover) !important; }
 
+  /* A post you have already opened keeps a dimmed title in the feed
+     (--color-black-700 against the near-black of an unread one) — the only
+     read/unread signal on the card. The blanket title colour above is !important,
+     so it outranks that plain rule and every post reads as unread; restate the
+     dim at (0,2,0). On the post page itself Pikabu keeps the title at full
+     strength, hence the second rule. */
+  .story__title-link.story__title-link_visited { color: var(--pk-text-muted) !important; }
+  .page-story__story .story__title-link.story__title-link_visited { color: var(--pk-text) !important; }
+
   /* "Primary" colour text posts: the author picks a coloured background that is
      painted on .story__content-inner (with a decorative white-gloss overlay we
      keep). Our generic .story-block surface rule forced the nested text block to
@@ -645,6 +654,15 @@
      Keep the inner text block transparent so the author's colour shows through. */
   [class*="story_primary"] .story-block,
   [class*="story_primary"] .story-block_type_text { background-color: transparent !important; }
+
+  /* The copy of a colour ("short") post sits on the author's own plate, which stays
+     saturated because --color-story-theme resolves to a hue token this theme does not
+     flip. Pikabu writes that copy in --color-bright-900, i.e. pure white; the generic
+     ink rule above drops it to --pk-text-soft, 2.5:1 on a mid-tone plate. Restate the
+     white. `bright-800` is the one plate Pikabu paints from a neutral token — this
+     theme flips that dark — so it keeps the light ink of its own rule. */
+  .story_short .story__content-inner { color: #ffffff !important; }
+  .story_short.story_bright-800 .story__content-inner { color: var(--pk-text) !important; }
 
   /* Rating block on the story card */
   .story__rating-block { background-color: var(--pk-surface-2) !important; }
@@ -676,6 +694,12 @@
   .tags__tag.tags__tag_added,
   .story__tags a.tags__tag_added,
   a.tag_added { color: var(--pk-green) !important; }
+  /* `_highlight` is the "[моё]" original-content marker: Pikabu emphasises it by
+     darkening it a step below the other tags (--color-black-800 vs --color-black-700),
+     which the blanket label colour flattens away. Lift it a step instead, so the
+     emphasis survives inverted. Scoped off the skeleton row, whose own rule paints
+     every tag transparent at the same (0,2,0) this fix would otherwise tie. */
+  .story__tags:not(.story__tags_skeleton) .tags__tag_highlight { color: var(--pk-text) !important; }
 
   /* ===== Comments tree ===== */
   .comments,
@@ -710,6 +734,17 @@
   .comment__user[data-own="true"] .user__nick {
     background-color: #4a525c !important;
     color: var(--pk-text) !important;
+  }
+
+  /* The OP pill — the post author's own comments, and `.user_own` on the mobile
+     layout — fills from --color-primary-700, which this theme lifts to the bright
+     brand green. Its label reads --color-bright-900, but the blanket .user__nick
+     rule is !important and outranks that, leaving light-on-bright-green at 1.4:1.
+     Take the dark label every other bright-green fill on this theme carries. */
+  .comment__user[data-own-story="true"] .user__nick,
+  .user_own .user__nick {
+    color: var(--pk-bg) !important;
+    -webkit-text-fill-color: var(--pk-bg) !important;
   }
 
   /* ===== Author / user blocks, avatars (do NOT tint the avatar image) ===== */

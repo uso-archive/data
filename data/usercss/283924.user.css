@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for FanFiction.Net and FictionPress, with an easy-on-the-eyes story reader, dark browse filters, profiles and forums.
-@version      20260814.23.04
+@version      20260820.00.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -153,6 +153,16 @@
   #_fontastic_reading_preview {
     background-image: none !important;
     background-color: var(--ff-surface-2) !important;
+  }
+
+  /* The "Narrow Results" rail on the writer / forum / community search results
+     is a bare <div> with no class or id — its only paint is an inline
+     `background-color:#ffffff` beside a `z-index:20000` float. Nothing else on
+     FFN writes that literal (the page wrappers use `background-color: white`),
+     so the substring is an exact hook. Without it the rail renders as a white
+     column and its `<small>Narrow Results</small>` heading sits at ~1.7:1. */
+  div[style*="background-color:#ffffff"] {
+    background-color: var(--ff-surface) !important;
   }
 
   /* ---- Header / top brand bar ------------------------------------------ */
@@ -512,11 +522,38 @@
     background-color: #232a32 !important;
     color: var(--ff-text) !important;
   }
+  /* Bootstrap marks the toggle of an OPEN dropdown/dropup by dropping the
+     white→grey gradient for the flat `#e6e6e6` it also uses for `:hover` and
+     `.active` — the only pressed cue on the button itself. The `.btn` fill
+     above is `!important` and outranks it, so an open toggle rendered
+     identical to its closed siblings on the reader's Actions / Share / review
+     "As" menus and the search-type picker. Same tone as the hover arm, which
+     is what the site does. */
+  .btn-group.open .btn.dropdown-toggle {
+    background-color: #232a32 !important;
+  }
   .btn.active,
   .btn-primary,
   .active > .btn {
     background-color: var(--ff-brand) !important;
     color: var(--ff-text) !important;
+  }
+  /* The category-picker popup (`/search/?popup=1`, opened by the "Select" link
+     in the search Options panel) ships its submit as a real
+     `<input type="button" disabled>` until a main category is picked. The UA
+     paints a disabled control at 30% ink; the rules above are `!important` and
+     repaint it at full strength, so a dead control reads as clickable. Must
+     stay AFTER the hover/active arms — it ties them on specificity and only
+     wins on order. */
+  button[disabled],
+  input[disabled],
+  select[disabled],
+  textarea[disabled],
+  .btn.disabled {
+    background-color: var(--ff-bg) !important;
+    color: var(--ff-muted) !important;
+    border-color: var(--ff-border) !important;
+    opacity: .7 !important;
   }
 
   /* ---- Form inputs & search -------------------------------------------- */

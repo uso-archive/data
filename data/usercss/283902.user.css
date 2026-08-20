@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260814.23.04
+@version      20260820.00.09
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -263,22 +263,24 @@
   [data-lyrics-container] a { color: #e6edf3 !important; } /* inline section labels */
 
   /* Annotated (referent) words. The site paints the whole chip on the inner Highlight
-     span and encodes its state ONLY in that span's colour: light grey (#e9e9e9) at rest,
-     brand red #ca4e45 while hovered OR while its annotation is open. Both are
-     single-class styled-components rules whose hash changes every build, so no selector
-     can name the open one — setting background-color here flattens hover AND the "you are
-     reading this one" cue into one identical chip across the whole song.
-     Blend a dark layer over whatever the site painted instead. The blend mode must be
-     luminosity, NOT darken: darken() takes the per-channel minimum, and every channel of
-     #ca4e45 (202,78,69) is above the layer's (28,33,40), so both states collapse onto the
-     exact same #1c2128 chip. luminosity keeps the backdrop's hue and takes the layer's
-     lightness — the achromatic resting chip lands on a neutral dark grey, the red one on
-     a dark brand red, so the states stay apart without naming either. Do NOT add a
-     background-color to this rule — the blend needs the site's own value underneath. */
+     span and encodes its state ONLY in that span's background-color: #e9e9e9 at rest,
+     pure BLACK while hovered OR while its annotation is open. Both are single-class
+     styled-components rules whose hash changes every build, so no selector can name the
+     open one — setting a background-color here flattens hover AND the "you are reading
+     this one" cue into one identical chip across the whole song. Both site values are
+     achromatic, so no single blend mode separates them either (luminosity maps both onto
+     the layer's lightness, and every mode that keeps the resting chip dark maps black
+     onto black). The three layers derive the two tones from that one value, bottom to
+     top: `difference` against #e9e9e9 inverts it (rest -> 0, open -> 233), `multiply`
+     tints the inverted value brand red, `lighten` floors it at the resting chip tone.
+     Both source values are load-bearing — re-derive the stack if either changes. Do NOT
+     add a background-color: the stack needs the site's own value underneath. */
   [class*="ReferentFragment-desktop__Highlight"],
   [class*="ReferentFragment"][class*="Highlight"] {
-    background-image: linear-gradient(#1c2128, #1c2128) !important;
-    background-blend-mode: luminosity !important;
+    background-image: linear-gradient(#21262d, #21262d),
+                      linear-gradient(#6a2b24, #6a2b24),
+                      linear-gradient(#e9e9e9, #e9e9e9) !important;
+    background-blend-mode: lighten, multiply, difference !important;
     color: #e6edf3 !important; }
   /* the ClickTarget anchor around it is natively bare; painting it draws an elevated
      rectangle in the chip's padding that the blended span no longer matches */
@@ -747,13 +749,15 @@
   .leaderboard-user, .leaderboard-user *,
   .header_with_cover_art-pyongs_count { color: #9aa7f0 !important; }
   /* the filled count pills carry a 2px border in their OWN fill colour (so each reads as a
-     solid pill); the blanket border reset draws a dark ring around them. genius ships three
+     solid pill); the blanket border reset draws a dark ring around them. genius ships four
      variants and they must all be restated or the ring comes back on the ones left out:
-     "--purple_filled" #99a7ee, "--pink_filled" #ff1464, and the unfilled "--gray" whose
-     edge IS the pill (it has no background at all). */
+     "--purple_filled" #99a7ee, "--pink_filled" #ff1464, and the unfilled "--gray" / "--red"
+     whose edge IS the pill (they have no background at all). Red is lifted from the site's
+     #ff1414 (4.3:1) to clear 4.5:1 on the dark card. */
   .numbered_indicator--purple_filled { border-color: #99a7ee !important; }
   .numbered_indicator--pink_filled { border-color: #ff1464 !important; }
   .numbered_indicator--gray { border-color: #9a9a9a !important; color: #9a9a9a !important; }
+  .numbered_indicator--red { border-color: #ff4d4d !important; color: #ff4d4d !important; }
 
   /* legacy buttons / tags */
   .normal_button, .text_button, .quinary_button, .tag,
@@ -823,15 +827,32 @@
   .square_button.square_button--white, .square_button.square_button--white *,
   .square_button.square_button--white .inline_icon {
     color: #ffffff !important; fill: #ffffff !important; border-color: #ffffff !important; }
-  /* "--gray" / "--waiting" are the DE-emphasised end of the same family (genius draws the
-     default variant with a black edge and these with a grey one). Only the label and glyph
-     move: pinning their edge to #9a9a9a too would make the muted variant louder than the
-     default #2d333b edge and invert the hierarchy. */
+  /* "--gray" / "--waiting" / "--disabled" are the DE-emphasised end of the same family
+     (genius draws the default variant with a black edge and these three with the same
+     #9a9a9a one). Only the label and glyph move: pinning their edge to #9a9a9a too would
+     make the muted variant louder than the default #2d333b edge and invert the hierarchy.
+     "--disabled" carries no other cue than that hue — flattened to the default light
+     label, a disabled control reads as enabled. */
   .square_button.square_button--gray, .square_button.square_button--gray *,
   .square_button.square_button--gray .inline_icon,
   .square_button.square_button--waiting, .square_button.square_button--waiting *,
-  .square_button.square_button--waiting .inline_icon {
+  .square_button.square_button--waiting .inline_icon,
+  .square_button.square_button--disabled, .square_button.square_button--disabled *,
+  .square_button.square_button--disabled .inline_icon {
     color: #9a9a9a !important; fill: #9a9a9a !important; }
+  /* The "_inverse" pair is the outline form of the two brand buttons: no fill, the brand
+     hue on the label and the glyph only. The neutral family rule above is the same
+     specificity and comes first, so both collapse into the plain light button. Facebook
+     blue is lifted from #3b5998 (2.2:1 on the #21262d fill) to clear 4.5:1; Twitter's
+     #55acee already clears it. */
+  .square_button.square_button--facebook_inverse,
+  .square_button.square_button--facebook_inverse *,
+  .square_button.square_button--facebook_inverse .inline_icon {
+    color: #8ba4e0 !important; fill: #8ba4e0 !important; }
+  .square_button.square_button--twitter_inverse,
+  .square_button.square_button--twitter_inverse *,
+  .square_button.square_button--twitter_inverse .inline_icon {
+    color: #55acee !important; fill: #55acee !important; }
   .square_button--facebook *, .square_button--twitter *, .square_button--google *,
   .square_button--instagram *, .square_button--spotify *, .square_button--apple *,
   .square_button--email * { color: #ffffff !important; }
@@ -1026,6 +1047,141 @@
     background-color: rgba(0, 0, 0, 0.7) !important; }
 
   /* ====================================================================
+     livingtracklist.genius.com — the "Living Tracklist" microsite the nav links to.
+     domain("genius.com") covers every subdomain, so this Next.js app is in scope: a
+     separate stack whose only stable hooks are its CSS-module class prefixes
+     ("<Component>-module__<hash>__<part>"; the hash rots, the component name does not).
+     Its paper is one fixed full-viewport "Loader" section, so the base html/body rule
+     never reaches it and every string the shared typography lifts lands light-on-white.
+     ==================================================================== */
+  [class*="Loader-module__"] { background-color: #14181d !important; }
+  /* the loading counter is the one string the loader paints brand green, and the shared
+     span rule greys it out — first paint then carries no colour at all */
+  [class*="Loader-module__"][class*="__progress"] span { color: #01a74a !important; }
+  /* The two pill CTAs keep their brand fill and carry their label in ink the fill was
+     chosen for: "Explore More"/"Enter" rest on yellow with black ink, "Sweepstakes" is
+     green with white. Both are <a>, so the shared link rule repaints them periwinkle at
+     ~2.4:1 on their own fill — and its ":hover" half outranks a plain [class*=] selector,
+     so Sweepstakes has to name the state to hold its label through a pointer. */
+  [class*="MainButton-module__"], [class*="MainButton-module__"] *,
+  [class*="ExploreMoreButton-module__"], [class*="ExploreMoreButton-module__"] * {
+    color: #14181d !important; }
+  [class*="SweepstakesButton-module__"], [class*="SweepstakesButton-module__"] *,
+  [class*="SweepstakesButton-module__"]:hover, [class*="SweepstakesButton-module__"]:hover *,
+  [class*="SweepstakesButton-module__"]:focus, [class*="SweepstakesButton-module__"]:focus * {
+    color: #ffffff !important; }
+  /* MainButton's hover/focus fill flips from the yellow to that same brand green and the
+     site flips its label white with it. The rest-state rule above is !important, so
+     without this the label stays dark once the fill has gone green. */
+  [class*="MainButton-module__"]:hover, [class*="MainButton-module__"]:hover *,
+  [class*="MainButton-module__"]:focus, [class*="MainButton-module__"]:focus * {
+    color: #ffffff !important; }
+  /* Decade rail: the site marks the current decade brand green (plus a bigger italic
+     face), the rest black-20%, and moves to solid black on hover. Every one of those
+     inks needs lifting on dark, but lifting them all alike is what erases the "you are
+     here" and hover cues — give each state its own tone. The green rule also names
+     :first-child because the rail rotates through a fixed slot the site styles the same
+     way, and it must stay last: the active item carries the "__item" class too. */
+  [class*="TrackExplorerNav-module__"][class*="__item"],
+  [class*="TrackExplorerNav-module__"][class*="__item"] * { color: #c4cdd6 !important; }
+  [class*="TrackExplorerNav-module__"][class*="__item"]:hover,
+  [class*="TrackExplorerNav-module__"][class*="__item"]:hover * { color: #ffffff !important; }
+  [class*="TrackExplorerNav-module__"][class*="__active"],
+  [class*="TrackExplorerNav-module__"][class*="__active"] *,
+  [class*="TrackExplorerNav-module__"][class*="__item"]:first-child,
+  [class*="TrackExplorerNav-module__"][class*="__item"]:first-child * { color: #01a74a !important; }
+  /* "Explore More" swaps the canvas explorer for /explore, a scrolling article rendered
+     inside one fixed full-viewport "PageOverlay" whose paper is white — a second sheet of
+     paper the Loader rule above never reaches, so every string the shared typography
+     lifts lands light-on-white. */
+  [class*="PageOverlay-module__"] { background-color: #14181d !important; }
+  /* The wordmark is a <canvas> masked by loader-mask.svg: the mask cuts the glyphs, the
+     element's own background-color is the UNFILLED ink and the bitmap paints only the
+     green fill that wipes up over it. Black unfilled ink vanishes on a dark plate, and
+     the loader carries the same canvas at 0% fill. */
+  canvas[class*="LoaderLogo-module__"] { background-color: #e6edf3 !important; }
+  /* The "For The Record" and panelist sections are solid brand-green plates the site
+     pairs with white copy; the shared p/span/a rules dull that to ~2:1 on the fill. */
+  [class*="ExploreVideoInfo-module__"], [class*="ExploreVideoInfo-module__"] *,
+  [class*="ExplorePanelists-module__"], [class*="ExplorePanelists-module__"] * {
+    color: #ffffff !important; }
+  /* /track/<slug> opens in the same overlay, and both routes separate their sections with
+     full-width #ffff64 plates carrying black ink. At ~0.93 luminance those are light-bombs
+     here, so take the elevated surface and let the lifted copy land on it. The "Explore
+     More" rail is shared between the two routes, and on /explore the same fill arrives as
+     a green -> #ffff64 gradient running straight into the footer. */
+  [class*="TrackInsights-module__"][class*="__TrackInsights"],
+  [class*="TrackRelated-module__"][class*="__TrackRelated"],
+  [class*="ExploreMore-module__"][class*="__ExploreMore"] {
+    background-color: #1c2128 !important; }
+  [class*="ExploreMore-module__"][class*="__gradient"] {
+    background-image: linear-gradient(#01a74a 0px, #1c2128 35%, #1c2128 100%) !important; }
+  /* ...except the key-lyric marker, where that same yellow IS the signal: it is a
+     highlighter drawn over one lyric line, so keep the fill and put its ink back. */
+  [class*="TrackLyric-module__"] blockquote span,
+  [class*="TrackLyric-module__"] blockquote span * { color: #14181d !important; }
+  /* At narrow widths the lyric block collapses behind a white "more below" fade and an
+     "Expand" pill. The fade is a ::after gradient, so no background-color scan sees it;
+     the pill keeps the site's white fill and the black ink that fill was chosen for. */
+  [class*="TrackLyric-module__"][class*="__lyric"]::after {
+    background-image: linear-gradient(rgba(20, 24, 29, 0), #14181d) !important; }
+  [class*="ExpandButton-module__"], [class*="ExpandButton-module__"] * { color: #14181d !important; }
+  /* Under those plates sit two black-on-yellow marks: the section's Genius wordmark SVG,
+     which carries no fill attribute at all and so falls back to black, and the insight
+     tabs' icons, stroked/filled with currentColor off a button the shared rules leave
+     black — the label span is lifted but the icon beside it is not. */
+  svg[class*="TrackInsights-module__"] path { fill: #c4cdd6 !important; }
+  [class*="TrackInsights-module__"] nav button { color: #c4cdd6 !important; }
+  /* The current tab is marked ONLY by an opaque border while the rest ship theirs
+     transparent, so the blanket border reset paints all four alike. */
+  [class*="TrackInsights-module__"] nav button { border-color: transparent !important; }
+  [class*="TrackInsights-module__"] nav button[aria-current="true"] {
+    border-color: #c4cdd6 !important; }
+  /* Its footer is natively a yellow plate carrying the Sprite/GENIUS lockup as one inline
+     SVG of fill="#000" paths; the shared footer rule darkens the plate under it. The
+     sibling chevron SVG in the sticky Home pill is stroked with fill="none", so key this
+     to the lockup's own class instead of every path in the footer. */
+  svg[class*="Footer-module__"] path { fill: #c4cdd6 !important; }
+  /* The microsite's sticky bar is a bare 24px anchor the floating Home/Explore pill hangs
+     off, natively transparent so the page scrolls under it; the shared footer rule fills
+     it into an opaque strip across the bottom of every view. */
+  footer[class*="StickyFooter-module__"] { background-color: transparent !important; }
+
+  /* ====================================================================
+     promote.genius.com — the "Promote Your Music" Shopify storefront, also in scope
+     through domain(). Its own theme is already near-black, so only the two places it
+     paints white need us. None of these class names exist on genius.com proper.
+     ==================================================================== */
+  /* The hero subhead sits on genius's own yellow plate and carries the black ink that
+     plate was chosen for; the shared span rule lifts it to ~1.5:1 on the yellow. The H1
+     next to it is a BLACK box and must keep the lifted ink. */
+  .banner__text.subtitle, .banner__text.subtitle * { color: #14181d !important; }
+  /* Dawn's ".button" is one WHITE pill carrying near-black ink, in both element forms,
+     with or without a "--primary" modifier, and with its label sometimes in a nested
+     <span>. The shared link rule repaints the <a> form periwinkle at 2.3:1 and the
+     shared span rule washes the <button> form's label to 1.6:1, both ON the white fill.
+     None of these class names exist on genius.com proper. */
+  a.button, a.button *, button.button, button.button *,
+  .shopify-challenge__button, .shopify-challenge__button *,
+  .customer button, .customer button * { color: #212121 !important; }
+  /* ...except the outline variants, which Dawn fills TRANSPARENT: they sit on the
+     store's own near-black panels and take a light label, not the pill's dark ink. */
+  a.button--secondary, a.button--secondary *,
+  a.button--tertiary, a.button--tertiary * { color: #9aa7f0 !important; }
+  button.button--secondary, button.button--secondary *,
+  button.button--tertiary, button.button--tertiary * { color: #e6edf3 !important; }
+  /* The header cart badge is a WHITE disc carrying near-black ink, and it sits inside the
+     cart <a>, so the shared link rule repaints its count periwinkle at 2.3:1 on the disc.
+     It only renders once the cart is non-empty. */
+  .cart-count-bubble, .cart-count-bubble * { color: #212121 !important; }
+  /* The newsletter pop-up is a Booster widget rendered in an about:blank subframe that
+     inherits the store's origin, so this block applies inside it: its card is white
+     while the heading our typography lifts sits on top of it, and its body line is the
+     one string the widget paints pure black. */
+  .ba_widget_main_design { background-color: #1c2128 !important; }
+  .ba_initial_state_body { color: #c4cdd6 !important; }
+
+  /* ====================================================================
      Forms / inputs (shared)
      ==================================================================== */
   input, textarea, select {
@@ -1079,6 +1235,18 @@
     background-color: #1c2128 !important; }
   #onetrust-pc-sdk .category-menu-switch-handler,
   #onetrust-pc-sdk .ot-pc-footer-logo { background-color: #21262d !important; }
+  /* The IAB vendor list behind "List of IAB Vendors" is a second view inside the same
+     panel, and its two chrome rows keep OneTrust's own white fill: the "Allow All
+     Consent" select-all band ("#ot-sel-blk") and the search row ("#ot-search-cntr").
+     The panel rule above only paints the outer container, so the band renders as a
+     white slab carrying our lifted light label. Both are unclassed <div>s under those
+     two SDK ids, and the view only exists once the vendor list is opened. */
+  #onetrust-pc-sdk #ot-sel-blk { background-color: #21262d !important; }
+  #onetrust-pc-sdk #ot-search-cntr { background-color: #1c2128 !important; }
+  /* ...and expanding a vendor row opens a white "ot-ven-dets" table (lifespan, data
+     declaration, purposes) whose rows carry no fill of their own, so the whole block
+     reads as our light copy on white. */
+  #onetrust-pc-sdk .ot-ven-dets { background-color: #21262d !important; }
   #onetrust-banner-sdk, #onetrust-banner-sdk *,
   #onetrust-pc-sdk, #onetrust-pc-sdk * {
     color: #c4cdd6 !important; -webkit-text-fill-color: #c4cdd6 !important; }

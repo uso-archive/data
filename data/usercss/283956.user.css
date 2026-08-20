@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260814.23.10
+@version      20260820.00.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -139,11 +139,14 @@
      (blue-on-black letters). Nothing about it is a background-color or a fill, so
      every scan passed. Put the white backdrop back BEHIND the mark (exactly what the
      native page provides) -- the letters read white again and the blue square, which
-     is the actual painted geometry, is untouched. Both frontends: the SPA header /
-     rail carries the Tailwind arbitrary class, the legacy Daybreak rail its module
-     class. */
+     is the actual painted geometry, is untouched. Three carriers, one per frontend and
+     no shared hook: the SPA header / rail has the Tailwind arbitrary class, the legacy
+     Daybreak rail its module class, and support.weather.com's "Browse by Brand" tile is
+     a bare inline <svg> whose only distinguishing attribute is its 48x48 viewBox -- the
+     Weather Underground tile beside it is 50x50 and must NOT take a white plate. */
   svg[class*="text-[#003399]"],
-  svg[class*="SidebarNavigation--logoIcon"] {
+  svg[class*="SidebarNavigation--logoIcon"],
+  .brands svg[viewBox="0 0 48 48"] {
     background-color: #ffffff !important;
   }
 
@@ -718,6 +721,19 @@
   [class*="hover:bg-neutral-200"]:hover {
     background-color: var(--wx-surface-2) !important;
   }
+  /* `hover:bg-white` is the same family one step further: the video page's outlined
+     "Transcript" pill is `bg-transparent border-gray-500 hover:bg-white`, so hovering it
+     filled PURE #fff under our lifted --wx-text-2 label -- 1.42:1, the word and its
+     chevron gone. Only a native-vs-themed hover diff sees it; at rest the button is
+     correct. The site's move is transparent -> a full-contrast plate, so match that
+     intent with the component border tone rather than the near-base surface, which
+     against #14181d would read as no change at all.
+     The chart tab strip carries `hover:bg-white` too, but pairs it with the `!`-suffixed
+     `hover:!bg-gray-900`, whose layered !important outranks this unlayered one -- the
+     selected tab keeps the light pill the --color-gray-900 remap gives it. */
+  [class~="hover:bg-white"]:hover {
+    background-color: var(--wx-border-2) !important;
+  }
   /* A control that is ALREADY a grey fill at rest (bg-gray-100) and steps one shade
      down on hover collapses to a no-op above, because both the rest rule and the hover
      rule land on --wx-surface-2 -- the /hourbyhour/day-N prev/next day pills lost their
@@ -732,12 +748,18 @@
      indicator on the rail items and the video-category tabs, `active:bg-gray-200` the
      press state on most pills -- both painted #f2f2f2 under our lifted light text.
      Matched on plain `:focus`, a superset of `:focus-visible` and the CSS2 form the
-     userstyles.org parser accepts. */
+     userstyles.org parser accepts.
+     `active:bg-[#E6E6E6]` is the arbitrary-hex sibling, on the hero CTAs ("Read more" /
+     "Watch") that ship `bg-white text-gray-900` and get NO hover state -- the press is
+     their only feedback. It cannot flash light here: our unlayered `.bg-white` !important
+     already outranks that layered utility, which is exactly why the control ends up with
+     no press response at all unless it is restated. */
   [class~="focus:bg-gray-100"]:focus,
   [class~="focus-visible:bg-gray-100"]:focus,
   [class~="active:bg-gray-100"]:active,
   [class~="active:bg-gray-200"]:active,
   [class~="active:bg-gray-300"]:active,
+  [class~="active:bg-[#E6E6E6]"]:active,
   [class~="max-sm:active:bg-gray-100"]:active {
     background-color: var(--wx-surface-2) !important;
   }

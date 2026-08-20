@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Vinted with the homepage, catalog and search, item pages and seller profiles in a comfortable dark look that's easy on the eyes for late-night browsing.  Works on every country version of Vinted (vinted.fr, .de, .com, .co.uk, .es, .it, .nl, .be, .pl and more).   Prices, ratings and Vinted's teal stay clear and recognizable.
-@version      20260814.23.10
+@version      20260820.00.14
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -717,6 +717,16 @@
   [class*="InfoBanner__title"], [class*="InfoBanner__body"],
   [class*="InfoBanner__prefix"], [class*="InfoBanner__suffix"],
   [class*="InfoBanner__actions"] { background-color: transparent !important; }
+  /* /pro closes on a full-bleed brand band whose CSS-module class happens to carry
+     the "Banner" substring (`Banner-module-scss-module__<hash>__business-accounts-
+     homepage__banner`), so the neutral fill above swallowed the teal — the band, the
+     plate behind its heading and its CTA wrapper all flattened to one elevated grey
+     slab and the closing CTA read as an anonymous box. Restore the deep teal the
+     other brand bands take, and clear the inner plates the neutral rule painted
+     over it (they are natively transparent). */
+  [class*="business-accounts-homepage__banner"] { background-color: #0e3b42 !important; }
+  [class*="business-accounts-homepage__banner"] [class*="Banner-module"] {
+    background-color: transparent !important; }
 
   /* ============================================================
      Ad slots / blank iframes — never let them flash as bright
@@ -866,6 +876,39 @@
      base surface. Painting them elevated would swallow the #1c2128 cards that
      sit inside them. */
 
+  /* /sell_electronics and /buy_electronics are one CSS module
+     (`Electronics-module-scss-module__<hash>__electronics__…`) that bakes a
+     literal #000 on every heading and paragraph of its first three sections —
+     legible only on the light bands it also bakes. Two of those bands are
+     `::after` pseudo-elements (invisible to any element-background scan) filling
+     #edf2f2, i.e. the literal value of --greyscale-level-5, so they take the
+     page surface the token remap would have given them. Once the bands go dark
+     the ink has to come with them, or the section reads as a blank slab. */
+  [class*="electronics__introduction-image"]::after,
+  [class*="electronics__why-section"]::after {
+    background-color: #14181d !important; }
+  [class*="electronics__introduction-headline"],
+  [class*="electronics__introduction-title"],
+  [class*="electronics__why-title"],
+  [class*="electronics__why-card-title"],
+  [class*="electronics__how-title"],
+  [class*="electronics__how-card-title"],
+  [class*="electronics__how-card-title-number"],
+  [class*="electronics__how-card-title-text"] { color: #e6edf3 !important; }
+  [class*="electronics__introduction-description"],
+  [class*="electronics__why-card-description"],
+  [class*="electronics__how-card-description"] { color: #c4cdd6 !important; }
+  /* Its closing "discover" band is a full-bleed pale mint (#edffe9) carrying the
+     deep-teal brand ink — the one section whose copy is NOT #000, so darkening
+     the surface alone would bury it. Move both: the elevated grey the other
+     landing-page cards take, with the teal kept on the link so the band still
+     reads as the branded row. */
+  [class*="electronics__discover-section"] { background-color: #1c2128 !important; }
+  [class*="electronics__discover-title"] { color: #e6edf3 !important; }
+  [class*="electronics__discover-card-title"] { color: #c4cdd6 !important; }
+  [class*="electronics__discover-link"],
+  [class*="electronics__discover-link-icon"] { color: #4db8c4 !important; }
+
   /* how-it-works' hero keeps its native #fce7dc peach: the illustration is an
      absolutely-positioned raster whose own background IS that peach, and it
      starts 184px INSIDE the title column, so a dark band leaves the tail of
@@ -952,7 +995,14 @@
   .gnf-page h1 { color: #e6edf3 !important; }
   .gnf-button--outlined {
     color: #4db8c4 !important; border-color: #4db8c4 !important; }
-  .gnf-page video {
+  /* Vinted serves TWO not-found surfaces: the server-rendered `gnf-*` page for a
+     hard 404, and a web_ui `_error-display-module-scss-module__<hash>__error-display`
+     block for the SPA's soft 404 (/our-platform, /new-again, /house-of-vinted,
+     /sell_electronics…). The second one reuses the same mascot <video>, which
+     carries no `src` attribute (two <source> children), so only the wrapper class
+     can reach it. Everything else on it is web_ui, so the token remap covers it. */
+  .gnf-page video,
+  [class*="error-display"] video {
     filter: invert(1) hue-rotate(180deg) !important;
     mix-blend-mode: screen !important; }
 
@@ -968,6 +1018,14 @@
      CSS2 subset the userstyles.org parser accepts. */
   input:focus, textarea:focus, select:focus {
     border-color: #4db8c4 !important; }
+  /* A web_ui Radio hides the real input and draws its ring as the 1px border of
+     the `Radio__button` span — an ELEMENT, so unlike the Checkbox (whose ring
+     lives on a pseudo the universal selector cannot reach) the blanket border
+     reset takes it, and the divider grey is 1.1:1 on a dropdown card — the
+     unselected options of the catalog's "Sort by" menu have no visible ring at
+     all. Give it back the control stroke the token block already defines. */
+  .web_ui__Radio__button, [class*="Radio__button"] {
+    border-color: #667273 !important; }
 
   /* ============================================================
      company.vinted.com — the corporate/newsroom site, a separate

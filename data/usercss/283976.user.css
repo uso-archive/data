@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260814.23.05
+@version      20260820.00.10
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -296,24 +296,33 @@
   }
   [role="status"][aria-label="Notification Banner"] a { color: #9bd4ff !important; }
 
-  /* The logged-out "Turn learning into progress." sign-up promo. On content
-     pages it renders INSIDE `#main-content` and the neutralizer below flattens
-     it; on the 404 page Khan mounts it as a SIBLING of `#main-content`, where
-     nothing reaches it — so it keeps its pale blue panel, its white
-     illustration and its white audience buttons under near-white text. Give
-     that instance the same treatment the in-content one already gets. Scoped to
-     the app shell; if Khan re-hashes the class the banner simply returns to
-     today's behaviour rather than breaking anything. */
-  #app-shell-root > ._1ipaf6gj {
+  /* The logged-out "Turn learning into progress." sign-up promo. On content pages
+     it renders INSIDE `#main-content` and the neutralizer below flattens it; Khan
+     also mounts it as a SIBLING of `#main-content`, in `#above-main-content-portal`
+     — on the course, unit, lesson, exercise and 404 pages — where nothing else
+     reaches it, so it keeps its pale blue panel, its white illustration and its
+     white audience pills under near-white text: a 205px band of invisible copy
+     above the fold. The portal carries this promo and nothing else, so it is keyed
+     on the id alone and depends on no hashed class.
+     `data-kind` rather than `button[class]`: the audience pills are Wonder Blocks
+     `secondary` (natively white-filled) and the dismiss ✕ is `tertiary` (natively
+     transparent), so keying on the kind reproduces the native fills instead of
+     boxing the ✕ in a plate Khan never draws. */
+  #above-main-content-portal {
     background-color: #14181d !important;
     background-image: none !important;
   }
-  #app-shell-root > ._1ipaf6gj [class]:not(span) {
+  #above-main-content-portal [class]:not(span) {
     background-color: transparent; background-image: none;
   }
-  #app-shell-root > ._1ipaf6gj button[class] { background-color: #1c2128; }
-  #app-shell-root > ._1ipaf6gj button[class]:hover { background-color: #232a32; }
-  #app-shell-root > ._1ipaf6gj button > span:first-child:empty {
+  /* The element type in each of these is load-bearing, not decoration: without it
+     the selector is one step LESS specific than the `[class]:not(span)`
+     neutralizer above and the fill silently never paints. */
+  #above-main-content-portal button[data-kind="secondary"],
+  #above-main-content-portal a[data-kind="secondary"] { background-color: #1c2128; }
+  #above-main-content-portal button[data-kind="secondary"]:hover,
+  #above-main-content-portal a[data-kind="secondary"]:hover { background-color: #232a32; }
+  #above-main-content-portal button > span:first-child:empty {
     background-color: #c4cdd6 !important;
   }
 
@@ -507,6 +516,22 @@
   .nav_dropdown_main_content, .nav_dropdown_main_scroll, .nav_skip_wrap,
   .tab_button_item, .tab_content_list, .card_testimonial_inner,
   .card_primary_element { background-color: #1c2128 !important; }
+  /* /schools "Curriculum across every major subject": ten pill chips Webflow fills
+     with Khan's palest blue (#eef7fe) and labels in the page ink (#191918, with a
+     matching text-fill). Left alone they are the ten brightest surfaces on the dark
+     page. They are invisible to the light-surface scan because Webflow serialises
+     the fill as `color(srgb …)`, which a channel-parsing audit skips — only the
+     screenshot shows them.
+     Khan's own hover cue is the chip LOSING its fill, so the rest state takes the
+     card tone and hover goes back to the page: an unqualified `!important` fill
+     would paint both states alike and erase the cue. The subject glyphs are inline
+     SVG with literal per-subject fills and are untouched. */
+  .catalog_item_wrap { background-color: #1c2128 !important; }
+  .catalog_item_wrap:hover { background-color: transparent !important; }
+  .catalog_item_text {
+    color: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important;
+  }
   /* Full-bleed decorative section bands. Despite the name these are not small
      shapes: both live under `.u-cover-absolute` and measure 1268px wide (a
      517px pale-blue slab behind the supporters hero, a 348px pink one on
@@ -785,13 +810,13 @@
   #main-content ._1hupj7i9 { border-color: #d77d0f !important; }  /* Familiar outline */
   #main-content ._88nb8z9 { border-color: #c66024 !important; }   /* Attempted outline */
 
-  /* Course page "Up next for you:" card. Khan marks it as the recommended next
-     step with a 4px top rule in the brand blue; the blanket `* { border-color }`
-     reset near the end of this file repaints all four sides, so the accent drops
-     to the generic divider grey and the card reads as an ordinary bordered box.
-     Restore the top edge only — the other three sides are Khan's own hairline
-     and are correctly softened. Stable test id. */
-  [data-testid="course-challenge-card"] { border-top-color: #5fb0e6 !important; }
+  /* Course / unit page "Up next for you:" card. Khan marks it as the recommended
+     next step with a 4px top rule in the brand blue; the blanket
+     `* { border-color }` reset near the end of this file repaints all four sides,
+     so the accent drops to the generic divider grey and the card reads as an
+     ordinary bordered box. Restore the top edge only — the other three sides are
+     Khan's own hairline and are correctly softened. Stable test id. */
+  [data-testid="mastery-practice-content-item"] { border-top-color: #5fb0e6 !important; }
 
   /* The "Level N … 0 /1 skill" bar above every article, video and exercise
      marks how far along the level you are with a 14px knob Khan fills its
@@ -854,13 +879,13 @@
   #main-content ul.indicatorContainer button[aria-current="true"] > div {
     background-color: #5fb0e6;
   }
-  /* The exercise page itself draws a SECOND, newer progress strip ("Do 4 problems"
+  /* The exercise page itself draws a SECOND, newer progress strip ("Do 7 problems"
      in the sticky footer bar) that the list above does not cover: each problem is a
-     `div[role="img"]` with a `data-testid` of `exercise-progress-N-<state>`. The
-     strip is MONOCHROME — Khan paints every marker its light-page ink (#21242c) and
-     encodes state by shape alone: an unanswered problem is a hollow 2px ring, an
-     answered one a solid disc, and the one you are on is 12px instead of 8px. Both
-     halves need restating on dark, and they are two different properties.
+     `data-testid` of `exercise-progress-N-<state>`. Khan encodes state by SHAPE —
+     an unanswered problem is a hollow 2px ring, an answered-wrong one a solid disc,
+     and the one you are on is 12px instead of 8px — and paints all three its
+     light-page ink (#21242c). Those need restating on dark, and they are two
+     different properties.
      The ring: the blanket `* { border-color }` reset near the end of this file drops
      it to #2d333b, about 1.3:1 on the page base. */
   [data-testid^="exercise-progress-"][data-testid*="-incomplete"] {
@@ -868,16 +893,25 @@
   }
   /* The disc: an answered marker has NO border, so the `#main-content [class]`
      neutralizer flattening its fill to transparent leaves it rendering as nothing
-     at all — the strip loses every problem you have already done. Same blue as the
-     ring, so filled = done / hollow = to do survives exactly as Khan draws it.
-     Every state that is not `-incomplete` is a disc, so the four suffixes below are
-     the whole set; `-incorrect` cannot match `$="-correct"` because the character
-     before `correct` is `n`, which keeps the two selectors disjoint. */
-  [data-testid^="exercise-progress-"][data-testid$="-correct"],
-  [data-testid^="exercise-progress-"][data-testid$="-correct-current"],
+     at all — the strip loses every problem you got wrong. Same blue as the ring, so
+     filled = done / hollow = to do survives exactly as Khan draws it, and the two
+     share a tone here just as they share the one ink natively. */
   [data-testid^="exercise-progress-"][data-testid$="-incorrect"],
   [data-testid^="exercise-progress-"][data-testid$="-incorrect-current"] {
     background-color: #5fb0e6 !important;
+  }
+  /* A CORRECT problem is the one marker Khan does NOT draw in the neutral ink: it is
+     a `mask-image` tick <span> filled the brand green (#00a60e), which is the only
+     thing in the strip saying you got a problem RIGHT rather than merely answered.
+     Painting it the same blue as the disc — as a single answered-state rule would —
+     collapses right and wrong into one appearance. Khan's own green measures 5.3:1
+     on the page base, so it is restated verbatim rather than lightened; it needs
+     `!important` only to hold the tick against the icon-span rules further down.
+     `-incorrect` cannot match `$="-correct"` (the preceding character is `n`), which
+     keeps this rule and the disc rule above disjoint. */
+  [data-testid^="exercise-progress-"][data-testid$="-correct"],
+  [data-testid^="exercise-progress-"][data-testid$="-correct-current"] {
+    background-color: #00a60e !important;
   }
 
   /* Wonder Blocks renders a button's leading icon as an EMPTY <span> whose

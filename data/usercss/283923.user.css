@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Avito that's easy on the eyes, perfect for late-night browsing.
-@version      20260814.23.03
+@version      20260820.00.08
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -1217,6 +1217,14 @@
   [class*="itemIconImg"] {
     filter: invert(1);
   }
+  /* A seller profile's in-profile search field ends in a filters icon whose two SVG paths
+     carry a hard `fill="black"` ATTRIBUTE (the `<svg fill="currentColor">` above them is
+     overridden by it), drawn for the native white field — so on the dark one the glyph is
+     black on `--av-surface`. Neither scan sees it: the SVG bucket flags only near-WHITE
+     fills, and the element's own `color` reads correctly light. */
+  [data-marker$="/filters_icon"] svg path {
+    fill: var(--av-text) !important;
+  }
 
   /* Auth popup (login + registration). Its fields were a grey rectangle on the
      white modal; the neutraliser wiped that fill, and the generic input rule
@@ -1245,6 +1253,25 @@
   [class*="controlledInput_checked"] + [class*="toggle_mode_checkbox"] *,
   [class*="controlledInput_checked"] + [class*="toggle_mode_radio"],
   [class*="controlledInput_checked"] + [class*="toggle_mode_radio"] * {
+    color: #0b1620 !important;
+  }
+  /* The item page's dialogs ("Причина жалобы") ship the same control from a build whose
+     classes are pure hashes, so the module-name hooks above reach none of it: natively the
+     disc is `#e3e2e1` unchecked and `#141414` checked, the neutraliser wiped both, and the
+     chosen reason was left marked by a bare knob on an identical ring.
+     The DS puts `role="radio"`/`role="checkbox"` + `aria-checked` on the LABEL and paints
+     the disc on the input's next sibling, so ARIA is the build-independent hook. Only the
+     CHECKED fill is restored — the unchecked disc keeps the ring the blanket border rule
+     already draws, which is what the module-named build ships today. */
+  [role="radio"][aria-checked="true"] input + div,
+  [role="checkbox"][aria-checked="true"] input + div {
+    background-color: var(--av-accent) !important;
+    border-color: var(--av-accent) !important;
+  }
+  [role="radio"][aria-checked="true"] input + div,
+  [role="radio"][aria-checked="true"] input + div *,
+  [role="checkbox"][aria-checked="true"] input + div,
+  [role="checkbox"][aria-checked="true"] input + div * {
     color: #0b1620 !important;
   }
 
@@ -1417,6 +1444,23 @@
   }
   [class*="uxs-"] a div {
     background-color: var(--av-text-muted) !important;
+  }
+  /* Map view (`?map=1`, and the "На карте" entry points). The results rail floating over
+     the map is a natively WHITE panel, so the div-neutraliser left every card and price
+     sitting straight on the map tiles at about 1:1. Opening "Фильтры" slides a second
+     white sheet (`side-block-overlay-wrapper`) over it and whitens what is left of the
+     list with a third (`side-block-disabled`) — all three must be opaque or the drawer's
+     controls and the cards underneath render on top of each other. The names do not
+     nest as substrings, so each has to be listed. `map-root` is the map's own `#fafafa`
+     canvas, visible wherever a tile has not painted yet; the tiles are raster and stay
+     untouched. */
+  [class*="side-block-wrapper"],
+  [class*="side-block-overlay-wrapper"],
+  [class*="side-block-disabled"] {
+    background-color: var(--av-surface) !important;
+  }
+  [class*="map-root"] {
+    background-color: var(--av-bg) !important;
   }
   /* Cookie-consent toast (bottom-centre, z-index 12000). It is a DIV-based
      floating "kitty toastBar", so the neutraliser flattened it to transparent

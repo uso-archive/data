@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260814.23.07
+@version      20260820.00.12
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -488,11 +488,6 @@
        * the currency/language modal's field labels ("Язык", "Валюта") ship
          a literal #070707 that the token remap never reaches, so they go
          near-black on the dark panel. They are the widget's only <p>.
-       * the address modal lays its title OVER a LIGHT splash illustration
-         (an <img>). Natively the title is near-black on that pale ground,
-         but our `[class*="tsHeadline600Medium"]` shelf-heading rule lifts it
-         to near-white -> light-on-light, fully invisible. The title box is
-         the illustration's adjacent sibling, so keep it dark there ONLY.
      ------------------------------------------------------------ */
   .vue-portal-target [data-widget="modalLayout"] button,
   .vue-portal-target [data-widget="modalLayout"] button div,
@@ -501,10 +496,6 @@
   }
   [data-widget="currencyLanguageSelector"] p {
     color: var(--d-text) !important;
-  }
-  [data-widget="commonAddressBook"] img + div,
-  [data-widget="commonAddressBook"] img + div span {
-    color: #081b2b !important;
   }
 
   /* ------------------------------------------------------------
@@ -1116,13 +1107,22 @@
      every clamped review, and the "+N" photo count, both colour themselves with
      `color: var(--bgActionPrimary)` — a token NAMED for the blue CTA fill but
      reused here as text. It stays the raw #005bff, ~2.9:1 on the base, sitting
-     right beside the review's own links which the rule above lifts to #2e78ff:
-     the same widget shipping two different blues, one of them below the WCAG
-     floor. --bgActionPrimary cannot be lifted at :root (17 of its uses are button
-     FILLS, where white-on-#2e78ff drops to 3.4:1), so rebind it inside this widget
-     only — measured live, it repaints exactly these text uses and no fill. */
+     right beside the review's own links, which take --textAction: the same widget
+     shipping two different blues, one of them below the WCAG floor.
+     --bgActionPrimary cannot be lifted at :root (17 of its uses are button FILLS,
+     where white-on-a-lighter-blue drops to 3.4:1), so rebind it inside this widget
+     only — measured live, it repaints exactly these text uses and no fill. The
+     target is the INK blue, not the fill blue: these are body-size runs on the
+     review card (#1c2128), where the fill blue measures 4.05:1. */
   [data-widget="webListReviews"] {
-    --bgActionPrimary: var(--d-blue) !important;
+    --bgActionPrimary: var(--d-blue-ink) !important;
+  }
+  /* The Q&A list ("/questions/" page and the PDP's questions block) reuses the same
+     token the same way for its "показать больше вопросов" pager, which is a <button>,
+     not an <a>, so no link rule reaches it. The widget has no --bgActionPrimary FILL
+     of its own, so the rebind repaints the pager and nothing else. */
+  [data-widget="webListQuestions"] {
+    --bgActionPrimary: var(--d-blue-ink) !important;
   }
   /* REVIEW RATING HISTOGRAM ("5 звёзд … 1 звезда" bars): the webReviewTabs
      `div { transparent }` reset above flattens BOTH the grey track and the gold
@@ -1273,11 +1273,12 @@
      with `color: var(--bgActionPrimary)` — a token NAMED for the blue CTA fill but
      used here as text, so it stays the raw #005bff at ~2.9:1 on the base, below the
      WCAG floor. --bgActionPrimary cannot be lifted at :root (most of its uses are
-     button FILLS, where white-on-#2e78ff drops to 3.4:1), so rebind it inside this
-     widget only: measured live, the label is its ONLY use anywhere in the gallery.
-     It renders on video-bearing PDPs alone, so a gallery of stills never shows it. */
+     button FILLS, where white-on-a-lighter-blue drops to 3.4:1), so rebind it inside
+     this widget only: measured live, the label is its ONLY use anywhere in the
+     gallery. It takes the INK blue — a body-size text run, not a fill. It renders on
+     video-bearing PDPs alone, so a gallery of stills never shows it. */
   [data-widget="webGallery"] {
-    --bgActionPrimary: var(--d-blue) !important;
+    --bgActionPrimary: var(--d-blue-ink) !important;
   }
 
   /* ============================================================
@@ -1537,6 +1538,17 @@
   [data-widget="webCustomizedCertificate"] div[class*="tsBody300XSmall"] {
     background-color: var(--d-surface) !important;
     color: var(--d-text-3) !important;
+  }
+  /* SELECTED design tile — the chosen certificate artwork is the only tile
+     Ozon gives a border at all (2px brand blue; the other 31 carry
+     border-width 0), so the blanket `* { border-color }` softener leaves the
+     picker with no selection indicator. Painting every tile blue is safe: a
+     border colour on a border that is not drawn paints nothing. The widget's
+     one other bordered button is the "Свой дизайн" uploader, whose ring is a
+     neutral #f5f7fa natively and must stay grey — it is the only button here
+     carrying a ts* typography class, which is what the :not() excludes. */
+  [data-widget="webCustomizedCertificate"] button:not([class*="ts"]) {
+    border-color: var(--d-blue) !important;
   }
 
   /* ============================================================

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Depop, easy on the eyes across home, search, categories and product pages, with prices, sale tags and the Depop red kept readable.
-@version      20260814.23.03
+@version      20260820.00.09
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -35,6 +35,16 @@
        token there) plus the chip-button and condensed-card icon-button hover
        fills, which only exist on logged-in surfaces we cannot reach. */
     --surface-primary-weak: #1c2128;
+
+    /* The design system's primary ink (#262626 via --primitive-night-900). Its
+       consumers are the typography classes (_body-*, _heading-*, _caption-*,
+       _display_), which the site puts on ANY tag — the tag rules below cover
+       p/span/li/headings, but a <div> carrying one keeps #262626 and renders
+       dark-on-dark (every bullet of /shipping/'s "Why choose Depop Shipping?").
+       Keep the definition unqualified: components that rebind it locally (the
+       homepage hero's aria-current nav link takes --text-accent-base) must
+       still win, and every light plate we preserve pins its ink literally. */
+    --text-primary-base: #c4cdd6;
   }
 
   /* ---- Base ---- */
@@ -423,6 +433,17 @@
     background-color: transparent !important;
   }
 
+  /* The marketing pages (/safety/, /shipping/) lay their feature lists out as
+     `stepCard` tiles filled with the same light gradient family as the hero
+     thumb (#FBF6F1 → #E2E8F7 and a pink → cream variant). It arrives as a
+     background-IMAGE on a <div> inside an <li>, so neither the `main div`
+     bg-COLOUR reset nor the `main section` gradient rule reaches it: thirteen
+     near-white slabs carrying #262626 copy our text rules re-light. */
+  [class*="stepCard"] {
+    background-image: none !important;
+    background-color: #1c2128 !important;
+  }
+
   /* The homepage's "Shop by price" tiles (Under £10 / £20 / £50 / £100) take
      their fill from an inline `--background` custom property holding the same
      light linear-gradient as the hero thumb (#FBF6F1 → #E2E8F7). It arrives as
@@ -708,6 +729,56 @@
 
   main button[class*="pillActive"]:hover {
     background-color: #ffffff !important;
+    color: #14181d !important;
+  }
+
+  /* The /brands/ A–Z index draws its 27 letter chips as <a>s filled #fff with a
+     #262626 border and #262626 ink, inverting to a #262626 fill with white ink
+     on hover/focus and for the letter you are on. They are anchors, so the
+     `main div` reset never reached them: the whole strip renders as white tiles
+     carrying our #c4cdd6 ink at ~1.6:1 — the letters are effectively gone.
+     Mirror the inversion, and ring the rest state so a chip still reads as a
+     chip on the elevated fill. `brandGroupsNavLinkActive` contains the substring
+     `brandGroupsNavLink`, so the inverted rules must stay below the rest state. */
+  [class*="brandGroupsNavLink"] {
+    background-color: #1c2128 !important;
+    border-color: #4a525b !important;
+  }
+
+  [class*="brandGroupsNavLink"] p {
+    color: #c4cdd6 !important;
+  }
+
+  [class*="brandGroupsNavLink"]:hover,
+  [class*="brandGroupsNavLink"]:focus,
+  [class*="brandGroupsNavLinkActive"] {
+    background-color: #e6edf3 !important;
+  }
+
+  [class*="brandGroupsNavLink"]:hover p,
+  [class*="brandGroupsNavLink"]:focus p,
+  [class*="brandGroupsNavLinkActive"] p {
+    color: #14181d !important;
+  }
+
+  /* The sitemap's Categories / Brand Categories switch draws its tabs as bare
+     <li>s: `background:#fff` with #262626 ink, inverted to a #262626 fill with
+     white ink for the selected one. `main div` never reaches an <li>, so the
+     unselected tab keeps the white fill under our #c4cdd6 ink (~1.4:1) while
+     the selected one sits at #262626 on the #14181d page — the strip reads as
+     one unreadable pill beside one invisible one. Mirror the native inversion.
+     Across every logged-out page type `li[class*="__tab"]` matches this strip
+     alone; the profile's Shop/Likes tabs are tabsWrapper/tabHighlight, not <li>. */
+  li[class*="__tab"] {
+    background-color: #1c2128 !important;
+  }
+
+  /* Must stay BELOW: the active tab carries both classes and ties on specificity. */
+  li[class*="activeTab"] {
+    background-color: #e6edf3 !important;
+  }
+
+  li[class*="activeTab"] a {
     color: #14181d !important;
   }
 

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260814.23.03
+@version      20260820.00.09
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -144,6 +144,20 @@
     color: #e6edf3 !important; }
   .contentItem__title a:hover, .headlineStack__list > li > a:hover,
   .AnchorLink:hover { color: #5fb0e6 !important; }
+  /* .AnchorLink is ESPN's generic next-gen anchor and its BASE ink is the site's link blue
+     #0066cc; only heading-like components (card headlines, a table's sortable column head)
+     override it to near-black. The headline-white rule above therefore also swallowed every
+     genuinely-blue one, so a box-score player name, a standings team name and a card's
+     "See All" rendered the same white as the stat numbers beside them — while the team name
+     one column over, whose ink comes from `a span`, stayed blue, leaving the same row
+     two-toned. Restore the link tone on table DATA cells and the named link components.
+     `.Table__sub-header` is re-excluded: those anchors are the sortable column heads, which
+     ESPN paints near-black, i.e. they really are headings. */
+  .Table__TBODY .Table__TD .AnchorLink, .Boxscore__Athlete_Name,
+  .News__FooterLink, .Card__Header__SubLink, .Card__Header__SubLink__Text,
+  .TeamLinks__Link .AnchorLink, .ScoreboardEventInfo__TicketContainer .AnchorLink {
+    color: #5fb0e6 !important; }
+  .Table__sub-header .AnchorLink { color: #e6edf3 !important; }
 
   /* ---- Story / article body ---- */
   .article, #article-feed .article, .article-body, .Story, .Story__Body,
@@ -187,15 +201,36 @@
   .video-play-button { background-color: transparent !important; }
 
   /* ---- Tables (stats / standings) ---- */
+  /* The wrappers matter as much as the table: a team ROSTER paints .ResponsiveTable and its
+     .Roster__Heading band solid #fff, which the old opaque row fill happened to cover — so
+     restoring the zebra (rows transparent on the unstriped half) is what exposes it. Any
+     table container left white here shows through between the striped rows. */
   .Table, .Table2, table, .tablehead, .mpTable > table, .Table__TBODY,
-  .Table2__table { background-color: transparent !important; }
+  .Table2__table, .ResponsiveTable, .Roster__Heading, .TableDetails,
+  .Table__ScrollerWrapper, .Table__Scroller { background-color: transparent !important; }
   .Table__THEAD, .Table2__thead, thead, .Table__TH, .Table2__th, th,
   .tablehead tr.colhead, .Table__sub-header {
     background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   .Table__TR, .Table2__tr, tr, td, .Table__TD, .Table2__td, .tablehead td {
     border-color: #2d333b !important; color: #c4cdd6 !important; }
-  .Table__TR--sm, tr:nth-child(even), .Table__even { background-color: #181d23 !important; }
-  .Table__TR:hover, tr:hover { background-color: #21262d !important; }
+  /* Zebra striping. `.Table__even` and `.Table__TR--sm` are size/variant classes ESPN puts
+     on EVERY row of a .Table (a stats grid is 56 `Table__even` rows to 6 `Table__odd`), so
+     naming them painted every row one tone and erased the rgba(0,0,0,.02) zebra the site
+     draws — standings, box scores, stats and rosters all shipped as one flat block. ESPN
+     tints nth-child(even) by default; inside `.is-color-controlled` (standings, team
+     schedule) the app marks the tinted rows itself with `.filled` and the default is off,
+     so those two must not both apply or every row is striped again. The hover rules carry
+     the `.is-color-controlled` prefix because a bare `tr:hover` loses to the two-class
+     rules above it. The tint is TRANSLUCENT for the same reason ESPN's is: these tables sit
+     on the page base on one route and inside an elevated card on the next, so an opaque
+     stripe would vanish on one of them — and it would also hide the sorted-column band
+     ESPN paints the full height of the table BEHIND the rows. */
+  tr:nth-child(even) { background-color: rgba(255,255,255,0.05) !important; }
+  .is-color-controlled tr:nth-child(even) { background-color: transparent !important; }
+  .is-color-controlled tr.filled { background-color: rgba(255,255,255,0.05) !important; }
+  .Table__TR:hover, tr:hover,
+  .is-color-controlled tr:hover, .is-color-controlled tr.filled:hover {
+    background-color: #21262d !important; }
   /* Box-score / line-score DATA cells hardcode a solid white bg (baseball gamecast
      line score's PIT/WSH score rows) → light-grey numerals on white, unreadable.
      Audit-blind: each cell is <40px tall so it slips the light-surface size filter.
@@ -334,6 +369,13 @@
     background-color: #588ae4 !important; border-color: #588ae4 !important;
     color: #121213 !important; -webkit-text-fill-color: #121213 !important; }
   [data-testid="watchButton"]:hover { background-color: #7aa1ea !important; }
+  /* A prism <Button> wraps its label in a bare <span> and lets it INHERIT the button's own
+     ink, which on a filled variant is a near-black chosen against that fill (#121213 on
+     Where-to-Watch's #5990f6 "Add Favorites"). The generic span body-grey out-specifies the
+     inherited value, so the label repainted #c4cdd6 on light blue — 1.9:1, while the
+     button's own colour still said #121213. Hand the span back to the button. */
+  [data-testid="prism-Button"] span {
+    color: inherit !important; -webkit-text-fill-color: inherit !important; }
   /* Shot-map filter row (soccer match report / gamecast "SHOT MAP"): the shot-type pills
      and the All-Periods / All-Players dropdowns are built on `.Button--default`, so the
      filled brand-blue PRIMARY rule above turned the whole filter bank into a row of blue
@@ -1478,4 +1520,60 @@
     color: #4ac76a !important; -webkit-text-fill-color: #4ac76a !important; }
   .GameResults.GameResults--loss {
     color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
+
+  /* ---- ESPN Radio player (/radio/play/_/s/<station>, reached from the footer's "ESPN
+       Radio: Listen Live"). The video.js shell ships an `.audio` skin that is the inverse
+       of the video one: a 900x500 solid #fff stage, a #fff caption layer, a #fff
+       now-playing block and a #fff settings menu, all with black ink and black icon-font
+       glyphs, and the right rail's contact card paints .RadioContact__Content #fff inside
+       an already-dark .Card. Our light body ink then rendered the station name, the show
+       title and both clocks near-invisible on white. Only the `.audio` variant is named —
+       the video skin is already black and must stay so. The control glyphs are drawn by
+       each button's own ::before, which inherits `color`, so lighting the buttons covers
+       them; the scrubber and volume fills are real backgrounds and need inverting
+       separately (track light-on-dark becomes dark, played black becomes light). ---- */
+  .evp-player.audio, .evp-player.audio .vjs-text-track-display,
+  .evp-player.audio .vjs-menu, .audio-content-container, .RadioContact__Content {
+    background-color: #1c2128 !important; }
+  .evp-player.audio, .evp-player.audio .vjs-control, .evp-player.audio button,
+  .audio-content-container { color: #c4cdd6 !important; }
+  /* .vjs-progress-holder also carries .vjs-slider but is the 30px HIT AREA, not the 4px
+     track — painting the shared class turned the scrubber into a thick grey slab. */
+  .evp-player.audio .vjs-volume-bar,
+  .evp-player.audio .evp-progress-holder-wrapper { background-color: #3a4149 !important; }
+  .evp-player.audio .vjs-load-progress { background-color: #4a525b !important; }
+  .evp-player.audio .vjs-play-progress, .evp-player.audio .vjs-volume-level {
+    background-color: #c4cdd6 !important; }
+  /* Every transport glyph is a data-URI SVG background-image with a hardcoded black fill,
+     on a transparent ::before box — no color or fill rule reaches it, so inverting the
+     pseudo flips the glyph and nothing else. The LIVE chip draws BOTH its box and its
+     label in one such SVG on the button itself, so it takes the invert directly — clearing
+     the background-image instead would delete the word LIVE. */
+  .evp-player.audio .vjs-control::before,
+  .evp-player.audio .vjs-menu-button::before,
+  .evp-player.audio .vjs-icon-placeholder::before { filter: invert(1) !important; }
+  .evp-player.audio .vjs-seek-to-live-control { filter: invert(1) !important; }
+  /* The big centre play triangle is the one glyph ESPN ships already WHITE: on the white
+     stage it is invisible by design (the transport bar carries the real control), and
+     darking the stage turned it into a huge clipped white wedge over the scrubber. Sink it
+     back to the panel tone so the skin reads as ESPN draws it. */
+  .evp-player.audio .vjs-big-play-button::before {
+    filter: invert(1) brightness(0.16) !important; }
+
+  /* ---- fantasy.espn.com marketing pages (a claimed espn.com subdomain running its own
+       Next.js frontend, linked from the footer's Fantasy column). Its secondary nav bar,
+       the two feature bands and the support module ship solid #fff — plus a near-white
+       linear-gradient on the app-upsell band, which no background-COLOR rule reaches — so
+       our light headings and body copy landed at ~1.2:1 on white. The jsx-<hash> class
+       beside each of these rotates every deploy; the semantic class is the stable hook. ---- */
+  nav.NavSecondary, .CompeteWithFriends, .SupportModule, .chat--container--wrapper {
+    background-color: #1c2128 !important; }
+  .WelcomeMobileUpsell {
+    background-color: #14181d !important; background-image: none !important; }
+  /* Its dividers are pseudo bars in #dcdddf (the nav's item separator, the contest-rules
+     rule) and a #f1f2f3 border-TOP longhand on the upsell card — a one-class !important,
+     so the blanket `*` border reset, which only sets the shorthand at (0,0,0), loses. */
+  .NavSecondary__Link::after, .GridironGauntletGameplay__Content::after {
+    background-color: #2d333b !important; }
+  .Card__Content { border-top-color: #2d333b !important; }
 }

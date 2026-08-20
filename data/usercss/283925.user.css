@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A polished dark look across the whole site: the home page, video pages and their comment lists, the rankings, search results and user profiles.
-@version      20260814.23.06
+@version      20260820.00.12
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -127,6 +127,14 @@
     --colors-action-text-on-tertiary-azure-inv: #5fb0e6 !important;
     --colors-icon-primary-azure: #5fb0e6 !important;
     --colors-layer-surface-accent-azure: #1f4a78 !important;
+
+    /* The ranking medal ramp — gold 1位 / "silver" 2位 / bronze 3位, set as 32px italic
+       numerals with a matching crown on the ranking page. The silver step is the site's
+       #1466b8, which clears 3:1 on its own near-black base but only reaches 2.8:1 on our
+       elevated card, failing AA for large text while its gold and bronze siblings pass.
+       Lift the blue and leave the other two verbatim, so the three ranks stay told apart
+       by hue. (The legacy video_top rail hardcodes the same value and needs its own arm.) */
+    --colors-ranking-grade-silver: #3d8ddd !important;
 
     /* The "lust" accent is the site's semantic red (the ショート "New" flag in
        the left rail, live/error markers). At its own #e61a1a it only reaches
@@ -513,6 +521,53 @@
      itself by turning the site's #559cff on hover; the heading pass pins it #e6edf3, and
      nothing else in that row moves, so it stopped reading as clickable. */
   a.channel-name-anchor:hover { color: #5fb0e6 !important; }
+
+  /* Live (live.nicovideo.jp) broadcast-history embed — the iframe a www user page's 生放送
+     tab mounts (live.nicovideo.jp/embed/broadcast-history). It is a live document, so this
+     theme does reach it, but nothing in it was ever named and no scan of the HOST page can
+     see it: audit-theme walks the top document only. The page shell is #fafafa and as tall
+     as the program list (14000px on an active broadcaster, so it rendered as a white band
+     between every card and a white slab on a broadcaster with none); the ⧉ copy-URL button,
+     the 絞り込み toggle and the filter popup's twelve month buttons are #fff pills; and each
+     card's category chip is a #fff pill our text pass had already painted light grey
+     (~1.9:1). The pagination is the one part a rule of ours already touched —
+     `[class*="page-selector"]` gave it a dark tile — which left its #555 numerals at 1.7:1
+     on that tile, i.e. every page but the current one was invisible.
+     The month picker marks its choice with aria-pressed and the pager with aria-selected;
+     both keep the theme's active azure so the choice still reads. The prev/next arrows are
+     a mask-image ::before whose background-color IS the glyph, so they are lightened, not
+     darkened — the number buttons' ::before is the digit itself and takes the button's
+     colour, so it must not be given a background. */
+  .ga-ns-broadcast-history-page { background-color: #14181d !important; }
+  /* Each card is separated by a 2px #e5e5e5 border-TOP on its <li>. The legacy
+     `.BaseLayout *` border reset cannot reach it — that class is on the HOST page's body,
+     and this is a separate document. */
+  .ga-ns-broadcast-history-page li { border-color: #2d333b !important; }
+  .ga-ns-broadcast-history-page button,
+  .ga-ns-broadcast-history-page .program-category-type-label {
+    background-color: #262c33 !important;
+    color: #c4cdd6 !important;
+    border-color: #2d333b !important;
+  }
+  .ga-ns-broadcast-history-page button[aria-pressed="true"],
+  .ga-ns-broadcast-history-page button[aria-selected="true"] {
+    background-color: #1f4a78 !important;
+    color: #ffffff !important;
+    border-color: #1f4a78 !important;
+  }
+  .ga-ns-broadcast-history-page button[data-name="prev"]::before,
+  .ga-ns-broadcast-history-page button[data-name="next"]::before {
+    background-color: #c4cdd6 !important;
+  }
+  /* The picker's own header controls (前月へ / 次月へ / リセット) are bare chrome on the
+     popup panel, not pills — the plate above would stamp a square on each, including the
+     glyph-less disabled one. Additive override rather than a :not() arm, whose specificity
+     would then outrank the later same-specificity rules. */
+  .ga-ns-broadcast-history-page [class*="year-month-picker"] [class*="-button"] {
+    background-color: transparent !important;
+    border-color: transparent !important;
+  }
+  .ga-ns-broadcast-history-page [class*="message"] { color: #c4cdd6 !important; }
 
   /* Selected segmented-control pill — the search type tabs (動画 / ショート /
      シリーズ / マイリスト / ユーザー), the comment vs. tag search toggle and
@@ -1301,8 +1356,21 @@
      2.46:1), and the `Label` arm overmatched Panda's atomic colour class — literally
      named `c_textOnLabel.white` — dropping the ranking/search "限定" chip on nicoad
      gold to 1.42:1. Both sit on saturated fills, so restore white. Must stay AFTER
-     the rule above: same specificity, later wins. */
+     the rule above: same specificity, later wins.
+     `.ContentThumbnail-label` is the same shape one component over — the type chip on
+     every home digest card (動画 / アニメ / マンガ on a #252525 pill, 生放送 on the same
+     brand red #ff0033). The site paints all of them white; the grey pass left the live
+     one at 2.46:1.
+     The home stage rail carries three of these chips side by side and only the LIVE one
+     was named, so 動画 and エンタメチャンネル/イベント rendered grey beside a white 放送予定.
+     The 動画 chip lost its pill on top of that: its class contains "VideoCard", so the
+     card-surface arm repainted the #252525 chip to the card's own #1c2128 and it stopped
+     reading as a chip at all. */
+  .StageRecommendVideoCard-label { background-color: #252525 !important; }
   .StageRecommendLiveCard-label,
+  .StageRecommendVideoCard-label,
+  .StageRequestedContentCard-label,
+  .ContentThumbnail-label,
   [class*="c_textOnLabel.white"] { color: #ffffff !important; }
   /* Same family, different cause: the nicoad "supporter comment" banner is painted
      brand gold and takes its label from the high-emphasis TEXT TOKEN, which we remap
@@ -1399,6 +1467,14 @@
   .SearchBox-option[data-active="true"] {
     background-color: #1f4a78 !important; color: #e6edf3 !important;
   }
+  /* The あなたにおすすめ rail repeats the ranking medal ramp, but its bundle hardcodes the
+     three colours instead of reading --colors-ranking-grade-*, so the token lift in :root
+     cannot reach it and 2位 stayed #1466b8 at 2.8:1 on the card. The numeral and its crown
+     are one glyph pair and the crown's fill comes from the same rule, not from
+     currentColor, so both halves have to be named. */
+  .ForYouRankingContainer-videoRank[data-rank="2"] { color: #3d8ddd !important; }
+  .ForYouRankingContainer-videoRank[data-rank="2"] svg * { fill: #3d8ddd !important; }
+
   /* Each notification row prints its date in the site's #333, which the legacy meta
      passes never reach (a bare `timestamp` class), so every date read ~1.4:1 on the
      repainted card. */
