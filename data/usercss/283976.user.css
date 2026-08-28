@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260820.00.10
+@version      20260827.15.12
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -496,6 +496,31 @@
      separate white strip — the drawer under it already resolves dark, so at 390
      the header alone stayed white above a dark menu. */
   .nav_desktop_contain, .nav_mobile_layout { background-color: #0d1117 !important; }
+  /* The announcement strip above that bar ("We have seen a rise in recruitment
+     scams.") is a full-bleed pale-periwinkle band (#dfeaff) — the brightest surface
+     above the fold on every marketing page, at both widths. Natively its whole
+     content is ONE indigo ink (the link, the trailing arrow, whose <svg> is
+     `stroke="currentColor"`, and the ✕); the theme's plain `a { color }` rule reached
+     only the link and left it at 1.9:1 on the band it does not darken. Give the band
+     the same info tint the app's notification banner gets and restate the single ink
+     across the whole strip so both the message and the dismiss control read. */
+  .nav_banner_wrap { background-color: #18222f !important; }
+  .nav_banner_wrap, .nav_banner_wrap * { color: #9bd4ff !important; }
+  /* The full text of that strip lives in a `<dialog class="modal_dialog">` that slides in
+     over the right half of the viewport. It is `display:none` until the strip is clicked,
+     so it exists in the DOM on every marketing page but no load-time scan can read it.
+     `.modal_content` is the panel; `.modal_backdrop` is already a near-black scrim and is
+     left alone. Every string inside is lifted by the global text block, so only the panel
+     needs a surface. The ✕ is a `stroke: currentColor` <svg> whose colour Webflow sets on
+     the button wrapper, and Webflow serialises that ink as `color(srgb …)` — a form a
+     channel-parsing audit skips — so the stroke is restated on the path as well as the
+     wrapper. `.modal_content` and `.button_close_element` exist ONLY inside this dialog on
+     every marketing page, but the dialog is named anyway so a future non-modal reuse of
+     either class is not swept up. */
+  dialog.modal_dialog .modal_content { background-color: #1c2128 !important; }
+  dialog.modal_dialog .button_close_element,
+  dialog.modal_dialog .button_close_icon { color: #c4cdd6 !important; }
+  dialog.modal_dialog .button_close_icon svg path { stroke: #c4cdd6 !important; }
   /* The header's dropdown carets ("For schools ▾", "Explore ▾", "About ▾") are inline
      <svg>s whose path is `fill="currentColor"`, and the desktop variant class sets that
      colour to the light page's pure black — so on the dark bar each caret renders #000
@@ -513,6 +538,16 @@
      cursor. Khan never draws its logo in either tone; the app's own header renders it
      near-white, so match that. */
   .nav_desktop_logo, .nav_mobile_logo, .footer_logo_wrap { color: #e6edf3 !important; }
+  /* Every anchor in the Webflow footer — the nav column, the legal row, the four
+     `currentColor` social marks and the inline "Support us" — takes its colour by
+     INHERITANCE from `.footer_wrap`, which Khan paints white. A direct declaration
+     beats an inherited one whatever its importance, so the theme's plain
+     `a { color }` rule won all of them and the footer rendered as a block of blue
+     links with blue social glyphs, a tone Khan never draws there. The app's own
+     footer escapes this only because its shell rule already pins it near-white;
+     match that. Native hover changes no colour (it adds an underline, which is
+     untouched here), so one state covers both. */
+  .footer_wrap a { color: #e6edf3 !important; }
   .nav_dropdown_main_content, .nav_dropdown_main_scroll, .nav_skip_wrap,
   .tab_button_item, .tab_content_list, .card_testimonial_inner,
   .card_primary_element { background-color: #1c2128 !important; }
@@ -661,6 +696,17 @@
   [style*="background-color: var(--wb-semanticColor-core-foreground-knockout"] {
     background-color: #1c2128 !important;
   }
+
+  /* The app shell's "we're having trouble loading external resources" notice. Khan
+     hides it from its own stylesheet and paints it from an INLINE `background`, so it
+     is precisely the one surface that survives when that stylesheet does not load —
+     while this theme, injected independently of Khan's CDN, still paints its text
+     light. Pale pink under a near-white ink is the failure notice you can no longer
+     read. The tint carries "something is wrong", so it maps to a dark red rather than
+     the neutral card tone. Surface only: the notice sits inside the page shell, so its
+     copy already takes that block's near-white ink, and a `color` here would be
+     out-specified by `.bibliotron-header div` anyway. */
+  .external-styles-missing { background-color: #2b1d1e !important; }
 
   /* …but that first substring also matches Perseus widget wrappers, whose inline
      style declares the CUSTOM PROPERTY `--perseus-widget-background-color:
@@ -815,8 +861,13 @@
      `* { border-color }` reset near the end of this file repaints all four sides,
      so the accent drops to the generic divider grey and the card reads as an
      ordinary bordered box. Restore the top edge only — the other three sides are
-     Khan's own hairline and are correctly softened. Stable test id. */
-  [data-testid="mastery-practice-content-item"] { border-top-color: #5fb0e6 !important; }
+     Khan's own hairline and are correctly softened. Stable test id.
+     Two test ids, one component: the unit page mounts it as
+     `mastery-practice-content-item`, the course page's "Course challenge" twin still
+     carries the older `course-challenge-card`. Both draw the same 4px brand-blue top
+     rule, so both need naming — matching only one leaves the other flat. */
+  [data-testid="mastery-practice-content-item"],
+  [data-testid="course-challenge-card"] { border-top-color: #5fb0e6 !important; }
 
   /* The "Level N … 0 /1 skill" bar above every article, video and exercise
      marks how far along the level you are with a 14px knob Khan fills its
@@ -1134,6 +1185,28 @@
   #onetrust-consent-sdk #close-pc-btn-handler { color: #9aa4af !important; }
   #onetrust-consent-sdk .ot-always-active { color: #5fb0e6 !important; }
   #onetrust-consent-sdk .ot-pc-footer-logo { background-color: #1c2128 !important; }
+  /* Surfaces the preference centre only creates on an interaction, so a scan of the
+     opened centre still reports them clean:
+     - `.ot-acc-grpcntr` is a cookie category's description body, `display:none` until
+       that category's accordion is expanded — a white panel under the remapped light ink.
+     - `#ot-sel-blk` belongs to the "Cookie List" screen behind the category rows.
+     - `.ot-optout-signal` is the pale-green strip shown only when the browser sends a
+       Global Privacy Control signal. */
+  #onetrust-consent-sdk .ot-acc-grpcntr,
+  #onetrust-consent-sdk .ot-acc-txt,
+  #onetrust-consent-sdk #ot-sel-blk,
+  #onetrust-consent-sdk #ot-fltr-cnt,
+  #onetrust-consent-sdk .ot-optout-signal { background-color: #1c2128 !important; }
+  /* Those four panels are the only place OneTrust puts its near-black ink on a plate
+     rather than on the modal, so darkening them is what makes the ink dark-on-dark:
+     the Cookie List's "Consent" / "Leg.Interest" column headers, the filter panel's
+     "Clear" (its "Apply" / "Cancel" siblings are natively dark charcoal with white
+     labels and need nothing), and the Global Privacy Control strip's message. */
+  #onetrust-consent-sdk #ot-sel-blk .ot-consent-hdr,
+  #onetrust-consent-sdk #ot-sel-blk .ot-li-hdr,
+  #onetrust-consent-sdk #clear-filters-handler,
+  #onetrust-consent-sdk .ot-optout-signal,
+  #onetrust-consent-sdk .ot-optout-signal * { color: #c4cdd6 !important; }
   /* Both OneTrust wordmarks are solid-black artwork drawn for a white modal. */
   #onetrust-consent-sdk .ot-pc-logo,
   #onetrust-consent-sdk .ot-pc-footer-logo img { filter: invert(1) !important; }
@@ -1238,6 +1311,19 @@
     border-top-color: transparent !important;
     border-right-color: #1c2128 !important;
   }
+  /* The picker's full-size twin. `.tooltip.mediapicker` above is the hover grid; the
+     "see all" control opens a body-level `.modal.mediapicker-modal` instead — a separate
+     node with its own white sheet and its own white footer, `display:none` until opened.
+     Its sound rows are <audio> elements with the browser's own dark controls, so only the
+     sheet behind them and the footer under them need a surface.
+     The modal declares a mid grey (#555) on itself and its ~33 file labels are bare
+     <span>s that inherit it, which no rule in this sheet reaches — on the darkened sheet
+     that ink is the whole file list at ~2.4:1. Restating the inherited colour on the
+     modal covers every one of them; the footer's own buttons declare their own ink and
+     keep their native light faces. */
+  .modal.mediapicker-modal,
+  .modal.mediapicker-modal .mediapicker-modal-footer { background-color: #1c2128 !important; }
+  .modal.mediapicker-modal { color: #c4cdd6 !important; }
 
   /* The live editor's error bubble (`.tipbar`, "Oh noes! `ackground` is not
      defined…") floats OVER the program canvas, which the learner's own program

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for HeadHunter (hh.ru / hh.kz / hh.uz / hh.by / rabota.by). Job search, vacancies and companies in an easy-on-the-eyes dark UI.
-@version      20260820.00.10
+@version      20260827.15.11
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -1568,6 +1568,20 @@
      paths, and they read as page-base lines once the land is dark. */
   [class*="tmpl_hh_geo"] svg path[fill="#E3E6E9"] {
     fill: #3a424c !important; }
+  /* hh's constructor widgets stack their decorative artwork in a DEDICATED layer
+     element (`tmpl_hh_<widget>__object(s)`, `tmpl_hh_<widget>__bg`) that is
+     position:absolute, pointer-events:none, natively TRANSPARENT and — on the
+     benefits widget — `z-index:20`, i.e. ABOVE the `__content` layer at z-index 10.
+     Opaque, it is a solid sheet over the whole section and every heading, card and
+     paragraph under it disappears (hh.ru/employer/3529 carries two such layers).
+     Nothing detects that state: the buried text keeps a correct colour on a correct
+     background, the cover hit-tests as absent because of pointer-events:none, and
+     its own computed background is a legitimate theme value — only a native-vs-themed
+     diff over absolutely-positioned elements finds it.
+     Two attribute selectors (0,2,0) outrank the single-attribute blanket. */
+  [class*="tmpl_hh"][class*="__object"], [class*="tmpl-hh"][class*="__object"],
+  [class*="tmpl_hh"][class*="__bg"], [class*="tmpl-hh"][class*="__bg"] {
+    background-color: transparent !important; }
   /* newer Magritte "constructor" employer pages: the "О компании" body widget
      ships a hardcoded WHITE panel — our light body text then reads light-on-light
      (unreadable). Dark the widget surface; its text already maps to light grey. */
@@ -2626,6 +2640,34 @@
   .partners-tools__tool { background-color: #1c2128 !important; }
   .partners-tools::before, .partners-howto::before {
     background-color: #14181d !important; }
+
+  /* ---- Мобильные приложения (/mobile) ----
+     Its own `mob__hh__` module. Every section paints its full-bleed band on a
+     dedicated `.mob__hh__background` child and the curved seam between two bands
+     on a second `.mob__hh__wave` layer stacked over it — an inline SVG on one
+     section, a raster plate on the others, both carrying the two band colours
+     baked in, so the seam has to be dropped whenever a band moves. The band
+     class is shared with the hero and the bottom link band, which are dark
+     natively, hence the per-section arms. `#311791` is hh's own value for the
+     search band: it ships that purple on the narrow-viewport twin of this
+     element and only goes pale on desktop, where the raster seam supplies the
+     colour. The phone mock-ups, the notification cards and the QR keep their
+     light plates — they depict the app, and a QR needs its quiet zone. */
+  .mob__hh__section__beside > .mob__hh__background:not(.mob__hh__wave),
+  .mob__hh__section__declare > .mob__hh__background:not(.mob__hh__wave) {
+    background-color: #14181d !important; }
+  .mob__hh__section__search > .mob__hh__background:not(.mob__hh__wave) {
+    background-color: #311791 !important; }
+  .mob__hh__section__find-job > .mob__hh__wave,
+  .mob__hh__section__beside > .mob__hh__wave,
+  .mob__hh__section__search > .mob__hh__wave {
+    background-image: none !important; }
+  .mob__hh__section__find-job .mob__hh__wave path,
+  .mob__hh__section__beside .mob__hh__wave path {
+    fill: #14181d !important; }
+  /* The store CTA is an <a> carrying the solid-button class, so the site-wide
+     link ink lands on the label instead of the button's own white. */
+  a.mob__hh__button { color: #ffffff !important; }
 
   /* ---- Misc surfaces hh paints white directly ---- */
   [style*="background-color: rgb(255, 255, 255)"],

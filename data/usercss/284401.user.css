@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A dark theme for the Russian SCP Foundation wiki (articles, sidebar, tag search, forum)
-@version      20260820.00.13
+@version      20260827.15.14
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -40,6 +40,38 @@
     /* The 2023 sidebar redesign draws its corner brackets, its folded-section
        wipe and its section rules from one crimson. */
     --new-side-bar-color: #8a2f2f;
+
+    /* The Basalt theme family builds every surface it owns — sticky masthead,
+       sidebar, page-options strip, component boxes — out of this palette, as
+       bare `r,g,b` triplets fed to rgb(). Fill the surfaces one at a time and
+       the ink pitched against them stays where it was, so the palette moves
+       whole. `light-text` is the ink the family puts ON its accent chips and
+       stays light; `sub-text` is already legible on a dark plate and is left
+       alone, as are the accent hues. The themes state these on :root from the
+       page's own <style>, which the browser reads after this sheet, so weight
+       is what decides it. */
+    --basalt-primary-color: 20, 24, 29 !important;
+    --basalt-secondary-color: 26, 31, 38 !important;
+    --basalt-tertiary-color: 45, 51, 59 !important;
+    --basalt-main-text-color: 230, 237, 243 !important;
+    --basalt-light-text-color: 230, 237, 243 !important;
+    --header-background-color: 26, 31, 38 !important;
+    --header-border-color: 45, 51, 59 !important;
+
+    /* Cosmonaut's one light-panel colour. It backs the theme's quote boxes,
+       table headers, image captions, tooltips, footnote footer and social
+       cards, and it reaches the quote boxes from a `z-index: -1` pseudo, which
+       paints over any background-color set on the box itself. */
+    --hazyCyanColor: #1a1f26 !important;
+
+    /* Black Highlighter's link ink. The skin is imported cross-origin and
+       keeps it at its light-mode dark red, which lands at 2.7:1 on the page
+       base. It feeds the skin's bare `a` rule and, through tokens the skin
+       resolves on :root, the footnote numerals, the pager and the contents
+       box — a rebind lower down the tree cannot reach those, so it has to
+       sit here. The article column is already crimson from the two-id link
+       rule below, so this only moves the chrome around it. */
+    --link-color: 232, 98, 110 !important;
   }
 
   html,
@@ -48,15 +80,87 @@
     color: #c4cdd6 !important;
   }
 
+  /* A visual theme that names the id outranks the element selector above and
+     leaves a light page behind every surface the theme below leaves clear. */
+  html body#html-body {
+    background-color: #14181d !important;
+  }
+
   #html-body,
   #skrollr-body,
   #container-wrap-wrap,
   #container,
+  #action-area {
+    background-color: transparent;
+  }
+
+  /* ------------------------------------------------------------
+     ACTION AREA — the click-gated panels (rating, history, page
+     source, backlinks, authorship) the page-options rail swaps in
+
+     Clearing the panel above puts every ink a visual theme pitched
+     at its own near-white panel onto the page base: black, navy
+     and mid-teal headings all land under 2.5:1, and the skins that
+     drive the heading from a design token keep that token at its
+     light-mode value. Unlike an in-article heading, nothing here
+     is authored — the strings come from the site's own modules and
+     no author surface sits under them — so this is the one place
+     the heading colour is pinned. */
+  #action-area h1 {
+    color: var(--scpru-title) !important;
+  }
+
+  #action-area h2,
+  #action-area h3,
+  #action-area h4,
+  #action-area h5,
+  #action-area h6 {
+    color: var(--scpru-heading) !important;
+  }
+
+  /* Voter and revision-author names. They sit outside the article
+     column, so the two-id link rule below never reaches them and a
+     theme's own bare `a` wins on document order. */
+  #action-area .printuser a,
+  #action-area .printuser a:visited {
+    color: var(--scpru-link) !important;
+  }
+
+  /* Two Black Highlighter tokens, moved only inside this panel.
+     `text-general` carries the labels of the rename and set-parent
+     forms the panel shows a logged-in user; `secondary-color` fills
+     the summary block the file list opens with, which the skin
+     paints near-white while the ink over it stays the page's. Both
+     are left alone elsewhere — `text-general` also inks the wiki
+     content table, and the themes that paint that table near-white
+     need it dark. */
+  #action-area,
+  #who-rated-page-area {
+    --swatch-text-general: 230, 237, 243 !important;
+    --swatch-secondary-color: 28, 33, 40 !important;
+  }
+
+  /* The history panel's «страница N из M» line reads a token the
+     skin resolves on :root, out of reach of the block above, and
+     the skin's own selector matches this one's specificity from a
+     later sheet. The anchors and the current-page chip state their
+     own colour. */
+  #action-area .pager {
+    color: #e6edf3 !important;
+  }
+
+  /* The content column and the chrome strips beside it. A visual theme that
+     paints any of them near-white puts the page's ink on paper it was never
+     measured against — body copy lands at 1.6:1 and the login links at 1.1:1.
+     Forcing them clear costs only the few themes that paint them a near-black
+     of their own, which the page base underneath already matches. */
   #content-wrap,
   #main-content,
   #page-content,
-  #action-area {
-    background-color: transparent;
+  #login-status,
+  #login-status span,
+  #page-options-container {
+    background-color: transparent !important;
   }
 
   /* The masthead art is a black-to-maroon band with a mid-grey stripe at
@@ -86,23 +190,42 @@
     border-color: #2d333b !important;
   }
 
-  /* The front page's own divider carries a light drop shadow. */
-  .hr-main {
-    background-color: #3a4048 !important;
+  /* Page-local divider components. Each one is a 3px bar with a `#ccc` drop
+     shadow — a light band plus a halo on a dark page. `.hr-logos` keeps its
+     own teal bar and only loses the halo. */
+  .hr-main,
+  .hr-big,
+  .hr-logos {
     box-shadow: 0 2px 3px rgba(0, 0, 0, .5) !important;
+  }
+
+  .hr-main,
+  .hr-big {
+    background-color: #3a4048 !important;
   }
 
   /* ============================================================
      TYPOGRAPHY
      ============================================================ */
 
-  /* Site chrome — always on the page floor, so the colour is pinned. */
+  /* Site chrome — always on the page floor, so the colour is pinned.
+     `.page-title` is the class form: an article that hides `#page-title` and
+     draws its own carries the branch crimson and a `#bbb` rule, both pitched
+     for the white page the article expected. */
   #page-title,
   .meta-title,
   .sub-page-title,
-  .sub-page-title h1 {
+  .sub-page-title h1,
+  #page-content .page-title {
     color: var(--scpru-title) !important;
     border-color: #2d333b !important;
+  }
+
+  /* Only the id form: a theme fills the title bar with its page plate, and the
+     crimson above then sits on near-white. The class form is author markup and
+     may carry paper of its own, so it is left out. */
+  #page-title {
+    background-color: transparent !important;
   }
 
   /* An in-article h1 is not pinned: an article that states a heading colour has
@@ -405,8 +528,13 @@
     border-color: #3a4048 !important;
   }
 
+  /* A theme whose own `#top-bar a` colour is a near-black states it from the
+     page's <style>, which the browser reads after this sheet — equal weight
+     there loses. No theme on the branch names the fill property, so that is
+     what carries the ink on those skins. */
   #top-bar a {
     color: #eaeaea !important;
+    -webkit-text-fill-color: #eaeaea !important;
   }
 
   /* The dropdown panel carries its own border and shadow; the anchor fills
@@ -418,18 +546,31 @@
   }
 
   /* Only the left and right sides are drawn. Stating all four keeps the two at
-     zero width off currentColor, which is now light. */
+     zero width off currentColor, which is now light.
+
+     The row carries its own plate because the band beneath this bar is often
+     artwork or a gradient on an ancestor: every element between the ink above
+     and that paint computes `rgba(0,0,0,0)`, so a contrast walk reads a page
+     base that is nowhere near the pixels. Sampled off rendered pixels and
+     compared against the same pixels with this sheet off, four themes put the
+     ink at 1.3-3.1:1 where their own was 5.4-13.6:1. The plate is the site's
+     own top-menu stripe colour, so where a theme leaves the band alone it is
+     seamless; where a theme paints the band, the label sits on this instead. */
   #top-bar ul li a {
+    background-color: #1c2128 !important;
     border-color: rgba(255, 255, 255, .06) !important;
   }
 
-  /* Open dropdown: the site paints these #eee / #fff */
+  /* Open dropdown: the site paints these #eee / #fff. The fill is restated
+     because the bar's own fill declaration otherwise reaches every row inside
+     it and overrides whatever `color` says here. */
   #top-bar ul li.sfhover a,
   #top-bar ul li:hover a,
   #top-bar li ul li a,
   #top-bar a:hover {
     background-color: #1c2128 !important;
     color: #ff8f97 !important;
+    -webkit-text-fill-color: #ff8f97 !important;
     border-left-color: #3a4048 !important;
     border-right-color: #3a4048 !important;
   }
@@ -458,12 +599,6 @@
 
   #top-bar .open-menu a:hover {
     box-shadow: 0 0 16px 2px rgba(0, 0, 0, .8) !important;
-  }
-
-  #top-bar .mobile-top-bar {
-    background-color: #1c2128 !important;
-    background-image: none !important;
-    border-color: #3a4048 !important;
   }
 
   /* The glyph is the anchor's own "≡" character, and an article theme can hold
@@ -545,10 +680,36 @@
     background-color: #2a1c1c !important;
   }
 
+  /* Wikidot wraps the heading text in a `p`, and an article theme states that
+     `p`'s colour directly — a direct declaration inheritance cannot reach, so
+     the block above darkens the surface under ink pitched for a white one. */
+  #container-wrap #side-bar .heading,
+  #container-wrap #side-bar .heading p,
+  #interwiki .heading,
+  #interwiki .heading p {
+    color: #e07b83 !important;
+  }
+
   #container-wrap #side-bar .heading,
   #interwiki .heading {
-    color: #e07b83 !important;
     border-bottom-color: #7d3030 !important;
+  }
+
+  /* The site draws this label as bare text over the block — no fill of its own.
+     A visual theme that gives it one pitches it against its own sidebar, and
+     the pink above then sits on a pale veil at 1.3-2.0:1. Clearing the fill
+     returns the label to the block colour, which is ours. The image is cleared
+     on the wrapper only: a theme that hangs an ornament on the inner `p` keeps
+     it, and no theme puts anything but a wash on the wrapper. */
+  #container-wrap #side-bar .heading,
+  #interwiki .heading {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  #container-wrap #side-bar .heading p,
+  #interwiki .heading p {
+    background-color: transparent !important;
   }
 
   /* The sidebar's own ink. Article themes state `#side-bar a` near-black for
@@ -672,7 +833,11 @@
     border-color: #2d333b !important;
   }
 
-  table.wiki-content-table th {
+  /* The id form is the one that reaches a theme stating the header row from the
+     column id — an id beats any class chain, `!important` on both sides or not.
+     The bare form stays for the tables that sit outside the content column. */
+  table.wiki-content-table th,
+  #main-content table.wiki-content-table th {
     background-color: #22282f !important;
     color: #e6edf3 !important;
   }
@@ -714,6 +879,16 @@
   div.note-block:not([style*="background"]) {
     border-color: #7d3030 !important;
     background-color: #1a1f26 !important;
+  }
+
+  /* The hub pages' own TOC head and legend rule themselves at a fixed `#ccc`,
+     which is a whisper on their white page and a bright hairline on ours.
+     Sibling separators drawn in `currentColor` are left alone — those track the
+     ink and stay proportionate on either background. */
+  #toc .title,
+  #toc .toc-action-bar,
+  #page-content .legend table tr {
+    border-bottom-color: #2d333b !important;
   }
 
   blockquote:not([style*="background"]),
@@ -959,6 +1134,14 @@
 
   .content-panel .panel-heading {
     color: #f0f0f0;
+  }
+
+  /* An index page states its section headings from the column id, which the
+     element rule in TYPOGRAPHY cannot reach — near-black on the panel we just
+     filled dark. Scoped to the panel because that surface is ours; an h1 out in
+     the column belongs to whatever surface its page drew for it. */
+  #main-content #page-content .content-panel h1 {
+    color: var(--scpru-title);
   }
 
   .content-panel .panel-footer {
@@ -1444,8 +1627,21 @@
     border-color: #3a4058 !important;
   }
 
-  a.action-area-close:hover {
+  /* The panel's close control. Wikidot ships it as a bare `.btn` anchor and a
+     visual theme dresses it for the near-white panel it expects underneath —
+     either a near-white pill, which survives as the one bright chip on the
+     cleared panel, or a near-black link, which survives as 1.1:1 ink on it.
+     Stripped back to the bare link the unskinned page already shows; the
+     hover fill below is the affordance. */
+  #action-area a.action-area-close {
+    background-color: transparent !important;
+    border-color: #3a4048 !important;
+    color: var(--scpru-link) !important;
+  }
+
+  #action-area a.action-area-close:hover {
     background-color: #262c33 !important;
+    color: var(--scpru-link-hover) !important;
   }
 
   /* The «Авторство» panel's author chip is a styled-components node, so its
@@ -1684,6 +1880,28 @@
   #page-content .author-single .date,
   #page-content .author-single .index {
     color: #8b949e !important;
+  }
+
+  /* The column header strip of the story and draft listings, painted #eee from
+     each page's own <style> and carrying the column ink by inheritance. The
+     three rules below carry the same inline-paper escape as every other fill in
+     this file: a box that names its own background keeps it, and the ink that
+     goes with it. */
+  #page-content .item.heading:not([style*="background"]) {
+    background-color: #22282f !important;
+    border-color: #3a4048 !important;
+  }
+
+  /* The four "create a page" cards, white from the same kind of page <style>. */
+  #page-content .new-page-form:not([style*="background"]) {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* A highlighter strip the object indexes put over a spoiler line. The plate
+     is the signal, so the ink is what moves. */
+  #page-content span.lie:not([style*="background"]) {
+    color: #140f0c !important;
   }
 
   /* ============================================================
@@ -2191,7 +2409,7 @@
      in its own family and only pitched to sit on a dark page — Euclid's amber
      could not carry its knocked-out white label at the site's own lightness. */
   .lb-article-class.lb-euclid {
-    background-color: #c98f00 !important;
+    background-color: #bd8700 !important;
   }
 
   .lb-article-class.lb-neutralized {
@@ -2776,7 +2994,15 @@
   #page-content [style*="color:#282467"]:not([style*="background"]),
   #page-content [style*="color: #282467"]:not([style*="background"]),
   #page-content [style*="color:#04b"]:not([style*="background"]),
-  #page-content [style*="color: #04b"]:not([style*="background"]) {
+  #page-content [style*="color: #04b"]:not([style*="background"]),
+  #page-content [style*="color:steelblue"]:not([style*="background"]),
+  #page-content [style*="color: steelblue"]:not([style*="background"]),
+  #page-content [style*="color:SteelBlue"]:not([style*="background"]),
+  #page-content [style*="color: SteelBlue"]:not([style*="background"]),
+  #page-content [style*="color:#4682b4"]:not([style*="background"]),
+  #page-content [style*="color: #4682b4"]:not([style*="background"]),
+  #page-content [style*="color:royalblue"]:not([style*="background"]),
+  #page-content [style*="color: royalblue"]:not([style*="background"]) {
     color: var(--scpru-lift-blue) !important;
   }
 
@@ -2787,12 +3013,18 @@
   #page-content [style*="color:#057800"]:not([style*="background"]),
   #page-content [style*="color: #057800"]:not([style*="background"]),
   #page-content [style*="color:#060"]:not([style*="background"]),
-  #page-content [style*="color: #060"]:not([style*="background"]) {
+  #page-content [style*="color: #060"]:not([style*="background"]),
+  #page-content [style*="color:#0a460a"]:not([style*="background"]),
+  #page-content [style*="color: #0a460a"]:not([style*="background"]) {
     color: var(--scpru-lift-green) !important;
   }
 
+  /* The attribute match is literal, so a second space after the colon is a
+     separate spelling and needs an entry of its own. `color:  purple` ships on
+     /scp-series-3. */
   #page-content [style*="color:purple"]:not([style*="background"]),
   #page-content [style*="color: purple"]:not([style*="background"]),
+  #page-content [style*="color:  purple"]:not([style*="background"]),
   #page-content [style*="color:indigo"]:not([style*="background"]),
   #page-content [style*="color: indigo"]:not([style*="background"]),
   #page-content [style*="color:#800080"]:not([style*="background"]),
@@ -2815,7 +3047,15 @@
   #page-content [style*="color:#900"]:not([style*="background"]),
   #page-content [style*="color: #900"]:not([style*="background"]),
   #page-content [style*="color:#a00"]:not([style*="background"]),
-  #page-content [style*="color: #a00"]:not([style*="background"]) {
+  #page-content [style*="color: #a00"]:not([style*="background"]),
+  #page-content [style*="color:firebrick"]:not([style*="background"]),
+  #page-content [style*="color: firebrick"]:not([style*="background"]),
+  #page-content [style*="color:#b22222"]:not([style*="background"]),
+  #page-content [style*="color: #b22222"]:not([style*="background"]),
+  #page-content [style*="color:#ce005c"]:not([style*="background"]),
+  #page-content [style*="color: #ce005c"]:not([style*="background"]),
+  #page-content [style*="color:#b04164"]:not([style*="background"]),
+  #page-content [style*="color: #b04164"]:not([style*="background"]) {
     color: var(--scpru-lift-maroon) !important;
   }
 
@@ -2833,7 +3073,11 @@
   #page-content [style*="color:#a52a2a"]:not([style*="background"]),
   #page-content [style*="color: #a52a2a"]:not([style*="background"]),
   #page-content [style*="color:#743"]:not([style*="background"]),
-  #page-content [style*="color: #743"]:not([style*="background"]) {
+  #page-content [style*="color: #743"]:not([style*="background"]),
+  #page-content [style*="color:sienna"]:not([style*="background"]),
+  #page-content [style*="color: sienna"]:not([style*="background"]),
+  #page-content [style*="color:#a0522d"]:not([style*="background"]),
+  #page-content [style*="color: #a0522d"]:not([style*="background"]) {
     color: var(--scpru-lift-brown) !important;
   }
 
@@ -2870,10 +3114,18 @@
     border-top: 1px solid #262c33;
   }
 
-  #footer a,
+  /* The engine credit bar is dark on the live site and its links are white
+     there, so they stay body ink. */
+  #footer a {
+    color: #c4cdd6 !important;
+  }
+
+  /* The licence strip is a light band on the live site and its one link is the
+     branch crimson. Body ink there is the same tone as the sentence around it,
+     and the strip carries no underline to fall back on. */
   #license-area a,
   .license-area a {
-    color: #c4cdd6 !important;
+    color: var(--scpru-link) !important;
   }
 
   #footer a:hover,
@@ -2886,6 +3138,15 @@
   .license-area {
     background-color: #0d1117 !important;
     color: #8b949e !important;
+  }
+
+  /* The version/last-edited line under the article. Nothing in the site's own
+     sheets states it, so a visual theme that does holds it at the near-black it
+     drew for its light column. The value is the body ink, so the default skin
+     is unchanged. */
+  #page-info,
+  #page-info .odate {
+    color: #c4cdd6 !important;
   }
 
   #navi-bar {
@@ -2994,12 +3255,31 @@
   #main-content #page-content .series-block .tag-lead a {
     color: #ffffff !important;
   }
+
+  /* The section rule and the card's inner divider are a fixed `#ccc`, drawn
+     full width. The page states the section rule from `:where(#page-content) h2`
+     — zero specificity, so this is scoped rather than site-wide: an article's
+     own h2 rule is left alone, because those are drawn in `currentColor` and
+     stay proportionate on either background. */
+  #page-content h2 {
+    border-bottom-color: #2d333b !important;
+  }
+
+  #page-content .series-block .blurb {
+    border-top-color: #3a4048 !important;
+  }
 }
 
 @-moz-document url-prefix("https://scpfoundation.net/canon-hub"), url-prefix("https://scpfoundation.net/foundation-tales") {
 #page-content .canon-block:not([style*="background"]),
   #page-content .tale-block:not([style*="background"]) {
     background-color: #1c2128 !important;
+  }
+
+  /* The filter toggle above the grid is a pill the same <style> paints a pale
+     green, which the crimson link colour sits on at 2.7:1. */
+  #page-content a.collapsible-block-link {
+    background-color: #1a1f26 !important;
   }
 }
 
@@ -3038,5 +3318,59 @@ div.modal,
   #main-content #page-content a[href="/components-hub"],
   #main-content #page-content a[href="/themes-hub"] {
     color: #8b949e !important;
+  }
+}
+
+@-moz-document url-prefix("https://scpfoundation.net/chat") {
+#page-content .rules-table th,
+  #page-content .rules-table td,
+  #page-content .rules-table p,
+  #page-content .rules-table li,
+  #page-content .rules-table strong {
+    color: #c4cdd6 !important;
+  }
+
+  /* The two join buttons are solid brand plates carrying a knocked-out white
+     label, which the site-wide link colour repaints to crimson at 1.1:1. */
+  #page-content a.join-btn {
+    color: #ffffff !important;
+  }
+}
+
+@-moz-document url-prefix("https://scpfoundation.net/artwork:russian-art-hub") {
+#page-content .head,
+  #page-content .head p,
+  #page-content .desc,
+  #page-content .desc p {
+    color: #c4cdd6 !important;
+  }
+
+  #page-content .head .classified,
+  #page-content .head .classified p {
+    color: var(--scpru-lift-maroon) !important;
+  }
+}
+
+@-moz-document url-prefix("https://scpfoundation.net/wl:") {
+#page-content .blurb {
+    color: #140f0c !important;
+  }
+
+  /* The skin's section headings and its pager caption are set for the cream
+     page it draws behind them, and the page is ours here. */
+  #main-content #page-content h1,
+  #main-content #page-content h2 {
+    color: var(--scpru-lift-green) !important;
+  }
+
+  #page-content .pager-no {
+    color: #8b949e !important;
+  }
+}
+
+@-moz-document url-prefix("https://scpfoundation.net/new-page-ru") {
+#page-content .sub-heading,
+  #page-content .sub-heading p {
+    color: var(--scpru-title) !important;
   }
 }

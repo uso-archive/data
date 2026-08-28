@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark mode for the SCP Foundation Wiki: articles, sidebar, tables, tabs, ratings, forums and search all get a comfortable night palette.
-@version      20260820.00.12
+@version      20260827.15.14
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -85,12 +85,22 @@
   div#container-wrap,
   div#container-wrap-wrap,
   #container,
-  #content-wrap,
   #main-content,
   #page-content,
   #skrollr-body,
   #html-body {
     background-color: transparent;
+  }
+
+  /* The skins that hang their page artwork on #container-wrap rather than the
+     body draw it under the article as well, and about one in ten of those is a
+     light one — the body ink then sits on near-white for the height of the art.
+     The two content columns carry the page floor so the ink always has its own
+     ground under it; the artwork still shows in the margins either side, and
+     the skins whose page is already this colour are unchanged. Stated below the
+     masthead only: #container-wrap's own art IS the masthead on Sigma-9. */
+  #content-wrap {
+    background-color: #14181d !important;
   }
 
   /* The masthead art is already dark on both skins, so only the paper under it
@@ -381,8 +391,21 @@
     border-color: #3a4048 !important;
   }
 
+  /* Two families need more than a light `color` here. The themes that leave
+     #header light — Bedrock and everything built on it (Basalt, Inkblot,
+     Broken Masquerade, Eigenvector, Angel, Immrama) paint it from their own
+     near-white gradient, which this theme does not touch because Sigma-9's
+     masthead is artwork — put these labels on a white band, so the fill below
+     gives every menu anchor its own dark plate. Sigma-9's grey stripe and
+     Black Highlighter's dark bar are unaffected: no skin sampled gives this
+     anchor a background of its own.
+     The other family (theme:ch-scp-theme, theme:crocker-theme) holds `color`
+     at a near-black that no !important dislodges; -webkit-text-fill-color is
+     unclaimed and is what paints the glyphs. It has to be restated on every
+     rule below that states a colour, or the pin overrides them. */
   #top-bar a {
     color: #eaeaea !important;
+    -webkit-text-fill-color: #eaeaea !important;
   }
 
   /* The dropdown panel carries its own fill on Black Highlighter — the anchor
@@ -397,6 +420,7 @@
   }
 
   #top-bar ul li a {
+    background-color: #1c2128 !important;
     border-color: rgba(255, 255, 255, .06);
   }
 
@@ -407,6 +431,7 @@
   #top-bar a:hover {
     background-color: #1c2128 !important;
     color: #ff8f97 !important;
+    -webkit-text-fill-color: #ff8f97 !important;
     border-left-color: #3a4048 !important;
     border-right-color: #3a4048 !important;
   }
@@ -423,6 +448,23 @@
 
   #top-bar ul li ul a {
     color: #ff8f97;
+  }
+
+  /* The "default theme failed to load" warning hangs off #top-bar, not the
+     sidebar, so the menu ink above reaches its links while the panel keeps the
+     site's own pink paper and near-black copy. It takes the ink pitched for a
+     light box instead. The plate is cleared for the same reason: the menu-hover
+     rule above would otherwise drop a dark chip behind a link mid-paragraph. */
+  #top-bar .ios-cache-issue-notification a {
+    background-color: transparent !important;
+    color: #a4161a !important;
+    -webkit-text-fill-color: #a4161a !important;
+  }
+
+  #top-bar .ios-cache-issue-notification a:hover {
+    background-color: transparent !important;
+    color: #d21414 !important;
+    -webkit-text-fill-color: #d21414 !important;
   }
 
   /* Mobile hamburger. The glyph is the anchor's own "≡" character, and the
@@ -455,28 +497,36 @@
     border-color: #3a4048 !important;
   }
 
-  #top-bar .mobile-top-bar a {
+  /* This chain outweighs the dropdown-item rule above, so the fill has to be
+     restated or the two properties disagree on the phone menu's own rows. It
+     stops at the menu list: the hamburger beside it is an .open-menu anchor
+     with its own pair, which a bare `.mobile-top-bar a` would outweigh. */
+  #top-bar .mobile-top-bar ul a {
     color: #eaeaea !important;
+    -webkit-text-fill-color: #eaeaea !important;
   }
 
   /* Search button. Black Highlighter clips this input to a magnifier mask and
      paints the GLYPH with the element's own BACKGROUND, so a fill stated here
-     becomes the icon's colour, and the skins want opposite values: a masked skin
-     needs it LIGHT to read on our bar, while the ones that leave a real "Search"
-     button — Sigma-9, and article themes like /scp-8007 that drop its gradient —
-     need it DARK under their own near-white label. The .user.css picks the side
-     per skin by reading the theme's own token, which userstyles.org's parser
-     cannot accept (its rgb() wants three numbers and dies on `var(`, taking the
-     whole upload down with a 502). DELIBERATE DIVERGENCE FROM THE .user.css,
-     ONE OF TWO IN THIS FILE (the other is the `[name="search"]` exclusion on the
-     `input.btn` group further down, which this fill depends on): no selector
-     distinguishes the two skin families — the markup is identical and only the
-     imported theme CSS differs — so this build states a single mid maroon that
-     clears 3:1 both ways (glyph 3.1:1 on the top bar, near-white label 3.2:1 on
-     the fill) instead of serving one family and blanking the other. Any value
-     stated here must stay a mid tone for that reason. No background-IMAGE is
-     stated, so Sigma-9's own opaque brand gradient covers this colour entirely
-     and is unaffected. */
+     becomes the icon's colour, and three skin families want different values:
+     a masked skin needs it LIGHT to read on our bar; the ones that leave a real
+     "Search" button — Sigma-9, and article themes like /scp-8007 that drop its
+     gradient — need it DARK under their own near-white label; and the ones that
+     draw the magnifier from #search-top-box::before in their accent
+     (theme:newspaper, theme:monotypical, theme:cosmonaut) need it far from that
+     accent. The .user.css picks a side per skin by reading the theme's own
+     token, which userstyles.org's parser cannot accept (its rgb() wants three
+     numbers and dies on a var reference, taking the whole upload down with a
+     502). THE ONE DELIBERATE DIVERGENCE FROM THE .user.css, here and on the
+     hover rule below: no selector distinguishes the families — the markup is
+     identical and only the imported theme CSS differs — so this build states a
+     single mid maroon that clears 3:1 for the first two (glyph 3.1:1 on the top
+     bar, near-white label 3.2:1 on the fill) and gives up on the third, which
+     is by far the smallest. No flat value can serve all three: the window that
+     satisfies the first two is exactly the band the accent glyph sits in. Any
+     value stated here must stay a mid tone for that reason. No background-IMAGE
+     is stated, so Sigma-9's own opaque brand gradient covers this colour
+     entirely and is unaffected. */
   #search-top-box-form input[type="submit"] {
     background-color: #a05a5a !important;
     border-color: #6d4a4a !important;
@@ -500,7 +550,7 @@
      the mask lives in the shared Black Highlighter sheet, so every skin that
      draws this glyph draws it masked, and Sigma-9 gives the pseudo no content
      at all — so a flat light fill is stated rather than a token branch, and
-     this rule is NOT one of the two divergences: both builds state it. */
+     this rule is NOT the divergence: both builds state it. */
   #login-status::before {
     background-color: #c4cdd6 !important;
   }
@@ -554,8 +604,12 @@
     --sidebar-links-text: 196, 205, 214;
   }
 
+  /* Several skins band this heading with a translucent light veil that inverts
+     over the dark block below it. Clearing the fill lands the label on the
+     block's own plate; the skins that leave it unfilled are unaffected. */
   #side-bar .heading,
   #interwiki .heading {
+    background-color: transparent !important;
     color: #e07b83 !important;
     border-bottom-color: #7d3030 !important;
   }
@@ -603,9 +657,24 @@
     border-color: #2d333b !important;
   }
 
-  table.wiki-content-table th {
+  /* The id qualifier is what outranks a skin that reaches these cells through
+     #content-wrap: an !important on a plain class chain loses to any id-scoped
+     rule however it is ordered. */
+  #main-content table.wiki-content-table th {
     background-color: #22282f !important;
     color: #e6edf3 !important;
+  }
+
+  /* A skin that states the cell fill outright beats the token remap above and
+     leaves the inherited page ink on a near-white cell. The second rule hands
+     the cell back inside an author-painted box: their paper survives there and
+     the ink rebind is pitched for it. */
+  #main-content table.wiki-content-table td {
+    background-color: #1a1f26 !important;
+  }
+
+  #page-content [style*="background"] table.wiki-content-table td {
+    background-color: transparent !important;
   }
 
   table.page-compare td,
@@ -636,6 +705,14 @@
     background-color: #1a1f26 !important;
     border-color: #2d333b !important;
     color: #c4cdd6 !important;
+  }
+
+  /* The list inside the box above carries a plate of its own on the skins that
+     give the table of contents a paper of theirs, which lands as a near-white
+     panel inside the dark frame. Cleared so it takes the box's fill; the skins
+     that leave it unpainted have nothing here to lose. */
+  #toc-list {
+    background-color: transparent !important;
   }
 
   div.note-block {
@@ -675,6 +752,18 @@
     color: #79c0ff !important;
   }
 
+  /* The two darkest tokens Wikidot's highlighter emits — a maroon for numeric
+     literals and a navy for pseudo-selectors and other special tokens — on the
+     code plate above. A skin that restates them only ever moves them a shade,
+     so both ends of the range need lifting, not just the default. */
+  .hl-number {
+    color: #ffa657 !important;
+  }
+
+  .hl-special {
+    color: #7ee787 !important;
+  }
+
   .hl-inlinetags {
     color: #d2a8ff !important;
   }
@@ -703,8 +792,11 @@
 
   /* The "Footnotes" tab. Article themes state its ink near-black for their light
      panel and keep it when they repaint the tab in their accent, so the words
-     vanish on the dark panel. Only the ink is taken — the accent fill is theirs. */
+     vanish on the dark panel. The tab has to carry its own plate as well as its
+     ink: the accents it is repainted in run from a dark red to a bright yellow,
+     and no single ink is legible on both. */
   #page-content .footnotes-footer .title {
+    background-color: #22282f !important;
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
   }
@@ -759,6 +851,11 @@
      ARTICLE FURNITURE
      ============================================================ */
 
+  /* No fill here on purpose. The skins that give this frame a near-white one
+     are giving the picture its paper: article images are routinely transparent
+     PNGs drawn in black linework, and clearing the plate takes the artwork with
+     it. Sigma-9 leaves the frame unpainted and those images unreadable — that
+     is the site's own behaviour, not something to spread. */
   .scp-image-block {
     border-color: #3a4048 !important;
     box-shadow: 0 1px 6px rgba(0, 0, 0, .5);
@@ -1122,7 +1219,14 @@
      RATING WIDGET
      ============================================================ */
 
+  /* The Bedrock family (Basalt, Immrama and the rest) pads this box and fills
+     the padding from its own near-white page plate, so the strip below sits in
+     a white frame. The value matches --rating-module-bg-color, which is what
+     Black Highlighter and theme:newspaper already resolve here; the skins that
+     leave the box transparent give it no padding at all, so the fill has
+     nothing to show on them. */
   .page-rate-widget-box {
+    background-color: #1a1f26 !important;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, .6);
   }
 
@@ -1139,13 +1243,19 @@
     border-bottom-color: #5a2f2f !important;
   }
 
-  .page-rate-widget-box .rateup a,
-  .page-rate-widget-box .ratedown a {
+  /* The Bedrock family underlines each of the three buttons in its own page
+     plate; only the bottom side is drawn, so a colour here reaches nothing on
+     the skins that leave the anchor unbordered. The element qualifier is what
+     outranks a skin that states this same two-class chain !important from the
+     page's own <style>, which the cascade orders after this sheet. */
+  div.page-rate-widget-box .rateup a,
+  div.page-rate-widget-box .ratedown a {
     color: #e8949a !important;
+    border-color: #5a2f2f !important;
   }
 
-  .page-rate-widget-box .rateup a:hover,
-  .page-rate-widget-box .ratedown a:hover {
+  div.page-rate-widget-box .rateup a:hover,
+  div.page-rate-widget-box .ratedown a:hover {
     background-color: #5a2f2f !important;
     color: #fff6f0 !important;
   }
@@ -1155,13 +1265,34 @@
     border-color: #5a2f2f !important;
   }
 
-  .page-rate-widget-box .cancel a {
+  div.page-rate-widget-box .cancel a {
     color: #c99a9a !important;
+    border-color: #7d4444 !important;
   }
 
-  .page-rate-widget-box .cancel a:hover {
+  div.page-rate-widget-box .cancel a:hover {
     background-color: #7d4444 !important;
     color: #fff6f0 !important;
+  }
+
+  /* The Bedrock family hides each button's own "+" / "–" / "x" and draws the
+     glyph by clipping a ::before to a mask, so that pseudo's BACKGROUND is the
+     mark and the colours above never reach it — its value is pitched near-black
+     for that skin's light box. The skins that keep the anchor's text give this
+     pseudo no content at all, so it has no box here to paint. */
+  .page-rate-widget-box .rateup a::before,
+  .page-rate-widget-box .ratedown a::before {
+    background-color: #e8949a !important;
+  }
+
+  .page-rate-widget-box .cancel a::before {
+    background-color: #c99a9a !important;
+  }
+
+  .page-rate-widget-box .rateup a:hover::before,
+  .page-rate-widget-box .ratedown a:hover::before,
+  .page-rate-widget-box .cancel a:hover::before {
+    background-color: #fff6f0 !important;
   }
 
   /* Articles with a credit module wrap the widget in a second maroon strip that
@@ -1225,7 +1356,23 @@
 
   .yui-navset .yui-nav,
   .yui-navset .yui-navset-top .yui-nav {
+    background-color: #22282f !important;
     border-color: #7d3030 !important;
+  }
+
+  /* The Bedrock family holds the anchor's own fill transparent and paints the
+     list item instead, so the anchor rule below reaches nothing there and the
+     labels land on a near-white slab. The item carries the same pair; on the
+     skins whose anchor fill does apply it sits behind that anchor and shows
+     only in the gaps the strip already had. */
+  .yui-navset .yui-nav li,
+  .yui-navset .yui-navset-top .yui-nav li {
+    background-color: #22282f !important;
+  }
+
+  .yui-navset .yui-nav li.selected,
+  .yui-navset .yui-navset-top .yui-nav li.selected {
+    background-color: #8a2f2f !important;
   }
 
   .yui-navset .yui-nav a,
@@ -1311,13 +1458,12 @@
      the same class is a real submit — the forum's "Update" filter button carries
      `.buttons.btn` and nothing else, so it needs `input.btn` to be reached.
      The masthead search submit carries `.button.btn` too and is the site's only
-     `[name="search"]`, but it is not one of these buttons: Black Highlighter
-     masks it to a magnifier and relies on its own `color: transparent` to keep
-     the "Search" value from punching through the glyph, so a light ink stated
-     here would print the word across the icon. That exclusion is the second
-     deliberate divergence from the .user.css — it is what lets the mid-tone
-     search fill above render a clean glyph, and the .user.css does not need it
-     because the token it reads is near-white on every masked skin. */
+     `[name="search"]`, but it is not one of these buttons: every skin either
+     hides its "Search" value — Black Highlighter clips the whole element to a
+     magnifier mask, theme:newspaper sets it transparent, the Bedrock family
+     sizes it to 0 — or states a near-white label of its own. Ink stated here
+     un-hides the first group and prints the word across the glyph, so the
+     search submit is excluded and takes the rule above instead. */
   div.buttons input,
   input.button:not([name="search"]),
   input.btn:not([name="search"]),
@@ -1341,6 +1487,14 @@
   a.button:hover {
     background-color: #333a42 !important;
     color: #fff !important;
+  }
+
+  /* The Bedrock family fills this row from its own near-white page plate, so
+     the link colour below lands on white. The row carries the rating strip's
+     fill instead; the skins that leave it unfilled draw nothing of their own
+     here, so it reads as the toolbar band it already is. */
+  .page-options-bottom {
+    background-color: #1a1f26 !important;
   }
 
   .page-options-bottom a,

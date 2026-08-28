@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Vinted with the homepage, catalog and search, item pages and seller profiles in a comfortable dark look that's easy on the eyes for late-night browsing.  Works on every country version of Vinted (vinted.fr, .de, .com, .co.uk, .es, .it, .nl, .be, .pl and more).   Prices, ratings and Vinted's teal stay clear and recognizable.
-@version      20260820.00.14
+@version      20260827.15.16
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -289,6 +289,14 @@
   .web_ui__Card__lifted, [class*="Card__lifted"],
   .web_ui__Card__elevated, [class*="Card__elevated"] {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55) !important; }
+  /* Card ships the same two tint variants as Cell — a brand-teal one and an amber
+     one, each carrying its meaning ONLY in the fill — and the blanket Card rule
+     above flattens both to the plain elevated grey. Match the deep teal and amber
+     the Cell/InfoBanner tints take; the amber one also draws a rim of its own
+     colour, which the blanket border reset would otherwise mute. */
+  [class*="Card__primaryLightExperimental"] { background-color: #12363d !important; }
+  [class*="Card__exposeLightExperimental"] {
+    background-color: #302816 !important; border-color: #6e5136 !important; }
   /* Prominent status cells (the green "Vendu"/Sold banner on a sold item,
      plus error/warning notices) are solid-colour web_ui Cells: a saturated
      background carrying white text drawn from greyscale-level-6. The blanket
@@ -375,6 +383,11 @@
   [class*="Badge__filled"][class*="Badge__expose"], [class*="Badge__filled"][class*="Badge__expose"] *,
   [class*="Navigation__expose"] [class*="Navigation__body"] {
     color: #14181d !important; fill: #14181d !important; }
+  /* The `default` Badge is the only one whose label reads greyscale-level-3, the
+     chip-outline step of the ramp — 4.4:1 on the elevated card. Lift it to the
+     muted-text step so the smallest label on the component still clears AA. */
+  [class*="Badge__light"][class*="Badge__default"] [class*="Badge__content"],
+  [class*="Badge__light"][class*="Badge__default"] { color: #9ca7b0 !important; }
 
   /* web_ui Text colours are baked as literal light-theme hex inside
      the (cross-origin) component CSS, so the token ramp can't reach
@@ -469,9 +482,32 @@
   [class*="Button__flat"][class*="Button__success"] { color: #57c98a !important; }
   [class*="Button__flat"][class*="Button__warning"] { color: #f2707a !important; }
   [class*="Button__flat"][class*="Button__muted"] { color: #9ca7b0 !important; }
+  /* Those variant colours reach the SVG glyph (it draws from currentColor) but not
+     the label: the base label rule above is a direct declaration on the label node,
+     so it beats the button's inherited ink. Without these the header's muted
+     "Catalog" chevron sat grey beside a white word, and a flat danger/success
+     button lost its severity entirely. */
+  [class*="Button__flat"][class*="Button__success"]
+    [class*="Button__label"] { color: #57c98a !important; }
+  [class*="Button__flat"][class*="Button__warning"]
+    [class*="Button__label"] { color: #f2707a !important; }
+  [class*="Button__flat"][class*="Button__muted"]
+    [class*="Button__label"] { color: #9ca7b0 !important; }
+  [class*="Button__flat"][class*="Button__expose"]
+    [class*="Button__label"] { color: #f9bb42 !important; }
   /* Filled primary CTA keeps the teal fill — pure white label for AA */
   .web_ui__Button__filled .web_ui__Button__label,
   [class*="Button__filled"] [class*="Button__label"] { color: #ffffff !important; }
+  /* A filled button with NO colour variant still fills from `currentColor`, and the
+     only thing supplying it is the SIZE class (`default`/`medium`/`small`), which
+     reads greyscale-level-1/-2 — near-black natively, near-WHITE for us, so the
+     button paints a light slab under the white label rule above (2.5:1). Pin the
+     neutral fill. Every variant fill below is declared AFTER this and wins the
+     source-order tie on a button that carries one; the inverse pill, declared
+     later still, wins over all of them. */
+  [class*="Button__filled"][class*="Button__default"],
+  [class*="Button__filled"][class*="Button__medium"],
+  [class*="Button__filled"][class*="Button__small"] { background-color: #39424e !important; }
   /* A filled button takes its FILL from `currentColor`, so the variant token is
      both the surface and (via the label rule above) the thing white sits on.
      Two of the six break on dark:
@@ -486,6 +522,14 @@
      near-black natively, near-WHITE for us — so it needs dark ink, not white. */
   [class*="Button__filled"][class*="Button__primary"] { background-color: #007782 !important; }
   [class*="Button__filled"][class*="Button__amplified"] { background-color: #39424e !important; }
+  /* The remaining four fill from their own semantic token, which needs no lift —
+     but the neutral size pin above matches them too, so each has to be restated
+     or it inherits that grey. `expose` pairs its amber with greyscale-level-1,
+     near-black natively and near-WHITE for us, so it needs dark ink. */
+  [class*="Button__filled"][class*="Button__success"] { background-color: #28865a !important; }
+  [class*="Button__filled"][class*="Button__warning"] { background-color: #d04555 !important; }
+  [class*="Button__filled"][class*="Button__muted"]   { background-color: #5a6566 !important; }
+  [class*="Button__filled"][class*="Button__expose"]  { background-color: #f9bb42 !important; }
   [class*="Button__filled"][class*="Button__expose"]
     [class*="Button__label"] { color: #14181d !important; }
   /* An INVERSE filled button is the light pill used on brand/photo surfaces:
@@ -622,6 +666,15 @@
   .web_ui__Chip__activated, [class*="Chip__chip"][class*="Chip__activated"],
   [class*="Chip__chip"][aria-pressed="true"] {
     background-color: #12363d !important; border-color: #1a7d88 !important; }
+  /* The press state is `Chip__clicked`, natively a brighter teal than `activated`.
+     Every rule above carries !important, so the site's own pressed fill never
+     landed and the pill did not react to a click at all. A pointer press always
+     arrives WITH hover, so the base attribute is repeated to reach the hover
+     rules' specificity; declared last, it then wins on an activated or filled
+     chip too, a step brighter than either so the states stay distinct. */
+  [class*="Chip__chip"][class*="Chip__chip"][class*="Chip__clicked"],
+  [class*="Chip__chip"][class*="Chip__chip"]:active {
+    background-color: #16474f !important; border-color: #4db8c4 !important; }
 
   /* Pagination — natively the current page is near-black text against
      mid-grey siblings. Our page-link colour was so close to the active
@@ -764,6 +817,14 @@
   .web_ui__Dialog__overlay, [class*="Dialog__overlay"],
   .web_ui__BottomSheet__overlay, [class*="BottomSheet__overlay"] {
     background-color: rgba(6, 8, 10, 0.72) !important; }
+  /* The onboarding modal darkens the top and bottom quarters of its video with two
+     level-1 pseudo-element gradients — the same inverted-scrim shape, but drawn as
+     a background-IMAGE, which no background-color rule reaches. */
+  .onboarding-modal__slide-video-content::before,
+  .onboarding-modal__slide-video-content::after {
+    background-image: linear-gradient(180deg, rgba(6, 8, 10, 0.4) 0%, transparent 100%) !important; }
+  .onboarding-modal__slide-video-content::after {
+    background-image: linear-gradient(180deg, transparent 0%, rgba(6, 8, 10, 0.4) 100%) !important; }
   /* The complaints carousel moved to a CSS module, so its class is now
      `ComplaintsImageCarousel-module-scss-module__<hash>__complaints-image-…`
      and every exact `.complaints-image-carousel*` selector is dead against it.
@@ -840,7 +901,8 @@
   [class*="Box__box-theme-primary-extra-dark"],
   section[class*="item-verification"][class*="closing"],
   [class*="hc-"][class*="search-header"],
-  [class*="advertising-module"][class*="__hero"] {
+  [class*="advertising-module"][class*="__hero"],
+  [class*="dac7__taxrules"], [class*="dac7__checkstatus"] {
     background-color: #0e3b42 !important; }
   .web_ui__Tooltip__tooltip, [class*="Tooltip__tooltip"],
   [class*="privacy-center__bottom-section"],
@@ -856,6 +918,12 @@
   section[class*="item-verification"][class*="closing"] a,
   [class*="dac7__taxrules"], [class*="dac7__checkstatus"] {
     color: #e6edf3 !important; }
+  /* /dac7's "more information" headings take their colour from `--shadow`, the
+     token that otherwise only ever casts box-shadows. Ours is pure black, so the
+     three headings rendered invisible on the dark page; the shadow token has to
+     stay black for its real job, so the ink is overridden here instead. */
+  [class*="dac7__links-group-heading"] { color: #e6edf3 !important; }
+
   /* The privacy centre's own h1 bakes a literal #000 that only ever worked on
      its light #edf2f2 band — the h2/h3 rule below never reached it. */
   [class*="privacy-center__glance-title"],
@@ -1005,12 +1073,25 @@
   [class*="error-display"] video {
     filter: invert(1) hue-rotate(180deg) !important;
     mix-blend-mode: screen !important; }
+  /* The soft-404 block is `u-background-white small-container`, i.e. a full-height
+     centred COLUMN rather than a card: white on the white page natively, so it has
+     no edges. The elevated fill the u-background-white rule gives it draws a
+     lighter 480px band with hard vertical seams down the middle of the page, which
+     the hard 404 (flat, `gnf-*`) does not have. Put it back on the page surface. */
+  [class*="error-display"] { background-color: #14181d !important; }
 
-  /* Inputs / forms / selects in modals & pages */
+  /* Inputs / forms / selects in modals & pages.
+     A web_ui text field has no box — its ONLY boundary is a 1px bottom rule, drawn
+     from greyscale-level-2, which our remap sends to the muted-TEXT step. The
+     border colour here is what that field is; keep it on the control-stroke step
+     the token block defines (3.2:1 on the elevated card, so the field edge clears
+     the 3:1 floor for a component boundary). Fields with a filled box — the header
+     search bar, the filter panels — carry border-width 0, so this never draws a
+     ring the design does not have. */
   input, textarea, select,
   .web_ui__Input__input, [class*="Input__input"] {
     background-color: #1c2128 !important; color: #e6edf3 !important;
-    border-color: #2d333b !important; }
+    border-color: #667273 !important; }
   /* A web_ui field draws its whole focus indicator as a border-colour swap on
      the inner value element and gets no UA outline, so the rest-state border
      above erased it on every text field. Re-assert it on the focused state,
@@ -1041,6 +1122,20 @@
   .bg-greyscale-level-7 { background-color: #1c2128 !important; }
   .text-calypso-80 { color: #4db8c4 !important; }
   .text-greyscale-level-3 { color: #9ca7b0 !important; }
+  /* /ventures has its own `ventures-*` palette on top of the two above, used for
+     the "where we can advise" pill cloud: five fills, four of them pastels the
+     near-white surface scan cannot see (purple and peach both have a channel under
+     200), each carrying the same deep-teal `text-ventures-green` ink. Take each
+     pastel down to a deep tint of ITS OWN hue so the cloud keeps its five-colour
+     rhythm, and lift the ink on the same selector — the ink class is shared with
+     the fills we leave alone, so it must move with the fill, not on its own.
+     `medium-green` is already a deep teal under white ink and stays. */
+  .bg-ventures-grey        { background-color: #2f3742 !important; }
+  .bg-ventures-light-green { background-color: #17402e !important; }
+  .bg-ventures-light-purple { background-color: #322a52 !important; }
+  .bg-ventures-peach       { background-color: #4a2c20 !important; }
+  .bg-ventures-grey, .bg-ventures-light-green,
+  .bg-ventures-light-purple, .bg-ventures-peach { color: #e6edf3 !important; }
   /* The sustainability report's section bands and finding cards. Their copy
      already reads our light ink, so only the surfaces need turning. */
   [class*="InfoSection_infoSection"],
@@ -1059,6 +1154,29 @@
   [class*="Article_content"] strong,
   [class*="Article_content"] em {
     color: #c4cdd6 !important; background-color: transparent !important; }
+
+  /* Marketing landing copy is pasted out of Google Docs/Sheets, so a leaf
+     <span> carries the paste's own `color: #000000` on a surface that is only
+     dark because of us; an inline declaration outranks every inherited ink, so
+     `!important` is the only reach. Per-locale, not per-route: the same route
+     is clean on .de and black on .fr/.it.
+     The hooks must be PROPERTY-adjacent — a bare `#000` substring also matches
+     an inline black background, border or outline, and repainting those ruins
+     surfaces that are correct. `:not([style*="-color:"])` excludes every
+     `*-color` longhand wholesale (border, outline, text-decoration) and
+     `:not([style*="background"])` both the background shorthand and the black
+     inline plate case; the arguments carry no space because userstyles.org's
+     parser rejects a `:not()` that contains one. Both spacing forms and the
+     rgb() spelling the CSSOM writes on re-render are separate attribute
+     strings, so each needs its own hook. The background guard also keeps black
+     ink an author deliberately put on their OWN inline light plate: that
+     pairing needs the black. */
+  [style*="color:#000000"]:not([style*="-color:"]):not([style*="background"]),
+  [style*="color: #000000"]:not([style*="-color:"]):not([style*="background"]),
+  [style*="color:#000;"]:not([style*="-color:"]):not([style*="background"]),
+  [style*="color: #000;"]:not([style*="-color:"]):not([style*="background"]),
+  [style*="color: rgb(0, 0, 0)"]:not([style*="-color:"]):not([style*="background"]) {
+    color: #c4cdd6 !important; }
 
   /* ---- OneTrust cookie banner (until accepted) ---- */
   #onetrust-banner-sdk, #onetrust-pc-sdk,
@@ -1095,6 +1213,19 @@
   #onetrust-pc-btn-handler, #onetrust-banner-sdk .ot-pc-btn-handler {
     background-color: #2a3139 !important; color: #4db8c4 !important;
     border-color: #2d333b !important; }
+  /* The banner's reject-all ("Choose essential") is the one OUTLINED control of the
+     three: natively a white pill ringed in the brand teal, against a borderless
+     "Manage cookies" and a solid "Accept all". Its fill collapsed onto the banner
+     surface and the blanket border reset muted its ring, so the shape vanished and
+     the least prominent native control read as the most prominent. Give it the
+     elevated pill the other secondary button takes, plus the ring that is its
+     identity. Scoped to the banner: the preference centre's twin is a filled CTA.
+     OneTrust injects its own two-id `!important` fill from the CDN sheet AFTER any
+     injected stylesheet, so it wins the source-order tie — the third id is what
+     makes the fill land. */
+  #onetrust-consent-sdk #onetrust-banner-sdk #onetrust-reject-all-handler {
+    background-color: #2a3139 !important;
+    border-color: #4db8c4 !important; }
   /* /cookie-policy embeds OneTrust's STANDALONE cookie list, a third widget
      with its own light palette that lives outside the banner and preference
      -centre ids above: #f2f2f2 table headers, #4d4d4d copy on our dark card

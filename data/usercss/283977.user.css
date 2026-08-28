@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for KHInsider's game-music archive: easy on the eyes across album pages, song lists, the audio player, search and comments.
-@version      20260820.00.11
+@version      20260827.15.12
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -49,6 +49,9 @@
 
   /* ---- Sidebar logo + navigation ---- */
   #leftColumn h1, #leftColumn h1 a { color: #e6edf3 !important; }
+  /* The logo's ink sits on the <h1> INSIDE the anchor, so the anchor's own :hover
+     colour never reaches the rendered text — the hover cue has to target the h1. */
+  #leftColumn a:hover h1 { color: #9bd4ff !important; }
 
   /* Beveled module heads ship a light gradient image — flatten to dark */
   #leftColumn h3 {
@@ -193,6 +196,12 @@
   .albumImage img, .albumImage a,
   td.albumIcon img, td.albumIconLarge img,
   .albumIconDefaultSmall, .albumIconDefaultLarge { border-color: #2d333b !important; }
+  /* Albums with no cover get an empty bordered tile carrying an `audiotrack` ligature.
+     Under the site's own Dark Mode (`?theme=dark`) that glyph takes a directly
+     declared `color: black`, which outranks the body ink our rules set on its
+     ancestors, so the tile needs its own. */
+  #pageContent .albumIconDefaultSmall i,
+  #pageContent .albumIconDefaultLarge i { color: #c4cdd6 !important; }
   /* Albums whose cover is withheld get the site's stand-in raster: a flat #bdbdbd
      plate carrying pure-black lettering, which blends into the native #ebebeb column
      and glares as a lit tile in an otherwise dark cover grid. It is image data, so it
@@ -272,6 +281,10 @@
     background-color: #5fb0e6 !important;
     background-image: none !important;
   }
+  /* While a track buffers, the duration cell swaps in `spinner.svg` as an <img>, so
+     its `stroke="#000000"` arc is out of CSS reach on the dark player bar; inverting
+     the raster is the only way to light it. */
+  img.loadingSpinner { filter: invert(1) !important; }
 
   /* ---- Comments ---- */
   #news_comments, .comment_wrap { background-color: transparent !important; }
@@ -511,6 +524,17 @@
      ours. Our `.structItem-parts` colour sets the ul but the pseudo keeps the site's
      own hue, so lift the separator to a muted-but-visible grey. */
   .structItem-parts > li::before { color: #8b949e !important; }
+  /* Every other meta part carries its own `#4f4f4f` (`.structItem-parts > li:nth-child(even)`),
+     a direct declaration the `.structItem-parts` colour above cannot reach by inheritance —
+     1.98:1 on our row. One tone for the whole line; the `::before` middot above already
+     separates the parts. */
+  .structItem-parts > li { color: #aab4bf !important; }
+  /* The thread-list meta line is CONCEALED by the skin: `.structItem-minor a { color: inherit }`,
+     so "started by X · date" and the latest-post column read as quiet text and the thread TITLE
+     is the only link. Our `.p-body-content a` blue is !important and ties that selector's
+     specificity, so every meta part rendered as prominent as the title above it. Give the
+     anchors their line's colour back; the hover blue above still answers the pointer. */
+  .structItem-minor a { color: inherit !important; }
   .node-extra, .node-meta, .node-statsMeta,
   .node-description, .node-descriptionText { color: #aab4bf !important; }
   .pairs dt { color: #8b949e !important; }
@@ -563,6 +587,10 @@
     border-color: #2d333b !important;
   }
   .input:focus { background-color: #1a2029 !important; border-color: #3d6a96 !important; }
+  /* Checkbox / radio glyphs are FontAwesome masks painted with `currentColor`, and the skin
+     answers a hover by DARKENING that colour (#47a7eb -> #1265a1) — right on its white form,
+     backwards on ours, where it drops the box from 6.2:1 to 2.6:1. Lift the hover instead. */
+  .iconic:hover > i { color: #79c0ff !important; }
   .input::placeholder, .js-editor::placeholder { color: #8b949e !important; opacity: 1 !important; }
   /* `select.input` is `appearance: none` and draws its caret as a data-URI SVG whose
      fill is baked to #141414 — 1.08:1 on our control, so the arrows vanish. A <select>
@@ -716,6 +744,20 @@
     background-color: #161b22 !important;
     border-color: #2d333b !important;
   }
+  /* When the member HAS a banner, that dark tile is covered by the user's own image — often
+     a bright one — and the skin's only legibility mechanism there is white ink over a black
+     text-shadow, which it keeps on the card's every line. Our muted card palette (`.pairs dt`
+     at #8b949e, the tooltip body at #c4cdd6) replaces that ink and drops the Joined /
+     Last seen rows to ~1.5:1 over a light banner. Put the white back inside the banner only;
+     with no banner it sits on the #161b22 tile above and still reads.
+     Carry it on `color` alone: an inherited `-webkit-text-fill-color` would out-rank the
+     `.userBanner--staff/--primary/--accent` badge hues below, which sit inside this header. */
+  .memberProfileBanner,
+  .memberProfileBanner .pairs dt,
+  .memberProfileBanner .pairs dd,
+  .memberProfileBanner .u-dt,
+  .memberProfileBanner .userTitle,
+  .memberProfileBanner a { color: #ffffff !important; }
   /* The user-group badge inside that card ("Staff member") is an identity chip the
      skin paints as a LIGHT tile with coloured text — #e8f4fc/blue for staff+primary,
      #fef4e7/brown for accent. Both survived our theme untouched and glared as light
@@ -1070,6 +1112,19 @@
     border-color: #20262e !important;
   }
   .p-footer a { color: #aab4bf !important; }
+
+  /* ---- Concealed-link utilities ----
+     XenForo pins these to `color: inherit` (`--concealed`/`--cloaked` with !important) so the
+     anchor reads as the text around it — the footer's platform credit, the member card's
+     stats rows. Our broad link colours tie their specificity and land later, so each one
+     rendered as a live link the skin deliberately hides. This block must stay AFTER
+     `.p-footer a` above, which also matches at (0,1,1). */
+  .u-concealed, a.u-concealed,
+  .u-concealed--icon, a.u-concealed--icon,
+  .u-cloaked, a.u-cloaked,
+  .u-concealed a, .u-cloaked a, .u-concealed--icon a,
+  .u-dimmed a, .u-muted a, .u-faint a,
+  .contentRow-minor--hideLinks a { color: inherit !important; }
 
   /* avatars / image wrappers stay transparent (no white tile). The <img> itself
      carries a white disc that opaque JPEGs hide but transparent PNGs do not. */

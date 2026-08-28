@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A polished dark look across the whole site: the home page, video pages and their comment lists, the rankings, search results and user profiles.
-@version      20260820.00.12
+@version      20260827.15.13
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -308,6 +308,17 @@
      changes nothing, and no CSS from this document can reach a cross-origin
      grandchild frame. Leave it: darkening real content is worse than a white ad. */
 
+  /* Segment-group pills (the OFF / ON, 画質 and danmaku-density rows in the watch page's
+     player-settings and comment-settings dialogs). The selected pill fills from
+     --colors-text-on-layer-accent-azure, a token whose other role is LINK INK, so the
+     light azure the ink role needs lands under the pill's white label at ~2:1 — half the
+     3.5:1 the site's own #1a80e6 gives it. Both dialogs are portal-mounted and closed at
+     load, and the pill is 47x24, under the scanner's surface floor. Use the theme's active
+     surface instead, which keeps the pills chromatic and the label at ~7.7:1. */
+  [data-scope="segment-group"][data-part="item"][data-state="checked"] {
+    background-color: #1f4a78 !important; color: #e6edf3 !important;
+  }
+
   /* Pre-roll video-ad overlay controls (watch page). The skip prompt
      ("○秒後にスキップできます") and the countdown timer color their labels
      through monotone.l95 — which we remap to a dark elevated surface — so over
@@ -521,6 +532,10 @@
      itself by turning the site's #559cff on hover; the heading pass pins it #e6edf3, and
      nothing else in that row moves, so it stopped reading as clickable. */
   a.channel-name-anchor:hover { color: #5fb0e6 !important; }
+  /* Same shape one level out: the broadcaster line under every live program card announces
+     itself only by going #056dff on hover, and the card text pass pins it #c4cdd6 in both
+     states. */
+  a.name-label:hover { color: #5fb0e6 !important; }
 
   /* Live (live.nicovideo.jp) broadcast-history embed — the iframe a www user page's 生放送
      tab mounts (live.nicovideo.jp/embed/broadcast-history). It is a live document, so this
@@ -703,6 +718,40 @@
   .CrossSearch-rowService:hover { background-color: #262c33 !important; }
   .CrossSearch-rowService.active {
     background-color: #1f4a78 !important; color: #e6edf3 !important;
+  }
+  /* Below 1100px the three scope rows above are replaced by a single trigger showing the
+     current scope, and that trigger keeps the site's own light-header greys: #555 at rest,
+     #999 while the list is open — the brightest surface in the darkened header, and
+     brighter than the panel it sits on. It is the ONLY scope control at those widths, so
+     every window narrower than the desktop breakpoint gets it. */
+  .CrossSearch-pullDownButton { background-color: #262c33 !important; }
+  .CrossSearch-pullDownButton:hover,
+  .CrossSearch-pullDownButton.active { background-color: #2d333b !important; }
+
+  /* The account flyout's ヘッダー追従 switch is the shared common-header component, so it
+     rides on EVERY page of both hosts. Its two states are two different hashed class
+     pairs, and the OFF pair is a literal #ececec track under a #fff knob — a bright
+     white pill on the dark panel. No load-time scan reaches it (the flyout is closed)
+     and the state persists in the visitor's own storage, so a user who switches it off
+     keeps the pill on every page. Key on the checkbox instead of the hashes: the header
+     holds exactly one, and its two siblings are the track and the knob in that order.
+     The ON pair also needs restating — the knob's 2px border IS its own blue natively,
+     and the blanket border reset turned it into a dark ring inside the disc. */
+  #CommonHeader label > input[type="checkbox"] + span,
+  #common-header label > input[type="checkbox"] + span {
+    background-color: #3a424c !important;
+  }
+  #CommonHeader label > input[type="checkbox"] + span + span,
+  #common-header label > input[type="checkbox"] + span + span {
+    background-color: #8b949e !important; border-color: #8b949e !important;
+  }
+  #CommonHeader label > input[type="checkbox"]:checked + span,
+  #common-header label > input[type="checkbox"]:checked + span {
+    background-color: #1f4a78 !important;
+  }
+  #CommonHeader label > input[type="checkbox"]:checked + span + span,
+  #common-header label > input[type="checkbox"]:checked + span + span {
+    background-color: #4990e2 !important; border-color: #4990e2 !important;
   }
 
   /* ============================================================
@@ -1098,6 +1147,18 @@
   .NC-MylistMediaObject-thumbnail::before {
     background-image: linear-gradient(90deg, rgba(28, 33, 40, 0), #1c2128) !important;
   }
+  /* Third instance of the same horizontal scroll-fade: each 急上昇中のタグ card on
+     /video_top clips its nicopedia summary and fades the cut edge out under
+     「…続きを見る」 with a transparent→#fff gradient, painting a white block over the
+     link on the dark card. The 急上昇中のタグ section is served with `data-hide-hrc`
+     (display:none) outside Japan, so no scan run from here ever renders it. */
+  .TagWithVideoItem-nicopediaLink {
+    background-image: linear-gradient(90deg, rgba(28, 33, 40, 0), #1c2128 20px) !important;
+  }
+  /* The summary those cards clip is the site's #666 on its own white tile — 2.1:1 once the
+     tile is dark, so the whole paragraph reads as a grey smear under a legible
+     「…続きを見る」. Same region gate as the gradient above. */
+  .TagWithVideoItem-articleBody { color: #c4cdd6 !important; }
 
   /* Profile popovers. Both are closed at audit time and both keep a #fff root that
      no token reaches: the "他サービスのユーザーページ" panel (.Dropdown) rendered a
@@ -1192,6 +1253,19 @@
      white bar across its lower 40px. The colour rule alone cannot clear it. */
   .ModalContent-body { background-image: none !important; }
   .ModalActionButton { background-color: #2d333b !important; }
+  /* The legacy-browser notice is a third member of that family: a #fff sheet whose #ffbe3c
+     header strip takes the light heading ink while its body ink and 閉じる button stay the
+     site's #252525. It is gated on a legacy-UA sniff, so nothing that can run a userstyle
+     manager renders it — force it visible (`removeAttribute('hidden')`) to check it. */
+  .NC-LegacyBrowserModal-modal { background-color: #1c2128 !important; }
+  .NC-LegacyBrowserModal-modal .NC-LegacyBrowserModal-mainText,
+  .NC-LegacyBrowserModal-modal label { color: #c4cdd6 !important; }
+  /* The heading keeps DARK ink: its strip is the site's warning yellow, which stays. The
+     two-class form is needed to outrank the `.BaseLayout p` pass further down. */
+  .NC-LegacyBrowserModal-header .NC-LegacyBrowserModal-headerText { color: #1a1a1a !important; }
+  .NC-LegacyBrowserModal-closeButton {
+    background-color: #2d333b !important; color: #c4cdd6 !important;
+  }
   .NC-CopyForm-copy:hover { background-color: #262c33 !important; }
 
   /* The ⋮ overflow glyph has two variants and the site picks by SURFACE, not by theme:
@@ -1484,6 +1558,21 @@
      coloured bars that ride on them, and leaves the 紹介履歴 flyout with no surface at
      all — the feed scrolls straight through the open list. The button itself keeps a
      #252525 label meant for its white fill. */
+  /* The two overlay CTAs and the volume dock ride ON TOP of the playing video: natively a
+     #252525 plate inside a white 2px outline (the dock, #000 inside #929292), darkening to
+     #000 on hover. The subtree neutraliser cleared both plates and the border reset took
+     the outlines, leaving white labels floating on whatever frame happens to be playing
+     and no hover feedback at all. Keep the site's own fills — over video they are the
+     right ones — and soften the outline to the theme's off-white. */
+  .VideoIntroductionPlayerContainer-button {
+    background-color: #252525 !important; border-color: #c4cdd6 !important;
+  }
+  .VideoIntroductionPlayerContainer-button:hover {
+    background-color: #000000 !important;
+  }
+  .VideoIntroductionPlayerContainer-audioPanel {
+    background-color: #000000 !important; border-color: #6e7781 !important;
+  }
   .VideoIntroductionPlayerContainer-historyButton {
     background-color: #2d333b !important; border-color: #3a424c !important;
     color: #c4cdd6 !important;
@@ -1822,6 +1911,15 @@
   /* Misc light greys used as separators / rails in legacy DOM */
   hr, .Divider, [class*="Divider"], [class*="Separator"] {
     border-color: #2d333b !important; background-color: #2d333b !important;
+  }
+  /* /video_top's section rule is a 6px band whose stripes live only in a
+     repeating-linear-gradient, so the background-COLOR above never touches them and the
+     #ddd diagonals stayed at full brightness — eight barber-pole bars down the page.
+     (6px tall, so audit-theme's lightBgImages size floor skips it too.) Restate the
+     gradient in the divider grey over a transparent track, keeping the striped motif. */
+  .Separator {
+    background-color: transparent !important;
+    background-image: repeating-linear-gradient(-45deg, #2d333b, #2d333b 6px, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0) 12px) !important;
   }
 
   /* Floating "back to top" button (legacy home / profile). It defaults to a

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Substack (the hub, discovery, and every publication and post) while keeping each newsletter's own accent color intact.
-@version      20260820.00.14
+@version      20260827.15.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -290,6 +290,12 @@
     background-color: #363b42 !important;
     color: #e6edf3 !important;
   }
+  /* The site lifts the selected pill one step on hover; the fill above is
+     `!important`, so the hover has to be restated or the selected tab is the
+     one control on the bar with no pointer feedback. */
+  [role="tab"][aria-selected="true"][class*="priority_secondary"]:hover {
+    background-color: #4a515a !important;
+  }
 
   /* --- Archive month dividers ---
      The grouped-archive month header takes the pub accent as INK. It shares the
@@ -562,7 +568,11 @@
      The three `^=` members are /jobs bands whose whole fill is a cream RASTER
      (no CSS gradient to read, so the bg-image scan is blind to them). They must
      be prefix-matched: `[class*="jobsHero"]` would also swallow the orange
-     jobsHeroButton and the jobsHeroImage that sit inside the band. */
+     jobsHeroButton and the jobsHeroImage that sit inside the band.
+     `comparisonsContainer` (the whole body of every /substack-vs-* route) is a
+     TRANSLUCENT fill — `rgba(200, 200, 200, 0.2)`, a barely-there wash on white
+     that composites to #383c40 over this canvas, i.e. LIGHTER than the base and
+     lighter than the cards standing on it. */
   #substack-home [class*="statsStrip"],
   #substack-home [class^="jobsHero-"],
   #substack-home [class^="buildSection-"],
@@ -581,6 +591,7 @@
   #substack-home section[class*="becomeSponsor"],
   #substack-home section[class*="testimonial-"],
   #substack-home [class*="jobPerks"],
+  #substack-home [class*="comparisonsContainer"],
   #substack-home section[aria-labelledby="hero-heading"] {
     background-color: #14181d !important;
     background-image: none !important;
@@ -595,9 +606,14 @@
     filter: invert(1) hue-rotate(180deg) !important;
   }
 
-  /* Cards and panels that sit ON those sections take the elevated surface. */
+  /* Cards and panels that sit ON those sections take the elevated surface.
+     `heroCard` is matched at a word boundary: the /features hero puts the cards
+     in a `heroCardGrid-` wrapper and their body copy in a `heroCardBody-` block,
+     both natively transparent over the green brand band, so a substring match
+     paints the gutters between the cards dark. */
   #substack-home [class*="benefitCard"],
-  #substack-home [class*="heroCard"],
+  #substack-home [class^="heroCard-"],
+  #substack-home [class*=" heroCard-"],
   #substack-home [class*="heroCreatorCard"],
   #substack-home [class*="compareTableScrollInn"],
   #substack-home [class*="startOptionCard"],
@@ -620,6 +636,17 @@
   .www-footer h3,
   .www-footer h4 {
     color: #e6edf3 !important;
+  }
+  /* The two store badges are the WHITE lockups (`app-store-white.png`,
+     `google-play-white.png`) on a white anchor, so they stay two bright plates
+     on the dark footer. Inverting the raster produces the vendors' own BLACK
+     lockup rather than an off-brand recolour; the hue-rotate keeps the Google
+     Play triangle's colours. */
+  .www-footer .app-badge {
+    background-color: #14181d !important;
+  }
+  .www-footer .app-badge img {
+    filter: invert(1) hue-rotate(180deg) !important;
   }
 
   /* --- Discover / not-found marketing landing hero (hardcoded dark-brown
@@ -721,6 +748,27 @@
   .lt-btn--topbar:hover,
   .lt-btn--topbar:focus,
   .lt-btn--topbar:active {
+    color: #00cc99 !important;
+  }
+
+  /* The ink list above is `!important` on the base class, so on its ANCHOR
+     members it also outranks the theme's own `a:hover` (0,1,1, unimportant) and
+     those cards carry no hover cue at all. The theme's ramp goes DARKER on hover
+     (#00231d) because that reads as pressed on white; here the hover has to move
+     up the ramp, to the green the links already carry.
+     `.lt-contact-box__title` is in the ink list AND natively inherits its
+     anchor's hover, so it needs the descendant arm.
+     `.lt-custom-block__link` is deliberately absent: every node inside it that
+     renders text carries a colour of its own, so neither the theme's hover nor
+     one restated here paints anything. */
+  .lt-contact-box:hover,
+  .lt-contact-box:focus,
+  .lt-contact-box:hover .lt-contact-box__title,
+  .lt-contact-box:focus .lt-contact-box__title,
+  .lt-article-box:hover,
+  .lt-article-box:focus,
+  .lt-section-link:hover,
+  .lt-section-link:focus {
     color: #00cc99 !important;
   }
 

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Pikabu.
-@version      20260820.00.12
+@version      20260827.15.19
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -111,6 +111,19 @@
     --c-textarea-bgDisabled: var(--pk-bg);
     --c-textarea-strokeDefault: var(--pk-border);
     --c-textarea-textFilled: var(--pk-text);
+    /* File drop-zone. Its whole face is token-driven: a #fcfdff panel inside an #ebedf2
+       dashed ring, under a #292a2e label, and it turns pale green (#f9fff5 / #f4ffeb)
+       while a file is dragged over it. The drag states keep the green "drop here" signal
+       on the dark-green family the rest of this sheet uses. */
+    --c-uploader-bgDefault: var(--pk-surface-2);
+    --c-uploader-bgHover: #26331c;
+    --c-uploader-bgClick: #3a4d2a;
+    --c-uploader-bgDisabled: var(--pk-bg);
+    --c-uploader-strokeDefault: var(--pk-border);
+    --c-uploader-strokeAccent: var(--pk-green-deep);
+    --c-uploader-textDefault: var(--pk-text-soft);
+    --c-uploader-textAccent: var(--pk-green);
+    --c-uploader-textLoader: var(--pk-text-muted);
     --c-combobox-bgDefault: var(--pk-surface-2);
     --c-combobox-bgDisabled: var(--pk-bg);
     --c-combobox-content-bg: var(--pk-bg);
@@ -233,8 +246,12 @@
     --c-tag-stroke: var(--pk-border);
     --c-tag-strokeContrast: var(--pk-border);
     --c-quote-bg: var(--pk-surface-2);
-    --c-tooltip-bg: var(--pk-surface);
-    --c-tooltip-text: var(--pk-text);
+    /* The ui-kit Tooltip's NEUTRAL card paints from the `-base-` pair (#fcfdff panel /
+       #37393d label). The `-secondary-` pair beside it is already a dark card with a
+       light label, so it needs no flip. The component is portaled in on hover, so no
+       load-time scan sees it. */
+    --c-tooltip-base-bg: var(--pk-surface);
+    --c-tooltip-base-text: var(--pk-text);
     --c-menu-item-text: var(--pk-text);
     --c-menu-item-hover: var(--pk-surface-2);
     --c-menu-item-click: var(--pk-border);
@@ -353,10 +370,13 @@
 
     /* Checkbox / radio. Both draw an UNCHECKED box as a solid #fcfdff fill with a
        #ced1d9 ring — a white square/disc on the dark canvas. The checked fill carries a
-       white tick/dot, so it needs the deeper green for the mark to read. */
+       white tick/dot, so it needs the deeper green for the mark to read.
+       The DISABLED fill must stay a step BELOW the default one, or a disabled box reads
+       as the most active control on the form. */
     --c-checkbox-mainBgDefault: #5e6066;
     --c-checkbox-mainBgHover: #757880;
     --c-checkbox-mainBgClick: #909299;
+    --c-checkbox-mainBgDisabled: #3a4149;
     --c-checkbox-mainStroke: #37393d;
     --c-checkbox-activeDefault: var(--pk-green-shade);
     --c-checkbox-activeHover: #67993d;
@@ -364,6 +384,7 @@
     --c-radio-mainBgDefault: #5e6066;
     --c-radio-mainBgHover: #757880;
     --c-radio-mainBgClick: #909299;
+    --c-radio-mainBgDisabled: #3a4149;
     --c-radio-mainStroke: #37393d;
     --c-radio-activeDefault: var(--pk-green-shade);
     --c-radio-activeHover: #67993d;
@@ -712,17 +733,42 @@
   .comment-toolbar,
   .comments__sorting,
   .comment__children { background-color: transparent !important; }
-  /* the thin nesting guide-lines between nested comments */
-  .comment__branch,
-  .comment__indent,
-  .comment-thread__line { border-color: var(--pk-border) !important; background-color: var(--pk-border) !important; }
+  /* The nesting guide-line down the left of a thread. `.comment__branch` /
+     `.comment__indent` / `.comment-thread__line` do not exist in the shipped sheet —
+     the live guide is `.comment__children`'s own border-left, which the universal
+     border reset drops to --pk-border and makes almost invisible. Give it the
+     divider tone Pikabu means it to have (--color-black-500's dark-side value). */
+  .comment__children { border-left-color: #4a525c !important; }
 
-  /* The "expand/collapse thread" toggle (the small +/− square beside "раскрыть
-     ветку N") is a green-filled pill: Pikabu paints its border AND fill from
-     --color-primary-700, so it reads as a seamless green chip. Our universal
-     `* { border-color }` reset flattened the ring to grey, wrapping every green
-     toggle in a mismatched grey 1px outline. Restore the border to brand green. */
-  .comment-toggle-children__icon { border-color: var(--pk-green) !important; }
+  /* The "expand/collapse thread" toggle (the small +/− square on the guide-line) and
+     its ring ENCODE STATE, and only the COLLAPSED variant is the green chip:
+       rest (thread open)  -> grey ring + grey glyph, from --color-black-500
+       hover / collapse-strip hovered -> brand-green ring + green glyph
+       `_collapse` (thread shut)      -> brand-green FILL + knockout glyph
+     Pinning the ring green at rest made every open thread read as an active green
+     control, erased the hover cue, and left the glyph on --color-black-500, which
+     this theme darkens to a divider tone (~1.9:1 on the comment surface). */
+  .comment-toggle-children__icon {
+    border-color: #6b7480 !important;
+    color: var(--pk-text-muted) !important;
+  }
+  .comment-toggle-children:hover .comment-toggle-children__icon,
+  .comment_collapsing-area > .comment-toggle-children > .comment-toggle-children__icon,
+  .comment-toggle-children_collapse .comment-toggle-children__icon {
+    border-color: var(--pk-green) !important;
+    color: var(--pk-green) !important;
+  }
+  .comment-toggle-children_collapse .comment-toggle-children__icon { color: var(--pk-bg) !important; }
+  /* Grey "N скрытых комментариев" group toggle: Pikabu fills it from --color-black-440
+     and matches the ring to the fill — it is not a green control. */
+  .comment-hidden-group__toggle .comment-toggle-children__icon,
+  .comment-toggle-children_only-hidden.comment-toggle-children_collapse .comment-toggle-children__icon {
+    border-color: var(--pk-border) !important;
+  }
+  /* Hovering the 25px collapse strip previews which subtree will fold by turning that
+     subtree's whole guide-line brand green — the universal border reset flattened it,
+     so the preview was gone and rest and hover were pixel-identical. */
+  .comment_collapsing-area > .comment__children { border-left-color: var(--pk-green) !important; }
 
   /* Pikabu marks the comment you wrote yourself with a filled username pill:
      `[data-own=true]` paints it from --color-black-700, a mid-grey (#70737b) that
@@ -1139,6 +1185,14 @@
     background-color: transparent !important;
     color: var(--base-text-color) !important;
   }
+  /* Same page: its hero mock post is a deliberately WHITE card, framed by a 12/24px
+     white band around the screenshot and split by two near-white 1px dividers. The
+     universal border reset repaints all three --pk-border, so a dark frame and two
+     hard dark rules land on white paper. Restore the landing's own tones. */
+  .apps-landing-story__image { border-color: #ffffff !important; }
+  .apps-landing-story__tags,
+  .apps-landing-story__footer,
+  .apps-landing-story > footer { border-color: #f3f4f5 !important; }
 
   /* ===== Generic muted / hint text =====
      `.hint` is NOT a muted-text class on Pikabu — it marks "this element owns a
@@ -1407,6 +1461,14 @@
   [class*="Textarea__host_error"],
   [class*="ComboBox__host_error"] { border-color: #e5594c !important; }
 
+  /* Selected thumbnail in the multi-image gallery viewer. Every thumbnail already
+     carries a 2px ring, so the accent ring on the active one is the ONLY thing that
+     says which image you are looking at; the blanket reset paints all of them
+     --pk-border. `input:checked + .pkb-radio__handle` is the same shape — the checked
+     radio is drawn as a 5px brand-green ring and nothing else. */
+  .gallery-viewer__thumbnails .gallery-viewer__thumbnail-item_active,
+  input:checked + .pkb-radio__handle { border-color: var(--pk-green) !important; }
+
   /* Destructive button — see the --c-btn-negativeOutline-* remap above. */
   .pkb-normal-btn_negative-outline { border-color: var(--c-btn-negativeOutline-textStrokeDefault) !important; }
   .pkb-normal-btn_negative-outline:hover { border-color: var(--c-btn-negativeOutline-textStrokeHover) !important; }
@@ -1446,6 +1508,16 @@
   /* Green-variant tooltip card: the ring is what makes it read as the "positive" variant
      rather than the neutral one. */
   [class*="pkb-tooltip-base__host_green"] [class*="pkb-tooltip-base__card"] { border-color: var(--pk-green-deep) !important; }
+
+  /* The three COLOURED tooltip variants take their label from --color-bright-900, which
+     this theme flips dark so it reads on the lightened brand fills. That is right for
+     `_red` (a bright #f75c48 card) and wrong for the two dark-carded ones, where it lands
+     dark-on-dark. `_dark` also fills from --color-black-900, an INVERTED token: it is a
+     text tone everywhere else, so the flip turns the card near-white. Both the fill and
+     the arrow read --card-bg, so pinning it on the host covers both. */
+  [class*="pkb-tooltip-base__host_green"],
+  [class*="pkb-tooltip-base__host_dark"] { --color-bright-900: #e9e9e9; }
+  [class*="pkb-tooltip-base__host_dark"] { --card-bg: var(--pk-surface) !important; }
 
   /* "Пикабу в цифрах" stat cards on /about. Pikabu paints each card a literal #fff and
      its number + caption a literal #212121. Our generic `.block` surface rule darkens

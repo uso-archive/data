@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Stack Overflow and the whole Stack Exchange network: easy-on-the-eyes questions, answers, code blocks, comments and sidebar.
-@version      20260820.00.13
+@version      20260827.15.15
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -172,7 +172,7 @@
   }
 
   .fc-black-600, .fc-black-500,
-  .fc-medium, .s-link__muted,
+  .fc-medium,
   .post-signature .user-action-time,
   .mod-message, .subheader h1 {
     color: #c4cdd6 !important;
@@ -185,7 +185,7 @@
   .fc-black-300, .fc-black-250, .fc-black-200,
   .fc-light, .s-description, .fs-caption,
   .relativetime, .relativetime-clean,
-  .s-user-card--time,
+  .s-user-card--time, .s-link__muted,
   .js-share-link, .js-suggest-edit-post,
   .s-navigation--item, .disabled-link,
   .v-visible-sr, .post-menu .lsep,
@@ -195,6 +195,16 @@
   .s-prose .fc-light,
   .revision-comment, span.revision-comment {
     color: #9198a1 !important;
+  }
+
+  /* `.s-link__muted` reads `--_li-fc: var(--black-400)`, the SAME token as the
+     metadata it sits inside (a question list's `.s-user-card--time` wraps one),
+     so it belongs in the group above, not with 500/600 — grouped there it read a
+     full step brighter than its own container. Its hover token is `--black-500`;
+     the rest colour is `!important`, so the arm is required or the generic
+     `a:hover` cannot reach it. */
+  .s-link__muted:hover {
+    color: #c4cdd6 !important;
   }
 
   /* `.fc-black` carries NO numeric step: it is pure #000, Stacks' darkest ink,
@@ -334,6 +344,16 @@
     color: #9bd4ff !important;
   }
 
+  /* …but a user with no profile to link to (a deleted account) is a bare
+     <span class="s-user-card--link">, which SE leaves at the body ink. The
+     classless arm above painted it the accent, so the ONE name on a question
+     page that is not clickable read brighter than the 71 that are. Match the
+     `.s-user-card--time` it shares its row with. */
+  span.s-user-card--link,
+  .s-user-card--info span.s-user-card--link {
+    color: #9198a1 !important;
+  }
+
   /* `.fs-caption` is a SIZE utility, not a colour: SE puts it on small ACCENT
      text and on small LINKS too. Our blanket muted-grey `.fs-caption` rule
      above swallowed both — the sidebar "Last 1 hr" activity accent
@@ -350,6 +370,15 @@
   a.s-link.fs-caption,
   .fs-caption a.s-link {
     color: #5fb0e6 !important;
+  }
+
+  /* …and the hover arm those two shapes need. The generic `a:hover` accent is
+     unimportant, so the `!important` rest colour above out-ranks it and the
+     caption link is the one link on the page with no hover feedback (SE's own
+     `.s-link:hover` darkens it). */
+  a.s-link.fs-caption:hover,
+  .fs-caption a.s-link:hover {
+    color: #9bd4ff !important;
   }
 
   /* …but a `.relativetime` inside an anchor is HALF of that link's label —
@@ -386,6 +415,18 @@
     color: #e6edf3 !important;
   }
 
+  /* Same collision on the BLUE end: the mute is 2 classes and the `.fc-blue-*`
+     remap is 1, so a body-size element carrying an explicit link-blue utility
+     lost it. /collectives renders its explainer card's title this way and it
+     came out the same grey as the metadata, beside a `.fc-blue-500` caption in
+     the same card that kept the accent. */
+  .fs-body2.fc-blue-400,
+  .fs-body2.fc-blue-500,
+  .fs-body2.fc-blue-600,
+  .fs-body2.fc-blue-700 {
+    color: #6fb3e8 !important;
+  }
+
   /* Labels, strong metadata, user-card rows: dark #3b4045 by
      default — lift so they read on dark surfaces. */
   .s-label,
@@ -419,6 +460,19 @@
   a:hover, .s-link:hover, .s-prose a:hover,
   .question-hyperlink:hover, .answer-hyperlink:hover {
     color: #9bd4ff;
+  }
+
+  /* `.s-link__inherit` is Stacks' explicit opt-OUT of the link colour
+     (`--_li-fc: inherit`): SE uses it where an anchor must read as the plain
+     text around it — the question header's "Modified <date>", a Collectives
+     card whose whole body is one link, the Hot Network Questions heading. Our
+     `.s-link` arm above ties with Stacks' own `.s-link` and wins on order, so
+     every one of them rendered accent-blue among plain siblings. Two classes
+     beats that arm; no `!important`, so the places we DO paint deliberately
+     (`#sidebar a`, `.fc-blue-400`, the HNQ heading) still win. */
+  a.s-link__inherit,
+  .s-link.s-link__inherit {
+    color: inherit;
   }
 
   /* VISITED links. The generic accent rule above carries no `!important`, so
@@ -475,6 +529,41 @@
   }
 
   .wiki-ph-content a:not(.s-tag):not(.post-tag):not(.badge-tag):not(.badge):not(.s-btn):visited:hover {
+    color: #d3c4f5 !important;
+  }
+
+  /* The user-card and user-list anchors are BARE `<a>` with no class, so the
+     unimportant accent above loses to SE's five-`:not()` `:visited` rule and a
+     returning reader's already-opened tag / name / timestamp links drop to
+     #155ca2, 2.4:1 on the page base — visibly dimmer than the siblings beside
+     them. Same two arms as the prose links: an `!important` floor that holds
+     wherever the engine refuses to repaint a visited link, plus the violet
+     that keeps the read/unread signal where `:visited` styling does apply. */
+  .user-tags a,
+  .s-user-card--link a,
+  .s-user-card--awards a,
+  #users-legend a {
+    color: #5fb0e6 !important;
+  }
+
+  .user-tags a:hover,
+  .s-user-card--link a:hover,
+  .s-user-card--awards a:hover,
+  #users-legend a:hover {
+    color: #9bd4ff !important;
+  }
+
+  .user-tags a:visited,
+  .s-user-card--link a:visited,
+  .s-user-card--awards a:visited,
+  #users-legend a:visited {
+    color: #b09ae0 !important;
+  }
+
+  .user-tags a:visited:hover,
+  .s-user-card--link a:visited:hover,
+  .s-user-card--awards a:visited:hover,
+  #users-legend a:visited:hover {
     color: #d3c4f5 !important;
   }
 
@@ -656,12 +745,18 @@
     filter: invert(1) hue-rotate(180deg) !important;
   }
 
-  /* Stack Apps' question summaries carry a 144x106 thumbnail; every app without
-     its own screenshot falls back to the site's `library-thumb.png`, a solid
-     white plate (mean luminance 238) with pale gear line-art. On a list page
-     that is a column of ~15 bright tiles. Match the fallback asset by SRC —
-     the same slot holds user-uploaded screenshots, which must stay untouched. */
-  img[src*="library-thumb"] {
+  /* Stack Apps' question summaries carry a 144x119 thumbnail; every post without
+     its own screenshot falls back to one of the site's default plates —
+     `library-thumb.png` for apps, `script-thumb.png` for scripts — both solid
+     white with pale gear line-art (mean luminance 242). A tagged list is a
+     column of ~10 of them. Two constraints pin the selector shape: the same
+     slot holds user-uploaded screenshots, which must stay untouched (they are
+     served from i.sstatic.net and third-party CDNs, never from the site's own
+     `/Content/Sites/<site>/Img/`), and that asset directory ALSO holds the
+     brand rasters — `icon-48.png`, `apple-touch-icon.png`, `logo.svg` — which
+     must not invert. So match the directory AND the `-thumb.png` suffix; any
+     further default plate the site adds to the family is covered. */
+  img[src*="/Content/Sites/"][src*="-thumb.png"] {
     filter: invert(1) hue-rotate(180deg) !important;
   }
 
@@ -1439,6 +1534,15 @@
     color: #c4cdd6 !important;
   }
 
+  /* Stacks separates two stacked `--content` blocks with a `--black-150`
+     #e3e6e8 top rule on the second one (`+` sibling), a path the `--item`
+     arm above never reaches. The widget's own surface/ink rules carry no
+     border-colour, so an accordion sidebar draws bright hairlines. */
+  .s-sidebarwidget--content,
+  .s-sidebarwidget .s-sidebarwidget--content {
+    border-color: #2d333b !important;
+  }
+
   /* Stacks deliberately de-links plain anchors inside a sidebar widget
      (`.s-sidebarwidget:not(.s-anchors) a:not(…)` → `--black-600`), i.e. they
      are the widget's PROMINENT ink, not the accent. That reads 1.2:1 once the
@@ -1651,6 +1755,20 @@
     color: #e6edf3 !important;
   }
 
+  /* A pressed toggle outside an `.s-btn-group` (the intro-banner disclosure on
+     /beta/challenges) is filled from `--_bu-bg-selected` / `--_bu-fc-selected`
+     — `--black-150` #e3e6e8 under `--black-600` ink. No `.bg-black-*` utility
+     is on the element, so nothing else in this file reaches it. `__filled` and
+     `__primary` carry their own selected tokens and keep the brand blue; the
+     hover arm is needed because the mute above would otherwise strip the
+     pressed fill on pointer-over, which Stacks itself never does. */
+  .s-btn.is-selected:not(.s-btn__filled):not(.s-btn__primary),
+  .s-btn.is-selected:not(.s-btn__filled):not(.s-btn__primary):hover,
+  .s-btn--radio:checked + .s-btn {
+    background-color: #20303d !important;
+    color: #bfe0f7 !important;
+  }
+
   .s-btn__outlined {
     border-color: #2d333b !important;
   }
@@ -1670,6 +1788,27 @@
 
   .s-btn.s-btn__github,
   .s-btn.s-btn__facebook {
+    color: #ffffff !important;
+  }
+
+  /* Their hover arms too. `.s-btn:hover` is 1 class + 1 pseudo — the same
+     weight as the `.s-btn.s-btn__google` rest rule above, which is declared
+     later and therefore keeps the dark ink while the hover paints the pill
+     #1c2128: hovering "Sign up with Google" dropped the label to ~1.2:1 on the
+     signup modal every page ships. SE gives each variant its own hover fill;
+     restore those. */
+  .s-btn.s-btn__google:hover {
+    background-color: #f1f2f3 !important;
+    color: #3b4045 !important;
+  }
+
+  .s-btn.s-btn__github:hover {
+    background-color: #0c0d0e !important;
+    color: #ffffff !important;
+  }
+
+  .s-btn.s-btn__facebook:hover {
+    background-color: #314a86 !important;
     color: #ffffff !important;
   }
 
@@ -2625,6 +2764,20 @@
     background-color: #262c33 !important;
   }
 
+  /* The signup modal's "OR" separator draws its two rules as `h1::before` /
+     `::after` borders straight off `--black-225` (#d6d9dc) — two near-white
+     hairlines the full width of the dialog, and the widest bright thing on the
+     page. Pseudo-elements are invisible to any element-background scan, and the
+     modal is `aria-hidden` until a guest opens it. Its class is a Svelte hash,
+     so key off the modal + heading instead; an `h1::before` with no `content`
+     renders nothing, so the other dialogs are unaffected. */
+  .s-modal h1::before,
+  .s-modal h1::after,
+  .s-modal--dialog h1::before,
+  .s-modal--dialog h1::after {
+    border-color: #2d333b !important;
+  }
+
   .s-popover::before, .s-popover::after,
   .s-popover .s-popover--arrow::before,
   .s-popover .s-popover--arrow::after {
@@ -2740,6 +2893,15 @@
   .s-block-link.is-selected {
     --_bl-bg: #2d333b !important;
     --_bl-fc: #e6edf3 !important;
+  }
+
+  /* An autocomplete panel marks its ACTIVE row with the `bg-black-150` utility
+     instead of `.is-selected` (the homepage-wizard topic search), so the row
+     takes the flat surface remap further down and lands on exactly the popover
+     colour — the keyboard/first-result cue disappears. A direct fill is needed:
+     the utility sets `background-color`, not `--_bl-bg`. */
+  .s-block-link.bg-black-150 {
+    background-color: #2d333b !important;
   }
 
   /* `__danger` ("Delete", destructive menu items) is a SEMANTIC variant that
@@ -2870,6 +3032,111 @@
     border-color: #2d333b !important;
   }
 
+  /* The body a cookie category unfolds into. The `.ot-cat-item` rules above only
+     reach the collapsed header strip; the panel underneath is a sibling
+     `.ot-acc-grpcntr.ot-acc-txt` that OneTrust plates #f8f8f8 — ~1300px of white
+     once every category is open. It is `max-height: 0` until expanded, so a
+     load-time scan reports it clean; the expander is an UNCLASSED
+     `<button aria-expanded>` stacked over the heading, so only clicking THAT
+     button opens it. #20262d keeps it one step above the #1c2128 category rows.
+     `.ot-host-info` / `.ot-ven-dets` / `.ot-acc-cntr > .ot-acc-hdr` are the same
+     plate on the host-list and vendor sub-screens. */
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-acc-grpcntr.ot-acc-txt,
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-acc-txt .ot-ven-dets,
+  #onetrust-consent-sdk #onetrust-pc-sdk #ot-host-lst .ot-host-info,
+  #onetrust-pc-sdk .ot-host-info,
+  #onetrust-pc-sdk .ot-acc-cntr > .ot-acc-hdr,
+  #onetrust-pc-sdk .ot-pli-hdr.ot-leg-border-color {
+    background-color: #20262d !important;
+    border-color: #2d333b !important;
+  }
+
+  /* The switch's own wrapper is plated (white at the category level, #f8f8f8
+     inside a sub-group) purely to mask the track; transparent lets it sit on
+     whichever surface it lands on. The track itself is painted below. */
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-switch.ot-toggle {
+    background-color: transparent !important;
+  }
+
+  /* Search / filter chrome of the vendor sub-screen. OneTrust plates all of it
+     pure white at 2-id specificity and rings the flyout with a light shadow. */
+  #onetrust-consent-sdk #ot-search-cntr,
+  #onetrust-consent-sdk #onetrust-pc-sdk #ot-fltr-cnt,
+  #onetrust-consent-sdk #onetrust-pc-sdk #ot-anchor,
+  #onetrust-pc-sdk input[type="text"] {
+    background-color: #20262d !important;
+    border-color: #2d333b !important;
+  }
+
+  #onetrust-pc-sdk #ot-fltr-cnt,
+  #onetrust-pc-sdk #ot-anchor {
+    box-shadow: 0 0 12px 2px rgba(0, 0, 0, 0.55) !important;
+  }
+
+  /* "Object to Legitimate Interest" is a two-state pill: OneTrust ships the
+     resting state as a white/#4d4d4d OUTLINE button and the objected state as a
+     filled one, so the dark versions must stay just as distinguishable. */
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-leg-btn-container .ot-inactive-leg-btn {
+    background-color: transparent !important;
+    color: #c4cdd6 !important;
+    border-color: #3d444d !important;
+  }
+
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-leg-btn-container .ot-active-leg-btn {
+    background-color: #2f6f9f !important;
+    color: #ffffff !important;
+    border-color: #3b82b8 !important;
+  }
+
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-leg-btn-container .ot-active-leg-btn svg path {
+    fill: #ffffff !important;
+  }
+
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-leg-btn-container .ot-remove-objection-handler {
+    color: #5fb0e6 !important;
+  }
+
+  /* Hairlines OneTrust draws inside an expanded body and the vendor sub-screens
+     (#d8d8d8 / #e2e2e2 / #e9e9e9). `.ot-ven-disc` states its rule !important at
+     1-id + 3-class, so that one override needs the second id to land. */
+  #onetrust-pc-sdk .ot-acc-cntr,
+  #onetrust-pc-sdk .ot-acc-grpcntr .ot-subgrp-cntr,
+  #onetrust-pc-sdk .ot-vnd-info-cntr,
+  #onetrust-pc-sdk .ot-vnd-serv-hdr-cntr,
+  #onetrust-pc-sdk .ot-vnd-item button,
+  #onetrust-pc-sdk .ot-vnd-info,
+  #onetrust-pc-sdk .ot-ven-dets .ot-ven-pur p[aria-level="5"],
+  #onetrust-pc-sdk .ot-pgph-desc::after,
+  #onetrust-pc-sdk ul li {
+    border-color: #2d333b !important;
+  }
+
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-ven-dets .ot-ven-disc {
+    border-top-color: #2d333b !important;
+  }
+
+  /* Labels and status spans OneTrust paints #3b4045 directly on the span, below
+     the p / li / label rule above. */
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-chkbox label span,
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-checkbox label span,
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-sel-all-hdr span,
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-li-title,
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-label-status,
+  #onetrust-consent-sdk #onetrust-pc-sdk #ot-pvcy-txt,
+  #onetrust-consent-sdk #onetrust-pc-sdk #privacy-text,
+  #onetrust-consent-sdk #onetrust-pc-sdk #modal-header {
+    color: #c4cdd6 !important;
+  }
+
+  /* Global Privacy Control notice: a pale-green plate that only renders when the
+     browser sends the signal. Keep the green ring and glyph, drop the plate. */
+  #onetrust-banner-sdk #onetrust-policy .ot-optout-signal,
+  #onetrust-pc-sdk #ot-pc-content .ot-optout-signal {
+    background-color: #1b2b25 !important;
+    border-color: #32ae88 !important;
+    color: #c4cdd6 !important;
+  }
+
   /* the accordion "+" expander is drawn from two dark-navy bars */
   #onetrust-pc-sdk .ot-plus-minus span {
     background-color: #9198a1 !important;
@@ -2898,6 +3165,21 @@
     color: #5fb0e6 !important;
   }
 
+  /* Footer of the vendor-filter flyout. OneTrust hands both buttons SE's
+     `--black-600` fill, so on the dark flyout Apply and Cancel become two
+     edgeless blocks that also stop telling each other apart. */
+  #onetrust-consent-sdk #onetrust-pc-sdk #filter-apply-handler {
+    background-color: #2f6f9f !important;
+    color: #ffffff !important;
+    border-color: #3b82b8 !important;
+  }
+
+  #onetrust-consent-sdk #onetrust-pc-sdk #filter-cancel-handler {
+    background-color: transparent !important;
+    color: #5fb0e6 !important;
+    border-color: #2d333b !important;
+  }
+
   /* Vendors List sub-screen ("List of partners (vendors)" in the banner, or the
      Vendors link inside the preference center). It is a SEPARATE view from the
      category list `#ot-pc-lst` above, with its own ids, so none of the rules
@@ -2908,17 +3190,18 @@
   #onetrust-pc-sdk #ot-sel-blk,
   #onetrust-pc-sdk #ot-lst-cnt,
   #onetrust-pc-sdk #ot-pc-lst .ot-sel-all,
-  #onetrust-pc-sdk ul.ot-ven-dets {
+  #onetrust-pc-sdk .ot-ven-dets {
     background-color: #20262d !important;
     border-color: #2d333b !important;
   }
 
   /* `.ot-ven-dets` only exists once a vendor row is EXPANDED, so a scan of the
      collapsed list reports it clean. OneTrust paints its value text near-black
-     while the surrounding labels take our light ink, so both ends need naming. */
-  #onetrust-pc-sdk ul.ot-ven-dets li,
-  #onetrust-pc-sdk ul.ot-ven-dets li span,
-  #onetrust-pc-sdk ul.ot-ven-dets li p {
+     on every tag inside, so name the tags, not just the list items. */
+  #onetrust-pc-sdk .ot-ven-dets li,
+  #onetrust-pc-sdk .ot-ven-dets p,
+  #onetrust-pc-sdk .ot-ven-dets h5,
+  #onetrust-pc-sdk .ot-ven-dets span {
     color: #c4cdd6 !important;
   }
 
@@ -2950,23 +3233,37 @@
     filter: invert(1) brightness(0.9);
   }
 
+  /* Keyboard focus ring. SE sets it to #2445b3, which reads 8:1 on OneTrust's
+     white panel and under 2:1 on the darkened one — the ring survives but stops
+     being visible. Mirror the 2-id selector it is stated at. */
+  #onetrust-consent-sdk #onetrust-pc-sdk :focus,
+  #onetrust-consent-sdk #onetrust-pc-sdk .ot-vlst-cntr > a:focus,
+  #onetrust-consent-sdk #onetrust-banner-sdk :focus,
+  #onetrust-consent-sdk #onetrust-banner-sdk:focus {
+    outline-color: #5fb0e6 !important;
+  }
+
   /* The banner is a fixed-height scrolling panel and OneTrust styles its own
      scrollbar: `::-webkit-scrollbar { width: 11px }` with a #c1c1c1 thumb and no
      track rule. On the darkened panel that thumb is a bright light bar running its
      full height — the single brightest thing on a first visit, and a scrollbar
      pseudo-element no element walk can reach. Mirror OneTrust's own
-     id+class specificity so the override lands. */
+     id+class specificity so the override lands. `.ot-pc-scrollbar` is the
+     class OneTrust puts on every inner scroller, including the vendor-filter
+     flyout's fieldset, which has its own lighter #d8d8d8 thumb rule. */
   #onetrust-banner-sdk::-webkit-scrollbar,
   #onetrust-banner-sdk.otFloatingRoundedCorner::-webkit-scrollbar,
   #onetrust-pc-sdk::-webkit-scrollbar,
-  #onetrust-pc-sdk #ot-pc-lst::-webkit-scrollbar {
+  #onetrust-pc-sdk #ot-pc-lst::-webkit-scrollbar,
+  #onetrust-pc-sdk .ot-pc-scrollbar::-webkit-scrollbar {
     background-color: #14181d !important;
   }
 
   #onetrust-banner-sdk::-webkit-scrollbar-thumb,
   #onetrust-banner-sdk.otFloatingRoundedCorner::-webkit-scrollbar-thumb,
   #onetrust-pc-sdk::-webkit-scrollbar-thumb,
-  #onetrust-pc-sdk #ot-pc-lst::-webkit-scrollbar-thumb {
+  #onetrust-pc-sdk #ot-pc-lst::-webkit-scrollbar-thumb,
+  #onetrust-pc-sdk .ot-pc-scrollbar::-webkit-scrollbar-thumb {
     background: #3d444d !important;
   }
 
@@ -2978,7 +3275,8 @@
   #onetrust-banner-sdk::-webkit-scrollbar-corner,
   #onetrust-banner-sdk.otFloatingRoundedCorner::-webkit-scrollbar-corner,
   #onetrust-pc-sdk::-webkit-scrollbar-corner,
-  #onetrust-pc-sdk #ot-pc-lst::-webkit-scrollbar-corner {
+  #onetrust-pc-sdk #ot-pc-lst::-webkit-scrollbar-corner,
+  #onetrust-pc-sdk .ot-pc-scrollbar::-webkit-scrollbar-corner {
     background-color: #14181d !important;
   }
 
@@ -3199,6 +3497,16 @@
     background-color: #14222e !important;
     border-color: #234055 !important;
     color: #cfe0ef !important;
+  }
+
+  /* `.bg-blue-300` (#92c2f2) is the step between them and the banner tint, and
+     it was the only one left native: /collectives builds its explainer mock's
+     tag chips from it, eight solid pastel bars on the dark card. It is not
+     near-WHITE, so the light-surface scan (all channels > 200) never sees it —
+     only a luminance read does. Keep it recognisably blue, one step up from the
+     banner fill. */
+  .bg-blue-300 {
+    background-color: #234055 !important;
   }
 
   /* Post /revisions diff highlights. SE marks changed text with light-theme
@@ -4095,6 +4403,29 @@ header.site-header,
     color: #9198a1 !important;
   }
 
+  /* …and the CURRENT tab, which the flat rest colour above swallowed together
+     with the main block's `.youarehere { border-color: #2d333b }`: the API docs
+     mark it with a #f35d5f label and a 2px underline of the same red, so with
+     both gone the only remaining cue was the bold weight. */
+  #tabs a.youarehere {
+    color: #f35d5f !important;
+    border-bottom-color: #f35d5f !important;
+  }
+
+  #tabs a:hover {
+    color: #c4cdd6 !important;
+  }
+
+  /* The docs sidebar collapses to a `.mobile-nav` disclosure below the `md`
+     breakpoint, and it is the ONLY control there: `apiv2.css` gives it #242729
+     straight off its own palette, ~1.2:1 once the rail behind it is #1c2128, so
+     at 390px the page opens with an unreadable "Navigation" label above the
+     intro. `display:none` at desktop, so a desktop-only pass cannot see it. */
+  .module.help .mobile-nav,
+  .mobile-nav {
+    color: #c4cdd6 !important;
+  }
+
   /* Home page: the version chip beside the API version and the big
      lowercase strapline, which carries a white text-shadow. */
   .home-links-version-value {
@@ -4359,6 +4690,14 @@ header.site-header,
     color: #9198a1 !important;
   }
 
+  /* `.beta-days` is the one tile whose plate stays the site's brand blue
+     (#71bce0) rather than going dark, so the grey above sits at 1.9:1 on it
+     while the "days" label beside it keeps its native white. Both halves of
+     the tile have to move together. */
+  .a51-votes.beta-days .a51-mini-counts {
+    color: #ffffff !important;
+  }
+
   /* Legacy pager chips: #ccc frames on the numbers, and the prev/next/…
      chips take the cream plate colour as a border so they show as bright
      outlines once the plate behind them is dark. */
@@ -4600,6 +4939,14 @@ header.site-header,
      invert only names the header/`.-logo` shapes, and this one is a bare
      `img.site`. */
   img.site {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+
+  /* The Data Explorer wordmark is not an <img> at all: `#logo` is a text-indent
+     sprite (`topbar-sprite.png`) whose "Stack" half is baked near-black for the
+     white page, so it disappeared into the header. Same luminance invert as
+     every other dark-ink logo raster in this theme. */
+  #logo {
     filter: invert(1) hue-rotate(180deg) !important;
   }
 
@@ -4860,5 +5207,30 @@ header.site-header,
   .search-highlight {
     background-color: #4a3a1c !important;
     color: #f0dfae !important;
+  }
+
+  /* /account/login's OpenID provider chips are legacy Data Explorer markup,
+     not the Stacks OAuth pills: `#f9f9f9` plate, `#d4d4d4` frame, a `#f2f2f2`
+     offset shadow and #888 ink. They are the only content on that page, so
+     they read as two bright cards on the dark shell. The provider glyph is a
+     sprite and stays untouched. `.custom-login` is the same widget's white
+     icon/label split — it is served by the same stylesheet but renders no node
+     for anonymous visitors here. */
+  .preferred-login,
+  .preferred-login.custom-login {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    box-shadow: none !important;
+    color: #c4cdd6 !important;
+  }
+
+  .preferred-login.custom-login .icon-container {
+    background-color: #1c2128 !important;
+    border-right-color: #2d333b !important;
+  }
+
+  .preferred-login.custom-login .text {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
   }
 }

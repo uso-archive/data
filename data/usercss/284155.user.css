@@ -3,12 +3,19 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean dark theme for itch.io's homepage, browse, jams, community and profiles that keeps game art, sale ribbons and creators' own page designs untouched.
-@version      20260820.00.10
+@version      20260827.15.11
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
 @-moz-document domain("itch.io") {
 :root { color-scheme: dark !important; }
+  /* color-scheme is inherited, so the root value would reach creator layouts too and flip the UA
+     system colours there — buttontext on itch's click-to-activate embed shim is the visible one.
+     Restoring `normal` on the excluded bodies keeps those pages at browser parity. The root
+     element itself stays dark, so the viewport scrollbar is dark on every page. */
+  body.game_layout_widget,
+  body.user_layout_widget,
+  body.jam_layout_widget { color-scheme: normal !important; }
 
   /* ==== Base surfaces (apex chrome pages only; creator layouts excluded) ==== */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) {
@@ -391,6 +398,12 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .selectize-input {
     background-image: none !important;
     box-shadow: none !important;
+  }
+  /* The seam between the open input and its dropdown is a full-width ::before filled
+     var(--itchio_border_color) #DADADA — a bright hairline across the only popover on the
+     browse rail and the sale-explorer facet picker. Pseudo, and only in the open state. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .selectize-input.dropdown-active::before {
+    background-color: #2d333b !important;
   }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .divider {
     background-color: #2d333b !important;
@@ -871,6 +884,12 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jam_cover {
     background-color: #1a1f26 !important;
   }
+  /* The FEATURED strip across the foot of a jam card is the one part of the card itch fills
+     with var(--itchio_gray_back) #F4F4F4 — a full-width white band on the darkened card, with
+     the muted label on it. #262c33 keeps the label at 4.5:1 and still reads as a chip. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .featured_flag {
+    background-color: #262c33 !important;
+  }
   /* Default-jam page header band (overview / community / topic) ships a white
      var(--itchio_white_back); a host-customised jam carries body.jam_layout_widget and is
      excluded by the prefix, so this only repaints the untuned itch default. */
@@ -880,6 +899,14 @@
   }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jam_header_widget .jam_title_header,
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jam_header_widget .stat_box .stat_value { color: #e6edf3 !important; }
+  /* A jam's sub-pages — submissions, submission feed, screenshots — wrap the itch chrome in a
+     .jam_page_base_page container filled var(--itchio_white_back) (the feed variant
+     var(--itchio_gray_back)). Whatever part of it the header widget does not cover renders as
+     a full-width light band, and empty-state copy sits directly on it. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .jam_page_base_page {
+    background-color: #14181d !important;
+    border-color: #2d333b !important;
+  }
   /* Jam-page tab strip. Every tab carries `border-bottom: 4px solid transparent` as a
      spacer, so the blanket border reset paints a grey stub under EVERY tab and the active
      tab stops reading as selected — clear the spacer, keep the accent on active/hover. */
@@ -1099,6 +1126,12 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .countdown .block_value {
     color: #e6edf3 !important;
   }
+  /* The ended-sale/bundle banner is the one promotion_page surface itch fills with
+     var(--itchio_border_color) #DADADA instead of a card tone, so the page ink lands on it at
+     1.4:1. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .promotion_page .not_active_notification {
+    background-color: #1c2128 !important;
+  }
   /* "More from this sale" banner fills var(--itchio_target_bg) #D7FCAF; keep the green
      read as a positive tint but at a dark-fit value. */
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .sale_explorer_page .similar_banner {
@@ -1233,6 +1266,21 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .markdown-section {
     color: #c4cdd6 !important;
   }
+  /* The reader's own White/Sepia/Night switcher writes .color-theme-1 / -2 on .book. Night is
+     already dark, but Sepia keeps honkit's cream #F3EACB plate on .markdown-section while our
+     ink rules above paint the copy #c4cdd6 on it — 1.4:1, the whole chapter unreadable. Give
+     the sepia plate back its own #704214 brown (7:1) so the skin the reader picked still works;
+     the surrounding chrome stays dark. Natively every token in that pane — headings, links,
+     bold, list items — is that one brown, so the descendant sweep matches the skin. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book.color-theme-1 .markdown-section,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book.color-theme-1 .markdown-section * {
+    color: #704214 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book.color-theme-1 .markdown-section code,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book.color-theme-1 .markdown-section pre {
+    background-color: rgba(112, 66, 20, 0.08) !important;
+    border-color: rgba(112, 66, 20, 0.25) !important;
+  }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) #book-search-input {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
@@ -1245,6 +1293,16 @@
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
     border-color: #2d333b !important;
+  }
+  /* Chapter rows in the manual's table of contents are itch-inked, not link-coloured — only
+     the chapter you are reading takes the link colour. The blanket accent paints all ~30 rows
+     the same pink, leaving the rail with no current-chapter mark. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book-summary ul.summary li a {
+    color: #c4cdd6 !important;
+  }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book-summary ul.summary li.active > a,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .book-summary ul.summary li a:hover {
+    color: #fa7d8c !important;
   }
   /* "Return to app" sits on itch's #BB4F4F band and is natively white with a white hairline;
      the blanket accent + border reset drop it to 1.9:1 inside a near-black outline. */
@@ -1343,6 +1401,14 @@
   }
   /* "Did you like this post?" ships --itchio_body_color_med (#434343) — 1.6:1 on the card.
      That token also paints the WEB flag's fill, so it is fixed here rather than rebound. */
+  /* Pull-quotes in a blog post are the one block itch fills var(--itchio_gray_back) #F4F4F4
+     inside the darkened article column — the body ink we set lands at ~1.5:1 on it. Only the
+     blog build does this; the docs/user_formatted blockquote is a bordered quote and is
+     handled in the documentation block. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .blog_post_page .post_body blockquote {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .support_header p {
     color: #c4cdd6 !important;
   }
@@ -1509,6 +1575,12 @@
   body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .cover_image {
     background-color: #1a1f26 !important;
   }
+  /* A cover-less entry in a sale row renders .game_thumb as a bare DIV, which then shows the
+     gray_back plate. Deliberately not !important: a per-game inline cover colour, which only
+     ever appears on a DIV outside .sale_games, must keep priority. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .sale_games div.game_thumb {
+    background-color: #1a1f26;
+  }
 
   /* ==== Moderation notices ==== */
   /* "moved this topic to …" ships itch's #606060 straight on the post card (2.6:1) */
@@ -1518,11 +1590,14 @@
   }
 
   /* ==== Footer ==== */
-  .footer .primary,
-  .footer .secondary,
-  .footer .copyright { color: #8b949e !important; }
-  .footer a { color: #a8b0b8 !important; }
-  .footer a:hover { color: #e6edf3 !important; }
+  /* A creator page ends in div#view_game_footer.footer INSIDE the creator's own #wrapper, and
+     creator CSS styles it (`.inner_column a, .inner_column .footer a`) as part of the page
+     design — so .footer is not an itch-only hook and these rules carry the layout guard. */
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .footer .primary,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .footer .secondary,
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .footer .copyright { color: #8b949e !important; }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .footer a { color: #a8b0b8 !important; }
+  body:not(.game_layout_widget):not(.user_layout_widget):not(.jam_layout_widget) .footer a:hover { color: #e6edf3 !important; }
 
   /* Horizontal carousel scroll-fade paddles (home rows, profile "Creator of") ship a
      white background-image gradient — a scroll-fade indicator that washes to white over

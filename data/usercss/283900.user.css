@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260820.00.09
+@version      20260827.15.10
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -36,6 +36,12 @@
   .Nav__Secondary__Menu__Link, .global-nav a { color: #e6edf3 !important; }
   .Nav a:hover, #global-nav a:hover, .Nav__Primary__Menu__Link:hover { color: #ffffff !important; }
   .nav-menu, .menu-flyout, .QuickMenu, .HeaderUserMenu, .HeaderUserMenu__Menu { background-color: #1c2128 !important; }
+  /* The Watch nav item plays a one-shot 6s intro on the first page view: a red burst SVG
+     behind an "ALL OF ESPN" wordmark painted #f33, ESPN's brand accent. It is a <span>, so
+     the generic body-grey span rule out-specifies it and the wordmark reads as ordinary
+     nav metadata. The animation runs once with no fill-mode and the node is then removed,
+     so it exists in no scan of a settled page. */
+  .all-of-espn-animated-menu { color: #ff3333 !important; -webkit-text-fill-color: #ff3333 !important; }
 
   /* ---- Scoreboard strip / score chips ---- */
   #global-scoreboard, .HeaderScoreboard, .HeaderScoreboard__Wrapper,
@@ -406,6 +412,12 @@
   .tabs__list__item--active .tabs__link,
   .tabs__list__item--active .Button--unstyled {
     color: #e6edf3 !important; border-bottom-color: #c8102e !important; }
+  /* Hovering the tab strip moves the 2px underline off the active item onto the hovered
+     one (.tabs__list:hover swaps the border-width between them) and ESPN paints that
+     hover underline its own #c00 — a colour the blanket `*` border reset flattened to
+     the generic line grey, so pointing at a tab drew a dead grey bar instead of the
+     brand accent the active tab uses. */
+  .tabs__list__item:hover { border-bottom-color: #c8102e !important; }
   /* Segmented filter control (standings "League / Conference / Division"): ESPN paints
      the ACTIVE segment's label its live-red #dd0000 as the selected-state accent. The
      generic .AnchorLink white-headline rule flattened it, so all three segments read
@@ -505,6 +517,21 @@
      border reset cannot reach — a #dcdddf hairline the full width of the dark panel. */
   #onetrust-banner-sdk #onetrust-button-group-parent::before {
     border-top-color: #2d333b !important; }
+  /* The preference centre's "List of Partners (vendors)" sub-view is a SECOND screen behind
+     the panel's own link, so the panel-level surface rule above never reaches it: the
+     "Allow All Consent" strip (#ot-sel-blk) and each vendor-group accordion row
+     (.ot-acc-hdr) paint their own #f9f9fc, and the funnel control opens a 325x300 pure-white
+     #ot-fltr-cnt popover over them — our light panel ink lands at ~1.4:1 on all three.
+     The popover floats above the panel, so it takes the raised tone. */
+  #onetrust-pc-sdk #ot-sel-blk, #onetrust-pc-sdk .ot-acc-hdr {
+    background-color: #21262d !important; }
+  #onetrust-pc-sdk #ot-fltr-cnt {
+    background-color: #21262d !important; border-color: #2d333b !important; }
+  /* OneTrust's tenant blue #0079bc on the filter heading and the "Always Active" status,
+     plus a #696969 Clear Filters label — all three sit at 2.6-3.4:1 once the panel darks. */
+  #onetrust-pc-sdk #ot-filter-list-header, #onetrust-pc-sdk .ot-always-active {
+    color: #5fb0e6 !important; }
+  #onetrust-pc-sdk #clear-filters-handler { color: #c4cdd6 !important; }
 
   /* ---- Catch-all: any element ESPN paints white/near-white inline ---- */
   [style*="background-color: rgb(255, 255, 255)"],
@@ -893,6 +920,13 @@
   .game-details.header.sm, .game-details.header.sm span,
   .game-details.header.sm .cscore_notes_game {
     color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+  /* When NEITHER side has a brand colour (Little League, national teams) ESPN fills both
+     gradient stops with its neutral #a5a6a7, so the band is a light grey slab carrying the
+     white label at 2.4:1. Match both stops so a half-branded gradient — one real team
+     colour plus the neutral — keeps its brand half. */
+  .game-details.header[style*="#a5a6a7,#a5a6a7"],
+  .game-details.header[style*="#a5a6a7, #a5a6a7"] {
+    background-color: #2d333b !important; background-image: none !important; }
 
   /* ---- Live-game "AutoGameBlock" (.game-strip.live "LAST PLAY" panel on section
        pages): the top team strip is themed via .game-strip, but the LAST PLAY sub-panel
@@ -1423,6 +1457,9 @@
   .MonthContainer__MonthYear { color: #e6edf3 !important; }
   .MonthContainer__Day--selected {
     color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+  /* The popover's Today / Cancel actions are <div>s, not anchors, so the link rule never
+     reaches them and they keep ESPN's #0066cc at 2.9:1 on the darked card. */
+  .MonthContainer__button { color: #5fb0e6 !important; }
   /* The popover's own chrome is drawn by two pseudo-elements the `*` border reset cannot
      reach: ::before is the CSS-triangle pointer (border-bottom #fff) and ::after is the
      rotated #edeef0 rule under the caption. Both were invisible while the card was white
@@ -1559,6 +1596,12 @@
      back to the panel tone so the skin reads as ESPN draws it. */
   .evp-player.audio .vjs-big-play-button::before {
     filter: invert(1) brightness(0.16) !important; }
+  /* The Settings menu's Autoplay switch draws its whole track as a 1px #0066cc ring on
+     .toggle-checkbox and only swaps the ::after knob grey<->blue; the blanket `*` border
+     reset erased that ring, so the ON state was a bare blue dot floating with no track
+     and the OFF state had no control outline at all. Lift the ring to the readable blue
+     this theme already maps ESPN's #0066cc to. */
+  .toggle-checkbox { border-color: #5fb0e6 !important; }
 
   /* ---- fantasy.espn.com marketing pages (a claimed espn.com subdomain running its own
        Next.js frontend, linked from the footer's Fantasy column). Its secondary nav bar,
@@ -1576,4 +1619,8 @@
   .NavSecondary__Link::after, .GridironGauntletGameplay__Content::after {
     background-color: #2d333b !important; }
   .Card__Content { border-top-color: #2d333b !important; }
+  /* The league-creation form's radio cards carry a helper line in ESPN's #6c6d6f, a grey
+     picked for the white page — it is not in the .clr-gray-* scale the theme remaps, so it
+     survived at 3.1:1 on our card. */
+  .LargeRadioControl__Description { color: #9aa4ae !important; }
 }

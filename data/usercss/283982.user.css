@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260820.00.12
+@version      20260827.15.13
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -540,6 +540,17 @@
     background-color: var(--d-header) !important;
     color: var(--d-text) !important;
   }
+  /* `data-widget="header"` is NOT unique to the site chrome: the checkout bundle
+     reuses the name for the TITLE ROW of its modals (the address picker's
+     "Способ доставки" is `div.checkout_j4a[data-widget="header"]`). The rule
+     above then paints that row the chrome near-black inside a --d-surface panel,
+     a 376px slab sitting behind the heading and lining up with nothing. It is
+     natively transparent; hand it back. Scoped to modalLayout, which the real
+     page header is never inside. */
+  [data-widget="modalLayout"] [data-widget="header"],
+  [data-widget="modalLayout"] [data-widget="header"] > div {
+    background-color: transparent !important;
+  }
   /* STICKY / AFFIXED HEADER (appears on scroll): Ozon mounts a
      position:fixed clone of the header whose OWN background is
      transparent but which paints a full-size WHITE panel through a
@@ -907,6 +918,20 @@
      over the surface colour, i.e. no hover feedback at all, site-wide. */
   [style*="var(--bgLightKey)"] {
     --bgLightKey: var(--d-surface) !important;
+  }
+  /* …and --bgLightKey is dual-role: the delivery-method segmented control inside
+     the address modal ("Самовывоз" / "Курьером") writes the SAME token as INK,
+     `style="color: var(--bgLightKey)"`, on the selected segment's brand-blue
+     pill. The rebind above matches any inline mention of the token, so it turned
+     that white label into our card surface on #005bff — 2.0:1, the chosen
+     delivery method all but unreadable while the unselected one beside it stays
+     crisp. Re-rebind to white where the declaration is a COLOUR: same
+     specificity, later in the sheet, so it wins for exactly these elements.
+     The control only exists two clicks into a portal-mounted modal, so no
+     load-time scan reaches it. */
+  [style*="color: var(--bgLightKey)"],
+  [style*="color:var(--bgLightKey)"] {
+    --bgLightKey: #ffffff !important;
   }
   .tile-root span,
   .tile-root a,
@@ -1779,6 +1804,40 @@
   [data-widget="webAspects"] a:hover > span {
     border-color: rgba(46, 120, 255, 0.55) !important;
   }
+  /* COLOUR-SWATCH DISCS — the 34px circle inside each colour option. Ozon paints
+     the variant's real colour (inline SVG paths: #000000, #171717, #b8b8b8 …) and
+     softens the whole disc with `opacity: .5`, a device that only works over a
+     light plate: on white the black variant lands at a legible mid grey. Over our
+     dark plate the same 50% blend drags every dark variant to ~#131519 — the black
+     swatch becomes a hole and its near-black neighbour is indistinguishable from
+     it. The opacity sits on the disc itself, so it fades any background we put
+     BEHIND the art too; the only fix is to stop halving it and delineate the disc
+     instead, which is what the site's own 1px ring does (natively a light
+     rgba(204,214,228,.6) hairline, flattened to our dark border by the blanket
+     softener — i.e. the one cue that would have saved the black swatch).
+     `[title]` is the swatch marker: every colour option carries the variant code
+     there (the selected one as a <div>, the rest as <a>), and no text chip has it.
+     Requiring `> span > div` on top means even a text chip that gained a title
+     could not match — it has no disc. */
+  [data-widget="webAspects"] [title] > span > div {
+    opacity: 1 !important;
+    border-color: rgba(206, 219, 235, 0.45) !important;
+  }
+
+  /* PICKUP-POINT MAP (the delivery-address modal's map, an embedded Ozon Maps
+     SDK). Its cluster pins print the number of pickup points inside a brand-blue
+     44px disc, and the SDK takes that ink from --bgPrimary — the page-CANVAS
+     token — used as a label colour. Our :root remap sends it to #14181d, so all
+     ~60 counts read 1.9:1 on the blue and the map looks like a field of empty
+     dots. The SDK's sheet is cross-origin, so the declaration is invisible to
+     CSSOM and only a native-vs-themed read names the token; found by bisecting
+     the candidates on the live marker. Nothing inside the marker uses
+     --bgPrimary as a surface — the disc's own fill is the literal brand blue.
+     The map only exists two clicks into a portal-mounted modal, so no load-time
+     scan reaches it. */
+  .sdk-map-cluster-marker {
+    --bgPrimary: #ffffff !important;
+  }
 
   /* Carousel shelf headings ("Покупают вместе", "Рекомендуем также")
      are LINKS, and the link component pins `color: #070707` on its
@@ -1819,6 +1878,21 @@
   }
   button[disabled][aria-label="Next slide"] > span,
   button[disabled][aria-label="Previous slide"] > span {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--d-text-4) !important;
+  }
+
+  /* The recommendation-shelf arrows carry no aria-label and paint the disc on
+     the <button> itself, not on an inner span: a literal #fff ground with
+     --ozTextPrimary as the chevron, so the remapped chevron vanishes into the
+     white circle. Only the two shelf arrows are grandchildren of the widget;
+     every other button inside it sits deeper. [disabled] carries the
+     enabled/disabled distinction, so both states must be painted. */
+  [data-widget="tileScrollDesktop"] > div > div > button {
+    background-color: var(--d-surface) !important;
+    color: var(--d-text) !important;
+  }
+  [data-widget="tileScrollDesktop"] > div > div > button[disabled] {
     background-color: rgba(255, 255, 255, 0.05) !important;
     color: var(--d-text-4) !important;
   }
@@ -2013,5 +2087,36 @@
      the stars — the gaps composite back to themselves. */
   .rating__group {
     box-shadow: inset 0 0 0 40px rgba(20, 24, 29, 0.72) !important;
+  }
+
+  /* Chrome glyphs delivered as background-image SVGs painting a literal `black`
+     (sectionIcons) or `#001122` (icons): the file is a raster to CSS, so no
+     colour token reaches inside it and each renders at or below the ground it
+     sits on. The files are single-colour, so an inversion is lossless.
+     `icons/disclosure.svg` (#8b939c) and `svg/beak.svg` are excluded — the first
+     already reads on dark, the second is a tooltip pointer that must stay the
+     colour of the dark tooltip plate it extends, and `icons/check.svg` is #005BFF
+     and must keep the brand hue that marks the selected country.
+
+     A filter takes the host's own plate, text and children with it, so it is only
+     safe on a pseudo-element or on a box that carries nothing but the glyph. */
+  .tree-item__button-icon,
+  .tree-item__button-marker-arrow,
+  .page-header__burger,
+  .country-modal__close-btn,
+  .dropdown::before,
+  .select__trigger::after,
+  .menu__lang::after {
+    filter: invert(1) !important;
+  }
+  /* The remaining glyphs are the background of a box that also carries text, so
+     they can only be replaced, not filtered: the header magnifier (30% of a
+     near-black) and the mobile menu's language-row chevron. Restated as the same
+     paths in the muted ink. */
+  .search__wrapper {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%238b949e' d='M17.8924 15.0639C18.5962 13.8729 19 12.4836 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C12.4836 19 13.8729 18.5961 15.064 17.8923L17.5858 20.4142C18.3669 21.1953 19.6332 21.1953 20.4143 20.4142C21.1953 19.6332 21.1953 18.3668 20.4143 17.5858L17.8924 15.0639ZM11 16C8.23858 16 6 13.7614 6 11C6 8.23858 8.23858 6 11 6C13.7614 6 16 8.23858 16 11C16 13.7614 13.7614 16 11 16Z'/%3E%3C/svg%3E") !important;
+  }
+  .menu__lang {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='25' viewBox='0 0 24 25'%3E%3Cpath fill='%238b949e' d='M9.29289 6.35527C8.90237 6.7458 8.90237 7.37896 9.29289 7.76948L13.5858 12.0624L9.29289 16.3553C8.90237 16.7458 8.90237 17.379 9.29289 17.7695C9.68342 18.16 10.3166 18.16 10.7071 17.7695L15.7071 12.7695C16.0976 12.379 16.0976 11.7458 15.7071 11.3553L10.7071 6.35527C10.3166 5.96475 9.68342 5.96475 9.29289 6.35527Z'/%3E%3C/svg%3E") !important;
   }
 }

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260820.00.15
+@version      20260827.15.16
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -406,6 +406,15 @@
   [class*="AirQuality--popoverTitle"] {
     color: var(--wx-text-2) !important;
   }
+  /* the same locales' Daily Forecast writes each row's temperatures as
+     `<TemperatureValue>29</> <span class="Column--tempLo">/<TemperatureValue>20</></span>`.
+     Our TemperatureValue rule lifts both numbers, but the "/" between them is a bare text
+     node on the tempLo wrapper, which keeps the Helios ink #252422 -- 1.2:1, so the row
+     renders as two temperatures with nothing separating them. A separator, not data, so
+     it takes the muted ink; the numbers keep their own colour. */
+  [class*="Column--tempLo"] {
+    color: var(--wx-text-muted) !important;
+  }
   /* that page's per-pollutant concentration (19.36 ug/m3) is the dimmer #6f7585, which
      reads on the site's white card and 3.4:1 on ours -- an AA fail at 14px. */
   [class*="AirQualityText--measurement"] {
@@ -462,6 +471,33 @@
   }
   svg[class*="Icon--icon"][class*="SearchInput--searchIcon"] {
     color: var(--wx-text-2) !important;
+  }
+  /* ...and two Helios icons are NOT ink: they inherit a CHROMATIC currentColor
+     that the blanket lift above swallows, so their hue is the signal, not their
+     legibility. The sunrise/sunset marks in the day-part card are #febc11 gold
+     (matched to the gold sun on the arc right above them, which survives because
+     its own paths carry fill attributes), and the Health & Activities row
+     chevrons are the brand --Ocean #1b4de4, the same blue as the row's link
+     text -- but #1b4de4 is 1.9:1 on the dark card, so that one takes the theme's
+     link accent rather than its literal value. Both need the fill as well as the
+     colour: the paths carry no fill attribute, so `path:not([fill])` above
+     paints them directly and a matched rule beats an inherited one. */
+  svg[class*="Icon--icon"][class*="TwcSunChart--sunIcon"],
+  svg[class*="Icon--icon"][class*="TwcSunChart--sunIcon"] path {
+    color: #febc11 !important;
+    fill: #febc11 !important;
+  }
+  svg[class*="Icon--icon"][class*="HealthActivitiesListItem--icon"],
+  svg[class*="Icon--icon"][class*="HealthActivitiesListItem--icon"] path {
+    color: var(--wx-link) !important;
+    fill: var(--wx-link) !important;
+  }
+  /* the sun-position marker on the sunrise/sunset arc is a plain
+     `<circle r="12" fill="#FFF">` drawn UNDER the gold sun to punch the arc
+     stroke out behind it. On the site's white card it is invisible; it has to
+     track the card it sits on or it renders as a bright disc. */
+  [class*="TwcSunChart"] circle {
+    fill: var(--wx-surface) !important;
   }
 
   /* the legacy sign-in page separates the Google button from the email form with a
@@ -784,6 +820,20 @@
     color: var(--wx-chrome) !important;
     -webkit-text-fill-color: var(--wx-chrome) !important;
   }
+  /* the header "More" drawer's UNIT picker is the same control one component over: a
+     `role="radiogroup"` whose track is `bg-gray-100` and whose CHECKED option is a plain
+     (un-`!`) `bg-gray-900` pill. Both utilities are remapped above, and they land one
+     step apart -- the track on --wx-surface-2, the pill on --wx-chrome -- so the selected
+     unit's plate reads 1.1:1 against the track it sits in and the chip disappears; only
+     the white-vs-muted label was left to say which unit is active. The control only
+     exists once the drawer is opened, so no load-time scan renders it. Invert it the way
+     the chart tabs above are inverted: a light plate with chrome ink. Keyed to
+     aria-checked so the unchecked options keep the transparent track. */
+  [role="radio"][aria-checked="true"][class~="bg-gray-900"] {
+    background-color: var(--wx-text) !important;
+    color: var(--wx-chrome) !important;
+    -webkit-text-fill-color: var(--wx-chrome) !important;
+  }
   /* the video-category strip (Viral Videos / Latest Weather / News / ...) is `md:hidden`,
      so it exists ONLY below 768px -- a desktop scan never renders it. It fills its
      UNSELECTED tabs through the state variant `data-[state=inactive]:bg-gray-100`, a
@@ -1002,8 +1052,13 @@
      ship the SAME placeholder as an INLINE `background:` shorthand with no
      class, on the card <div> or directly on the <img>. Match the literal
      attribute text -- an inline shorthand is beaten by an !important
-     background-image, and the loaded thumbnail still paints over it. */
-  [style*="linear-gradient(135deg, rgb(243, 243, 243)"] {
+     background-image, and the loaded thumbnail still paints over it. An
+     attribute selector matches the RAW attribute value, so the hex and rgb()
+     spellings of the same gradient are two different selectors and both have to
+     be listed. */
+  [style*="linear-gradient(135deg, rgb(243, 243, 243)"],
+  [style*="linear-gradient(135deg, #f3f3f3"],
+  [style*="linear-gradient(135deg, #F3F3F3"] {
     background-image: linear-gradient(135deg, var(--wx-surface-2), var(--wx-surface)) !important;
   }
   /* the legacy Classic Maps pages (/maps/*) size every map thumbnail with an
@@ -1028,10 +1083,17 @@
   [data-testid="TemperatureValue"] {
     color: var(--wx-text) !important;
   }
-  /* the dimmer (low / secondary) temperature -> cool light */
+  /* the dimmer (low / secondary) temperature -> cool light. weather.com marks it
+     two different ways and only one of them is an inline style: the SPA daily rows
+     wrap the low in a `text-gray-500` span (the high is `text-gray-900` + bold),
+     while older markup carries an inline rgb(103, 103, 103). Both forms have to be
+     listed or the low and the high resolve to the same light and the pair reads
+     as one value. The class form must be TWO classes deep to out-rank the
+     TemperatureValue lift above, which is a direct declaration on the child. */
   [data-testid="daily-forecast"] [data-testid="TemperatureValue"][style*="103"],
   [data-testid="daily-forecast"] span[style*="rgb(103, 103, 103)"] [data-testid="TemperatureValue"],
-  span[style*="rgb(103, 103, 103)"] > [data-testid="TemperatureValue"] {
+  span[style*="rgb(103, 103, 103)"] > [data-testid="TemperatureValue"],
+  span.text-gray-500 > [data-testid="TemperatureValue"] {
     color: #7fb4e6 !important;
   }
   /* the "Feels Like" widget paints a SOLID disc whose inline background-color is
@@ -1223,6 +1285,17 @@
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
   }
+  /* ...but the content hubs (/health, /pets, /home-garden) DO paint `bg-primary`:
+     the selected category chip is `bg-primary text-primary-foreground`, natively a
+     near-black pill with a near-white label. Our `--primary` remap makes that pill
+     the light link blue, and the white pinned above lands on it at 2.38:1. Where
+     the element carries the fill itself, give it the dark `--primary-foreground`
+     the design system pairs with `--primary`; the two-class selector keeps the
+     dark-filled CTAs (Sign in, Next 10 Days) on white. */
+  .bg-primary.text-primary-foreground {
+    color: var(--primary-foreground) !important;
+    -webkit-text-fill-color: var(--primary-foreground) !important;
+  }
 
   /* ---- data tables (hourly / 10-day details) ---------------------------- */
   table,
@@ -1335,10 +1408,19 @@
      rule above filled that box with an opaque dark surface, so the slider
      covered its own track: both scrubbers rendered as a flat empty bar with no
      visible handle and no risk-level colour. Give the range input its
-     transparency back; the track beneath paints normally. */
+     transparency back; the track beneath paints normally.
+     accent-color covers the opposite case: the rebuilt radar app's Map Menu
+     ("Layer Transparency") leaves its slider entirely to the UA, tinted
+     `accent-gray-900`. The UA paints the FILLED part in accent-color and the
+     remainder in its own light track, so on a dark panel the filled part sinks
+     out of sight while the empty part glares and the control reads as its own
+     inverse -- and no element, pseudo or author declaration is involved, so
+     nothing scans it. The UA ignores accent-color wherever the site styles the
+     thumb itself, which is why the two scrubbers above keep their own colours. */
   input[type="range"] {
     background-color: transparent !important;
     border-color: transparent !important;
+    accent-color: var(--wx-link) !important;
   }
 
   /* the location-search dialog + its results list must be opaque dark */
@@ -1785,6 +1867,18 @@
   [class*="TimeLine--nowContainer"] [class*="TimeLine--tickLabelButton"] {
     color: var(--wx-text) !important;
   }
+  /* the radar map's +/- zoom control is a single WHITE pill split by a 1px #cecece
+     hairline -- a light-on-light divider inside a region the theme deliberately leaves
+     the site's own, since it sits on the basemap. The blanket `* { border-color }` reset
+     crosses straight into it and repaints that hairline --wx-border, so the white pill
+     renders with a hard black bar across its middle. Nothing else about the control is a
+     colour we touch, so neither scanner reports it; only a native-vs-themed border diff
+     over the map does. Put the site's own hairline back. The `Radar--zoomContainer`
+     module prefix is stable (only the trailing build-hash rotates). */
+  [class*="Radar--zoomContainer"] button {
+    border-color: rgb(206, 206, 208) !important;
+  }
+
   /* the map's SELECTED layer (Radar / Clouds / Temperatures) is marked ONLY by
      brand blue: a 2px ring on its thumbnail and a blue label. The blanket
      `* { border-color }` rule flattened the ring and the ControlPanel text rule
@@ -2173,6 +2267,118 @@
   .article-body [style*="color: #000000"],
   .alert-detail-card [style*="color: #000000"] {
     color: var(--wx-text-2) !important;
+  }
+  /* the same editor also emits the article's SECTION HEADINGS as
+     `<h2><strong><span style="color: #1a1a1a">`. That inline colour is a declaration on
+     the span itself, so it beats the `h1..h6` lift that matches the <h2> two levels up,
+     and every heading in the article rendered at 1.1:1 -- a wall of body copy with no
+     visible structure. Attribute values are case-sensitive and the parser here rejects
+     the ` i` flag, so both spellings are listed. */
+  .article-body [style*="color: #1a1a1a"],
+  .article-body [style*="color: #1A1A1A"] {
+    color: var(--wx-text) !important;
+  }
+  /* the help centre's grey-500 metadata (#6b7280) reads 3.2:1 on the darkened card -- an
+     AA fail on the article dateline, the view count, the filter-bar label and the
+     sidebar's "Browse by Brand" caption. None of them carry a text-* utility, so the
+     muted-token list above cannot reach them; pin the muted ink by their own classes. */
+  .filter-label,
+  .other-brands-label,
+  .articles-count,
+  .article-meta,
+  .article-meta span,
+  .meta-dot,
+  .vote-item,
+  .vote-item span,
+  .helpful-label {
+    color: var(--wx-text-muted) !important;
+  }
+  /* the breadcrumb's LAST crumb (the page you are on) is a plain <span> painted in an
+     `oklch()` slate -- a notation an rgb-matching scan cannot pattern-match, and a colour
+     no text rule of ours reaches, so the trail ended in an unreadable crumb after three
+     blue links. Muted keeps it quieter than the links, as the site intends. */
+  .breadcrumb-item.active,
+  .breadcrumb-item.active span {
+    color: var(--wx-text-muted) !important;
+  }
+  /* the Topics page's platform FILTER CHIPS are `.filter-btn`: white pill + #1a2a3a ink
+     when unselected, a #204794 navy fill + white label when selected. On the site's white
+     page the selected chip is the darkest thing in the row; on ours it is the LIGHTEST
+     three that shout and the selected one sinks into the page, so the control reads
+     backwards -- and the row is four pure-white blobs on a dark page besides. Neither
+     scanner sees it: the chips are 34px tall (under the light-surface floor) and both
+     states are achromatic-vs-brand exactly as the site paints them, so the chroma diff is
+     empty. Sink the unselected chips to the elevated surface and give the selected one
+     the theme accent, restoring the site's own inversion. The `.active` chip also ships
+     `bg-blue-600`; matching the pair keeps us above the site's own two-class rule. */
+  .filter-btn {
+    background-color: var(--wx-surface-2) !important;
+    color: var(--wx-text-2) !important;
+    border-color: var(--wx-border-2) !important;
+  }
+  /* the chip's only hover feedback is its label and rim going navy, which the restated
+     colour above would otherwise pin flat. */
+  .filter-btn:hover {
+    color: var(--wx-link) !important;
+    border-color: var(--wx-link) !important;
+  }
+  /* the selected chip has to come AFTER the hover rule: both are (0,2,0), so source
+     order decides, and hovering the selected chip must not paint its label the same
+     blue as its fill. */
+  .filter-btn.active,
+  .filter-btn.active.bg-blue-600 {
+    background-color: var(--wx-link) !important;
+    color: var(--wx-chrome) !important;
+  }
+  /* the article's utility buttons are the same shape of miss one page over: the two
+     thumb `.vote-btn`s and the `.action-btn` ("Print") are white pills, and the blanket
+     `* { border-color }` had already turned their #e5e7eb hairline into a dark band
+     across each white blob. */
+  .vote-btn,
+  .action-btn {
+    background-color: var(--wx-surface-2) !important;
+    color: var(--wx-text-2) !important;
+    border-color: var(--wx-border-2) !important;
+  }
+  /* each of the two has its OWN hover move and the restatement above pins whichever
+     property carries it: the vote pills take a navy label + rim and keep their fill,
+     Print keeps its ink and gains a faint tint. Mirror them one for one. */
+  .vote-btn:hover {
+    color: var(--wx-link) !important;
+    border-color: var(--wx-link) !important;
+  }
+  .action-btn:hover {
+    background-color: var(--wx-border) !important;
+  }
+  /* `.contact-btn` ("Email Us") is the OUTLINE half of the "Can't find what you're looking
+     for?" pair -- white fill, navy label and navy rim, i.e. invisible-on-white by design.
+     Filled in on our base it is a solid white slab beside the navy `.ai-btn`. Give it the
+     outline treatment the site intends: no fill, accent label and rim. */
+  .contact-btn {
+    background-color: transparent !important;
+    color: var(--wx-link) !important;
+    border-color: var(--wx-link) !important;
+  }
+  /* its hover is the outline-to-filled flip, which the transparent fill above pins. */
+  .contact-btn:hover {
+    background-color: var(--wx-link) !important;
+    color: var(--wx-chrome) !important;
+  }
+  /* every in-app navigation in the Experience Cloud app (a nav pill, a topic row,
+     an article link) mounts a `siteforceLoadingBalls` spinner whose plate is
+     rgba(255, 255, 255, .8) -- a bright rectangle over the dark page for as long
+     as the route takes. It exists in the DOM at display:none from first paint, so
+     only a forced reveal of hidden subtrees finds it. Its dots are mid-grey and
+     read on a dark plate. */
+  .siteforceLoadingBalls {
+    background-color: rgba(13, 17, 23, 0.85) !important;
+  }
+
+  /* the article header's product pill (`.brand-badge-outline`, "Storm Radar") keeps the
+     Salesforce navy #204794 as its LABEL -- 1.9:1 on the dark card. */
+  .brand-badge-outline {
+    color: var(--wx-link) !important;
+    border-color: var(--wx-border-2) !important;
   }
 
   /* ====================================================================== */

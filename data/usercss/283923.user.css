@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Avito that's easy on the eyes, perfect for late-night browsing.
-@version      20260820.00.08
+@version      20260827.15.09
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -83,12 +83,24 @@
     background-color: var(--av-surface) !important;
   }
 
+  /* "Для бизнеса" nav mark. The DS inline icon paints its glyph from the inherited
+     `color`, so the broad text rule greyed the one coloured mark in the top nav — the
+     row's only brand accent, on every page type. Its `data-icon-name` is the hook; the
+     glyph itself is a mask, so `color` is what moves it, not `fill`. */
+  svg[data-icon-name="afblogo"] {
+    color: #ff6163 !important;
+  }
+
   /* Stories rail. The unread ring around each 98×98 story avatar is a 2px border
      in Avito's status red `#ff6163` — the ONLY thing marking a story as unseen —
      and the blanket border reset above collapsed it to the generic line colour, so
      every story looked already watched. Native hue kept: it clears 4.5:1 on the
-     dark canvas and is the same red the theme keeps for seller status. */
-  [class*="preview-item-bordered"] {
+     dark canvas and is the same red the theme keeps for seller status.
+     Two builds: the older one names the ringed avatar `preview-item-bordered`, the
+     newer one puts a bare `bordered-<hash>` modifier on a child of the story's marker.
+     The marker scope is what keeps that short modifier from matching elsewhere. */
+  [class*="preview-item-bordered"],
+  [data-marker="story-previewer/block-preview"] [class*="bordered-"] {
     border-color: #ff6163 !important;
   }
 
@@ -414,6 +426,7 @@
   button,
   a[class*="styles-module-root"], label[class*="styles-module-root"],
   [class*="multiselect-outline-input"], [class*="style-module-wrapper"],
+  [class*="wrapper_variant_"],
   [data-marker$="-button"], [data-marker$="-button/link"],
   [data-marker="icebreakers"], [data-marker="icebreakers"] > * {
     background-color: var(--av-surface) !important;
@@ -442,13 +455,15 @@
      `--av-surface` bar was covering the card it floats over.
      The marker belongs to the CALL SITE, not to the control: the `/all/<category>`
      hubs' top-sellers rail ships the identical scroll button with `data-marker`
-     absent and only its hashed module class (`styles-module-scrollButton-<hash>`)
-     to name it, so the class hook is required alongside the markers. Every
-     instance of it, on every page family, is natively transparent. */
+     absent and only its hashed module class (`scrollButton-<hash>`, spelled
+     `styles-module-scrollButton-<hash>` in the older build) to name it, so the class
+     hook is required alongside the markers — matched on the shared substring so both
+     builds are reached. Every instance of it, on every page family, is natively
+     transparent, and the fill turned it into a grey bar masking the rail behind it. */
   div[data-marker$="-button"],
   [data-marker$="/scroll-button-back"],
   [data-marker$="/scroll-button-forward"],
-  button[class*="styles-module-scrollButton"] {
+  button[class*="scrollButton"] {
     background-color: transparent !important;
   }
   /* And on the LIST side: the results pagination is a `<ul data-marker="pagination-button">`
@@ -662,7 +677,15 @@
      treatment, while a Badge resolves them. Redefining the sale token on the same
      element lands the pill on the refined red the theme uses for every other red fill
      (5.0:1 against the white label) rather than the raw brand hue. */
-  div[class*="root_preset_primary"] {
+  /* A second Badge build ships with pure-hash classes and no preset name — the item
+     page's "0%" flag over the installment period pills is one — so the preset arm
+     cannot reach it and the pill was wiped down to bare grey digits floating above the
+     control. What both builds share is the wrapper the site anchors the badge to, which
+     carries the offset as an inline custom property; that wrapper holds exactly one
+     child, the badge itself. Match the property NAME only: the value is a per-instance
+     px offset. */
+  div[class*="root_preset_primary"],
+  [style*="--module-badge-offset-x"] > div {
     --theme-semantics-components-badge-bg-sale: #c8323f;
     background-color: var(--module-badge-backgroundColor, transparent) !important;
     color: var(--module-badge-color, var(--av-text-soft)) !important;
@@ -798,13 +821,24 @@
      was completely invisible. No contrast or luminance check can see this (all the
      chips are legible dark controls); only the native diff shows the lost state.
      Promote the checked pill to the accent, matching the current-page pagination
-     pill. */
-  input:checked + [class*="style-module-wrapper"] {
+     pill.
+     Two builds ship this control. The older one names the pill `style-module-wrapper`,
+     where the only state marker is the sibling `<input>`'s `:checked`. The newer one
+     names it `wrapper_variant_default-<hash>` and puts the state on the pill itself as
+     `wrapper_isChecked-<hash>`, so it is hooked directly — one class instead of a
+     combinator, and it holds even where the pill is not an input's sibling. Match the
+     modifier prefixes, never the hash: a rebuild rotates the hash and the unselected
+     pills fall back to their native `#f2f1f0`, which on the dark rail is a white chip
+     carrying light-grey body text at ~1.3:1. */
+  input:checked + [class*="style-module-wrapper"],
+  [class*="wrapper_isChecked"] {
     background-color: var(--av-accent) !important;
     border-color: var(--av-accent) !important;
   }
   input:checked + [class*="style-module-wrapper"],
-  input:checked + [class*="style-module-wrapper"] * {
+  input:checked + [class*="style-module-wrapper"] *,
+  [class*="wrapper_isChecked"],
+  [class*="wrapper_isChecked"] * {
     color: #0b1620 !important;
   }
 
@@ -1041,22 +1075,25 @@
   [class*="styles-module-star"] [class*="styles-module-filled"] {
     color: #ffb021 !important;
   }
-  /* The ITEM page ships the same rating widget from a newer build whose classes
-     are pure hashes, so the `styles-module-filled` hook above misses it and all
-     five of the seller's stars rendered body grey — the shop next to "4,9" looked
-     unrated. The widget declares its palette as inline custom properties on
-     `[data-marker="sellerRate"]` (`--star-color-filled:#ffb021`,
-     `--star-color-empty:#e0e0e0`) and picks between them with three hashed classes
-     on the star's span; that hash is the ONLY thing separating a filled star from
-     an empty one, so it has to be named. Written to fail SAFE: matching the FILLED
-     hash means a rebuilt hash drops the stars back to the theme's neutral grey,
-     where they are merely uninformative — never gold on an empty star, which would
-     overstate a seller's rating. The model/catalog page's offer rows mount the same
-     widget under a different marker (`seller-rating/rating-stars`, one `star-N` div
-     per star) and were missed by the `sellerRate` scope, so all fifteen stars in its
-     offer list rendered body grey — every shop in the list looked unrated. */
+  /* The item, search and model pages ship the same rating widget from newer builds that
+     the `styles-module-filled` hook above misses, so every seller's stars render body
+     grey — a shop next to "4,9" looks unrated, and no contrast or light-surface check
+     can see it. The widget declares its palette as custom properties on the rating root
+     (`--star-color-filled`, `--star-color-empty`) but paints the glyph through the span's
+     inherited `color`, which the broad text rule takes.
+     THREE builds are live at once and each needs its own arm. The item page's
+     `sellerRate` widget names the filled span with a PURE HASH — nothing but the hash
+     separates it from an empty star, so it has to be listed. The search cards' and model
+     page's `seller-rating/rating-stars` widget names it `filled-<hash>`; match the
+     modifier PREFIX there, never the hash. The trailing `-` in `filled-` is load-bearing:
+     it anchors to the build's `<name>-<hash>` shape instead of any class containing
+     "filled". Every arm is scoped to the FILLED state so a rebuild that rotates a hash
+     leaves a star merely uninformative — never gold on an empty star, which would
+     overstate a seller's rating. */
   [data-marker="sellerRate"] span[class*="_4da9fca36a8c49c9"],
-  [data-marker^="seller-rating/rating-stars"] span[class*="_4da9fca36a8c49c9"] {
+  [data-marker^="seller-rating/rating-stars"] span[class*="_4da9fca36a8c49c9"],
+  [data-marker="sellerRate"] span[class*="filled-"],
+  [data-marker^="seller-rating/rating-stars"] span[class*="filled-"] {
     color: #ffb021 !important;
   }
   /* `[data-marker*="title"]` was too loose: Avito also hangs a bare
@@ -1112,6 +1149,17 @@
   a[class*="root_underlineOffset"]:hover > p,
   a[class*="root_underlineOffset"]:hover > span {
     color: var(--av-accent-hover) !important;
+  }
+  /* The `link-<hash>` variant reserves its underline as a `border-bottom: 1px
+     solid transparent` and only tints it on hover, so the blanket border reset
+     paints every one of them a permanent dull grey AND pins that grey through
+     the hover (the reset is `!important`). Hand the border back to the text
+     colour so the underline is a hover cue again. */
+  a[class*="link-"] {
+    border-color: transparent !important;
+  }
+  a[class*="link-"]:hover {
+    border-color: currentColor !important;
   }
 
   /* ---- Text on coloured surfaces (must come after the broad text rule) ---- */
@@ -1197,15 +1245,42 @@
   [data-marker="search-form/suggest"] {
     background-color: var(--av-surface) !important;
   }
-  /* Focusing the header search opens the suggest widget, which paints its
-     expanded panel (the sheet the input and the suggestion list sit on) with a
-     hard-coded white `::before` — a pseudo-element, so every element-bg scan
-     reports the page clean while a white ring/sheet flashes around the input. */
-  [class*="index-suggest"]::before,
-  [class*="index-form"] [class*="index-button"]::before {
+  /* The design-system Input draws its field box on the wrapping <label> and
+     leaves the <input> itself transparent, so the rule above fills only the text
+     run: a lighter block hugging the words inside an otherwise empty outline
+     (search "Слова в описании", the vacancy hub's "Должность"). `root_size-`
+     with a HYPHEN is the Input's own size modifier — the switch/checkbox label
+     spells it `root_size_` and must keep its own styling. The Beduin banner's
+     suggest field is a second build of the same component whose box is a
+     `suggest-<hash>` LABEL; the header search widget shares that name on a DIV,
+     which already has its own fill, so the tag guard is load-bearing. */
+  label[class*="root_size-"],
+  label[class*="suggest-"] {
     background-color: var(--av-surface) !important;
   }
+  /* The header-search field and its submit button each sit on a full-size
+     `::before` plate that paints the brand ring around them — Avito blue at rest
+     and hard-coded WHITE while the suggest panel is open. A pseudo-element, so
+     every element-bg scan reports the page clean while a white ring flashes
+     around the input. Avito ships two builds of this widget (named classes on
+     home/search, pure hashes on item pages) and the open-state modifier is a
+     hash in both, so the durable hook is structural: the plates are the direct
+     div children of the `search-form` marker. Painting the accent in BOTH states
+     keeps the ring on brand. */
+  [data-marker="search-form"] > div::before {
+    background-color: var(--av-accent) !important;
+  }
   ::placeholder { color: var(--av-text-muted) !important; opacity: 1; }
+  /* The price range fields have no `placeholder` attribute: their "От" / "до" hints are
+     `prefix-<hash>` SPANs inside the field, and the site mutes them only while the field
+     is EMPTY (a `root_empty-<hash>` class on the wrapping label, dropped as soon as a
+     digit is typed). The broad text rule paints them body-light in both states, so an
+     empty field reads as if it already held a value. Restore the empty-state mute; a
+     filled field keeps the body colour from the broad rule. */
+  [class*="root_empty-"] [class*="prefix-"],
+  [class*="root_empty-"] [class*="postfix-"] {
+    color: var(--av-text-muted) !important;
+  }
   /* Every row of that suggest panel is prefixed by a 20×20 `<img>` from Avito's
      suggest icon set (`/s/a/i/suggest/*.png`, `/s/suggest/<category>/*.png`,
      `/static/ims/…_suggest_with_query_light_80x80.png`) — flat BLACK line art drawn
@@ -1348,6 +1423,12 @@
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
   }
+  /* `styles-module-tooltip` above also substring-matches the tooltip TRIGGER — an
+     inline hint glyph, not a surface — which then wears a grey plate (the seller
+     profile's "Сотрудники отмечают" thumbs-up row). Only the panel is a surface. */
+  [class*="tooltip-trigger"] {
+    background-color: transparent !important;
+  }
   /* `role="listbox"` above is a floating-panel hook, but Avito's design-system List
      component also hangs the role on IN-FLOW horizontal carousels — the seller
      profile's "Группы объявлений" (`item_selections/items-list`) and the category
@@ -1381,7 +1462,13 @@
      and unreadable. Painting the shared `…content-root` prefix covers all three nested
      nodes at once; they are opaque over opaque in the same tone, so the nesting is
      harmless. No load-time scan sees this — the panel is portalled in on click. */
-  [class*="new-rubricator-content-root"] {
+  /* The rebuilt menu drops the `new-rubricator-` prefix — the sheet is now a
+     `contentSheet-<hash>` div under the popup's own marker, and with the class arm dead
+     the whole category tree rendered over the page again. The marker is the durable
+     hook; painting the outer sheet is enough because everything inside it is
+     transparent. */
+  [class*="new-rubricator-content-root"],
+  [data-marker="more-popup"] [class*="contentSheet"] {
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
   }
@@ -1390,14 +1477,18 @@
      one arm. Inside it, the root-category list marks which subtree is on show with a light
      `#f2f1f0` fill on the current row and nothing else — no icon, no ink change — so
      the neutraliser left all twelve rows identical. The `active` modifier is the only
-     discriminator; a raised surface reads the same way the light fill does natively. */
-  [data-marker^="top-rubricator/root-category"][class*="styles-module-active"] {
+     discriminator; a raised surface reads the same way the light fill does natively.
+     The rebuilt menu shortens that modifier to `active-<hash>`, so both spellings are
+     listed; the trailing `-` anchors the short one to the build's `<name>-<hash>` shape
+     and the marker scope keeps it inside this twelve-row list. */
+  [data-marker^="top-rubricator/root-category"][class*="styles-module-active"],
+  [data-marker^="top-rubricator/root-category"][class*="active-"] {
     background-color: #262c35 !important;
   }
   /* And its promo card is a `#cfedff` light-blue panel, the same soft blue the theme
      sinks to a tinted dark chip everywhere else. Scoped to the open menu so the shared
      `background_color` class is untouched elsewhere. */
-  [data-marker="more-popup"] [class*="styles-module-background_color"] {
+  [data-marker="more-popup"] [class*="background_color"] {
     background-color: #1d2c3a !important;
   }
   /* Third-party UX-survey card ("Сейчас мы изучаем, как люди пользуются Авито",
@@ -1453,14 +1544,32 @@
      controls and the cards underneath render on top of each other. The names do not
      nest as substrings, so each has to be listed. `map-root` is the map's own `#fafafa`
      canvas, visible wherever a tile has not painted yet; the tiles are raster and stay
-     untouched. */
+     untouched.
+     The rebuilt map view drops every one of those names — its whole subtree is pure
+     build hashes — but it does mark the two containers that matter, so the panels are
+     reached through the markers instead. Inside the side block, `fullHeight-<hash>` is
+     the rail and `left-<hash>` is the slide-in filter drawer, one element each; both
+     modifiers are far too generic to use unscoped, which is what the marker prefix is
+     doing. The drawer must be opaque in its own right — it stacks ON the rail, so a
+     surface on the rail alone still leaves the cards showing through the filters. */
   [class*="side-block-wrapper"],
   [class*="side-block-overlay-wrapper"],
-  [class*="side-block-disabled"] {
+  [class*="side-block-disabled"],
+  [data-marker="map-full/side-block"] [class*="fullHeight-"],
+  [data-marker="map-full/side-block"] [class*="left-"] {
     background-color: var(--av-surface) !important;
   }
-  [class*="map-root"] {
+  [class*="map-root"],
+  [data-marker="map-view"] {
     background-color: var(--av-bg) !important;
+  }
+  /* Each card in that rail ends its contact row with a scroll-fade mask whose
+     `#f5f5f5` stops live in a background-IMAGE, which layers over any
+     background-color, so the panel fill above cannot reach it. The element is
+     `visibility: hidden` until the row overflows, which is why no load-time
+     element-bg scan ever sees it lit. */
+  [class*="contacts__overflow"] {
+    background-image: none !important;
   }
   /* Cookie-consent toast (bottom-centre, z-index 12000). It is a DIV-based
      floating "kitty toastBar", so the neutraliser flattened it to transparent
@@ -1505,11 +1614,6 @@
   [class*="styles-module-point_"] {
     background-color: var(--av-surface) !important;
     border-color: var(--av-surface) !important;
-  }
-  /* Page dimmer behind the expanded header-search suggest. It is `display:none`
-     while closed, so restoring its fill cannot leak onto the resting page. */
-  [class*="index-blackout"] {
-    background-color: rgba(0, 0, 0, 0.5) !important;
   }
   /* Full-screen photo lightbox. Its 0.7-black backdrop lives on two hashed DIVs
      that carry no marker and no stable class, and the only ancestor hook is the
@@ -1569,8 +1673,22 @@
   [data-marker="adv-badge-tag"] * {
     color: #fff !important;
   }
+  /* ---- Brand-lift survey widget (Buzzoola, in a same-origin iframe) ---- */
+  /* The survey block seeded through the home feed renders inside an iframe whose
+     `location.href` is the avito page itself, so this domain block applies to it. Its
+     step tracks are bare `<span>`s (`#E5E7EF`) — outside the div-neutraliser by design,
+     since spans carry Avito's data-driven fills — and they render as two bright white
+     bars across the dark card. The `:not(.active)` guard is load-bearing: the widget
+     paints the completed step's blue without `!important`, so an unguarded arm would
+     take the progress fill with it and leave three identical tracks. */
+  .buzz_wrapper .progress__items span:not(.active) {
+    background-color: var(--av-border) !important;
+  }
+
   /* ---- Design-system Banner ---- */
-  /* The Banner paints its card on a child layer (`styles-module-background_color`)
+  /* The Banner paints its card on a child layer — `background_color-<hash>`, spelled
+     `styles-module-background_color-<hash>` in the older build, so the arms below hook
+     the shared substring and reach either —
      whose fill is `var(--kitty-banner-backgroundColor)` — a token the preset class on
      the Banner ROOT sets, so no `[style*=…]` or literal-colour selector can reach it and
      the div-neutraliser wipes the card entirely: the banner's heading, fields and CTA
@@ -1583,34 +1701,34 @@
      inline stack of pastel `radial-gradient`s (the seller profile's "Лучшие предложения"
      showcase cards ship three of them), which layers over any background-COLOR and left
      those cards near-white with the theme's light-grey ink on top at about 1.2:1. */
-  [class*="root_preset_blue"] [class*="styles-module-background_color"] {
+  [class*="root_preset_blue"] [class*="background_color"] {
     background-color: #1d2c3a !important;
     background-image: none !important;
     border-color: #2f4a63 !important;
   }
-  [class*="root_preset_green"] [class*="styles-module-background_color"] {
+  [class*="root_preset_green"] [class*="background_color"] {
     background-color: #16291d !important;
     background-image: none !important;
     border-color: #24452e !important;
   }
-  [class*="root_preset_red"] [class*="styles-module-background_color"] {
+  [class*="root_preset_red"] [class*="background_color"] {
     background-color: #2e1a1d !important;
     background-image: none !important;
     border-color: #4a2a2f !important;
   }
-  [class*="root_preset_orange"] [class*="styles-module-background_color"] {
+  [class*="root_preset_orange"] [class*="background_color"] {
     background-color: #2a2116 !important;
     background-image: none !important;
     border-color: #3d3120 !important;
   }
-  [class*="root_preset_violet"] [class*="styles-module-background_color"] {
+  [class*="root_preset_violet"] [class*="background_color"] {
     background-color: #2b2140 !important;
     background-image: none !important;
     border-color: #40325e !important;
   }
-  [class*="root_preset_beige"] [class*="styles-module-background_color"],
-  [class*="root_preset_warmGray"] [class*="styles-module-background_color"],
-  [class*="root_preset_white"] [class*="styles-module-background_color"] {
+  [class*="root_preset_beige"] [class*="background_color"],
+  [class*="root_preset_warmGray"] [class*="background_color"],
+  [class*="root_preset_white"] [class*="background_color"] {
     background-color: var(--av-surface) !important;
     background-image: none !important;
     border-color: var(--av-border) !important;
@@ -1734,7 +1852,8 @@
      background pseudo out of the viewport and collapse it onto the button's own box. */
   button:hover,
   a[class*="styles-module-root"]:hover,
-  [class*="style-module-wrapper"]:hover {
+  [class*="style-module-wrapper"]:hover,
+  [class*="wrapper_variant_"]:hover {
     filter: brightness(1.3);
   }
   .js-item-view-title-info [data-marker="item-view/favorite-button"]:hover {
@@ -1761,9 +1880,16 @@
      `[data-marker="item"]`, on both surfaces — the marker is the durable hook.
      The pseudo only exists on hover, so painting it unconditionally cannot show a
      surface on a resting card. */
+  /* The search grid now builds that action slot from `actions-<hash>` /
+     `actionsRedesign-<hash>` instead of `iva-item-actions`, so the legacy arm matches
+     nothing there and all 49 slots painted a white 180×80 plate — with its light glow
+     — straight through the dark card, behind the "Показать телефон" / "Написать" CTAs.
+     Unlike the `iva-` panel this one exists at rest (an `actionsVisible-<hash>` state
+     class, not `:hover`), so it is on screen the moment the results load. */
   [class*="iva-item-redesign"]:hover::before,
   [class*="iva-item-redesign"]:hover [class*="iva-item-actions"]::before,
   [class*="iva-item-actions"]::before,
+  [class*="actionsRedesign"]::before,
   [data-marker="item"]::before {
     background-color: var(--av-surface) !important;
     box-shadow: none !important;
@@ -1779,13 +1905,26 @@
      pair is normalised in both directions to the same surface/ink values. */
   [data-marker$="/scroll-button-back"] svg rect,
   [data-marker$="/scroll-button-forward"] svg rect,
-  button[class*="styles-module-scrollButton"] svg rect {
+  button[class*="scrollButton"] svg rect {
     fill: var(--av-surface) !important;
   }
   [data-marker$="/scroll-button-back"] svg path,
   [data-marker$="/scroll-button-forward"] svg path,
-  button[class*="styles-module-scrollButton"] svg path {
+  button[class*="scrollButton"] svg path {
     fill: var(--av-text) !important;
+  }
+  /* The item gallery's own prev/next control is a different component: a disc
+     that is white NATIVELY (it sits over the photo) holding a design-system mask
+     icon, and a mask icon is painted by its `background-color`, which follows
+     `color` — so the broad text rule turns the arrow body-light and it vanishes
+     into its own white disc. Pin the glyph dark; the disc stays white. The
+     `arrowback`/`arrowforward` icon names belong to this control alone (the
+     carousels above draw an SVG `<path>`, and breadcrumb/link chevrons are
+     `arrowright`/`arrowforwardios`), and the `aria-label` guard keeps the rule on
+     the labelled disc. */
+  [aria-label] > [data-inline-icon] > svg[data-icon-name="arrowback"],
+  [aria-label] > [data-inline-icon] > svg[data-icon-name="arrowforward"] {
+    background-color: #0b1620 !important;
   }
 
   /* ---- Gallery thumbnail strip: the SELECTED photo ---- */
@@ -1818,11 +1957,32 @@
      keep a hard light-grey fill: the visual-rubricator category tiles, the lazy
      product-image placeholders inside the "Техника Apple"/appliance blocks, and
      the search-history chips. Repaint each to the elevated dark surface. */
+  /* The rubricator tile was rebuilt as `gridItem-<hash>`, which the class arm no longer
+     reaches — ten white tiles carrying accent-blue labels at ~1.5:1. Its marker is the
+     durable hook. Natively the label is BLACK body text, not a link, so the accent from
+     the blanket `a` rule has to be taken back off it too. */
   [class*="visual-rubricator-gridItem"],
   [class*="search-history-widget-item"],
-  [class*="category-block-img__placeholder"] {
+  [class*="category-block-img__placeholder"],
+  [data-marker^="visual-rubricator/block"] {
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
+  }
+  [data-marker^="visual-rubricator/block"],
+  [data-marker^="visual-rubricator/block"] * {
+    color: var(--av-text) !important;
+  }
+  /* One tile per rail is promoted with an inline `background:#cfedff` — a pale-blue
+     wash, the only thing marking it as the featured entry. Keep that distinction on the
+     blue-tinted surface the theme uses for its other soft-blue controls; the arm has to
+     out-specify the marker rule above, hence the doubled attribute selector. All three
+     serialisations are listed because Avito emits inline colours as lower-case hex on
+     SSR pages, upper-case hex on some blocks and spaced `rgb()` after a client-side
+     re-render, and attribute matching is case-SENSITIVE. */
+  [data-marker^="visual-rubricator/block"][style*="background:#cfedff"],
+  [data-marker^="visual-rubricator/block"][style*="background:#CFEDFF"],
+  [data-marker^="visual-rubricator/block"][style*="background: rgb(207, 237, 255)"] {
+    background-color: #1d2c3a !important;
   }
   /* One tile per grid is the FEATURED one: the class fill is a neutral `#f2f1f0`, and
      the highlight arrives as an inline soft-blue `background:` shorthand, so the rule

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Depop, easy on the eyes across home, search, categories and product pages, with prices, sale tags and the Depop red kept readable.
-@version      20260820.00.09
+@version      20260827.15.10
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -253,6 +253,18 @@
     background-color: #262c33 !important;
   }
 
+  /* One entry in a mega-menu category list can be accented, and the site does it
+     with an inline `color:red` on the link's <p> (Men > Sale). Both the blanket p
+     rule and the menu-descendant text rule above are !important, so they beat the
+     inline declaration and the one highlighted row reads exactly like its twelve
+     neighbours. Tone the red to the same value the nav's Sale item takes. The
+     attribute selector tests the AUTHORED string, and the site ships both
+     spellings across routes, so both are matched. */
+  [class*="hoverContainer"] [style*="color:red"],
+  [class*="hoverContainer"] [style*="color: red"] {
+    color: #ff6b7d !important;
+  }
+
   /* ============================================================
      Global search bar + dropdown
      ============================================================ */
@@ -398,6 +410,18 @@
     color: #e6edf3 !important;
   }
 
+  /* The modal shell's title bar is a position:sticky <span> the site fills #fff so
+     the heading stays legible while the body scrolls under it. `[role="dialog"]`
+     above darkens the panel but not this child, and it is a <span> portaled outside
+     <main>, so no reset reaches it: the MOBILE search modal opens with a white slab
+     across its top carrying an <h1> our heading rule paints #e6edf3 — the title is
+     white on white. Match the panel so the bar disappears into it. The desktop
+     modals use the floating-header variant, which has no fill, so only a 390px
+     pixel check renders this. */
+  [class*="modalHeader__header"] {
+    background-color: #1c2128 !important;
+  }
+
   /* ============================================================
      Main content area + filter / sort bar
      ------------------------------------------------------------
@@ -431,6 +455,52 @@
   [class*="quizEntryPoint"] {
     background-image: none !important;
     background-color: transparent !important;
+  }
+
+  /* The Top Seller Program's hero is the one <section> on the site whose fill is a
+     SATURATED brand band rather than the pale promo gradient — red → orange under
+     white copy — so the reset above erases the loudest surface of that page and
+     leaves a bare headline. Give it the band back, toned down: a full-strength
+     #e20020 → #e9520e slab 539px tall glares on a dark page, and the toned pair
+     still clears 6:1 for the white copy restored below. Stated as a two-stop
+     linear gradient — the site layers a radial bloom over it, which the old
+     userstyles.org parser cannot take.
+     `section[class*="__hero"]` ALONE is not enough: /gb/sell/ and
+     /partners/depop-affiliates/ both carry a geometry-only `__hero` section that
+     must stay unpainted. The `main > div[class*="__page"] >` prefix is what
+     isolates this one — across every logged-out page type the only other
+     `__page` element is the header chrome, which is outside <main>. */
+  main > div[class*="__page"] > section[class*="__hero"] {
+    background-image: linear-gradient(#a81021 0%, #a8420c 100%) !important;
+  }
+
+  /* Its copy is natively pure white BECAUSE it sits on that band; the generic
+     heading and body rules drop it to #e6edf3 / #c4cdd6, and #c4cdd6 on the orange
+     end of the gradient is 3.8:1. */
+  main > div[class*="__page"] > section[class*="__hero"] h1,
+  main > div[class*="__page"] > section[class*="__hero"] h2,
+  main > div[class*="__page"] > section[class*="__hero"] p,
+  main > div[class*="__page"] > section[class*="__hero"] span,
+  main > div[class*="__page"] > section[class*="__hero"] strong {
+    color: #ffffff !important;
+  }
+
+  /* ...and its CTA is the design system's white-pill-on-colour variant. It carries
+     no "outl" class, so the solid rule further down gives it the brand red — the
+     same hue as the band it sits on. Mirror the native inversion instead. Must
+     stay BELOW the white-ink rule above, which also matches the label span. */
+  main > div[class*="__page"] > section[class*="__hero"] [class*="buttonWrapper"] {
+    background-color: #e6edf3 !important;
+    border-color: #e6edf3 !important;
+  }
+
+  main > div[class*="__page"] > section[class*="__hero"] [class*="buttonWrapper"]:hover {
+    background-color: #ffffff !important;
+  }
+
+  main > div[class*="__page"] > section[class*="__hero"] [class*="buttonWrapper"],
+  main > div[class*="__page"] > section[class*="__hero"] [class*="buttonWrapper"] * {
+    color: #262626 !important;
   }
 
   /* The marketing pages (/safety/, /shipping/) lay their feature lists out as
@@ -889,6 +959,18 @@
     outline: 1px solid #4a525b !important;
   }
 
+  /* Same shape one layer over: the MOBILE gallery's prev/next arrows are 28px
+     `background:#fff; border-radius:50%` discs holding a #262626 chevron. The disc
+     is a <div> so `main div` erases it, while the `button` colour rule re-lights
+     the chevron — a white arrow with nothing behind it, invisible on the pale
+     product photos this marketplace is full of. Desktop mounts no such control.
+     Must stay BELOW the `[class*="carousel"]` transparent reset above: the class
+     contains that substring and the two tie on specificity. */
+  [class*="carouselActionContainer"] {
+    background-color: #1c2128 !important;
+    outline: 1px solid #4a525b !important;
+  }
+
   /* The PDP's social-proof nudges ("In 2 people's bags", "1 offer sent") are
      border-radius:50px pills filled from --surface-primary-weak. They are <div>s
      inside <main>, so `main div` outranks the token and flattens each one to bare
@@ -1324,6 +1406,24 @@
   [class*="labelOverlay"] span {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
+  }
+
+  /* An UNSELECTED quiz tile is de-emphasised by an rgba(255,255,255,.5) veil over
+     its photo; the chosen one drops the veil entirely (React removes the node) and
+     takes a 2px #262626 outline. Both cues break on dark: a white veil LIGHTENS,
+     so the three tiles you did not pick become the brightest things in the modal
+     while the one you did looks recessed, and the outline is invisible against the
+     page. De-emphasise downward instead, at the site's own alpha, and re-light the
+     outline. The veil is a <div> inside <main> on the homepage's inline tiles, so
+     the blanket transparent reset erases it there — the attribute selector's (0,1,0)
+     outranks that rule's (0,0,2). Only outline-COLOR: the site also paints a
+     #ffda0a focus outline on the same element through outline-width/offset. */
+  [class*="fadeOverlay"] {
+    background-color: rgba(20, 24, 29, 0.5) !important;
+  }
+
+  [class*="labelSelected"] {
+    outline-color: #e6edf3 !important;
   }
 
   /* ============================================================

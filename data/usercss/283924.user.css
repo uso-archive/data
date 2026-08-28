@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for FanFiction.Net and FictionPress, with an easy-on-the-eyes story reader, dark browse filters, profiles and forums.
-@version      20260820.00.15
+@version      20260827.15.10
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -571,6 +571,15 @@
     color: var(--ff-muted) !important;
     opacity: 1 !important;
   }
+  /* `/recover.php` is the one guest page that renders a VISIBLE reCAPTCHA: a
+     304x78 cross-origin frame painting Google's `#f9f9f9` panel, unreachable by
+     any rule of ours. Inverting the frame itself is the only lever; the
+     hue-rotate returns the brand blue and the solved-state green tick to their
+     own hues. Keyed to `api2/anchor` on purpose — the `api2/bframe` sibling is
+     the photo-grid challenge, whose images must not be inverted. */
+  iframe[src*="recaptcha/api2/anchor"] {
+    filter: invert(.92) hue-rotate(180deg) !important;
+  }
 
   /* ---- Tables (gui_table, forum topic lists, .table-striped) ----------- */
   /* FFN forums render rows as a striped table whose <td> carry their own
@@ -611,12 +620,30 @@
   }
 
   /* ---- Forum post quotes ----------------------------------------------- */
-  /* FFN styles quoted text with color:#535353 — readable on the old light
-     posts, dark-on-dark here. Lift to body text, keep the quote accent bar. */
-  blockquote,
-  blockquote.quoteStyle,
-  .quoteStyle {
+  /* An unclassed blockquote inherits the post ink on FFN, so it stays on body
+     text; only the accent bar needs the dark line colour. */
+  blockquote {
     color: var(--ff-body) !important;
+    border-color: var(--ff-border-2) !important;
+  }
+  /* `.quoteStyle` is the forum's quote wrapper (`p`, `div` or `blockquote`),
+     which FFN sets a step UNDER the post copy it sits in (#535353 against #000)
+     beside a 5px #cdcdcd bar. The bar alone is a ~1.2:1 cue on the dark post
+     surface, so the ink step is what carries the block. The inner runs must be
+     listed: the blanket `p`/`div`/`span` text rule is a direct declaration and
+     beats the colour they would inherit from the wrapper. Anchors stay out —
+     quoted links keep the link accent, as they do natively. */
+  .quoteStyle,
+  .quoteStyle p,
+  .quoteStyle div,
+  .quoteStyle span,
+  .quoteStyle li,
+  .quoteStyle b,
+  .quoteStyle strong,
+  .quoteStyle em {
+    color: var(--ff-muted) !important;
+  }
+  .quoteStyle {
     border-color: var(--ff-border-2) !important;
   }
 
@@ -744,6 +771,33 @@
   span[style*="color:red"],
   font[color="red"] {
     color: #f85149 !important;
+  }
+
+  /* FFN tones its status messages with a class from the same per-page inline
+     sheet that declares the `.panel_*` boxes — `.gui_error` is `red`,
+     `.gui_warning` `#E56717`, `.gui_success` `green`. Each wraps its
+     text in a `<span>`, so the blanket text rule outranks all three and error,
+     warning and success collapse into one grey notice — the "Story Not Found"
+     warning on both hosts, and the "is currently accepting beta reading
+     requests" line on every `/beta/` profile. The `b` arm is not redundant: the
+     words carrying the message (`accepting`, the `β` mark) sit in `<b>`, and a
+     direct declaration beats the colour they would inherit from the span.
+     `red` (4.1:1) and `green` (3.2:1) miss AA on the panel surface and take the
+     palette equivalents; the orange clears 4.9:1 and stays verbatim. */
+  .gui_error,
+  .gui_error b,
+  .gui_error strong {
+    color: #f85149 !important;
+  }
+  .gui_warning,
+  .gui_warning b,
+  .gui_warning strong {
+    color: #e56717 !important;
+  }
+  .gui_success,
+  .gui_success b,
+  .gui_success strong {
+    color: var(--ff-green) !important;
   }
 
   /* ---- Cookie bar ------------------------------------------------------- */

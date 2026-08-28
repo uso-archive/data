@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260820.00.09
+@version      20260827.15.11
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -179,6 +179,24 @@
   [class*="SongHeader-desktop__Information"],
   [class*="SongHeader"] [class*="Credit"],
   [class*="SongHeader"] [class*="MetadataStats"] { color: #c4cdd6 !important; }
+  /* MOBILE song hero: genius wraps the WHOLE song-bio teaser in one <a href="#about"> and
+     carries the affordance on its "__ViewBio" span alone — the only underlined part — so the
+     shared link rule paints the entire paragraph periwinkle and it reads as one long link.
+     Same shape as ".album_description_preview" on the AMP bundle. Return the body to the
+     reading tone; the "Read More" cue keeps the link hue, its inline caret included (the
+     shared "InlineSvg__Wrapper" fill would otherwise leave a grey glyph beside it).
+     Both selectors are doubled on the SongBioPreview names to clear 0-1-1: the desktop
+     copy of this block sits inside [data-lyrics-container], and the caret inside an
+     "InlineSvg__Wrapper", so the single-attribute forms lose `color`/`fill` to those two
+     rules and only the -webkit-text-fill lands — which paints in Chromium but not in
+     Firefox. */
+  [class*="SongBioPreview__Container"] [class*="SongBioPreview__Wrapper"] {
+    color: #c4cdd6 !important; -webkit-text-fill-color: #c4cdd6 !important; }
+  [class*="SongBioPreview__Container"] [class*="SongBioPreview__ViewBio"],
+  [class*="SongBioPreview__ViewBio"] [class*="InlineSvg__Wrapper"] svg,
+  [class*="SongBioPreview__ViewBio"] [class*="InlineSvg__Wrapper"] svg path {
+    color: #9aa7f0 !important; fill: #9aa7f0 !important;
+    -webkit-text-fill-color: #9aa7f0 !important; }
 
   /* ====================================================================
      Typography (shared)
@@ -263,25 +281,45 @@
   [data-lyrics-container] a { color: #e6edf3 !important; } /* inline section labels */
 
   /* Annotated (referent) words. The site paints the whole chip on the inner Highlight
-     span and encodes its state ONLY in that span's background-color: #e9e9e9 at rest,
-     pure BLACK while hovered OR while its annotation is open. Both are single-class
-     styled-components rules whose hash changes every build, so no selector can name the
-     open one — setting a background-color here flattens hover AND the "you are reading
-     this one" cue into one identical chip across the whole song. Both site values are
-     achromatic, so no single blend mode separates them either (luminosity maps both onto
-     the layer's lightness, and every mode that keeps the resting chip dark maps black
-     onto black). The three layers derive the two tones from that one value, bottom to
-     top: `difference` against #e9e9e9 inverts it (rest -> 0, open -> 233), `multiply`
-     tints the inverted value brand red, `lighten` floors it at the resting chip tone.
-     Both source values are load-bearing — re-derive the stack if either changes. Do NOT
-     add a background-color: the stack needs the site's own value underneath. */
+     span and encodes its state ONLY in that span's background-color. Rest is always
+     #e9e9e9; hovered-OR-open is the SONG'S OWN cover-art colour, so the state value is
+     per-song and covers the whole gamut — live readings include #000, #212121, #24221e,
+     #7f7f7f, #cc7813, #d86524, #eaca44, #cdc9aa and #d9d9d9. Both states are
+     single-class styled-components rules whose hash differs per song and per build, so
+     no selector can name the open one, and no derivation keyed to the state colour's
+     hue or lightness survives that range: every fixed mapping collapses on the songs
+     whose art colour happens to land where the mapping is flat.
+     The stack below therefore reads only ONE thing — whether the chip is still exactly
+     the resting #e9e9e9 — and paints one fixed pair of tones from that bit, bottom layer
+     first: `saturation` over a grey drops the art colour onto its own grey axis (a
+     cross-channel step: without it a colour that differs from #e9e9e9 in only one
+     channel, e.g. the yellow #eaca44, leaves the red channel of the mask at zero and the
+     tint below dies); `difference` against #e9e9e9 is exactly zero for the resting chip
+     and non-zero for everything else; `color-dodge` with #fafafa multiplies what is left
+     by 51, so it keeps zero at zero and saturates even a 16-step art colour like
+     #d9d9d9 to white; `multiply` stains that mask brand red; `lighten` floors it at the
+     resting chip tone. Rest lands on #21262d and EVERY active art colour on #6b262d.
+     The one blind spot is an art colour whose grey value is within ~5 of #e9e9e9 — a
+     chip the site itself renders indistinguishable from rest. Do NOT add a
+     background-color: the blend needs the site's own value underneath. */
   [class*="ReferentFragment-desktop__Highlight"],
   [class*="ReferentFragment"][class*="Highlight"] {
     background-image: linear-gradient(#21262d, #21262d),
-                      linear-gradient(#6a2b24, #6a2b24),
-                      linear-gradient(#e9e9e9, #e9e9e9) !important;
-    background-blend-mode: lighten, multiply, difference !important;
+                      linear-gradient(#6b2422, #6b2422),
+                      linear-gradient(#fafafa, #fafafa),
+                      linear-gradient(#e9e9e9, #e9e9e9),
+                      linear-gradient(#808080, #808080) !important;
+    background-blend-mode: lighten, multiply, color-dodge, difference, saturation !important;
     color: #e6edf3 !important; }
+  /* Hover is the one referent state a selector CAN name, so it carries an explicit fill
+     rather than a derived one: it is the only part of the cue that cannot go stale when
+     genius re-tunes the art colour, and it separates hover from the open chip, which the
+     site paints with the same value. Brighter than the derived open tone, so the ramp
+     reads rest -> open -> hover; #e6edf3 holds 5.1:1 on it. */
+  [class*="ReferentFragment"][class*="ClickTarget"]:hover [class*="Highlight"] {
+    background-image: none !important;
+    background-blend-mode: normal !important;
+    background-color: #a53a31 !important; }
   /* the ClickTarget anchor around it is natively bare; painting it draws an elevated
      rectangle in the chip's padding that the blended span no longer matches */
   [class*="ReferentFragment-desktop__ClickTarget"] {
@@ -543,6 +581,12 @@
                  0.12em 0 #1c2128, -0.12em 0 #1c2128, 0.15em 0 #1c2128, -0.15em 0 #1c2128 !important; }
   [class*="ChartSong-desktop__Artist"], [class*="EditorialPlacement__Author"],
   [class*="EditorialPlacement__PublishedAt"], [class*="ChartSong-desktop__Metadatum"] { color: #8b949e !important; }
+  /* "PRESENTED BY" + the sponsor logo box on a sponsored card: a plain <div> genius paints
+     its ordinary body black, but it sits inside the card's <a>, so the shared link rule
+     repaints it periwinkle and the ad disclosure reads as an accent link beside the muted
+     byline it belongs with. Take the byline tone. */
+  [class*="EditorialPlacement__Sponsor"],
+  [class*="EditorialPlacement__Sponsor"] * { color: #8b949e !important; }
   /* red eyebrow label ("NEWS" / "FEATURE" / "VIDEO") — the word sits in a <span> inside the
      card's <a>, so the generic "a span" link rule repaints it periwinkle unless the
      descendant is named too. Lifted from the raw brand #ed4337: that clears 4.5:1 on the
@@ -659,6 +703,12 @@
     color: #c4cdd6 !important; }
   .article_title, .article_title--o {
     -webkit-text-stroke: 0 !important; color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
+  /* A lyric pull-quote inside an article carries no fill and no indent: its whole
+     identity is a 2px #99a7ee box, which the blanket "*" border reset collapses into the
+     same line colour every divider on the page uses. It needs the accent restated at a
+     specificity above "*". The periwinkle quotation glyph beside it is a ::before the
+     reset cannot reach, so the two must stay the same hue. */
+  blockquote.g_lyrics_tag { border-color: #9aa7f0 !important; }
   /* article body + sidebar reference links fake an underline-skip: a black 1px
      background-image "underline" plus a WHITE text-shadow halo punched around each
      glyph. On dark the underline vanishes and the white halo outlines every letter,
@@ -1017,6 +1067,23 @@
   /* AMP accordion band ("TRANSLATIONS" on album pages) is a full-width white header
      between two dark sections. */
   .footer_accordion-header_with_arrow { background-color: #14181d !important; }
+  /* Its body is a second white panel carrying the whole Q&A answer / translation list, and
+     it is display:none until the header is tapped, so no load-time scan reaches it. It must
+     land on the same tone as the header above or the section reads as a light slab hanging
+     off a dark bar. */
+  .footer_accordion-body { background-color: #14181d !important; }
+  /* Cover-art lightbox (the "N Covers, M Annotated" overlay): the art stage is already
+     black, but the annotation under it is a separate #f7f7f7 sheet. Tap-only, and it lives
+     in an amp-lightbox that does not render until then. */
+  .cover_art_annotation-content { background-color: #14181d !important; }
+  /* Mobile lyrics EDITOR: a full-screen form whose chrome is #e9e9e9 and whose text pane is
+     white. It is rendered into every song page but revealed only to a signed-in editor, so
+     it is unreachable anonymously. The desktop twin is transparent over an already-dark
+     PageGrid, hence the "-mobile" scope. */
+  [class*="LyricsEdit-mobile__Container"],
+  [class*="LyricsEdit-mobile__Header"],
+  [class*="LyricsEdit-mobile__Controls"] { background-color: #14181d !important; }
+  [class*="LyricsEdit-mobile__LyricsContainer"] { background-color: #1c2128 !important; }
   /* Album description teaser: genius wraps the WHOLE preview paragraph in a bare <a> (no
      href, an AMP tap action) and carries the affordance only on the "-read_more" span, which
      it alone paints periwinkle over #222 body copy. The shared link rule reaches the whole
