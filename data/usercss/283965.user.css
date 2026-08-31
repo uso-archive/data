@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Comfortable dark theme for Syosetu (小説家になろう). Easy-on-the-eyes reading for novel chapters, plus the home, rankings, search and bookmark controls.
-@version      20260827.15.12
+@version      20260830.17.26
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -486,13 +486,21 @@
     color: #c4cdd6 !important;
   }
 
-  /* Reaction widget — the emoticon chips sit on a light #f1f3f5
-     bar; darken it and lift the count text off link-blue */
+  /* Reaction widget — only .p-reaction__emoticon carries a fill (light
+     #f1f3f5, radius 5px); the wrappers are natively bare. The chip fill IS
+     the button affordance and its :hover shade the only press cue, so keep
+     both as an elevated pair rather than clearing them. */
   .p-reaction,
-  .p-reaction__body,
+  .p-reaction__body {
+    background-color: transparent !important;
+  }
   .js-reactionepisode_change,
   .p-reaction__emoticon {
-    background-color: transparent !important;
+    background-color: #21262d !important;
+  }
+  .js-reactionepisode_change:hover,
+  .p-reaction__emoticon:hover {
+    background-color: #2d333b !important;
   }
   .p-reaction__count {
     color: #9bd4ff !important;
@@ -1335,9 +1343,16 @@
   }
   /* The site-guide / 特殊検索 / ヘルプ sidebar links render as white #fff
      button-pills (an <a> background) — flash a column of white blocks on
-     dark. Clear the fill; the blue link text stays. */
+     dark. Clear the fill; the blue link text stays. The pill's whole hover
+     state is a fill + ink swap (#ffd / #393), so it needs its own elevated
+     pair or the row answers a pointer with nothing. */
   .list_g a {
     background-color: transparent !important;
+  }
+  #trad .list_g a:hover,
+  .list_g a:hover {
+    background-color: #21262d !important;
+    color: #9bd4ff !important;
   }
 
   /* Search-history panel (履歴から検索 → 検索履歴) is a full white #fff box
@@ -1534,8 +1549,18 @@
   #trad option {
     color: #c4cdd6 !important;
   }
+  /* A keyword-picker row (検索ワードを選択) marks hover on the label's inner
+     span alone, so the rule above has to yield to a hovered ancestor. */
+  #trad label:hover span {
+    color: #9bd4ff !important;
+  }
   #trad a {
     color: #5fb0e6 !important;
+  }
+  /* The ID above also out-specifies the global a:hover, so the hover ink has
+     to be restated at ID strength for the whole legacy column. */
+  #trad a:hover {
+    color: #9bd4ff !important;
   }
   /* ...but the result TITLES are natively the warm Narou orange (#fd6532)
      and live inside #trad, so the ID rule above out-specified the
@@ -2662,6 +2687,16 @@
   .c-menu__second {
     background-color: #161b22 !important;
   }
+  /* The ncode story-index / chapter pages carry a second, scroll-up-revealed
+     nav (.c-follow-header, position:fixed, translateY(-45px) at rest). It is
+     off-screen at load and exists on no other host, so it only shows itself
+     once the reader scrolls back up. */
+  .c-follow-header {
+    background-color: #161b22 !important;
+  }
+  .c-follow-header__item {
+    color: #9bd4ff !important;
+  }
   /* The SP header's ログイン link bullets itself with a 16x16 login.gif — an OPAQUE
      (no alpha) raster tile of a grey key on WHITE, so it renders as a bright chip
      against the dark header bar at the very top of every SP page. Same class as the
@@ -2993,5 +3028,54 @@
   }
   .fc-consent-root .fc-help-dialog-container .fc-help-dialog-close-button .fc-help-dialog-close-button-label {
     color: #5fb0e6 !important;
+  }
+  /* ============================================================
+     Hover cues on the footer-toned link families
+     ============================================================ */
+  /* Every link the footer rules pin to #9bd4ff already sits at the global
+     hover blue, so `a:hover` cannot move it — and on the ncode frontend that
+     is not just the site footer: the reader's whole post-chapter block
+     (.l-foot-contents — bookmark bar, feedback form, 最新の感想, the
+     感想/レビュー/PDF row) is one of those containers. The .c-announce /
+     .help-link rule (0,1,1) likewise ties the global a:hover and wins on
+     source order. All of these go #393 natively; give them a step of their
+     own. Specificity must reach 0,2,1 for the under-nav row. */
+  .l-footer a:hover,
+  .l-foot-contents a:hover,
+  footer a:hover,
+  .p-footer a:hover,
+  .c-announce a:hover,
+  .c-announce--note a:hover,
+  .help-link:hover,
+  div.c-under-nav .c-under-nav__item:hover,
+  div.c-under-nav input.c-under-nav__pdflink:hover {
+    color: #ffffff !important;
+  }
+  /* The floating ↓ / ↑ pill is natively a pale #cdd chip under the pointer. */
+  .c-navigater:hover,
+  .c-navigater a:hover {
+    background-color: #2d333b !important;
+    color: #ffffff !important;
+  }
+  /* Filled and outline buttons whose fills are pinned above: natively the
+     useradd pill lightens and the outline chip re-inks on hover. */
+  .c-button.c-button--useradd:hover {
+    background-color: #ffa94d !important;
+    border-color: #ffa94d !important;
+  }
+  .c-button.c-button--minor:hover,
+  .c-button.c-button--outline:hover,
+  .c-button.c-button--secondary:hover {
+    background-color: #21262d !important;
+    color: #9bd4ff !important;
+  }
+
+  /* A ranking row whose work was deleted or made private (noc / mnlt / mid
+     rank lists): the R18 base sheets' universal `* { color:#333 }` reaches the
+     rank-number span directly, so it cannot inherit the row's grey. */
+  .deadlink,
+  .deadlink_t,
+  .deadlink .ranking_number_d {
+    color: #9aa3ad !important;
   }
 }

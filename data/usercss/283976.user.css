@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260827.15.12
+@version      20260830.17.26
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -165,6 +165,12 @@
      neither is touched. The CTA rules further down restate their own label
      colour and win on order. */
   #main-content a > span:empty { color: inherit !important; }
+  /* A prose link's label is often a <span> (Khan's `<a><span><strong>PDF</strong></span></a>`
+     on the unit "About" card). The shell's `span` rule pins that span near-white while the
+     anchor and its trailing icon glyph are link-blue, so one link renders in two colours.
+     Scoped to `p a` so lesson-row / card links (never inside a <p>) keep their near-white
+     titles; the `a[data-kind="primary"] span` white label below out-specifies this. */
+  #main-content p a > span { color: inherit !important; }
   /* Wonder Blocks' `tertiary` kind IS a link rendered as a button ("See our
      Google-powered results", the "What's this?" beside an exercise Hint). Khan
      paints it the brand blue; the shell's span rule flattened its label to the
@@ -548,6 +554,25 @@
      match that. Native hover changes no colour (it adds an underline, which is
      untouched here), so one state covers both. */
   .footer_wrap a { color: #e6edf3 !important; }
+  /* The marketing header's dropdown panels are the same inherited-ink shape as the
+     footer above: Khan paints one neutral ink on the panel and every one of the ~50
+     entries (both column layouts plus the seasonal promo card) takes it by
+     INHERITANCE, so the plain `a { color }` rule wins the lot and the menu renders as
+     a wall of blue links. The app's own Explore menu draws its items near-white;
+     match it. Native hover changes no colour, so one state covers both. The group
+     headers declare their own tone and are handled below. */
+  .nav_dropdown_main_content a { color: #e6edf3 !important; }
+  /* Webflow gives each menu entry and each CTA an overlay ring of
+     `border: 1-2px solid transparent`, so the blanket `* { border-color }` reset near
+     the end of this file paints a box around all four sides that Khan never draws —
+     grey rounded frames around every mega-menu row, and a dark rim over the purple
+     CTAs. Both classes are ring-only elements, so keeping them transparent costs no
+     other cue. */
+  .nav_group_link, .button_main_border { border-color: transparent !important; }
+  /* …except on the SECONDARY button variant, where that overlay is the only element
+     with a border width at all — `.button_main_element` itself is 0px — so it is what
+     has to carry the outline the dark fill below needs to read as a button. */
+  .button_main_border[class*="w-variant-e85564cd"] { border-color: #3a424c !important; }
   .nav_dropdown_main_content, .nav_dropdown_main_scroll, .nav_skip_wrap,
   .tab_button_item, .tab_content_list, .card_testimonial_inner,
   .card_primary_element { background-color: #1c2128 !important; }
@@ -585,8 +610,12 @@
      the map legible as a map while putting it back under the type. */
   .graphic_map_lines { color: #232a34 !important; }
   /* Webflow's hairline rules are 1px DIVs with a light background, so the
-     blanket `* { border-color }` reset never reaches them. */
-  .c-divider { background-color: #2d333b !important; }
+     blanket `* { border-color }` reset never reaches them. `.nav_links_line` is the
+     row separator in the narrow-width nav drawer and `.nav_seasonal_line` the column
+     rule beside the mega-menu's promo card; both keep a fixed #cbcbcd that reads as a
+     bright rule once the panel behind them goes dark. `.nav_button_line` is NOT in
+     this family — its background is `currentColor`, so it already tracks the ink. */
+  .c-divider, .nav_links_line, .nav_seasonal_line { background-color: #2d333b !important; }
   /* Text that Webflow colours directly instead of inheriting, so the global
      `html, body` ink does not reach it: the skip link, the testimonial
      attribution (near-black on the now-dark card — "Sal Khan / Founder & CEO"
@@ -793,6 +822,14 @@
   #main-content a[data-kind="secondary"]:hover,
   #main-content a[class][role]:hover,
   #main-content [role="button"]:hover { background-color: #232a32; }
+  /* Home testimonial video: the play affordance is an 88px disc (`border-radius: 50%` div,
+     brand-indigo fill) holding a white mask-icon triangle, over a photo thumbnail. The
+     neutralizer above flattens the disc, leaving a bare triangle floating on the photo.
+     Restore the disc in the theme's CTA blue. The button's accessible name is the stable
+     hook; `> div > div` is the disc (button > wrapper > [img, disc]). Must out-rank the
+     `[class]:not(span)` neutralizer (1,1,1), so keep the element types. */
+  #main-content button[aria-label^="Play video"] > div > div { background-color: #2563c9; }
+  #main-content button[aria-label^="Play video"]:hover > div > div { background-color: #2f6fd6; }
 
   /* Khan's list ROWS — the course-unit rail, the lesson rail beside a video /
      article / exercise, and a search result card — are anchors whose only hover
@@ -868,6 +905,20 @@
      rule, so both need naming — matching only one leaves the other flat. */
   [data-testid="mastery-practice-content-item"],
   [data-testid="course-challenge-card"] { border-top-color: #5fb0e6 !important; }
+  /* The course page's own "Up next for you:" section (below the mastery grid, mounted a
+     few seconds after the page) draws its brand-blue accent as a separate 4px DIV above
+     the heading rather than a border, so the `#main-content [class]` neutralizer is
+     what reaches it. Khan gives that bar no test id and no non-hashed class; the element
+     type is what lifts this above the neutralizer's `[class]:not(span)` specificity. */
+  #main-content div._x7kvevl { background-color: #5fb0e6 !important; }
+  /* In the mastery grid the recommended skill is a tile carrying a 2px brand-blue ring on
+     a pale-blue plate — the only cue separating it from the "not started" tiles beside
+     it. The ring is border-reset territory and the plate is the neutralizer's; both are
+     restated on the tile's stable test id. */
+  #main-content a[data-testid="m8z-unfy-item"] {
+    border-color: #5fb0e6 !important;
+    background-color: #18222f;
+  }
 
   /* The "Level N … 0 /1 skill" bar above every article, video and exercise
      marks how far along the level you are with a 14px knob Khan fills its
@@ -1221,6 +1272,18 @@
      draws. `div[tabindex]` is the counter's shape inside that banner — its only
      focusable siblings there are an <h2> and an icon <span>. */
   .stp-animated-banner div[tabindex] { border-color: transparent !important; }
+  /* That banner's "View progress for all courses" popover renders into a body-level
+     portal, outside `#main-content`. Its chrome and table header read Wonder Blocks
+     tokens; the empty-state box ("No recent progress yet!") is a literal
+     `background: rgb(247,248,250)` on a hashed class and needs its own surface.
+     `[data-placement]` separates a Popper-anchored Wonder Blocks Popover from the
+     app's modal dialogs (the Share-link sheet is `aria-modal`, no placement), and
+     "Close Popover" is the component's fixed close label; the box is the sibling
+     after the table's wrapper. Only that box is painted, so a populated table keeps
+     its own level/progress fills. */
+  [role="dialog"][data-placement] button[aria-label="Close Popover"] + div > div > div + div {
+    background-color: #1c2128 !important;
+  }
 
   /* ====================================================================
      Soften any remaining bright borders across the app

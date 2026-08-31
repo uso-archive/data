@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260827.15.13
+@version      20260830.17.27
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -292,6 +292,16 @@
     border-color: var(--d-border) !important;
   }
 
+  /* UA BUTTON FACE. `color-scheme: dark` above makes Chrome paint every <button>
+     the site never gave a background as a mid-grey rgb(107,107,107) slab. The
+     rule MUST stay unimportant: an author declaration outranks the UA sheet at
+     any importance, so this reaches only the buttons nothing else styles, while
+     every site rule and every rule below still wins — with !important it would
+     repaint the transparent icon buttons (tile favourite, gallery arrows) too. */
+  button {
+    background-color: var(--d-surface);
+  }
+
   /* ============================================================
      NOTE — there is deliberately NO global `ts*` typography colour
      rule here. Ozon's ts* classes carry font metrics only; the text
@@ -383,7 +393,7 @@
      that only exists after a click, so no load-time scan sees it.
      Every rail glyph the grey lift was written for sits inside an <a>; every flyout
      toggle carries the site bundle's own `uw_` class prefix, which the viewer's
-     bundle does not. Specificity is deliberately kept BELOW the a[isload] and
+     bundle does not. Specificity is deliberately kept BELOW the rail-hover and
      [data-widget="modalLayout"] rules further down, so those still win. */
   .vue-portal-target a svg {
     color: var(--d-text-4) !important;
@@ -393,8 +403,8 @@
   .vue-portal-target button[class*="uw_"] svg {
     color: var(--d-blue-ink) !important;
   }
-  .vue-portal-target a[isload="true"],
-  .vue-portal-target a[isload="true"] svg {
+  .vue-portal-target a[id][class*="uw_"]:hover,
+  .vue-portal-target a[id][class*="uw_"]:hover svg {
     color: var(--d-blue-ink) !important;
   }
   /* Ozon also renders its DROPDOWN LISTS (the search-results sort menu, …) into
@@ -407,14 +417,27 @@
   .vue-portal-target [style*="graphicActionPrimary"] {
     color: var(--d-blue-ink) !important;
   }
-  /* the currently-selected left-rail category paints a near-white pill
-     (#f5f7fa via a hashed class, NOT a token) as its active highlight —
-     a stark white box in the dark flyout. It only mounts on hover, so the
-     page-load audit never sees it. It is uniquely the one loaded category
-     (a[isload="true"]); repaint it to an elevated active dark surface so
-     the highlight reads as a selection, not a white box. */
-  .vue-portal-target a[isload="true"] {
+  /* The CURRENT left-rail category (the one whose columns are open) paints a
+     near-white pill (#f5f7fa via a hashed class, NOT a token) with a blue label
+     and icon, and the row under the pointer paints the same. Ozon marks the
+     current row with a rotating MODIFIER class only; there is no attribute for
+     it — `isload="true"` is NOT that marker, it accumulates on every category
+     loaded so far in the session, so keying anything on it lights up several
+     rows at once. The rail rows are the only anchors in the flyout carrying an
+     `id` (the category number).
+
+     The current row's plate is therefore darkened without naming it: an inset
+     shadow in the CANVAS colour paints over the element's own background and
+     under its label, so on the 28 transparent rows it composites to the canvas
+     (invisible) and on the one #f5f7fa plate it lands at ~#242830, an elevated
+     plate. The label keeps the rail's light ink — the blue is unreachable the
+     same way. The hover state is ours outright, so it drops the veil. */
+  .vue-portal-target a[id][class*="uw_"] {
+    box-shadow: inset 0 0 0 200px rgba(20, 24, 29, 0.93) !important;
+  }
+  .vue-portal-target a[id][class*="uw_"]:hover {
     background-color: var(--layerActiveFloor0) !important;
+    box-shadow: none !important;
   }
   /* FLYOUT STORE PICKER ("Весь Ozon" -> Ozon Банк / Билеты / Ozon Premium / …, the
      282px box above the category rail). Ozon paints its plate a literal near-white
@@ -460,6 +483,41 @@
   .vue-portal-target [reviewuuid] {
     --layerFloor1: #ffffff !important;
   }
+  /* REVIEW MEDIA VIEWER comment column — the review beside the slide and the
+     comment thread under it render from the same `rpProduct_*` module as the
+     PDP review list, hardcoding rgb(7,7,7) on names and body copy and
+     rgba(0,26,51,.6) on dates and "Вам помог этот отзыв?", outside the token
+     system. The webListReviews rules never reach it: the column is portal-mounted
+     with no data-widget wrapper. Rooted on the two Vue props leaked as plain
+     attributes (data-review-uuid on the review, data-comment-uuid on each
+     comment); a bare `div[class*="rpProduct_"]` across the portal also mutes the
+     "Комментарии" heading and the viewer's own H1. Same tag split as the list:
+     body copy in SPANs, metadata in DIVs. The reply link ("в ответ …") is a bare
+     #005bff <a> that the flyout's grey link rule above would otherwise swallow.
+     The comment COUNT beside "Комментарии" sits outside both roots and keeps its
+     navy: it shares a shape with the comment body span, so no selector separates
+     them. */
+  .vue-portal-target [data-review-uuid] div[class*="rpProduct_"],
+  .vue-portal-target [data-comment-uuid] div[class*="rpProduct_"] {
+    color: var(--d-text-3) !important;
+  }
+  .vue-portal-target [data-review-uuid] span,
+  .vue-portal-target [data-comment-uuid] span {
+    color: var(--d-text) !important;
+  }
+  .vue-portal-target a[class*="rpProduct_"] {
+    color: var(--d-blue-ink) !important;
+  }
+  /* The viewer's "Другие фото и видео" grid carries a sticky 48px BACK-TO-TOP
+     disc: a literal #fff plate whose chevron takes --textPrimary, so once the
+     token is lifted the glyph is white-on-white. The disc and the media grid are
+     the two children of one attribute-less wrapper under the viewer's scroll
+     pane (`div[tabindex="-1"]`); the grid comes first, so `:last-child` names
+     the disc and never the grid, which is natively transparent and must stay so. */
+  .vue-portal-target div[tabindex="-1"] > div[class*="rpProduct_"] > div > div[class*="rpProduct_"]:last-child {
+    background-color: var(--d-surface) !important;
+    color: var(--d-text) !important;
+  }
   /* PORTAL ELEVATION SHADOWS — Ozon's is a PALE grey
      (`rgba(204,214,228,.6) 0 6px 16px 2px`), a soft drop shadow on the white site
      and a bright HALO on ours: it rings the review media viewer's whole 1120x612
@@ -494,8 +552,35 @@
   .vue-portal-target [data-widget="modalLayout"] button span {
     color: #ffffff !important;
   }
+  /* …but only the FILLED CTA is white-labelled natively. The same modals carry two
+     blue-labelled button kinds the rule above must not touch: the secondary
+     variant, which the site inks INLINE with `color: var(--textAction)` on a
+     tinted plate ("Отменить" beside "Применить" in the "Все фильтры" modal), and
+     the link component (`ga5_` id, "Посмотреть все" under a filter group), a bare
+     blue label on no plate. Both are named by what the site itself declares, so
+     the white rule keeps reaching every filled CTA it was written for. */
+  .vue-portal-target [data-widget="modalLayout"] button[style*="var(--textAction)"],
+  .vue-portal-target [data-widget="modalLayout"] button[style*="var(--textAction)"] div,
+  .vue-portal-target [data-widget="modalLayout"] button[class*="ga5_"],
+  .vue-portal-target [data-widget="modalLayout"] button[class*="ga5_"] div {
+    color: var(--d-blue-ink) !important;
+  }
   [data-widget="currencyLanguageSelector"] p {
     color: var(--d-text) !important;
+  }
+  /* The currency SELECT inside that modal lists its options through the shared
+     listbox component, but the option CONTENT is the modal's own bundle: the
+     group headers ("Рекомендуемые" / "Все доступные") are a literal #f5f7fa
+     plate and both they and the ISO code under every currency ("RUB", "USD" …)
+     are a literal rgba(0,26,51,.6), all outside the token system. The header
+     plate and the code are the SAME shape — the only uw_ div nested inside
+     another uw_ div under an option — while the currency name is a bare text
+     node of the outer div, so this depth reaches the two secondary runs and
+     never the label. The list only exists two clicks into a portal-mounted
+     modal, so no load-time scan reaches it. */
+  .vue-portal-target [role="option"] div[class*="uw_"] > div[class*="uw_"] {
+    background-color: transparent !important;
+    color: var(--d-text-3) !important;
   }
 
   /* ------------------------------------------------------------
@@ -818,6 +903,15 @@
      non-difference on dark. The APPLIED state is restored below. */
   .search-bar-wrapper div[class*="search_"] {
     background-color: var(--d-bg) !important;
+  }
+  /* SUGGESTION CHIPS in the open suggest flyout ("андроид", "xiaomi" …). Each
+     word sits on a pill whose only fill is rgba(0,48,120,.04) — over white that
+     is a visible pale plate, over the dark panel it composites to the panel's own
+     colour and the chips read as bare words in a row. The pill is the chip's
+     inner DIV; its own class is a build hash, but the row is the whole content of
+     [data-widget="tapTags"], so `> div > div > div` names exactly the pills. */
+  [data-widget="tapTags"] > div > div > div {
+    background-color: var(--d-surface) !important;
   }
   /* APPLIED SEARCH-SCOPE CHIP ("Смартфоны ✕" — the pill shown when a query is
      restricted to a store or category). Natively a solid #005bff fill with a white
@@ -1146,8 +1240,86 @@
      token the same way for its "показать больше вопросов" pager, which is a <button>,
      not an <a>, so no link rule reaches it. The widget has no --bgActionPrimary FILL
      of its own, so the rebind repaints the pager and nothing else. */
-  [data-widget="webListQuestions"] {
+  [data-widget="webListQuestions"],
+  [data-widget="webPDPListQuestions"] {
     --bgActionPrimary: var(--d-blue-ink) !important;
+  }
+  /* The PDP's own Q&A list (webPDPListQuestions — the /questions/ page keeps the
+     older widget name) hardcodes two inks outside the token system, the same
+     rpProduct module as the review list: the answering shop's name is a literal
+     rgb(7,7,7) on the module's compact-control span, and "Вам помог этот ответ?"
+     a literal rgba(0,26,51,.6) on a hashed DIV. That DIV is the first child of
+     the answer footer's only classless wrapper; the vote buttons beside it carry
+     their own inline ink and are untouched. Every other text run in the widget
+     is token-coloured. */
+  [data-widget="webPDPListQuestions"] span[class*="tsCompactControl500"] {
+    color: var(--d-text) !important;
+  }
+  [data-widget="webPDPListQuestions"] div:not([class]) > div[class*="rpProduct_"]:first-child {
+    color: var(--d-text-3) !important;
+  }
+  /* "ЗАДАЙТЕ ВОПРОС О ТОВАРЕ" form at the head of the Q&A tab (and the
+     /questions/ page). The same rpProduct module paints the form's plate a
+     literal #f5f7fa through a hashed class, outside the token system, while its
+     heading and hint take --graphicPrimary, lifted to light by the remap — so
+     the whole form is light-on-light. The <form> is the widget's only form. */
+  [data-widget="webCreateQuestion"] form {
+    background-color: var(--d-surface) !important;
+  }
+  /* REVIEW LIST + its page heading. Both render from a module that hardcodes its
+     ink instead of reading the tokens: rgb(7,7,7) on headings, reviewer names and
+     the review body, rgba(0,26,51,.6) on every date and meta line — 1.1:1 and
+     1.0:1 on the dark card. Both are literals, so no token remap reaches them, and
+     the module's class hashes rotate; the TAGS carry the split instead, body copy
+     in SPANs and metadata in DIVs. */
+  [data-widget="webListReviews"] span,
+  [data-widget="reviewsTitle"] span {
+    color: var(--d-text) !important;
+  }
+  [data-widget="webListReviews"] div,
+  [data-widget="reviewsTitle"] sup {
+    color: var(--d-text-3) !important;
+  }
+  /* The two action inks the blanket above would otherwise swallow, both a literal
+     #005bff (2.9:1) that has to be lifted anyway. The SELECTED sort option is the
+     only span in the widget carrying two module classes — the unselected one ships
+     a single class — and the "Читать полностью" expander is emitted only on a
+     clamped review, as a second SPAN beside the body copy. */
+  [data-widget="webListReviews"] span[class*="rpProduct_"][class*=" "],
+  [data-widget="webListReviews"] div > span + span {
+    color: var(--d-blue-ink) !important;
+  }
+  /* Two more action labels the DIV blanket swallows, both natively #005bff and
+     both wrapped in a component whose label is a DIV: the "N комментариев"
+     toggle under a review (Ozon's link component, id prefix `ga5_` — the version
+     suffix rotates, the id does not, same as `b25_` for buttons) and the pager's
+     "Дальше", which is the button component's ANCHOR form. The anchor already
+     takes the widget link blue; its label only needs to inherit it, which also
+     keeps the current page chip's white label white. Every other <a> in the
+     widget carries bare text, so `a div` reaches nothing else. */
+  [data-widget="webListReviews"] a div {
+    color: inherit !important;
+  }
+  [data-widget="webListReviews"] button[class*="ga5_"],
+  [data-widget="webListReviews"] button[class*="ga5_"] div {
+    color: var(--d-blue-ink) !important;
+  }
+  /* REVIEW-LIST PAGINATION ("1 2 3 4 5 Дальше"). The page chips are literal-white
+     plates with blue digits on the light site, and the current page inverts to a
+     #005bff fill with a white label. Nothing in the token layer reaches either, so
+     on dark the four unvisited pages stay glaring white tiles while the current
+     page keeps its blue fill but takes the remapped link blue as its label —
+     1.4:1, blue on blue. The chips are the only anchors in the widget whose parent
+     div carries no class of its own, and the current one is the only one of those
+     with a second class, so both states are named by shape, not by hash. */
+  [data-widget="webListReviews"] div[class=""] > a,
+  [data-widget="webListReviews"] div:not([class]) > a {
+    background-color: var(--d-surface) !important;
+  }
+  [data-widget="webListReviews"] div[class=""] > a[class*=" "],
+  [data-widget="webListReviews"] div:not([class]) > a[class*=" "] {
+    background-color: #005bff !important;
+    color: #ffffff !important;
   }
   /* REVIEW RATING HISTOGRAM ("5 звёзд … 1 звезда" bars): the webReviewTabs
      `div { transparent }` reset above flattens BOTH the grey track and the gold
@@ -1192,6 +1364,20 @@
      spacing, and one lost hairline beats five phantom bars. */
   [data-widget="webReviewProductScore"] div {
     border-bottom-color: transparent !important;
+  }
+  /* The widget's own module hardcodes its ink instead of reading the tokens: the
+     "5 / 5" score and the per-row counts are rgb(7,7,7) and the "N звёзд" labels
+     rgba(0,26,51,.6), all ~1.1:1 on the dark panel. Reached through the module
+     prefix (the hash after it rotates) and restricted to DIVs plus the score SPAN,
+     because the five rating stars are SVG in the same subtree and take their gold
+     from `color` — an `*` here would repaint them. `:last-child` is the count
+     column; the label column is the row's first child and keeps the muted tone. */
+  [data-widget="webReviewProductScore"] div[class*="rpProduct_"] {
+    color: var(--d-text-3) !important;
+  }
+  [data-widget="webReviewProductScore"] div[class*="rpProduct_"]:last-child,
+  [data-widget="webReviewProductScore"] div[class*="rpProduct_"] > span {
+    color: var(--d-text) !important;
   }
   /* ACTIVE review-tab underline ("Отзывы о товаре" / "Вопросы о товаре"): a 2px bar
      Ozon slides under the current tab, painted brand-blue via an inline left+width.
@@ -1285,6 +1471,23 @@
     background-color: var(--d-surface) !important;
     color: var(--d-text) !important;
   }
+  /* "ПОХОЖИЕ" MODAL TAB STRIP ("Аналоги" / "Похожие по фото", opened from the
+     pill over the main photo). The active tab is the one place Ozon uses
+     --graphicPrimary — an INK token, near-black natively and lifted to light
+     text by the :root remap — as a FILL, with a white label: on the light site a
+     near-black pill with a white word, on ours a near-white pill with a white
+     word. Every button in this modal takes the white CTA label from the
+     modalLayout rule above, so the plate is what has to move. The token cannot
+     be rebound on the widget: webMobTabs wraps the whole modal body, where
+     --graphicPrimary is the glyph ink of every tile. The strip is the widget's
+     first child and holds nothing but the two tab buttons, so it is rebound there
+     alone, to the brand fill the theme's other selected chips use (the applied
+     filter chip, the current review page). Only mounts on click, so no load-time
+     scan reaches it. */
+  [data-widget="webMobTabs"] > div:first-child {
+    --graphicPrimary: #005bff !important;
+  }
+
   /* product photos sit on white in the source; give the photo
      frame a soft light mat so cut-out PNGs stay legible, but the
      surrounding stage/thumbnail strip stays dark */
@@ -1335,6 +1538,19 @@
     background-color: var(--d-header) !important;
     color: var(--d-text) !important;
     border-color: var(--d-border) !important;
+  }
+  /* webChatButton is not only the fixed "?" disc: the Q&A tab's right rail mounts
+     a second instance as an in-flow SECONDARY button ("Спросить продавца о
+     товаре"), inked inline with `background: var(--bgActionSecondary); color:
+     var(--textAction)` — a blue label on a translucent blue tint. The rule above
+     turns it into a grey label on the chrome near-black. The inline token names
+     the variant, so hand that instance its two colours back. */
+  [data-widget="webChatButton"][style*="var(--textAction)"] {
+    background-color: rgba(55, 175, 255, 0.1) !important;
+  }
+  [data-widget="webChatButton"][style*="var(--textAction)"],
+  [data-widget="webChatButton"][style*="var(--textAction)"] div {
+    color: var(--d-blue-ink) !important;
   }
   /* ============================================================
      FILTERS / LEFT RAIL  (data-widget="filtersDesktop")
@@ -1557,8 +1773,33 @@
      The delivery note beside step 2 is the widget's only tinted plate — a
      literal #f5f7fa slab that stays light-on-dark. */
   [data-widget="webCustomizedCertificate"] div[class*="tsHeadline"],
-  [data-widget="webCustomizedCertificate"] button {
+  [data-widget="webCustomizedCertificate"] button[class*="tsBody"] {
     color: var(--d-text) !important;
+  }
+  /* The quantity stepper's "−" / "+" are icon buttons (`ag5_` component) that
+     paint their glyph from `color`: #005bff when enabled, a 40%-alpha navy when
+     disabled — the only thing that tells the two apart, since the disabled plate
+     is a 4%-alpha tint either way. The lift above is therefore restricted to the
+     upload button (the widget's one ts-classed button) so the stepper keeps a
+     two-state ink. */
+  [data-widget="webCustomizedCertificate"] button[class*="ag5_"] {
+    color: var(--d-blue-ink) !important;
+  }
+  [data-widget="webCustomizedCertificate"] button[class*="ag5_"][disabled] {
+    color: var(--d-text-4) !important;
+  }
+  /* Delivery-time radios and the notify checkbox draw their box on the input's
+     adjacent sibling with a 2px ring: literal #005bff when checked (the fill is
+     token-driven and already blue), a literal light tint when not. The blanket
+     softener paints both states the same dark grey, so the unchecked ring sinks
+     into the card and the checked one loses its outline. */
+  [data-widget="webCustomizedCertificate"] input[type="radio"] + span,
+  [data-widget="webCustomizedCertificate"] input[type="checkbox"] + div {
+    border-color: rgba(206, 219, 235, 0.45) !important;
+  }
+  [data-widget="webCustomizedCertificate"] input[type="radio"]:checked + span,
+  [data-widget="webCustomizedCertificate"] input[type="checkbox"]:checked + div {
+    border-color: var(--d-blue) !important;
   }
   [data-widget="webCustomizedCertificate"] div[class*="tsBody300XSmall"] {
     background-color: var(--d-surface) !important;
@@ -1846,6 +2087,42 @@
      which must keep their own (white / green / gradient) colour. */
   [class*="tsHeadline600Medium"] {
     color: var(--d-text) !important;
+  }
+
+  /* CMS RICH-TEXT CARDS (data-widget="richTextWidget" — the "Как задать вопрос
+     продавцу?" / "Как спросить о сервисе Ozon?" cards in the Q&A tab's rail, and
+     the same component wherever the CMS places copy). The widget ships an INLINE
+     `background-color: rgb(255,255,255); color: rgb(0,0,0)` and its stylesheet
+     pins #005bff on links, #666-style greys on paragraphs, a pale-blue <mark>
+     and a pale <th>, all outside the token system. The inline-white neutraliser
+     darkens the plate, so the inline black ink has to be lifted with it; the
+     paragraph and heading are split by tag, as the CMS sheet itself does. */
+  [data-widget="richTextWidget"],
+  [data-widget="richTextWidget"] p,
+  [data-widget="richTextWidget"] li,
+  [data-widget="richTextWidget"] div,
+  [data-widget="richTextWidget"] td {
+    color: var(--d-text-2) !important;
+  }
+  [data-widget="richTextWidget"] h1,
+  [data-widget="richTextWidget"] h2,
+  [data-widget="richTextWidget"] h3,
+  [data-widget="richTextWidget"] h4,
+  [data-widget="richTextWidget"] h5,
+  [data-widget="richTextWidget"] h6,
+  [data-widget="richTextWidget"] th,
+  [data-widget="richTextWidget"] mark {
+    color: var(--d-text) !important;
+  }
+  [data-widget="richTextWidget"] a {
+    color: var(--d-blue-ink) !important;
+  }
+  [data-widget="richTextWidget"] a:hover {
+    color: var(--d-blue-hover) !important;
+  }
+  [data-widget="richTextWidget"] th,
+  [data-widget="richTextWidget"] mark {
+    background-color: #16233a !important;
   }
 
   /* Spec-rating verdicts ("среднее" / "высокая" / "хороший") ship the

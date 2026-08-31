@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark mode for the SCP Foundation Wiki: articles, sidebar, tables, tabs, ratings, forums and search all get a comfortable night palette.
-@version      20260827.15.14
+@version      20260830.17.28
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -30,6 +30,7 @@
     --scp-lift-red: #ff453a;
     --scp-lift-brown: #d4a373;
     --scp-lift-teal: #56d4dd;
+    --scp-lift-pink: #ff7eb0;
   }
 
   /* Black Highlighter declares its whole palette on :root and feeds the site
@@ -190,16 +191,33 @@
      the boxes seen doing it hold no text of their own. Filtering it needs a
      `color:`-bearing :not(), which also drops the light boxes that DO name
      their ink — and those still need the rebinds below for their headings and
-     links. */
-  #page-content [style*="background"][style*="#c"],
-  #page-content [style*="background"][style*="#d"],
-  #page-content [style*="background"][style*="#e"],
-  #page-content [style*="background"][style*="#f"],
-  #page-content [style*="background"][style*="#C"],
-  #page-content [style*="background"][style*="#D"],
-  #page-content [style*="background"][style*="#E"],
-  #page-content [style*="background"][style*="#F"],
-  #page-content [style*="background"][style*="white"] {
+     links.
+     `.content-panel` is the one exclusion: the ARTICLE FURNITURE rules fill that
+     component dark with !important, so its inline paper never renders and this
+     ink would land on our own surface. Any component filled that way has to be
+     excluded here too.
+     `##` is a malformed hex — `background: ##F6F6F6` paints nothing, so the box
+     renders on our own fill and this ink would land dark on dark.
+     A `.content-panel` whose inline background is an IMAGE is the other half of
+     that exclusion and has to come back in: the image paints over our fill, so
+     the paper is the author's after all.
+     The curated-series grids are the same shape one step out: the card is a white
+     plate from the page's own CSS rather than an inline style, and it frames
+     black-linework logos, so the paper stays and the ink comes back. Only the
+     cards that name an inline background COLOUR are excluded — a card carrying
+     just a `background-image` keeps the class's white plate underneath it. */
+  #page-content [style*="background"][style*="#c"]:not(.content-panel):not([style*="##"]),
+  #page-content [style*="background"][style*="#d"]:not(.content-panel):not([style*="##"]),
+  #page-content [style*="background"][style*="#e"]:not(.content-panel):not([style*="##"]),
+  #page-content [style*="background"][style*="#f"]:not(.content-panel):not([style*="##"]),
+  #page-content [style*="background"][style*="#C"]:not(.content-panel):not([style*="##"]),
+  #page-content [style*="background"][style*="#D"]:not(.content-panel):not([style*="##"]),
+  #page-content [style*="background"][style*="#E"]:not(.content-panel):not([style*="##"]),
+  #page-content [style*="background"][style*="#F"]:not(.content-panel):not([style*="##"]),
+  #page-content [style*="background"][style*="white"]:not(.content-panel):not([style*="##"]),
+  #page-content .content-panel[style*="url("],
+  #page-content .multi-grid > div:not([style*="background:"]):not([style*="background-color"]),
+  #page-content .multi-grid-small > div:not([style*="background:"]):not([style*="background-color"]) {
     color: #1b1815;
     --scp-title: #7a1d24;
     --scp-heading: #1b1815;
@@ -225,6 +243,42 @@
     --scp-lift-red: #c30000;
     --scp-lift-brown: #6b4423;
     --scp-lift-teal: #006a6a;
+    --scp-lift-pink: #a1004a;
+  }
+
+  /* A heading inside a box that states its own `color:` follows that ink, not
+     the paper value above: the author chose it for their paper, light or dark,
+     and the site's skins let headings inherit. A box with a dark gradient, a
+     white ink and one light hex in its border trips the paper match above and
+     would otherwise print its heading near-black on near-black. A box that
+     names no ink computes the paper value itself, so the heading lands on the
+     same colour either way.
+     The ink match has to be property-adjacent: a bare `color:` substring also
+     sits inside `background-color:` and `--link-color:`, which most hub cards
+     carry without naming an ink, and would hand their headings the body ink.
+     Wikidot echoes the author's spacing verbatim; the corpus spells a real
+     declaration `color:` at the start of the attribute or `; color:` after a
+     semicolon (`;color:` covered for free). `-color:` longhands never match
+     any of the three. */
+  #page-content [style*="background"][style^="color:"] h1,
+  #page-content [style*="background"][style*=";color:"] h1,
+  #page-content [style*="background"][style*="; color:"] h1,
+  #page-content [style*="background"][style^="color:"] h2,
+  #page-content [style*="background"][style*=";color:"] h2,
+  #page-content [style*="background"][style*="; color:"] h2,
+  #page-content [style*="background"][style^="color:"] h3,
+  #page-content [style*="background"][style*=";color:"] h3,
+  #page-content [style*="background"][style*="; color:"] h3,
+  #page-content [style*="background"][style^="color:"] h4,
+  #page-content [style*="background"][style*=";color:"] h4,
+  #page-content [style*="background"][style*="; color:"] h4,
+  #page-content [style*="background"][style^="color:"] h5,
+  #page-content [style*="background"][style*=";color:"] h5,
+  #page-content [style*="background"][style*="; color:"] h5,
+  #page-content [style*="background"][style^="color:"] h6,
+  #page-content [style*="background"][style*=";color:"] h6,
+  #page-content [style*="background"][style*="; color:"] h6 {
+    color: inherit !important;
   }
 
   hr {
@@ -369,6 +423,13 @@
     color: #dde3e9 !important;
   }
 
+  /* Black Highlighter's only hover cue on these is the fill swap the rule
+     above removes, so the ink carries one; Sigma-9's underline is untouched. */
+  #login-status a.btn:hover,
+  #login-status a.btn-primary:hover {
+    color: #ff8f97 !important;
+  }
+
   #login-status ul a,
   #account-options li a {
     color: #e8626e !important;
@@ -506,36 +567,37 @@
     -webkit-text-fill-color: #eaeaea !important;
   }
 
-  /* Search button. Black Highlighter clips this input to a magnifier mask and
-     paints the GLYPH with the element's own BACKGROUND, so a fill stated here
-     becomes the icon's colour, and three skin families want different values:
-     a masked skin needs it LIGHT to read on our bar; the ones that leave a real
-     "Search" button — Sigma-9, and article themes like /scp-8007 that drop its
-     gradient — need it DARK under their own near-white label; and the ones that
-     draw the magnifier from #search-top-box::before in their accent
-     (theme:newspaper, theme:monotypical, theme:cosmonaut) need it far from that
-     accent. The .user.css picks a side per skin by reading the theme's own
-     token, which userstyles.org's parser cannot accept (its rgb() wants three
-     numbers and dies on a var reference, taking the whole upload down with a
-     502). THE ONE DELIBERATE DIVERGENCE FROM THE .user.css, here and on the
-     hover rule below: no selector distinguishes the families — the markup is
-     identical and only the imported theme CSS differs — so this build states a
-     single mid maroon that clears 3:1 for the first two (glyph 3.1:1 on the top
-     bar, near-white label 3.2:1 on the fill) and gives up on the third, which
-     is by far the smallest. No flat value can serve all three: the window that
-     satisfies the first two is exactly the band the accent glyph sits in. Any
-     value stated here must stay a mid tone for that reason. No background-IMAGE
-     is stated, so Sigma-9's own opaque brand gradient covers this colour
-     entirely and is unaffected. */
+  /* Search button. Black Highlighter turns this same input into a magnifier
+     GLYPH by clipping it to a mask-image and painting the glyph with the
+     element's own BACKGROUND, so a fill stated flat here becomes the icon's
+     colour — and the skins want opposite values, so it is read from a token
+     instead. The token is the HOVER one on purpose: a theme names the pair for
+     its own light bar and only the emphasised end is reliably light, so the
+     resting end draws nothing at all on ours (/scp-1730 states 15, 15, 15
+     against a hover of 248, 246, 244). Both ends are the same value on most
+     Black Highlighter themes anyway, so no hover cue is lost.
+     Only the skins that mask the input define these; the ones that leave it a
+     real "Search" button — Sigma-9, and article themes like /scp-8007 that drop
+     its gradient — take the dark fallback, which their own near-white label
+     needs. No background-IMAGE is stated at all, so Sigma-9's brand gradient
+     survives.
+
+     A third family — theme:newspaper (the /news pages), theme:monotypical,
+     theme:cosmonaut — leaves the input a plain plate and draws the magnifier
+     from #search-top-box::before on top of it, in the theme's accent. Those
+     skins define no Black Highlighter token, so the fallback is what the glyph
+     is read against and it is pitched at the page floor rather than a maroon
+     for that reason. The maroon survives on the border, which is what gives the
+     control its edge on the skins whose own fill covers this one. */
   #search-top-box-form input[type="submit"] {
     background-color: #a05a5a !important;
     border-color: #6d4a4a !important;
   }
 
   /* The base fill above is !important and would otherwise freeze the skin's own
-     hover swap on the button skins. Lifted far enough to stay visible against the
-     dark red panel Black Highlighter slides in behind the glyph on hover, while
-     the label the skins switch to #fff here keeps 3.4:1. */
+     hover swap on the button skins. The fallback end goes DARKER, not lighter:
+     the pressed cue is carried by the border, and an accent glyph drawn over
+     this plate loses contrast against any lift. */
   #search-top-box-form input[type="submit"]:hover,
   #search-top-box-form input[type="submit"]:focus {
     background-color: #c07878 !important;
@@ -544,13 +606,12 @@
 
   /* The account glyph beside it is the same trap one element over: below the
      desktop breakpoint Black Highlighter masks #login-status::before to a
-     person icon and paints it from --login-mobile-icon-color, which the
-     themes pitch near-black for their light bar (/scp-1730 states
+     person icon and paints it from --login-mobile-icon-color, which
+     the themes pitch near-black for their light bar (/scp-1730 states
      15, 15, 15). Unlike the search button there is no opposite case to serve —
      the mask lives in the shared Black Highlighter sheet, so every skin that
      draws this glyph draws it masked, and Sigma-9 gives the pseudo no content
-     at all — so a flat light fill is stated rather than a token branch, and
-     this rule is NOT the divergence: both builds state it. */
+     at all — so a flat light fill is stated rather than a token branch. */
   #login-status::before {
     background-color: #c4cdd6 !important;
   }
@@ -720,11 +781,29 @@
     background-color: #1a1f26 !important;
   }
 
+  /* This plate is ours and dark wherever it sits, so the heading, link and
+     lifted-palette tokens have to be restated here: inside an author's light
+     paper box the paper block above hands its subtree the dark inks, and a
+     heading or link in the quote would print them on this fill. */
   blockquote,
   div.blockquote {
     background-color: #1a1f26 !important;
     border-color: #3a4048 !important;
     color: #c4cdd6;
+    --scp-title: #e05f6b;
+    --scp-heading: #e6edf3;
+    --scp-link: #e8626e;
+    --scp-link-visited: #cf90a8;
+    --scp-link-hover: #ff8f97;
+    --scp-lift-black: #c4cdd6;
+    --scp-lift-blue: #79c0ff;
+    --scp-lift-green: #7ee787;
+    --scp-lift-purple: #d2a8ff;
+    --scp-lift-maroon: #ff9492;
+    --scp-lift-red: #ff453a;
+    --scp-lift-brown: #d4a373;
+    --scp-lift-teal: #56d4dd;
+    --scp-lift-pink: #ff7eb0;
   }
 
   .hl-default,
@@ -894,6 +973,16 @@
   #main-content #page-content .danger-diamond a,
   #main-content #page-content .danger-diamond a:visited,
   #main-content #page-content .danger-diamond a:hover {
+    color: transparent !important;
+    border-color: transparent !important;
+  }
+
+  /* Same shape on the Wanderers' Library dustjacket (/main's Sister Sites): the
+     card's first anchor is stretched over the whole plate with `color:
+     transparent` and the gold title is drawn by the divs under it. */
+  #main-content #page-content .library > a:first-of-type,
+  #main-content #page-content .library > a:first-of-type:visited,
+  #main-content #page-content .library > a:first-of-type:hover {
     color: transparent !important;
     border-color: transparent !important;
   }
@@ -1088,6 +1177,8 @@
   #page-content span[style*="color: steelblue"],
   #page-content span[style*="color:#0000ff"],
   #page-content span[style*="color: #0000ff"],
+  #page-content span[style*="color:#00f;"],
+  #page-content span[style*="color: #00f;"],
   #page-content span[style*="color:#4682b4"],
   #page-content span[style*="color: #4682b4"],
   #page-content a[style*="color:blue"],
@@ -1104,6 +1195,14 @@
   #page-content em[style*="color: blue"],
   #page-content em[style*="color:steelblue"],
   #page-content em[style*="color: steelblue"] {
+    color: var(--scp-lift-blue) !important;
+  }
+
+  /* The #00f shorthand only ends a declaration when it is the last one in the
+     attribute, and a loose match would swallow #00ff00. Kept in a rule of its
+     own so the suffix matcher can only cost this one form. */
+  #page-content span[style$="color:#00f"],
+  #page-content span[style$="color: #00f"] {
     color: var(--scp-lift-blue) !important;
   }
 
@@ -1126,6 +1225,10 @@
   #page-content span[style*="color: indigo"],
   #page-content span[style*="color:#800080"],
   #page-content span[style*="color: #800080"],
+  #page-content span[style*="color:#880680"],
+  #page-content span[style*="color: #880680"],
+  #page-content a[style*="color:#880680"],
+  #page-content a[style*="color: #880680"],
   #page-content a[style*="color:purple"],
   #page-content a[style*="color: purple"],
   #page-content strong[style*="color:purple"],
@@ -1142,6 +1245,14 @@
   #page-content span[style*="color: maroon"],
   #page-content span[style*="color:darkred"],
   #page-content span[style*="color: darkred"],
+  #page-content span[style*="color:firebrick"],
+  #page-content span[style*="color: firebrick"],
+  #page-content a[style*="color:firebrick"],
+  #page-content a[style*="color: firebrick"],
+  #page-content strong[style*="color:firebrick"],
+  #page-content strong[style*="color: firebrick"],
+  #page-content em[style*="color:firebrick"],
+  #page-content em[style*="color: firebrick"],
   #page-content span[style*="color:#800000"],
   #page-content span[style*="color: #800000"],
   #page-content span[style*="color:#990000"],
@@ -1191,6 +1302,19 @@
   #page-content strong[style*="color:sienna"],
   #page-content strong[style*="color: sienna"] {
     color: var(--scp-lift-brown) !important;
+  }
+
+  /* #ce005c is the magenta half of the taboo-family palette and carries whole
+     paragraphs, so it needs a hue of its own rather than the maroon lift. */
+  #page-content span[style*="color:#ce005c"],
+  #page-content span[style*="color: #ce005c"],
+  #page-content a[style*="color:#ce005c"],
+  #page-content a[style*="color: #ce005c"],
+  #page-content strong[style*="color:#ce005c"],
+  #page-content strong[style*="color: #ce005c"],
+  #page-content em[style*="color:#ce005c"],
+  #page-content em[style*="color: #ce005c"] {
+    color: var(--scp-lift-pink) !important;
   }
 
   #page-content span[style*="color:teal"],
@@ -1394,6 +1518,26 @@
     text-shadow: none !important;
   }
 
+  /* At the narrow breakpoint the hub sort strip fills this anchor and its <em>
+     label near-white from a four-class rule, which no !important on a two-class
+     selector reaches. An id outweighs it — and then also outweighs the hover and
+     selected fills above, so both are restated at that weight. */
+  #main-content .yui-navset .yui-nav a,
+  #main-content .yui-navset .yui-nav a em {
+    background-color: #22282f !important;
+    background-image: none !important;
+  }
+
+  #main-content .yui-navset .yui-nav a:hover,
+  #main-content .yui-navset .yui-nav a:focus {
+    background-color: #33272a !important;
+  }
+
+  #main-content .yui-navset .yui-nav .selected a,
+  #main-content .yui-navset .yui-nav .selected a em {
+    background-color: #8a2f2f !important;
+  }
+
   /* The frame those hub pages draw around the whole tab widget. */
   #page-content .tab-box {
     border-color: #2d333b !important;
@@ -1505,6 +1649,16 @@
   .page-options-bottom a:hover,
   a.btn.btn-default:hover {
     color: #ff8f97;
+  }
+
+  /* Black Highlighter and the skins built on it swap this row's ink and fill
+     together under the cursor. The site-wide hover rule clears the fill and the
+     skin's ink stays — pitched for that fill, near-black on djkaktus's gold —
+     so the ink is pinned at a weight the skin's own rule cannot beat and lands
+     on the bar's plate. */
+  #page-options-bottom a:hover,
+  .page-options-bottom a:hover {
+    color: #ff8f97 !important;
   }
 
   input.button.disabled,
@@ -1816,6 +1970,147 @@
   #page-content .content-type-title a,
   #page-content .content-type-footer a {
     color: #fff !important;
+  }
+
+  /* ============================================================
+     HUB / INDEX CARDS
+
+     The tales, series, canon, artwork and contest indexes the sidebar links to
+     render their entries through one shared card component set, and every card
+     in it is a white plate. Only the plate and its hairlines are stated: the
+     cards hold nothing but text and links the article rules already colour.
+     ============================================================ */
+
+  #page-content .tale-block,
+  #page-content .series-block,
+  #page-content .canon-block,
+  #page-content .item-list .item {
+    background-color: #1c2128;
+    box-shadow: 0 0 .325rem rgba(0, 0, 0, .6);
+  }
+
+  /* Series and canon cards head themselves with a transparent PNG logo drawn in
+     black linework, which the site frames on the card's white plate. The plate
+     is the picture's paper, so it moves onto the image once the card is dark;
+     an opaque emblem covers it and is unchanged.
+     Only for cards still carrying the fill above: a card naming an inline
+     background keeps the author's own paper — light or dark, colour or image —
+     which beats that fill, and the logo is drawn to sit on it, so a plate there
+     is a grey box the site never frames. Matched on the VALUE, like the inline
+     paper rules at the top of the sheet, since the classes are page-local. */
+  #page-content .canon-block:not([style*="background"]) img,
+  #page-content .series-block:not([style*="background"]) img {
+    background-color: #dcdcdc;
+  }
+
+  /* The separator between a series card's blurb and its metadata row is a
+     10%-black hairline, invisible once the card is dark. */
+  #page-content .series-block .metadata {
+    border-top-color: rgba(255, 255, 255, .12);
+  }
+
+  /* The canon and series hubs paint each card's links from --link-color, which
+     authors set inline per card next to the paper it was picked for. The two-id
+     article-link rule outranks the hub's own `.canon-block a`, so the token is
+     handed back — but only on a card that also names its own paper: a card
+     sitting on the fill above keeps the article ink, because its token was
+     chosen against white (#275495 on the series archive). The `##` paper never
+     paints and is excluded as everywhere else. Hover and visited are pinned to
+     the same value: the hub draws no swap of its own, and the article rules
+     would otherwise turn an author's white or orange link crimson on hover.
+     The series archive reads the token only in the blurb and the h3: its tag
+     strip and byline chip are white knocked out of the accent, stated below. */
+  #main-content #page-content .canon-block[style*="--link-color"][style*="background"]:not([style*="##"]) a,
+  #main-content #page-content .canon-block[style*="--link-color"][style*="background"]:not([style*="##"]) a:visited,
+  #main-content #page-content .canon-block[style*="--link-color"][style*="background"]:not([style*="##"]) a:hover,
+  #main-content #page-content .series-block[style*="--link-color"][style*="background"]:not([style*="##"]) .blurb a,
+  #main-content #page-content .series-block[style*="--link-color"][style*="background"]:not([style*="##"]) .blurb a:visited,
+  #main-content #page-content .series-block[style*="--link-color"][style*="background"]:not([style*="##"]) .blurb a:hover,
+  #main-content #page-content .series-block[style*="--link-color"][style*="background"]:not([style*="##"]) h3 a,
+  #main-content #page-content .series-block[style*="--link-color"][style*="background"]:not([style*="##"]) h3 a:visited,
+  #main-content #page-content .series-block[style*="--link-color"][style*="background"]:not([style*="##"]) h3 a:hover {
+    color: var(--link-color);
+  }
+
+  /* A tale card's preview is ruled off from its tag row in #ddd. */
+  #page-content .tale-block .preview {
+    border-color: #3a4048;
+  }
+
+  /* The curated-series grids make each card's link inherit the card's ink
+     (`.multi-grid > div a { color: inherit }`): the author's own on a card with
+     inline paper, the plate's near-black on a bare white one. The two-id
+     article-link rule outranks the hub's, so the inherit is restated at that
+     weight, hover and visited included — the hub draws no swap of its own. */
+  #main-content #page-content .multi-grid > div a,
+  #main-content #page-content .multi-grid > div a:visited,
+  #main-content #page-content .multi-grid > div a:hover,
+  #main-content #page-content .multi-grid-small > div a,
+  #main-content #page-content .multi-grid-small > div a:visited,
+  #main-content #page-content .multi-grid-small > div a:hover {
+    color: inherit;
+  }
+
+  /* The tales and artwork hubs' tag chips — the filter rail and each card's tag
+     row — go white on the hub accent under the cursor. The site-wide hover rule
+     clears every link's fill, and the two-id article hover ink outranks the
+     hub's white, so both halves are restated at a weight above them. */
+  #page-content .tag-list a:hover,
+  #page-content .tag-list a:focus {
+    background-color: var(--box-accent) !important;
+    color: #fff !important;
+  }
+
+  /* The series archive knocks its tag strip and byline chip out of the card
+     accent in white (`.tag-lead a`, `.footer a`), which the two-id article-link
+     rule outranks. Stated at a weight above that rule's hover and visited forms
+     so the chip never swaps to the article ink. */
+  #main-content #page-content .series-block .tag-lead a,
+  #main-content #page-content .series-block .footer a {
+    color: #fff;
+  }
+
+  /* The contest archive frames each entry and its floating title tab in #bbb,
+     which is the card's whole outline on a dark page. The title tab inherits
+     the card's fill, so it follows the plate above on its own. */
+  #page-content .item-list .item,
+  #page-content .item-list .item .item-title {
+    border-color: #3a4048;
+  }
+
+  #page-content .item-list .item > hr {
+    border-bottom-color: #3a4048;
+  }
+
+  /* "Unofficial" contests are marked by a cream plate rather than a label, so
+     the variant needs a distinct tone of its own, not the neutral card fill. */
+  #page-content .item-list .item.unofficial {
+    background-color: #2a2419;
+  }
+
+  /* /universe-hub renders its whole orientation letter inside one near-white
+     terminal panel; its rule is drawn by the shared `hr` override. */
+  #page-content .terminalbody {
+    background-color: #1c2128;
+    border-color: #3a4048;
+  }
+
+  /* The letter's "End Session" pill is a light chip on the maroon band, and the
+     band's own colours are what read on it — the page crimson does not. Two ids
+     are needed to outweigh the article-link rule, which then also takes the
+     hover state, so the hover pair is restated. */
+  #main-content #page-content .mailend a {
+    color: #990000;
+  }
+
+  #main-content #page-content .mailend a:hover {
+    color: #f7f7f7;
+  }
+
+  /* The author and artist directories head themselves with a class-painted
+     #660000 masthead, which is 1.3:1 on the page floor. */
+  #page-content .welcome-header {
+    color: var(--scp-title);
   }
 
   /* ============================================================
@@ -2166,13 +2461,19 @@
      HOME PAGE — the site's own custom front-page theme
      ============================================================ */
 
+  /* --box-accent is deliberately NOT restated: the front page's own #823f3f
+     already reads on dark, and the hubs sharing this component set (series
+     archive, tales, artwork) declare their own colour code on :root and pull it
+     through #page-content with `--box-accent: inherit`, so a value here would
+     paint every hub the front page's maroon. */
   #page-content {
     --dark: #e6edf3;
     --light: #1c2128;
-    --box-accent: #8a4444;
     --active: #a03636;
-    --link-color: #e8626e;
-    --link-bg: #e8626e1f;
+    /* The pair meets on the feature boxes' pill links: the ink sits on the tint
+       over the card, and the tint has to stay this faint for it to clear AA. */
+    --link-color: #ea6b76;
+    --link-bg: #ea6b7614;
     --attention: #2a2418;
   }
 

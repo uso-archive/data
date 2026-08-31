@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260827.15.16
+@version      20260830.17.30
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -112,6 +112,14 @@
   [class*="hover:border-black"]:hover {
     border-color: var(--wx-text-muted) !important;
   }
+  /* the news-hub byline block ("By <author>") is set off by a 1px brand-blue left rule
+     (`border-l border-[#679CED]`) -- a chromatic accent the blanket reset above erases.
+     #679ced reads on the dark card, so it keeps its own value. Both hex spellings
+     because the attribute match is case-sensitive. */
+  [class*="border-[#679CED]"],
+  [class*="border-[#679ced]"] {
+    border-color: #679ced !important;
+  }
 
   /* ---- header / sidebar chrome ----------------------------------------- */
   [data-testid="header-main"],
@@ -188,6 +196,17 @@
   [data-testid="sidebar-navigation"] a.bg-gray-100 p {
     color: var(--wx-link) !important;
   }
+  /* the LEGACY rail (monthly / maps / the /forecast/* Daybreak routes) carries the same
+     `data-testid="sidebar-navigation"`, but marks the current page with a
+     `SidebarNavigation--active` class and a #f2f2f2 pill -- no aria-current, no
+     bg-gray-100 -- so the blanket `a { background: transparent }` above blanked the one
+     thing that distinguished it and every rail item rendered identically. The pill is
+     the site's ONLY marker here (its ink is the same near-black as the inactive items),
+     so restore the fill alone; adding an accent would have to be repeated on the icon,
+     which the Icon--icon rules match directly. */
+  [data-testid="sidebar-navigation"] a[class*="SidebarNavigation--active"] {
+    background-color: var(--wx-surface) !important;
+  }
   /* the location-pill popover anchor (rounded-4xl bg-white wrapper) */
   [data-slot="popover-anchor"],
   .rounded-4xl.bg-white {
@@ -232,7 +251,10 @@
      module surfaces via their STABLE prefixes (only the trailing hash rotates);
      the colored condition icons + the temperature numbers keep their own hues. */
   [class*="Card--card"],
-  [class*="CalendarMonthPicker--"],
+  /* the `CalendarMonthPicker--` prefix also lands on the nav's "View" button (a
+     `Button--primary`): its fill + ink pair IS the enabled/disabled cue, so it is
+     exempt and keeps the site's own primary/disabled colours. */
+  [class*="CalendarMonthPicker--"]:not([class*="viewButton"]),
   [class*="DailyForecast--"],
   /* id-prefixed forms out-rank module CSS-in-JS rules injected after our sheet
      (which otherwise win same-specificity ties -- seen on the radar map card,
@@ -472,6 +494,16 @@
   svg[class*="Icon--icon"][class*="SearchInput--searchIcon"] {
     color: var(--wx-text-2) !important;
   }
+  /* the international header's co-branding partner mark (`Cobranding--icon`, e.g. the
+     de-DE "FOCUS online" wordmark) is an inline <svg> whose letters carry a LITERAL
+     `fill="#000"` -- so the `path:not([fill])` lift above skips them and they vanish on
+     the chrome. Only the black paths are re-inked; the partner's own brand colour on
+     the remaining paths (the teal globe) is left as shipped. */
+  svg[class*="Cobranding--icon"] path[fill="#000"],
+  svg[class*="Cobranding--icon"] path[fill="#000000"],
+  svg[class*="Cobranding--icon"] path[fill="black"] {
+    fill: var(--wx-text) !important;
+  }
   /* ...and two Helios icons are NOT ink: they inherit a CHROMATIC currentColor
      that the blanket lift above swallows, so their hue is the signal, not their
      legibility. The sunrise/sunset marks in the day-part card are #febc11 gold
@@ -489,6 +521,27 @@
   }
   svg[class*="Icon--icon"][class*="HealthActivitiesListItem--icon"],
   svg[class*="Icon--icon"][class*="HealthActivitiesListItem--icon"] path {
+    color: var(--wx-link) !important;
+    fill: var(--wx-link) !important;
+  }
+  /* the Monthly day-detail's moon-phase glyph (DetailsTable--moonIcon) is a third such
+     accent -- the one chromatic mark in a table of ink ones, so it is what says which row
+     is the moon -- but unlike the two above its <path> carries NO fill attribute, so the
+     blanket `svg[class*="Icon--icon"]:not(..):not(..) path:not([fill])` rule above matches
+     it at (0,4,2). The fill selector has to carry that same tail plus one more simple
+     selector or the glyph takes the accent colour while its path stays body-grey. */
+  svg[class*="Icon--icon"][class*="DetailsTable--moonIcon"],
+  svg[class*="Icon--icon"][class*="DetailsTable--moonIcon"]:not([class*="logoIcon"]):not([class*="WxIcon"]) path:not([fill]) {
+    color: var(--wx-link) !important;
+    fill: var(--wx-link) !important;
+  }
+  /* the legacy list pagination ("Zurück" / "Weiter" on the international news hubs)
+     draws its chevrons brand-blue, the same ink as the "Weiter" label beside them; the
+     disabled "Zurück" keeps that blue under the button's own opacity fade. Keyed to the
+     Pagination class, NOT to `Icon--actionTheme`: that Helios theme class also sits on
+     Monthly's precip / wind / day-detail marks, which resolve to plain ink natively. */
+  svg[class*="Icon--icon"][class*="Pagination--arrows"],
+  svg[class*="Icon--icon"][class*="Pagination--arrows"]:not([class*="logoIcon"]):not([class*="WxIcon"]) path:not([fill]) {
     color: var(--wx-link) !important;
     fill: var(--wx-link) !important;
   }
@@ -561,6 +614,33 @@
   [class*="Button--plainText"] {
     color: var(--wx-link) !important;
   }
+  /* a disabled legacy button (`Button--disabled`, e.g. the news-list pagination's
+     "Zurück"/"Back" on the first page) keeps the Helios ink at opacity .4 -- the fade is
+     what marks it disabled, so only the ink is lifted; the opacity stays the site's.
+     The `Button--primary` + `Button--disabled` pair (the /login submit, the /monthly
+     "View" picker) is opacity 1 and marks disabled by its own #545351 fill + #cdcdcd
+     ink (5.3:1) against the white-on-#252422 enabled state -- that pair stays native. */
+  [class*="Button--disabled"]:not([class*="Button--primary"]) {
+    color: var(--wx-text) !important;
+  }
+  /* the legacy solid CTA (`Button--primary`: Monthly's "View", the international Today
+     card's "Nächste 48 h" / "Siehe details", the /login and /data-rights submits) is the
+     Helios ink #252422 under a white label -- within 1.05:1 of the card it sits on, so the
+     plate vanishes and only its DISABLED sibling (#545351 fill, kept native above) still
+     reads as a button: the pair inverts. Invert the enabled state the way the chart tabs
+     and the units radiogroup are inverted: a light plate with chrome ink. Two attributes
+     so it out-ranks the anchor rule on the `<a>` form and the ExpandableMenu lift; the
+     Helios icon rules match an inner glyph directly, so it is re-pointed with the label. */
+  [class*="Button--primary"]:not([class*="Button--disabled"]) {
+    background-color: var(--wx-text) !important;
+    color: var(--wx-chrome) !important;
+    -webkit-text-fill-color: var(--wx-chrome) !important;
+  }
+  [class*="Button--primary"]:not([class*="Button--disabled"]) svg[class*="Icon--icon"],
+  [class*="Button--primary"]:not([class*="Button--disabled"]) svg[class*="Icon--icon"]:not([class*="logoIcon"]):not([class*="WxIcon"]) path:not([fill]) {
+    color: var(--wx-chrome) !important;
+    fill: var(--wx-chrome) !important;
+  }
 
   /* /mission's "Better Decisions" panels drop to a pure-black heading + legal
      disclaimer in their lower sections (the upper ones are brand blue). */
@@ -607,11 +687,19 @@
   }
   /* the chart tab strip's fades are authored as literal
      `linear-gradient(to right/left, #fff 36px, transparent)` (not from-white),
-     so also override the whole image to the page base. */
-  [class*="pointer-events-none"][class*="absolute"][class*="inset-y-0"][class*="left-0"] {
+     so also override the whole image to the page base. An edge fade is anchored
+     to ONE side only (`inset-y-0 left-0 w-32` / `inset-y-0 right-0 w-32`); an
+     overlay anchored on BOTH sides is a full-width layer, not a fade -- the radar
+     map's control layer (legend strip, layer pills, floating buttons) is
+     `inset-y-0 left-0 right-0` at rest and `inset-y-0 right-0 left-[370px]`
+     while the Map Menu is open, ships no background, and must never get this
+     image or the basemap is veiled in a dark gradient. The exclusion is the
+     OTHER side's prefix (`left-`/`right-`), not `left-0`, so the open-menu
+     `left-[370px]` variant stays excluded too. */
+  [class*="pointer-events-none"][class*="absolute"][class*="inset-y-0"][class*="left-0"]:not([class*="right-"]) {
     background-image: linear-gradient(to right, var(--wx-base) 36px, rgba(20, 24, 29, 0) 100%) !important;
   }
-  [class*="pointer-events-none"][class*="absolute"][class*="inset-y-0"][class*="right-0"] {
+  [class*="pointer-events-none"][class*="absolute"][class*="inset-y-0"][class*="right-0"]:not([class*="left-"]) {
     background-image: linear-gradient(to left, var(--wx-base) 36px, rgba(20, 24, 29, 0) 100%) !important;
   }
   /* the LEGACY equivalent is the Helios Carousel arrow button, whose own
@@ -646,6 +734,13 @@
   .bg-secondary,
   .bg-accent {
     background-color: var(--wx-surface-2) !important;
+  }
+  /* the article's "Get More of Our News on Google" callout floats its `bg-gray-50` card on
+     a warm-grey drop shadow written as an arbitrary utility. A light shadow composited
+     over the dark article body is a halo, not a shadow, so it takes a black one of the
+     same geometry. */
+  [class*="shadow-[0_3px_20px_0_rgba(181,171,162,0.5)]"] {
+    box-shadow: 0 3px 20px 0 rgba(0, 0, 0, 0.55) !important;
   }
   /* -200/-300 are one step STRONGER than -100 on the site's white page, so one step
      LIGHTER than the -100 surface here. They are rail/track fills, not card surfaces
@@ -1377,6 +1472,16 @@
   [style*="background-color: rgb(245, 245, 245)"] {
     background-color: var(--wx-border) !important;
   }
+  /* the Hourly table's Cloud Cover tab draws each row's bar as an 8px pill with an
+     INLINE `background-color: rgb(202, 217, 226)` and centres its `text-gray-900`
+     percentage ON the pill (16px text on an 8px bar). The label is lifted to --wx-text by
+     the text rules, so the pill has to be dark enough to carry white text while staying
+     a visible cloud-grey against the card; the bar's WIDTH is the data and is untouched.
+     The dotted rail beside it uses the same colour as a background-IMAGE, which this
+     `background-color:` substring does not match -- its dots stay as shipped. */
+  [style*="background-color: rgb(202, 217, 226)"] {
+    background-color: #4f6a80 !important;
+  }
   /* the Cold & Flu extended-forecast scrubber paints one segment per day from the
      flu-risk ramp as an INLINE background-color, same shape as the track above. The
      ramp's bottom step is achromatic #f2f2f2 -- invisible on the site's white card,
@@ -1699,6 +1804,13 @@
   .trc_exclude_undo_btn {
     color: var(--wx-link) !important;
   }
+  /* hovering a feed card is the widget's only affordance: Taboola's per-placement rule
+     (`.thumbs-feed-01-* .videoCube:hover .video-label-box .video-title`, 0,4,0, no
+     !important) turns the title brand blue, and the `.video-title` !important lift above
+     pins it. One class deeper than the brand-kit rule that repaints the titles at rest. */
+  .trc_rbox .videoCube:hover .video-label-box .video-title.video-label {
+    color: var(--wx-link-hover) !important;
+  }
   /* Taboola's popover points at its trigger with a CSS-triangle: a 0/11/11/11
      border box whose left/right/top edges are transparent. The blanket
      `* { border-color }` painted all four, so the caret renders as a solid
@@ -1779,6 +1891,68 @@
   }
   [class*="tbl-ui-line"] {
     background-color: var(--wx-border-2) !important;
+  }
+
+  /* ---- Outbrain recommendation strips (international news lists) --------- */
+  /* `#outbrain_widget_N` slots ship a white fill of their own and stay in flow at
+     645x32 even when the widget mounts EMPTY (the inner `.ob-widget` never fills in
+     regions where no campaign is served) -- two bare white pills under the article
+     list. Sink the slot into whatever card it sits in; a populated strip's copy takes
+     the body ink. */
+  [id^="outbrain_widget"] {
+    background-color: transparent !important;
+  }
+  .ob-widget,
+  .ob-widget a {
+    color: var(--wx-text-2) !important;
+  }
+
+  /* ---- interactive radar map: the rebuilt Tailwind map UI ---------------- */
+  /* The /radar route now ships the SPA map app (floating layer pills over the basemap,
+     a Map Menu sheet, a bottom timeline card) instead of the Helios ControlPanel handled
+     further below. It writes its own palette as Tailwind ARBITRARY hexes, which no named
+     `bg-*` utility rule reaches, and the ACTIVE state is exactly one of them:
+     `bg-[#252422] text-white border-[#c5c4c9]` on the current layer pill (and on the Map
+     Menu toggle while open) against `bg-white` siblings. #252422 is within 1.05:1 of our
+     card, so the pill the site inverts to near-black read identically to the unselected
+     ones our .bg-white rule darkens -- the strip showed no current layer at all. Invert
+     it the other way, as the chart tab strip and the units radiogroup are: a light plate
+     with chrome ink. The pill's glyph carries `text-white`, which is a matched rule, so
+     it has to be re-pointed with the label.
+     Two other elements ship the same hex and must NOT flip: the overlay/theme check badge
+     and the thumbnail carousel arrows both sit ON a light map thumbnail, where the site's
+     near-black is correct. `border-[#c5c4c9]` is carried only by the active pills, so it
+     is what separates them. */
+  [class*="bg-[#252422]"][class*="border-[#c5c4c9]"] {
+    background-color: var(--wx-text) !important;
+    color: var(--wx-chrome) !important;
+    -webkit-text-fill-color: var(--wx-chrome) !important;
+  }
+  [class*="bg-[#252422]"][class*="border-[#c5c4c9]"] svg {
+    color: var(--wx-chrome) !important;
+  }
+  /* the Map Menu's own Map Type list marks its selected row with the same hex; every row
+     in that list carries `border-[#f2f2f2]`, so the pair picks out the selected one. It
+     sits INSIDE the darkened sheet rather than over the map, so it takes an elevated row
+     fill rather than the full inversion. */
+  [class*="bg-[#252422]"][class*="border-[#f2f2f2]"] {
+    background-color: var(--wx-border-2) !important;
+  }
+  /* the timeline scrubber is three unnamed arbitrary values: a `bg-[#e8e8e8]` groove, a
+     `bg-[#b1b1b0]` elapsed fill inside it, and a dashed `border-gray-900` NOW marker the
+     blanket border reset flattens to the subtle line colour. On the site's white card the
+     groove is invisible and the marker is near-black; on the dark card that inverts --
+     the groove became the brightest thing in the panel and the marker vanished. Keep the
+     past/future ordering (past stays the more prominent of the two) with the groove on
+     the component border and the elapsed fill on the muted ink. */
+  [class*="bg-[#e8e8e8]"] {
+    background-color: var(--wx-border-2) !important;
+  }
+  [class*="bg-[#b1b1b0]"] {
+    background-color: var(--wx-text-muted) !important;
+  }
+  [class*="border-dashed"][class*="border-gray-900"] {
+    border-color: var(--wx-text-muted) !important;
   }
 
   /* ---- interactive radar map: floating control / insight panels --------- */
@@ -2077,8 +2251,12 @@
   #dd-widget .dd-widget-article-summary-button {
     color: var(--wx-text) !important;
   }
+  /* the shader sits under the absolutely-positioned "Full Summary" button and must be
+     OPAQUE for the button's full width, or the clamped paragraph shows through the label;
+     the widget publishes that width as `--dd-article-summary-button-width` (150px when
+     unset) and ends its own gradient there, so this one ends at the same stop. */
   #dd-widget .dd-widget-article-summary-button-shader {
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), var(--wx-surface)) !important;
+    background-image: linear-gradient(to right, rgba(28, 33, 40, 0), var(--wx-surface) calc(100% - var(--dd-article-summary-button-width, 150px))) !important;
   }
   #dd-widget .dd-widget-input-wrapper {
     background-color: var(--wx-surface-2) !important;
@@ -2364,6 +2542,29 @@
     background-color: var(--wx-link) !important;
     color: var(--wx-chrome) !important;
   }
+  /* the Cookie Notice modal (the help centre's own, shown on a first visit and the only
+     thing on screen when it is) footers two bare `slds-button_neutral` secondary buttons:
+     white fill, navy label, navy-on-hover. On the site's white modal that is an outline
+     pair beside the filled "Ok"; on the darkened modal they are two lit slabs and the
+     brand CTA beside them stops being the loudest thing. Give them the same outline
+     treatment `.contact-btn` gets. Scoped to the modal so the two buttons that already
+     carry the class with a fill of their own (.ai-btn, .contact-btn) keep it. */
+  .slds-modal .slds-button_neutral {
+    background-color: transparent !important;
+    color: var(--wx-link) !important;
+    border-color: var(--wx-border-2) !important;
+  }
+  .slds-modal .slds-button_neutral:hover {
+    background-color: var(--wx-link) !important;
+    color: var(--wx-chrome) !important;
+  }
+  /* the help-centre hero's Search button is white ON a white search form -- i.e. no plate
+     at all natively, just a navy label and magnifier inside the pill. Darkening the form
+     leaves the button as a bright pill the site never draws. */
+  .search-form button {
+    background-color: transparent !important;
+    color: var(--wx-link) !important;
+  }
   /* every in-app navigation in the Experience Cloud app (a nav pill, a topic row,
      an article link) mounts a `siteforceLoadingBalls` spinner whose plate is
      rgba(255, 255, 255, .8) -- a bright rectangle over the dark page for as long
@@ -2437,6 +2638,14 @@
      the precip green stays green and the heavier blues stay blue. The chart carries a
      stable `aria-label`, so nothing else on the page is filtered. */
   [aria-label="Precipitation Intensity Chart"] canvas {
+    filter: invert(1) hue-rotate(180deg);
+  }
+  /* the Cold & Flu "CDC Flu Report" bar chart is a <canvas> too (FluCDCReportModule):
+     gridlines #ececec, axis labels #676767, the "Wk of" caption in the near-black ink,
+     the case bars #3a61cc -- all pixels. The same chain maps the gridlines to #121212
+     (as faint on the card as #ececec is on white), the labels to a legible grey, the
+     caption to light, and the bars to a lighter blue (#789fff) that keeps their hue. */
+  [data-testid="FluCDCReportModule"] canvas {
     filter: invert(1) hue-rotate(180deg);
   }
 

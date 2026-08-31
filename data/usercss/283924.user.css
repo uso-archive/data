@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for FanFiction.Net and FictionPress, with an easy-on-the-eyes story reader, dark browse filters, profiles and forums.
-@version      20260827.15.10
+@version      20260830.17.24
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -183,11 +183,15 @@
     background-color: var(--ff-header) !important;
     border-bottom: 1px solid var(--ff-border-2) !important;
   }
-  /* the mobile nav labels are header chrome (natively black, not link blue) */
-  .t_head a {
+  /* the mobile nav labels are header chrome (natively black, not link blue).
+     The m.fictionpress.com wordmark is `<a style="color:black"><b>` — the `b`
+     must be named or the `a b` link rule below outranks the chrome ink on it. */
+  .t_head a,
+  .t_head a b {
     color: var(--ff-text) !important;
   }
-  .t_head a:hover {
+  .t_head a:hover,
+  .t_head a:hover b {
     color: var(--ff-link-hover) !important;
   }
   div#top a,
@@ -393,10 +397,14 @@
      ships none, and this rule only sets `color`, so a stray match costs nothing. Keep a
      literal `;` OUT of these selectors: `parse-check.js` finds a rule's prelude by
      scanning back to the previous `;`, and reports a valid rule as dead.
-     Anchors stay out on purpose: the disclaimer greys its links too, and those keep the
-     link accent. */
+     An anchor is matched only when it carries the grey itself (the m. hosts' per-post
+     `Report` links, thirty per topic page); an anchor merely inside a greyed block (the
+     sign-up disclaimer's Terms links) keeps the link accent. This block sits after the
+     `a:hover` arm, so a grey anchor stays grey under the cursor as it does natively —
+     the hover cue is its underline. */
   div[style*="color:gray"],
   span[style*="color:gray"],
+  a[style*="color:gray"],
   span[style*="color:#8c8c8c"],
   div[style*="color:#c4c4c4"] {
     color: var(--ff-muted) !important;
@@ -538,18 +546,36 @@
     background-color: var(--ff-brand) !important;
     color: var(--ff-text) !important;
   }
+  /* `.btn-primary` is the only primary CTA the site ships logged-out: the Filters
+     modal's Apply and the reader's Fontastic / Follow-Fav Save. Bootstrap keeps it
+     blue through hover, focus and press; the generic `.btn:hover` arm above ties
+     this on specificity, so the arm must stay AFTER it or the CTA collapses onto
+     the neutral chip and reads as less prominent hovered than at rest. */
+  .btn-primary:hover,
+  .btn-primary:focus,
+  .btn-primary:active {
+    background-color: #2d4a80 !important;
+  }
   /* The category-picker popup (`/search/?popup=1`, opened by the "Select" link
      in the search Options panel) ships its submit as a real
      `<input type="button" disabled>` until a main category is picked. The UA
      paints a disabled control at 30% ink; the rules above are `!important` and
      repaint it at full strength, so a dead control reads as clickable. Must
      stay AFTER the hover/active arms — it ties them on specificity and only
-     wins on order. */
+     wins on order. The `:hover` forms are not redundant: `.btn:hover` is
+     (0,2,0) and outranks `button[disabled]` (0,1,1), so without them a disabled
+     `.btn` (the recover-page submit until its reCAPTCHA is solved) lights up
+     under the cursor like a live control. */
   button[disabled],
+  button[disabled]:hover,
   input[disabled],
+  input[disabled]:hover,
   select[disabled],
   textarea[disabled],
-  .btn.disabled {
+  .btn[disabled],
+  .btn[disabled]:hover,
+  .btn.disabled,
+  .btn.disabled:hover {
     background-color: var(--ff-bg) !important;
     color: var(--ff-muted) !important;
     border-color: var(--ff-border) !important;
@@ -570,6 +596,19 @@
   ::placeholder {
     color: var(--ff-muted) !important;
     opacity: 1 !important;
+  }
+  /* Bootstrap marks a focused field that fails its constraint (the `required`
+     email on login.php / recover.php, autofocused empty on load) with a red
+     border, red ink and a pink glow. The field rule above is `!important` and
+     holds border and ink neutral while the site's box-shadow still lands, so
+     the state arrives as a pink haze around a neutral field. All three must be
+     restated together. */
+  input:focus:invalid,
+  textarea:focus:invalid,
+  select:focus:invalid {
+    border-color: #f85149 !important;
+    color: #f85149 !important;
+    box-shadow: 0 0 6px rgba(248, 81, 73, .45) !important;
   }
   /* `/recover.php` is the one guest page that renders a VISIBLE reCAPTCHA: a
      304x78 cross-origin frame painting Google's `#f9f9f9` panel, unreachable by
@@ -666,10 +705,10 @@
     border: 1px solid var(--ff-border-2) !important;
     text-shadow: none !important;
   }
-  .badge-blue {
-    background-color: var(--ff-brand) !important;
-    color: var(--ff-text) !important;
-  }
+  /* `.badge-blue` (the forum post-count and writer-search story-count pills) has
+     no rule in the site CSS: it renders as the plain #999 `.badge`. It must not
+     be given its own fill — on --ff-brand it would share the selected topic-filter
+     chip's colour, thirty times per forum board. */
   /* The site distinguishes the selected/hovered forum topic-filter chip with a
      plain .badge-active / .badge:hover (no !important), which our generic
      .badge rule above outranks — both states collapse into the default chip.

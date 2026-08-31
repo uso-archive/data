@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Depop, easy on the eyes across home, search, categories and product pages, with prices, sale tags and the Depop red kept readable.
-@version      20260827.15.10
+@version      20260830.17.23
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -457,6 +457,69 @@
     background-color: transparent !important;
   }
 
+  /* The home / start-to-sell hero is A/B'd through a `data-variant` attribute on
+     the section: `red` fills the whole band with the brand #e20020, `grey` with
+     #262626, and the unattributed legacy hero with the pale gradient the reset
+     above is written for. Only `red` carries a colour signal, and the reset
+     erased it. Tone the band: #e20020 across 570px glares on a dark page, and
+     #a81021 still clears 7.5:1 for the white copy the site pins on it. */
+  [class*="homepageHero"][data-variant="red"] {
+    background-color: #a81021 !important;
+  }
+
+  [class*="homepageHero"][data-variant="red"] h1,
+  [class*="homepageHero"][data-variant="red"] h2,
+  [class*="homepageHero"][data-variant="red"] p {
+    color: #ffffff !important;
+  }
+
+  /* On that band the three trust signals sit on --primitive-poppy-700 plates with
+     white glyphs, not the translucent-white plate + #43484d glyph the generic
+     rules further down restore — those read as dark cards dropped on a red slab. */
+  [class*="homepageHero"][data-variant="red"] [class*="trustSignalContainer"] > div,
+  [class*="homepageHero"][data-variant="red"] [class*="trustSignalContainer"] > a {
+    background-color: #8d0e1c !important;
+  }
+
+  [class*="homepageHero"][data-variant="red"] [class*="trustSignal"] svg path {
+    fill: #ffffff !important;
+  }
+
+  /* ...and its CTA is the new button component's inverted form: a white pill with
+     --text-accent-base ink. Nothing of ours paints a <button> surface here, so the
+     white pill survived under the `button` colour rule at ~1.05:1. Mirror the
+     native inversion. The hover must be pinned too: the site takes it from
+     --surface-primary-weak, which we remap to a dark elevated surface. */
+  [class*="homepageHero"][data-variant="red"] [class*="heroCta"] button {
+    background-color: #e6edf3 !important;
+    color: #a81021 !important;
+  }
+
+  [class*="homepageHero"][data-variant="red"] [class*="heroCta"] button:hover {
+    background-color: #ffffff !important;
+  }
+
+  /* Both attributed variants paint the Buy/Sell switch track --primitive-poppy-700
+     under a WHITE thumb whose selected label takes --text-accent-base. `nav` and
+     the thumb rule above flatten all three, leaving the control with no accent at
+     all. The legacy hero has no data-variant and keeps the dark treatment. */
+  [class*="homepageHero"][data-variant] nav {
+    background-color: #8d0e1c !important;
+  }
+
+  [class*="homepageHero"][data-variant] nav span[class*="thumb"] {
+    background-color: #e6edf3 !important;
+    border-color: #e6edf3 !important;
+  }
+
+  [class*="homepageHero"][data-variant] nav a p {
+    color: #ffffff !important;
+  }
+
+  [class*="homepageHero"][data-variant] nav a[aria-current="page"] p {
+    color: #a81021 !important;
+  }
+
   /* The Top Seller Program's hero is the one <section> on the site whose fill is a
      SATURATED brand band rather than the pale promo gradient — red → orange under
      white copy — so the reset above erases the loudest surface of that page and
@@ -501,6 +564,15 @@
   main > div[class*="__page"] > section[class*="__hero"] [class*="buttonWrapper"],
   main > div[class*="__page"] > section[class*="__hero"] [class*="buttonWrapper"] * {
     color: #262626 !important;
+  }
+
+  /* That page also closes on a #e81f00 marquee band of white "Depop Top Seller"
+     stamps; `main div` flattens it and the stamps then float on the page base.
+     Tone it into the same family as the hero above. The class PAIR is what
+     isolates the band: `__banner` alone also matches the slideshow's bannerButton
+     pills and bannerImage photos. */
+  main div[class*="__banner"][class*="__container"] {
+    background-color: #ac1700 !important;
   }
 
   /* The marketing pages (/safety/, /shipping/) lay their feature lists out as
@@ -634,6 +706,13 @@
   [class*="FilterDropdownOption"]:hover,
   [class*="searchFilterCheckbox"]:hover {
     background-color: #262c33 !important;
+  }
+
+  /* The Brand filter's section headings ("Suggested" / "A-Z") are <div>s inked
+     with the site's subtle-text constant #747474 — 4.5:1 on its white panel,
+     3.4:1 on the elevated dark one — and no tag rule reaches a <div>. */
+  [class*="brandFilterDropdownHeading"] {
+    color: #8b949e !important;
   }
 
   /* The category filter's collapsible group headers (Men / Women / Kids /
@@ -1286,6 +1365,14 @@
     color: #8b949e !important;
   }
 
+  /* Must stay BELOW the solid and outline :hover rules: `:disabled:hover` ties
+     with both at (0,3,0), so only order keeps a hovered disabled pill from
+     taking the CTA fill under its muted ink. */
+  [class*="buttonWrapper"]:disabled:hover {
+    background-color: #30363d !important;
+    border-color: #30363d !important;
+  }
+
   /* Outline variants tint only their label; the outline-text rule above
      flattens all of them to the same grey. */
   [class*="buttonWrapper"][class*="outline--green"] * {
@@ -1298,6 +1385,36 @@
 
   [class*="buttonWrapper"][class*="outline--yellow"] * {
     color: #ffda0a !important;
+  }
+
+  /* Depop is migrating to a SECOND button component whose class fragments are
+     `_button_<hash>_` plus `_primary_/_secondary_/_tertiary_` — no buttonWrapper,
+     so none of the rules above reach it. It puts its label in a child <span> that
+     the blanket span rule paints #c4cdd6: on the _primary_ fill (the brand red
+     where a page rebinds --surface-primary-base) that is 3.3:1 where the site had
+     white. Let the label track whatever ink its own button carries, and give the
+     primary variant the on-base white the site pins there. `_button_` with both
+     underscores does not match `_buttonWrapper_`; the `button` tag keeps the
+     label rule off the `_button_<hash>_` TYPOGRAPHY class, which the old
+     component puts on its own label spans. */
+  button[class*="_button_"] [class*="_label_"] {
+    color: inherit !important;
+  }
+
+  button[class*="_button_"][class*="_primary_"] {
+    color: #ffffff !important;
+  }
+
+  /* Its base rule reserves the outline variant's ring as `2px solid transparent`,
+     which the blanket `*` border-color reset at the top of the file turns opaque:
+     every filled pill of this component ships with a dark 2px ring the site does
+     not draw. Only the secondary variant paints one. */
+  button[class*="_button_"] {
+    border-color: transparent !important;
+  }
+
+  button[class*="_button_"][class*="_secondary_"] {
+    border-color: #4a525b !important;
   }
 
   /* Depop's design system paints its text ACTIONS in an indigo (#3d37bd):
@@ -1454,5 +1571,37 @@
   svg[fill="#000"],
   svg[fill="black"] {
     fill: #e6edf3 !important;
+  }
+
+  /* `domain("depop.com")` also covers news.depop.com, the newsroom (a separate
+     styled-components frontend). Its "newsroom" wordmark is an inline <svg> whose
+     letter paths carry NO fill of their own, so they take the SVG default black
+     and the mark disappears into our dark header — the rules above only match a
+     literal black fill ATTRIBUTE. The badge beside it pins its colours through an
+     inline style that our !important would otherwise steal, so restore the white
+     "d" glyph explicitly; the red disc is a <circle> nothing here matches. */
+  [class*="StyledLogoLink"] svg path {
+    fill: #e6edf3 !important;
+  }
+
+  [class*="StyledLogoLink"] svg circle + path {
+    fill: #ffffff !important;
+  }
+
+  /* The newsroom's photo bands paint their #eeeeee plate with a full-size
+     ::before AND ::after on the section, not on any box — the element scan reads
+     the section as transparent while a 1280x424 near-white slab renders behind
+     the photos. */
+  [class*="StyledImagePreview"]::before,
+  [class*="StyledImagePreview"]::after {
+    background-color: #1c2128 !important;
+  }
+
+  /* The newsroom hero carousel's position dots are <div>s inside <main>: the
+     current one is a 14px white disc, the others 10px #e4e4e4, so the state is
+     carried by SIZE and only a styled-components hash suffix separates the two —
+     one fill serves both. */
+  [class*="StyledDotIndication"] {
+    background-color: #c4cdd6 !important;
   }
 }

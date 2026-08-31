@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260827.15.11
+@version      20260830.17.24
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -560,6 +560,10 @@
   [class*="CommunityRanking-desktop__Row"]:hover {
     background-color: #1c2128 !important; }
   [class*="ChartSong-desktop__Title"], [class*="EditorialPlacement__Title"] { color: #e6edf3 !important; }
+  /* The rank column of the chart and community leaderboard rows is a plain <div> inside
+     the row's <a>, painted the black primary ink on the live site — the shared link rule
+     would make it an accent. */
+  [class*="ChartItem-desktop__Rank"], [class*="CommunityRanking-desktop__Rank"] { color: #e6edf3 !important; }
   /* Homepage news cards repeat the article-link underline-skip trick on hover: a black
      1px background-image "underline" plus a WHITE text-shadow halo (out to .15em) that
      punches gaps around the glyphs so the rule skips descenders. On the dark card the
@@ -792,12 +796,43 @@
   /* annotation "Read More" affordance ships the periwinkle link hue; the shared span
      rule greys it, so it stops reading as clickable */
   .truncated_annotation_text-read_more { color: #9aa7f0 !important; }
-  /* contributor leaderboard: the rank, the username and the IQ score are the periwinkle
-     accent, greyed by the shared span rule — the column reads as plain metadata without it */
+  /* contributor leaderboard: the rank and the IQ score are the periwinkle accent, greyed by
+     the shared span rule — the column reads as plain metadata without it. The username
+     between them is NOT: bagon paints it the plain #222 body ink (".user_badge-login" is
+     color:inherit), so it is handled with the rest of the user badge below. */
   .leaderboard-rank, .leaderboard-rank *,
   .leaderboard-sort_value, .leaderboard-sort_value *,
-  .leaderboard-user, .leaderboard-user *,
   .header_with_cover_art-pyongs_count { color: #9aa7f0 !important; }
+  /* Legacy user badge (leaderboard rows, annotation / comment attributions, proposed-edit
+     authors, the article byline): the whole badge is an <a>, so the shared link rules
+     repaint its username / "by <author>" line periwinkle, the "@handle" line and the
+     "ARTIST" / "CONTRIBUTOR" subhead too — the username then no longer stands apart from
+     the rank and IQ accents beside it. bagon draws the username and the emphasis line as
+     the primary text (#222 via inherit), the handle as body text and the subhead muted
+     (#9a9a9a). The role glyphs beside them carry their own fills and are not named here. */
+  .user_badge-text > div { color: #c4cdd6 !important; }
+  .user_badge-login, .user_badge-text-emphasis { color: #e6edf3 !important; }
+  .user_badge-text > .user_badge-subhead, .user_badge-subhead span { color: #9a9a9a !important; }
+  /* Legacy mini card (popular songs, search results, the nav autocomplete, the "show all
+     songs" slide-over): the card is one <a>, so the shared "a span" rule reaches the pageview
+     count and the muted featured-artist subtitle — bagon paints those the #222 body ink and
+     #9a9a9a, not the link hue, so a periwinkle count beside a grey eye glyph is invented. */
+  .mini_card-metadata, .mini_card-metadata span,
+  .mini_card-subtitle > span { color: #c4cdd6 !important; }
+  .mini_card-subtitle .mini_card-muted_subtitle { color: #9a9a9a !important; }
+  /* Legacy breadcrumb trail (artist / album / article foot): bagon draws it as one muted
+     #9a9a9a line, its links included (".breadcrumb a" is color:inherit) — the shared link
+     rule turns the whole trail into accent links. */
+  .breadcrumbs, .breadcrumb a, .breadcrumb a span { color: #9a9a9a !important; }
+  /* Legacy tracklist / chart rows (desktop "chart_row", AMP "tracklist_row") and the credits
+     table: the "Lyrics" suffix after each track title and the "N more" toggle in a credit
+     line are muted #9a9a9a in bagon; both sit inside a link, so the shared link rules turn
+     them into accents. */
+  .chart_row-content-title-subtitle, .tracklist_row-header-content-title-subtitle,
+  .metadata_unit-show_more { color: #9a9a9a !important; }
+  /* Search-result lyric excerpt: the query match is a bare bold <span> in the #222 body ink
+     on a muted excerpt — the ink contrast IS the highlight, and the card link repaints it. */
+  .mini_card-lyric_excerpt span { color: #e6edf3 !important; }
   /* the filled count pills carry a 2px border in their OWN fill colour (so each reads as a
      solid pill); the blanket border reset draws a dark ring around them. genius ships four
      variants and they must all be restated or the ring comes back on the ones left out:
@@ -936,6 +971,28 @@
   /* periwinkle count chips: keep accent bg, dark label for contrast */
   .profile_contributions_group-count, .profile_contributions_group-count * { color: #14181d !important; }
 
+  /* Suggestion speech bubbles in the contributions feed (profile + artist pages): a solid
+     #99a7ee periwinkle slab whose copy the site paints white. The shared p/span typography
+     lifts the paragraphs to #c4cdd6, so the whole quote sits under 1.6:1 on the accent.
+     Darken the slab to a periwinkle-tinted surface and take its CSS-triangle tail with it —
+     the tail is a "::before" whose bottom border carries the plate colour, and "*" does not
+     reach pseudo-elements, so it survives the blanket border reset. */
+  .note_bubble { background-color: #2a3050 !important; color: #e6edf3 !important; }
+  .note_bubble::before { border-bottom-color: #2a3050 !important; }
+  /* Proposed-edit diff (rich-text-diff under "Show N Proposed Edits", artist / album /
+     profile pages): genius marks every <del> / <ins> AND its children ("del>*", "ins>*")
+     with a light pink / green plate (background !important) and black ink, so a deleted
+     paragraph is a light slab on the dark card. Keep the sentiment, darken the plate;
+     the children must be named or the site's own child rule keeps them light. The
+     "img.ins" / "img.del" 3px borders carry the same cue and the blanket border reset
+     collapses them. */
+  body del, body del > * {
+    background-color: #4a1e1e !important; color: #ffb3b3 !important; }
+  body ins, body ins > * {
+    background-color: #1b3a1e !important; color: #b3ffb3 !important; }
+  .rich_text_formatting img.del { border-color: #f85149 !important; }
+  .rich_text_formatting img.ins { border-color: #3fb950 !important; }
+
   /* legacy contribution vote score ("+1793" between the thumb buttons): the site paints
      it green when net-positive and red when negative — a real sentiment cue. It carries
      "square_button", so the neutral .square_button color rule above flattens both to grey
@@ -1020,6 +1077,21 @@
      site draws them #e9e9e9; the blanket border reset is `*`, which does not match
      pseudo-elements, so they survive as a bright chevron outline on the dark card. */
   .standalone_annotation { background-color: #1c2128 !important; }
+  /* Legacy modal window (the "N Annotated Covers" cover-art annotation on album pages, the
+     lyrics-card and share dialogs): the panel is a light #e9e9e9 card under the dark
+     overlay, so the lifted copy lands on it. "--white_background" ships #fff and the media
+     strip repeats the panel tone; "--no_background" is a transparent pass-through and
+     "--dark_background" is already #111, both must stay as they are. */
+  .modal_window-content, .modal_window-content-media,
+  .modal_window-content--white_background { background-color: #1c2128 !important; }
+  .modal_window-content--no_background { background-color: transparent !important; }
+  .modal_window-content--dark_background { background-color: #14181d !important; }
+  /* "This cover art annotation is unreviewed" pending-content stripe: pink ink on a faint
+     pink candy stripe, with a pink dotted underline on the toggle word. The shared span
+     rule and the blanket border reset grey both. Lifted from #ff1464 to clear 4.5:1. */
+  .dashed_background_message, .dashed_background_message *,
+  .dashed_background_message-underlined_word { color: #ff3d7f !important; }
+  .dashed_background_message-underlined_word { border-bottom-color: #ff3d7f !important; }
   .standalone_annotation-referent_fragment--with_caret::before,
   .standalone_annotation-referent_fragment::before {
     background-color: #1c2128 !important; border-color: #2d333b !important; }
@@ -1254,6 +1326,15 @@
   input, textarea, select {
     background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   input::placeholder, textarea::placeholder { color: #8b949e !important; }
+  /* react-select comboboxes (the "Get Verified" artist picker) build their field out of a
+     transparent div and hide a content-sized <input> inside it, so the surface above draws a
+     lighter chip that hugs the typed text instead of filling the field. Emotion names the
+     control "css-<hash>-control"; genius's own components are styled-components, so the
+     "css-" prefix reaches react-select alone. The field's own dark chrome is native. */
+  [class^="css-"][class*="-control"] input { background-color: transparent !important; }
+  /* The "Get Verified" hero title is the brand yellow on the page's own black ground; the
+     shared h1 rule flattens it to plain white. */
+  [class*="SearchArtists__Title"] { color: #ffff64 !important; }
 
   /* ====================================================================
      Footer (both React + legacy)

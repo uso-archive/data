@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Vinted with the homepage, catalog and search, item pages and seller profiles in a comfortable dark look that's easy on the eyes for late-night browsing.  Works on every country version of Vinted (vinted.fr, .de, .com, .co.uk, .es, .it, .nl, .be, .pl and more).   Prices, ratings and Vinted's teal stay clear and recognizable.
-@version      20260827.15.16
+@version      20260830.17.30
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -146,12 +146,18 @@
   .u-background-white,
   [class*="u-background-white"] { background-color: #1c2128 !important; }
 
-  /* Page shell <main class="site u-background-white">: Vinted raised the
+  /* Page shell <main class="…__site u-background-white">: Vinted raised the
      specificity of its white-bg rule on a CDN sheet, so the single-class
      overrides above lose and main stays white on catalog/profile. Raise
      specificity to force the base surface (scoped to the main shell only,
-     so other u-background-white cards keep their elevated #1c2128). */
+     so other u-background-white cards keep their elevated #1c2128).
+     The shell class is a CSS module (`ContentLayoutStructure-module-scss-
+     module__<hash>__site`), so the exact `.site` never matches it; the
+     substring form is the one that lands. Without it the shell takes the
+     generic u-background-white elevation and every card, chip, buybox and
+     the profile header column merges into the page. */
   html body main.site.u-background-white,
+  html body main[class*="__site"].u-background-white,
   html body .standard-layout { background-color: #14181d !important; }
 
   /* Homepage hero overlay card + seller-promotion card.
@@ -217,7 +223,7 @@
   .nav-links a, .header-nav a, [data-testid="nav-tabs"] a,
   [class*="__l-header"] a:not([class*="Button__filled"]):not([class*="Button__primary"]) {
     color: #e6edf3 !important; }
-  .nav-links a:hover, .header-nav a:hover { color: #9bd4ff !important; }
+  .nav-links a:hover, .header-nav a:hover { color: #ffffff !important; }
 
   /* Category nav bar under the header.
      A bare `[class*="HorizontalScroll"]` must NEVER go here: web_ui's
@@ -227,9 +233,13 @@
      catalog/search and the "similar items" rail on item pages both rendered as
      one solid black slab. Scope the fill to the header, and paint only the
      arrow handle, which is the one natively-white part of the component. */
-  .catalog-tree-menu, .nav-tabs, .horizontal-navigation,
+  .catalog-tree-menu, .horizontal-navigation,
   [class*="__l-header"] [class*="HorizontalScroll"] {
     background-color: #0d1117 !important; }
+  /* No bare `.nav-tabs` here: the header's category bar is hooked by
+     `[data-testid="nav-tabs"]` above, and the only element still carrying the
+     bare class is the help centre's CMS tab switcher (`ul.nav.nav-tabs`),
+     which is natively plateless — a header fill boxes it in a dark slab. */
   [class*="horizontal-scroll__handle"] { background-color: #1c2128 !important; }
   /* The category row is a web_ui Tabs bar, whose surface reads the white
      token (level-6). We map that to the elevated #1c2128, so inside the
@@ -289,6 +299,16 @@
   .web_ui__Card__lifted, [class*="Card__lifted"],
   .web_ui__Card__elevated, [class*="Card__elevated"] {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55) !important; }
+  /* Two more lifts read that same token on classes carrying no Card marker: the
+     item page's attribute overflow menu (`dropdown-menu--shadow`, a CSS module,
+     so match the substring) and the slide-over sheet. Only the LARGE-blur lifts
+     belong here — the site draws 0-2px hairlines from the same token (the
+     help-centre FAQ accordion, the content-column rule) and those read as the
+     component's edge on dark, which a black shadow would erase. */
+  [class*="dropdown-menu--shadow"] {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55) !important; }
+  .sheet-content {
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.55) !important; }
   /* Card ships the same two tint variants as Cell — a brand-teal one and an amber
      one, each carrying its meaning ONLY in the fill — and the blanket Card rule
      above flattens both to the plain elevated grey. Match the deep teal and amber
@@ -340,6 +360,22 @@
   [class*="Cell__cell"][class*="Cell__warning"], [class*="Cell__cell"][class*="Cell__warning"] *,
   [class*="Cell__cell"][class*="Cell__expose"], [class*="Cell__cell"][class*="Cell__expose"] * {
     color: #ffffff !important; fill: #ffffff !important; }
+  /* A `navigating` Cell draws its chevron as a masked `::after` coloured by a
+     token, so the ink rules above — which only reach child ELEMENTS — cannot
+     touch it. On the solid variants that token is greyscale-level-6, white in
+     the light theme and our elevated surface here, leaving a dark glyph beside
+     the white label. `expose` is absent on purpose: its chevron reads
+     greyscale-level-1, which the remap already sends light. */
+  [class*="Cell__cell"][class*="Cell__primary"]::after,
+  [class*="Cell__cell"][class*="Cell__amplified"]::after,
+  [class*="Cell__cell"][class*="Cell__muted"]::after,
+  [class*="Cell__cell"][class*="Cell__success"]::after,
+  [class*="Cell__cell"][class*="Cell__warning"]::after {
+    background-color: #ffffff !important; }
+  /* The mint TINT carries the `Cell__success` substring but is not a solid
+     banner; declared after so its chevron keeps the neutral muted grey. */
+  [class*="Cell__cell"][class*="Cell__successLightExperimental"]::after {
+    background-color: #9ca7b0 !important; }
 
   /* Badge and Navigation ship the SAME solid-fill variant family as Cell, and
      break the same way: the fill reads a semantic token while the label reads
@@ -574,6 +610,18 @@
   [class*="Rating__half-full"] [class*="Rating__star-second-half"] {
     color: #4c5663 !important; }
 
+  /* A Loader with no colour variant strokes its arc from greyscale-level-6, so
+     the plain spinner draws in our elevated surface colour and vanishes. Each
+     variant carries its own semantic token, but the base rule below is
+     !important and would swallow them, so all six are restated. */
+  [class*="Loader__circle"] { stroke: #e6edf3 !important; }
+  [class*="Loader__primary"] [class*="Loader__circle"] { stroke: #4db8c4 !important; }
+  [class*="Loader__success"] [class*="Loader__circle"] { stroke: #57c98a !important; }
+  [class*="Loader__warning"] [class*="Loader__circle"] { stroke: #f2707a !important; }
+  [class*="Loader__expose"] [class*="Loader__circle"] { stroke: #f9bb42 !important; }
+  [class*="Loader__amplified"] [class*="Loader__circle"] { stroke: #e6edf3 !important; }
+  [class*="Loader__muted"] [class*="Loader__circle"] { stroke: #9ca7b0 !important; }
+
   /* Tabs (seller profile, item page sections) bake the dark literal.
      web_ui marks the current tab `Tabs__is-active`, not `Tabs__tab--selected`;
      the inactive titles are dimmed by opacity, so the selected one needs the
@@ -745,7 +793,10 @@
      `a`-only rule left one item of the row visibly dimmer. Match the class. */
   footer [class*="main-footer__links-section-link"],
   footer [class*="main-footer__privacy-section-link"] { color: #c4cdd6 !important; }
-  .main-footer a:hover, footer a:hover { color: #9bd4ff !important; }
+  /* Native hover leaves the link colour alone and only adds the underline, so
+     the cue here is a step brighter on the same neutral ramp — an off-ramp hue
+     would be the only one on a site whose whole accent is the brand teal. */
+  .main-footer a:hover, footer a:hover { color: #ffffff !important; }
 
   /* ============================================================
      Banners / sticky notices / cookie surrounds
@@ -815,7 +866,8 @@
      turned the lightbox letterbox into a full-screen white panel.
      Re-anchor every surface that reads level-1 as a background. */
   .web_ui__Dialog__overlay, [class*="Dialog__overlay"],
-  .web_ui__BottomSheet__overlay, [class*="BottomSheet__overlay"] {
+  .web_ui__BottomSheet__overlay, [class*="BottomSheet__overlay"],
+  .sheet-overlay {
     background-color: rgba(6, 8, 10, 0.72) !important; }
   /* The onboarding modal darkens the top and bottom quarters of its video with two
      level-1 pseudo-element gradients — the same inverted-scrim shape, but drawn as
@@ -923,6 +975,13 @@
      three headings rendered invisible on the dark page; the shadow token has to
      stay black for its real job, so the ink is overridden here instead. */
   [class*="dac7__links-group-heading"] { color: #e6edf3 !important; }
+  /* Each /dac7 band's CTA is an inverse pill whose text sits in a page-module
+     span (`dac7__taxrules-cta-text`) INSIDE the Button__label. The band rules
+     above match that span by substring too, so without this it carries the
+     band's teal plate and white ink into the middle of the pill. */
+  [class*="dac7__taxrules-cta-text"],
+  [class*="dac7__checkstatus-cta-text"] {
+    color: #4db8c4 !important; background-color: transparent !important; }
 
   /* The privacy centre's own h1 bakes a literal #000 that only ever worked on
      its light #edf2f2 band — the h2/h3 rule below never reached it. */
@@ -1204,6 +1263,19 @@
   #ot-sel-blk .ot-consent-hdr, #ot-sel-blk .ot-li-hdr,
   #ot-sel-blk .ot-label-txt, #ot-sel-blk .ot-label-status {
     color: #c4cdd6 !important; }
+  /* A third such panel: the vendor list's filter flyout, which OneTrust fills
+     white and lifts with a greyscale-level-1 shadow, and heads with its own
+     #3860be blue. Its option labels are already the muted-grey token, so they
+     only read once the panel itself is dark. */
+  #onetrust-pc-sdk #ot-fltr-cnt {
+    background-color: #1c2128 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55) !important; }
+  #onetrust-pc-sdk #ot-filter-list-header { color: #e6edf3 !important; }
+  /* The preference centre's close X is a background-image SVG from OneTrust's
+     CDN with a baked #565656 fill, which no `color` rule can reach; on the dark
+     panel it sits at 2.2:1. The button holds nothing but that glyph and has a
+     transparent fill, so inverting the whole box lifts only the X. */
+  #onetrust-pc-sdk #close-pc-btn-handler { filter: invert(1) !important; }
   /* The "vendor details" handler is a <button>, so the anchor rule above
      leaves it on the raw brand teal. */
   #onetrust-pc-sdk .ot-link-btn,

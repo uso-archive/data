@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Stack Overflow and the whole Stack Exchange network: easy-on-the-eyes questions, answers, code blocks, comments and sidebar.
-@version      20260827.15.15
+@version      20260830.17.29
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -726,7 +726,9 @@
      the white site — invisible black-on-dark. They're images we
      can't recolor internally, so apply the standard dark-mode
      luminance invert (hue-rotate keeps brand hues like SU's blue
-     bracket). SO uses an inline SVG (handled above), not this img. */
+     bracket). SO uses an inline SVG (handled above), not this img.
+     Sites whose header band is a BRAND colour reset this at the end
+     of the file — there the wordmark is baked for the band. */
   .site-header--link img,
   a.site-header--link img,
   #hlogo img,
@@ -980,6 +982,18 @@
     color: #e6edf3 !important;
   }
 
+  /* SE plates the glyph itself on hover/focus/active
+     (`.nav-links .nav-links--link.-link__with-icon:hover .svg-icon
+     { background: var(--black-100) }`, a raw token) — a near-white 18px
+     square behind the lifted glyph. The plate stays one step above the
+     row's own hover surface; the purple brand discs carry `.bg-transparent`
+     and are spared by `:not(.fc-white)`. */
+  .nav-links .nav-links--link.-link__with-icon:hover .svg-icon:not(.fc-white),
+  .nav-links .nav-links--link.-link__with-icon:focus .svg-icon:not(.fc-white),
+  .nav-links .nav-links--link.-link__with-icon:active .svg-icon:not(.fc-white) {
+    background-color: #2d333b !important;
+  }
+
   /* ============================================================
      Main content: question / answers / cards
      ============================================================ */
@@ -1126,6 +1140,26 @@
     color: #e6edf3 !important;
   }
 
+  /* Stacks semantic TEXT tones. `--fc-success` #18864b, `--fc-error` /
+     `--fc-danger` #c83232 and `--fc-warning` #9c730d were picked for the
+     white site and land 4.0:1 / 3.1:1 / 4.0:1 on the page base — all under
+     AA for the 12-13px labels they mark (the editor draft status, form
+     validation). Lift each to the palette sibling of the same hue; the
+     matching `.bg-*` / `.bc-*` utilities are solid fills that already read
+     on dark and must keep the site value. */
+  .fc-success {
+    color: #3fb950 !important;
+  }
+
+  .fc-error,
+  .fc-danger {
+    color: #f85149 !important;
+  }
+
+  .fc-warning {
+    color: #d98b3a !important;
+  }
+
   /* The accepted (green check) glyph */
   .accepted-answer-indicator,
   .js-accepted-answer-indicator,
@@ -1219,9 +1253,13 @@
   /* The POST OWNER's name in comments carries `.owner`, which SE highlights
      with a light-blue #ebf6fa pill background to mark the author — a glaring
      light pill on dark (short at 83x20, so it slips the audit height filter).
-     Retone to a subtle dark-blue tint; the #6f9ab0 name still reads on it. */
+     Retone to a subtle dark-blue tint; the #6f9ab0 name still reads on it.
+     The bare arms carry it to the post timeline, which repeats the pill
+     outside any `.comment` container. */
   .comment .comment-user.owner,
-  .comment a.comment-user.owner {
+  .comment a.comment-user.owner,
+  .comment-user.owner,
+  a.comment-user.owner {
     background-color: #16202c !important;
   }
 
@@ -1753,6 +1791,22 @@
   .s-btn__muted:hover {
     background-color: #1c2128 !important;
     color: #e6edf3 !important;
+  }
+
+  /* A BARE `.s-btn` — no `__muted` / `__outlined` / `__filled` / `__primary`
+     modifier — is Stacks' tertiary action, link-blue text on no fill: "Cancel"
+     under the questions Filter panel, "Not now" on the signup modal, "View all
+     N Collectives". The base grey above is the `__muted` look, so this shape
+     needs the accent back. Every modifier that carries its own ink is
+     excluded, as are the topbar / modal-close / pressed shapes and anything
+     stamped with an `.fc-*` utility (its ink is named on the element). The
+     `:not()` chain out-weighs `.s-btn:hover`, so the hover ink is restated. */
+  .s-btn:not(.s-btn__muted):not(.s-btn__outlined):not(.s-btn__filled):not(.s-btn__primary):not(.s-btn__unset):not(.s-btn__link):not(.s-btn__google):not(.s-btn__github):not(.s-btn__facebook):not(.s-btn__danger):not(.s-btn__featured):not(.is-selected):not(.s-topbar--item):not(.s-topbar--menu-btn):not(.s-modal--close):not([class*="fc-"]) {
+    color: #5fb0e6 !important;
+  }
+
+  .s-btn:not(.s-btn__muted):not(.s-btn__outlined):not(.s-btn__filled):not(.s-btn__primary):not(.s-btn__unset):not(.s-btn__link):not(.s-btn__google):not(.s-btn__github):not(.s-btn__facebook):not(.s-btn__danger):not(.s-btn__featured):not(.is-selected):not(.s-topbar--item):not(.s-topbar--menu-btn):not(.s-modal--close):not([class*="fc-"]):hover {
+    color: #9bd4ff !important;
   }
 
   /* A pressed toggle outside an `.s-btn-group` (the intro-banner disclosure on
@@ -3321,6 +3375,54 @@
   }
 
   /* ============================================================
+     Post timeline (/posts/<id>/timeline)
+     ------------------------------------------------------------
+     Reached from the clock icon in every post's vote column, and
+     anonymous. Its own stylesheet paints from raw Stacks tokens, so
+     no utility remap reaches it.
+     ============================================================ */
+  /* A deleted event plates the row from `--red-100` on each <td>, not
+     on the <tr> — the rule has to repeat per cell to cover the row. */
+  .post-timeline tr.deleted-event td {
+    background-color: #2a1718 !important;
+  }
+
+  .post-timeline tr.separator > td > div {
+    background-color: #2d333b !important;
+  }
+
+  .post-timeline tr.separator > td > div.deleted {
+    background-color: #5a2a2c !important;
+  }
+
+  /* Event kinds are `.event-type > span` pills, each filled by one raw
+     token. `history` (--black-225) and `comment` (--black-350) are the
+     two light-theme greys; every other kind is a brand hue that already
+     reads on dark and must keep its own colour. `.comment` additionally
+     collides with the post-comment component, whose network-wide
+     transparent + divider rule outranks the site's pill fill. */
+  .post-timeline .event-type > span.history {
+    background-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .post-timeline .event-type > span.comment {
+    background-color: #454e59 !important;
+    color: #f0f4f8 !important;
+    border: 0 !important;
+  }
+
+  /* ============================================================
+     Badge detail page (/help/badges/<id>/<slug>)
+     ============================================================ */
+  /* Every awarded row is separated by a `--black-200` top rule and a
+     page lists ~30 of them, so the light hairlines stripe the column. */
+  .badges-page .single-badge-table .single-badge-row-question,
+  .badges-page .single-badge-table .single-badge-row-reason {
+    border-top-color: #262c33 !important;
+  }
+
+  /* ============================================================
      Editor (Markdown answer/comment box) — public on ask flow
      ============================================================ */
   .wmd-button-bar,
@@ -3328,6 +3430,40 @@
   .js-editor-toolbar {
     background-color: #20262d !important;
     border-color: #2d333b !important;
+  }
+
+  /* The toolbar row draws the separator under the buttons from its own
+     id rule, which the .wmd-button-bar border above cannot reach, and
+     keeps it a light #babfc5 — a bright rule straight across the answer
+     box. The guest answer form on the network sites renders the editor
+     logged-out, so this is a public surface. */
+  ul#wmd-button-row,
+  .wmd-button-row {
+    border-color: #2d333b !important;
+  }
+
+  /* The Markdown help strip and its "?" toggle only mount once the answer
+     box takes focus, and the textarea sits on a resize grippie — all three
+     are SE #f1f2f3 plates with #babfc5 rules, and the strip already carries
+     our light tab labels, so it reads light-on-light until the plate moves.
+     The grippie and the "?" glyph are both drawn from the legacy sprite:
+     the "?" lives alone in its own <span> so it can be inverted, the
+     grippie paints its dots on the same box as the plate and can only drop
+     them. */
+  button#wmd-help-button,
+  div#mdhelp,
+  ul#mdhelp-tabs,
+  .grippie {
+    background-color: #20262d !important;
+    border-color: #2d333b !important;
+  }
+
+  .grippie {
+    background-image: none !important;
+  }
+
+  button#wmd-help-button > span {
+    filter: invert(1) !important;
   }
 
   .wmd-preview {
@@ -3657,19 +3793,39 @@
     color: #9198a1 !important;
   }
 
+  /* The "AD" disclosure the site's own ad loader stamps over a slot that
+     rendered an Acceptable Ad (list rows, the sidebar slots, the bottom
+     anchor). It is an unclassed div styled through `el.style`, so the only
+     hook is the serialised attribute: the CSSOM writes `rgba(255, 255, 255,
+     0.7)` WITH spaces, and the unspaced arm covers the same value set as
+     attribute text. It must stay a legible disclosure over whatever
+     creative sits under it, so only the plate and ink move. */
+  .js-zone-container div[style*="rgba(255, 255, 255, 0.7)"],
+  .js-zone-container div[style*="rgba(255,255,255,0.7)"],
+  .everyonelovesstackoverflow div[style*="rgba(255, 255, 255, 0.7)"],
+  .everyonelovesstackoverflow div[style*="rgba(255,255,255,0.7)"],
+  .aditude-div-wrapper div[style*="rgba(255, 255, 255, 0.7)"],
+  .aditude-div-wrapper div[style*="rgba(255,255,255,0.7)"] {
+    background-color: rgba(20, 24, 29, 0.85) !important;
+    color: #c4cdd6 !important;
+  }
+
   /* keep images untouched (no filter/recolor) */
   .s-prose img, img { /* intentionally no override */ }
 }
 
-@-moz-document domain("serverfault.com") {
+@-moz-document domain("3dprinting.stackexchange.com"), domain("alcohol.stackexchange.com"), domain("astronomy.stackexchange.com"), domain("bioacoustics.stackexchange.com"), domain("bioinformatics.stackexchange.com"), domain("boardgames.stackexchange.com"), domain("bricks.stackexchange.com"), domain("buddhism.stackexchange.com"), domain("cardano.stackexchange.com"), domain("chinese.stackexchange.com"), domain("civicrm.stackexchange.com"), domain("coffee.stackexchange.com"), domain("communitybuilding.stackexchange.com"), domain("computergraphics.stackexchange.com"), domain("conlang.stackexchange.com"), domain("craftcms.stackexchange.com"), domain("crafts.stackexchange.com"), domain("cs50.stackexchange.com"), domain("cseducators.stackexchange.com"), domain("devops.stackexchange.com"), domain("drones.stackexchange.com"), domain("earthscience.stackexchange.com"), domain("ebooks.stackexchange.com"), domain("economics.stackexchange.com"), domain("elementaryos.stackexchange.com"), domain("engineering.stackexchange.com"), domain("eosio.stackexchange.com"), domain("esperanto.stackexchange.com"), domain("expatriates.stackexchange.com"), domain("fitness.stackexchange.com"), domain("freelancing.stackexchange.com"), domain("french.stackexchange.com"), domain("genai.stackexchange.com"), domain("genealogy.stackexchange.com"), domain("german.stackexchange.com"), domain("ham.stackexchange.com"), domain("hardwarerecs.stackexchange.com"), domain("hermeneutics.stackexchange.com"), domain("hinduism.stackexchange.com"), domain("history.stackexchange.com"), domain("homebrew.stackexchange.com"), domain("hsm.stackexchange.com"), domain("interpersonal.stackexchange.com"), domain("iot.stackexchange.com"), domain("iota.stackexchange.com"), domain("italian.stackexchange.com"), domain("joomla.stackexchange.com"), domain("korean.stackexchange.com"), domain("langdev.stackexchange.com"), domain("languagelearning.stackexchange.com"), domain("latin.stackexchange.com"), domain("law.stackexchange.com"), domain("lifehacks.stackexchange.com"), domain("linguistics.stackexchange.com"), domain("literature.stackexchange.com"), domain("martialarts.stackexchange.com"), domain("matheducators.stackexchange.com"), domain("mattermodeling.stackexchange.com"), domain("medicalsciences.stackexchange.com"), domain("monero.stackexchange.com"), domain("musicfans.stackexchange.com"), domain("mythology.stackexchange.com"), domain("opendata.stackexchange.com"), domain("opensource.stackexchange.com"), domain("or.stackexchange.com"), domain("outdoors.stackexchange.com"), domain("parenting.stackexchange.com"), domain("pets.stackexchange.com"), domain("philosophy.stackexchange.com"), domain("pm.stackexchange.com"), domain("poker.stackexchange.com"), domain("politics.stackexchange.com"), domain("portuguese.stackexchange.com"), domain("proofassistants.stackexchange.com"), domain("psychology.stackexchange.com"), domain("retrocomputing.stackexchange.com"), domain("reverseengineering.stackexchange.com"), domain("robotics.stackexchange.com"), domain("rus.stackexchange.com"), domain("russian.stackexchange.com"), domain("scicomp.stackexchange.com"), domain("serverfault.com"), domain("sitecore.stackexchange.com"), domain("softwareengineering.stackexchange.com"), domain("solana.stackexchange.com"), domain("space.stackexchange.com"), domain("sports.stackexchange.com"), domain("sqa.stackexchange.com"), domain("stats.stackexchange.com"), domain("stellar.stackexchange.com"), domain("substrate.stackexchange.com"), domain("sustainability.stackexchange.com"), domain("tezos.stackexchange.com"), domain("tor.stackexchange.com"), domain("tridion.stackexchange.com"), domain("ukrainian.stackexchange.com"), domain("vegetarianism.stackexchange.com"), domain("vi.stackexchange.com"), domain("video.stackexchange.com"), domain("webapps.stackexchange.com"), domain("woodworking.stackexchange.com") {
 header.site-header,
   .site-header {
     background-color: #0d1117 !important;
     border-bottom: 1px solid #262c33 !important;
+    /* the three zero-width sides otherwise inherit the body ink and read as
+       a light border to any scan */
+    border-color: #262c33 !important;
   }
 }
 
-@-moz-document domain("askubuntu.com") {
+@-moz-document domain("ai.stackexchange.com"), domain("android.stackexchange.com"), domain("askubuntu.com"), domain("bicycles.stackexchange.com"), domain("blender.stackexchange.com"), domain("chemistry.stackexchange.com"), domain("chess.stackexchange.com"), domain("christianity.stackexchange.com"), domain("codegolf.stackexchange.com"), domain("crypto.stackexchange.com"), domain("cs.stackexchange.com"), domain("cstheory.stackexchange.com"), domain("datascience.stackexchange.com"), domain("diy.stackexchange.com"), domain("drupal.stackexchange.com"), domain("english.stackexchange.com"), domain("expressionengine.stackexchange.com"), domain("gaming.stackexchange.com"), domain("gardening.stackexchange.com"), domain("judaism.stackexchange.com"), domain("magento.stackexchange.com"), domain("meta.stackexchange.com"), domain("movies.stackexchange.com"), domain("music.stackexchange.com"), domain("networkengineering.stackexchange.com"), domain("patents.stackexchange.com"), domain("photo.stackexchange.com"), domain("physics.stackexchange.com"), domain("quant.stackexchange.com"), domain("quantumcomputing.stackexchange.com"), domain("raspberrypi.stackexchange.com"), domain("salesforce.stackexchange.com"), domain("scifi.stackexchange.com"), domain("security.stackexchange.com"), domain("sharepoint.stackexchange.com"), domain("softwarerecs.stackexchange.com"), domain("stackoverflow.com"), domain("travel.stackexchange.com"), domain("ux.stackexchange.com"), domain("webmasters.stackexchange.com"), domain("wordpress.stackexchange.com"), domain("writing.stackexchange.com") {
 .site-header--link img,
   a.site-header--link img,
   #hlogo img,

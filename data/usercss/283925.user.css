@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A polished dark look across the whole site: the home page, video pages and their comment lists, the rankings, search results and user profiles.
-@version      20260827.15.13
+@version      20260830.17.27
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -876,6 +876,8 @@
      is a separate child div, so whenever it 404s or has not lazy-loaded the well
      rendered a 206x206 white slab. Not a gradient, so the bg-image audit skips
      it. Dropping the image can never hide artwork — only the placeholder. */
+  /* The photo-news card is one anchor; its title inherits the #0080ff hover. */
+  a.NicoNewsContainer-photoNewsContent:hover .NicoNewsContainer-photoNewsTitle { color: #5fb0e6 !important; }
   .NicoNewsContainer-photoNewsThumbnail {
     background-color: #262c33 !important;
     background-image: none !important;
@@ -1390,6 +1392,7 @@
   .ContinuousPlayButton {
     background-color: #2d333b !important; border-color: #3a424c !important;
   }
+  .ContinuousPlayButton:hover { background-color: #3a424c !important; color: #e6edf3 !important; }
   /* The "no thumbnail" placeholder is a white raster with a grey TV glyph, painted
      as a background-image so the dark well behind it never shows. Invert it (only
      this one URL) so the glyph survives instead of the white square. Real artwork
@@ -1472,6 +1475,10 @@
      as an ordinary view count. The watch page's token-driven twin keeps the gold, so the
      same figure must not disagree between the two views. Tag prefix beats the meta rule. */
   div.NicoAdContainer-cardMetaPoint { color: #d9a300 !important; }
+  /* The card's TITLE carries "Meta" in its class too but is the site's body ink, not a
+     metric, and the anchor around it turns #0080ff on hover. */
+  div.NicoAdContainer-cardMetaTitle { color: #c4cdd6 !important; }
+  a.NicoAdContainer-cardContent:hover .NicoAdContainer-cardMetaTitle { color: #5fb0e6 !important; }
   /* The timeline period dividers ("1週間"/"1か月"…) label themselves in
      near-black #252525, which the legacy text passes don't reach — lift
      them to the muted meta grey so the section markers stay readable. */
@@ -1626,12 +1633,17 @@
      `[class*="Title"]` pass swallowed it — hovered and resting titles rendered the same
      #e6edf3, so the whole grid answered the pointer with nothing. The site also greys a
      visited title; that pair is the component's entire state vocabulary. */
-  .NC-Card-main:hover .NC-Link .NC-CardTitle { color: #5fb0e6 !important; }
-  .NC-Card-mainHeaderTitle.NC-Link:not(:hover):visited .NC-CardTitle {
+  .NC-Card-main:hover .NC-Link .NC-CardTitle,
+  .NC-MediaObject-contents.NC-Link:hover .NC-MediaObjectTitle,
+  .NC-MediaObject-contents.NC-Link:hover .NC-SeriesMediaObject-titleIcon { color: #5fb0e6 !important; }
+  .NC-Card-mainHeaderTitle.NC-Link:not(:hover):visited .NC-CardTitle,
+  .NC-MediaObject-contents.NC-Link:not(:hover):visited .NC-MediaObjectTitle {
     color: #8b949e !important;
   }
-  /* Same shape on a section heading's "もっと見る": the site turns label AND caret blue,
-     our heading pass pinned the label, so only the caret moved. */
+  /* Same shape on a section heading: the site turns the heading, its "もっと見る" label
+     AND the caret blue as ONE link, and every text node inside carries a pinned class,
+     so each needs its own arm. */
+  .ColumnTitle-link:hover .ColumnTitle-text,
   .ColumnTitle-link:hover .ColumnTitle-linkText { color: #5fb0e6 !important; }
   /* Sensitive / muted video thumbnails are placeholder rasters, not artwork: a #f4f4f4
      (resp. #ddd) SVG plate carrying a grey warning glyph, painted as the well's
@@ -1727,6 +1739,10 @@
   /* A timeline entry's poster name is the site's #252525 turning #0080ff on hover; the
      legacy body pass pinned it light, so the one link in each row's header went inert. */
   a.TimelineItem-senderName:hover { color: #5fb0e6 !important; }
+  /* The entry's content card is one anchor whose title and detail label inherit the same
+     #0080ff hover; both are pinned by the heading / label passes. */
+  a.TimelineItem-contentBody:hover .TimelineItem-contentTitle,
+  a.TimelineItem-contentBody:hover .TimelineItem-contentDetailLabel { color: #5fb0e6 !important; }
   /* The profile/mylist "サポート" button is an <a>, so the broad `.BaseUniLayout a`
      grey rule (no !important, spec 0,1,1) flattened its label to #c4cdd6 — while
      the "フォロー" button beside it is a <button> we never touch and kept the site's
@@ -1891,6 +1907,42 @@
      so inverting it is hue-lossless and turns the light disc into a dark one. */
   #__ap_gfc_consent_box_btn__ img {
     filter: invert(1) !important; border-color: #2d333b !important;
+  }
+
+  /* ---- Feedback form (www.nicovideo.jp/feedback/*) ----
+     A BaseUniLayout page family with its own literal-colour sheet
+     (pages_feedback_FeedbackPage.css) that no design token reaches. Linked from
+     the /watch footer and the video side menu.
+     `.FeedbackPage a:link` is (0,2,1), so the `.BaseUniLayout a` pass below cannot
+     take the link ink without !important. The validation banner ships in the DOM
+     as display:none; the confirmation panel and its back button render only on the
+     form's POST response, which nothing links to. */
+  .FeedbackPage a, .FeedbackPage a:link, .FeedbackPage a:hover {
+    color: #5fb0e6 !important;
+  }
+  .FeedbackPage .errorMessageContainer {
+    background: #2b1d20 !important;
+    border-bottom-color: #5a2f2f !important;
+  }
+  .FeedbackPage .errorMessageContainer p,
+  .FeedbackPage .errorMessageLink a,
+  .FeedbackPage .errorMessageLink a:after,
+  .FeedbackPage .notice,
+  .FeedbackPage .redText { color: #ff5c5c !important; }
+  .FeedbackPage .confirmationDetails {
+    background: #1c2128 !important;
+    border-color: #3a424c !important;
+  }
+  /* Disabled submit keeps a muted label so it still reads as unavailable next to
+     the enabled #006fff variant. */
+  .FeedbackPage input[type="submit"][disabled].confirmButton {
+    background: #2d333b !important;
+    color: #8b949e !important;
+  }
+  .FeedbackPage input[type="submit"].backButton {
+    background: #1c2128 !important;
+    color: #c4cdd6 !important;
+    border-color: #3a424c !important;
   }
 
   /* Search box (legacy header) */

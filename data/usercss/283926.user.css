@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for DaFont. Browse fonts late at night without the  glare: the homepage, font categories, search, font pages and author pages all get an  easy-on-the-eyes dark look.
-@version      20260827.15.10
+@version      20260830.17.23
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -292,6 +292,18 @@
   .item:hover, .item.selected {
     background-color: #21262d !important;
   }
+  /* Each cell's `.info` caption (glyph name in `.chars`, code point in `.unicode`) is the
+     site's #C8C8C8 — 1.55:1 on white, i.e. deliberately recessive beside the black glyph.
+     Carried over verbatim onto dark it reads ~11:1, level with the inverted glyph, and the
+     caption/glyph hierarchy is gone. Muted-text tone rather than the site's ratio: these
+     are the labels a glyph browser exists to show. `.chars` is painted by a background
+     gradient clipped to its text (`-webkit-text-fill-color: transparent`), so `color`
+     cannot reach it — restate the gradient. Its tail is the overflow fade for long names
+     and must end TRANSPARENT, not in a page colour: the cell background changes on hover. */
+  .item .info, .item .unicode { color: #8b949e !important; }
+  .item .chars {
+    background-image: linear-gradient(to right, #8b949e 90%, rgba(139, 148, 158, 0)) !important;
+  }
   /* Clicking a glyph opens `#glyph-full`: a full-width 230px `background-color:white`
      bottom sheet (the `div.sticky2{background:yellow}` on the same element loses on
      specificity). It carries a LIGHT `#CCC` drop shadow as its only separator, and its
@@ -308,10 +320,15 @@
      on dark. The safety net at the end of this sheet matches the literal `#fff`, not the
      rgb() form the DOM ends up with, so it never reaches this one. */
   #glyph-hide { background: transparent !important; }
-  /* The "Copied!" confirmation is `color:grey` — 4.1:1 on that sheet. Must out-specify
-     the `#glyph-full div` rule above (1,0,1), or it renders at full body strength and
-     the transient toast stops reading as secondary. */
-  #glyph-full #infoGlyph_copy { color: #8b949e !important; }
+  /* The "✓ Copied" confirmation is `#infoGlyph_copy {color:grey}` — 4.1:1 on that sheet —
+     but the visible text is a `span.copyAlert` CHILD of that div, and the `#glyph-full span`
+     rule above (1,0,1) paints the span directly, which beats anything it would inherit. The
+     span has to be named itself, at (1,1,0) or higher, or the transient toast renders at
+     full body strength and stops reading as secondary. Faded in from `opacity:0` on copy,
+     so no load-time scan reaches it. */
+  #glyph-full #infoGlyph_copy, #glyph-full #infoGlyph_copy span, #glyph-full .copyAlert {
+    color: #8b949e !important;
+  }
   /* Page pills (only built for fonts over 3000 glyphs) are bare <div>s, so the base
      `div {color:#000}` leaves them black on dark, and the blanket border reset above
      greys out the `1px solid #c00` ring that is their whole hover affordance. */
@@ -784,6 +801,23 @@
   .gsc-tabHeader.gsc-tabhInactive, .gsc-refinementHeader.gsc-refinementhInactive {
     color: #c4cdd6 !important;
   }
+
+  /* ---- Third-party consent overlay (Sirdata CMP) ---- */
+  /* A vendor-rendered LIGHT panel mounted outside the site's own markup, shown to every
+     visitor before they consent. The blanket `*` border reset and the `b, strong, label` /
+     `p, td, i` ink rules reach into it: its body copy drops to 1.7:1 on the white panel and
+     the section rule under "THE ACTIVITIES" plus every toggle track turn near-black. Hand
+     the panel back its own chrome instead of theming it — Sirdata's class names are build
+     hashes, so anything keyed to one would silently die and leave our light ink on white.
+     #999 is the tone DaFont pins for this panel in its own inline sheet, and one of the
+     three paragraphs carries it on the element itself, so `inherit` cannot recover it —
+     the copy has to be restated. The footer buttons look the same either way: the vendor
+     draws their visible sides in this same #d8d8d8 and gives the red one zero width. */
+  div[class*="sd-cmp"] p { color: #999999 !important; }
+  div[class*="sd-cmp"] b, div[class*="sd-cmp"] strong, div[class*="sd-cmp"] label,
+  div[class*="sd-cmp"] td, div[class*="sd-cmp"] i { color: inherit !important; }
+  div[class*="sd-cmp"] div,
+  div[class*="sd-cmp"] span { border-color: #d8d8d8 !important; }
 
   /* ---- Tables / generic light cells safety net ---- */
   td[bgcolor="#FFFFFF"], td[bgcolor="#ffffff"], td[bgcolor="white"],

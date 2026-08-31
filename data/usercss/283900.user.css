@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260827.15.10
+@version      20260830.17.24
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -158,10 +158,15 @@
      one column over, whose ink comes from `a span`, stayed blue, leaving the same row
      two-toned. Restore the link tone on table DATA cells and the named link components.
      `.Table__sub-header` is re-excluded: those anchors are the sortable column heads, which
-     ESPN paints near-black, i.e. they really are headings. */
+     ESPN paints near-black, i.e. they really are headings. The scoreboard's
+     .BaseballSituation "Play-by-Play" is a bare leaf .AnchorLink, and an .Athlete__Link
+     card's .Athlete__PlayerName is link-blue natively while the same class outside a link
+     (gamecast leaders) is near-black — the two-class selector is what separates them from
+     the single-class white rule further down. */
   .Table__TBODY .Table__TD .AnchorLink, .Boxscore__Athlete_Name,
   .News__FooterLink, .Card__Header__SubLink, .Card__Header__SubLink__Text,
-  .TeamLinks__Link .AnchorLink, .ScoreboardEventInfo__TicketContainer .AnchorLink {
+  .TeamLinks__Link .AnchorLink, .ScoreboardEventInfo__TicketContainer .AnchorLink,
+  .BaseballSituation .AnchorLink, .Athlete__Link .Athlete__PlayerName {
     color: #5fb0e6 !important; }
   .Table__sub-header .AnchorLink { color: #e6edf3 !important; }
 
@@ -181,6 +186,10 @@
      beside it and lost every hint that it is clickable. A muted link blue restores the
      affordance without competing with the headline. Plain-span bylines stay grey. */
   a.author { color: #8ab4d8 !important; }
+  /* The story rail's active item carries a reading-progress gauge: .story_progress is a
+     4px #fff TRACK (invisible on the native white item) that the red .bar fills as the
+     article scrolls. Only the track is re-toned; the bar keeps ESPN's red. */
+  .news-feed-item .story_progress { background-color: #2d333b !important; }
   /* Story pullquotes carry a 4px ESPN-red (#dd0000) left bar as a brand accent; the
      generic grey border-left flattened it to an invisible #2d333b strip on dark. Keep the
      panel dark but restore the brand-red bar (decorative, so the vivid ESPN red is fine). */
@@ -365,6 +374,17 @@
   .Button.Button--disabled {
     background-color: transparent !important; border-color: #4a525b !important;
     color: #6e7681 !important; -webkit-text-fill-color: #6e7681 !important; }
+  /* Prism's no-chrome variant: ESPN gives it no fill and no border. It is also the class
+     on the 2px screen-reader toggle that sits in every #global nav gap, where any surface
+     or border colour renders as a full-height bar between the nav items. */
+  .Button--unstyled {
+    background-color: transparent !important; border-color: transparent !important; }
+  /* Prism Radio / Switch: the glyph is an SVG filling from the control's own `color`, and
+     only the --checked variant carries the accent. Without it, selected and unselected
+     differ by the inner dot alone. */
+  .SwitchBase--checked, .Radio--checked,
+  .SwitchBase--checked .SvgIcon, .Radio--checked .SvgIcon {
+    color: #5fb0e6 !important; fill: #5fb0e6 !important; }
   /* Where-to-Watch row CTA + the scoreboard game-card "Watch" button: a filled brand-blue
      <a> whose only classes are hashed, so the `a` link rule painted its label #5fb0e6 on
      the site's own fill (~1.2:1). The data-testid is the one stable hook; reuse the
@@ -375,6 +395,12 @@
     background-color: #588ae4 !important; border-color: #588ae4 !important;
     color: #121213 !important; -webkit-text-fill-color: #121213 !important; }
   [data-testid="watchButton"]:hover { background-color: #7aa1ea !important; }
+  /* The same testid carries the disabled state ("Blackout" on a market-restricted game):
+     natively a bare #b5b7b7 outline with no fill, so it must not take the primary fill
+     above — mirror the .Button--disabled pairing. */
+  [data-testid="watchButton"]:disabled, [data-testid="watchButton"][disabled] {
+    background-color: transparent !important; border-color: #4a525b !important;
+    color: #6e7681 !important; -webkit-text-fill-color: #6e7681 !important; }
   /* A prism <Button> wraps its label in a bare <span> and lets it INHERIT the button's own
      ink, which on a filled variant is a near-black chosen against that fill (#121213 on
      Where-to-Watch's #5990f6 "Add Favorites"). The generic span body-grey out-specifies the
@@ -888,6 +914,9 @@
   .MediaPlaceholder__Pill { background-color: rgba(13,17,23,0.78) !important; color: #ffffff !important; }
   /* Search player-result tiles: team/league subtitle hardcodes #6c6d6f → dark-on-dark */
   .LogoTile__Meta, .LogoTile__Meta--subtitle, .LogoTile__Meta--category { color: #9aa4ae !important; }
+  /* The tile's own hover fill is #f9f9fb, a tint picked for the white results page — the
+     one state a load-time scan of this page never reaches. */
+  .LogoTile:hover { background-color: #2d333b !important; }
 
   /* ---- Taboola "sponsored content" wrapper (hyphenated class variant). The
        right-rail mount carries its white inline on an ID with no class at all
@@ -1275,6 +1304,16 @@
     background-color: #1c2128 !important; color: #e6edf3 !important; }
   .share-button-wrapper .share-popup .copy-link.active-copy-link .copy-link-inner {
     color: #4ac76a !important; -webkit-text-fill-color: #4ac76a !important; }
+  /* The byline Share / Like controls take a #f4f4f4 chip on hover and while their popup is
+     open, and their glyphs are RASTER icons authored near-black for ESPN's white page —
+     both invisible to a colour scan. Only these two are monochrome; .reactions-count-button
+     next to them carries the coloured reaction emoji, so the invert is keyed to the two
+     glyph files rather than the shared .reactions-button class. */
+  .reactions-hover-button:hover,
+  .share-button-wrapper.popup-active .reactions-hover-button {
+    background-color: #2d333b !important; }
+  .reactions-button img[src*="share-ios-on_light"],
+  .reactions-button img[src*="heart-light-unfilled"] { filter: invert(1) !important; }
 
   /* ---- One-feed game-strip out count: ESPN paints the LIVE clock (.game-time) red and
        leaves the "0 Outs" span inside it neutral ink. Our live-red rule sets
@@ -1324,6 +1363,20 @@
   .button-filter::before, .button-filter::after,
   .quicklinks_list__icon::before, .contentItem__content__meta::after,
   a.external::after, li.external > a::after { color: #9aa4ae !important; }
+
+  /* ---- Quick-links / network-logo slots carry RASTER brand marks, and ESPN serves the
+       near-black variant of several of them (the file name says so: `_bk`, `-black`) for
+       its white page. A pixel scan is the only way to see them; a colour scan reads the
+       slot as transparent. The slot holds nothing but the <img>, so a filter is safe, but
+       it must be keyed per file — the same slots hold full-colour marks (Facebook, YouTube,
+       Snapchat, the league and team logos) that an invert would wreck. The bare hash is the
+       X Games category id, the only hook on artwork.espncdn.com. ---- */
+  .quicklinks_list__icon img[src*="black.png"],
+  .quicklinks_list__icon img[src*="instagram.png"],
+  .quicklinks_list__icon img[src*="bf9d0869"],
+  .quicklinks_list__icon img[src*="_bk.png"],
+  .contentItem__logo img[src*="black.png"],
+  .contentItem__logo img[src*="_bk.png"] { filter: invert(1) !important; }
 
   /* ---- Card top rule: the legacy one-feed bar (.contentItem__teamBorder) and its
        Prism News-card successor (.ColorBorder) both carry the TEAM colour in an inline
@@ -1506,11 +1559,12 @@
        ESPNIcons char painted link-blue #0066cc (~2:1 once the disc is dark); the
        CarouselArrow glyph is already white. Dark the disc, lighten the slick glyph. ---- */
   .slick-prev, .slick-next, .CarouselArrow, button.CarouselArrow {
-    background-color: rgba(20,24,29,0.7) !important; border-color: #2d333b !important; }
+    background-color: rgba(20,24,29,0.7) !important; }
   .slick-prev::before, .slick-next::before { color: #e6edf3 !important; }
-  /* Unlike the borderless slick arrows, .CarouselArrow draws a 2px brand-blue ring that
-     matches its chevron; the shared reset above greys it into the thumbnail. */
-  .CarouselArrow, button.CarouselArrow { border-color: #4c99e6 !important; }
+  /* Both arrow families draw a brand-blue ring (#4c99e6: 1px on slick, 2px on
+     .CarouselArrow) that the blanket `*` border reset greys into the thumbnail. */
+  .slick-prev, .slick-next, .CarouselArrow, button.CarouselArrow {
+    border-color: #4c99e6 !important; }
 
   /* ---- Video-playlist "Now Playing" marker (.MediaList__item__playing): ESPN paints
        this label native red #dd0000 to flag the currently-playing clip in a video rail;
@@ -1623,4 +1677,12 @@
      picked for the white page — it is not in the .clr-gray-* scale the theme remaps, so it
      survived at 3.1:1 on our card. */
   .LargeRadioControl__Description { color: #9aa4ae !important; }
+  /* Its newer SelectableCard sibling hardcodes a near-black #121212 helper line — outside
+     the .clr-gray-* scale, so it lands at ~1.1:1 on our card. */
+  .SelectableCard__Description { color: #9aa4ae !important; }
+  /* The league-create hero tagline ("The Official Fantasy Game of the NFL") is an
+     unclassed <h2> painted the fantasy lime #cfff18 on the page's own blue artwork,
+     which the theme never darkens; the blanket heading white erases the brand accent. */
+  .league-onboarding-header-wrapper h2 {
+    color: #cfff18 !important; -webkit-text-fill-color: #cfff18 !important; }
 }
