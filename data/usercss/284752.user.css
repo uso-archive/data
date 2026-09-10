@@ -1,0 +1,189 @@
+/* ==UserStyle==
+@name         leopard print theme for spotify
+@namespace    USO Archive
+@author       geeti99911@gmail.com
+@description  leopard print brown sepia vintage theme for spotify
+@version      20260909.19.13
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("open.spotify.com") {
+:root {
+    /* ---- EDIT THESE TO CHANGE YOUR PALETTE ---- */
+    --sp-bg-main:      #1c140f;   /* main page background — dark espresso */
+    --sp-bg-elevated:  #2b1f17;   /* cards, sidebar, now-playing bar — coffee brown */
+    --sp-bg-hover:     #3d2c20;   /* hover states — warm mocha */
+    --sp-text-main:    #ede0d1;   /* primary text — cream */
+    --sp-text-dim:     #b9a189;   /* secondary text — soft tan */
+    --sp-accent:       #c8925a;   /* play button, progress bar, active states — antique gold */
+    --sp-accent-hover: #dcae7c;   /* accent hover state — lighter gold */
+    --sp-border:       #5a5049;   /* dividers, borders — muted coffee grey */
+
+    /* ---- PUT YOUR IMAGE URL HERE ---- */
+    --sp-bg-image: url("https://static.vecteezy.com/system/resources/thumbnails/037/918/540/small/ai-generated-trendy-leopard-fur-texture-golden-fur-and-black-spots-natural-animal-furry-background-concept-is-softness-comfort-and-luxury-can-be-used-as-backdrop-fashion-textile-interior-photo.jpeg");
+    /* -------------------------------------------- */
+  }
+
+  /* Background image behind everything.
+     Applied via a ::before pseudo-element on its own fixed layer,
+     separate from the actual UI -- this lets us apply a sepia + blur
+     filter to ONLY the photo without blurring the real interface
+     sitting on top of it. */
+  [data-testid="root"] {
+    position: relative;
+  }
+
+  [data-testid="root"]::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: var(--sp-bg-image);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    filter: sepia(0.45) saturate(0.7) brightness(0.85) blur(3px);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* Main view + sidebar -- TRANSPARENT glass: no color tint at all,
+     no extra blur (the photo behind is already softly blurred by its
+     own filter above, so stacking a second backdrop-blur here was
+     what turned everything milky/white). Just a thin glossy edge for
+     definition, nothing else. */
+  #Desktop_LeftSidebar_Id,
+  #main-view,
+  .main-view-container,
+  .main-view-container__scroll-node,
+  .main-view-container__scroll-node-child,
+  main[aria-label^="Spotify"],
+  [data-testid="home-page"],
+  [data-testid="playlist-page"] {
+    background-color: transparent !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+  }
+
+  /* Right sidebar (Liked Songs panel / About the artist) and bottom
+     now-playing bar -- same transparent glass treatment. */
+  aside,
+  footer,
+  [data-testid="now-playing-bar"],
+  [data-testid="now-playing-widget"] {
+    background-color: transparent !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+  }
+
+  /* The purple/blue gradient hero banner behind "Liked Songs" etc uses
+     an inline style with a hardcoded color that Spotify regenerates
+     periodically, so this exact value may need updating later -- if
+     it stops matching, send a screenshot of its inline style and
+     I'll swap in the new value. */
+  [style*="background-color: rgb(120, 96, 232)"] {
+    background-image: none !important;
+    background-color: transparent !important;
+  }
+
+  /* Belt-and-suspenders: force transparency on html/body so there's
+     no stray solid color sitting underneath anything. */
+  html, body {
+    background-color: transparent !important;
+  }
+
+  /* The CSS grid wrapper that sits directly inside [data-testid="root"]
+     (holds the top bar + sidebar + main view together) was found to have
+     its own solid background painting OVER our image. Its exact class
+     name is auto-generated and changes between Spotify deploys, so we
+     target it structurally (first div child of root) instead. */
+  [data-testid="root"] > div {
+    background-color: transparent !important;
+  }
+
+  /* Top bar / navbar */
+  header[data-testid="topbar"] {
+    background-color: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  }
+
+  /* General text colors */
+  body,
+  span, a, p, h1, h2, h3, div {
+    color: var(--sp-text-main);
+  }
+
+  /* Secondary / muted text (artist names, subtitles) */
+  [data-encore-id="text"][class*="secondary"],
+  .encore-text-body-small {
+    color: var(--sp-text-dim) !important;
+  }
+
+  /* Cards (albums, playlists) on hover */
+  [data-testid="card-click-handler"]:hover,
+  .main-card-card:hover {
+    background-color: var(--sp-bg-hover) !important;
+  }
+
+  /* Now playing bar border accent */
+  [data-testid="now-playing-bar"] {
+    border-top: 1px solid var(--sp-border) !important;
+  }
+
+  /* Play button + progress bar */
+  button[data-testid="control-button-playpause"] {
+    background-color: var(--sp-accent) !important;
+    color: var(--sp-bg-main) !important;
+  }
+
+  button[data-testid="control-button-playpause"]:hover {
+    background-color: var(--sp-accent-hover) !important;
+  }
+
+  [data-testid="progress-bar"] > div,
+  .progress-bar__slider,
+  input[type="range"]::-webkit-slider-thumb {
+    accent-color: var(--sp-accent) !important;
+  }
+
+  /* Progress bar filled track */
+  .playback-bar__progress-time,
+  .progress-bar__fg,
+  [style*="background-color: rgb(29, 185, 84)"] {
+    background-color: var(--sp-accent) !important;
+  }
+
+  /* Active / playing green text (song currently playing) -> gold instead */
+  [class*="encore-text-positive"],
+  span[data-encore-id="text"][class*="isCurrent"] {
+    color: var(--sp-accent) !important;
+  }
+
+  /* Like / heart icon when active */
+  button[aria-checked="true"] svg {
+    fill: var(--sp-accent) !important;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    background-color: transparent !important;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--sp-border) !important;
+    border-radius: 8px;
+  }
+
+  /* Buttons like "Create playlist", filter pills */
+  button[data-testid="chip"],
+  .x-filterButton-button {
+    background-color: var(--sp-bg-elevated) !important;
+    color: var(--sp-text-dim) !important;
+    border-color: var(--sp-border) !important;
+  }
+
+  button[data-testid="chip"][aria-checked="true"] {
+    background-color: var(--sp-accent) !important;
+    color: var(--sp-bg-main) !important;
+  }
+}
