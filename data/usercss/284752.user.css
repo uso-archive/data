@@ -1,9 +1,9 @@
 /* ==UserStyle==
 @name         leopard print theme for spotify
 @namespace    USO Archive
-@author       geeti99911@gmail.com
+@author       geetae
 @description  leopard print brown sepia vintage theme for spotify
-@version      20260909.19.13
+@version      20260910.06.24
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -65,18 +65,34 @@
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
   }
 
-  /* Right sidebar (Liked Songs panel / About the artist) and bottom
-     now-playing bar -- same transparent glass treatment. */
-  aside,
-  footer,
-  [data-testid="now-playing-bar"],
-  [data-testid="now-playing-widget"] {
+  /* Right sidebar (Liked Songs panel / About the artist) -- transparent
+     glass treatment. Excludes the now-playing-bar, which is ALSO an
+     <aside> tag and was being caught by this rule too, fighting with
+     the solid-brown rule below. */
+  aside:not([data-testid="now-playing-bar"]) {
     background-color: transparent !important;
     border-radius: 20px !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
   }
 
+  /* Bottom now-playing bar -- solid theme brown (matches top bar).
+     CONFIRMED via DevTools: real element is <aside data-testid="now-playing-bar">.
+     Using the tag+attribute combo for extra specificity. */
+  footer,
+  aside[data-testid="now-playing-bar"],
+  [data-testid="now-playing-widget"] {
+    background-color: var(--sp-bg-elevated) !important;
+  }
+
+  /* The "Good evening" quick-access shelf (jazz/running away/Liked Songs
+     row near the top) sits in its own <section> with its own opaque
+     background that our other selectors don't reach -- catching all
+     shelf sections here so the photo shows through there too. */
+  [data-testid="home-page"] section,
+  [data-testid="playlist-page"] section {
+    background-color: transparent !important;
+  }
   /* The purple/blue gradient hero banner behind "Liked Songs" etc uses
      an inline style with a hardcoded color that Spotify regenerates
      periodically, so this exact value may need updating later -- if
@@ -102,10 +118,12 @@
     background-color: transparent !important;
   }
 
-  /* Top bar / navbar */
-  header[data-testid="topbar"] {
-    background-color: transparent !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  /* Top bar / navbar -- solid theme brown.
+     CONFIRMED via DevTools: real element is #global-nav-bar
+     (a div, not a <header data-testid="topbar"> as originally guessed). */
+  #global-nav-bar {
+    background-color: var(--sp-bg-elevated) !important;
+    border-bottom: 1px solid var(--sp-border) !important;
   }
 
   /* General text colors */
@@ -127,14 +145,27 @@
   }
 
   /* Now playing bar border accent */
-  [data-testid="now-playing-bar"] {
+  aside[data-testid="now-playing-bar"] {
     border-top: 1px solid var(--sp-border) !important;
   }
 
-  /* Play button + progress bar */
-  button[data-testid="control-button-playpause"] {
+  /* Play button + progress bar.
+     CONFIRMED via DevTools: button[data-testid="control-button-playpause"]
+     IS the right element, but Spotify's own "Encore" design-system CSS
+     (class + data-encore-id combo) has higher specificity than a single
+     attribute selector, so it was winning. Chaining extra attributes
+     here to raise our specificity above theirs. */
+  button[data-testid="control-button-playpause"][data-encore-id="buttonPrimary"],
+  button[data-testid="control-button-playpause"][aria-label="Play"],
+  button[data-testid="control-button-playpause"][aria-label="Pause"] {
     background-color: var(--sp-accent) !important;
+    border-color: var(--sp-accent) !important;
     color: var(--sp-bg-main) !important;
+  }
+
+  button[data-testid="control-button-playpause"] svg,
+  button[data-testid="control-button-playpause"] span svg {
+    fill: var(--sp-bg-main) !important;
   }
 
   button[data-testid="control-button-playpause"]:hover {
@@ -147,7 +178,11 @@
     accent-color: var(--sp-accent) !important;
   }
 
-  /* Progress bar filled track */
+  /* Progress bar filled track -- catches any inline white or Spotify-green
+     fill within the playback bar specifically, so nothing else on the
+     page is affected. */
+  [data-testid="now-playing-bar"] [style*="background-color: rgb(255, 255, 255)"],
+  [data-testid="now-playing-bar"] [style*="background-color: rgb(29, 185, 84)"],
   .playback-bar__progress-time,
   .progress-bar__fg,
   [style*="background-color: rgb(29, 185, 84)"] {

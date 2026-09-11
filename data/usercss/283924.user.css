@@ -3,12 +3,12 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for FanFiction.Net and FictionPress, with an easy-on-the-eyes story reader, dark browse filters, profiles and forums.
-@version      20260831.14.40
+@version      20260910.22.35
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
 @-moz-document domain("fanfiction.net"), domain("m.fanfiction.net"), domain("fictionpress.com"), domain("m.fictionpress.com") {
-/* ---- Palette ---------------------------------------------------------- */
+/* Palette */
   :root {
     color-scheme: dark;
     --ff-bg: #14181d;
@@ -23,11 +23,11 @@
     --ff-link: #5fb0e6;
     --ff-link-hover: #9bd4ff;
     --ff-green: #3fb950;
-    /* brand accents refined for dark: FFN navy → readable blue-slate; FP maroon handled below */
+    /* FFN navy lifted to a readable blue-slate; FP maroon handled below */
     --ff-brand: #243b66;
   }
 
-  /* ---- Base ------------------------------------------------------------- */
+  /* Base */
   html, body {
     background: var(--ff-bg) !important;
     color: var(--ff-body) !important;
@@ -38,9 +38,8 @@
     border-color: var(--ff-border) !important;
   }
 
-  /* Bootstrap draws .caret as a pure-CSS triangle: one coloured border side and
-     the other three `transparent`. The blanket reset above paints all four, so
-     every nav / button / chapter-select caret renders as a solid rectangle. */
+  /* .caret is a CSS triangle — three border sides must stay transparent under the blanket
+     reset above */
   .caret {
     border-top-color: var(--ff-muted) !important;
     border-right-color: transparent !important;
@@ -54,41 +53,33 @@
     border-bottom-color: var(--ff-muted) !important;
   }
 
-  /* FFN underlines story titles with a 1px #357BD6 rule (border-bottom, not
-     text-decoration), which the blanket reset above flattens into the page line
-     colour. Restore the accent so titles read as links again. */
+  /* title underline is a border-bottom, not text-decoration */
   .stitle,
   .novtitle {
     border-bottom-color: var(--ff-link) !important;
   }
-  /* Same #357BD6 rule, two more places the blanket reset reaches: `a:hover`
-     pairs `text-decoration:none` with that border, so the underline IS the
-     hover affordance for every link on the site, and `.underline` is the
-     utility-class form. */
+  /* `a:hover` sets text-decoration:none, so this border IS the site's hover affordance */
   a:hover,
   .underline {
     border-bottom-color: var(--ff-link) !important;
   }
-  /* a tab owns its own border box: the site's `.nav-tabs > li > a:hover` outranks
-     its global a:hover, so a hovered tab must not pick up the link accent */
+  /* the site's own `.nav-tabs > li > a:hover` outranks global a:hover — a hovered tab must
+     not take the link accent */
   .nav-tabs > li > a:hover {
     border-bottom-color: var(--ff-border) !important;
   }
 
-  /* ---- Divider rules ---------------------------------------------------- */
-  /* FFN draws <hr> with border-style:none and a white→#cbcbcb→white gradient as
-     its background, so the border-color reset above cannot reach it. */
+  /* Divider rules */
+  /* <hr> is border-style:none over a gradient background, out of the border reset's reach */
   hr {
     background-color: var(--ff-border-2) !important;
     background-image: none !important;
   }
-  /* The rule behind a section heading is painted by .lc-wrapper::after, and `*`
-     never matches pseudo-elements — its #cdcdcd border-top survives untouched. */
+  /* `*` never matches pseudo-elements, so this border-top survives the blanket reset */
   .lc-wrapper::after {
     border-top-color: var(--ff-border-2) !important;
   }
-  /* .lc-left / .lc-right are the opaque white pills that mask the rule behind
-     the heading text (breadcrumbs, reader toolbar, forum headers). */
+  /* opaque pills masking the rule behind heading text */
   .lc-left,
   .lc-right {
     background-color: var(--ff-surface) !important;
@@ -98,16 +89,13 @@
     background-color: var(--ff-border-2) !important;
   }
 
-  /* ---- Main content surfaces ------------------------------------------- */
+  /* Main content surfaces */
   #content_wrapper,
   #content_wrapper_inner,
   #content_parent,
   .zui,
-  /* FFN emits its status panels from a per-page inline <style>, never from
-     xss26.css, as five identically-painted classes (#f6f7ee paper, #000 ink,
-     `border: 1px outset`). All five must be listed: `.panel_normal` carries the
-     "Message Type" notices (dead topic / user / review), `.panel_warning` the
-     "Story Not Found" page on both hosts. */
+  /* five identically-painted classes from a per-page inline <style>; all five must be
+     listed */
   .panel_normal,
   .panel_warning,
   .panel_error,
@@ -137,55 +125,37 @@
   #content_parent {
     background-color: transparent !important;
   }
-  /* The reader's Fontastic Panel "READING Texture" picker writes an inline
-     `background: url(/static/textures/<name>.png) repeat` onto
-     #content_wrapper_inner (guest-reachable: the choice rides in the xcookie2
-     `read_light_texture` field and replays on every load). It is a paper
-     background-IMAGE, so the transparent background-COLOR above does not clear
-     it and the whole reader column renders bright under the light body text.
-     FFN's own dark reading mode clears this background, so nothing is lost. */
+  /* the reader's texture picker writes an inline background-IMAGE url() here (replayed for
+     guests from xcookie2); a transparent background-COLOR cannot clear it */
   #content_wrapper_inner {
     background-image: none !important;
   }
-  /* The panel's own live preview pane takes that same inline texture url() the
-     moment a swatch is clicked, so the sample text renders --ff-body on cream
-     paper (~1.3:1) while the reader behind it is correctly dark. */
+  /* the picker's preview pane takes the same inline texture url() on click */
   #_fontastic_reading_preview {
     background-image: none !important;
     background-color: var(--ff-surface-2) !important;
   }
 
-  /* The "Narrow Results" rail on the writer / forum / community search results
-     is a bare <div> with no class or id — its only paint is an inline
-     `background-color:#ffffff` beside a `z-index:20000` float. Nothing else on
-     FFN writes that literal (the page wrappers use `background-color: white`),
-     so the substring is an exact hook. Without it the rail renders as a white
-     column and its `<small>Narrow Results</small>` heading sits at ~1.7:1. */
+  /* the "Narrow Results" rail is a classless, idless <div>; its inline
+     `background-color:#ffffff` is the only hook, and nothing else on FFN writes that literal */
   div[style*="background-color:#ffffff"] {
     background-color: var(--ff-surface) !important;
   }
 
-  /* ---- Header / top brand bar ------------------------------------------ */
-  /* FFN navy + FP maroon raw bars refined to harmonize with the dark palette.
-     Every selector here is qualified with `div` on purpose: on m.fanfiction.net
-     and m.fictionpress.com the id lives on <body id="top">, so a bare `#top`
-     repaints the whole mobile page and turns every link into header text. */
+  /* Header / top brand bar */
+  /* the `div` qualifier is load-bearing: on the m. hosts the id sits on <body id="top"> */
   div#top {
     background-color: var(--ff-header) !important;
     border-bottom: 1px solid var(--ff-border-2) !important;
   }
-  /* Mobile (m.fanfiction.net / m.fictionpress.com) top nav bar paints a
-     white→grey linear-gradient background-image (bg-color transparent) — the
-     already-light nav labels sit invisibly on it, and the bg-color audit is
-     blind to the gradient. Kill the gradient, give it the dark header bg. */
+  /* the bar's paint is a gradient background-IMAGE over a transparent bg-color */
   .t_head {
     background-image: none !important;
     background-color: var(--ff-header) !important;
     border-bottom: 1px solid var(--ff-border-2) !important;
   }
-  /* the mobile nav labels are header chrome (natively black, not link blue).
-     The m.fictionpress.com wordmark is `<a style="color:black"><b>` — the `b`
-     must be named or the `a b` link rule below outranks the chrome ink on it. */
+  /* header chrome, not links. The wordmark is `<a style="color:black"><b>` — name the `b`
+     or the `a b` rule below outranks it. */
   .t_head a,
   .t_head a b {
     color: var(--ff-text) !important;
@@ -212,7 +182,7 @@
     background-color: #2d4a80 !important;
   }
 
-  /* ---- Navigation menus / dropdowns ------------------------------------ */
+  /* Navigation menus / dropdowns */
   #nav_internal,
   #nav_internal a,
   .menulink,
@@ -234,12 +204,7 @@
   .dropdown-menu a {
     color: var(--ff-body) !important;
   }
-  /* Bootstrap 2 paints the highlight as a background-IMAGE gradient (#5678B2 →
-     #5670B2) layered over its background-color, so our background-color never
-     shows: the item renders the site's light blue under our dimmed --ff-text at
-     3.9:1, where the site's own #fff cleared 4.6:1. Kill the gradient so the fill
-     below is the one that paints. (`.active` is the same gradient trick in
-     #0081c2; it does not render logged-out but shares the rule.) */
+  /* Bootstrap 2's highlight is a background-IMAGE gradient over its background-color */
   .dropdown-menu li > a:hover,
   .dropdown-menu a:hover,
   .dropdown-menu > .active > a {
@@ -247,11 +212,8 @@
     background-image: none !important;
     color: var(--ff-text) !important;
   }
-  /* Each nav dropdown heads its groups with a `li.disabled > a` label ("Stories",
-     "Crossovers"): the site dims it to #999 against #333 entries and gives it no
-     hover fill, which is the only cue that it is a heading and not a link. Both
-     generic rules above outrank that, so headings read as entries and light up
-     under the cursor. */
+  /* dropdown group headings are `li.disabled > a`: dimmed and hover-less is the only cue
+     they are not links */
   .dropdown-menu > .disabled > a,
   .dropdown-menu > .disabled > a:hover,
   .dropdown-menu > .disabled > a:focus {
@@ -267,7 +229,7 @@
     color: var(--ff-muted) !important;
   }
 
-  /* ---- Links ------------------------------------------------------------ */
+  /* Links */
   a {
     color: var(--ff-link) !important;
   }
@@ -279,10 +241,7 @@
     color: var(--ff-link-hover) !important;
   }
 
-  /* The general text rules below carry a class (.xcontrast_txt) or an element
-     name (b) that outranks the bare `a` above, so FFN's breadcrumbs, author
-     names, rating links and the bolded keyword runs in search-result titles all
-     lose their link colour. Re-assert it on anchors and on runs inside one. */
+  /* .xcontrast_txt and `b` outrank the bare `a` above */
   a.xcontrast_txt,
   #profile_top a,
   #profile_top a.xcontrast_txt,
@@ -297,34 +256,24 @@
   a:hover strong {
     color: var(--ff-link-hover) !important;
   }
-  /* The forum post-admin row (opened by the cog beside a post) is the one place
-     FFN puts an entry's LABEL inside the anchor's glyph span instead of in the
-     anchor itself, so the blanket `span` rule below strips the link colour from
-     `Report Abuse` while every sibling entry beside it stays blue. Its glyph
-     siblings (`.icon-reply`, `.icon-cog`, `.icon-lock`) carry an inline
-     `color:black` and must keep the body tone they get today. */
+  /* this row alone puts the entry LABEL inside the anchor's glyph span, where the blanket
+     `span` rule below would strip it. Its `.icon-*` siblings carry inline `color:black`. */
   a span.icon-cr-warning {
     color: var(--ff-link) !important;
   }
   a:hover span.icon-cr-warning {
     color: var(--ff-link-hover) !important;
   }
-  /* Every muted metadata block — `.xgray` story-row lines on the desktop hosts,
-     `.gray` listing lines on the m. hosts — ends in bare `<span data-xutime>` date
-     children that carry no colour of their own and inherit the block's grey. The
-     blanket `span { color }` rule below is a DIRECT declaration, so it beats that
-     inheritance and lights only the dates up, inventing an emphasis the site never
-     had. Keep this ABOVE the `span._thread` / brand-glyph rules that follow: they
-     tie it on specificity, so order is what lets them win. */
+  /* these blocks end in bare `<span data-xutime>` dates that only inherit the block grey,
+     which the direct `span { color }` declaration below would light. Must stay ABOVE the
+     `span._thread` / brand-glyph rules — they tie it and win only on order. */
   .xgray span,
   .gray span,
   .z-list .z-padtop2 span {
     color: var(--ff-muted) !important;
   }
 
-  /* forum topic rows carry a clickable "jump to latest post" chevron painted
-     #0033cc — a plain <span> wrapping the glyph <span>, so the body-text rule
-     below greys out both */
+  /* a plain <span> wraps the glyph <span>, so the body-text rule below greys both */
   span._thread,
   span._thread span {
     color: var(--ff-link) !important;
@@ -333,13 +282,8 @@
   span._thread:hover span {
     color: var(--ff-link-hover) !important;
   }
-  /* Every story row ends with an orange `.reviews` link (#f50) — the site's only
-     cue that it leads to the review list rather than to the story. The bare `a`
-     rule above outranks the site's `.reviews` colour and the `a:hover` rule
-     outranks it again on hover, so both states read as an ordinary blue link.
-     #f50 clears 4.5:1 on the card surface; keep it verbatim. `.z-list a` below
-     ties `a.reviews` on specificity and comes later, so the row form needs the
-     `.z-list` prefix to win. */
+  /* orange is the only cue this leads to the review list, not the story; #f50 clears 4.5:1.
+     `.z-list a` below ties `a.reviews`, so the row form needs the `.z-list` prefix. */
   a.reviews,
   a.reviews:hover,
   .reviews,
@@ -348,26 +292,22 @@
     color: #ff5500 !important;
   }
 
-  /* Two fontello glyphs get their brand hue from an inline style attribute, and
-     the blanket `span` rule below beats it. The crossover blue is lifted out of
-     the 2:1 range it would land in on the dark surface. */
+  /* the inline brand hue loses to the blanket `span` rule below; the crossover blue is
+     lifted off 2:1 */
   span.icon-rss-squared {
     color: #ff8f00 !important;
   }
   span.icon-shuffle {
     color: #6d86f0 !important;
   }
-  /* Two more glyphs the blanket `span` rule promotes to full body ink, both of
-     which FFN keeps a step UNDER its body copy: the section chevron beside every
-     breadcrumb and story title (`.xicon-section-arrow`, #5a5a5a in the site CSS)
-     and the footer X/Twitter mark (inline #686464). Both source values are
-     unreadable on the dark surface, so the muted tone is what carries the step. */
+  /* the blanket `span` rule promotes both to full ink, but FFN keeps them a step under body
+     copy and their source values are unreadable on dark */
   span.xicon-section-arrow,
   span.icon-twitter-3 {
     color: var(--ff-muted) !important;
   }
 
-  /* ---- Headings & general text ----------------------------------------- */
+  /* Headings & general text */
   h1, h2, h3, h4, h5, h6, b, strong {
     color: var(--ff-text) !important;
   }
@@ -379,29 +319,17 @@
   .xgray, .gray, small {
     color: var(--ff-muted) !important;
   }
-  /* `small` covers two unrelated things on FFN. Inside a table cell it is forum
-     fine print (post dates, natively #686868) and belongs on the muted tone; as a
-     direct child of a div it is the "Narrow Results" rail heading on /search/ and
-     /betareaders/ (natively #000, the strongest ink in that panel) and the header
-     separator pipe (natively #fff). Muting those two puts a heading below the
-     controls it labels. */
+  /* as a direct div child, `small` is the "Narrow Results" heading and the header separator
+     pipe — the strongest ink there natively */
   div > small {
     color: var(--ff-body) !important;
   }
-  /* FFN writes its fine print as an inline grey one step under the black body copy:
-     `color:gray` (the profile Sort bar, the sign-up disclaimer), `#8c8c8c` (the bio
-     toggle), `#c4c4c4` (the footer ray id). The blanket text rule above is a direct
-     declaration and outranks every one of them, which on the Sort bar puts the inert
-     `Sort:` label ABOVE the `.gray` options it labels.
-     The substring also matches an inline `background-color:` of the same value — FFN
-     ships none, and this rule only sets `color`, so a stray match costs nothing. Keep a
-     literal `;` OUT of these selectors: `parse-check.js` finds a rule's prelude by
-     scanning back to the previous `;`, and reports a valid rule as dead.
-     An anchor is matched only when it carries the grey itself (the m. hosts' per-post
-     `Report` links, thirty per topic page); an anchor merely inside a greyed block (the
-     sign-up disclaimer's Terms links) keeps the link accent. This block sits after the
-     `a:hover` arm, so a grey anchor stays grey under the cursor as it does natively —
-     the hover cue is its underline. */
+  /* FFN's inline fine-print greys, which the blanket text rule above outranks.
+     Keep a literal `;` OUT of these selectors: parse-check.js finds a rule's prelude by
+     scanning back to the previous `;` and reports a valid rule as dead.
+     An anchor matches only when it carries the grey itself; one inside a greyed block keeps the
+     link accent. Placed after the `a:hover` arm so a grey anchor stays grey under the cursor —
+     its hover cue is the underline. */
   div[style*="color:gray"],
   span[style*="color:gray"],
   a[style*="color:gray"],
@@ -410,7 +338,7 @@
     color: var(--ff-muted) !important;
   }
 
-  /* ---- Story list rows (browse / search results) ----------------------- */
+  /* Story list rows (browse / search results) */
   .z-list,
   .z-list-content {
     background-color: var(--ff-surface) !important;
@@ -423,25 +351,16 @@
   .z-list .stitle {
     color: var(--ff-link) !important;
   }
-  /* Every story row stacks a summary (#000 natively) over a `.z-padtop2.xgray`
-     metadata line (#686868) — the site's only ranking of the two. Promoting the
-     metadata to body text collapses them into one block of identical grey on every
-     browse / search / profile / community / review page. --ff-muted keeps the step
-     and still clears 6.4:1 on the row surface. */
+  /* the metadata line sits a step under the summary — the site's only ranking of the two;
+     muted keeps the step and clears 6.4:1 */
   .z-list .xgray,
   .z-list .z-padtop2 {
     color: var(--ff-muted) !important;
   }
 
-  /* ---- Story reader (#storytext core long-text surface) ---------------- */
-  /* The m. hosts name the story column #storycontent (desktop: #storytext), and
-     their reader footer's "Contrast: Dark . Light" control writes the pick straight
-     onto it: `x_contrast()` sets an inline `background-color:white` (Light) or
-     `#333` (Dark), and `x_render_s_pref()` replays the dark one on reload as a
-     document.write'd sheet declaring `background-color:#333` on `.storycontent`.
-     The blanket text rule below keeps our light body ink under either, so one guest
-     click leaves the whole column light-grey on white. Both forms are background
-     declarations, so clearing the background covers them. */
+  /* Story reader (#storytext) */
+  /* the m. hosts' contrast toggle writes the pick onto this column as an inline
+     background-color, replayed on reload by a document.write'd sheet on `.storycontent` */
   #storytext,
   #storytextp,
   .storytext,
@@ -450,8 +369,8 @@
     color: var(--ff-body) !important;
     background-color: transparent !important;
   }
-  /* do NOT force a single color on inner runs — preserve author bold/italic/
-     alignment/hr emphasis; only normalize the common black text default */
+  /* do NOT force one colour on inner runs — author bold/italic/alignment must survive; only
+     normalize the black default */
   #storytext p,
   #storytext div,
   #storytext span[style*="color: rgb(0, 0, 0)"],
@@ -473,16 +392,14 @@
   #profile_top .xcontrast_txt {
     color: var(--ff-text) !important;
   }
-  /* The metadata line under the summary is `<span class="xgray xcontrast_txt">`
-     (#686868 natively, a step BELOW the black summary). The rule above matches it on
-     `.xcontrast_txt` at (1,1,0), so the dimmest run in the box came out as the
-     brightest — the site's hierarchy inverted. */
+  /* the rule above matches this on `.xcontrast_txt`, which would invert its step below the
+     summary */
   #profile_top .xgray.xcontrast_txt,
   #profile_top .xgray {
     color: var(--ff-muted) !important;
   }
 
-  /* ---- Reading-options bar + chapter select ---------------------------- */
+  /* Reading-options bar + chapter select */
   select,
   select[name="chapter"],
   #chap_select {
@@ -494,26 +411,21 @@
     background-color: var(--ff-surface-2) !important;
     color: var(--ff-text) !important;
   }
-  /* The search page's "Narrow Results" rails are `<select size="7">` list boxes whose
-     rows are always visible, so the UA highlight on the clicked row is the only
-     acknowledgement a filter was picked. The blanket option fill above outranks it and
-     the row stays identical to its siblings. */
+  /* `<select size="7">` rows are always visible, so the highlight on the picked one is the
+     only cue a filter was set */
   select[size] option:checked {
     background-color: var(--ff-brand) !important;
     color: var(--ff-text) !important;
   }
-  /* FFN marks every filter dropdown that carries a non-default value with
-     .selection_hl (green border + pale-green fill) — that is the only cue for
-     "this filter is active". The generic select rule above and the blanket
-     `* { border-color }` reset both outrank it, so a set filter looked exactly
-     like an unset one. Restore the cue as a dark green-tinted field. */
+  /* `.selection_hl` is the only "this filter is active" cue, and the generic select rule and
+     border reset outrank it */
   select.selection_hl {
     background-color: rgba(63, 185, 80, .18) !important;
     border-color: var(--ff-green) !important;
     color: var(--ff-text) !important;
   }
 
-  /* ---- Browse filter bar buttons / segmented controls / sort tabs ------ */
+  /* Buttons / segmented controls / sort tabs */
   button,
   .btn,
   input[type="button"],
@@ -530,13 +442,8 @@
     background-color: #232a32 !important;
     color: var(--ff-text) !important;
   }
-  /* Bootstrap marks the toggle of an OPEN dropdown/dropup by dropping the
-     white→grey gradient for the flat `#e6e6e6` it also uses for `:hover` and
-     `.active` — the only pressed cue on the button itself. The `.btn` fill
-     above is `!important` and outranks it, so an open toggle rendered
-     identical to its closed siblings on the reader's Actions / Share / review
-     "As" menus and the search-type picker. Same tone as the hover arm, which
-     is what the site does. */
+  /* the flat fill Bootstrap gives an OPEN toggle is the only pressed cue on the button, and
+     the `.btn` fill above is !important */
   .btn-group.open .btn.dropdown-toggle {
     background-color: #232a32 !important;
   }
@@ -546,26 +453,16 @@
     background-color: var(--ff-brand) !important;
     color: var(--ff-text) !important;
   }
-  /* `.btn-primary` is the only primary CTA the site ships logged-out: the Filters
-     modal's Apply and the reader's Fontastic / Follow-Fav Save. Bootstrap keeps it
-     blue through hover, focus and press; the generic `.btn:hover` arm above ties
-     this on specificity, so the arm must stay AFTER it or the CTA collapses onto
-     the neutral chip and reads as less prominent hovered than at rest. */
+  /* the only primary CTA shipped logged-out; the generic `.btn:hover` above ties this, so
+     this arm must stay AFTER it */
   .btn-primary:hover,
   .btn-primary:focus,
   .btn-primary:active {
     background-color: #2d4a80 !important;
   }
-  /* The category-picker popup (`/search/?popup=1`, opened by the "Select" link
-     in the search Options panel) ships its submit as a real
-     `<input type="button" disabled>` until a main category is picked. The UA
-     paints a disabled control at 30% ink; the rules above are `!important` and
-     repaint it at full strength, so a dead control reads as clickable. Must
-     stay AFTER the hover/active arms — it ties them on specificity and only
-     wins on order. The `:hover` forms are not redundant: `.btn:hover` is
-     (0,2,0) and outranks `button[disabled]` (0,1,1), so without them a disabled
-     `.btn` (the recover-page submit until its reCAPTCHA is solved) lights up
-     under the cursor like a live control. */
+  /* the !important rules above would repaint a disabled control at full strength. Must stay
+     AFTER the hover/active arms — it ties them and wins on order. `.btn:hover` (0,2,0)
+     outranks `button[disabled]` (0,1,1), so the `:hover` forms are needed. */
   button[disabled],
   button[disabled]:hover,
   input[disabled],
@@ -582,7 +479,7 @@
     opacity: .7 !important;
   }
 
-  /* ---- Form inputs & search -------------------------------------------- */
+  /* Form inputs & search */
   input[type="text"],
   input[type="search"],
   input[type="email"],
@@ -597,12 +494,8 @@
     color: var(--ff-muted) !important;
     opacity: 1 !important;
   }
-  /* Bootstrap marks a focused field that fails its constraint (the `required`
-     email on login.php / recover.php, autofocused empty on load) with a red
-     border, red ink and a pink glow. The field rule above is `!important` and
-     holds border and ink neutral while the site's box-shadow still lands, so
-     the state arrives as a pink haze around a neutral field. All three must be
-     restated together. */
+  /* the field rule above is !important and holds border and ink neutral while the site's
+     pink box-shadow lands, so all three must be restated */
   input:focus:invalid,
   textarea:focus:invalid,
   select:focus:invalid {
@@ -610,19 +503,15 @@
     color: #f85149 !important;
     box-shadow: 0 0 6px rgba(248, 81, 73, .45) !important;
   }
-  /* `/recover.php` is the one guest page that renders a VISIBLE reCAPTCHA: a
-     304x78 cross-origin frame painting Google's `#f9f9f9` panel, unreachable by
-     any rule of ours. Inverting the frame itself is the only lever; the
-     hue-rotate returns the brand blue and the solved-state green tick to their
-     own hues. Keyed to `api2/anchor` on purpose — the `api2/bframe` sibling is
-     the photo-grid challenge, whose images must not be inverted. */
+  /* the reCAPTCHA panel is cross-origin, so inverting the frame is the only lever; the
+     hue-rotate restores the brand blue and green tick. `api2/anchor` only — `api2/bframe` is
+     the photo-grid challenge and must not be inverted. */
   iframe[src*="recaptcha/api2/anchor"] {
     filter: invert(.92) hue-rotate(180deg) !important;
   }
 
-  /* ---- Tables (gui_table, forum topic lists, .table-striped) ----------- */
-  /* FFN forums render rows as a striped table whose <td> carry their own
-     light bg (rgb(249,249,249)); target the cells directly, not just rows. */
+  /* Tables */
+  /* the <td> carry their own light bg; target the cells, not just the rows */
   .gui_table,
   .gui_table td,
   .gui_table th,
@@ -643,10 +532,8 @@
     background-color: var(--ff-header) !important;
     color: var(--ff-text) !important;
   }
-  /* Forum boards label their columns with `<th class="thead">`, which the site dims
-     to grey against the black rows — the only thing that reads the row as a header,
-     since its background matches the body rows. `table.table th` above is (0,1,2) and
-     outranks both `.thead` and the `thead th` arm, so the labels came out as content. */
+  /* `.thead` is dimmed by the site — the only thing reading the row as a header — and
+     `table.table th` above outranks it */
   table.table th.thead,
   th.thead {
     color: var(--ff-muted) !important;
@@ -658,20 +545,15 @@
     background-color: var(--ff-surface-2) !important;
   }
 
-  /* ---- Forum post quotes ----------------------------------------------- */
-  /* An unclassed blockquote inherits the post ink on FFN, so it stays on body
-     text; only the accent bar needs the dark line colour. */
+  /* Forum post quotes */
+  /* an unclassed blockquote inherits the post ink, so only the bar needs the line colour */
   blockquote {
     color: var(--ff-body) !important;
     border-color: var(--ff-border-2) !important;
   }
-  /* `.quoteStyle` is the forum's quote wrapper (`p`, `div` or `blockquote`),
-     which FFN sets a step UNDER the post copy it sits in (#535353 against #000)
-     beside a 5px #cdcdcd bar. The bar alone is a ~1.2:1 cue on the dark post
-     surface, so the ink step is what carries the block. The inner runs must be
-     listed: the blanket `p`/`div`/`span` text rule is a direct declaration and
-     beats the colour they would inherit from the wrapper. Anchors stay out —
-     quoted links keep the link accent, as they do natively. */
+  /* the quote wrapper sits a step UNDER the post copy; its 5px bar is only ~1.2:1 on dark,
+     so the ink step carries the block. Inner runs must be listed — the blanket p/div/span rule
+     beats inheritance. Anchors stay out. */
   .quoteStyle,
   .quoteStyle p,
   .quoteStyle div,
@@ -686,18 +568,14 @@
     border-color: var(--ff-border-2) !important;
   }
 
-  /* ---- Highlight spans (.hiliteStyle) ---------------------------------- */
-  /* FFN highlights forum "(N posts)" counts and matched search terms with a
-     pale-green mark (bg #ccffcc, dark text). As a short inline pill it slips
-     the height-based light-surface audit, and our body-text rule leaves its
-     text light-grey → washed-out on the pale green. Swap to a dark green-
-     tinted mark that keeps the highlight cue with readable light text. */
+  /* Highlight spans (.hiliteStyle) */
+  /* pale-green mark on "(N posts)" counts and matched search terms */
   .hiliteStyle {
     background-color: rgba(63, 185, 80, .2) !important;
     color: var(--ff-text) !important;
   }
 
-  /* ---- Badges / counters ----------------------------------------------- */
+  /* Badges / counters */
   /* default grey badge → dark chip with readable light text */
   .badge {
     background-color: var(--ff-surface-2) !important;
@@ -705,14 +583,10 @@
     border: 1px solid var(--ff-border-2) !important;
     text-shadow: none !important;
   }
-  /* `.badge-blue` (the forum post-count and writer-search story-count pills) has
-     no rule in the site CSS: it renders as the plain #999 `.badge`. It must not
-     be given its own fill — on --ff-brand it would share the selected topic-filter
-     chip's colour, thirty times per forum board. */
-  /* The site distinguishes the selected/hovered forum topic-filter chip with a
-     plain .badge-active / .badge:hover (no !important), which our generic
-     .badge rule above outranks — both states collapse into the default chip.
-     Re-establish them so the active filter reads as selected. */
+  /* `.badge-blue` has no site rule and renders as the plain `.badge`; giving it a fill would
+     clash with the selected topic-filter chip */
+  /* the site's `.badge-active` / `.badge:hover` carry no !important, so the generic `.badge`
+     rule above outranks them */
   .badge:hover {
     background-color: #232a32 !important;
   }
@@ -723,10 +597,7 @@
     color: var(--ff-text) !important;
   }
 
-  /* The join-date pill beside every beta reader / community member is
-     .xcount (#e1e1e1 bg with #626262 text). Only ~14px tall, so the
-     height-based light-surface audit skips it, and the body-text rule leaves
-     its label light-grey on light-grey — a bright pill with unreadable text. */
+  /* the light-grey join-date pill beside every beta reader / community member */
   .xcount {
     background-color: var(--ff-surface-2) !important;
     color: var(--ff-muted) !important;
@@ -737,23 +608,16 @@
     color: var(--ff-text) !important;
   }
 
-  /* ---- Profile / story tabs (Bootstrap .nav-tabs) ---------------------- */
-  /* FFN renders the active tab (li.active > a) with a white "folder" bg meant
-     to sit on light content — paints a bright panel on dark. As a short 38px
-     pill it slips past the height-based light-surface audit.
-     Selection lives on `li.active` ONLY: `a.current` is an inert marker the
-     site never styles and its tab-switch JS never moves, so keying off it
-     leaves the first tab looking selected alongside the real one. */
+  /* Profile / story tabs (.nav-tabs) */
+  /* Selection lives on `li.active` ONLY: `a.current` is an inert marker the site never styles
+     or moves */
   .nav-tabs > li > a,
   .nav-tabs a {
     background-color: transparent !important;
     color: var(--ff-link) !important;
   }
-  /* Bootstrap gives an inactive tab `border: 1px solid transparent`, so only the
-     selected tab draws the folder outline — and that outline is the whole cue, since
-     the active tab's fill matches the panel behind it on FFN as it does natively.
-     The blanket `* { border-color }` reset paints all four sides of every tab, so each
-     one renders as a closed box and selection collapses to the label colour alone. */
+  /* only the selected tab draws the folder outline natively, and that is the whole cue since
+     the active fill matches the panel; the blanket border reset boxes up every tab */
   .nav-tabs > li > a {
     border-color: transparent !important;
   }
@@ -765,15 +629,14 @@
     border-color: var(--ff-border-2) !important;
     border-bottom-color: var(--ff-surface) !important;
   }
-  /* native hover restores an outline (`border-color: #eee #eee #ddd`), so the tab under
-     the cursor must box up again — otherwise the transparent rule above eats the
-     hover affordance the site draws. Bottom stays the line colour, not the link accent. */
+  /* native hover restores an outline, so the hovered tab must box up again; bottom stays the
+     line colour, not the link accent */
   .nav-tabs > li > a:hover {
     background-color: var(--ff-surface-2) !important;
     border-color: var(--ff-border-2) var(--ff-border-2) var(--ff-border) !important;
   }
 
-  /* ---- Advanced-filter modal ------------------------------------------- */
+  /* Advanced-filter modal */
   .modal,
   .modal-body,
   .modal-header,
@@ -784,16 +647,14 @@
     color: var(--ff-body) !important;
     border-color: var(--ff-border-2) !important;
   }
-  /* Bootstrap paints a white inset highlight along the footer's top edge; a
-     box-shadow is invisible to every background-color audit. */
+  /* a white inset box-shadow highlight runs along the footer's top edge */
   .modal-footer,
   .modal-header {
     box-shadow: none !important;
   }
 
-  /* ---- Semantic cues: keep status / completed green readable ----------- */
-  /* FFN uses dark greens (e.g. #04761c "Complete"/"Plus") that vanish on
-     dark; lift them to the palette green while keeping the semantic. */
+  /* Semantic status colours */
+  /* FFN's dark greens vanish on dark; lift to the palette green, keeping the semantic */
   span[style*="color:green"],
   span[style*="#04761c"],
   span[style*="#080"],
@@ -801,28 +662,17 @@
   font[color="green"] {
     color: var(--ff-green) !important;
   }
-  /* The Filters modal pairs a green "Plus" heading with a red "Without" one
-     (inline style="color:#c00000") to mark the include vs exclude sections.
-     The green survived via the rule above; the blanket span rule flattened the
-     red to body text, so only half the cue was left. Lift it to a readable red
-     — #c00000 sits at ~2.8:1 on the modal surface. */
+  /* red "Without" pairs with green "Plus" to mark exclude vs include; the blanket span rule
+     flattens it, and #c00000 is only ~2.8:1 here */
   span[style*="#c00000"],
   span[style*="color:red"],
   font[color="red"] {
     color: #f85149 !important;
   }
 
-  /* FFN tones its status messages with a class from the same per-page inline
-     sheet that declares the `.panel_*` boxes — `.gui_error` is `red`,
-     `.gui_warning` `#E56717`, `.gui_success` `green`. Each wraps its
-     text in a `<span>`, so the blanket text rule outranks all three and error,
-     warning and success collapse into one grey notice — the "Story Not Found"
-     warning on both hosts, and the "is currently accepting beta reading
-     requests" line on every `/beta/` profile. The `b` arm is not redundant: the
-     words carrying the message (`accepting`, the `β` mark) sit in `<b>`, and a
-     direct declaration beats the colour they would inherit from the span.
-     `red` (4.1:1) and `green` (3.2:1) miss AA on the panel surface and take the
-     palette equivalents; the orange clears 4.9:1 and stays verbatim. */
+  /* each status class wraps its text in a `<span>` the blanket text rule outranks; the `b`
+     arm is not redundant, since the message words sit in `<b>`. `red` and `green` miss AA on
+     the panel surface and take palette equivalents; the orange stays verbatim. */
   .gui_error,
   .gui_error b,
   .gui_error strong {
@@ -839,15 +689,14 @@
     color: var(--ff-green) !important;
   }
 
-  /* ---- Cookie bar ------------------------------------------------------- */
-  /* Its Accept control is a bare <div> whose only affordance is an inline
-     `border:1px whitesmoke solid`; the blanket border reset darkens it below
-     the bar's own #363636 background, leaving an invisible click target. */
+  /* Cookie bar */
+  /* the Accept control's only affordance is an inline `border:1px whitesmoke solid`, which
+     the blanket reset drops below the bar's own #363636 */
   #cookie_notice div[onclick] {
     border-color: var(--ff-muted) !important;
   }
 
-  /* ---- Footer ----------------------------------------------------------- */
+  /* Footer */
   #footer,
   .footer,
   #zfooter {
@@ -857,7 +706,7 @@
   }
   #footer a, .footer a { color: var(--ff-link) !important; }
 
-  /* ---- Ad slots: darken blank bright rectangles ------------------------ */
+  /* Ad slots */
   ins.adsbygoogle,
   .adsbygoogle,
   div[id^="div-gpt-ad"],
@@ -876,28 +725,18 @@
     background-color: var(--ff-bg) !important;
   }
 
-  /* ---- Misc: don't tint cover images ----------------------------------- */
+  /* Misc: don't tint cover images */
   img, .cimage {
     background-color: transparent !important;
   }
-  /* FFN serves ONE raster for every missing cover and every missing avatar:
-     /static/images/d_60_90.jpg, a near-white plate (mean luminance 170/255)
-     that repeats 13-26 times per browse row list, review list, forum thread,
-     community index and beta list. Real cover art and real user avatars are
-     served from /image/<id>/ and must stay untouched, so the correction is
-     keyed to that one filename. No DOM scan reads image pixels, and the
-     element itself is transparent, so every bucket passes on it. */
+  /* keyed to the one placeholder filename — real cover art and avatars come from
+     /image/<id>/ and must stay untouched */
   img[src*="d_60_90"] {
     filter: brightness(.35) !important;
   }
-  /* The m. hosts mark each story row with a 16px document raster —
-     fcons/script-text.png (FictionPress) and fcons/script-attribute-c.png
-     (FanFiction), up to 48 per Just In page. Roughly a third of their opaque
-     pixels are pure white: the sheet of paper, invisible against the site's own
-     white page and a glaring chip here. Inverting turns the paper into the row
-     surface; the hue-rotate puts the coloured outline and letter back on their
-     own hue. The other fcons/ficons rasters are coloured line art with no white
-     plate (measured) and must not be filtered. */
+  /* a third of this raster's opaque pixels are pure white (the paper); invert makes it the
+     row surface, hue-rotate restores the outline hue. The other fcons/ficons rasters are line
+     art with no white plate (measured) — do not filter them. */
   img[src*="fcons/script-"] {
     filter: invert(1) hue-rotate(180deg) !important;
   }

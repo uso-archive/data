@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Avito that's easy on the eyes, perfect for late-night browsing.
-@version      20260831.14.39
+@version      20260910.22.34
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -23,7 +23,7 @@
     --av-accent-hover: #7cc4ff;
   }
 
-  /* ---- Base canvas ---- */
+  /* Base canvas */
   html {
     background-color: var(--av-bg) !important;
   }
@@ -32,73 +32,40 @@
     color: var(--av-text-soft) !important;
   }
 
-  /* ---- Borders ---- */
-  /* Soften every light border to a subtle dark one (colour only — this never
-     adds a border, so it is safe to apply universally). */
+  /* Borders */
+  /* Colour only, never adds a border, so it is safe to apply universally. */
   *, *::before, *::after {
     border-color: var(--av-border) !important;
   }
 
-  /* Avito's class names are hashed and unstable, and white/light-grey fills are
-     painted on hundreds of nested block wrappers. The robust lever is to make
-     structural block elements transparent so the dark canvas shows through,
-     then deliberately re-paint the real surfaces (header, cards, inputs,
-     coloured badges) in the rules below. Inline elements that carry brand
-     colours (badges, buttons) are re-painted afterwards and keep their fill.
-     `label` is included because Avito wraps several inputs (mortgage-calculator
-     value fields, the login/auth form fields) in a `<label>` that carries a
-     hard-coded white field background while the inner <input> is already dark —
-     neutralising the wrapper lets the dark input show; button-style labels are
-     re-painted to a surface by the button rules below.
-
-     `span` is deliberately NOT in this list. Avito paints its data-driven fills
-     on inline SPANs: the colour-filter swatches (`color-circle-circle`, whose
-     hue arrives as an inline `background: rgb(...)` straight from the API) and
-     the current-page pagination pill. Flattening every span erased all of them —
-     a "Цвет" filter with no circles at all. Across home / search / item /
-     profile exactly ONE span carries a light fill (the seller-avatar
-     placeholder), and it is re-painted explicitly below. */
+  /* Hashed, unstable class names: structural blocks go transparent and the real surfaces are
+     re-painted below. `label` is in the list — Avito wraps inputs in a `<label>` carrying a hard
+     white field background.
+     `span` must NOT be added: spans carry Avito's data-driven fills (colour swatches, the
+     current-page pill). The one light span, the avatar placeholder, is re-painted below. */
   div, section, article, main, aside, ul, ol, li, dl, dd, dt,
   table, tbody, thead, tr, td, th, figure, fieldset, label {
     background-color: transparent !important;
   }
-  /* The one light SPAN the neutraliser used to cover: the avatar placeholder
-     (#f2f1f0) behind a seller logo on brand/profile pages. Avito renamed the
-     wrapper from `UserInfo-module-avatar` to `AvatarNameView-module-avatar`, and
-     the placeholder grew to 120×120 — a glaring white disc on every profile whose
-     seller has no logo. Both names are matched so either build is covered.
-     The reviews list on a seller profile repeats the pattern a third time
-     (`styles-module-avatar` around a 40×40 span), 25 to a page — covered by a photo
-     once it loads, glaring white while it does not. Matching the shared
-     `…-module-avatar` fragment covers every build's spelling of the wrapper. */
+  /* The one light SPAN: the avatar placeholder. The shared `-module-avatar` fragment covers every
+     build's spelling. */
   [class*="-module-avatar"] span {
     background-color: var(--av-surface) !important;
   }
-  /* The "Показать все" badge row ends with a 28×28 `…ShowAllButton-module-circle`
-     holding a mask-image "⋯" glyph. The circle keeps a hard `#f2f1f0`, and the broad
-     text rule lightened the glyph that used to be dark on it — so the dots sat at
-     ~1.4:1 on a disc that was itself the brightest thing in the sidebar. Sinking the
-     disc to the elevated surface restores the contrast the light glyph needs. */
+  /* The circle keeps a hard `#f2f1f0` while the broad text rule lightens its mask glyph. */
   [class*="ShowAllButton-module-circle"] {
     background-color: var(--av-surface) !important;
   }
 
-  /* "Для бизнеса" nav mark. The DS inline icon paints its glyph from the inherited
-     `color`, so the broad text rule greyed the one coloured mark in the top nav — the
-     row's only brand accent, on every page type. Its `data-icon-name` is the hook; the
-     glyph itself is a mask, so `color` is what moves it, not `fill`. */
+  /* The DS inline icon paints its glyph from the inherited `color`, and it is a mask, so `color`
+     moves it, not `fill`. */
   svg[data-icon-name="afblogo"] {
     color: #ff6163 !important;
   }
 
-  /* Stories rail. The unread ring around each 98×98 story avatar is a 2px border
-     in Avito's status red `#ff6163` — the ONLY thing marking a story as unseen —
-     and the blanket border reset above collapsed it to the generic line colour, so
-     every story looked already watched. Native hue kept: it clears 4.5:1 on the
-     dark canvas and is the same red the theme keeps for seller status.
-     Two builds: the older one names the ringed avatar `preview-item-bordered`, the
-     newer one puts a bare `bordered-<hash>` modifier on a child of the story's marker.
-     The marker scope is what keeps that short modifier from matching elsewhere. */
+  /* The 2px `#ff6163` ring is the ONLY unread marker and the blanket border reset would collapse
+     it; native hue clears 4.5:1. The marker scope keeps the short `bordered-` modifier from
+     matching elsewhere. */
   [class*="preview-item-bordered"],
   [data-marker="story-previewer/block-preview"] [class*="bordered-"] {
     border-color: #ff6163 !important;
@@ -110,77 +77,44 @@
     background-color: var(--av-header) !important;
     border-color: var(--av-border) !important;
   }
-  /* The site chrome's navbar is a DIV (`header/navbar`); the only real <header>
-     elements are the ones INSIDE popups and cards, so the rule above painted a
-     near-black title bar across every modal (a hard seam against the modal's
-     elevated surface). Let those inherit the panel they sit on. */
+  /* The navbar is a DIV; real `<header>`s are inside popups and cards, which the bare `header`
+     arm above would blacken. */
   [data-marker$="/popup-header"] {
     background-color: transparent !important;
   }
-  /* The other half of that same over-reach: Avito builds every listing card's
-     PHOTO FRAME out of a semantic `<header class="styles-picture-…">`, so the rule
-     above painted 55 near-black slabs behind the photos on the home grid (natively
-     transparent). Invisible while a `object-fit:cover` photo covers the frame, but
-     it is the frame that shows during lazy-load, behind transparent PNGs and in
-     any letterboxed gap. The bare `header` arm must stay — the legacy 404/error
-     template uses a real `<header class="header">` for its page chrome. The frame
-     is `styles-picture-<hash>` in the prefixed build and `picture-<hash>` in the
-     bare-name one; the shared substring reaches both. */
+  /* Card PHOTO FRAMES are semantic `<header>`s, natively transparent, and show during lazy-load,
+     behind transparent PNGs and in letterboxed gaps. The bare `header` arm must stay: the legacy
+     404 template's page chrome is a real `<header class="header">`. */
   header[class*="picture"] {
     background-color: transparent !important;
   }
-  /* Same over-reach, third variant: a seller profile lists its reviews as cards whose
-     name/date row is a semantic `<header data-marker="review(N)/header">`, natively
-     transparent — so the rule stamped a near-black 553×40 band across the top of all
-     25 reviews while the review body sat on the canvas. Every `<header>` Avito ships
-     with a marker is a COMPONENT header (review, popup, card) rather than page chrome;
-     the legacy 404/error template's `<header class="header">`, which the bare arm
-     exists for, carries no marker. */
+  /* Every `<header>` with a marker is a COMPONENT header, natively transparent; the legacy 404
+     template's, which the bare arm exists for, has no marker. */
   header[data-marker] {
     background-color: transparent !important;
   }
 
-  /* Sticky-on-scroll header + sort/filter toolbar (search results). These are
-     hashed-class wrapper DIVs (not the <header> element), so the neutraliser
-     flattened them to transparent and scrolled results bled through as they
-     pinned to the top. Re-establish a solid opaque bar on each sticky variant. */
+  /* Sticky header + sort toolbar are hashed wrapper DIVs, not `<header>`, so the neutraliser
+     flattens them and scrolled results bleed through. */
   [class*="stickyHeader"] {
     background-color: var(--av-header) !important;
     border-color: var(--av-border) !important;
   }
-  /* The results page's sort / "Уведомлять о новых" bar is a `position:sticky` DIV
-     whose own fill is a hard `background-color: #fff`. Avito renamed it from
-     `…topPanelSticked` to `index-topPanel` (+ `…Hidden` / `…Static` /
-     `…StickyFiltersDesktop` state classes), so the old `topPanelStick` hook matched
-     nothing and the neutraliser left the bar transparent: scrolled cards ran
-     straight through the sort control and the subscribe link. Matching the whole
-     `topPanel` family covers both spellings. The fill is the CANVAS tone, not an
-     elevated one — natively the bar is the same white as the page behind it, so a
-     surface-coloured band would invent a stripe that is not there while the bar
-     sits in flow. */
+  /* The sort bar is a `position:sticky` DIV with a hard `#fff`; the `topPanel` family covers both
+     spellings. CANVAS tone, not elevated: natively it is the same white as the page, so a surface
+     tone would invent a stripe. */
   [class*="topPanel"] {
     background-color: var(--av-bg) !important;
     border-color: var(--av-border) !important;
   }
-  /* The item page's `position:fixed` title bar (thumbnail, price, title, favourite +
-     delivery/phone/message CTAs) is a natively WHITE viewport-wide 48px strip; without a
-     fill the description and the right-hand ad banner scroll straight through it.
-     The bar itself is unreachable, but it carries a `transform`, which makes it the
-     containing block for `position:fixed` descendants — so a fixed pseudo hung on a
-     node inside it anchors to the bar's own box. The hook is the bar's favourite
-     button scoped to `.js-item-view-title-info` (the one non-hash class on the
-     ancestor chain): the same marker also names the buy-box heart, and only the bar's
-     copy sits inside that wrapper.
-     Which node hosts the pseudo is load-bearing, not arbitrary. `z-index:-1` resolves
-     inside the nearest STACKING CONTEXT, and the bar's price container is
-     `position:relative; z-index:15` — a pseudo hung there paints above every sibling in
-     the bar and hides the title, thumbnail and CTAs behind the strip. The favourite
-     button is `position:relative; z-index:auto`, so it creates no context and the strip
-     lands in the bar's own negative layer, behind all of the bar's content.
-     The bar is `opacity:0` and translated off-screen while parked, so nothing shows at
-     scroll 0. The height is stated explicitly rather than as `bottom:0`: should Avito
-     drop the transform, the pseudo falls back to a viewport-anchored 48px strip in the
-     same place instead of a full-screen slab. */
+  /* The item page's `position:fixed` 48px title bar is natively WHITE and unreachable, but it
+     carries a `transform`, so it is the containing block for `position:fixed` descendants and a
+     pseudo hung inside it anchors to the bar's box. `.js-item-view-title-info` is the one non-hash
+     class on the chain, and the marker also names the buy-box heart.
+     The host node is load-bearing: `z-index:-1` resolves in the nearest STACKING CONTEXT, and the
+     bar's price container is `z-index:15` while the favourite button is `z-index:auto`.
+     The height is explicit rather than `bottom:0`, so losing the transform degrades this to a 48px
+     strip and not a full-screen slab. */
   .js-item-view-title-info [data-marker="item-view/favorite-button"]::before {
     content: "";
     position: fixed;
@@ -191,21 +125,34 @@
     z-index: -1;
     background-color: var(--av-header) !important;
   }
+  /* The other gallery arm ships the 88px deep-scroll bar instead, under pure hashes: its white sits
+     on a child whose `::before` spreads a 1280px white box-shadow to the viewport edges under a
+     `clip-path: inset(0 -1280px)`. Neither is nameable, but this arm keeps the bar's title as an `h4`
+     carrying the marker (the in-flow title and the 48px bar's are `h1`), so the pseudo hangs there
+     and repeats the same shadow-and-clip trick over the white one: both are `z-index:-1` in the
+     bar's stacking context and the deeper one paints last. Surface tone, not header: the bar's
+     thumbnail and price/title are bare `<button>`s the generic button rule chips, and on a surface
+     bar a surface chip is invisible should the hash below rotate. */
+  h4[data-marker="item-view/title-info"]::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    height: 88px;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    background-color: var(--av-surface) !important;
+    box-shadow: 0 0 0 1280px var(--av-surface) !important;
+    clip-path: inset(0 -1280px);
+  }
+  button[class*="_6a9117bb1fcd1b61"] {
+    background-color: transparent !important;
+  }
 
-  /* Avito logo wordmark — the "Avito" lettering is a second SVG whose single
-     path has NO fill attribute, so it defaults to solid black and vanishes on
-     the dark header (the colourful dot paths DO carry fill attrs and keep their
-     brand colours). Light only the attribute-less wordmark path. The header
-     logo also appears in a hashed-class variant (error/404, some entry pages)
-     where NO `index-logo`/`Logo-module` class is present — there the only stable
-     hook is the home-link anchor (`a[href="/"]`) wrapping the wordmark svg. The
-     `:not([fill])` guard keeps this scoped to the attribute-less wordmark path
-     and never touches the coloured dots (which carry fill attrs). The generic
-     error/maintenance template ("Сайт временно недоступен", 5xx) ships the
-     wordmark as a bare `<svg viewBox="0 0 79 30">` inside build-hashed spans —
-     no class, no home-link, no marker — so none of the hooks above reach it and
-     its single fill-less path renders solid black (invisible on the dark canvas).
-     The wordmark's fixed brand viewBox is the stable hook. */
+  /* The wordmark path has NO fill attribute, so it defaults to black; `:not([fill])` keeps this off
+     the coloured dot paths, which do carry fill attrs. Four builds name it differently — the last,
+     the error/maintenance template, is class-less and marker-less, leaving its fixed brand viewBox
+     as the only hook. */
   [class*="index-logo"] svg path:not([fill]),
   [class*="Logo-module"] svg path:not([fill]),
   a[href="/"] svg path:not([fill]),
@@ -213,11 +160,8 @@
     fill: var(--av-text) !important;
   }
 
-  /* Top notification banner ("how to keep using Avito on iOS", etc.) and the
-     full-width home hero-promo (`top-notification/hero-banner-main-page/…`).
-     The hero variant paints a light lavender→pink gradient as background-IMAGE,
-     which layers over any background-color — background-image must be cleared
-     too. The banner's 3D illustration is a separate child <img>, untouched. */
+  /* The hero-promo paints its gradient as background-IMAGE, which layers over background-color, so
+     that must be cleared too. */
   [data-marker^="top-notification"],
   [data-marker^="top-banner"] {
     background-color: var(--av-surface-2) !important;
@@ -225,33 +169,25 @@
     border-color: var(--av-border) !important;
   }
 
-  /* ---- Inline-styled badges & pills ---- */
-  /* These carry their fill via an inline `background` (so the neutraliser above
-     would otherwise flatten the DIVs). Re-paint them, refining each saturated
-     brand colour to a tone that sits well on the dark canvas while staying
-     instantly recognisable. */
+  /* Inline-styled badges & pills */
+  /* Fill arrives via an inline `background`, which the neutraliser would flatten. Each brand colour
+     is refined to sit on the dark canvas. */
 
-  /* NOTE ON CASE: Avito writes these inline styles as UPPERCASE hex
-     (`background-color:#02D15C`). Attribute substring matching is
-     case-SENSITIVE, and the case-insensitive `i` flag is rejected by the
-     userstyles.org parser — so every literal must be listed in the exact case
-     the site emits. Without the uppercase variants the neutraliser wins and the
-     badges lose their fill entirely (grey text floating over the photo). */
+  /* NOTE ON CASE: Avito emits these inline styles as UPPERCASE hex, attribute matching is
+     case-SENSITIVE, and the `i` flag is rejected by the userstyles.org parser — so every literal
+     is listed in the exact case the site emits. */
 
-  /* Ribbon end-caps, hex form. Avito serialises the cap's inline colour as hex
-     on some pages and as `rgb()` on others, so both must be covered; the cap
-     must take the SAME refined tone as the pill body or it reads as a mismatched
-     wedge. Must precede the pill rules: "background-color:#02D15C" CONTAINS the
-     substring "color:#02D15C", so the pill rules below re-override the label. */
+  /* Ribbon end-caps, hex form. The cap's inline colour serialises as hex on some pages and `rgb()`
+     on others, and must take the SAME tone as the pill body. Must precede the pill rules:
+     "background-color:#02D15C" CONTAINS "color:#02D15C". */
   [style*="color:#02D15C"], [style*="color:#02d15c"] {
     color: #198049 !important;
   }
   [style*="color:#965EEB"], [style*="color:#965eeb"] {
     color: #7d5bc4 !important;
   }
-  /* Red as INK, not fill: the refined `#c8323f` used for red badge fills sits at
-     ~3.3:1 on the canvas, below the site's own `#ff4053` (5.2:1) — text keeps a
-     lighter step of the same hue. */
+  /* Red as INK, not fill: the badge-fill red is only ~3.3:1 on the canvas, so text takes a lighter
+     step of the same hue. */
   [style*="color:#FF4053"], [style*="color:#ff4053"] {
     color: #ff5a6a !important;
   }
@@ -264,52 +200,35 @@
   [style*="color: rgb(207, 237, 255)"], [style*="color:rgb(207, 237, 255)"] {
     color: #1d2c3a !important;
   }
-  /* The DISCOUNT ribbon ("Скидка"): body is an inline `background-color:#E50965`
-     (Avito's discount crimson), cap is an inline `color:#E50965` on an SVG path
-     filled with `currentColor`. Neither form was covered, so the div-neutraliser
-     wiped the pill body and the broad text rule greyed both caps — the badge read
-     as bare text between two pale wedges, straight on the listing photo. Refined
-     to #c41f66 (5.6:1 against the white label), matching how the other saturated
-     brand fills are toned down. */
+  /* DISCOUNT ribbon ("Скидка"): body an inline `background-color:#E50965`, cap an inline
+     `color:#E50965` on a `currentColor`-filled SVG path. */
   [style*="color:#E50965"], [style*="color:#e50965"],
   [style*="color: rgb(229, 9, 101)"], [style*="color:rgb(229, 9, 101)"] {
     color: #c41f66 !important;
   }
-  /* The item page's stock line ("В наличии: несколько") wraps its QUANTITY in a span
-     carrying an inline `color: rgb(0, 194, 87)` — Avito's in-stock green, and the only
-     thing separating the quantity from the "В наличии:" label beside it. The broad text
-     rule's `!important` reaches it, so the inline value needs restating; native #00c257
-     clears 7:1 on the dark surfaces, so keep the exact hue. Listed with the cap rules
-     rather than in the text block below because "background-color:#00C257" contains the
-     substring "color:#00C257" — anything painting that fill must be able to re-override
-     this label colour, and only a rule LATER in source order can.
-     The descendant arm is required, not defensive: the coloured span wraps a second,
-     un-coloured span that holds the actual text node, and the broad rule reaches that
-     one through its own `span` match rather than through inheritance. */
+  /* The stock QUANTITY's inline `color: rgb(0, 194, 87)` is the only thing separating it from the
+     "В наличии:" label, and the broad text rule's `!important` beats it; native #00c257 clears 7:1,
+     so keep the hue. Listed with the cap rules because "background-color:#00C257" contains
+     "color:#00C257", so anything painting that fill must come LATER. The descendant arm is required:
+     the coloured span wraps an un-coloured span holding the text node. */
   [style*="color: rgb(0, 194, 87)"], [style*="color: rgb(0, 194, 87)"] *,
   [style*="color:rgb(0, 194, 87)"], [style*="color:rgb(0, 194, 87)"] *,
   [style*="color:#00C257"], [style*="color:#00C257"] *,
   [style*="color:#00c257"], [style*="color:#00c257"] * {
     color: #00c257 !important;
   }
-  /* The NEUTRAL ribbon ("Скидка на доставку", "14 дней на возврат", "Рассрочка"):
-     body is an inline `background-color:#EBEAE8`, cap is an inline `color:#EBEAE8`
-     on an SVG path filled with `currentColor`. The div-neutraliser wiped the body
-     and the broad text rule repainted the cap `--av-text-soft`, leaving two pale
-     wedges floating on either side of a bodiless label. */
+  /* NEUTRAL ribbon: body is an inline `background-color:#EBEAE8`, cap an inline `color:#EBEAE8`
+     on a `currentColor`-filled SVG path. */
   [style*="color:#EBEAE8"], [style*="color:#ebeae8"],
   [style*="color: rgb(235, 234, 232)"], [style*="color:rgb(235, 234, 232)"] {
     color: var(--av-surface) !important;
   }
 
-  /* CRITICAL: these selectors match inline `background-color:` ONLY. A bare
-     `[style*="rgb(2, 209, 92)"]` also matches the ribbon END-CAPS, whose inline
-     is `color: rgb(2, 209, 92)` and whose pointed tail is an SVG path filled
-     with `currentColor` — painting those a solid rectangle AND flipping the
-     tail white (white wedges on both ends of every green badge). */
+  /* CRITICAL: these match inline `background-color:` ONLY. A bare `[style*="rgb(2, 209, 92)"]`
+     also matches the ribbon END-CAPS, whose inline is `color: rgb(2, 209, 92)` on a
+     `currentColor` path — it would paint them a solid rectangle and flip the tail white. */
 
-  /* Light-blue info pills ("trusted seller", "documents verified", …) — the
-     biggest light surface on search. Move to a muted blue-tinted dark chip. */
+  /* Light-blue info pills ("trusted seller", "documents verified"). */
   [style*="background-color: rgb(204, 236, 255)"],
   [style*="background-color:rgb(204, 236, 255)"],
   [style*="background-color: rgb(207, 237, 255)"],
@@ -344,13 +263,9 @@
   [style*="background-color:#00aaff"], [style*="background-color:#00AAFF"] {
     background-color: var(--av-accent) !important; color: #0b1620 !important;
   }
-  /* Model-score badge in the item page's FIXED title bar. The buy-box copy is
-     reached through `rating-and-reviews` below, but the bar's copy sits under pure
-     build hashes — its only durable hook is the inline fill, written with the
-     `background` SHORTHAND (`background: rgb(0, 194, 87)`), which a
-     `background-color:` selector cannot see. Without it the div-neutraliser left a
-     bare grey "4,8" where a green score pill belongs. Same refined green as the
-     buy-box pill. */
+  /* The score badge in the FIXED title bar sits under pure hashes; its only durable hook is the
+     inline fill, written with the `background` SHORTHAND, which a `background-color:` selector
+     cannot see. */
   [style*="background: rgb(0, 194, 87)"],
   [style*="background:rgb(0, 194, 87)"],
   [style*="background:#00C257"], [style*="background:#00c257"] {
@@ -364,19 +279,16 @@
   [style*="background:#00c257"], [style*="background:#00c257"] * {
     color: #fff !important;
   }
-  /* Discount ribbon body (crimson) — same ordering constraint as the neutral one
-     below: "background-color:#E50965" CONTAINS "color:#E50965", so the cap rule
-     must come first and this must re-override the label. */
+  /* Discount ribbon body — same ordering constraint as the neutral one below:
+     "background-color:#E50965" CONTAINS "color:#E50965", so the cap rule must come first. */
   [style*="background-color:#E50965"], [style*="background-color:#e50965"],
   [style*="background-color: rgb(229, 9, 101)"],
   [style*="background-color:rgb(229, 9, 101)"] {
     background-color: #c41f66 !important; color: #fff !important;
   }
-  /* Neutral ribbon body — must come after the `color:#EBEAE8` cap rule above,
-     because "background-color:#EBEAE8" CONTAINS the substring "color:#EBEAE8".
-     Avito emits the inline value as raw hex on a server-rendered page and as
-     `rgb(...)` once React re-renders the list client-side (any filter change,
-     category click or sort), so both spellings must be listed. */
+  /* Neutral ribbon body — must follow the `color:#EBEAE8` cap rule, because
+     "background-color:#EBEAE8" CONTAINS "color:#EBEAE8". Avito emits the value as raw hex when
+     server-rendered and as `rgb(...)` after a client re-render, so both spellings are listed. */
   [style*="background-color:#EBEAE8"], [style*="background-color:#ebeae8"],
   [style*="background-color: rgb(235, 234, 232)"],
   [style*="background-color:rgb(235, 234, 232)"] {
@@ -384,9 +296,8 @@
     color: var(--av-text-soft) !important;
   }
 
-  /* Ribbon end-caps. Their inline is `color: rgb(<brand>)`; the tail is an SVG
-     path with `fill: currentColor`, so the cap must take the SAME refined tone
-     as the pill body above or it reads as a coloured/white wedge. */
+  /* Ribbon end-caps: inline `color: rgb(<brand>)` on an SVG path with `fill: currentColor`, so
+     the cap must take the SAME refined tone as the pill body above. */
   [style*="color: rgb(2, 209, 92)"], [style*="color: rgb(2, 209, 92)"] *,
   [style*="color:rgb(2, 209, 92)"], [style*="color:rgb(2, 209, 92)"] * {
     color: #198049 !important;
@@ -403,31 +314,23 @@
   [style*="color:rgb(0, 170, 255)"], [style*="color:rgb(0, 170, 255)"] * {
     color: var(--av-accent) !important;
   }
+  /* One card build draws the end-cap as an EMPTY div filled from that same inline colour through
+     `currentColor`, and the div-neutraliser wipes it, leaving the pill a flat rectangle. The cap
+     rules above have already moved the colour to the pill's tone, so `currentColor` is the right
+     fill. The card scope and `:empty` keep this off any text-bearing div with an inline colour. */
+  [data-marker="item"] div[style^="color:"]:empty,
+  [data-marker^="iva-item"] div[style^="color:"]:empty {
+    background-color: currentColor !important;
+  }
 
-  /* ---- Buttons ---- */
-  /* Avito reuses one hashed Button class for both primary (blue) and secondary
-     (light-grey) buttons, so the class can't tell them apart. Give every button
-     an elevated dark surface by default, then promote only the real primary
-     CTAs to brand blue by their stable data-marker.
-
-     One arm must stay narrow or plain TEXT links get a button surface — a grey
-     box hugging the words. `[data-marker$="/link"]` also caught `seller-link/link`
-     (the seller name — a transparent text link); only the `*-button/link` markers
-     (e.g. `messenger-button/link`, natively a filled `#f2f1f0`/brand-blue CTA)
-     are real buttons needing the dark repaint.
-
-     `[role="button"]` is NOT matched here. Avito hangs that role on whole
-     carousel SLIDES (`SliderGallery-module-carousel-children`, 849×192 on a
-     brand page) and on individual rating STARS, so the rule painted an
-     `--av-surface` slab straight across the profile's promo banner. Every
-     `[role="button"]` element the site ships is natively transparent — the ⋯
-     card action, the star row, the "Ещё" reference — so none of them needs a
-     surface at all.
-
-     `[data-marker$="-button"]` is left broad on purpose: adding `:not(a)` there
-     would raise it to specificity (0,1,1) and it would then beat the (0,1,0)
-     brand-blue CTA rule below, turning "Найти" grey. The anchors it over-reaches
-     are un-painted by the separate rule that follows instead. */
+  /* Buttons */
+  /* One hashed Button class serves both primary and secondary, so every button gets a dark surface
+     and the real primary CTAs are promoted by data-marker.
+     The `-button/link` arm must stay narrow: a bare `[data-marker$="/link"]` also catches
+     `seller-link/link`, a transparent text link. `[role="button"]` is NOT matched — Avito hangs it
+     on carousel SLIDES and rating STARS, all natively transparent.
+     `[data-marker$="-button"]` is broad on purpose: `:not(a)` would raise it to (0,1,1) and beat the
+     (0,1,0) brand-blue CTA rule below; the anchors it over-reaches are un-painted below. */
   button,
   a[class*="styles-module-root"], label[class*="styles-module-root"],
   [class*="multiselect-outline-input"], [class*="style-module-wrapper"],
@@ -436,146 +339,91 @@
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
   }
-  /* Avito also hangs the `-button` marker on plain text LINKS — `header/login-button`
-     ("Вход и регистрация"), `item-specification-button` ("Все характеристики") and
-     `expandable-button` ("Ещё 17") are all natively transparent `<a>`s, and the rule
-     above boxed each one in a grey slab. Every `-button` element that truly carries a
-     light fill (`item-view/favorite-button`, `item-view/abuse-button`: `#f2f1f0`) and
-     every brand-blue CTA ("Найти", both phone buttons) is a real `<button>`, so no
-     anchor here needs a surface. Anchor CTAs are painted via the `-button/link` and
-     `styles-module-root` arms, whose markers don't end in `-button`. */
+  /* `-button` is also on plain text LINKS, natively transparent `<a>`s. Every `-button` with a real
+     light fill, and every brand-blue CTA, is a `<button>`; anchor CTAs come from the `-button/link`
+     and `styles-module-root` arms. */
   a[data-marker$="-button"] {
     background-color: transparent !important;
   }
-  /* Same over-reach on the DIV side, where the `-button` marker names a hit ZONE
-     rather than a control: the item gallery's 50×456 prev/next strips
-     (`image-frame/left-button`, `…/right-button`) became two grey columns flanking
-     every photo, and `item-map-button` ("Узнать подробности") is a plain text link
-     that ended up in a grey slab. Every div carrying the marker is natively
-     transparent, and the div-neutraliser has already flattened them, so removing
-     the fill only returns them to the dark canvas — it can never leak a light
-     surface. The recommendation carousels' scroll arrows are the same shape of
-     hit zone but ship as real `<button>`s, so they need naming too: a 36×302
-     `--av-surface` bar was covering the card it floats over.
-     The marker belongs to the CALL SITE, not to the control: the `/all/<category>`
-     hubs' top-sellers rail ships the identical scroll button with `data-marker`
-     absent and only its hashed module class (`scrollButton-<hash>`, spelled
-     `styles-module-scrollButton-<hash>` in the older build) to name it, so the class
-     hook is required alongside the markers — matched on the shared substring so both
-     builds are reached. Every instance of it, on every page family, is natively
-     transparent, and the fill turned it into a grey bar masking the rail behind it. */
+  /* Same over-reach on the DIV side, where `-button` names a hit ZONE. Every such div is natively
+     transparent and already flattened, so un-painting can never leak a light surface.
+     The carousels' scroll arrows are the same zone shipped as real `<button>`s, and the marker
+     belongs to the CALL SITE: the `/all/<category>` hubs' rail ships the identical button with no
+     marker and only its hashed module class, so the class hook is required alongside the markers. */
   div[data-marker$="-button"],
   [data-marker$="/scroll-button-back"],
   [data-marker$="/scroll-button-forward"],
   button[class*="scrollButton"] {
     background-color: transparent !important;
   }
-  /* And on the LIST side: the results pagination is a `<ul data-marker="pagination-button">`
-     wrapping one `<li>` per page, so the `-button` suffix matched the whole strip and
-     boxed pages 1–30 plus both arrows in a 365×36 square-cornered grey slab that the
-     site never draws (the `<ul>` is natively transparent; only the current-page pill
-     carries a fill). The current-page rule further down is (0,2,0) on the page element
-     itself, so un-painting the list cannot touch the indicator. */
+  /* The pagination is a `<ul data-marker="pagination-button">`, so the suffix boxes the whole
+     strip; the `<ul>` is natively transparent and only the current-page pill has a fill. The
+     current-page rule below is (0,2,0) on the page element, so this cannot touch it. */
   ul[data-marker$="-button"] {
     background-color: transparent !important;
   }
-  /* Its prev/next arrows are real `<button>`s with no marker of their own, natively
-     transparent like the page numbers around them. The generic button surface gave
-     the (disabled) "previous" arrow a filled pill while the live page numbers stayed
-     flat — reading as the selected item. Only the current page may carry a fill. */
+  /* Its prev/next arrows are marker-less `<button>`s, natively transparent like the page numbers.
+     Only the current page may carry a fill. */
   [data-marker="pagination-button"] button {
     background-color: transparent !important;
   }
-  /* Design-system CHECKBOX and SWITCH labels — the filter rail's option rows
-     (`params[N]/checkbox/M`) and the results toolbar's "Сначала из Москвы"
-     (`filters/localPriority/localPriority`). Both are
-     `<label class="styles-module-root-… styles-module-root_preset_default-…">`, which the
-     button rule's `label[class*="styles-module-root"]` arm also matches — but natively
-     they paint nothing (the class only declares a hover TOKEN), so a fill reads as a
-     pre-selected row / an active chip. The Input-component labels that arm exists for
-     (`price-from`, `price-to`, `search-form/suggest`) carry `root_size-*` / `root_empty`
-     / `root_preset_overlay` instead, never `root_preset_default`.
-     The trailing hyphen is the discriminator: the DS emits `root_preset_default-<hash>`
-     for this label and `root_preset_default_priority_primary-<hash>` for the Button, so
-     `root_preset_default-` excludes the Button preset exactly. Same specificity (0,1,1)
-     as the button arm, so source order is what un-paints these. */
+  /* DS CHECKBOX and SWITCH labels are matched by the button rule's
+     `label[class*="styles-module-root"]` arm but natively paint nothing — the class only declares a
+     hover TOKEN. The Input labels that arm exists for carry `root_size-*` / `root_empty` /
+     `root_preset_overlay` instead. The trailing hyphen discriminates: `root_preset_default-`
+     excludes the Button's `root_preset_default_priority_primary-`. Same specificity (0,1,1), so
+     source order un-paints these. */
   label[data-marker*="/checkbox/"],
   label[class*="styles-module-root_preset_default-"] {
     background-color: transparent !important;
   }
-  /* The item gallery's prev/next chevrons. The 50×456 hit ZONES are un-painted above,
-     but each one holds a real 13×19 `<button>` that the generic rule then boxed: two
-     small dark tiles sitting on the photo where the site draws a bare white chevron.
-     The whole `image-frame/` family is overlay chrome on top of the picture — none of
-     it may carry a surface. The fullscreen lightbox repeats the pattern one prefix
-     over (`extended-gallery-frame/control-left|right`); its buy CTAs live under
-     `gallery-delivery-button` / `item-phone-button/gallery`, outside this prefix, so
-     they keep the fills their own rules give them. */
+  /* Each gallery hit zone holds a real `<button>` the generic rule would box; the whole
+     `image-frame/` family is overlay chrome on the picture and none of it may carry a surface. The
+     lightbox's buy CTAs sit outside this prefix and keep their fills. */
   [data-marker^="image-frame/"] button,
   [data-marker^="extended-gallery-frame/"] button {
     background-color: transparent !important;
   }
-  /* The rebuilt gallery drops the `image-frame/` markers: every slide, the prev/next
-     hit zones, the thumbnails and the lightbox's close control are `<button>`s under
-     pure hashes, all natively transparent (the prev/next disc is a white SPAN inside
-     the zone, not the button). The gallery marker is the one durable scope. */
+  /* The rebuilt gallery drops the `image-frame/` markers: slides, hit zones, thumbnails and the
+     lightbox close are all natively transparent `<button>`s under pure hashes, so the gallery marker
+     is the one durable scope. */
   [data-marker="item-view/main-gallery"] button {
     background-color: transparent !important;
   }
-  /* The buy-box heart is natively bare, so the generic `-button` surface gave it a
-     44px grey disc the site never draws. The FIXED title bar ships the same marker on
-     its own copy, and that one IS a light `#f2f1f0` chip — `.js-item-view-title-info`
-     is the one non-hash class separating them, and that copy also hosts the bar's
-     background pseudo, so it must keep a fill. */
+  /* The buy-box heart is natively bare. The FIXED title bar's copy of the same marker IS a light
+     `#f2f1f0` chip and hosts the bar's background pseudo, so it must keep a fill;
+     `.js-item-view-title-info` separates them. */
   [data-marker="item-view/favorite-button"] {
     background-color: transparent !important;
   }
   .js-item-view-title-info [data-marker="item-view/favorite-button"] {
     background-color: var(--av-surface) !important;
   }
-  /* Seller-profile badge rows ("Данные подтверждены", "Компания проверена", …) and the
-     "Показать все" row below them are `<button>`s laid out as bare icon+label lines —
-     natively transparent, and only 230px wide while their labels run longer. The
-     generic surface turned each into a grey pill that the label overflows, so the
-     sidebar read as four ragged, clipped chips. */
+  /* Seller-profile badge rows and "Показать все" are natively transparent `<button>`s, only 230px
+     wide while their labels run longer. */
   [data-marker^="badge-row-"],
   [data-marker="badge-show-all"] {
     background-color: transparent !important;
   }
-  /* Profile photo carousel: its scroll arrows are 16×156 `<button>`s that float ON the
-     photo strip (the site pairs each with a transparent `…arrow-cover` fade). The
-     generic surface turned them into two grey bands slicing a column out of the
-     end photos. Same shape of over-reach as the `scroll-button-*` bars above, under a
-     different component's class. */
+  /* Natively transparent 16x156 `<button>`s floating ON the photo strip; a surface slices a band
+     out of the end photos. */
   [class*="Carousel-module-arrow"] {
     background-color: transparent !important;
   }
-  /* Avito's design-system LINK component shares the `styles-module-root-…` class
-     prefix with its Button component, so the arm above boxed every plain link in a
-     grey slab — including all 91 listing-card titles on the home grid, which then
-     read as filled chips instead of text. The Link's own modifier class
-     (`root_underlineOffset_size-*`) is present on links and never on buttons, and
-     every element carrying it is natively transparent. Same specificity as the
-     button arm, so source order un-paints them. */
+  /* The DS LINK shares the `styles-module-root-...` prefix with the Button. Its own
+     `root_underlineOffset_size-*` modifier is on links and never on buttons, and every element
+     carrying it is natively transparent. Same specificity as the button arm, so source order
+     un-paints them. */
   a[class*="root_underlineOffset"] {
     background-color: transparent !important;
   }
-  /* Avito's design-system Button encodes its hierarchy in the preset/priority
-     modifier class: PRIMARY is a near-black `#141414` fill with a white label,
-     secondary is a light `#f2f1f0` fill. The generic button rule above painted
-     both `--av-surface`, so the two priorities became indistinguishable — and
-     inside a floating panel, whose own fill is also `--av-surface`, BOTH read as
-     bare text with no button shape at all (the region tooltip's "Изменить" /
-     "Оставить так"). Promote the primary priority to the accent, matching every
-     other brand CTA, and raise the secondary to a surface that separates from
-     both the canvas and an elevated panel. The marker-specific rules that follow
+  /* The DS Button encodes hierarchy in its preset/priority modifier: PRIMARY is near-black
+     `#141414`, secondary light `#f2f1f0`. Painted alike they are indistinguishable, and inside a
+     floating panel (also `--av-surface`) both lose their button shape. Marker-specific rules below
      are later in source order, so per-CTA tuning still wins.
-
-     The primary arm is scoped to `button`: Avito hangs the same preset on the
-     search page's 20 SEO tag ANCHORS ("Популярные запросы"), which are chips
-     rather than CTAs — and an anchor is already claimed by the (0,1,1)
-     `a[class*="styles-module-root"]` arm above, so a (0,1,0) primary rule would
-     win the label but lose the fill and leave dark text on the grey chip. */
+     The primary arm is scoped to `button`: the same preset lands on SEO tag ANCHORS, already claimed
+     by the (0,1,1) `a[class*="styles-module-root"]` arm, so a (0,1,0) rule would win the label but
+     lose the fill. */
   button[class*="root_preset_default_priority_primary"],
   button[class*="root_preset_primary"] {
     background-color: var(--av-accent) !important;
@@ -590,42 +438,33 @@
   [class*="root_preset_secondary"] {
     background-color: #262c35 !important;
   }
-  /* One build of the DS Button drops the preset NAME and ships pure hashes, so the arm
-     above cannot reach it; when such a button is also an `<a>` with no `data-marker`
-     (the model page's "Показать все отзывы") nothing in this file names it and it keeps
-     the design system's `#f2f1f0` fill under accent-blue text. Every build resolves the
-     fill through the same design token, so remap the token instead of chasing hashes.
-     The site declares it on class-scoped theme containers rather than `:root`, so a
-     `:root` override would never be reached — the tag+attribute pair is what raises this
-     above those declarations. Hover and pressed have to move with it: the site swaps the
-     fill through its own token on hover, and this theme paints no `!important` fill on
-     these buttons to mask a light one. */
+  /* The suggest panel's refinement bubbles are secondary DS Buttons that the item-page build ships
+     under pure hashes; the group's inline `--module-bubbleGroup-*` tokens are its only stable hook.
+     Secondary tone, not surface: the panel is itself `--av-surface`, so a surface chip has no edge. */
+  [style*="--module-bubbleGroup"] button {
+    background-color: #262c35 !important;
+  }
+  /* One build drops the preset NAME and ships pure hashes, and a marker-less `<a>` build is
+     unnameable here; every build resolves the fill through the same token, so remap the token rather
+     than chase hashes. The site declares it on class-scoped theme containers, not `:root`, so a
+     `:root` override would never be reached — the tag+attribute pair is what outranks them. Hover
+     and pressed must move with it: this theme paints no `!important` fill here to mask a light one. */
   html [class] {
     --theme-semantics-components-button-bg-secondary: #1c2128;
     --theme-semantics-components-button-bg-secondaryHover: #262c35;
     --theme-semantics-components-button-bg-secondaryPressed: #2a313a;
     --theme-semantics-components-button-text-secondary: #e6edf3;
   }
-  /* `root_preset_overlay` is the DS's float-over-imagery button: a solid WHITE pill the
-     site uses on banners and photos. The generic surface sank it to the same tone as the
-     panels it sits on (promo strips, hover cards), so it lost its button shape entirely.
-     The secondary tone separates from both the canvas and an elevated panel. */
+  /* `root_preset_overlay` is the DS's float-over-imagery button, a solid WHITE pill; the generic
+     surface would sink it to the tone of the panels it sits on. */
   [class*="root_preset_overlay"] {
     background-color: #262c35 !important;
   }
-  /* `root_preset_accent` is the DS's OTHER solid primary — Avito's brand blue
-     `#00AAFF` with a white label. Three of its instances already reach the accent
-     through their own markers ("Найти", "Все категории"), but the region picker's
-     main CTA ("Показать больше N объявлений") carries no marker, so it fell through
-     to the generic dark `button` surface — `--av-surface` on a modal whose own panel
-     is also `--av-surface`, i.e. the dialog's only action rendered as bare white text
-     with no button shape at all. The trailing hyphen is load-bearing: the DS emits
-     `root_preset_accent-<hash>`, so `root_preset_accent-` excludes the soft-blue
-     `root_preset_accentSecondary-…` that the block below re-tunes. Written to fail
-     SAFE: a build that drops the hash suffix simply restores today's grey. Scoped to
-     `button` for the reason the primary arm is — Avito hangs DS presets on ANCHORS
-     too, and those are already claimed by the (0,1,1) `a[class*="styles-module-root"]`
-     arm, so a fill rule that loses to it would leave dark ink on a grey chip. */
+  /* `root_preset_accent` is the DS's OTHER solid primary; the region picker's main CTA carries no
+     marker and would fall to the dark surface on a panel of the same tone. The trailing hyphen is
+     load-bearing: it excludes the soft-blue `root_preset_accentSecondary-...` the block below
+     re-tunes, and a build dropping the hash suffix simply restores today's grey. Scoped to `button`:
+     anchors are already claimed by the (0,1,1) `a[class*="styles-module-root"]` arm. */
   button[class*="root_preset_accent-"] {
     background-color: var(--av-accent) !important;
     border-color: var(--av-accent) !important;
@@ -634,25 +473,12 @@
   button[class*="root_preset_accent-"] * {
     color: #0b1620 !important;
   }
-  /* The rest of the Button component's preset vocabulary, all of it natively
-     COLOURED and all of it swallowed whole by the generic dark button rule:
-
-       root_preset_success        solid #02D15C — the "показать номер" call CTA on
-                                  seller profiles, the green counterpart to the blue
-                                  message CTA (see the phone-CTA rules below).
-       root_preset_accentSecondary  #cfedff fill + #008AED label — the soft-blue
-                                  secondary; every promo/ad card's "Подробнее".
-       root_preset_paySecondary   #e9ddfd fill + #8c4fe8 label — the Avito Pay
-                                  lavender, used by the cards' "В корзину".
-
-     Each was flattened to the same anonymous `--av-surface` grey as "Написать", so
-     an ad CTA, a cart action and a plain secondary all read identically. Keep each
-     family's hue but sink the fill to a tinted dark surface, exactly as the
-     light-blue phone button is handled. `root_preset_accent` is NOT matched here:
-     `[class*=…]` would also catch `root_preset_accentSecondary`. Avito's ad blocks
-     ship the same soft-blue CTA under pure-hash classes, so the ad container's
-     namespaced wrapper (`avito-ads-container_*`, whose only buttons ARE those
-     CTAs) carries the same treatment. */
+  /* The rest of the Button's preset vocabulary, all natively COLOURED: `success` is the solid
+     #02D15C call CTA, `accentSecondary` a #cfedff fill with a #008AED label, `paySecondary` the
+     #e9ddfd/#8c4fe8 Avito Pay lavender. Each keeps its hue on a tinted dark surface.
+     `root_preset_accent` is NOT matched here: `[class*=]` would also catch
+     `root_preset_accentSecondary`. Ad blocks ship the same soft-blue CTA under pure hashes, so the
+     ad container's wrapper, whose only buttons ARE those CTAs, takes the same treatment. */
   button[class*="root_preset_success"] {
     background-color: #198049 !important;
     border-color: #198049 !important;
@@ -680,11 +506,9 @@
   [class*="root_preset_paySecondary"] * {
     color: #c3a3f5 !important;
   }
-  /* Avito's ad blocks now build their "Подробнее" CTA from the DS Button's NEUTRAL
-     `secondary` preset — a `#f2f1f0` fill with a black label, not the soft-blue
-     `accentSecondary` the container arm above was written for — so that arm invented
-     a brand tint on twenty CTAs the site paints grey. An explicit preset must outrank
-     the container, hence the (0,2,1) pairing. */
+  /* Ad blocks also build "Подробнее" from the NEUTRAL `secondary` preset, not the soft-blue
+     `accentSecondary` the container arm is written for, so an explicit preset must outrank the
+     container: hence the (0,2,1) pairing. */
   [class*="avito-ads-container"] button[class*="root_preset_secondary"] {
     background-color: #262c35 !important;
     border-color: var(--av-border) !important;
@@ -693,40 +517,34 @@
   [class*="avito-ads-container"] button[class*="root_preset_secondary"] * {
     color: var(--av-text-soft) !important;
   }
-  /* Design-system BADGE. Both of its presets paint through
-     `--module-badge-backgroundColor` (`primary` is the sale red `#ff4053` with a white
-     label; `secondary` is a near-black chip, already covered by the preset rule above),
-     so the div-neutraliser wipes them — the category mega-menu's "Новое" flag rendered
-     as bare grey text with no pill at all.
-     `root_preset_primary` is shared with the Button (a `<button>`, promoted to the
-     accent above) and the Spinner (a div), so both properties are read from the badge's
-     OWN tokens with a fallback: a Spinner leaves them unset and keeps today's flat
-     treatment, while a Badge resolves them. Redefining the sale token on the same
-     element lands the pill on the refined red the theme uses for every other red fill
-     (5.0:1 against the white label) rather than the raw brand hue. */
-  /* A second Badge build ships with pure-hash classes and no preset name — the item
-     page's "0%" flag over the installment period pills is one — so the preset arm
-     cannot reach it and the pill was wiped down to bare grey digits floating above the
-     control. What both builds share is the wrapper the site anchors the badge to, which
-     carries the offset as an inline custom property; that wrapper holds exactly one
-     child, the badge itself. Match the property NAME only: the value is a per-instance
-     px offset. */
+  /* The DS Button's DISABLED state is a `root_disabled` modifier (plus `aria-disabled`) on top of
+     whatever preset the button has, natively the secondary's `#f2f1f0` under a `#a3a3a3` label: the
+     region picker's untouched save CTA and the complaint dialog's "Продолжить" both ship it on the
+     `accent` preset. Every preset arm above is (0,1,1) and paints it as a live CTA, so this block
+     must follow them all; the descendant arm ties the presets' ink arms and wins on order. */
+  button[class*="root_disabled"] {
+    background-color: #262c35 !important;
+    border-color: var(--av-border) !important;
+  }
+  button[class*="root_disabled"],
+  button[class*="root_disabled"] * {
+    color: var(--av-text-muted) !important;
+  }
+  /* DS BADGE. Both presets paint through `--module-badge-backgroundColor`. `root_preset_primary` is
+     shared with the Button and the Spinner, so both properties read the badge's OWN tokens with a
+     fallback: a Spinner leaves them unset and stays flat, a Badge resolves them. Redefining the sale
+     token on the same element lands the pill on the theme's refined red. */
+  /* A second Badge build ships pure hashes and no preset name. What both share is the wrapper the
+     badge is anchored to, which carries the offset as an inline custom property and holds exactly one
+     child. Match the property NAME only: the value is a per-instance px offset. */
   div[class*="root_preset_primary"],
   [style*="--module-badge-offset-x"] > div {
     --theme-semantics-components-badge-bg-sale: #c8323f;
     background-color: var(--module-badge-backgroundColor, transparent) !important;
     color: var(--module-badge-color, var(--av-text-soft)) !important;
   }
-  /* Search / company-card "Показать телефон" reveal CTA (marker
-     `item-phone-button/undefined`) is natively a SOFT light-blue button
-     (#cfedff fill, brand-blue label) — the per-card primary contact action,
-     revealed on card hover. The generic button rule greyed it to `--av-surface`,
-     which reads grey-on-grey with no affordance against the elevated card. Give
-     it a blue-tinted surface + light-blue label so it still reads as the contact
-     CTA. The item-page `item-phone-button/header`, `/card` and `/gallery`
-     (fullscreen-lightbox footer) primaries are promoted to the solid green call
-     CTA by the rules just below (same specificity, later source order wins), so
-     this only re-tunes the softer search/card variant. */
+  /* The search / card reveal CTA is natively a SOFT light-blue button. The item-page primaries are
+     promoted to the green call CTA below (same specificity, later wins). */
   [data-marker^="item-phone-button"] {
     background-color: #1d2c3a !important;
     border-color: #2f4a63 !important;
@@ -744,14 +562,8 @@
     background-color: var(--av-accent) !important;
     color: #0b1620 !important;
   }
-  /* The item page pairs TWO solid primaries: "Показать телефон" is Avito's call
-     green `#02D15C` and "Написать" its brand blue `#00AAFF` — the colour is the
-     only thing separating a call from a message. The theme painted the phone CTA
-     blue and let the messenger anchor fall through to the generic dark button
-     rule, so the pair read blue-vs-grey: the call/message distinction was gone and
-     the messenger CTA had been demoted to a tertiary. Give each side its own hue
-     back, in the tones the theme already uses for green and blue. Same green for
-     the profile page's `call-button` (see `root_preset_success` above). */
+  /* The item page pairs TWO solid primaries: call green and brand blue — the colour is the only
+     thing separating a call from a message. Same green as the profile page's `call-button`. */
   [data-marker="item-phone-button/header"],
   [data-marker="item-phone-button/card"],
   [data-marker="item-phone-button/gallery"] {
@@ -766,15 +578,11 @@
   [data-marker="item-phone-button/gallery"] * {
     color: #fff !important;
   }
-  /* `messenger-button/link` is the same marker on BOTH surfaces: a solid brand-blue
-     primary on the item page (buy-box + the fixed title bar), and a neutral
-     `#f2f1f0` chip on search / profile cards, three to a row. Promote the marker to
-     the accent — and put the card variant back, keyed on the fact that it is built
-     from the design-system Button (`styles-module-root-…`) while the item page's is
-     under pure build hashes. Keying on the DS class rather than on the preset
-     modifier matters: the card variant has already shipped as both
-     `root_preset_secondary` and `root_preset_overlay`. At (0,2,1) it beats the
-     accent rule outright, so no source-order tie is involved. */
+  /* `messenger-button/link` is the same marker on BOTH surfaces: a solid brand-blue primary on the
+     item page, a neutral `#f2f1f0` chip on cards. The card variant is keyed on its being a DS Button
+     while the item page's is under pure hashes — keying on the preset modifier would not hold, that
+     variant having shipped as both `root_preset_secondary` and `root_preset_overlay`. At (0,2,1) it
+     beats the accent rule outright. */
   a[data-marker="messenger-button/link"] {
     background-color: var(--av-accent) !important;
     border-color: var(--av-accent) !important;
@@ -791,17 +599,11 @@
   a[class*="styles-module-root"][data-marker="messenger-button/link"] * {
     color: var(--av-text-soft) !important;
   }
-  /* The model/catalog page's offer rows ship a THIRD build of the same marker, under
-     pure build hashes and with no border-radius — natively a plain WHITE square
-     secondary sitting under the row's soft-blue "Показать телефон" primary. The DS-class
-     arm above cannot reach it, so the accent rule painted it a solid blue slab: the
-     loudest thing in the row, square-cornered against its rounded neighbour, and the
-     row's two actions ranked upside down. Every card-embedded messenger CTA — search,
-     profile, model page — is a `[data-marker="item"]` descendant and is a secondary;
-     only the item page's own buy-box copy sits outside a card and stays the accent.
-     The fill is the secondary preset's tone, not `--av-surface`: a card only shows this
-     CTA while hovered, and the hover panel is itself `--av-surface`, so a surface-
-     coloured chip would have no edge at all and read as bare text. */
+  /* The model/catalog page ships a THIRD build under pure hashes the DS-class arm cannot reach.
+     Every card-embedded messenger CTA is a `[data-marker="item"]` descendant and is a secondary;
+     only the item page's buy-box copy sits outside a card and stays the accent. The fill is the
+     secondary preset's tone, not `--av-surface`: this CTA shows only on hover and the hover panel is
+     itself `--av-surface`, so a surface chip would have no edge. */
   [data-marker="item"] a[data-marker="messenger-button/link"] {
     background-color: #262c35 !important;
     border-color: var(--av-border) !important;
@@ -811,21 +613,11 @@
     color: var(--av-text-soft) !important;
   }
 
-  /* Avito Доставка's delivery CTAs (item page: sticky-header "Купить", buy-box
-     "Купить с доставкой" / "В корзину", legacy "Запросить доставку") are natively
-     SOLID PURPLE `#965EEB` buttons — the site's delivery accent, and the visual
-     counterpart to the blue phone CTA. Their fill comes from a hashed CLASS (not an
-     inline style), so none of the `[style*=…]` badge rules above reach them and the
-     generic dark `button` surface swallowed them whole: they read as anonymous grey
-     tertiary buttons, identical to "Написать". Restore the purple in the same
-     refined tone the theme already uses for purple badges (#7d5bc4, 5.0:1 against
-     white). The marker was `delivery-item-button-request`; Avito re-split it into
-     `-header` / `-main` / `-cart`, so match the whole `delivery-item-button` family
-     by prefix (the plain-text `delivery/landing` link has no `-button` and is
-     unaffected). The fullscreen photo lightbox ships the same purple CTA under a
-     marker outside that family — `gallery-delivery-button` — so it fell through to
-     the generic dark button rule and the gallery's only buy action read as an
-     anonymous grey pill; the `$=` arm covers it and any future `<surface>-delivery-button`. */
+  /* The delivery CTAs are natively SOLID PURPLE `#965EEB`, the counterpart to the blue phone CTA.
+     Their fill comes from a hashed CLASS, not an inline style, so no `[style*=]` badge rule reaches
+     them. The prefix arm covers the `delivery-item-button-` family (the plain-text
+     `delivery/landing` link has no `-button`); the lightbox's copy sits outside it, hence the `$=`
+     arm. */
   [data-marker^="delivery-item-button"],
   [data-marker$="-delivery-button"] {
     background-color: #7d5bc4 !important;
@@ -838,25 +630,15 @@
     color: #fff !important;
   }
 
-  /* ---- Segmented filter controls: the SELECTED option ---- */
-  /* The search filters ("Состояние": Любое/Новое/Б/у, "Продавцы": Все/Частные/
-     Компании) are radio groups whose pill is a SPAN next to a visually-hidden
-     checked <input>. Natively the selected pill is a solid BLACK chip with white
-     text and the unselected ones are light grey — but the generic button rule
-     paints every pill `--av-surface`, and the broad text rule paints every label
-     `--av-text-soft`, so all three options rendered IDENTICALLY: the active filter
-     was completely invisible. No contrast or luminance check can see this (all the
-     chips are legible dark controls); only the native diff shows the lost state.
-     Promote the checked pill to the accent, matching the current-page pagination
-     pill.
-     Two builds ship this control. The older one names the pill `style-module-wrapper`,
-     where the only state marker is the sibling `<input>`'s `:checked`. The newer one
-     names it `wrapper_variant_default-<hash>` and puts the state on the pill itself as
-     `wrapper_isChecked-<hash>`, so it is hooked directly — one class instead of a
-     combinator, and it holds even where the pill is not an input's sibling. Match the
-     modifier prefixes, never the hash: a rebuild rotates the hash and the unselected
-     pills fall back to their native `#f2f1f0`, which on the dark rail is a white chip
-     carrying light-grey body text at ~1.3:1. */
+  /* Segmented filter controls: the SELECTED option */
+  /* The search filters are radio groups whose pill is a SPAN next to a visually-hidden checked
+     <input>. The generic button rule paints every pill `--av-surface` and the broad text rule every
+     label `--av-text-soft`, so all options render IDENTICALLY and the active filter is invisible —
+     no contrast or luminance check sees it, only a native diff.
+     Two builds: the older puts the state on the sibling input's `:checked`, the newer on the pill
+     itself as `wrapper_isChecked-<hash>`, which holds even where the pill is not an input's sibling.
+     Match the modifier prefixes, never the hash: a rotated hash drops the unselected pills back to
+     their native `#f2f1f0`. */
   input:checked + [class*="style-module-wrapper"],
   [class*="wrapper_isChecked"] {
     background-color: var(--av-accent) !important;
@@ -869,15 +651,9 @@
     color: #0b1620 !important;
   }
 
-  /* ---- Installment-period selector (item buy-box) ---- */
-  /* The "рассрочка" period picker (`installments-promoblock`: 2 / 4 / 5 / 6 мес.)
-     is a radio group of `label > input[type=radio] + span` pills. Natively the
-     unselected pills are a solid WHITE `#fff` span and the checked one is a
-     near-black `#141414` span — but `span` is deliberately left out of the
-     div-neutraliser (it carries colour swatches / pagination pills), so the three
-     unselected pills stayed bright white, glaring on the dark buy-box. Sink the
-     unselected pills to the elevated surface and promote the checked one to the
-     accent, matching the segmented filter + pagination selected states above. */
+  /* Installment-period selector (item buy-box) */
+  /* The "рассрочка" period picker is `label > input[type=radio] + span` pills, natively white with a
+     near-black checked one; `span` is deliberately outside the div-neutraliser. */
   [data-marker="installments-promoblock"] input[type="radio"] + span {
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
@@ -888,32 +664,19 @@
     border-color: var(--av-accent) !important;
     color: #0b1620 !important;
   }
-  /* Payment-schedule bar under the same block: the paid segment is green and the
-     four upcoming ones are inline `background: rgb(214, 214, 214)` SPANs — a
-     subtle track on Avito's white buy-box, but four glaring 53×4 white bars on
-     the dark one, louder than the green segment they are supposed to sit behind.
-     They are SPANs (outside the div-neutraliser) under pure-hash classes, so the
-     inline value is the only stable hook. Sink them to the line colour so the
-     green "paid" segment reads as the filled part again. Written against
-     `background`, not `background-color`: Avito uses the shorthand here. */
+  /* The upcoming payment segments are inline-styled SPANs under pure hashes, so the inline value is
+     the only stable hook. Written against `background`, not `background-color`: Avito uses the
+     shorthand here. */
   [style*="background: rgb(214, 214, 214)"],
   [style*="background:rgb(214, 214, 214)"],
   [style*="background:#D6D6D6"], [style*="background:#d6d6d6"] {
     background-color: var(--av-border) !important;
   }
 
-  /* ---- Item-page variant chips (condition / memory / …) ---- */
-  /* The item page's attribute switchers ("Расширенное состояние": Отличное /
-     Хорошее / Удовлетворительное; "Встроенная память": 128 ГБ / 256 ГБ; "Ещё N")
-     are a `[data-marker="multi-items"]` group of `label > input + span` pills.
-     Each pill span is a hard-coded light `#f2f1f0` — a different class from the
-     `style-module-wrapper` segmented filters above, so none of those rules reached
-     it: the broad text rule inked the labels `--av-text-soft` light-grey, leaving
-     light-grey text on a light-grey pill (~1.3:1, effectively invisible) and the
-     checked pill indistinguishable from the rest. Sink the pills to the elevated
-     surface and promote the checked one to the accent, matching the segmented +
-     installment selected states. Scoped to the `multi-items` container so the
-     separate colour-swatch chips (which carry their hue on the pill) are untouched. */
+  /* Item-page variant chips (condition / memory / …) */
+  /* The item page's attribute switchers are `label > input + span` pills under a different class
+     from the segmented filters above. Scoped to the container so the colour-swatch chips, which carry
+     their hue on the pill, are untouched. */
   [data-marker="multi-items"] label > span {
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
@@ -931,15 +694,10 @@
     color: #0b1620 !important;
   }
 
-  /* ---- Model / catalog page (…/catalog/<brand>/<model>/…/specs-…) ---- */
-  /* Reached from an item page's "Все характеристики" link. Its modification
-     switcher ("Состояние", "Объём памяти", …) is the multi-items pill pattern
-     under a DIFFERENT hook — `label > input[type=checkbox] + span` inside
-     `model-card/modification-form`, with no `multi-items` marker — so none of the
-     rules above reached it: every unselected pill stayed a hard `#f2f1f0` white
-     with the broad text rule's light-grey label on top (~1.5:1, unreadable), and
-     the checked pill's native `#141414` made it read as the DIMMEST of the group,
-     inverting the indicator. Same treatment as every other switcher in the theme. */
+  /* Model / catalog page (…/catalog/<brand>/<model>/…/specs-…) */
+  /* The model page's modification switcher is the multi-items pattern under a DIFFERENT hook, with
+     no `multi-items` marker, and its checked pill's native `#141414` is the dimmest of the group,
+     inverting the indicator. */
   [data-marker="model-card/modification-form"] label > span {
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
@@ -956,11 +714,8 @@
   [data-marker="model-card/modification-form"] label input:checked + span * {
     color: #0b1620 !important;
   }
-  /* The same page's two CTAs are anchors under pure-hash classes, so neither the
-     `styles-module-root` nor the `-button` arms above reach them: the secondary
-     "Ещё N объявлений" kept its native `#f2f1f0` fill (a bright white 169×44 slab)
-     and the primary "Показать N объявлений" — natively a solid `#141414` pill —
-     lost its fill entirely and rendered as bare text. */
+  /* The same page's two CTAs are anchors under pure hashes, reached by neither the
+     `styles-module-root` nor the `-button` arms. */
   [data-marker="model-card/mini-serp-2/button"] {
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
@@ -977,36 +732,17 @@
     color: #0b1620 !important;
   }
 
-  /* ---- Item-page colour-variant swatches (inline-rgb solids) ---- */
-  /* Each colour option under `[data-marker="multi-item-image"]` is a 48×48 <div>
-     whose hue is EITHER a `rect_*_96.png` background-IMAGE (metallics — gold,
-     silver — which survive because the div-neutraliser only clears background-
-     COLOR) OR an inline solid `background-color: rgb(...)` (deep-purple, graphite/
-     black). The neutraliser flattened the solid ones to transparent, so those
-     variants rendered as an empty dark square with no hue — an invisible,
-     unidentifiable colour option leaving a gap between the metallic chips.
-     Restore the inline hue verbatim; scoped to the swatch container so nothing
-     structural is touched. Colour list follows Avito's solid product-swatch
-     palette (metallics never reach here — they carry a PNG); each hue must be named
-     literally, because nothing in CSS can re-apply an inline value an `!important`
-     rule has already beaten. On a phone listing offering белый / зелёный / красный /
-     синий / чёрный only the last was covered, so four of the five options rendered
-     as bare boxes and three of them — having no border either — were completely
-     invisible: the picker showed one chip where the site draws five. Both `rgb()`
-     spellings are listed for the reason the badge rules list them (a server-rendered
-     load and a client re-render serialise the same inline value differently).
-
-     The hues below are Avito's own swatch DICTIONARY, read off the search-filter
-     colour picker (`color-circle-circle`, which spells the same values as
-     `background:#HEX`) rather than guessed: an iPhone listing offering голубой /
-     жёлтый / зелёный / розовый / чёрный still rendered three of the five blank
-     because only two of its hues were named here. Any hue NOT in this list renders
-     as an empty slot — harvest it from a filter rail and add it; a guessed literal
-     is dead code. The full taxonomy is 14 hues, read off the `"color":"#HEX"` entries
-     in a search page's initial-state JSON (one page lists them all; filter rails only
-     show the subset the category sells). Gold (#FFB021) and beige (#CEC4AD) are solids
-     there; silver is the one metallic that ships as a PNG, and the neutraliser only
-     clears background-COLOR. */
+  /* Item-page colour-variant swatches (inline-rgb solids) */
+  /* Each colour option here is a 48x48 <div> whose hue is EITHER a `rect_*_96.png` background-IMAGE
+     (metallics, which survive — the neutraliser only clears background-COLOR) OR an inline solid
+     `background-color: rgb(...)`, which it flattens. Restore the inline hue verbatim; both `rgb()`
+     spellings are listed for the reason the badge rules list them.
+     Each hue must be named LITERALLY — nothing in CSS can re-apply an inline value an `!important`
+     rule has beaten, so a hue missing here renders as an empty slot and a guessed literal is dead
+     code. Harvest new ones from a filter rail's `color-circle-circle` swatches or the
+     `"color":"#HEX"` entries in a search page's initial-state JSON: 14 hues in all, a rail showing
+     only its category's subset. Gold and beige are solids; silver is the one metallic shipped as a
+     PNG. */
   [data-marker="multi-item-image"] [style*="background-color: rgb(106, 54, 227)"],
   [data-marker="multi-item-image"] [style*="background-color:rgb(106, 54, 227)"] {
     background-color: rgb(106, 54, 227) !important;
@@ -1064,85 +800,53 @@
     background-color: rgb(206, 196, 173) !important;
   }
 
-  /* ---- Text ---- */
+  /* Text */
   /* The site hardcodes near-black text colours; force them light. */
   body, p, span, li, td, th, div, label, dd, dt, time, small, b, strong, em,
   h1, h2, h3, h4, h5, h6 {
     color: var(--av-text-soft) !important;
   }
-  /* Seller business-hours status ("Закрыто до завтра" when closed) is a bare <p>
-     whose colour arrives as an inline `color: rgb(255, 97, 99)` — Avito's status
-     red. The broad text rule's `!important` beat the inline value and flattened it
-     to body grey, erasing the closed/open signal (a colour audit is blind to it:
-     the rendered grey reads as ordinary metadata). Preserve the red; native #ff6163
-     already clears 4.5:1 on the dark surfaces, so keep the exact hue. Same
-     inline-`[style]` lever the badge/ribbon colours use above. */
+  /* The business-hours status's inline `color: rgb(255, 97, 99)` is the only closed/open signal and
+     the broad text rule's `!important` beats it, so the value is restated at the native hue. */
   [style*="color: rgb(255, 97, 99)"], [style*="color:rgb(255, 97, 99)"],
   [style*="color:#ff6163"], [style*="color:#FF6163"] {
     color: #ff6163 !important;
   }
-  /* The design-system field carries its validation message in a bare `error-<hash>`
-     span whose only marking is that same status red — no icon, no border change — so
-     the broad text rule turned "Неизвестный город или регион" into ordinary grey
-     metadata under the input. The element is the span itself, not a wrapper, so no
-     descendant arm is wanted; the tag guard keeps the generic `error-` fragment off
-     any block a build may name the same way. */
+  /* The DS field's validation message is a bare `error-<hash>` span whose only marking is that
+     status red. The element is the span itself, so no descendant arm; the tag guard keeps the generic
+     `error-` fragment off any block a build may name the same way. */
   span[class*="error-"] {
     color: #ff6163 !important;
   }
-  /* SEO geo-links tab strip at the foot of a results page. Two tabs mark the
-     current one with a bold black `<strong>` and the other with an inline
-     `color: rgb(0, 153, 247)` on a bare SPAN — the link blue is the ONLY thing
-     saying the second tab is clickable. The broad span rule flattened it to body
-     grey, so both tabs rendered identically and the affordance was gone. Same
-     inline-`[style]` lever the badge colours use; the theme accent replaces the
-     native blue for the same reason `a` does. */
+  /* In the SEO geo-links tab strip the inactive tab's inline blue is the ONLY thing saying it is
+     clickable. The theme accent replaces it for the same reason `a` does. */
   [style*="color: rgb(0, 153, 247)"], [style*="color:rgb(0, 153, 247)"],
   [style*="color:#0099f7"], [style*="color:#0099F7"] {
     color: var(--av-accent) !important;
   }
-  /* Discount-percentage label ("−5%", "−10%") on recommendation / search cards
-     is a bare <span data-marker="discount-value"> whose native colour is Avito's
-     discount red `#f71b47` (arriving as an inline `color:` and via a class). The
-     broad span text rule's `!important` flattened it to body grey, erasing the
-     discount signal (a colour audit reads the grey as ordinary price metadata).
-     Native #f71b47 is 4.4:1 on the canvas and 4.0:1 on a card; one step lighter
-     in the same hue clears 4.5:1 on both. */
+  /* The discount-percentage label is a bare span, natively `#f71b47`, flattened by the broad span
+     rule; the native red is under 4.5:1 on a card, so it takes one step lighter. */
   [data-marker="discount-value"],
   [data-marker="discount-value"] * {
     color: #ff5c78 !important;
   }
-  /* Seller-rating STARS. Each star is a mask-image `<svg>` inside a
-     `styles-module-star-…` wrapper: the glyph is painted by the svg's
-     `background-color: currentColor`, so the star's colour IS its inherited
-     `color`. The broad span rule flattened all 248 of them on a search page from
-     Avito's rating gold `#ffb021` to body grey — every seller looked unrated, and
-     no contrast or light-surface check can see it (a grey star on a dark card is
-     a perfectly legible glyph). Scoped to the star wrapper's `filled` modifier so
-     an empty star keeps its muted state. */
+  /* Rating STARS are mask-image `<svg>`s painted by `background-color: currentColor`, so a star's
+     colour IS its inherited `color` and the broad span rule greys it — invisible to any contrast or
+     light-surface check. Scoped to the `filled` modifier so empty stars keep their muted state. */
   [class*="styles-module-star"] [class*="styles-module-filled"] {
     color: #ffb021 !important;
   }
-  /* The item, search and model pages ship the same rating widget from newer builds that
-     the `styles-module-filled` hook above misses, so every seller's stars render body
-     grey — a shop next to "4,9" looks unrated, and no contrast or light-surface check
-     can see it. The widget declares its palette as custom properties on the rating root
-     (`--star-color-filled`, `--star-color-empty`) but paints the glyph through the span's
-     inherited `color`, which the broad text rule takes.
-     THREE builds are live at once and each needs its own arm. The item page's
-     `sellerRate` widget names the filled span with a PURE HASH — nothing but the hash
-     separates it from an empty star, so it has to be listed. The search cards' and model
-     page's `seller-rating/rating-stars` widget names it `filled-<hash>`; match the
-     modifier PREFIX there, never the hash. The trailing `-` in `filled-` is load-bearing:
-     it anchors to the build's `<name>-<hash>` shape instead of any class containing
-     "filled". Every arm is scoped to the FILLED state so a rebuild that rotates a hash
-     leaves a star merely uninformative — never gold on an empty star, which would
-     overstate a seller's rating.
-     The marker belongs to the CALL SITE, so each new place the widget is embedded needs
-     naming again (`model-review/score` on the model page's review list is one). Every
-     call site declares the widget's palette as inline custom properties on the rating
-     root, so matching that property NAME — never its value, which serialises with and
-     without spaces — reaches them all. */
+  /* Newer builds of the same rating widget miss the `styles-module-filled` hook above. The widget
+     declares its palette as custom properties on the rating root but paints the glyph through the
+     span's inherited `color`, which the broad text rule takes.
+     THREE builds are live, one arm each. `sellerRate` names the filled span with a PURE HASH —
+     nothing but the hash separates it from an empty star. The others name it `filled-<hash>`: match
+     the modifier PREFIX, keeping the trailing `-` so it anchors to the `<name>-<hash>` shape and not
+     any class containing "filled". Every arm is scoped to the FILLED state, so a rotated hash leaves
+     a star uninformative rather than gold on an empty one.
+     The marker belongs to the CALL SITE, so each new embedding needs naming again, and every call
+     site declares the palette as inline custom properties on the rating root — match that property
+     NAME, never its value, which serialises with and without spaces. */
   [data-marker="sellerRate"] span[class*="_4da9fca36a8c49c9"],
   [data-marker^="seller-rating/rating-stars"] span[class*="_4da9fca36a8c49c9"],
   [data-marker="sellerRate"] span[class*="filled-"],
@@ -1151,27 +855,23 @@
   [style*="--star-color-filled"] span[class*="filled-"] {
     color: #ffb021 !important;
   }
-  /* `[data-marker*="title"]` was too loose: Avito also hangs a bare
-     `data-marker="title"` on the top notification banner's "Подробнее" LINK — a
-     natively brand-blue CTA — so this rule (0,1,0) beat `a { color: accent }`
-     (0,0,1) and rendered the banner's only call-to-action as plain body text.
-     Listing titles all carry `item-title`; the item page's own H1 is covered by
-     the element arm above. */
+  /* `[data-marker*="title"]` would be too loose: a bare `data-marker="title"` also sits on the
+     notification banner's brand-blue "Подробнее" LINK, and this rule at (0,1,0) beats
+     `a { color: accent }` at (0,0,1). Listing titles all carry `item-title`. */
   h1, h2, h3, h4, h5, h6,
   [class*="title"], [data-marker*="item-title"] {
     color: var(--av-text) !important;
   }
 
-  /* ---- Links / accent ---- */
+  /* Links / accent */
   a {
     color: var(--av-accent) !important;
   }
   a:hover {
     color: var(--av-accent-hover) !important;
   }
-  /* Titles that are links should stay light, not blue. Scoped to `item-title`
-     for the same reason as the rule above — a bare `title` marker is also used
-     for the notification banner's blue CTA link. */
+  /* Scoped to `item-title` for the same reason as the rule above — a bare `title` marker also names
+     the notification banner's blue CTA link. */
   a[class*="title"], a[data-marker*="item-title"],
   [data-marker="item-title"] a, h3 a {
     color: var(--av-text) !important;
@@ -1179,42 +879,30 @@
   [data-marker="item-title"] a:hover, h3 a:hover {
     color: var(--av-accent-hover) !important;
   }
-  /* The home grid's listing titles are Link components with `data-marker="title"`
-     (not `item-title`, which only search uses) and the design-system's
-     `root_preset_black` modifier — natively BLACK body text, not a blue link. The
-     generic `a` rule painted all 91 of them brand-blue, so the whole grid read as a
-     wall of saturated links and disagreed with the same titles on search, which are
-     light. The preset name states the native colour, so keying off it is exact. */
+  /* The home grid's listing titles carry `data-marker="title"` (not `item-title`, which only search
+     uses) and the DS `root_preset_black` modifier, whose name states the native colour, so keying off
+     it is exact. */
   a[class*="root_preset_black"] {
     color: var(--av-text) !important;
   }
   a[class*="root_preset_black"]:hover {
     color: var(--av-accent-hover) !important;
   }
-  /* Avito's design-system Link marks hover by COLOUR alone (`--kitty-link-color-hover`,
-     the palette's red600), and its label is a nested Text element — a `<p>` for the
-     header's region picker, `<span>`s for the results page's "Сортировка" and
-     "Уведомлять о новых". The broad text rule above nails those with `!important`, so
-     `a:hover` recoloured the anchor while the visible words never moved: those controls
-     had NO hover affordance at all, rest and hover rendering pixel-identical. Carry the
-     cue onto the label. The child combinator is load-bearing, not tidiness: a
-     seller-name link wraps its whole rating widget, whose gold stars are painted through
-     `color`, and a descendant selector would out-specify the star rule and turn every
-     star blue on hover — only the label is ever a direct `p`/`span` child.
-     The header's location link splits its label across two nested spans inside that
-     `p`, and the broad text rule pins each of them directly, so the paragraph arm
-     alone recolours nothing visible; the spans are reached under the direct `p` only,
-     which keeps the rating widget (never a direct `p` child) out of range. */
+  /* The DS Link marks hover by COLOUR alone, and its label is a nested Text element that the broad
+     text rule pins with `!important`, so `a:hover` alone moves nothing visible.
+     The child combinator is load-bearing: a seller-name link wraps its whole rating widget, whose
+     gold stars are painted through `color`, and a descendant selector would out-specify the star
+     rule and blue every star on hover — only the label is ever a direct `p`/`span` child. The
+     header's location link splits its label across two spans inside that `p`, reached under the
+     direct `p` only. */
   a[class*="root_underlineOffset"]:hover > p,
   a[class*="root_underlineOffset"]:hover > span,
   a[class*="root_underlineOffset"]:hover > p span {
     color: var(--av-accent-hover) !important;
   }
-  /* The `link-<hash>` variant reserves its underline as a `border-bottom: 1px
-     solid transparent` and only tints it on hover, so the blanket border reset
-     paints every one of them a permanent dull grey AND pins that grey through
-     the hover (the reset is `!important`). Hand the border back to the text
-     colour so the underline is a hover cue again. */
+  /* The `link-<hash>` variant reserves its underline as a transparent `border-bottom` and only tints
+     it on hover, so the blanket border reset paints it a permanent grey AND pins that grey through
+     the hover. */
   a[class*="link-"] {
     border-color: transparent !important;
   }
@@ -1222,7 +910,7 @@
     border-color: currentColor !important;
   }
 
-  /* ---- Text on coloured surfaces (must come after the broad text rule) ---- */
+  /* Text on coloured surfaces (must come after the broad text rule) */
   /* Keep labels readable on the re-painted chips, pills and primary buttons. */
   [style*="background-color: rgb(255, 64, 83)"],
   [style*="background-color: rgb(255, 64, 83)"] *,
@@ -1251,9 +939,8 @@
   [style*="background-color:#CFEDFF"], [style*="background-color:#CFEDFF"] * {
     color: #9fd0f5 !important;
   }
-  /* Dark text only on the brand-blue CTAs. The item page's own green call CTAs
-     (`item-phone-button/header|card|gallery`) take white ink from their own rules
-     above and must NOT be listed here — this block is later in source order and
+  /* Dark text only on the brand-blue CTAs. The item page's green call CTAs take white ink from
+     their own rules above and must NOT be listed here — this block is later in source order and
      would win the tie. */
   [data-marker="search-form/submit-button"],
   [data-marker="search-form/submit-button"] *,
@@ -1263,25 +950,19 @@
   [data-marker$="/phone-button"] * {
     color: #0b1620 !important;
   }
-  /* "В корзину" is the DS `paySecondary` preset: an `#e9ddfd` lavender fill with an
-     `#8c4fe8` label. The generic button surface plus the broad text rule left it an
-     anonymous grey CTA; the preset rule above restores the tinted fill, and this
-     keeps the purple label at a tone that clears 4.5:1 on it. */
+  /* "В корзину" is the DS `paySecondary` preset; the preset rule above restores the tinted fill and
+     this keeps the purple label above 4.5:1 on it. */
   [data-marker="cart-actions/cart-button"],
   [data-marker="cart-actions/cart-button"] * {
     color: #a97cf0 !important;
   }
-  /* Every `button[type="submit"]` is painted brand-blue by the button rules, but
-     the label lives in a `<span>` that the broad text rule painted `--av-text-soft`
-     — light grey on light blue (~2:1). The auth popup's "Войти" was effectively an
-     unreadable CTA. Ink the label like every other brand-blue CTA. */
+  /* `button[type="submit"]` is painted brand-blue by the button rules, but its label lives in a
+     `<span>` the broad text rule paints light grey — ~2:1 on the blue. */
   button[type="submit"] * {
     color: #0b1620 !important;
   }
-  /* The legacy error/404 template ships two anchors styled as brand-blue buttons
-     (`header-add-item-link`, `content-home-link`). They carry a native `#00aaff`
-     fill and a white label — but `a { color: var(--av-accent) }` repainted the
-     label brand-blue on brand-blue, so both CTAs read as empty pills. */
+  /* The legacy error/404 template styles two anchors as brand-blue buttons with a white label, so
+     `a { color: var(--av-accent) }` would leave brand-blue on brand-blue. */
   a.header-add-item-link, a.content-home-link {
     background-color: var(--av-accent) !important;
   }
@@ -1290,7 +971,7 @@
     color: #0b1620 !important;
   }
 
-  /* ---- Inputs, selects, filter fields ---- */
+  /* Inputs, selects, filter fields */
   [data-marker="search-form/suggest/input"],
   [data-marker="search-form"] input,
   input, textarea, select,
@@ -1305,80 +986,53 @@
   [data-marker="search-form/suggest"] {
     background-color: var(--av-surface) !important;
   }
-  /* The design-system Input draws its field box on the wrapping <label> and
-     leaves the <input> itself transparent, so the rule above fills only the text
-     run: a lighter block hugging the words inside an otherwise empty outline
-     (search "Слова в описании", the vacancy hub's "Должность"). `root_size-`
-     with a HYPHEN is the Input's own size modifier — the switch/checkbox label
-     spells it `root_size_` and must keep its own styling. The Beduin banner's
-     suggest field is a second build of the same component whose box is a
-     `suggest-<hash>` LABEL; the header search widget shares that name on a DIV,
-     which already has its own fill, so the tag guard is load-bearing. */
+  /* The DS Input draws its field box on the wrapping <label> and leaves the <input> transparent, so
+     filling the input alone lights only the text run. `root_size-` with a HYPHEN is the Input's own
+     size modifier — the switch/checkbox label spells it `root_size_`. The header search widget shares
+     the `suggest-` name on a DIV that already has its own fill, so the tag guard is load-bearing. */
   label[class*="root_size-"],
   label[class*="suggest-"] {
     background-color: var(--av-surface) !important;
   }
-  /* The header-search field and its submit button each sit on a full-size
-     `::before` plate that paints the brand ring around them — Avito blue at rest
-     and hard-coded WHITE while the suggest panel is open. A pseudo-element, so
-     every element-bg scan reports the page clean while a white ring flashes
-     around the input. Avito ships two builds of this widget (named classes on
-     home/search, pure hashes on item pages) and the open-state modifier is a
-     hash in both, so the durable hook is structural: the plates are the direct
-     div children of the `search-form` marker. Painting the accent in BOTH states
-     keeps the ring on brand. */
+  /* The header-search field and its submit button each sit on a full-size `::before` plate painting
+     the brand ring — blue at rest, hard-coded WHITE while the suggest panel is open, and invisible to
+     element-bg scans. The open-state modifier is a hash in both builds, so the hook is structural:
+     the plates are the direct div children of the marker. */
   [data-marker="search-form"] > div::before {
     background-color: var(--av-accent) !important;
   }
   ::placeholder { color: var(--av-text-muted) !important; opacity: 1; }
-  /* The price range fields have no `placeholder` attribute: their "От" / "до" hints are
-     `prefix-<hash>` SPANs inside the field, and the site mutes them only while the field
-     is EMPTY (a `root_empty-<hash>` class on the wrapping label, dropped as soon as a
-     digit is typed). The broad text rule paints them body-light in both states, so an
-     empty field reads as if it already held a value. Restore the empty-state mute; a
-     filled field keeps the body colour from the broad rule. */
+  /* The price range fields have no `placeholder`: their "От" / "до" hints are `prefix-<hash>` SPANs
+     the site mutes only while the field is EMPTY (a `root_empty-<hash>` class on the wrapping label,
+     dropped on the first digit). The broad text rule lights them in both states. */
   [class*="root_empty-"] [class*="prefix-"],
   [class*="root_empty-"] [class*="postfix-"] {
     color: var(--av-text-muted) !important;
   }
-  /* Every row of that suggest panel is prefixed by a 20×20 `<img>` from Avito's
-     suggest icon set (`/s/a/i/suggest/*.png`, `/s/suggest/<category>/*.png`,
-     `/static/ims/…_suggest_with_query_light_80x80.png`) — flat BLACK line art drawn
-     for the native white sheet, so on the dark panel every row led with an
-     invisible glyph. A raster's pixels are out of reach of `fill`/`color`, so flip
-     the lightness; the whole set is monochrome (the "full_color" path name
-     notwithstanding), so an invert cannot distort a hue. Scoped to the icon's own
-     class, which is the only node in the panel that is an `<img>`. */
+  /* Every suggest-panel row leads with a 20x20 `<img>` of flat BLACK line art drawn for the white
+     sheet. A raster is out of reach of `fill`/`color`, so flip the lightness; the set is monochrome
+     (the "full_color" path name notwithstanding), so the invert cannot distort a hue. Scoped to the
+     panel's only `<img>`. */
   [class*="itemIconImg"] {
     filter: invert(1);
   }
-  /* A seller profile's in-profile search field ends in a filters icon whose two SVG paths
-     carry a hard `fill="black"` ATTRIBUTE (the `<svg fill="currentColor">` above them is
-     overridden by it), drawn for the native white field — so on the dark one the glyph is
-     black on `--av-surface`. Neither scan sees it: the SVG bucket flags only near-WHITE
-     fills, and the element's own `color` reads correctly light. */
+  /* The in-profile filters icon has two SVG paths with a hard `fill="black"` ATTRIBUTE, overriding
+     the `<svg fill="currentColor">` above them. Neither scan sees it: the SVG bucket flags only
+     near-WHITE fills, and the element's own `color` reads light. */
   [data-marker$="/filters_icon"] svg path {
     fill: var(--av-text) !important;
   }
 
-  /* Auth popup (login + registration). Its fields were a grey rectangle on the
-     white modal; the neutraliser wiped that fill, and the generic input rule
-     above then painted them `--av-surface` — exactly the popup's own colour, so
-     an unfocused field (e.g. "Пароль") was invisible: only its placeholder
-     floated in mid-air. Sink the fields back to the base canvas so they read as
-     inputs against the elevated popup. */
+  /* The generic input rule paints the auth popup's fields `--av-surface`, exactly the popup's own
+     colour, so they sink to the base canvas instead. */
   [data-marker="auth-app/popup"] input {
     background-color: var(--av-bg) !important;
   }
 
-  /* ---- Checkbox / radio checked state ---- */
-  /* The real control is a DIV painted next to a visually-hidden <input>, and its
-     checked fill comes from `--kitty-commonToggle-toggle-checked-background` on
-     that DIV — which the div neutraliser wiped. Result: a ticked filter box was
-     indistinguishable from an empty one (dark box, grey tick) instead of the
-     brand-blue fill. Restore the fill and darken the tick/dot (drawn with
-     `fill: currentColor`, so it follows `color`). Scoped to checkbox/radio mode
-     so switch controls keep their own knob styling. */
+  /* Checkbox / radio checked state */
+  /* The real control is a DIV beside a visually-hidden <input>, its checked fill coming from a
+     `--kitty-commonToggle-*` token. The tick/dot uses `fill: currentColor`, so it follows `color`.
+     Scoped to checkbox/radio mode so switches keep their knob styling. */
   [class*="controlledInput_checked"] + [class*="toggle_mode_checkbox"],
   [class*="controlledInput_checked"] + [class*="toggle_mode_radio"] {
     background-color: var(--av-accent) !important;
@@ -1390,14 +1044,10 @@
   [class*="controlledInput_checked"] + [class*="toggle_mode_radio"] * {
     color: #0b1620 !important;
   }
-  /* The item page's dialogs ("Причина жалобы") ship the same control from a build whose
-     classes are pure hashes, so the module-name hooks above reach none of it: natively the
-     disc is `#e3e2e1` unchecked and `#141414` checked, the neutraliser wiped both, and the
-     chosen reason was left marked by a bare knob on an identical ring.
-     The DS puts `role="radio"`/`role="checkbox"` + `aria-checked` on the LABEL and paints
-     the disc on the input's next sibling, so ARIA is the build-independent hook. Only the
-     CHECKED fill is restored — the unchecked disc keeps the ring the blanket border rule
-     already draws, which is what the module-named build ships today. */
+  /* The item page's dialogs ship the same control under pure hashes, out of reach of the module-name
+     hooks. The DS puts the role and `aria-checked` on the LABEL and paints the disc on the input's
+     next sibling, so ARIA is the build-independent hook. Only the CHECKED fill is restored — the
+     unchecked disc keeps the blanket border rule's ring. */
   [role="radio"][aria-checked="true"] input + div,
   [role="checkbox"][aria-checked="true"] input + div {
     background-color: var(--av-accent) !important;
@@ -1410,13 +1060,9 @@
     color: #0b1620 !important;
   }
 
-  /* ---- Switch (toggle) track ---- */
-  /* The switcher's track is a DIV the neutraliser flattened to transparent, so
-     both states rendered as a white knob floating on the page with no track at
-     all: natively the track is light `#e3e2e1` when off and near-black `#141414`
-     when on, and it is the ONLY thing that distinguishes the two beyond a 20px
-     knob shift. Give the off state a visible neutral rail and the on state the
-     accent, matching every other "selected" indicator in the theme. */
+  /* Switch (toggle) track */
+  /* The switcher's track is natively light `#e3e2e1` off and near-black `#141414` on, the only thing
+     distinguishing the states beyond a 20px knob shift. */
   [class*="toggle_mode_switcher"] {
     background-color: var(--av-border) !important;
   }
@@ -1424,16 +1070,11 @@
     background-color: var(--av-accent) !important;
   }
 
-  /* ---- Search results view-mode switcher (list / gallery / map) ---- */
-  /* Avito marks the ACTIVE view by colour alone: the current icon is near-black
-     `#000` and the other two are muted `#757575`. The active one is a DIV (so the
-     broad text rule greyed it) while the others are `<a>` (so `a { accent }`
-     turned them bright blue) — the indicator ended up exactly INVERTED, the
-     selected view reading as the dimmest of the three. The two inactive icons are
-     mask-image glyphs painted from `currentColor`, so `color` carries them; the
-     active one ships an inline `--kitty-icon-color: #000000`, so its glyph is a
-     hard black `background-color` that no `color` rule can reach — it needs the
-     background painted directly. */
+  /* Search results view-mode switcher (list / gallery / map) */
+  /* The ACTIVE view is marked by colour alone. The active one is a DIV (greyed by the broad text
+     rule) while the others are `<a>` (blued by `a { accent }`), so the indicator ends up INVERTED.
+     The inactive icons are mask glyphs on `currentColor`; the active one ships an inline
+     `--kitty-icon-color`, a hard black `background-color` no `color` rule can reach. */
   [data-marker^="view-change"] {
     color: var(--av-text-muted) !important;
   }
@@ -1442,16 +1083,10 @@
     background-color: var(--av-accent) !important;
   }
 
-  /* ---- Tab bars (seller profile: Главная / Объявления / Отзывы) ---- */
-  /* Natively these are transparent `<button>`s that mark the current tab by TEXT
-     COLOUR alone — active `#000`, the rest `#757575`. Two of our broad rules
-     erased that: the generic button rule gave each one an `--av-surface` pill
-     (so the whole strip read as one grey slab against a natively bare row), and
-     the label carries a `…tab-button-title-…` class, so `[class*="title"]` inked
-     every label `--av-text` and the active tab became indistinguishable from the
-     other two. Restore the bare row and re-encode the state as muted vs accent.
-     The title arms are (0,2,0) so they outrank the generic title rule; the active
-     arm ties them and wins on source order. */
+  /* Tab bars (seller profile: Главная / Объявления / Отзывы) */
+  /* Natively transparent `<button>`s marking the current tab by TEXT COLOUR alone; the generic
+     button rule pills them and `[class*="title"]` inks every label alike. The title arms are (0,2,0)
+     so they outrank the generic title rule; the active arm ties them and wins on source order. */
   [class*="tab-button"] {
     background-color: transparent !important;
   }
@@ -1464,16 +1099,10 @@
     color: var(--av-accent) !important;
   }
 
-  /* ---- Floating surfaces (dropdowns, popovers, menus) ---- */
-  /* These are DIV-based, so the neutraliser above wiped their backgrounds and
-     page content bled through (search autocomplete, sort menu, region picker,
-     "Ещё" nav menu). Re-establish an opaque elevated surface on every floating
-     panel via stable data-marker / class-prefix selectors. The DS Dropdown root is
-     `styles-module-dropdown-<hash>` in the prefixed build and a bare
-     `dropdown-<hash>` in the newer one (the card "⋯" menu, `more-action-tooltip/
-     dropdown`); the trailing hyphen anchors the short spelling to the build's
-     `<name>-<hash>` shape, and the `/dropdown` marker suffix reaches any call site
-     that names its panel. */
+  /* Floating surfaces (dropdowns, popovers, menus) */
+  /* The DS Dropdown root is `styles-module-dropdown-` in one build and a bare `dropdown-` in the
+     newer one; the trailing hyphen anchors the short spelling to the `<name>-<hash>` shape, and the
+     `/dropdown` marker suffix reaches any call site that names its panel. */
   [data-marker="suggest/list/dropdown"],
   [data-marker$="/dropdown"],
   [class*="suggest-dropdownItems"],
@@ -1491,87 +1120,59 @@
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
   }
-  /* `styles-module-tooltip` above also substring-matches the tooltip TRIGGER — an
-     inline hint glyph, not a surface — which then wears a grey plate (the seller
-     profile's "Сотрудники отмечают" thumbs-up row). Only the panel is a surface. */
+  /* `styles-module-tooltip` above also substring-matches the tooltip TRIGGER, an inline hint glyph
+     rather than a surface. Only the panel is a surface. */
   [class*="tooltip-trigger"] {
     background-color: transparent !important;
   }
-  /* `role="listbox"` above is a floating-panel hook, but Avito's design-system List
-     component also hangs the role on IN-FLOW horizontal carousels — the seller
-     profile's "Группы объявлений" (`item_selections/items-list`) and the category
-     hub's stories rail — so the panel fill stamps an elevated slab behind them that
-     the site never draws and that ends abruptly at the carousel's scroll edge.
-     Orientation is the durable discriminator: a floating dropdown listbox is vertical.
-     The ARIA arm is the general one — the item page's "Другие объявления компании" rail
-     (`i2i-carousel`) carries the role and the orientation but neither the DS class nor
-     the `/items-list` marker. All three arms outrank the (0,1,0) panel arm. */
+  /* `role="listbox"` is a floating-panel hook, but the DS List also hangs the role on IN-FLOW
+     horizontal carousels. Orientation is the durable discriminator: a floating dropdown listbox is
+     vertical. The ARIA arm is the general one — the item page's carousel has role and orientation
+     but neither the DS class nor the marker. All three arms outrank the (0,1,0) panel arm. */
   [role="listbox"][aria-orientation="horizontal"],
   [role="listbox"][class*="_orientation_horizontal"],
   ul[data-marker$="/items-list"] {
     background-color: transparent !important;
   }
-  /* Header nav fly-out menus ("Ещё", "Для бизнеса", "Каталоги") — hashed-class
-     absolutely-positioned panels nested in the nav. Stable hook: the
-     nav-container-HEADER wrapper. Each such `li` holds exactly two child divs — the
-     TRIGGER (link + caret, natively transparent) then the PANEL — so the adjacent-
-     sibling combinator selects the panel alone. Without it the trigger also took an
-     `--av-surface` fill, giving "Для бизнеса" and "Ещё" a grey pill that read as an
-     active/selected state their plain-link siblings never got.
-     The fill belongs on that div's single CHILD, which is the panel proper: it is wider
-     than its wrapper, offset 24px left of it and rounded, so a fill on the wrapper
-     leaves a transparent strip down the menu's left edge — the width of the labels'
-     first characters — and stamps a square-cornered ledge above and below the panel. */
+  /* Header nav fly-out menus are hashed absolutely-positioned panels; the stable hook is the
+     nav-container wrapper. Each `li` holds exactly two child divs, TRIGGER then PANEL, so the
+     adjacent-sibling combinator picks the panel alone — without it the natively transparent trigger
+     takes a fill that reads as an active state. The fill belongs on that div's single CHILD: the
+     panel is wider than its wrapper, offset 24px left and rounded, so a fill on the wrapper leaves a
+     transparent strip down the left edge and a ledge above and below. */
   [class*="nav-container-HEADER"] li > div > div + div > div {
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
   }
-  /* Category RUBRICATOR mega-menu — the panel behind the blue grid button next to the
-     logo, on every page type. Its 1280×528 sheet is a natively WHITE pair of nested
-     DIVs (`new-rubricator-content-root` / `…root_wrapper` / `…root_content`), and the
-     div-neutraliser flattened all of them: the whole category tree rendered straight
-     over the page underneath, headings and links stacked on top of the results grid
-     and unreadable. Painting the shared `…content-root` prefix covers all three nested
-     nodes at once; they are opaque over opaque in the same tone, so the nesting is
-     harmless. No load-time scan sees this — the panel is portalled in on click. */
-  /* The rebuilt menu drops the `new-rubricator-` prefix — the sheet is now a
-     `contentSheet-<hash>` div under the popup's own marker, and with the class arm dead
-     the whole category tree rendered over the page again. The marker is the durable
-     hook; painting the outer sheet is enough because everything inside it is
+  /* The RUBRICATOR mega-menu's sheet is a natively WHITE trio of nested DIVs; painting the shared
+     `content-root` prefix covers all three at once, opaque over opaque in one tone. No load-time scan
+     sees it: the panel is portalled in on click. */
+  /* The rebuilt menu drops the `new-rubricator-` prefix; the sheet is a `contentSheet-<hash>` div
+     under the popup's marker. Painting the outer sheet is enough — everything inside it is
      transparent. */
   [class*="new-rubricator-content-root"],
   [data-marker="more-popup"] [class*="contentSheet"] {
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
   }
-  /* Its wrapper is the menu's backdrop (natively `rgba(0,0,0,0.32)`) — see the portal
-     backdrop rule further down, which covers it and the item page's dialog scrim in
-     one arm. Inside it, the root-category list marks which subtree is on show with a light
-     `#f2f1f0` fill on the current row and nothing else — no icon, no ink change — so
-     the neutraliser left all twelve rows identical. The `active` modifier is the only
-     discriminator; a raised surface reads the same way the light fill does natively.
-     The rebuilt menu shortens that modifier to `active-<hash>`, so both spellings are
-     listed; the trailing `-` anchors the short one to the build's `<name>-<hash>` shape
-     and the marker scope keeps it inside this twelve-row list. */
+  /* Its wrapper is the menu's backdrop, covered by the portal backdrop rule below. Inside, the
+     root-category list marks the open subtree with a light fill and nothing else, so the `active`
+     modifier is the only discriminator; the rebuilt menu shortens it to `active-<hash>`, whose
+     trailing `-` anchors it to the `<name>-<hash>` shape while the marker scope keeps it inside this
+     twelve-row list. */
   [data-marker^="top-rubricator/root-category"][class*="styles-module-active"],
   [data-marker^="top-rubricator/root-category"][class*="active-"] {
     background-color: #262c35 !important;
   }
-  /* And its promo card is a `#cfedff` light-blue panel, the same soft blue the theme
-     sinks to a tinted dark chip everywhere else. Scoped to the open menu so the shared
+  /* Its promo card is a `#cfedff` light-blue panel. Scoped to the open menu so the shared
      `background_color` class is untouched elsewhere. */
   [data-marker="more-popup"] [class*="background_color"] {
     background-color: #1d2c3a !important;
   }
-  /* Third-party UX-survey card ("Сейчас мы изучаем, как люди пользуются Авито",
-     `position: fixed`, bottom-right). Every node in the widget is a DIV under the
-     `uxs-` namespace, so the neutraliser blanked the whole card: its heading and
-     CTA rendered straight over the listing grid behind it, unreadable. The class
-     hashes rebuild but the `uxs-` prefix is the vendor namespace and cannot
-     collide with Avito's own (`styles-module-…`, `index-…` or a pure-hex hash).
-     Painting every node the same surface is equivalent to painting the card, so
-     no inner wrapper needs to be singled out; the CTA is natively `#00aaff` and
-     is promoted back out of that fill. */
+  /* Third-party UX-survey card, `position: fixed`. Every node is a DIV under the `uxs-` namespace;
+     the hashes rebuild but that prefix is the vendor namespace and cannot collide with Avito's own.
+     Painting every node the same surface is equivalent to painting the card; the CTA is natively
+     `#00aaff` and is promoted back out of that fill. */
   [class*="uxs-"] {
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
@@ -1583,11 +1184,9 @@
   [class*="uxs-"] button * {
     color: #0b1620 !important;
   }
-  /* The card's dismiss control is the widget's only `type="button"` — its submit CTA
-     carries no `type` — and it is bare chrome: a 20×20 icon-only button with no fill
-     of its own, holding an `<svg>` whose path has a hard `fill="#B5B8C2"`. The accent
-     rule above must not reach it, and its `color` is reset so a build that switches the
-     glyph to `currentColor` still renders it light rather than near-black. */
+  /* The dismiss control is the widget's only `type="button"` (the submit CTA carries no `type`),
+     bare chrome holding an `<svg>` with a hard `fill="#B5B8C2"`. Its `color` is reset so a build
+     switching the glyph to `currentColor` still renders it light. */
   [class*="uxs-"] button[type="button"] {
     background-color: transparent !important;
   }
@@ -1595,12 +1194,9 @@
   [class*="uxs-"] button[type="button"] * {
     color: var(--av-text-soft) !important;
   }
-  /* The card's Avito wordmark is an `<img>` of a black-on-transparent SVG, and the
-     vendor watermark below the CTA is a mask-image glyph painted by its own
-     background — both vanished on the dark card (the wordmark literally black on
-     near-black). An `<img>`'s pixels are out of reach of `fill`/`color`, so flip
-     its lightness and rotate the hue back, which whitens the lettering while the
-     four brand dots keep their colours. */
+  /* The card's wordmark is an `<img>` of a black-on-transparent SVG and the watermark a mask glyph
+     on its own background. An `<img>`'s pixels are out of reach of `fill`/`color`, so flip the
+     lightness and rotate the hue back: the lettering whitens, the brand dots keep their colours. */
   [class*="uxs-"] img {
     background-color: transparent !important;
     filter: invert(1) hue-rotate(180deg);
@@ -1608,22 +1204,14 @@
   [class*="uxs-"] a div {
     background-color: var(--av-text-muted) !important;
   }
-  /* Map view (`?map=1`, and the "На карте" entry points). The results rail floating over
-     the map is a natively WHITE panel, so the div-neutraliser left every card and price
-     sitting straight on the map tiles at about 1:1. Opening "Фильтры" slides a second
-     white sheet (`side-block-overlay-wrapper`) over it and whitens what is left of the
-     list with a third (`side-block-disabled`) — all three must be opaque or the drawer's
-     controls and the cards underneath render on top of each other. The names do not
-     nest as substrings, so each has to be listed. `map-root` is the map's own `#fafafa`
-     canvas, visible wherever a tile has not painted yet; the tiles are raster and stay
-     untouched.
-     The rebuilt map view drops every one of those names — its whole subtree is pure
-     build hashes — but it does mark the two containers that matter, so the panels are
-     reached through the markers instead. Inside the side block, `fullHeight-<hash>` is
-     the rail and `left-<hash>` is the slide-in filter drawer, one element each; both
-     modifiers are far too generic to use unscoped, which is what the marker prefix is
-     doing. The drawer must be opaque in its own right — it stacks ON the rail, so a
-     surface on the rail alone still leaves the cards showing through the filters. */
+  /* Map view (`?map=1`, "На карте"). The results rail is a natively WHITE panel; "Фильтры" slides a
+     second white sheet over it and a third whitens the rest. All three must be opaque, and the names
+     do not nest as substrings, so each is listed. `map-root` is the map's own canvas, visible where a
+     tile has not painted.
+     The rebuilt map view is pure hashes but marks the two containers that matter; inside the side
+     block, `fullHeight-` is the rail and `left-` the filter drawer, both far too generic to use
+     unscoped, hence the marker prefix. The drawer must be opaque in its own right — it stacks ON the
+     rail. */
   [class*="side-block-wrapper"],
   [class*="side-block-overlay-wrapper"],
   [class*="side-block-disabled"],
@@ -1635,45 +1223,40 @@
   [data-marker="map-view"] {
     background-color: var(--av-bg) !important;
   }
-  /* The seller profile's "Адрес" map floats an address card (address line + nearest
-     metro stations) over the Yandex tiles. It is a white plate natively; the
-     div-neutraliser clears it and the light body ink then lands directly on the light
-     map raster, which no scan sees — the tiles are an image, not a background. */
+  /* While the filter drawer is open a `disabled-<hash>` sibling veils the rail: a white plate the
+     site fades to 0.8, which the neutraliser wipes. The drawer is narrower than the rail, so the
+     uncovered strip must dim with it. The tag guard keeps the fragment off any disabled button. */
+  [data-marker="map-full/side-block"] div[class*="disabled-"] {
+    background-color: var(--av-surface) !important;
+  }
+  /* The seller profile's "Адрес" map floats a natively white address card over the Yandex tiles, and
+     the light body ink would land on the light raster — which no scan sees, the tiles being an image
+     rather than a background. */
   [class*="Geo-module-wrapper"] [class*="Card-module-container"] {
     background-color: var(--av-surface) !important;
   }
-  /* Each card in that rail ends its contact row with a scroll-fade mask whose
-     `#f5f5f5` stops live in a background-IMAGE, which layers over any
-     background-color, so the panel fill above cannot reach it. The element is
-     `visibility: hidden` until the row overflows, which is why no load-time
-     element-bg scan ever sees it lit. */
+  /* The rail's contact row ends in a scroll-fade mask whose `#f5f5f5` stops live in a
+     background-IMAGE, layering over any background-color. It is `visibility: hidden` until the row
+     overflows, so no load-time element-bg scan sees it lit. */
   [class*="contacts__overflow"] {
     background-image: none !important;
   }
-  /* Cookie-consent toast (bottom-centre, z-index 12000). It is a DIV-based
-     floating "kitty toastBar", so the neutraliser flattened it to transparent
-     and its text rendered straight over the listing photos behind it. */
+  /* Cookie-consent toast (bottom-centre, z-index 12000): a DIV-based floating "kitty toastBar". */
   [data-marker="cookie-consent"] {
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
   }
-  /* Modal backdrop scrim (region picker, auth popups, …). Avito paints it with
-     `--kitty-backdrop-background` on a DIV, which the neutraliser wiped — the
-     dialog then floated with no separation from the page behind it. Only the
-     `<name>/overlay` markers are backdrops; the bare `overlay` marker wraps
-     dropdown listboxes and must stay transparent. */
+  /* Modal backdrop scrim, painted with `--kitty-backdrop-background` on a DIV. Only the
+     `<name>/overlay` markers are backdrops; the bare `overlay` marker wraps dropdown listboxes and
+     must stay transparent. */
   [data-marker$="/overlay"] {
     background-color: rgba(0, 0, 0, 0.6) !important;
   }
-  /* Portalled backdrops that carry no marker of their own: the item page's dialogs
-     ("Причина жалобы") hang theirs on a `position:fixed` wrapper under pure build
-     hashes, and the header's category mega-menu wrapper is the same shape. Both were
-     wiped by the neutraliser, so an open dialog floated over a page at full brightness
-     and the mega-menu had nothing behind it at all. `role="region"` is the stable hook.
-     The child combinators are load-bearing, NOT decoration: the mega-menu's own inner
-     panel carries the same role several levels deeper, and a descendant selector at
-     (0,2,0) beat the `new-rubricator-content-root` surface above and washed the open
-     menu 40% black. Only a backdrop sits two levels under the portal container. */
+  /* Portalled backdrops with no marker of their own, under pure hashes; `role="region"` is the
+     stable hook. The child combinators are load-bearing: the mega-menu's own inner panel carries the
+     same role several levels deeper, and a descendant selector at (0,2,0) would beat the
+     rubricator-sheet surface above and wash the open menu black. Only a backdrop sits two levels
+     under the portal container. */
   [data-marker="portals-container"] > div > [role="region"] {
     background-color: rgba(0, 0, 0, 0.4) !important;
   }
@@ -1685,23 +1268,18 @@
   [data-marker="suggest/list/custom-option"]:hover {
     background-color: var(--av-surface-2) !important;
   }
-  /* Popover / tooltip arrow. Avito draws the nub as a rotated DIV whose fill is
-     its `background-color`; the neutraliser wiped it and the `*` border rule then
-     outlined the empty box, so the region popover pointed at nothing with a small
-     hollow grey ring hovering above it. Match the panel it belongs to. */
+  /* The popover nub is a rotated DIV whose fill is its `background-color`; without it the `*` border
+     rule outlines an empty box. Match the panel it belongs to. */
   [class*="styles-module-point-"],
   [class*="styles-module-point_"] {
     background-color: var(--av-surface) !important;
     border-color: var(--av-surface) !important;
   }
-  /* Full-screen photo lightbox. Its 0.7-black backdrop lives on two hashed DIVs
-     that carry no marker and no stable class, and the only ancestor hook is the
-     unnamed portal node — so the neutraliser blanked it and the whole item page
-     stayed visible behind the opened photo. A parent-selector rule would reach the
-     backdrop but is stripped from the userstyles.org build, so paint the scrim from
-     a fixed `::before` hung on the one marker'd descendant instead: `position:fixed` sizes
-     it to the viewport and `z-index:-1` drops it behind the gallery's own chrome
-     while staying inside the portal's stacking context. */
+  /* The photo lightbox's backdrop lives on two hashed, marker-less DIVs whose only ancestor hook is
+     the unnamed portal node. A parent-selector rule would reach it but is stripped from the
+     userstyles.org build, so the scrim is a fixed `::before` on the one marker'd descendant:
+     `position:fixed` sizes it to the viewport, `z-index:-1` drops it behind the gallery chrome while
+     staying in the portal's stacking context. */
   [data-marker="extended-gallery/frame-wrapper"]::before {
     content: "";
     position: fixed;
@@ -1712,23 +1290,17 @@
     z-index: -1;
     background-color: rgba(0, 0, 0, 0.85) !important;
   }
-  /* The rebuilt lightbox is not a scrim but a solid WHITE full-viewport sheet
-     (`position:fixed`, z-index 1000) under pure hashes, portalled as a direct child of
-     the gallery marker; the div-neutraliser blanks it and the whole item page shows
-     through the open photo. Its sibling, the inline slider wrapper, is natively
-     transparent, so the canvas tone is invisible on it at rest and opaque on the
-     sheet. The stage (`#f7f7f5`) and header row inside stay on that canvas. */
+  /* The rebuilt lightbox is a solid WHITE full-viewport sheet (`position:fixed`, z-index 1000) under
+     pure hashes, portalled as a direct child of the gallery marker. Its sibling, the inline slider
+     wrapper, is natively transparent, so the canvas tone is invisible on it at rest. */
   [data-marker="item-view/main-gallery"] > div {
     background-color: var(--av-bg) !important;
   }
 
-  /* ---- Dark scrims over photos (erased by the div-neutraliser) ---- */
-  /* Avito floats white icons and white labels directly on listing photos and
-     relies on a translucent BLACK pill behind each one for legibility (values
-     read from the site's own stylesheet). The neutraliser flattened every one of
-     those pills, so a white delivery glyph or a "Просмотрено" label landed on a
-     bare photo and vanished against any light image. Restore the scrims and keep
-     their labels white. */
+  /* Dark scrims over photos (erased by the div-neutraliser) */
+  /* Avito floats white icons and labels directly on listing photos and relies on a translucent BLACK
+     pill behind each one for legibility (values from the site's own stylesheet). Keep the labels
+     white. */
   [class*="styles-galleryBadge"],
   [class*="photo-slider-item-more"],
   [class*="badge-reserved"],
@@ -1749,11 +1321,9 @@
     color: #fff !important;
   }
 
-  /* ---- Ad disclosure ---- */
-  /* The "Реклама ⋮" tag is the legally required ad marker. Natively a translucent
-     WHITE chip with black text over the creative; the neutraliser erased the chip
-     and the broad text rule greyed the label, leaving it barely legible on a light
-     creative. A translucent BLACK chip with white text reads on any creative. */
+  /* Ad disclosure */
+  /* The "Реклама" tag is the legally required ad marker, natively a translucent WHITE chip with black
+     text over the creative. A translucent BLACK chip with white text reads on any creative. */
   [data-marker="adv-badge-tag"] {
     background-color: rgba(0, 0, 0, 0.6) !important;
   }
@@ -1761,34 +1331,24 @@
   [data-marker="adv-badge-tag"] * {
     color: #fff !important;
   }
-  /* ---- Brand-lift survey widget (Buzzoola, in a same-origin iframe) ---- */
-  /* The survey block seeded through the home feed renders inside an iframe whose
-     `location.href` is the avito page itself, so this domain block applies to it. Its
-     step tracks are bare `<span>`s (`#E5E7EF`) — outside the div-neutraliser by design,
-     since spans carry Avito's data-driven fills — and they render as two bright white
-     bars across the dark card. The `:not(.active)` guard is load-bearing: the widget
-     paints the completed step's blue without `!important`, so an unguarded arm would
-     take the progress fill with it and leave three identical tracks. */
+  /* Brand-lift survey widget (Buzzoola, in a same-origin iframe) */
+  /* The survey renders inside an iframe whose `location.href` is the avito page itself, so this
+     domain block applies to it. Its step tracks are bare `<span>`s, outside the div-neutraliser by
+     design. The `:not(.active)` guard is load-bearing: the widget paints the completed step's blue
+     without `!important`, so an unguarded arm would take the progress fill with it. */
   .buzz_wrapper .progress__items span:not(.active) {
     background-color: var(--av-border) !important;
   }
 
-  /* ---- Design-system Banner ---- */
-  /* The Banner paints its card on a child layer — `background_color-<hash>`, spelled
-     `styles-module-background_color-<hash>` in the older build, so the arms below hook
-     the shared substring and reach either —
-     whose fill is `var(--kitty-banner-backgroundColor)` — a token the preset class on
-     the Banner ROOT sets, so no `[style*=…]` or literal-colour selector can reach it and
-     the div-neutraliser wipes the card entirely: the banner's heading, fields and CTA
-     end up floating on the bare canvas with no card at all.
-     The component's whole preset vocabulary is eight names, read off Avito's own
-     stylesheet; each is a semantic bg token, so each keeps its hue and sinks to the tone
-     the theme already uses for that meaning. `beige`/`warmGray`/`white` are the neutral
-     ones and take the plain elevated surface.
-     `background-image` must be cleared on the same layer: a caller can hand the card an
-     inline stack of pastel `radial-gradient`s (the seller profile's "Лучшие предложения"
-     showcase cards ship three of them), which layers over any background-COLOR and left
-     those cards near-white with the theme's light-grey ink on top at about 1.2:1. */
+  /* Design-system Banner */
+  /* The Banner paints its card on a child layer (`background_color-<hash>`, prefixed
+     `styles-module-` in the older build, so the arms hook the shared substring) whose fill is
+     `var(--kitty-banner-backgroundColor)`, a token set by the preset class on the Banner ROOT — no
+     `[style*=]` or literal-colour selector can reach it.
+     The preset vocabulary is eight names, each a semantic bg token, so each keeps its hue;
+     `beige`/`warmGray`/`white` are the neutrals.
+     `background-image` must be cleared on the same layer: a caller can hand the card an inline stack
+     of pastel `radial-gradient`s, which layers over any background-COLOR. */
   [class*="root_preset_blue"] [class*="background_color"] {
     background-color: #1d2c3a !important;
     background-image: none !important;
@@ -1821,33 +1381,26 @@
     background-image: none !important;
     border-color: var(--av-border) !important;
   }
-  /* The Beduin Gradient component (promo strips such as the vacancies hub's "В отпуск
-     перед новой работой") paints a pastel `linear-gradient` as its background-IMAGE, fed
-     by an inline `--beduin-gradient`. The div-neutraliser only clears background-COLOR,
-     so the strip stayed near-white while the broad text rule inked its heading and
-     subtitle light grey — around 1.3:1. Both the component class and the token are
-     matched so either spelling reaches it. */
+  /* The Beduin Gradient component (promo strips) paints a pastel `linear-gradient` as its
+     background-IMAGE, fed by an inline `--beduin-gradient`; the div-neutraliser only clears
+     background-COLOR. Both the component class and the token are matched so either spelling reaches
+     it. */
   [class*="Gradient-module-root"],
   [style*="--beduin-gradient"] {
     background-image: none !important;
     background-color: var(--av-surface) !important;
   }
-  /* Partner promo card on the item page ("Получите кешбэк от Альфа‑Банка"): a soft-red
-     `#ffe0e0` panel whose fill arrives as an inline `background:` SHORTHAND on a
-     hash-classed div, so no class hook and no `background-color:` selector reaches it
-     and the div-neutraliser wiped the card outright — heading, body and CTA floated on
-     the bare canvas with no panel behind them. Takes the same red-tinted surface as the
-     Banner's `red` preset. Both `rgb()` spellings and both hex cases are listed for the
-     reason the badge rules list them. */
+  /* Partner promo card on the item page: a soft-red `#ffe0e0` panel whose fill arrives as an inline
+     `background:` SHORTHAND on a hash-classed div, so no class hook and no `background-color:`
+     selector reaches it. Both `rgb()` spellings and both hex cases are listed. */
   [style*="background: rgb(255, 224, 224)"],
   [style*="background:rgb(255, 224, 224)"],
   [style*="background:#FFE0E0"], [style*="background:#ffe0e0"] {
     background-color: #2e1a1d !important;
     border-color: #4a2a2f !important;
   }
-  /* The item page's "Скидки каждый день" sale banner (`saleBanner/*` markers inside)
-     is the same shape one hue over: a mint `#adf0d1` card painted through an inline
-     `background:` shorthand on a hash-classed div. Takes the Banner's green tone. */
+  /* The item page's "Скидки каждый день" banner is the same shape one hue over: a mint `#adf0d1` card
+     painted through an inline `background:` shorthand on a hash-classed div. */
   [style*="background: rgb(173, 240, 209)"],
   [style*="background:rgb(173, 240, 209)"],
   [style*="background:#ADF0D1"], [style*="background:#adf0d1"] {
@@ -1855,9 +1408,8 @@
     border-color: #24452e !important;
   }
 
-  /* ---- Model-rating badge (item page) ---- */
-  /* The green `#00c257` score pill next to "N отзывов о модели" is a hashed DIV
-     the neutraliser flattened, leaving a bare grey "4,7". Its only stable hook is
+  /* Model-rating badge (item page) */
+  /* The green `#00c257` score pill is a hashed DIV the neutraliser flattens; its only stable hook is
      the `rating-and-reviews` marker two levels up. */
   [data-marker="rating-and-reviews"] > div > div:first-child > div,
   [data-marker="rating-and-reviews"] > div > div:first-child > div * {
@@ -1866,32 +1418,22 @@
   [data-marker="rating-and-reviews"] > div > div:first-child > div {
     background-color: #198049 !important;
   }
-  /* The "138 отзывов о модели" label beside that pill is the LINK to the model's
-     reviews — the whole block is wrapped in an `<a>` whose native colour is the
-     rating green `#00a34c`. The label is a bare SPAN, so the broad text rule
-     (`span { color: --av-text-soft }`) beat the anchor and painted it plain body
-     grey: the review count lost both its green and any hint of being clickable.
-     Lift the green instead of blueing it, keeping it tied to the score pill. The
-     "4,7" inside the pill stays white — the rule above is more specific. */
+  /* The review-count label is the LINK to the model's reviews, natively the rating green `#00a34c`,
+     but a bare SPAN, so the broad text rule beats the anchor. Lift the green rather than blueing it;
+     the score inside the pill stays white, the rule above being more specific. */
   [data-marker="rating-and-reviews"] span {
     color: #57c98a !important;
   }
-  /* The MODEL / catalog page shows the same score-and-reviews block under its own
-     marker, and both halves were lost there: the review-count link flattened to body
-     grey, and the pill's fill wiped by the div-neutraliser so the score read as a bare
-     grey number with nothing marking it as a rating at all. */
+  /* The MODEL / catalog page shows the same score-and-reviews block under its own marker, where both
+     halves are lost: the link flattens to body grey and the neutraliser wipes the pill's fill. */
   [data-marker="model-card/common-info/rating"] span {
     color: #57c98a !important;
   }
-  /* That pill takes its fill from an INLINE design token rather than a class or a
-     literal colour (`background-color: var(--theme-semantics-components-rate-bg-*)`),
-     so no `[style*="rgb(…)"]`/`[style*="#hex"]` selector in this file could reach it —
-     the token NAME is the hook. Avito's rate palette is a five-step SCALE
-     (excellent #00c257, good #72ca00, medium #fca400, low #f71b47, none #999894), and
-     collapsing it to one tone would trade a missing pill for a rating that always
-     looks the same; each step is named separately and refined to clear 4.5:1 against
-     the white label. Listed after the link rule so the score inside the pill stays
-     white rather than taking the link's green (equal specificity, later wins). */
+  /* That pill's fill comes from an INLINE design token, so no
+     `[style*="rgb(...)"]`/`[style*="#hex"]` selector could reach it — the token NAME is the hook.
+     The rate palette is a five-step SCALE; collapsing it to one tone would make every rating look
+     the same, so each step is named and refined to clear 4.5:1 against the white label. Listed after
+     the link rule so the score stays white (equal specificity, later wins). */
   [style*="--theme-semantics-components-rate-bg-excellent"] {
     background-color: #198049 !important;
   }
@@ -1912,12 +1454,9 @@
     color: #fff !important;
   }
 
-  /* ---- Pagination current page ---- */
-  /* Avito marks the current page with a near-black `#141414` pill and white text.
-     The neutraliser erased the pill, and restoring the native colour would only
-     trade an invisible indicator for a different invisible one on a dark canvas —
-     so promote it to the theme's accent. Without this, page 1 is indistinguishable
-     from pages 2–5. */
+  /* Pagination current page */
+  /* The current page is natively a near-black `#141414` pill; restoring that colour would only trade
+     one invisible indicator for another on a dark canvas, so it takes the accent. */
   [data-marker^="pagination-button"][aria-current="page"] {
     background-color: var(--av-accent) !important;
   }
@@ -1927,26 +1466,22 @@
     color: #0b1620 !important;
   }
 
-  /* ---- Buttons ---- */
+  /* Buttons */
   [data-marker="search-form/submit-button"],
   button[type="submit"] {
     background-color: var(--av-accent) !important;
     color: #0b1620 !important;
   }
 
-  /* ---- Hover feedback on painted controls ---- */
-  /* Avito's design system marks button, chip and card-CTA hover by swapping a
-     background token. Every fill this theme paints is `!important`, so that swap lost
-     the cascade on every control at once: buttons, filter chips and the search cards'
-     phone/message CTAs all rendered pixel-identical at rest and under the pointer.
-     A `brightness()` lift is used instead of per-variant hover fills because the fill a
-     control ends up with depends on which of the rules above won it — the accent, the
-     call green, the delivery purple, the soft-blue chip and the plain surface each need
-     a different hover tone, and a filter derives it from whatever is actually painted.
-     It also cannot invent a surface: a natively bare control has nothing to lighten.
-     Excluded: `filter` makes an element the containing block for its `position:fixed`
-     descendants, so lifting the fixed title bar's favourite button would drag that bar's
-     background pseudo out of the viewport and collapse it onto the button's own box. */
+  /* Hover feedback on painted controls */
+  /* The design system marks hover by swapping a background token, and every fill this theme paints
+     is `!important`, so that swap loses the cascade on every control at once. A `brightness()` lift
+     replaces per-variant hover fills because the fill a control ends up with depends on which rule
+     above won it, and a filter derives the hover tone from what is actually painted; it also cannot
+     invent a surface on a natively bare control.
+     Excluded: `filter` makes an element the containing block for its `position:fixed` descendants,
+     so lifting the fixed title bar's favourite button would drag that bar's background pseudo onto
+     the button's own box. */
   button:hover,
   a[class*="styles-module-root"]:hover,
   [class*="style-module-wrapper"]:hover,
@@ -1956,39 +1491,27 @@
   .js-item-view-title-info [data-marker="item-view/favorite-button"]:hover {
     filter: none;
   }
-  /* Pagination page numbers are natively bare and mark hover with a grey pill, so a
-     brightness lift has nothing to act on. The current page carries the accent from the
-     rule above and is a `<span>`, so only the other pages match here. */
+  /* Pagination page numbers are natively bare and mark hover with a grey pill, so a brightness lift
+     has nothing to act on. The current page carries the accent and is a `<span>`, so only the other
+     pages match here. */
   [data-marker^="pagination-button"] a:hover {
     background-color: var(--av-surface) !important;
   }
 
-  /* ---- Search-result card hover highlight (pseudo-element panels) ---- */
-  /* On card hover Avito paints a full-card light-grey backdrop via
-     `.iva-item-redesign…:hover::before` (inset:-8px, rgb(245,245,245)) plus a
-     light halo behind the floating action buttons via
-     `.iva-item-actions…::before` (box-shadow glow). Both are ::before panels —
-     invisible to element-bg scans — and flash bright on every hover. Repaint
-     them to the dark elevated surface and drop the light halo shadow. Classes
-     are hashed, so hook the stable `iva-item-` prefixes. */
-  /* The model/catalog page's offer rows ship the same hover panel under pure-hash
-     classes, so the `iva-item-` arms miss it and the whole row went white with
-     near-invisible light-grey text on it. Every card that carries the panel is a
-     `[data-marker="item"]`, on both surfaces — the marker is the durable hook.
-     The pseudo only exists on hover, so painting it unconditionally cannot show a
-     surface on a resting card. */
-  /* The search grid now builds that action slot from `actions-<hash>` /
-     `actionsRedesign-<hash>` instead of `iva-item-actions`, so the legacy arm matches
-     nothing there and all 49 slots painted a white 180×80 plate — with its light glow
-     — straight through the dark card, behind the "Показать телефон" / "Написать" CTAs.
-     Unlike the `iva-` panel this one exists at rest (an `actionsVisible-<hash>` state
-     class, not `:hover`), so it is on screen the moment the results load. */
-  /* The model page's offer rows build the same slot under pure hashes with no
-     `actions` name at all, so the last arm reaches it by structure: it is the only
-     `div::before` inside any `[data-marker="item"]` card that paints a background
-     (the cards' other pseudos are `::after` photo veils), so the arm cannot box a
-     decorative pseudo. The card's own `::before` (the hover panel) has `content:
-     none` at rest and never masks this one. */
+  /* Search-result card hover highlight (pseudo-element panels) */
+  /* On card hover Avito paints a full-card light-grey `::before` backdrop plus a light halo behind
+     the action buttons (a box-shadow glow on another `::before`) — both invisible to element-bg
+     scans. Classes are hashed, so hook the stable `iva-item-` prefixes. */
+  /* The model/catalog page ships the same hover panel under pure hashes; every card carrying it is
+     a `[data-marker="item"]` on both surfaces. The pseudo only exists on hover, so painting it
+     unconditionally cannot show a surface on a resting card. */
+  /* The search grid builds that action slot from `actions-<hash>` / `actionsRedesign-<hash>` rather
+     than `iva-item-actions`. Unlike the `iva-` panel this one exists at rest (an
+     `actionsVisible-<hash>` state class, not `:hover`). */
+  /* The model page builds the same slot under pure hashes with no `actions` name, so the last arm
+     reaches it by structure: it is the only `div::before` inside a card that paints a background
+     (the other pseudos are `::after` photo veils). The card's own `::before` has `content: none` at
+     rest and never masks this one. */
   [class*="iva-item-redesign"]:hover::before,
   [class*="iva-item-redesign"]:hover [class*="iva-item-actions"]::before,
   [class*="iva-item-actions"]::before,
@@ -1999,14 +1522,10 @@
     box-shadow: none !important;
   }
 
-  /* ---- Carousel scroll-arrow buttons (SVG-disc, audit-blind) ---- */
-  /* The "other listings" / recommendation carousels render their round scroll
-     buttons as an SVG `<rect fill=#fff>` disc with a black `<path>` arrow — a
-     bright white circle glaring on the dark page (element-bg scans miss SVG
-     fills). Darken the disc to the elevated surface and lighten the arrow.
-     The hub rails' marker-less copy ships the OPPOSITE polarity — a `#141414`
-     disc with a white arrow, which collapses into the near-black canvas — so the
-     pair is normalised in both directions to the same surface/ink values. */
+  /* Carousel scroll-arrow buttons (SVG-disc, audit-blind) */
+  /* The recommendation carousels draw their scroll buttons as an SVG `<rect fill=#fff>` disc with a
+     black `<path>` arrow, and element-bg scans miss SVG fills. The hub rails' copy ships the OPPOSITE
+     polarity, so the pair is normalised in both directions. */
   [data-marker$="/scroll-button-back"] svg rect,
   [data-marker$="/scroll-button-forward"] svg rect,
   button[class*="scrollButton"] svg rect {
@@ -2017,60 +1536,46 @@
   button[class*="scrollButton"] svg path {
     fill: var(--av-text) !important;
   }
-  /* The item gallery's own prev/next control is a different component: a disc
-     that is white NATIVELY (it sits over the photo) holding a design-system mask
-     icon, and a mask icon is painted by its `background-color`, which follows
-     `color` — so the broad text rule turns the arrow body-light and it vanishes
-     into its own white disc. Pin the glyph dark; the disc stays white. The
-     `arrowback`/`arrowforward` icon names belong to this control alone (the
-     carousels above draw an SVG `<path>`, and breadcrumb/link chevrons are
-     `arrowright`/`arrowforwardios`), and the `aria-label` guard keeps the rule on
-     the labelled disc. */
+  /* The item gallery's prev/next disc is white NATIVELY and holds a DS mask icon painted by its
+     `background-color`, which follows `color` — so the broad text rule lightens the arrow into its
+     own white disc. Pin the glyph dark; the disc stays white. `arrowback`/`arrowforward` belong to
+     this control alone (breadcrumb chevrons are `arrowright`/`arrowforwardios`), and the `aria-label`
+     guard keeps the rule on the labelled disc. */
   [aria-label] > [data-inline-icon] > svg[data-icon-name="arrowback"],
   [aria-label] > [data-inline-icon] > svg[data-icon-name="arrowforward"] {
     background-color: #0b1620 !important;
   }
 
-  /* ---- Gallery thumbnail strip: the SELECTED photo ---- */
-  /* Both strips — the item page's inline row (`image-preview/item`) and the fullscreen
-     lightbox's rail (`extended-image-preview/item`) — mark the current photo with a
-     brand-blue `::after` ring and nothing else, so the blanket `*::after` border reset
-     collapses it to the generic line colour and every thumbnail reads the same. The
-     pseudo has `content: none` on the unselected thumbnails, so painting it
-     unconditionally cannot draw a ring on them. */
+  /* Gallery thumbnail strip: the SELECTED photo */
+  /* Both strips mark the current photo with a brand-blue `::after` ring and nothing else, which the
+     blanket `*::after` border reset collapses. The pseudo has `content: none` on unselected
+     thumbnails, so painting it unconditionally cannot ring them. */
   [data-marker="image-preview/item"]::after,
   [data-marker="extended-image-preview/item"]::after {
     border-color: var(--av-accent) !important;
   }
 
-  /* ---- Favorite (add-to-wishlist) heart outline (SVG stroke, audit-blind) ---- */
-  /* Search cards and item pages render the un-favourited heart as an SVG whose
-     path has NO fill (`fill:none`) and a hard-coded black `stroke` → a near-invisible
-     black outline on the dark card. Both the element-bg and the white-fill SVG scans
-     miss a stroke-only black icon. Lighten the stroke to a muted grey; the favourited
-     state uses a separate filled/red icon and is untouched. */
+  /* Favorite (add-to-wishlist) heart outline (SVG stroke, audit-blind) */
+  /* The un-favourited heart is an SVG whose path has NO fill (`fill:none`) and a hard-coded black
+     `stroke`; both the element-bg and the white-fill SVG scans miss a stroke-only black icon. The
+     favourited state uses a separate filled/red icon and is untouched. */
   [data-marker="favorites-add"] svg path,
   [data-marker="item-view/favorite-button"] svg path,
   [class*="favoritesOutlineIcon"] path {
     stroke: var(--av-text-muted) !important;
   }
 
-  /* ---- Category-hub landing tiles & cards (e.g. /all/bytovaya_elektronika) ---- */
-  /* The electronics/category HUB pages render their showcase surfaces as hashed
-     `<a>` elements — which the div-only neutraliser above never touches — so they
-     keep a hard light-grey fill: the visual-rubricator category tiles, the lazy
-     product-image placeholders inside the "Техника Apple"/appliance blocks, and
-     the search-history chips. Repaint each to the elevated dark surface. */
-  /* The rubricator tile was rebuilt as `gridItem-<hash>`, which the class arm no longer
-     reaches — ten white tiles carrying accent-blue labels at ~1.5:1. Its marker is the
-     durable hook. Natively the label is BLACK body text, not a link, so the accent from
-     the blanket `a` rule has to be taken back off it too. */
-  /* The employer profile ("Все вакансии компании") builds the same idea from a
-     `Categorizer-module-item-<hash>` anchor whose fill arrives from a palette-named
-     sibling class (`…-warmGray4-<hash>`), so naming the component class covers every
-     tone variant at once. Its illustration is a transparent-backed PNG sized `cover`,
-     so the colour override is enough — the artwork survives and only the plate under
-     it changes. */
+  /* Category-hub landing tiles & cards (e.g. /all/bytovaya_elektronika) */
+  /* Category HUB pages render their showcase surfaces as hashed `<a>` elements, which the div-only
+     neutraliser never touches, so they keep a hard light-grey fill: rubricator tiles, lazy
+     product-image placeholders, search-history chips. */
+  /* The rubricator tile was rebuilt as `gridItem-<hash>`, out of the class arm's reach; its marker is
+     the durable hook. Natively the label is BLACK body text, not a link, so the blanket `a` accent has
+     to come back off it. */
+  /* The employer profile builds the same idea from a `Categorizer-module-item` anchor whose fill
+     arrives from a palette-named sibling class, so the component class covers every tone variant at
+     once. Its illustration is a transparent-backed PNG sized `cover`, so a colour override leaves the
+     artwork intact. */
   [class*="visual-rubricator-gridItem"],
   [class*="search-history-widget-item"],
   [class*="category-block-img__placeholder"],
@@ -2083,25 +1588,18 @@
   [data-marker^="visual-rubricator/block"] * {
     color: var(--av-text) !important;
   }
-  /* One tile per rail is promoted with an inline `background:#cfedff` — a pale-blue
-     wash, the only thing marking it as the featured entry. Keep that distinction on the
-     blue-tinted surface the theme uses for its other soft-blue controls; the arm has to
-     out-specify the marker rule above, hence the doubled attribute selector. All three
-     serialisations are listed because Avito emits inline colours as lower-case hex on
-     SSR pages, upper-case hex on some blocks and spaced `rgb()` after a client-side
-     re-render, and attribute matching is case-SENSITIVE. */
+  /* One tile per rail is promoted with an inline `background:#cfedff`, the only thing marking it as
+     the featured entry; the arm has to out-specify the marker rule above, hence the doubled attribute
+     selector. All three serialisations are listed — Avito emits lower-case hex, upper-case hex and
+     spaced `rgb()` depending on the render path, and attribute matching is case-SENSITIVE. */
   [data-marker^="visual-rubricator/block"][style*="background:#cfedff"],
   [data-marker^="visual-rubricator/block"][style*="background:#CFEDFF"],
   [data-marker^="visual-rubricator/block"][style*="background: rgb(207, 237, 255)"] {
     background-color: #1d2c3a !important;
   }
-  /* One tile per grid is the FEATURED one: the class fill is a neutral `#f2f1f0`, and
-     the highlight arrives as an inline soft-blue `background:` shorthand, so the rule
-     above flattened it into the row and the grid lost its lead tile. Take the theme's
-     soft-blue chip tone. Scoped to the tile class — the search rail's colour swatches
-     spell their hue the same way and must keep it verbatim. Both hex cases and both
-     `rgb()` spellings are listed: a server-rendered load and a client re-render
-     serialise the same inline value differently. */
+  /* One tile per grid is the FEATURED one, its highlight an inline soft-blue `background:` shorthand
+     the rule above would flatten. Scoped to the tile class — the search rail's colour swatches spell
+     their hue the same way and must keep it verbatim. */
   [class*="visual-rubricator-gridItem"][style*="background:#cfedff"],
   [class*="visual-rubricator-gridItem"][style*="background:#CFEDFF"],
   [class*="visual-rubricator-gridItem"][style*="background: rgb(207, 237, 255)"],
@@ -2110,81 +1608,62 @@
     border-color: #2f4a63 !important;
   }
 
-  /* Stories-rail scroll arrow. It is an empty DIV whose glyph is a background-IMAGE
-     (`avito.st/.../*.svg`, a single `stroke="black"` path), so the div-neutraliser —
-     which only clears background-COLOR — leaves a black arrow on the dark canvas and
-     no `color`/`fill` rule can reach it. The asset is monochrome, so inverting its
-     lightness cannot distort a hue. */
+  /* The stories-rail scroll arrow is an empty DIV whose glyph is a background-IMAGE (a single
+     `stroke="black"` path), which the neutraliser does not clear and no `color`/`fill` rule can reach.
+     The asset is monochrome, so inverting its lightness cannot distort a hue. */
   [class*="story-previewer-arrow"] {
     filter: invert(1);
   }
 
-  /* ---- Loading skeletons ---- */
-  /* While a result list re-fetches (pagination, sort change, the home grid's lazy
-     pages) Avito swaps in `placeholder-one-…` blocks whose bars are drawn by a
-     mid-grey SVG served as a background-IMAGE. The div-neutraliser only clears
-     background-COLOR, so the artwork survived and a 634×202 light-grey slab
-     flashed over the dark page on every reload — and no scan sees it: the element
-     background is transparent and the grey is well under the near-white
-     threshold. Dimming the layer keeps the skeleton's shape and lands it on the
-     elevated-surface tone. */
+  /* Loading skeletons */
+  /* Result-list re-fetches swap in `placeholder-one-...` blocks whose bars are a mid-grey SVG
+     served as a background-IMAGE, which the neutraliser does not clear — and no scan sees it: the
+     element background is transparent and the grey is under the near-white threshold. */
   [class*="placeholder-one"] {
     opacity: 0.25;
   }
-  /* The buyer-pages micro-frontend draws its own hydration skeletons — the home
-     recommendation grid, the ad-mimicry cards seeded through it and the side-block
-     stub — with a near-white SVG (#F5F5F5 / #EBEAE8 / #FFF artwork) served as a
-     background-IMAGE, so the div-neutraliser, which only clears background-COLOR,
-     leaves them at full brightness for the second or two before the feed mounts.
-     `opacity` is not available as the dimmer here: their pulse ANIMATES opacity, so
-     an unimportant value never applies and an important one kills the pulse. The
-     artwork is achromatic, so inverting its lightness cannot shift a hue, and 0.86
-     lands #F5F5F5 on ~#2b2b2b — a step above the elevated surface.
-
-     The grid skeleton is a hash-only twin of the REAL recommendations grid (same
-     `styles-root-`/`styles-compactGrid-`/`styles-main-` shape): the real one carries
-     `id="bx_recommendations"` and its cards as children, so both guards are what
-     keeps this filter off live listing photos. */
+  /* The buyer-pages micro-frontend draws its hydration skeletons with a near-white SVG served as a
+     background-IMAGE, which the neutraliser does not clear.
+     `opacity` is not available as the dimmer: their pulse ANIMATES opacity, so an unimportant value
+     never applies and an important one kills the pulse. The artwork is achromatic, so inverting its
+     lightness cannot shift a hue, and 0.86 lands #F5F5F5 on ~#2b2b2b.
+     The grid skeleton is a hash-only twin of the REAL recommendations grid: the real one carries
+     `id="bx_recommendations"` and its cards as children, so both guards are what keeps this filter
+     off live listing photos. */
   div[class*="styles-compactGrid-"]:not([id]):empty,
   div[class*="advert-mimicry-block-skeleton"],
   div[class*="placeholder-loading"] {
     filter: invert(0.86);
   }
 
-  /* ---- Price (semantic, kept prominent and light) ---- */
+  /* Price (semantic, kept prominent and light) */
   [data-marker="item-price"],
   [data-marker="item-price-value"],
   [data-marker="item-view/item-price"],
   [itemprop="price"] {
     color: var(--av-text) !important;
   }
-  /* Sellers can PAY to highlight a price. Avito paints that yellow swash (#FFD950,
-     a single-path avito.st SVG) as a `background-image` on an EMPTY, absolutely
-     positioned sibling whose own `background-color` is `transparent` — so the
-     element-bg audit sees nothing and the rule above left near-white text sitting
-     on bright yellow at 1.16:1. Keep the swash (it is the paid feature) and re-ink
-     the text to 13.3:1 instead. The highlighted STATE lives on the price's parent
-     (`price-highlightRedesign` in the prefixed build, `highlightRedesign-<hash>` in
-     the bare-name one — the shared substring reaches both); the swash div itself
-     holds no text, so scoping to `yellowHighlight` would match nothing. */
+  /* Sellers can PAY to highlight a price. The yellow swash is a `background-image` on an EMPTY,
+     absolutely positioned sibling whose own `background-color` is `transparent`, so the element-bg
+     audit sees nothing while near-white text sits on it at 1.16:1. Keep the swash — it is the paid
+     feature — and re-ink the text. The STATE lives on the price's parent, reached by the shared
+     `highlightRedesign` substring; the swash div holds no text, so scoping to `yellowHighlight` would
+     match nothing. */
   [class*="highlightRedesign"],
   [class*="highlightRedesign"] * {
     color: #0b1620 !important;
     -webkit-text-fill-color: #0b1620 !important;
   }
 
-  /* ---- Footer ---- */
-  /* Only the legacy error/404 template ships a real `<footer>`, and there it IS the
-     full-width page footer, so it takes the header tone.
-     The modern template has no `<footer>` at all: `[data-marker="footer"]` is just the
-     1200px CONTENT COLUMN, and the full-width band around it lives on a wrapper under
-     pure build hashes. Painting the marker therefore stamped a hard-edged near-black
-     slab into the middle of the page — canvas showing 40px either side and 80px below
-     it. The band is unreachable, and natively it is `#f7f7f5` against a `#fff` page: a
-     3% step with no meaningful dark counterpart, so the column is left on the canvas
-     rather than given an edge the site never draws. The `*=` arm still carries the link
-     ink, and must not carry a fill — it also matches every descendant marker
-     (`footer/regions/seo-link`, `footer/more/toggle`, …), not just the column. */
+  /* Footer */
+  /* Only the legacy error/404 template ships a real `<footer>`, and there it IS the full-width page
+     footer, so it takes the header tone.
+     The modern template has no `<footer>`: the marker is just the 1200px CONTENT COLUMN, and the
+     full-width band around it is a wrapper under pure hashes, so painting the marker stamps a
+     hard-edged slab into the middle of the page. The band is unreachable and natively only a 3% step
+     off the page, with no meaningful dark counterpart, so the column stays on the canvas. The `*=`
+     arm carries the link ink only and must not carry a fill — it also matches every descendant
+     marker. */
   footer {
     background-color: var(--av-header) !important;
     border-color: var(--av-border) !important;
@@ -2192,11 +1671,9 @@
   footer a, [data-marker*="footer"] a {
     color: var(--av-text-soft) !important;
   }
-  /* The page footer is a `<div data-marker="footer">`; every semantic `<footer>` Avito
-     ships inside a dialog is a COMPONENT action row, natively transparent, so the
-     element arm above stamps a near-black slab across the panel it sits on. The bare
-     arm has to stay — a `<footer>` is outside the div-neutraliser, so dropping it would
-     let a natively light one through on a template not covered here. */
+  /* The page footer is a `<div data-marker="footer">`; every semantic `<footer>` inside a dialog is
+     a COMPONENT action row, natively transparent. The bare arm has to stay — a `<footer>` is outside
+     the div-neutraliser, so dropping it would let a natively light one through. */
   [role="dialog"] footer {
     background-color: transparent !important;
   }

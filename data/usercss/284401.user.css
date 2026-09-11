@@ -3,23 +3,17 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A dark theme for the Russian SCP Foundation wiki (articles, sidebar, tag search, forum)
-@version      20260831.14.44
+@version      20260910.22.39
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
 @-moz-document domain("scpfoundation.net"), domain("scpfoundation.ru"), domain("scp-ru.wikidot.com") {
-/* ============================================================
-     BASE
+/* BASE
+     Articles ship their own <style> after this sheet, so equal specificity
+     loses: article-body rules carry !important, and the ones a theme is
+     likeliest to claim use two ids so an author's inline colour still wins. */
 
-     Articles may ship their own <style> block, which the browser sees AFTER
-     this sheet — equal specificity there loses. Article-body rules therefore
-     carry !important, and the ones an article theme is most likely to claim
-     are written with two ids so an author's inline colour still wins.
-     ============================================================ */
-
-  /* Headings and links state a colour directly on the element, so they cannot
-     reach an author's callout box by inheritance the way body ink does. They
-     read these instead, and a light author box rebinds them for its subtree. */
+  /* Headings and links state colour directly — inheritance cannot recolour them, so a light author box rebinds these tokens for its subtree instead. */
   :root {
     color-scheme: dark;
     --scpru-title: #e05f6b;
@@ -37,19 +31,14 @@
     --scpru-lift-brown: #d4a373;
     --scpru-lift-teal: #56d4dd;
 
-    /* The 2023 sidebar redesign draws its corner brackets, its folded-section
-       wipe and its section rules from one crimson. */
+    /* Feeds the 2023 sidebar's corner brackets, folded-section wipe and section rules. */
     --new-side-bar-color: #8a2f2f;
 
-    /* The Basalt theme family builds every surface it owns — sticky masthead,
-       sidebar, page-options strip, component boxes — out of this palette, as
-       bare `r,g,b` triplets fed to rgb(). Fill the surfaces one at a time and
-       the ink pitched against them stays where it was, so the palette moves
-       whole. `light-text` is the ink the family puts ON its accent chips and
-       stays light; `sub-text` is already legible on a dark plate and is left
-       alone, as are the accent hues. The themes state these on :root from the
-       page's own <style>, which the browser reads after this sheet, so weight
-       is what decides it. */
+    /* Basalt-family surfaces, bare `r,g,b` triplets fed to rgb(). The palette
+       moves whole: fill the surfaces one at a time and the ink pitched against
+       them is stranded. `light-text` sits ON the family's accent chips and stays
+       light; `sub-text` and the accent hues are left alone. !important because
+       the themes state these on :root after this sheet. */
     --basalt-primary-color: 20, 24, 29 !important;
     --basalt-secondary-color: 26, 31, 38 !important;
     --basalt-tertiary-color: 45, 51, 59 !important;
@@ -58,19 +47,11 @@
     --header-background-color: 26, 31, 38 !important;
     --header-border-color: 45, 51, 59 !important;
 
-    /* Cosmonaut's one light-panel colour. It backs the theme's quote boxes,
-       table headers, image captions, tooltips, footnote footer and social
-       cards, and it reaches the quote boxes from a `z-index: -1` pseudo, which
-       paints over any background-color set on the box itself. */
+    /* Cosmonaut's light-panel colour, reached by a `z-index: -1` pseudo that paints over any background-color on the box — the token is the only handle. */
     --hazyCyanColor: #1a1f26 !important;
 
-    /* Black Highlighter's link ink. The skin is imported cross-origin and
-       keeps it at its light-mode dark red, which lands at 2.7:1 on the page
-       base. It feeds the skin's bare `a` rule and, through tokens the skin
-       resolves on :root, the footnote numerals, the pager and the contents
-       box — a rebind lower down the tree cannot reach those, so it has to
-       sit here. The article column is already crimson from the two-id link
-       rule below, so this only moves the chrome around it. */
+    /* Black Highlighter's link ink, resolved on :root for the footnote numerals,
+       the pager and the contents box — a rebind lower down cannot reach those. */
     --link-color: 232, 98, 110 !important;
   }
 
@@ -80,8 +61,7 @@
     color: #c4cdd6 !important;
   }
 
-  /* A visual theme that names the id outranks the element selector above and
-     leaves a light page behind every surface the theme below leaves clear. */
+  /* A visual theme that names the id outranks the element selector above. */
   html body#html-body {
     background-color: #14181d !important;
   }
@@ -94,18 +74,10 @@
     background-color: transparent;
   }
 
-  /* ------------------------------------------------------------
-     ACTION AREA — the click-gated panels (rating, history, page
-     source, backlinks, authorship) the page-options rail swaps in
-
-     Clearing the panel above puts every ink a visual theme pitched
-     at its own near-white panel onto the page base: black, navy
-     and mid-teal headings all land under 2.5:1, and the skins that
-     drive the heading from a design token keep that token at its
-     light-mode value. Unlike an in-article heading, nothing here
-     is authored — the strings come from the site's own modules and
-     no author surface sits under them — so this is the one place
-     the heading colour is pinned. */
+  /* ACTION AREA — the click-gated panels the page-options rail
+     swaps in: rating, history, page source, backlinks, authorship
+     Nothing here is authored, so this is the one place the heading
+     colour is pinned. */
   #action-area h1 {
     color: var(--scpru-title) !important;
   }
@@ -118,42 +90,25 @@
     color: var(--scpru-heading) !important;
   }
 
-  /* Voter and revision-author names. They sit outside the article
-     column, so the two-id link rule below never reaches them and a
-     theme's own bare `a` wins on document order. */
+  /* Outside the article column: the two-id link rule below never reaches it, and a theme's bare `a` wins on document order. */
   #action-area .printuser a,
   #action-area .printuser a:visited {
     color: var(--scpru-link) !important;
   }
 
-  /* Two Black Highlighter tokens, moved only inside this panel.
-     `text-general` carries the labels of the rename and set-parent
-     forms the panel shows a logged-in user; `secondary-color` fills
-     the summary block the file list opens with, which the skin
-     paints near-white while the ink over it stays the page's. Both
-     are left alone elsewhere — `text-general` also inks the wiki
-     content table, and the themes that paint that table near-white
-     need it dark. */
+  /* Panel-scoped only — `text-general` also inks the wiki content table, which the themes that paint it near-white need dark. */
   #action-area,
   #who-rated-page-area {
     --swatch-text-general: 230, 237, 243 !important;
     --swatch-secondary-color: 28, 33, 40 !important;
   }
 
-  /* The history panel's «страница N из M» line reads a token the
-     skin resolves on :root, out of reach of the block above, and
-     the skin's own selector matches this one's specificity from a
-     later sheet. The anchors and the current-page chip state their
-     own colour. */
+  /* Token resolved on :root, out of reach of the block above; the skin's own selector ties this specificity from a later sheet. */
   #action-area .pager {
     color: #e6edf3 !important;
   }
 
-  /* The content column and the chrome strips beside it. A visual theme that
-     paints any of them near-white puts the page's ink on paper it was never
-     measured against — body copy lands at 1.6:1 and the login links at 1.1:1.
-     Forcing them clear costs only the few themes that paint them a near-black
-     of their own, which the page base underneath already matches. */
+  /* Forced clear: a theme painting these near-white strands the page's ink on paper it was never measured against. */
   #content-wrap,
   #main-content,
   #page-content,
@@ -163,12 +118,9 @@
     background-color: transparent !important;
   }
 
-  /* The masthead art is a black-to-maroon band with a mid-grey stripe at
-     140-165px (the top menu) and nothing below it — the PNG is transparent
-     there, so only that stripe has to be repainted. A first background layer
-     covers it; the artwork stays as the second layer and keeps the identity.
-     The artwork URL must stay absolute: userstyles.org rejects any relative
-     url() reference at upload. */
+  /* Only the 140-165px top-menu stripe is opaque in the artwork, so a first
+     background layer repaints it and the artwork stays as the second. The URL
+     must stay absolute — userstyles.org rejects relative url() at upload. */
   div#container-wrap {
     background-color: #14181d !important;
     background-image:
@@ -178,8 +130,7 @@
     background-position: top left, top left !important;
   }
 
-  /* iframes default to a 2px inset border in currentColor, which turns light
-     the moment the page text does. */
+  /* iframe default border is 2px inset currentColor — turns light with the text. */
   iframe {
     border-color: #2d333b;
   }
@@ -190,9 +141,7 @@
     border-color: #2d333b !important;
   }
 
-  /* Page-local divider components. Each one is a 3px bar with a `#ccc` drop
-     shadow — a light band plus a halo on a dark page. `.hr-logos` keeps its
-     own teal bar and only loses the halo. */
+  /* `.hr-logos` keeps its own teal bar and only loses the `#ccc` halo. */
   .hr-main,
   .hr-big,
   .hr-logos {
@@ -204,14 +153,9 @@
     background-color: #3a4048 !important;
   }
 
-  /* ============================================================
-     TYPOGRAPHY
-     ============================================================ */
+  /* TYPOGRAPHY */
 
-  /* Site chrome — always on the page floor, so the colour is pinned.
-     `.page-title` is the class form: an article that hides `#page-title` and
-     draws its own carries the branch crimson and a `#bbb` rule, both pitched
-     for the white page the article expected. */
+  /* Page floor always, so pinned. `.page-title` is the class form an article draws when it hides `#page-title`. */
   #page-title,
   .meta-title,
   .sub-page-title,
@@ -221,17 +165,12 @@
     border-color: #2d333b !important;
   }
 
-  /* Only the id form: a theme fills the title bar with its page plate, and the
-     crimson above then sits on near-white. The class form is author markup and
-     may carry paper of its own, so it is left out. */
+  /* Id form only — the class form is author markup and may carry paper of its own. */
   #page-title {
     background-color: transparent !important;
   }
 
-  /* An in-article h1 is not pinned: an article that states a heading colour has
-     a surface of its own in mind for it, and this only has to beat the site's
-     base #901, which document order already does. Pinning it strips the light
-     ink off headings on author-painted dark panels. */
+  /* Not pinned: an article stating a heading colour has its own surface in mind, and document order already beats the site's base #901. */
   h1 {
     color: var(--scpru-title);
     border-color: #2d333b;
@@ -245,38 +184,49 @@
     color: var(--scpru-heading);
   }
 
-  /* Declared on the article root ONLY, so the ink reaches the text by
-     inheritance. A copy of this on p/li/dd/dt/td is a direct declaration and
-     beats any colour an author put on a wrapping callout box, however specific
-     or inline that wrapper's colour was — which erases the author's ink while
-     leaving their light paper behind. */
+  /* Sigma-9 gives h2–h6 no colour of their own, so inside a box that states
+     `color:` inline they take the box's ink natively; the element rule above
+     would state one directly and beat that inheritance. h1 is excluded: the
+     site colours it directly, so it never inherited. Anchored on the
+     declaration boundary — a `-color:` longhand (`background-color:`,
+     `--link-color:`) can never precede `color:` with `^`, `;` or `; `. */
+  #page-content [style^="color:"] h2,
+  #page-content [style*=";color:"] h2,
+  #page-content [style*="; color:"] h2,
+  #page-content [style^="color:"] h3,
+  #page-content [style*=";color:"] h3,
+  #page-content [style*="; color:"] h3,
+  #page-content [style^="color:"] h4,
+  #page-content [style*=";color:"] h4,
+  #page-content [style*="; color:"] h4,
+  #page-content [style^="color:"] h5,
+  #page-content [style*=";color:"] h5,
+  #page-content [style*="; color:"] h5,
+  #page-content [style^="color:"] h6,
+  #page-content [style*=";color:"] h6,
+  #page-content [style*="; color:"] h6 {
+    color: inherit !important;
+  }
+
+  /* Article root ONLY — on p/li/dd/dt/td it would be a direct declaration beating an author's callout-box colour, erasing their ink under their light paper. */
   #page-content,
   .thread-container .post .content,
   .forum-thread-box .description-block {
     color: #c4cdd6;
   }
 
-  /* Authors build callout boxes as [[div style="background:#EEE"]] and let the
-     site's near-black body ink carry the words — the wrapper names a paper
-     colour and no ink. That paper survives the theme, so the box has to hand
-     the ink back. Matched on the VALUE (an inline background alongside a light
-     hex or `white`), never on a class: the classes are page-local and differ
-     per article.
-     EVERY form names the background PROPERTY immediately before its value.
-     Evidence taken from anywhere in the attribute reads the author's INK as if
-     it were their paper: `background-color:#334; color:#eee` and
-     `background: black url(x.jpg); color:#f7f7f7` are dark plates whose light
-     ink matched the loose `#e`/`#f` forms, and `background: #000
-     url('…futuredeep001.png')` matched `red` inside the file name — each one
-     put near-black ink on a black plate. The cost is that a light colour
-     appearing only as a GRADIENT STOP no longer matches.
-     The saturated colour KEYWORDS listed last are the ones whose luminance
-     carries near-black ink better than light ink — `red` reads at 5.3:1 dark
-     and 2.5:1 light. `blue`, `navy`, `purple` and `maroon` are deliberately
-     absent for the same reason in reverse; `darkred` and its relatives are
-     excluded by the property-adjacent form on its own.
-     Deliberately NOT !important — an author who did name their own colour
-     still wins, so this can never read worse than the unstyled site. */
+  /* Authors build callout boxes as [[div style="background:#EEE"]] with no ink
+     of their own, so the paper survives the theme and the box must hand the ink
+     back. Matched on the VALUE, never on a class: classes are page-local.
+     EVERY form names the background PROPERTY immediately before its value —
+     matching a light hex anywhere in the attribute reads the author's INK as
+     their paper and puts near-black ink on a dark plate. The cost: a light
+     colour appearing only as a GRADIENT STOP no longer matches.
+     The KEYWORDS listed last are only those whose luminance carries near-black
+     ink better than light ink; `blue`, `navy`, `purple` and `maroon` are absent
+     for the reverse reason, `darkred` and relatives excluded by the
+     property-adjacent form alone.
+     NOT !important, so an author who named their own colour still wins. */
   #page-content [style*="background:#c"],
   #page-content [style*="background: #c"],
   #page-content [style*="background-color:#c"],
@@ -309,9 +259,7 @@
   #page-content [style*="background: #F"],
   #page-content [style*="background-color:#F"],
   #page-content [style*="background-color: #F"],
-  /* Below the `#c` floor the group starts at, and the only such value on the
-     branch: the copy-pasted translation-notice box, 10 hits in a 267-article
-     sweep. */
+  /* Below the `#c` floor the group above starts at, and the only such value on the branch. */
   #page-content [style*="background:#bfe1ff"],
   #page-content [style*="background: #bfe1ff"],
   #page-content [style*="background :#bfe1ff"],
@@ -361,10 +309,7 @@
   #page-content [style*="background:magenta"],
   #page-content [style*="background: magenta"],
   #page-content [style*="background-color:magenta"],
-  /* Wikidot keeps the author's spacing verbatim, so `background :#F5F5F5` is a
-     separate spelling from `background:#F5F5F5`. A 300-article sweep found the
-     space only before the colon and only on the shorthand — `background-color :`
-     does not occur on the branch. */
+  /* Wikidot keeps author spacing verbatim: `background :#F5F5F5` is a separate spelling. The space occurs only before the colon, only on the shorthand. */
   #page-content [style*="background :#c"],
   #page-content [style*="background : #c"],
   #page-content [style*="background :#d"],
@@ -409,8 +354,7 @@
     --scpru-link-visited: #6d3550;
     --scpru-link-hover: #d21414;
     --scpru-newpage: #8a4b00;
-    /* On paper the author's own dark end of the ##blue|…## palette reads, and
-       the lifted end does not. */
+    /* On light paper the author's own dark end of the ##blue|…## palette reads, and the lifted end does not. */
     --scpru-lift-black: #140f0c;
     --scpru-lift-blue: #0000cd;
     --scpru-lift-green: #046307;
@@ -421,13 +365,9 @@
     --scpru-lift-teal: #006a6a;
   }
 
-  /* Authors nest the Wikidot boxes INSIDE those light callouts, and those boxes
-     we do fill dark. The rebind above travels into them through the custom
-     properties — inheritance the box's own `color` cannot stop — so a link in a
-     blockquote in a white callout renders near-black on our dark fill at 2.1:1.
-     Every surface we force dark therefore restores the dark-page token set. The
-     guard mirrors each fill rule's: a box that names its own inline paper is
-     left light and keeps the paper values. */
+  /* The rebind above travels into nested boxes through the custom properties,
+     which the box's own `color` cannot stop, so every surface we force dark
+     restores the dark-page token set. The guard mirrors each fill rule's. */
   #page-content .code:not([style*="background"]),
   #page-content #toc:not([style*="background"]),
   #page-content .page-source:not([style*="background"]),
@@ -471,9 +411,7 @@
     --scpru-lift-teal: #56d4dd;
   }
 
-  /* ============================================================
-     LINKS — the crimson identity, lifted for dark
-     ============================================================ */
+  /* LINKS — the crimson identity, lifted for dark */
 
   a,
   #interwiki a,
@@ -493,11 +431,7 @@
     color: var(--scpru-link-hover);
   }
 
-  /* Article themes reach the body links from their own page-scoped rules, which
-     out-specify a single-id selector — on the themes that pitch their links
-     near-black for a light page, that leaves them invisible here. Two ids win
-     on the id count alone, so no !important is needed and an author's inline
-     colour (and the ##name|text## lifts further down) still take precedence. */
+  /* Themes reach body links from page-scoped rules out-specifying one id. Two ids win on id count, so no !important — an inline colour and the ##name|text## lifts below still win. */
   #main-content #page-content a {
     color: var(--scpru-link);
   }
@@ -510,8 +444,17 @@
     color: var(--scpru-link-hover);
   }
 
-  /* Wikidot paints a light hover fill on every link. Kept at low specificity
-     so component rules (the rating buttons) can still fill their own hover. */
+  /* Site chrome outside the article column: a skin's bare `a` wins on document order against the one-id rule above. */
+  #main-content #breadcrumbs a,
+  #main-content #breadcrumbs a:visited {
+    color: var(--scpru-link);
+  }
+
+  #main-content #breadcrumbs a:hover {
+    color: var(--scpru-link-hover);
+  }
+
+  /* Low specificity, so component rules (the rating buttons) can still fill their own hover. */
   a:hover {
     background-color: transparent !important;
   }
@@ -527,9 +470,7 @@
     color: var(--scpru-link);
   }
 
-  /* ============================================================
-     MASTHEAD / TOP BAR / SEARCH
-     ============================================================ */
+  /* MASTHEAD / TOP BAR / SEARCH */
 
   #header h1 a {
     color: #eee;
@@ -539,13 +480,9 @@
     color: #f0f0c0;
   }
 
-  /* Article themes hide the masthead's real text with `color: transparent` and
-     draw their own copy from a pseudo-element, pitched near-black for a light
-     bar. Only the pseudo is coloured: touching the anchor itself would print a
-     second title over the first on every theme that does this.
-     `color` alone is taken — a theme whose title is knocked-out artwork sets
-     -webkit-text-fill-color to transparent so the artwork shows through the
-     glyphs, and naming it here would paint over that artwork. */
+  /* Themes hide the real text with `color: transparent` and draw a pseudo copy;
+     colouring the anchor would print a second title over it. `color` only — a
+     knocked-out-artwork title sets -webkit-text-fill-color transparent. */
   #header h1 a::before,
   #header h1 a::after {
     color: #eee !important;
@@ -596,42 +533,30 @@
     border-color: #3a4048 !important;
   }
 
-  /* A theme whose own `#top-bar a` colour is a near-black states it from the
-     page's <style>, which the browser reads after this sheet — equal weight
-     there loses. No theme on the branch names the fill property, so that is
-     what carries the ink on those skins. */
+  /* A theme's near-black `#top-bar a` comes from the page's <style> after this sheet, so equal weight loses. No theme names the fill property. */
   #top-bar a {
     color: #eaeaea !important;
     -webkit-text-fill-color: #eaeaea !important;
   }
 
-  /* The dropdown panel carries its own border and shadow; the anchor fills
-     below only cover the rows, not the gaps between them. */
+  /* The anchor fills below cover only the rows, not the gaps between them. */
   #top-bar ul li ul {
     background-color: #1c2128 !important;
     border-color: #3a4048 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, .7);
   }
 
-  /* Only the left and right sides are drawn. Stating all four keeps the two at
-     zero width off currentColor, which is now light.
-
-     The row carries its own plate because the band beneath this bar is often
-     artwork or a gradient on an ancestor: every element between the ink above
-     and that paint computes `rgba(0,0,0,0)`, so a contrast walk reads a page
-     base that is nowhere near the pixels. Sampled off rendered pixels and
-     compared against the same pixels with this sheet off, four themes put the
-     ink at 1.3-3.1:1 where their own was 5.4-13.6:1. The plate is the site's
-     own top-menu stripe colour, so where a theme leaves the band alone it is
-     seamless; where a theme paints the band, the label sits on this instead. */
+  /* All four sides stated so the zero-width two stay off currentColor.
+     The row carries its own plate: the band beneath is often ancestor artwork,
+     everything between computes `rgba(0,0,0,0)`, and a contrast walk then reads
+     a base nowhere near the pixels. The plate is the site's own top-menu
+     stripe, seamless where a theme leaves the band alone. */
   #top-bar ul li a {
     background-color: #1c2128 !important;
     border-color: rgba(255, 255, 255, .06) !important;
   }
 
-  /* Open dropdown: the site paints these #eee / #fff. The fill is restated
-     because the bar's own fill declaration otherwise reaches every row inside
-     it and overrides whatever `color` says here. */
+  /* Restated: the bar's own fill declaration otherwise reaches every row inside it. */
   #top-bar ul li.sfhover a,
   #top-bar ul li:hover a,
   #top-bar li ul li a,
@@ -657,8 +582,11 @@
     color: #ff8f97;
   }
 
-  /* Mobile hamburger — a white disc with a grey rule and a grey glyph. */
-  #top-bar .open-menu a {
+  /* Mobile hamburger — a white disc with a grey rule and a grey glyph. Two ids:
+     Black Highlighter clears the disc from a page <style> at more than one id,
+     and the glyph it leaves is this sheet's light text-fill on the skin's light
+     mobile bar. */
+  #header #top-bar .open-menu a {
     background-color: #1c2128 !important;
     border-color: #4a5058 !important;
     color: #eaeaea !important;
@@ -669,19 +597,13 @@
     box-shadow: 0 0 16px 2px rgba(0, 0, 0, .8) !important;
   }
 
-  /* The glyph is the anchor's own "≡" character, and an article theme can hold
-     its `color` at a near-black pitched for its light bar that no specificity
-     dislodges. -webkit-text-fill-color is what actually paints the glyph. */
+  /* Same fill-property reason; the glyph is the anchor's own "≡" character. */
   #top-bar .mobile-top-bar a {
     color: #eaeaea !important;
     -webkit-text-fill-color: #eaeaea !important;
   }
 
-  /* The search field and its button already sit on the site's own dark maroon,
-     so only the ink and the light focus outline are re-pitched.
-     Article themes repaint this input white with black ink from a rule of the
-     same single-id weight, and theirs is later in the document, so the second
-     id is what decides it. */
+  /* Themes repaint this input at the same single-id weight, later in the document, so the second id decides it. */
   #header #search-top-box-input,
   #header #search-top-box input.text {
     background-color: #22181a !important;
@@ -715,15 +637,18 @@
     color: #fff !important;
   }
 
-  /* ============================================================
-     SIDE BAR
-     ============================================================ */
+  /* The Basalt family draws the magnifier as a masked `::after` at z-index 1
+     under a transparent submit, and the submit is a flex item whose z-index 2
+     puts the plate above it. Lifted over the plate; clicks pass through to the
+     submit as before. Skins without the pseudo generate no box, so no effect. */
+  #search-top-box::after {
+    z-index: 3 !important;
+    pointer-events: none !important;
+  }
 
-  /* Every rule that names a sidebar SURFACE carries the wrapper id as well.
-     Article themes repaint these blocks white from `#side-bar .side-block`
-     with !important — the same weight as ours, and later in the document, so
-     nothing but a second id decides it. The `#interwiki` half lives in a
-     separate frame document that has no wrapper and is never contested. */
+  /* SIDE BAR */
+
+  /* Every sidebar SURFACE rule carries the wrapper id: themes repaint these from `#side-bar .side-block` !important, later in the document. `#interwiki` is a separate frame document, uncontested. */
   #container-wrap #side-bar {
     background-color: #14181d !important;
     border-color: #2d333b !important;
@@ -748,9 +673,7 @@
     background-color: #2a1c1c !important;
   }
 
-  /* Wikidot wraps the heading text in a `p`, and an article theme states that
-     `p`'s colour directly — a direct declaration inheritance cannot reach, so
-     the block above darkens the surface under ink pitched for a white one. */
+  /* Wikidot wraps the heading text in a `p`, and an article theme states that `p`'s colour directly — out of reach of inheritance. */
   #container-wrap #side-bar .heading,
   #container-wrap #side-bar .heading p,
   #interwiki .heading,
@@ -763,12 +686,7 @@
     border-bottom-color: #7d3030 !important;
   }
 
-  /* The site draws this label as bare text over the block — no fill of its own.
-     A visual theme that gives it one pitches it against its own sidebar, and
-     the pink above then sits on a pale veil at 1.3-2.0:1. Clearing the fill
-     returns the label to the block colour, which is ours. The image is cleared
-     on the wrapper only: a theme that hangs an ornament on the inner `p` keeps
-     it, and no theme puts anything but a wash on the wrapper. */
+  /* Fill cleared so the label returns to the block colour. Image cleared on the wrapper only, so an ornament on the inner `p` survives. */
   #container-wrap #side-bar .heading,
   #interwiki .heading {
     background-color: transparent !important;
@@ -780,11 +698,7 @@
     background-color: transparent !important;
   }
 
-  /* The sidebar's own ink. Article themes state `#side-bar a` near-black for
-     the white blocks they paint, and once the block above is ours instead, the
-     ink has to come with the surface — so every rule in this group carries the
-     wrapper id too, and the component rules below carry it as well so the two
-     ids do not steal their labels. */
+  /* Themes state `#side-bar a` near-black for their white blocks, so the ink comes with the surface: this group and the component rules below carry the wrapper id too. */
   #container-wrap #side-bar a,
   #container-wrap #side-bar a:visited,
   #interwiki a {
@@ -806,8 +720,7 @@
     color: #8b949e !important;
   }
 
-  /* The row separator carries no colour of its own, so it takes the link/body
-     ink — a bright hairline under every entry once that ink is light. */
+  /* The row separator carries no colour of its own, so it takes the link/body ink. */
   #side-bar .menu-item,
   #interwiki .menu-item {
     border-color: #2d333b !important;
@@ -829,8 +742,7 @@
     color: #c4cdd6 !important;
   }
 
-  /* "Случайная статья" / "Поиск по тегам" — a near-white gradient plate with
-     grey uppercase labels, and a crimson gradient under the cursor. */
+  /* "Случайная статья" / "Поиск по тегам" */
   #container-wrap #side-bar .random-article-block {
     background: linear-gradient(to top, #1c2128 0%, #1c2128 80%, #262c33 100%) !important;
     border-color: #3a4048 !important;
@@ -854,9 +766,7 @@
     color: #fff !important;
   }
 
-  /* "Об организации" and its siblings. Folded, the block is a half-crimson,
-     half-WHITE gradient that slides across on hover — only the white half is
-     restated, so the wipe still reads as a wipe. */
+  /* Only the white half of the folded gradient is restated, so the hover wipe still reads as a wipe. */
   #container-wrap #side-bar .collapsible-side .collapsible-block-folded {
     background: linear-gradient(to left, #1c2128 50%, var(--new-side-bar-color) 50%) right !important;
     background-size: 200% 100% !important;
@@ -890,28 +800,34 @@
     }
   }
 
-  /* ============================================================
-     TABLES
-     ============================================================ */
+  /* TABLES */
 
-  /* No ink here: td would beat an author box's inherited colour the same way
-     the page-content copy did. The cell text inherits; th states its own. */
+  /* No ink here: td would beat an author box's inherited colour. The cell text inherits; th states its own. */
   table.wiki-content-table td,
   table.wiki-content-table th {
     border-color: #2d333b !important;
   }
 
-  /* The id form is the one that reaches a theme stating the header row from the
-     column id — an id beats any class chain, `!important` on both sides or not.
-     The bare form stays for the tables that sit outside the content column. */
+  /* An author's white cell border is an invisible spacer on the white page and a drawn grid here; a cell naming its own paper keeps its border. */
+  #page-content td[style*="border: 1px solid white"]:not([style*="background"]),
+  #page-content td[style*="border:1px solid white"]:not([style*="background"]),
+  #page-content td[style*="border: 1px solid #fff"]:not([style*="background"]),
+  #page-content td[style*="border:1px solid #fff"]:not([style*="background"]),
+  #page-content th[style*="border: 1px solid white"]:not([style*="background"]),
+  #page-content th[style*="border:1px solid white"]:not([style*="background"]),
+  #page-content th[style*="border: 1px solid #fff"]:not([style*="background"]),
+  #page-content th[style*="border:1px solid #fff"]:not([style*="background"]) {
+    border-color: transparent !important;
+  }
+
+  /* The id form reaches a theme stating the header row from the column id. The bare form covers tables outside the content column. */
   table.wiki-content-table th,
   #main-content table.wiki-content-table th {
     background-color: #22282f !important;
     color: #e6edf3 !important;
   }
 
-  /* Same token pair as the page-options rail: the fill and the cell ink move
-     together, so a skin that states either one directly keeps it. */
+  /* Fill and cell ink move together, so a skin that states either one directly keeps it. */
   #page-content table.wiki-content-table {
     --tables-body-bg: 26, 31, 38;
     --tables-body-txt: 196, 205, 214;
@@ -934,14 +850,9 @@
     background-color: #22282f !important;
   }
 
-  /* ============================================================
-     CODE / TOC / NOTES / QUOTES
-     ============================================================ */
+  /* CODE / TOC / NOTES / QUOTES */
 
-  /* An element that names its own paper inline is left as authored — these
-     fills are !important and would otherwise strip the author's box down to
-     our surface while the ink rebind above hands its contents a DARK colour,
-     leaving the text on the page floor at no contrast at all. */
+  /* Inline-paper escape as above: these fills are !important, and the ink rebind hands a light box's contents a DARK colour. */
   .code:not([style*="background"]),
   #toc:not([style*="background"]),
   .page-source:not([style*="background"]),
@@ -956,10 +867,7 @@
     background-color: #1a1f26 !important;
   }
 
-  /* The hub pages' own TOC head and legend rule themselves at a fixed `#ccc`,
-     which is a whisper on their white page and a bright hairline on ours.
-     Sibling separators drawn in `currentColor` are left alone — those track the
-     ink and stay proportionate on either background. */
+  /* Fixed `#ccc`. Sibling separators in `currentColor` are left alone — they track the ink. */
   #toc .title,
   #toc .toc-action-bar,
   #page-content .legend table tr {
@@ -1111,9 +1019,7 @@
     -webkit-text-fill-color: #e6edf3 !important;
   }
 
-  /* The inline footnote popup. It is white-on-transparent and only
-     `visibility: hidden` until hovered, so a load-time surface scan sees a
-     white box that never moves. */
+  /* White-on-transparent and only `visibility: hidden` until hovered. */
   #page-content .fncon {
     background-color: #1c2128 !important;
     border-color: #3a4048 !important;
@@ -1134,18 +1040,14 @@
     color: #e6edf3 !important;
   }
 
-  /* ============================================================
-     ARTICLE FURNITURE
-     ============================================================ */
+  /* ARTICLE FURNITURE */
 
   .scp-image-block {
     border-color: #3a4048 !important;
     box-shadow: 0 1px 6px rgba(0, 0, 0, .5) !important;
   }
 
-  /* Sigma-9 draws only the caption's top rule; article themes frame all four
-     sides in their paper colour, which is a 4px white band on a dark page.
-     Every side is stated — the three at zero width cost nothing. */
+  /* Article themes frame all four sides in their paper colour; the three at zero width cost nothing. */
   .scp-image-block .scp-image-caption {
     background-color: #1c2128 !important;
     border-color: #3a4048 !important;
@@ -1184,11 +1086,7 @@
     border-color: #3a4048 !important;
   }
 
-  /* Hub pages wrap these panels in an inline `background-color:#ececec`, which
-     puts them in the light-paper family above: that rule hands the subtree
-     near-black ink. Filling them dark anyway leaves that ink on a dark panel at
-     1.2:1, so the fill yields to an inline background exactly as `.code`,
-     `#toc`, `blockquote` and `div.note` do. */
+  /* Hub pages wrap these in an inline `background-color:#ececec`, so the same inline-paper escape applies. */
   .content-panel:not([style*="background"]) {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
@@ -1199,11 +1097,7 @@
     background-color: #1a1f26 !important;
   }
 
-  /* `.content-panel.standalone` is already near-white (`#fcfdfb`) in the site's
-     own sheet, so an inline neutral white on it restates the component default
-     rather than naming a paper — the hub template writes one on every section
-     of /task-forces, /departments and /groups-of-interest. Chromatic tints stay
-     with the escape above: those are a choice. */
+  /* Already `#fcfdfb` in the site's own sheet, so an inline neutral white restates the default rather than naming a paper. Chromatic tints keep the escape above. */
   #page-content .content-panel.standalone[style*="#FFF"],
   #page-content .content-panel.standalone[style*="#fff"],
   #page-content .content-panel.standalone[style*="white"],
@@ -1217,8 +1111,7 @@
     background-image: none !important;
   }
 
-  /* The body is a background-IMAGE (a cream field with a gradient strip along
-     the bottom), so a colour alone never reaches it. */
+  /* The body is a background-IMAGE, so a colour alone never reaches it. */
   .content-panel .panel-body {
     background-color: #1c2128 !important;
     background-image: none !important;
@@ -1229,10 +1122,7 @@
     color: #f0f0f0;
   }
 
-  /* An index page states its section headings from the column id, which the
-     element rule in TYPOGRAPHY cannot reach — near-black on the panel we just
-     filled dark. Scoped to the panel because that surface is ours; an h1 out in
-     the column belongs to whatever surface its page drew for it. */
+  /* Index pages state these from the column id, out of reach of the TYPOGRAPHY element rule. Panel-scoped: that surface is ours. */
   #main-content #page-content .content-panel h1 {
     color: var(--scpru-title);
   }
@@ -1241,10 +1131,7 @@
     color: #d8d4c8;
   }
 
-  /* The department plaque is a brass GRADIENT — a background-image, which the
-     inline light-paper detector cannot read — with its own brown ink set on
-     the plaque, and its two lines are links, so the two-id crimson lands on
-     gold at 1.9:1. Handing the links the plaque's ink puts them at 5.3:1. */
+  /* Brass GRADIENT, invisible to the inline light-paper detector, with its own brown ink; its two lines are links, so the two-id crimson would land on gold. */
   #main-content #page-content .brass-plaque a,
   #main-content #page-content .brass-plaque a:visited,
   #main-content #page-content .brass-plaque a:hover {
@@ -1268,8 +1155,15 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, .5) !important;
   }
 
-  /* The Heritage strip is already a dark maroon; only its cream rule is
-     pitched down so it stops glaring. */
+  /* The ACS component stretches an anchor over the diamond with `color: transparent` so only the artwork shows; one class, which the two-id article-link rule outweighs. The border takes currentColor. */
+  #main-content #page-content .danger-diamond a,
+  #main-content #page-content .danger-diamond a:visited,
+  #main-content #page-content .danger-diamond a:hover {
+    color: transparent !important;
+    border-color: transparent !important;
+  }
+
+  /* Already a dark maroon; only its cream rule is pitched down. */
   .heritage-rating-module {
     border-color: #8a7a3a !important;
   }
@@ -1292,9 +1186,7 @@
     color: #ff8f97 !important;
   }
 
-  /* The page-status banners. Both are loud on purpose and stay loud; only the
-     white frame around them and the ink they inherit are restated, because the
-     page ink is now light and would vanish on either fill. */
+  /* Both banners stay loud on purpose; only the white frame and the ink they inherit are restated. */
   .archieved-message {
     border-color: #6d5a2a !important;
     box-shadow: 0 0 0 2px #d4b820 !important;
@@ -1361,9 +1253,7 @@
     color: #8b949e !important;
   }
 
-  /* The tag rail and the prev/next wikiwalk rail are furniture, not author
-     prose, so their link colour is pinned against article themes that darken
-     it, and any chip fill an article theme puts behind them is cleared. */
+  /* Furniture, not author prose: link colour pinned against themes that darken it, chip fill cleared. */
   #main-content .page-tags a,
   #page-content .footer-wikiwalk-nav a {
     background-color: transparent !important;
@@ -1379,10 +1269,7 @@
     color: #ff8f97 !important;
   }
 
-  /* The tag cloud writes its frequency gradient as inline per-tag colours, and
-     the whole range — periwinkle through crimson — falls below AA on a dark
-     page. Font size encodes the same frequency, so the tags take the site link
-     colour and the size keeps the signal. */
+  /* Inline per-tag colours, the whole range below AA here; font size carries the same frequency signal. */
   #page-content a.tag {
     color: #e8626e !important;
   }
@@ -1406,12 +1293,9 @@
     color: #060 !important;
   }
 
-  /* ============================================================
-     STAR RATING MODULE
-
-     The RU branch replaced Wikidot's ± widget with a five-star control whose
-     stars are Font Awesome GLYPHS, so both star rows are text colours.
-     ============================================================ */
+  /* STAR RATING MODULE
+     The RU branch's five-star control draws its stars as Font Awesome GLYPHS,
+     so both star rows are text colours. */
 
   .w-stars-rate-module {
     color: #c4cdd6 !important;
@@ -1434,23 +1318,17 @@
     box-shadow: 0 0 4px rgba(0, 0, 0, .5) !important;
   }
 
-  /* The unfilled row is drawn at #eee on white — barely visible on purpose. A
-     legible "off" star would read as a lit one and invert the rating, so this
-     stays low-contrast; it is decorative state, not text. */
+  /* Deliberately low-contrast: a legible "off" star would read as a lit one and invert the rating. */
   .w-stars-rate-module .w-stars-rate-stars-wrapper::before {
     color: #4a525b !important;
   }
 
-  /* The filled row's colour is an INLINE custom property on the element, so an
-     ancestor rebind cannot reach it. Rebinding the property itself — rather
-     than stating `color` on the pseudo — leaves the hover rule below free to
-     paint its amber preview. */
+  /* INLINE custom property, out of reach of an ancestor rebind. Rebinding the property rather than the pseudo's `color` leaves the hover rule below free to paint its preview. */
   .w-stars-rate-module .w-stars-rate-stars-view {
     --rated-var: #6fb6b6 !important;
   }
 
-  /* The score histogram behind the "Оценки" page option. Its bars carry the
-     same teal as the stars, so both move together. */
+  /* Same teal as the stars, so both move together. */
   .w-rate-bar {
     background-color: #2d333b !important;
   }
@@ -1518,9 +1396,7 @@
     color: #fff6f0 !important;
   }
 
-  /* ============================================================
-     YUI TABS
-     ============================================================ */
+  /* YUI TABS */
 
   .yui-navset .yui-content,
   .yui-navset .yui-navset-top .yui-content {
@@ -1546,8 +1422,18 @@
     border-color: #7d3030 !important;
   }
 
-  /* The tab strip's fill is a sprite background-IMAGE, so it has to be dropped
-     rather than covered. */
+  /* The Bedrock family holds the anchor's own fill transparent and paints the list item instead, so the anchor rule below reaches nothing there. The item takes the same pair, elsewhere showing only in the gaps. */
+  .yui-navset .yui-nav li,
+  .yui-navset .yui-navset-top .yui-nav li {
+    background-color: #22282f !important;
+  }
+
+  .yui-navset .yui-nav li.selected,
+  .yui-navset .yui-navset-top .yui-nav li.selected {
+    background-color: #8a2f2f !important;
+  }
+
+  /* The tab strip's fill is a sprite background-IMAGE, so it has to be dropped rather than covered. */
   .yui-navset .yui-nav a,
   .yui-navset .yui-navset-top .yui-nav a {
     background-color: #22282f !important;
@@ -1581,16 +1467,13 @@
     border-color: #8a2f2f !important;
   }
 
-  /* Some articles put the tab's label in a pseudo-element with a hardcoded
-     black fill, which disappears once the tab strip goes dark. */
+  /* Some articles put the tab's label in a pseudo-element with a hardcoded black fill. */
   .yui-navset .yui-nav a::before,
   .yui-navset .yui-nav a::after {
     color: inherit !important;
   }
 
-  /* ============================================================
-     FORMS / BUTTONS / DIALOGS
-     ============================================================ */
+  /* FORMS / BUTTONS / DIALOGS */
 
   input.text,
   input[type="text"],
@@ -1617,9 +1500,7 @@
     color: #e6edf3 !important;
   }
 
-  /* Wikidot's `.btn*` classes are bare text links on ANCHORS here (the
-     page-options bar, forum Reply/Fold/Options), so `a.btn` is deliberately
-     absent. On an INPUT the same class is a real submit. */
+  /* `.btn*` is a bare text link on ANCHORS here (page-options, forum Reply/Fold/Options), so `a.btn` is deliberately absent; on an INPUT it is a real submit. */
   div.buttons input,
   input.button,
   input.btn,
@@ -1630,8 +1511,7 @@
     color: #e6edf3 !important;
   }
 
-  /* That button keeps the UA's `outset` bevel, which draws its own light/dark
-     pair from the border colour and ignores the one set above. */
+  /* Keeps the UA's `outset` bevel, which draws its own light/dark pair from the border colour. */
   input.btn {
     border-style: solid !important;
   }
@@ -1650,10 +1530,7 @@
     color: #e8626e;
   }
 
-  /* Black Highlighter — imported by a large share of the modern corpus — paints
-     this rail from `rgb(var(--ui-button-*))`, which leaves five near-white pills
-     on our dark page. Moving the tokens keeps an article that states the fill
-     directly (a branded rail, e.g. /scp-4967) as its author drew it. */
+  /* Black Highlighter paints this rail from `rgb(var(--ui-button-*))`; moving the tokens leaves an article that states the fill directly as authored. */
   #page-options-container a.btn {
     --ui-button-bg: 26, 31, 38;
     --ui-button-txt: 232, 98, 110;
@@ -1745,12 +1622,7 @@
     border-color: #3a4058 !important;
   }
 
-  /* The panel's close control. Wikidot ships it as a bare `.btn` anchor and a
-     visual theme dresses it for the near-white panel it expects underneath —
-     either a near-white pill, which survives as the one bright chip on the
-     cleared panel, or a near-black link, which survives as 1.1:1 ink on it.
-     Stripped back to the bare link the unskinned page already shows; the
-     hover fill below is the affordance. */
+  /* Stripped to the bare link the unskinned page shows — a theme dresses this `.btn` anchor for the near-white panel it expects. The hover fill below is the affordance. */
   #action-area a.action-area-close {
     background-color: transparent !important;
     border-color: #3a4048 !important;
@@ -1762,10 +1634,7 @@
     color: var(--scpru-link-hover) !important;
   }
 
-  /* The «Авторство» panel's author chip is a styled-components node, so its
-     class is a build hash and cannot be named — the chip is reached by its
-     depth under the container's own semantic class instead. Its `#eee` fill
-     is a light pill on a dark page, and the crimson link on it reads 2.8:1. */
+  /* styled-components node: the class is a build hash, so the chip is reached by depth under the container's semantic class. */
   .w-authorship-editor-container > div > div > div {
     background-color: #22282f !important;
   }
@@ -1853,9 +1722,7 @@
     box-shadow: 0 10px 24px rgba(0, 0, 0, .6) !important;
   }
 
-  /* ============================================================
-     PAGER / HISTORY / DIFFS
-     ============================================================ */
+  /* PAGER / HISTORY / DIFFS */
 
   .pager a {
     border-color: #2d333b !important;
@@ -1952,9 +1819,7 @@
     color: #c4cdd6;
   }
 
-  /* ============================================================
-     CHANGE LISTS / ARTICLE LISTINGS
-     ============================================================ */
+  /* CHANGE LISTS / ARTICLE LISTINGS */
 
   #site-changes-list .changes-list-item:hover {
     background-color: #1c2128 !important;
@@ -1968,12 +1833,8 @@
     border-color: #2d333b !important;
   }
 
-  /* The card the tag-search results, author pages and index listings share.
-     Its ink is stated `black !important` on the card itself, so the ink has to
-     be stated back at the same weight. */
-  /* The card states `color: black !important` on itself, so the ink has to be
-     handed back at a weight above that — everything the card holds inherits
-     from it. */
+  /* The card the tag-search results, author pages and index listings share. */
+  /* States `color: black !important` on itself, so the ink must be handed back above that weight; everything inside inherits. */
   #page-content .author-single {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
@@ -2000,11 +1861,7 @@
     color: #8b949e !important;
   }
 
-  /* The column header strip of the story and draft listings, painted #eee from
-     each page's own <style> and carrying the column ink by inheritance. The
-     three rules below carry the same inline-paper escape as every other fill in
-     this file: a box that names its own background keeps it, and the ink that
-     goes with it. */
+  /* #eee from each page's own <style>. This and the two rules below take the same inline-paper escape. */
   #page-content .item.heading:not([style*="background"]) {
     background-color: #22282f !important;
     border-color: #3a4048 !important;
@@ -2016,15 +1873,12 @@
     border-color: #2d333b !important;
   }
 
-  /* A highlighter strip the object indexes put over a spoiler line. The plate
-     is the signal, so the ink is what moves. */
+  /* The plate is the signal, so the ink is what moves. */
   #page-content span.lie:not([style*="background"]) {
     color: #140f0c !important;
   }
 
-  /* ============================================================
-     FORUM — the Wikidot half
-     ============================================================ */
+  /* FORUM — the Wikidot half */
 
   .forum-group div.head {
     background-color: #22282f !important;
@@ -2108,13 +1962,9 @@
     color: #8b949e !important;
   }
 
-  /* ============================================================
-     FORUM — the 2025 app layer
-
-     Reactions, per-post menus, the date scrubber rail, pinned posts, user
-     popovers and @-mentions. None of it exists until the thread renders, and
-     most of it only until something is opened.
-     ============================================================ */
+  /* FORUM — the 2025 app layer
+     None of it exists until the thread renders, and most of it only until
+     something is opened. */
 
   .forum-infinite-sentinel {
     background-color: #1c2128 !important;
@@ -2161,9 +2011,7 @@
     border-color: #35442c !important;
   }
 
-  /* The "in reply to" line is dimmed to 58% opacity, a fraction calibrated
-     against near-black text on a white head. Nothing survives it on a dark
-     one — not even white — so the de-emphasis is carried by colour instead. */
+  /* 58% opacity, calibrated against near-black on a white head; nothing survives it here, so colour carries the de-emphasis. */
   .thread-container .post .long .head .forum-reply-target {
     opacity: 1 !important;
     color: #8b949e !important;
@@ -2175,8 +2023,7 @@
     color: #c4cdd6 !important;
   }
 
-  /* The quoted author's name is the branch crimson, which the head's elevated
-     surface drops below AA even at the page link's lightness. */
+  /* The head's elevated surface drops the branch crimson below AA even at the page link's lightness. */
   .forum-reply-target .printuser .printuser-name {
     color: #ee7079 !important;
   }
@@ -2227,8 +2074,7 @@
     color: #8ab4d8 !important;
   }
 
-  /* These are bare <button>s the site leaves unfilled, so the blanket button
-     fill boxes each one into a chip that is not part of the design. */
+  /* Bare <button>s the site leaves unfilled — the blanket button fill would box each into a chip that is not part of the design. */
   .forum-post-menu-button,
   .forum-post-menu-button:hover,
   .forum-post-menu-button:focus,
@@ -2431,12 +2277,7 @@
     color: #f08a8a !important;
   }
 
-  /* Username flair. Each role ships as an inline `background` + `color` pair
-     on the chip — the fill IS the role (crimson for a site moderator, slate for
-     a bot, grey for a reviewer), with a white label knocked out of it — so a
-     chip that names a fill keeps it. Only the site's bare `gray` default and
-     the one white-paper role (technical moderator: white chip, orange label,
-     orange rule) are re-pitched; that label sits on the dark chip at 4.9:1. */
+  /* Each role ships an inline `background` + `color` pair — the fill IS the role — so a chip naming a fill keeps it. Only the bare `gray` default and the white-paper role (technical moderator) are re-pitched. */
   .printuser .badge:not([style*="background"]),
   .printuser .badge[style*="background: #fff"],
   .printuser .badge[style*="background:#fff"],
@@ -2451,9 +2292,7 @@
     border-color: #4a5058 !important;
   }
 
-  /* The wrapper carries the site's near-black body ink of its own, which shows
-     wherever a name is not a link — a deleted or anonymous account. Left
-     un-!important so a role's inline colour on the name still wins. */
+  /* Wrapper ink shows wherever a name is not a link. Un-!important so a role's inline colour on the name wins. */
   .printuser {
     color: #c4cdd6;
   }
@@ -2463,12 +2302,9 @@
     background-color: rgba(121, 192, 255, .12) !important;
   }
 
-  /* ============================================================
-     FRONT PAGE
-
+  /* FRONT PAGE
      The branch's own block layout: gradient plates, #ccc drop shadows and
-     half-opacity black line-art icons.
-     ============================================================ */
+     half-opacity black line-art icons. */
 
   .scp-front-block,
   #page-content .collapsible-block {
@@ -2488,8 +2324,7 @@
     box-shadow: 0 2px 3px rgba(0, 0, 0, .5) !important;
   }
 
-  /* The banner's own paper is white behind a translucent watermark PNG, so
-     the fill is restated while the artwork is kept. */
+  /* White paper behind a translucent watermark PNG: fill restated, artwork kept. */
   .classified-banner {
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
@@ -2531,9 +2366,7 @@
     border-color: #2d333b !important;
   }
 
-  /* The object-class plates. The hues ARE the classification, so each is kept
-     in its own family and only pitched to sit on a dark page — Euclid's amber
-     could not carry its knocked-out white label at the site's own lightness. */
+  /* The hues ARE the classification — each kept in its family, only pitched for a dark page. */
   .lb-article-class.lb-euclid {
     background-color: #bd8700 !important;
   }
@@ -2542,9 +2375,7 @@
     background-color: #767d86 !important;
   }
 
-  /* The CTA row. At rest the icons are black line art dimmed for a light
-     plate; the site already inverts them on hover for its crimson fill, so the
-     two states swap rather than one being invented. */
+  /* The site already inverts these icons on hover, so the two states swap rather than one being invented. */
   .scp-front-button,
   .scp-front-button:visited,
   .scp-front-button:link {
@@ -2602,12 +2433,8 @@
     border-color: #4a5058 !important;
   }
 
-  /* ============================================================
-     TAG SEARCH — the /tags builder panel
-
-     A same-origin srcdoc iframe, so nothing on the host page reaches it and no
-     host-page scan sees it.
-     ============================================================ */
+  /* TAG SEARCH — the /tags builder panel
+     A same-origin srcdoc iframe, so nothing on the host page reaches it. */
 
   .autocomplete-container {
     background-color: #1c2128 !important;
@@ -2650,8 +2477,7 @@
     color: #f08a8a !important;
   }
 
-  /* The chip's remove button is a bare <button> the site leaves unfilled; the
-     blanket button fill would box it into a plate of its own inside the chip. */
+  /* Another bare <button> the blanket fill would box into a plate of its own. */
   .tag-chip button {
     background-color: transparent !important;
     color: #e8626e !important;
@@ -2755,14 +2581,9 @@
     color: #6b737c !important;
   }
 
-  /* ============================================================
-     REGISTRATION PAGE
-
-     `/system:join` carries its own page CSS rather than an article theme's,
-     with a white card per membership tier and a crimson alert banner framed in
-     white. Its classes are page-local but the page is site chrome, not an
-     author's article, so they are named directly.
-     ============================================================ */
+  /* REGISTRATION PAGE
+     `/system:join` has its own page CSS. Its classes are page-local but the
+     page is site chrome, not an author's article, so they are named directly. */
 
   #page-content .user-block {
     background-color: #1c2128 !important;
@@ -2797,13 +2618,10 @@
     color: #e8626e !important;
   }
 
-  /* ============================================================
-     SITE SEARCH — the /search:site results
-
-     Google Custom Search, in a second same-origin srcdoc frame. Its own
-     stylesheet is loaded from google.com and out-specifies everything, so the
-     whole block is stated !important.
-     ============================================================ */
+  /* SITE SEARCH — the /search:site results
+     Google Custom Search in a same-origin srcdoc frame; its stylesheet loads
+     from google.com and out-specifies everything, so the whole block is
+     !important. */
 
   .gsc-control-cse,
   .gsc-control-wrapper-cse,
@@ -2847,9 +2665,7 @@
     border-color: #a03636 !important;
   }
 
-  /* The embed's configured link red is #d52c1f, stated !important from a
-     two-class rule that reaches the anchor and every element inside it. Three
-     classes are what it takes to out-specify; the hue is kept and lifted. */
+  /* The embed states its link red !important from a two-class rule reaching the anchor and its children — three classes to out-specify. */
   .gsc-control-cse .gs-result .gs-title,
   .gsc-control-cse .gs-result .gs-title *,
   .gsc-control-cse .gs-per-result-labels a.gs-label,
@@ -2925,13 +2741,9 @@
     background-color: transparent !important;
   }
 
-  /* ============================================================
-     SYSTEM PAGES — login, join, profile, preferences
-
-     A separate `body.system` layout with its own token set. The tokens are
-     declared on :root by a stylesheet only these pages load; they are rebound
-     on the body instead, so a page that never loads that sheet is untouched.
-     ============================================================ */
+  /* SYSTEM PAGES — login, join, profile, preferences
+     Tokens a stylesheet only these pages load declares on :root, rebound on the
+     body so a page that never loads that sheet is untouched. */
 
   body.system {
     --background-color: #14181d;
@@ -2959,8 +2771,7 @@
     color: #c4cdd6 !important;
   }
 
-  /* The heading band is already a black-to-teal gradient; its pinstripe overlay
-     is a white one, which only lifts the band on a dark page. */
+  /* The band is already a black-to-teal gradient; only its white pinstripe overlay lifts it. */
   .system-content .heading {
     background-image:
       repeating-linear-gradient(45deg, rgba(0, 0, 0, .14), transparent 4px),
@@ -3087,16 +2898,11 @@
     color: #ff8f97 !important;
   }
 
-  /* ============================================================
-     AUTHOR-WRITTEN INLINE COLOURS
-
-     Wiki syntax like ##blue|text## emits a literal inline `color:`. The dark
-     end of that palette is unreadable on a dark page, so lift the common names
-     and hexes to the same hue at a legible lightness. Every selector is
-     guarded against `background-color: red`, which contains the substring
-     `color:red` — unguarded, a span that named only a FILL has its ink
-     repainted the same hue and vanishes.
-     ============================================================ */
+  /* AUTHOR-WRITTEN INLINE COLOURS
+     ##blue|text## emits a literal inline `color:` whose dark end is unreadable
+     here. Every selector is guarded against `background-color: red`, which
+     contains the substring `color:red`: unguarded, a span that named only a
+     FILL has its ink repainted the same hue and vanishes. */
 
   #page-content [style*="color:black"]:not([style*="background"]),
   #page-content [style*="color: black"]:not([style*="background"]),
@@ -3105,12 +2911,7 @@
     color: var(--scpru-lift-black) !important;
   }
 
-  /* The hexes beside each keyword are the spellings the branch's authors
-     actually ship — enumerated from a 400-article sweep of inline `color:`
-     values, not guessed. A keyword and its own hex are the same colour, so
-     a list that carries only one of the two spellings leaves the other on
-     the page floor: `#282467` runs at 1.31:1 across a whole section of
-     /scp-028-j, `#a52a2a` (the `brown` keyword's hex) at 2.52:1 on /scp-179. */
+  /* Keyword and its own hex are the same colour: carrying one spelling and not the other leaves the other on the page floor. */
   #page-content [style*="color:blue"]:not([style*="background"]),
   #page-content [style*="color: blue"]:not([style*="background"]),
   #page-content [style*="color:  blue"]:not([style*="background"]),
@@ -3146,9 +2947,7 @@
     color: var(--scpru-lift-green) !important;
   }
 
-  /* The attribute match is literal, so a second space after the colon is a
-     separate spelling and needs an entry of its own. `color:  purple` ships on
-     /scp-series-3. */
+  /* The attribute match is literal, so a second space after the colon is a separate spelling and needs an entry of its own. */
   #page-content [style*="color:purple"]:not([style*="background"]),
   #page-content [style*="color: purple"]:not([style*="background"]),
   #page-content [style*="color:  purple"]:not([style*="background"]),
@@ -3215,9 +3014,7 @@
     color: var(--scpru-lift-teal) !important;
   }
 
-  /* The branch's own title and link crimsons. Authors paste them into
-     style="color:…" on fake page titles and section heads, where they are
-     near-black on a dark page. */
+  /* The branch's own title and link crimsons, which authors paste into inline `color:` on fake page titles and section heads. */
   #page-content [style*="color:#901"]:not([style*="background"]),
   #page-content [style*="color: #901"]:not([style*="background"]),
   #page-content [style*="color:#b01"]:not([style*="background"]),
@@ -3231,9 +3028,7 @@
     color: var(--scpru-lift-maroon) !important;
   }
 
-  /* ============================================================
-     FOOTER / LICENSE / NAVI
-     ============================================================ */
+  /* FOOTER / LICENSE / NAVI */
 
   #container-wrap #footer {
     background-color: #0d1117 !important;
@@ -3241,15 +3036,12 @@
     border-top: 1px solid #262c33;
   }
 
-  /* The engine credit bar is dark on the live site and its links are white
-     there, so they stay body ink. */
+  /* The engine credit bar is dark on the live site and its links are white there. */
   #footer a {
     color: #c4cdd6 !important;
   }
 
-  /* The licence strip is a light band on the live site and its one link is the
-     branch crimson. Body ink there is the same tone as the sentence around it,
-     and the strip carries no underline to fall back on. */
+  /* Light band on the live site, its one link the branch crimson; body ink there is the sentence's own tone and has no underline to fall back on. */
   #license-area a,
   .license-area a {
     color: var(--scpru-link) !important;
@@ -3267,10 +3059,7 @@
     color: #8b949e !important;
   }
 
-  /* The version/last-edited line under the article. Nothing in the site's own
-     sheets states it, so a visual theme that does holds it at the near-black it
-     drew for its light column. The value is the body ink, so the default skin
-     is unchanged. */
+  /* Unstated in the site's own sheets, so a theme that states it holds it at its light-column near-black. The value is the body ink, so the default skin is unchanged. */
   #page-info,
   #page-info .odate {
     color: #c4cdd6 !important;
@@ -3314,9 +3103,7 @@
     border-color: #2d333b !important;
   }
 
-  /* ============================================================
-     SCROLLBAR
-     ============================================================ */
+  /* SCROLLBAR */
 
   ::-webkit-scrollbar {
     border-color: rgba(255, 255, 255, .08) !important;
@@ -3334,9 +3121,7 @@
     background-color: #4a5058 !important;
   }
 
-  /* ============================================================
-     INTERWIKI FRAME (other-languages box)
-     ============================================================ */
+  /* INTERWIKI FRAME (other-languages box) */
 
   #interwiki body,
   body#interwiki {
@@ -3360,8 +3145,7 @@
     color: var(--scpru-lift-green) !important;
   }
 
-  /* The per-element fact boxes floated beside each section. Same page <style>,
-     same story: white paper, ink inherited from #page-content at 1.6:1. */
+  /* Same page <style>: white paper, ink inherited from #page-content. */
   #page-content dl,
   #page-content dl > dt,
   #page-content dl > dd {
@@ -3375,19 +3159,12 @@
     background-color: #1c2128 !important;
   }
 
-  /* The card's footer strip is a solid chip the page paints on the link itself
-     — grey by default, the block's own accent on a collaboration cycle — so the
-     crimson sits on that chip rather than on the card, at 2.2:1. Knocked out
-     white is the only ink that clears AA on every accent the page ships. */
+  /* The footer strip is a chip painted on the link itself (grey, or the block's accent), so knocked-out white is the only ink clearing AA on every accent. */
   #main-content #page-content .series-block .tag-lead a {
     color: #ffffff !important;
   }
 
-  /* The section rule and the card's inner divider are a fixed `#ccc`, drawn
-     full width. The page states the section rule from `:where(#page-content) h2`
-     — zero specificity, so this is scoped rather than site-wide: an article's
-     own h2 rule is left alone, because those are drawn in `currentColor` and
-     stay proportionate on either background. */
+  /* The page states the section rule from `:where(#page-content) h2` — zero specificity. Scoped, so an article's own h2 rule, drawn in `currentColor`, is left alone. */
   #page-content h2 {
     border-bottom-color: #2d333b !important;
   }
@@ -3403,8 +3180,7 @@
     background-color: #1c2128 !important;
   }
 
-  /* The filter toggle above the grid is a pill the same <style> paints a pale
-     green, which the crimson link colour sits on at 2.7:1. */
+  /* A pill the same <style> paints pale green, which the crimson link colour sits on at 2.7:1. */
   #page-content a.collapsible-block-link {
     background-color: #1a1f26 !important;
   }
@@ -3416,6 +3192,12 @@ div.modal,
     background-color: #1c2128 !important;
     border-color: #2d333b !important;
     color: #c4cdd6 !important;
+  }
+
+  /* The hub's warning variant is a red wash and frame over the modal paper; the wash stays a tint of the branch crimson so it still reads as a warning and not a second neutral plate. */
+  div.modal.themes-warning {
+    background-color: #2a1618 !important;
+    border-color: #8a2f2f !important;
   }
 
   div.modal h1,
@@ -3438,10 +3220,7 @@ div.modal,
     background-color: rgba(28, 33, 40, 0.85) !important;
   }
 
-  /* The "reset" link is greyed to #333 to mark the active page size — a
-     disabled cue for a white page, invisible on this one. The page states it
-     !important from a sheet that loads after ours, so this needs both ids and
-     !important of its own to reach it. It is the page's only self-link. */
+  /* #333 marks the active page size. Stated !important from a sheet loaded after ours, so both ids and !important are needed. */
   #main-content #page-content a[href="/components-hub"],
   #main-content #page-content a[href="/themes-hub"] {
     color: #8b949e !important;
@@ -3457,8 +3236,7 @@ div.modal,
     color: #c4cdd6 !important;
   }
 
-  /* The two join buttons are solid brand plates carrying a knocked-out white
-     label, which the site-wide link colour repaints to crimson at 1.1:1. */
+  /* Solid brand plates carrying a knocked-out white label, which the site-wide link colour would repaint crimson. */
   #page-content a.join-btn {
     color: #ffffff !important;
   }
@@ -3483,8 +3261,7 @@ div.modal,
     color: #140f0c !important;
   }
 
-  /* The skin's section headings and its pager caption are set for the cream
-     page it draws behind them, and the page is ours here. */
+  /* Set for the cream page the skin draws behind them, and the page is ours here. */
   #main-content #page-content h1,
   #main-content #page-content h2 {
     color: var(--scpru-lift-green) !important;
@@ -3501,9 +3278,7 @@ div.modal,
     color: var(--scpru-title) !important;
   }
 
-  /* The card's submit is the same <style>'s near-white gradient pill with
-     `#666` ink and a `#ccc` halo. The id outranks the page's own :hover, so
-     its crimson wipe is restated below rather than lost. */
+  /* The id outranks the page's own :hover, so its crimson wipe is restated below rather than lost. */
   #page-content .new-page-form input[type="submit"] {
     background: linear-gradient(to top, #262c33 0%, #262c33 80%, #333a42 100%);
     border-color: #3a4048;
@@ -3516,5 +3291,30 @@ div.modal,
     border-color: #621b0d;
     color: #fff;
     box-shadow: 0 2px 3px rgba(0, 0, 0, .6);
+  }
+}
+
+@-moz-document url-prefix("https://scpfoundation.net/site-7-midnight-radio") {
+#page-content .jk {
+    color: #140f0c !important;
+    --scpru-title: #7a1d24;
+    --scpru-heading: #140f0c;
+    --scpru-link: #a4161a;
+    --scpru-link-visited: #6d3550;
+    --scpru-link-hover: #d21414;
+    --scpru-newpage: #8a4b00;
+    --scpru-lift-black: #140f0c;
+    --scpru-lift-blue: #0000cd;
+    --scpru-lift-green: #046307;
+    --scpru-lift-purple: #800080;
+    --scpru-lift-maroon: #800000;
+    --scpru-lift-red: #c30000;
+    --scpru-lift-brown: #6b4423;
+    --scpru-lift-teal: #006a6a;
+  }
+
+  /* `lightgrey` frame from the same <style>. */
+  #page-content .material-box {
+    border-color: #3a4048 !important;
   }
 }

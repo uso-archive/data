@@ -3,36 +3,18 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260831.14.42
+@version      20260910.22.37
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
 @-moz-document regexp("https?://(?!donate\.|blog\.|support\.)([a-z0-9-]+\.)*khanacademy\.org(/.*)?") {
 :root { color-scheme: dark !important; }
 
-  /* ====================================================================
-     Wonder Blocks design tokens — Khan drives almost every surface,
-     border and text color through these CSS custom properties, so
-     retoning them re-themes the bulk of the app at once.
-     Light neutrals -> dark palette; learning/mastery/brand tokens are
-     left untouched below to preserve meaning.
-
-     `body` MUST be in the selector, not just `:root`. Khan re-declares the
-     whole light palette on `body`, and a custom property declared on a closer
-     ancestor beats an inherited one no matter how `!important` the ancestor's
-     is — so a `:root`-only override silently resolved back to Khan's light
-     values for every element in the document (e.g. tooltip tails still drew
-     with `--…-background-base-default: #fff`).
-
-     `[data-wb-theme]` is the same trap one level deeper. Khan's newer app
-     shell wraps the whole page (header + `#main-content`) in
-     `<div data-wb-theme="thunderblocks">` and re-declares the ENTIRE light
-     palette there, so on every page carrying that wrapper the block below
-     resolved back to Khan's light values — `#main-content` read
-     `--…-background-base-default: #fff`. The theme still looked dark only
-     because its explicit rules paint those surfaces anyway; every
-     token-only detail (the header logo's mark, tooltip chrome) went light.
-     ==================================================================== */
+  /* Wonder Blocks design tokens — retoning these re-themes the bulk of the app;
+     learning/mastery/brand tokens stay as Khan sets them. `body` and `[data-wb-theme]`
+     MUST stay in the selector: Khan re-declares the whole light palette on `body` and
+     again on the `thunderblocks` shell wrapper, and a property on a closer ancestor beats
+     an inherited one however `!important`. */
   :root, body, [data-wb-theme] {
     /* Surfaces */
     --wb-semanticColor-core-background-base-default: #14181d !important;
@@ -63,11 +45,9 @@
     --wb-semanticColor-chonky-progressive-background-secondary-press: #1d2a3a !important;
     --wb-semanticColor-chonky-progressive-background-secondary-selected: #1d2a3a !important;
 
-    /* Text. The neutral ink scale runs strong (darkest) -> default -> subtle
-       (lightest) on Khan's light page, so on dark it has to run the other way:
-       strong is the lightest and subtle the dimmest, with `default` between them.
-       `default` is not only text — it is the fill of the unit-progress grid's
-       Quiz/Unit-test mask glyphs, which is where a too-dark value shows first. */
+    /* Text. Khan's ink scale runs strong (darkest) -> subtle (lightest), so on dark it must
+       run the other way. `default` is also the fill of the progress grid's Quiz/Unit-test
+       mask glyphs, where a too-dark value shows first. */
     --wb-semanticColor-core-foreground-neutral-strong: #e6edf3 !important;
     --wb-semanticColor-core-foreground-neutral-default: #c4cdd6 !important;
     --wb-semanticColor-core-foreground-neutral-subtle: #9aa4af !important;
@@ -76,11 +56,8 @@
     --wb-semanticColor-status-neutral-foreground: #c4cdd6 !important;
     --wb-semanticColor-input-error-foreground: #e6edf3 !important;
 
-    /* Borders / dividers (soften the bright default greys). The `subtle` tone
-       (#dbdcdd) is the one Khan paints its hairline rules with — lesson-row
-       separators, the login "or" divider and the tooltip tail outline are all
-       inset box-shadows / SVG strokes reading this token, none of which a
-       border-color rule can reach. */
+    /* Borders. The `subtle` tone is Khan's hairline colour, drawn as inset box-shadows
+       and SVG strokes no border-color rule can reach. */
     --wb-semanticColor-core-border-neutral-subtle: #2d333b !important;
     --wb-semanticColor-core-border-neutral-default: #2d333b !important;
     --wb-semanticColor-core-border-neutral-strong: #3a424c !important;
@@ -89,140 +66,111 @@
     --wb-semanticColor-feedback-neutral-subtle-border: #2d333b !important;
     --wb-semanticColor-core-shadow-chonky-neutral-subtle: #2d333b !important;
 
-    /* Brand blue: refine the raw Khan link/CTA blue (#1865f2) so it reads
-       well on near-black instead of glowing harshly */
+    /* Brand blue refined: the raw #1865f2 glows harshly on near-black. */
     --wb-semanticColor-core-foreground-instructive-default: #5fb0e6 !important;
     --wb-semanticColor-core-foreground-instructive-strong: #9bd4ff !important;
     --wb-semanticColor-chonky-progressive-foreground-secondary-rest: #5fb0e6 !important;
     --wb-semanticColor-action-secondary-progressive-hover-foreground: #9bd4ff !important;
     --wb-semanticColor-status-notice-foreground: #5fb0e6 !important;
-    /* `link-rest` is the token Wonder Blocks' inline text links actually read
-       (`link-hover` alone only covered the hover). Left at Khan's raw #1865f2 it
-       lands ~3.7:1 on the dark page, and because Khan applies it through a hashed
-       class the theme's un-important `a { color }` rule never reached it. */
+    /* `link-rest` is the token Wonder Blocks' inline links read (`link-hover` covers
+       only hover), applied through a hashed class the un-important `a { color }` rule
+       below cannot reach. */
     --wb-semanticColor-link-rest: #5fb0e6 !important;
     --wb-semanticColor-link-hover: #9bd4ff !important;
 
-    /* Primary CTA buttons keep the Khan blue identity but are deepened a
-       touch so they sit on the dark UI and white button text reads clean */
+    /* Primary CTAs keep the Khan blue, deepened so white button text reads clean. */
     --wb-semanticColor-action-primary-progressive-default-background: #2563c9 !important;
     --wb-semanticColor-action-primary-progressive-hover-background: #2f6fd6 !important;
     --wb-semanticColor-action-primary-progressive-press-background: #1d51b0 !important;
     --wb-semanticColor-core-background-instructive-default: #2563c9 !important;
     --wb-semanticColor-core-background-instructive-strong: #1d51b0 !important;
 
-    /* Mastery / progress: keep the meaningful "attempted" (gold) and
-       "complete" (green) states; only the empty "not started" square is
-       remapped from light grey to a dark grey so it reads as empty on the
-       dark grid instead of glowing white */
+    /* Mastery: gold "attempted" and green "complete" carry meaning and stay; only the
+       empty "not started" square is darkened. */
     --wb-semanticColor-learning-background-progress-notStarted-default: #2d333b !important;
     --wb-semanticColor-learning-foreground-progress-notStarted-strong: #8b949e !important;
+
+    /* Worked-example term highlights. MathJax articles colour each term through
+       `color: var(--wb-semanticColor-learning-math-foreground-<hue>, #hex)` on an <mjx-mstyle>,
+       so the token is what renders; the literal-colour rules further down only reach the
+       `mathcolor` / inline-rgb carriers. Same lifted hues as that block so both renderers pair.
+       `grayH` / `grayI` are near-black inks, not highlights. */
+    --wb-semanticColor-learning-math-foreground-blue: #6cb6d9 !important;
+    --wb-semanticColor-learning-math-foreground-gold: #e3b341 !important;
+    --wb-semanticColor-learning-math-foreground-gray: #9aa4af !important;
+    --wb-semanticColor-learning-math-foreground-grayH: #c4cdd6 !important;
+    --wb-semanticColor-learning-math-foreground-grayI: #e6edf3 !important;
+    --wb-semanticColor-learning-math-foreground-green: #7ee787 !important;
+    --wb-semanticColor-learning-math-foreground-pink: #ff8ac4 !important;
+    --wb-semanticColor-learning-math-foreground-purple: #d2a8ff !important;
+    --wb-semanticColor-learning-math-foreground-purpleD: #d2a8ff !important;
+    --wb-semanticColor-learning-math-foreground-red: #ff7b72 !important;
   }
 
-  /* ====================================================================
-     Base surfaces
-     ==================================================================== */
+  /* Base surfaces */
   html, body { background-color: #14181d !important; color: #c4cdd6 !important; }
 
-  /* ====================================================================
-     Legacy "bibliotron" page shell (hardcoded white, stable class)
-     Despite the name this is NOT a header: `div.clearfix.bibliotron-header
-     .white-outer-wrapper` is the white sheet Khan lays the WHOLE page on —
-     it contains `#main-content` and every link on search, course, article,
-     exercise and 404 pages. So it takes the base background, not the header
-     black it used to get (which made the content area darker than the home
-     page and erased the seam under the nav bar).
-     ==================================================================== */
+  /* Legacy "bibliotron" page shell. Not a header despite the name: `.white-outer-wrapper`
+     is the sheet the WHOLE page sits on, `#main-content` included, so it takes the base
+     background. */
   .bibliotron-header,
   .white-outer-wrapper,
   .clearfix.bibliotron-header { background-color: #14181d !important; }
-  /* Khan hardcodes the light-page ink on the shell's text, so its anchors, spans
-     and divs need an enforced light colour — this is also what keeps the header's
-     wordmark, "Donate" and "Log in" near-white, since the nav is inside the shell
-     too. */
+  /* The shell hardcodes light-page ink on its text. Also covers the header wordmark,
+     "Donate" and "Log in" — the nav is inside the shell. */
   .bibliotron-header a,
   .bibliotron-header span,
   .bibliotron-header div { color: #e6edf3 !important; }
-  /* …but because the shell wraps the WHOLE page, that `!important` also repainted
-     every brand link in the page body near-white: "Browse Projects" and the
-     search-facet links rendered as plain bold text with no link affordance at all.
-     Restore the link colour inside the content area only. Of the anchors under
-     `#main-content`, only genuine inline links carry a direct text node — search
-     result cards, lesson rows and course tiles wrap their label in a child
-     <div>/<span>/<p>, which the shell rule above still paints, so their titles
-     stay near-white and only real links turn blue. */
+  /* The shell wraps the WHOLE page, so restore link colour inside the content area only.
+     Only genuine inline links carry a direct text node; cards, rows and tiles wrap their
+     label in a child element the shell rule still paints, so their titles stay
+     near-white. */
   #main-content a { color: #5fb0e6 !important; }
   #main-content a:hover { color: #9bd4ff !important; }
   /* Wonder Blocks draws a link's leading/trailing glyph as an EMPTY <span> whose
-     `mask-image` is filled by the span's own `background-color: currentColor` —
-     so the glyph is the link's colour, not a separate paint. The shell's `span`
-     rule above hits that span directly and pins it near-white, which splits one
-     component into two colours: the breadcrumb house sits white beside a blue
-     "Math", and the same external-link arrow renders blue in one place and white
-     in another. Give the glyph the anchor's colour back. `> span:empty` is the
-     precise shape of a mask icon — a label span has text, and the nested icon
-     spans of the mastery grid and the onboarding cards are grandchildren, so
-     neither is touched. The CTA rules further down restate their own label
-     colour and win on order. */
+     `mask-image` is filled by its own `background-color: currentColor`, so the shell's
+     `span` rule would split one component into two colours. `> span:empty` is the exact
+     shape of a mask icon: label spans have text, and the mastery-grid icon spans are
+     grandchildren. */
   #main-content a > span:empty { color: inherit !important; }
-  /* A prose link's label is often a <span> (Khan's `<a><span><strong>PDF</strong></span></a>`
-     on the unit "About" card). The shell's `span` rule pins that span near-white while the
-     anchor and its trailing icon glyph are link-blue, so one link renders in two colours.
-     Scoped to `p a` so lesson-row / card links (never inside a <p>) keep their near-white
-     titles; the `a[data-kind="primary"] span` white label below out-specifies this. */
+  /* A prose link's label is often a <span> the shell's `span` rule would pin near-white
+     beside a blue anchor. Scoped to `p a` so lesson-row / card links keep near-white
+     titles; `a[data-kind="primary"] span` below out-specifies it. */
   #main-content p a > span { color: inherit !important; }
-  /* Wonder Blocks' `tertiary` kind IS a link rendered as a button ("See our
-     Google-powered results", the "What's this?" beside an exercise Hint). Khan
-     paints it the brand blue; the shell's span rule flattened its label to the
-     same near-white as an ordinary heading. Give the whole kind its colour back.
-     `#main-content button[aria-expanded]` (the home subject accordions) is more
-     specific, so those headers stay near-white. */
+  /* The unit page's lesson-section title is an <h2> whose ONLY child is a link with a direct
+     text node, so the content-link rule paints a 24px heading link-blue where Khan draws it in
+     the heading ink. Stable test id; the hover arm is restated because this rule ties the
+     `a:hover` above and would otherwise erase the cue. */
+  #main-content a[data-testid="lesson-card-link"] { color: #e6edf3 !important; }
+  #main-content a[data-testid="lesson-card-link"]:hover { color: #9bd4ff !important; }
+  /* `tertiary` IS a link rendered as a button, so give back the brand blue the shell's
+     span rule flattens. `#main-content button[aria-expanded]` (home accordions) is more
+     specific and stays near-white. */
   button[data-kind="tertiary"],
   button[data-kind="tertiary"] span { color: #5fb0e6 !important; }
   button[data-kind="tertiary"]:hover,
   button[data-kind="tertiary"]:hover span { color: #9bd4ff !important; }
 
-  /* ====================================================================
-     Top navigation bar
-     `#top-header-container` is the full-bleed strip Khan paints its brand
-     navy (#0b2149) onto; the inner `nav` is width-capped, so theming only
-     the nav leaves navy shoulders at both ends of the header. Dark both.
-     ==================================================================== */
+  /* Top nav. `#top-header-container` is the full-bleed strip; the inner `nav` is
+     width-capped, so theming only the nav leaves brand-navy shoulders. */
   nav[role="navigation"], header[role="banner"],
   #top-header-container { background-color: #0d1117 !important; }
 
-  /* Header wordmark, monochrome variant. Khan draws the hexagon mark with
-     `fill="var(--wb-semanticColor-core-foreground-neutral-strong)"` (its ink)
-     and knocks the leaf out of it in a hardcoded `#ffffff`. The token block
-     correctly flips the ink to near-white for dark, which leaves a white leaf
-     on a white hexagon — the mark reads as a solid light blob. Knock the leaf
-     out in the header colour instead, so the mark is the exact lightness
-     inversion Khan's own artwork implies. Only this variant matches: the
-     classic logo fills its hexagon with the literal brand green (#14bf96) and
-     its white leaf has no `neutral-strong` sibling before it. */
+  /* Header wordmark, monochrome variant: the leaf is knocked out of the hexagon in a
+     hardcoded `#ffffff` over the `neutral-strong` ink — white on white once that ink flips
+     light. Only this variant matches; the classic logo fills its hexagon brand green with
+     no `neutral-strong` sibling before the leaf. */
   [aria-label="Khan Academy"] path[fill*="neutral-strong"] + path[fill="#ffffff"] {
     fill: #0d1117 !important;
   }
 
-  /* Global site footer. Khan paints it with the SAME brand navy (#0b2149) it uses
-     on the header strip above — but nothing here reached it, so while the header
-     was darkened the footer kept the raw navy, rendering as the single brightest
-     large surface in the theme (~1.7x the base luminance). Darken it to match the
-     themed header so the brand navy reads consistently dark; its light link text
-     stays legible on the deeper tone. */
+  /* Global footer: the same brand navy as the header strip and otherwise unreached, so
+     it would be the brightest large surface. */
   footer[class] { background-color: #0d1117 !important; }
 
-  /* ====================================================================
-     "Explore" mega-menu (header dropdown)
-     Khan renamed the menu's hook from `data-test-id` to `data-testid`, so
-     the old selector matched nothing and the panel kept its native white
-     while our token remaps had already lifted its labels to near-white —
-     an unreadable white-on-white menu. It is a floating surface, so it
-     needs a SOLID elevated background (not `transparent`, which would let
-     the page scroll through it). The item hover/focus state and the
-     column divider (a 1px `div` Khan paints light grey) are hardcoded for
-     the light page and are re-toned here too.
-     ==================================================================== */
+  /* "Explore" mega-menu. A floating surface, so it needs a SOLID background —
+     `transparent` would let the page scroll through it. Its hover/focus state and column
+     divider are hardcoded light. */
   #header-dropdown [data-testid="learn-menu"] { background-color: #1c2128 !important; }
   [data-testid="learn-menu"] > ul + div { background-color: #2d333b !important; }
   [data-testid="learn-menu"] a:hover, [data-testid="learn-menu"] button:hover,
@@ -230,71 +178,47 @@
     background-color: #232a32 !important;
   }
 
-  /* Mobile hamburger navigation drawer (`#page-header-responsive-nav-menu`,
-     role="menu"): Khan renders it into a body-level region OUTSIDE #main-content
-     and hardcodes a white panel plus white item rows, so neither the token
-     remaps nor the content neutralizer reach it — the whole slide-out menu
-     (Log in / Sign up / every subject accordion) rendered as near-white text on
-     white. Dark the panel via its stable id and flatten its inner white
-     surfaces; the item text is already lifted to light by the token block. */
+  /* Mobile hamburger drawer: a body-level region outside `#main-content` with a hardcoded
+     white panel and rows, so neither the token remaps nor the neutralizer reach it. */
   #page-header-responsive-nav-menu { background-color: #1c2128 !important; }
   #page-header-responsive-nav-menu [class] { background-color: transparent !important; }
   #page-header-responsive-nav-menu a:hover,
   #page-header-responsive-nav-menu button:hover { background-color: #232a32 !important; }
 
-  /* Wonder Blocks "NEW" pill (course-list badges): a pale blue chip
-     (#edf3fe) whose label inherits the remapped near-white text, leaving it
-     invisible. Stable test id; re-tone to the theme's dark info tint. */
+  /* "NEW" pill: a pale blue chip whose label inherits the remapped near-white text.
+     Stable test id. */
   [data-testid="new-pill"] { background-color: #18222f !important; }
   [data-testid="new-pill"] * {
     color: #9bd4ff !important; -webkit-text-fill-color: #9bd4ff !important;
   }
 
-  /* Skip-to-main-content link: visually hidden until keyboard focus, then it
-     paints a hardcoded white panel that our remapped near-white link text
-     disappears into. Stable id. */
+  /* Skip-to-main-content link: hidden until keyboard focus, then paints a hardcoded
+     white panel. Stable id. */
   #triggerless-modal-focus-anchor {
     background-color: #1c2128 !important;
     color: #5fb0e6 !important;
   }
 
-  /* Wonder Blocks tooltips (truncated lesson/course titles, the mastery "i"
-     affordance) render into a body-level portal, so they escape every
-     `#main-content` rule and keep a hardcoded white bubble — with our remapped
-     near-white text inside it. They are hover-only, so an element-bg scan of a
-     static page never sees them. The tail is an <svg> polyline filled white,
-     not a CSS border triangle, so it needs its own fill. */
+  /* Wonder Blocks tooltips render into a body-level portal, escaping every
+     `#main-content` rule, and keep a hardcoded white bubble. The tail is an <svg>
+     polyline, not a CSS border triangle, so it needs its own fill. */
   [role="tooltip"] { color: #e6edf3 !important; }
   [role="tooltip"] > div { background-color: #1c2128 !important; }
   [role="tooltip"] svg polyline { fill: #1c2128 !important; }
 
-  /* Wonder Blocks links hardcode the raw brand blue (#1865f2). The theme's plain
-     `a { color }` rule below is deliberately un-important so brand CTAs keep their
-     own colour, which means the hardcoded class wins wherever it is used. Inside
-     the "Reach new Levels!" onboarding dialog that leaves the body link at 3.55:1
-     on the dark modal — a WCAG fail. Lift links inside dialogs only. */
+  /* Wonder Blocks links hardcode the raw brand blue through a class, and the plain
+     `a { color }` rule below is deliberately un-important so brand CTAs keep their colour
+     — leaving 3.55:1 on a dark modal. */
   [role="dialog"] a { color: #9bd4ff !important; }
 
-  /* NOT a bug, and deliberately left alone: the logged-out "Reach new Levels!" onboarding
-     dialog opens on a lavender (#e4d7ff) illustration band. It is the brightest surface the
-     theme shows, but the mastery bar + star inside it is an OPAQUE raster gif with that
-     lavender baked into its own pixels — darkening the container only recolours the strip
-     below the artwork and leaves a two-tone band that looks worse than the original. Raster
-     art gets left as drawn (same rule the 404 space scene and the login collage follow). */
+  /* Deliberately left alone: the onboarding dialog's lavender band. Its mastery bar is an
+     OPAQUE raster gif with that lavender baked in, so darkening the container only yields a
+     two-tone band. */
 
-  /* Wonder Blocks notification banner (the logged-out "Log in or Sign up to
-     save your future progress!" strip above the header, and its siblings).
-     It hardcodes the pale info blue #edf3fe and lives OUTSIDE `#main-content`,
-     so neither the token remaps nor the content neutralizer reach it — the
-     banner reads as near-white text on near-white. Scoped to the component's
-     stable ARIA contract rather than its hashed class.
-     The banner's other cue is a 6px left rule that Khan paints the brand blue
-     to mark the strip as informational; the blanket `* { border-color }` reset
-     at the end of this file drops it to the generic divider grey, so the accent
-     disappears into the tint. Restore it on the left edge ONLY — at narrow
-     widths Khan drops the accent and gives the banner a 1px border that is
-     TRANSPARENT on all four sides, which the same blanket reset turns into a
-     grey box the site never draws. */
+  /* Notification banner: hardcodes the pale info blue outside `#main-content`; keyed on
+     its stable ARIA contract, not a hashed class. Restore its 6px brand-blue accent against
+     the blanket border reset — LEFT EDGE ONLY: at narrow widths Khan's border is transparent
+     on all four sides, which the reset would turn into a grey box. */
   [role="status"][aria-label="Notification Banner"] {
     background-color: #18222f !important;
     border-color: transparent !important;
@@ -302,18 +226,11 @@
   }
   [role="status"][aria-label="Notification Banner"] a { color: #9bd4ff !important; }
 
-  /* The logged-out "Turn learning into progress." sign-up promo. On content pages
-     it renders INSIDE `#main-content` and the neutralizer below flattens it; Khan
-     also mounts it as a SIBLING of `#main-content`, in `#above-main-content-portal`
-     — on the course, unit, lesson, exercise and 404 pages — where nothing else
-     reaches it, so it keeps its pale blue panel, its white illustration and its
-     white audience pills under near-white text: a 205px band of invisible copy
-     above the fold. The portal carries this promo and nothing else, so it is keyed
-     on the id alone and depends on no hashed class.
-     `data-kind` rather than `button[class]`: the audience pills are Wonder Blocks
-     `secondary` (natively white-filled) and the dismiss ✕ is `tertiary` (natively
-     transparent), so keying on the kind reproduces the native fills instead of
-     boxing the ✕ in a plate Khan never draws. */
+  /* The logged-out sign-up promo also mounts as a SIBLING of `#main-content`, in
+     `#above-main-content-portal`, which the neutralizer never reaches; that portal carries
+     this promo alone, so it is keyed on the id. `data-kind` rather than `button[class]`: the
+     audience pills are `secondary` (natively white-filled) and the dismiss X `tertiary`
+     (natively transparent). */
   #above-main-content-portal {
     background-color: #14181d !important;
     background-image: none !important;
@@ -321,9 +238,9 @@
   #above-main-content-portal [class]:not(span) {
     background-color: transparent; background-image: none;
   }
-  /* The element type in each of these is load-bearing, not decoration: without it
-     the selector is one step LESS specific than the `[class]:not(span)`
-     neutralizer above and the fill silently never paints. */
+  /* The element type here is load-bearing: without it the selector is one step LESS
+     specific than the `[class]:not(span)` neutralizer above and the fill never
+     paints. */
   #above-main-content-portal button[data-kind="secondary"],
   #above-main-content-portal a[data-kind="secondary"] { background-color: #1c2128; }
   #above-main-content-portal button[data-kind="secondary"]:hover,
@@ -332,102 +249,68 @@
     background-color: #c4cdd6 !important;
   }
 
-  /* The home page's donation takeover (`#donate-banner`) is mounted as a SIBLING
-     of `#main-content`, so the content neutralizer never reaches it, and it paints
-     its carrier the full-bleed brand navy (#0b2149) — the same tone the header and
-     footer rules above deliberately darken, here as a 616px slab above the fold and
-     the brightest large surface on the page. Flatten the carrier onto the base
-     surface. The gift form inside keeps its own fills: the amount/frequency options
-     come from the `form fieldset` rules below and the "Give now" CTA from
-     `[data-kind="primary"]`, both `!important`. `:not(span)` for the usual reason —
-     Wonder Blocks icon spans are mask-images whose FILL is their background-color. */
+  /* The home donation takeover is a SIBLING of `#main-content`, so the neutralizer misses
+     it. The gift form keeps its fills from the `form fieldset` and `[data-kind="primary"]`
+     rules below. `:not(span)` for the usual reason — icon spans are mask-images whose FILL
+     is their background-color. */
   #donate-banner { background-color: #14181d !important; }
   #donate-banner [class]:not(span) { background-color: transparent; }
-  /* `#donate-banner` itself is a 0-height wrapper: its only child is an ABSOLUTELY
-     POSITIONED full-bleed panel that, on every page except the home page, lies over
-     the page's own heading, breadcrumb, sidebar and unit grid. Natively that panel is
-     opaque brand navy so nothing shows through; the neutralizer above flattens it to
-     transparent, so the takeover and the page beneath it rendered on top of each
-     other — overlapping text, unreadable. The overlay must stay OPAQUE. */
+  /* `#donate-banner` is a 0-height wrapper whose only child is an ABSOLUTELY POSITIONED
+     full-bleed panel lying over the page content everywhere but home. Natively opaque, so
+     it must stay opaque here. */
   #donate-banner > div { background-color: #14181d !important; }
 
-  /* ====================================================================
-     Headings + body text
-     Khan ships dark-on-light body copy through hardcoded atomic color
-     classes that bypass the design tokens, so plain text tags need an
-     enforced light color. Inline-colored spans (links, badges, mastery
-     labels) keep their own color via the more specific rules below.
-     ==================================================================== */
+  /* Headings + body text. Khan ships dark-on-light copy through hardcoded atomic colour
+     classes that bypass the tokens; inline-coloured spans keep their colour via the
+     rules below. */
   h1, h2, h3, h4, h5, h6 { color: #e6edf3 !important; }
-  /* Home hero stat band: each headline figure ("180M+", "63B+", "Free",
-     "15+ years") is a bare <b> Khan hardcodes to the light-page ink
-     rgb(21,21,33) — with a matching `-webkit-text-fill-color`, so `color` alone
-     would not stick — rendering ~1.05:1 (invisible) on the dark hero. No rule
-     reached a bare <b>. Body bold is emphasis text that reads light on dark
-     everywhere.
-
-     `-webkit-text-fill-color` INHERITS and overrides `color` on every
-     descendant, so this rule reaches into anything nested inside a bold run.
-     Khan bolds most exercise prompts, and those prompts colour-code their key
-     term — every rule that recolours such a term therefore has to set the fill
-     alongside `color` or it silently renders this ink instead (the `mathcolor`
-     and inline-`color` math remaps further down all pair the two). */
+  /* Bare <b>: Khan hardcodes the hero stat figures WITH a matching
+     `-webkit-text-fill-color`, so `color` alone would not stick. That fill INHERITS and
+     overrides `color` on every descendant, so every rule recolouring a term inside a bold
+     run must set the fill too — the math remaps below all do. */
   b, strong { color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
-  /* …but a bold run INSIDE a link is part of the link, not body emphasis, and the rule
-     above outranks every un-important link colour. Khan's CMS wraps some entries of a
-     single menu or list in <strong> and not others (the marketing mega-menu's "Life
-     skills" / "Test prep" / "Partner content" sit beside eleven plain siblings), so the
-     same list renders in two colours where the site draws one. Follow the link instead.
-     `currentColor` rather than `inherit` for the fill, so it tracks whatever colour the
-     surrounding rules resolve for the anchor; a coloured marketing card still wins,
-     `.card_stat_inner *` and friends being a class selector. */
+  /* …but a bold run INSIDE a link is part of the link, and the rule above outranks every
+     un-important link colour; Khan's CMS bolds some list entries and not others, which would
+     render one list in two colours. `currentColor` rather than `inherit` so the fill tracks
+     the anchor's resolved colour; a coloured marketing card (a class selector) still wins. */
   a b, a strong { color: inherit !important; -webkit-text-fill-color: currentColor !important; }
-  /* Home "Get started as a…" audience tablist (Teachers / Students / Families):
-     Khan hardcodes every tab label to the same light-page ink (+ text-fill), so
-     all three render invisible on the dark band and only the selected tab's
-     purple underline shows. Native draws no text-colour difference between the
-     states, so lift all three to the heading light via their stable tab ids. */
+  /* Home audience tablist: all three labels hardcoded to the light-page ink (+
+     text-fill), with no native colour difference between states, so lift all three. */
   #teachers-tab, #students-tab, #parents-tab {
     color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important;
   }
-  /* Home "Explore" subject grid: each category header is an accordion toggle
-     button whose label is a direct text node hardcoded to a near-black
-     (rgb(33,36,44)) that bypasses the token remaps, leaving the subject titles
-     ("Math: Pre-K - 8th grade", "Computing", "Test prep" …) ~1.04 contrast on
-     the dark grid. Stable scope: the only aria-expanded buttons under
-     #main-content. */
+  /* Home "Explore" grid: each category header's label is a direct text node hardcoded
+     near-black. Stable scope: the only aria-expanded buttons under #main-content. */
   #main-content button[aria-expanded] { color: #e6edf3 !important; }
   p, li, label, dd, dt, blockquote, figcaption, td, th, caption,
   legend, article, section, main { color: #c4cdd6 !important; }
   span:not([class*="color"]):not([style*="color"]) { color: inherit; }
 
-  /* ====================================================================
-     Links — keep Khan blue identity, refined for dark
-     ==================================================================== */
+  /* Links — keep Khan blue identity, refined for dark */
   a { color: #5fb0e6; }
   a:hover { color: #9bd4ff; }
 
-  /* ====================================================================
-     Exercise "Report a problem" button — Khan hardcodes its label to a
-     dark navy (rgba(33,36,44,.64)) that bypasses the Wonder Blocks token
-     remaps, leaving it dark-on-dark (~1.04 contrast) at the foot of the
-     exercise card. Scoped to the stable exercise-chrome wrapper (its only
-     button) and lifted to a readable muted light.
-     ==================================================================== */
+  /* Exercise "Report a problem" button: label hardcoded to a dark navy. Scoped to the
+     stable exercise-chrome wrapper, its only button. */
   .exercise-chrome-content-for-mobile-zoom button { color: #9aa4af !important; }
   .exercise-chrome-content-for-mobile-zoom button:hover { color: #c4cdd6 !important; }
 
-  /* ====================================================================
-     Discussion tabs ("Questions" / "Tips & Thanks") under articles and
-     videos. Khan hardcodes the active tab to the raw brand blue (#1865f2,
-     ~3.7:1 on near-black) and the inactive tab to a mid grey (#717378,
-     ~3.8:1) via -webkit-text-fill-color, both bypassing the Wonder Blocks
-     token remaps and landing dark-on-dark. Scoped to the stable ARIA tab
-     ids; lift the inactive label to a readable muted light and the active
-     one to the theme's refined Khan blue. Set text-fill too (fill drives
-     the rendered color, so color alone would not stick). */
-  /* The video page's own "About" / "Transcript" tabs are a second, later
-     tablist with the same hardcoded palette and the same text-fill trick. */
+  /* "Draw on exercise" overlay: `[data-testid="drawing-area"]` lays a transparent SVG over
+     the problem, and its strokes take the light-page ink #21242c by default, from a palette
+     of black / red / gold / green / teal / blue / purple. Only a filter reaches the pattern
+     fill the strokes are painted through; transparent pixels stay transparent, so the page
+     shows through unchanged. The swatch is the wrapper DIV of the opacity-0 colour input
+     (hashed, so it degrades to a mismatched swatch, not a lost stroke). */
+  [data-testid="drawing-area"],
+  [role="toolbar"][aria-label="Drawing controls"] ._a7ipt1d {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+
+  /* Discussion tabs: active (brand blue) and inactive (mid grey) hardcoded through
+     `-webkit-text-fill-color`. Stable ARIA tab ids; set the fill too, since it drives
+     the rendered colour. */
+  /* The video page's "About" / "Transcript" tabs are a second tablist with the same
+     palette and text-fill trick. */
   #questions-tab, #comments-tab,
   #videoTabAbout-tab, #videoTabTranscript-tab {
     color: #9aa4af !important; -webkit-text-fill-color: #9aa4af !important;
@@ -437,9 +320,7 @@
     color: #5fb0e6 !important; -webkit-text-fill-color: #5fb0e6 !important;
   }
 
-  /* ====================================================================
-     Search box (header) — white-on-white in light theme
-     ==================================================================== */
+  /* Search box (header) — white-on-white in light theme */
   input[type="search"],
   input[type="text"],
   input[type="email"],
@@ -455,212 +336,116 @@
   }
   input::placeholder, textarea::placeholder { color: #8b949e !important; opacity: 1 !important; }
 
-  /* Collapsed header search control. Khan's navbar search is a Wonder Blocks
-     `secondary` BUTTON (it expands into a real input on click), not an <input>,
-     and it lives in `#top-header-container`, OUTSIDE `#main-content` — so neither
-     the input rules above nor the content neutralizer reach it, and it kept its
-     native pale-blue `secondary` fill (#ebf1fd) with a periwinkle border: a light
-     pill glowing on the dark header, its "Search" label + magnifier barely legible.
-     Dark it to match the expanded field via its stable test id; the label and the
-     mask-icon glyph already resolve light, so they read once the fill goes dark. */
+  /* Collapsed header search: a Wonder Blocks `secondary` BUTTON that expands into a real
+     input, not an <input>, and outside `#main-content` — so neither the input rules above nor
+     the neutralizer reach it. */
   [data-testid="navbar-search-button"] {
     background-color: #1a1f26 !important;
     border-color: #2d333b !important;
   }
   [data-testid="navbar-search-button"]:hover { background-color: #232a32 !important; }
 
-  /* ====================================================================
-     Marketing site (/about, /about/*, /teachers, /schools)
-     Khan builds these in Webflow, not Wonder Blocks: there is no
-     `#main-content`, no design token and no hashed atomic class, so not one
-     rule above reaches them. What DID reach them is the global text block
-     (`html, body`, `h1-h6`, `p, li, …`), which lifts every heading, paragraph
-     and nav link to near-white — on Webflow's white sections, i.e. invisible.
-     The pages are one click from every footer ("About us", "Impact",
-     "Leadership", "Supporters", "Careers", "Khan Academy for Teachers").
-     Only the SURFACES need work: the whole ink layer is inherited (99 of the
-     101 links on /teachers take their colour from an ancestor, including the
-     white labels on the purple CTAs), so once the sections go dark the text
-     already lands right way up. `.page_wrap` is the Webflow shell wrapper and
-     the `[class]` neutralizer flattens its pale bands (white, #ddf0fe,
-     #eef7fe and the cream testimonial card) exactly like the `#main-content`
-     one does; nothing here paints a background-image, so clearing them is
-     safe. The header and its mega-menu panels are floating surfaces and must
-     stay opaque, and the tab module's cards have to keep reading as cards.
-     Webflow class names are author-written and stable (nothing here is hashed),
-     and the pale surfaces are a CLOSED set — enumerated live across all seven
-     marketing pages — so these are listed explicitly rather than swept up by a
-     `[class]` neutralizer like the app's. That distinction matters: a blanket
-     sweep here also erased the purple active-tab underline (`.tab_button_line`),
-     the coloured stat cards and the CTA fills, which are the only colour the
-     page carries. Left deliberately alone for the same reason:
-     `.card_icon_circle` and `.graphic_shape_wrap`, whose pale-blue instances
-     have green and pink siblings that are the site's own colour code.
-     ==================================================================== */
+  /* Marketing site (/about, /about/*, /teachers, /schools). Webflow: no `#main-content`, no
+     design token, no hashed class, so nothing above reaches it except the global text block.
+     Only SURFACES need work — the ink layer is inherited, and nothing here paints a
+     background-image.
+     The pale surfaces are a CLOSED set of stable author-written Webflow classes, listed
+     explicitly rather than swept blanket-style: a sweep also erases the purple active-tab
+     underline (`.tab_button_line`), the coloured stat cards and the CTA fills, the only
+     colour these pages carry. `.card_icon_circle` and `.graphic_shape_wrap` are left alone
+     for the same reason. Header and mega-menu panels must stay opaque; the tab module's
+     cards must keep reading as cards. */
   .page_wrap, section.u-section { background-color: #14181d !important; }
-  /* `.nav_mobile_layout` is the narrow-width twin of the desktop bar and is a
-     separate white strip — the drawer under it already resolves dark, so at 390
-     the header alone stayed white above a dark menu. */
+  /* `.nav_mobile_layout` is the narrow-width twin of the desktop bar, a separate white
+     strip. */
   .nav_desktop_contain, .nav_mobile_layout { background-color: #0d1117 !important; }
-  /* The announcement strip above that bar ("We have seen a rise in recruitment
-     scams.") is a full-bleed pale-periwinkle band (#dfeaff) — the brightest surface
-     above the fold on every marketing page, at both widths. Natively its whole
-     content is ONE indigo ink (the link, the trailing arrow, whose <svg> is
-     `stroke="currentColor"`, and the ✕); the theme's plain `a { color }` rule reached
-     only the link and left it at 1.9:1 on the band it does not darken. Give the band
-     the same info tint the app's notification banner gets and restate the single ink
-     across the whole strip so both the message and the dismiss control read. */
+  /* The announcement strip's whole content is ONE indigo ink — link, trailing arrow
+     (`stroke="currentColor"`) and X — but the plain `a { color }` rule reaches only the
+     link. */
   .nav_banner_wrap { background-color: #18222f !important; }
   .nav_banner_wrap, .nav_banner_wrap * { color: #9bd4ff !important; }
-  /* The full text of that strip lives in a `<dialog class="modal_dialog">` that slides in
-     over the right half of the viewport. It is `display:none` until the strip is clicked,
-     so it exists in the DOM on every marketing page but no load-time scan can read it.
-     `.modal_content` is the panel; `.modal_backdrop` is already a near-black scrim and is
-     left alone. Every string inside is lifted by the global text block, so only the panel
-     needs a surface. The ✕ is a `stroke: currentColor` <svg> whose colour Webflow sets on
-     the button wrapper, and Webflow serialises that ink as `color(srgb …)` — a form a
-     channel-parsing audit skips — so the stroke is restated on the path as well as the
-     wrapper. `.modal_content` and `.button_close_element` exist ONLY inside this dialog on
-     every marketing page, but the dialog is named anyway so a future non-modal reuse of
-     either class is not swept up. */
+  /* That strip's full text lives in a `<dialog class="modal_dialog">`, `display:none` until
+     clicked; `.modal_backdrop` is already a near-black scrim. The X is a
+     `stroke: currentColor` <svg> whose ink Webflow sets on the wrapper and serialises as
+     `color(srgb …)`, so the stroke is restated on the path too. Both classes are qualified by
+     the dialog so a future non-modal reuse is not swept up. */
   dialog.modal_dialog .modal_content { background-color: #1c2128 !important; }
   dialog.modal_dialog .button_close_element,
   dialog.modal_dialog .button_close_icon { color: #c4cdd6 !important; }
   dialog.modal_dialog .button_close_icon svg path { stroke: #c4cdd6 !important; }
-  /* The header's dropdown carets ("For schools ▾", "Explore ▾", "About ▾") are inline
-     <svg>s whose path is `fill="currentColor"`, and the desktop variant class sets that
-     colour to the light page's pure black — so on the dark bar each caret renders #000
-     on #0d1117 (~1.2:1) and the only "this opens a menu" affordance disappears. The
-     narrow-width twin of the same markup uses a mid grey and reads fine; restating the
-     nav's own link ink covers both without touching any coloured mark. The variant sets
-     that black on the <svg> ITSELF, so an inherited value from the wrapper never reaches
-     it — the fill has to be restated on the path. */
+  /* The dropdown carets are inline <svg>s with `fill="currentColor"`, and the desktop
+     variant sets that colour to pure black on the <svg> ITSELF, so an inherited value never
+     reaches it — restate the fill on the path. */
   .nav_links_svg svg { color: #c4cdd6 !important; }
   .nav_links_svg svg path { fill: #c4cdd6 !important; }
-  /* The Khan wordmark in that header (plus its narrow-width twin and the footer lockup)
-     is a single-colour `currentColor` mark Webflow paints the page ink. Nothing in this
-     block reached it, so the plain `a { color }` rule tinted the whole mark the link
-     blue — and `a:hover` out-specifies a bare class, so it also flipped shade under the
-     cursor. Khan never draws its logo in either tone; the app's own header renders it
-     near-white, so match that. */
+  /* The Khan wordmark here (and its narrow twin and the footer lockup) is a single-colour
+     `currentColor` mark, so the plain `a { color }` rule would tint it link-blue and
+     `a:hover`, out-specifying a bare class, would flip it under the cursor. */
   .nav_desktop_logo, .nav_mobile_logo, .footer_logo_wrap { color: #e6edf3 !important; }
-  /* Every anchor in the Webflow footer — the nav column, the legal row, the four
-     `currentColor` social marks and the inline "Support us" — takes its colour by
-     INHERITANCE from `.footer_wrap`, which Khan paints white. A direct declaration
-     beats an inherited one whatever its importance, so the theme's plain
-     `a { color }` rule won all of them and the footer rendered as a block of blue
-     links with blue social glyphs, a tone Khan never draws there. The app's own
-     footer escapes this only because its shell rule already pins it near-white;
-     match that. Native hover changes no colour (it adds an underline, which is
-     untouched here), so one state covers both. */
+  /* Every anchor in the Webflow footer, the `currentColor` social marks included, inherits
+     its colour from `.footer_wrap`; a direct declaration beats an inherited one whatever its
+     importance, so the plain `a { color }` rule would turn the whole footer blue. Native
+     hover changes no colour. */
   .footer_wrap a { color: #e6edf3 !important; }
-  /* The marketing header's dropdown panels are the same inherited-ink shape as the
-     footer above: Khan paints one neutral ink on the panel and every one of the ~50
-     entries (both column layouts plus the seasonal promo card) takes it by
-     INHERITANCE, so the plain `a { color }` rule wins the lot and the menu renders as
-     a wall of blue links. The app's own Explore menu draws its items near-white;
-     match it. Native hover changes no colour, so one state covers both. The group
-     headers declare their own tone and are handled below. */
+  /* The dropdown panels are the same inherited-ink shape as the footer: one neutral ink on
+     the panel, ~50 entries inheriting it, so the plain `a { color }` rule wins the lot. The
+     group headers declare their own tone. */
   .nav_dropdown_main_content a { color: #e6edf3 !important; }
-  /* Webflow gives each menu entry and each CTA an overlay ring of
-     `border: 1-2px solid transparent`, so the blanket `* { border-color }` reset near
-     the end of this file paints a box around all four sides that Khan never draws —
-     grey rounded frames around every mega-menu row, and a dark rim over the purple
-     CTAs. Both classes are ring-only elements, so keeping them transparent costs no
-     other cue. */
+  /* Webflow gives each menu entry and CTA an overlay ring of
+     `border: 1-2px solid transparent`, which the blanket `* { border-color }` reset would box
+     on all four sides. Both classes are ring-only. */
   .nav_group_link, .button_main_border { border-color: transparent !important; }
-  /* …except on the SECONDARY button variant, where that overlay is the only element
-     with a border width at all — `.button_main_element` itself is 0px — so it is what
-     has to carry the outline the dark fill below needs to read as a button. */
+  /* …except on the SECONDARY variant, where that overlay is the only element with a border
+     width at all (`.button_main_element` is 0px), so it carries the outline the dark fill
+     needs. */
   .button_main_border[class*="w-variant-e85564cd"] { border-color: #3a424c !important; }
   .nav_dropdown_main_content, .nav_dropdown_main_scroll, .nav_skip_wrap,
   .tab_button_item, .tab_content_list, .card_testimonial_inner,
   .card_primary_element { background-color: #1c2128 !important; }
-  /* /schools "Curriculum across every major subject": ten pill chips Webflow fills
-     with Khan's palest blue (#eef7fe) and labels in the page ink (#191918, with a
-     matching text-fill). Left alone they are the ten brightest surfaces on the dark
-     page. They are invisible to the light-surface scan because Webflow serialises
-     the fill as `color(srgb …)`, which a channel-parsing audit skips — only the
-     screenshot shows them.
-     Khan's own hover cue is the chip LOSING its fill, so the rest state takes the
-     card tone and hover goes back to the page: an unqualified `!important` fill
-     would paint both states alike and erase the cue. The subject glyphs are inline
-     SVG with literal per-subject fills and are untouched. */
+  /* /schools curriculum chips: palest-blue fill with page-ink labels, serialised as
+     `color(srgb …)`, which a channel-parsing audit skips. Khan's hover cue is the chip LOSING
+     its fill, so an unqualified `!important` fill would erase the cue. */
   .catalog_item_wrap { background-color: #1c2128 !important; }
   .catalog_item_wrap:hover { background-color: transparent !important; }
   .catalog_item_text {
     color: #e6edf3 !important;
     -webkit-text-fill-color: #e6edf3 !important;
   }
-  /* Full-bleed decorative section bands. Despite the name these are not small
-     shapes: both live under `.u-cover-absolute` and measure 1268px wide (a
-     517px pale-blue slab behind the supporters hero, a 348px pink one on
-     /teachers), i.e. they are section backdrops like the `u-section` fills
-     above and get the same flattening. The child combinator keeps it off any
-     genuinely small `.graphic_shape_wrap` Khan adds later. */
+  /* Full-bleed decorative section bands. Despite the name not small shapes — 1268px wide
+     under `.u-cover-absolute`, i.e. section backdrops. The child combinator keeps this off a
+     genuinely small `.graphic_shape_wrap`. */
   .u-cover-absolute > .graphic_shape_wrap { background-color: #14181d !important; }
-  /* The /schools hero's decorative street map: a 1312x436 inline <svg> whose
-     26px-wide "roads" are `stroke="currentColor"` over Khan's palest blue
-     (#eef7fe). It is a whisper on the white page — 1.06:1, a texture you have to
-     look for — and nothing in this sheet touches an SVG stroke, so on the dark
-     hero the SAME colour becomes near-white ribbons: the brightest thing on the
-     page, out-shouting the headline and the purple CTA. Restating `color` is
-     enough (the strokes inherit it); the coloured schoolhouse markers are
-     separate literal fills and keep their blue/green/pink/gold. This tone leaves
-     the map legible as a map while putting it back under the type. */
+  /* The /schools hero's street map is an inline <svg> whose "roads" are
+     `stroke="currentColor"`, and nothing else here touches an SVG stroke. Restating `color`
+     is enough (the strokes inherit it); the coloured markers are literal fills. */
   .graphic_map_lines { color: #232a34 !important; }
-  /* Webflow's hairline rules are 1px DIVs with a light background, so the
-     blanket `* { border-color }` reset never reaches them. `.nav_links_line` is the
-     row separator in the narrow-width nav drawer and `.nav_seasonal_line` the column
-     rule beside the mega-menu's promo card; both keep a fixed #cbcbcd that reads as a
-     bright rule once the panel behind them goes dark. `.nav_button_line` is NOT in
-     this family — its background is `currentColor`, so it already tracks the ink. */
+  /* Webflow's hairlines are 1px DIVs with a light background, so the blanket border reset
+     never reaches them. `.nav_button_line` is NOT in this family — its background is
+     `currentColor` and already tracks the ink. */
   .c-divider, .nav_links_line, .nav_seasonal_line { background-color: #2d333b !important; }
-  /* Text that Webflow colours directly instead of inheriting, so the global
-     `html, body` ink does not reach it: the skip link, the testimonial
-     attribution (near-black on the now-dark card — "Sal Khan / Founder & CEO"
-     was rendering at ~1.2:1) and the mega-menu group headers (a mid grey that
-     lands ~3.2:1 on the panel). The stat cards are deliberately NOT lifted here:
-     they sit on Khan's gold/orange/pink tiles, which keep their fill, so their
-     near-black ink is still the correct colour — the block below RE-ASSERTS it. */
+  /* Text Webflow colours directly rather than inheriting, so the global `html, body` ink
+     misses it. The stat cards are deliberately NOT lifted: they keep their coloured fills, so
+     near-black is still correct there. */
   .nav_skip_text { color: #e6edf3 !important; }
   .card_testimonial_quote, .card_testimonial_author_name,
   .card_testimonial_author_title { color: #c4cdd6 !important; }
   .nav_group_title { color: #9aa4af !important; }
-  /* The coloured cards Webflow KEEPS its fill on — the impact/teacher stat tiles
-     (`.card_stat_inner`, gold / orange / pink / green / blue / periwinkle) and the
-     full-width feature card (`.card_large_wrap`, 1120x492 pink on /schools) — are
-     the one place on these pages where near-black ink is still the RIGHT colour,
-     and the global `h1-h6` / `p, li, …` block above repaints it near-white:
-     "learning minutes" landed at 1.01:1 on the pink tile (i.e. gone) and
-     "Students deserve more than chatbots." at 1.6:1. The `.card_stat_number` was
-     already left alone but its caption is a Webflow rich-text `<p>` INSIDE the
-     wrapper, so the wrapper's own colour never reached it. Restate the authored
-     ink for the whole subtree; neither card contains a button or link whose label
-     needs a different colour. `-webkit-text-fill-color` too, since the global bold
-     rule sets it and it overrides `color` on every descendant. */
+  /* The coloured cards Webflow KEEPS its fill on are the one place here where near-black ink
+     is still RIGHT, and the global `h1-h6` / `p, li, …` block repaints it near-white. The
+     captions are rich-text `<p>`s INSIDE the wrapper, so the wrapper's own colour never
+     reaches them. `-webkit-text-fill-color` too, since the global bold rule sets it. */
   .card_stat_inner, .card_stat_inner *,
   .card_large_wrap, .card_large_wrap * {
     color: #191918 !important;
     -webkit-text-fill-color: #191918 !important;
   }
-  /* Webflow's text-link button ("See Tier 1 studies →", inside the evidence cards
-     on /about/impact) keeps the light page's near-black ink, which lands ~1.3:1 on
-     the `.card_primary_element` surface the block above darkens — the only call to
-     action on those three cards, effectively invisible. Native it is the strongest
-     ink on the card, so it maps to the theme's strong ink rather than the link
-     blue. */
+  /* Webflow's text-link button keeps the light page's near-black ink on the surface
+     darkened above. Natively the strongest ink on the card, so it maps to the strong ink,
+     not the link blue. */
   .button_link_element, .button_link_text { color: #e6edf3 !important; }
-  /* Webflow's SECONDARY button variant is a pale-blue (#ebf1fd) pill with a purple
-     label — the inverse of the solid purple primary, and on the dark page it is the
-     brightest thing on the screen ("Read our blog to learn more", "View internships",
-     "Join the Learners Fund", plus the 48px carousel play/pause toggle). Same
-     treatment the Wonder Blocks `secondary` navbar search button gets: dark fill,
-     bordered, label lifted to a light shade of Khan's purple so the secondary still
-     reads as the quieter sibling of the solid CTA. Matched on the Webflow variant
-     id, which marks ONLY this variant (the solid primary carries no variant class);
-     if Khan re-authors it the rule simply stops applying and the button returns to
-     today's pale pill. */
+  /* Webflow's SECONDARY variant is a pale-blue pill with a purple label; same treatment as
+     the Wonder Blocks `secondary` search button. Matched on the Webflow variant id, which
+     marks ONLY this variant (the solid primary carries no variant class). */
   .button_main_element[class*="w-variant-e85564cd"],
   .button_toggle_element[class*="w-variant-ab355ea0"] {
     background-color: #1c2128 !important;
@@ -671,54 +456,30 @@
     color: #a5a1ff !important;
     -webkit-text-fill-color: #a5a1ff !important;
   }
-  /* The "AS SEEN ON" press band (/teachers) and the district band (/schools):
-     flat greyscale wordmarks drawn for the white section, invisible once it goes
-     dark, so a straight inversion is faithful.
-
-     `lighten` is what makes that inversion safe on the ones that ship an OPAQUE
-     white plate instead of alpha — GatesNotes (1% transparent, 69% white) and the
-     Palm Beach County seal (11% transparent, 34% white). Inverting those paints a
-     pure #000 rectangle, DARKER than the band, so the plate reads as a hard-edged
-     black box around the mark. Blending picks the lighter of image and backdrop:
-     everything the inversion pushes below the band colour snaps back to the band,
-     the light linework is untouched, and the alpha-backed marks (55-82%
-     transparent, ~0% white) are unaffected — so no per-file exception list to keep
-     in sync as Khan swaps logos.
-
-     The wrapper fill is load-bearing: `.section_contain` is `position:relative;
-     z-index:1`, i.e. a stacking context, so the blend's backdrop is empty unless
-     the band colour is painted INSIDE it. It restates the `section.u-section`
-     colour these bands always sit on, so it is invisible on its own. */
+  /* Press / district logo bands: flat greyscale wordmarks drawn for the white section, so a
+     straight inversion is faithful. `lighten` makes it safe on the marks shipping an OPAQUE
+     white plate rather than alpha — inverting those gives a #000 rectangle darker than the
+     band; the blend snaps anything below the band colour back to it, so no per-file exception
+     list is needed. The wrapper fill is load-bearing: `.section_contain` is a stacking
+     context, so the blend has no backdrop unless the band colour is painted INSIDE it. */
   .item_logo_wrap { background-color: #14181d !important; }
   .item_logo_wrap .item_logo_image {
     filter: invert(1) !important;
     mix-blend-mode: lighten !important;
   }
 
-  /* The "Students are falling behind" bar chart on /about is a flat alpha-ground
-     raster (75% transparent) whose two axis TITLES — "Student proficiency" and
-     "Grade level" — are baked bold black, so they vanish on the dark page while the
-     bars and the "Grade level proficiency" rule stay legible. It lives on the Webflow
-     build, outside `#main-content`, so the content-image invert further down cannot
-     reach it. The invert is what lifts those titles, but the four bars are a
-     SEQUENTIAL blue ramp (#28a9ff · #87cbfc · #cce9fd · #eef7fe) and inverting maps
-     its palest step to near-black — below the #14181d page ground, where a bar reads
-     as a hole. The trailing chain is the floor that prevents that: `contrast()` pulls
-     the inverted range in towards mid, `brightness()` re-seats it above the ground,
-     `saturate()` gives back the blue the compression costs. The invariant to hold on
-     any retune is per-step pixels, not eyeballing: every one of the four bars above
-     the page ground, ordered, and adjacent steps at least as far apart as they are
-     natively (1.47 / 1.38 / 1.16). Matched on the Webflow asset stem, which is
-     anchored at the end so it cannot also swallow the `…_graphic.avif` photo
-     collage in the next section. */
+  /* The /about bar chart's axis TITLES are baked bold black into a flat alpha-ground raster,
+     and it sits outside `#main-content`. The invert lifts those titles, but the four bars are
+     a SEQUENTIAL blue ramp whose palest step inverts below the #14181d ground, where a bar
+     reads as a hole; the trailing chain is the floor. The invariant on any retune is per-step
+     pixels: all four bars above the ground, ordered, adjacent steps at least as far apart as
+     natively (1.47 / 1.38 / 1.16). The stem is anchored so it cannot swallow
+     `…_graphic.avif`. */
   img[src$="_graph.avif"] {
     filter: invert(1) hue-rotate(180deg) contrast(0.62) brightness(1.2) saturate(1.4) !important;
   }
 
-  /* ====================================================================
-     Hardcoded light surfaces that bypass the design tokens
-     (some cards/sections set white or pale-grey directly, not via a var)
-     ==================================================================== */
+  /* Hardcoded light surfaces that bypass the design tokens */
   [style*="background-color: rgb(255, 255, 255)"],
   [style*="background-color:#fff"],
   [style*="background-color: #fff"],
@@ -726,94 +487,55 @@
     background-color: #1c2128 !important;
   }
 
-  /* The app shell's "we're having trouble loading external resources" notice. Khan
-     hides it from its own stylesheet and paints it from an INLINE `background`, so it
-     is precisely the one surface that survives when that stylesheet does not load —
-     while this theme, injected independently of Khan's CDN, still paints its text
-     light. Pale pink under a near-white ink is the failure notice you can no longer
-     read. The tint carries "something is wrong", so it maps to a dark red rather than
-     the neutral card tone. Surface only: the notice sits inside the page shell, so its
-     copy already takes that block's near-white ink, and a `color` here would be
-     out-specified by `.bibliotron-header div` anyway. */
+  /* The app shell's "trouble loading external resources" notice is hidden from Khan's own
+     stylesheet and painted from an INLINE `background` — the one surface that survives when
+     that stylesheet fails, while this theme still paints its text light. Dark red because the
+     tint carries "something is wrong". Surface only: a `color` here loses to
+     `.bibliotron-header div`. */
   .external-styles-missing { background-color: #2b1d1e !important; }
 
-  /* …but that first substring also matches Perseus widget wrappers, whose inline
-     style declares the CUSTOM PROPERTY `--perseus-widget-background-color:
-     rgb(255, 255, 255)` — the text `background-color: rgb(255, 255, 255)` is a
-     substring of the property NAME plus value. Painting a Perseus widget wrapper
-     opaque is the classic Khan failure: the widget surface covers the MathJax the
-     answer choices are rendered on and the cards go blank. Keep every carrier
-     transparent and re-tone the variable itself, so a widget that DOES consume it
-     paints dark instead of white. (An `!important` author declaration outranks a
-     non-important inline one, so the variable really is overridden.) */
+  /* …but that first substring also matches Perseus widget wrappers, whose inline style
+     declares the CUSTOM PROPERTY `--perseus-widget-background-color: rgb(255, 255, 255)` —
+     the match is a substring of the property NAME plus value. An opaque Perseus wrapper
+     covers the MathJax the answer choices render on. Keep every carrier transparent and
+     re-tone the variable itself; an `!important` author declaration outranks a non-important
+     inline one. */
   [style*="--perseus-widget-background-color"] {
     background-color: transparent !important;
     --perseus-widget-background-color: #14181d !important;
   }
 
-  /* Content-area neutralizer — the robust catch for surfaces that hardcode
-     white / pale-blue through hashed atomic classes (the logged-out
-     "Welcome to Khan Academy" onboarding banner, the homepage audience
-     pills + course band, search result/facet cards, and the CS course
-     "Create / View programs" promo tiles). All page content lives under
-     the stable `#main-content` wrapper, so we flatten stray light surfaces
-     onto the dark page there. No `!important`, so it overrides the hashed
-     atomic-class backgrounds (which aren't important) while still yielding
-     to the token-driven dark surfaces and the `!important` rules below —
-     deploy-durable, no per-hash targeting. The `background-image:none` kills the
-     white "more content below" scroll-fade overlay (a hardcoded
-     `linear-gradient(transparent -> white)` on a hashed div at the foot of the
-     scrollable unit sidebar) which the color-only neutralizer otherwise misses;
-     Khan paints no decorative gradients in `#main-content` (mastery/progress use
-     solid tokens + SVG strokes), so this is safe. The `:not(span)` carve-out is
-     essential: Khan's mastery legend keys (Mastered/Quiz/Unit test…) and the
-     unit-progress grid markers are Wonder Blocks icon `<span>`s rendered as a
-     `mask-image` SVG whose FILL is the span's own `background-color` (the slate
-     mastery tone, white, or `currentColor`). Flattening that to transparent
-     stripped every icon to an empty box; excluding `span` keeps the mastery /
-     progress colors intact (no large light-surface span exists to need it).
-     The `var(--tile-color, transparent)` fallback keeps the mastery-KEY swatches
-     coloured: the course-page legend (Mastered / Proficient / Familiar / Attempted)
-     and every grid tile paint their fill `<div>` with `background-color:
-     var(--tile-color)` — a hardcoded flatten to `transparent` collapsed all four
-     learning states to the same grey square, erasing the colour code. Khan defines
-     `--tile-color` only on these mastery tiles, so every other surface resolves the
-     fallback and still flattens dark exactly as before. */
+  /* Content-area neutralizer for surfaces hardcoding white or pale blue through hashed
+     atomic classes. No `!important`, so it overrides those non-important backgrounds while
+     yielding to the token-driven dark surfaces and the `!important` rules below.
+     `background-image: none` also kills the white scroll-fade gradient at the foot of the
+     unit sidebar; Khan paints no decorative gradients in `#main-content`.
+     `:not(span)` is essential: mastery legend keys and progress-grid markers are icon
+     `<span>`s whose `mask-image` FILL is their own `background-color`.
+     The `var(--tile-color, transparent)` fallback keeps the mastery swatches coloured; a flat
+     `transparent` collapses all four states to one grey square. Khan sets `--tile-color` only
+     there. */
   #main-content [class]:not(span) { background-color: var(--tile-color, transparent); }
-  /* The `background-image` half is split off so it can carve out ONE case: the CS
-     scratchpad's Documentation panel draws its ~100 shape previews as a CSS sprite,
-     one `background-image` shared by every thumbnail with a per-entry offset in an
-     inline `background-position-y`. Blanking the image there erases every preview
-     and leaves the list a column of labels beside empty gaps. The inline offset is
-     the sprite's signature — no decorative gradient in `#main-content` carries one. */
+  /* The `background-image` half is split off to carve out ONE case: the CS scratchpad's
+     Documentation panel draws its shape previews from a shared sprite with a per-entry inline
+     `background-position-y`, which is the sprite's signature. */
   #main-content [class]:not(span):not([style*="background-position"]) { background-image: none; }
-  /* That sprite is black line art with pale fills on an OPAQUE white sheet, drawn for
-     the white panel, so it needs the same lightness inversion the CDN diagrams get
-     further down: strokes go light, the fills keep their hue. 0.92 rather than a full
-     invert because the sheet is what dominates each 66x40 tile — a full invert lands
-     it on pure #000 and punches a hundred black rectangles out of the page, while
-     0.92 lands it on #141414, within a shade of the page base. */
+  /* That sprite is black line art with pale fills on an OPAQUE white sheet, so it needs the
+     same inversion the CDN diagrams get. 0.92 rather than a full invert because the sheet
+     dominates each tile: a full invert lands on #000, while 0.92 lands #141414, within a
+     shade of the page base. */
   #main-content [style*="background-position"] {
     filter: invert(0.92) hue-rotate(180deg);
   }
-  /* Re-surface the elements that NATIVELY carry a background, and only those.
-     An earlier version painted every `#main-content button[class]`, which is a
-     rule about an element TYPE rather than about what the element actually looks
-     like — so it kept finding victims and growing carve-outs. Enumerated live on
-     the home, search, exercise, CS-course and CS-challenge pages: not one button
-     without a Wonder Blocks `data-kind` has a native background, `tertiary` is
-     Khan's link-styled button (transparent at rest AND on hover), and `secondary`
-     is the white-filled one. Painting all of them turned the `tertiary` inline
-     link-buttons ("See our Google-powered results", the "What's this?" beside a
-     challenge Hint) into grey pills floating mid-sentence, and flattened Perseus's
-     answer tiles. Keying on `data-kind` reproduces the native backgrounds exactly.
-     This can never leak a light surface: the neutralizer above has already flattened
-     everything, so a button we no longer paint renders on the dark page. */
-  /* `a[data-kind="secondary"]` for the same reason the primary rule above matches on the
-     attribute: Khan renders the secondary kind as an <a> wherever the CTA navigates
-     ("Explore teacher tools", "Learn about our mission" on the home page), so keying on
-     `button` alone left the navigating half of one component unfilled beside its filled
-     twin. Natively both are the same pale-blue pill. */
+  /* Re-surface the elements that NATIVELY carry a background, and only those — keyed on what
+     the element looks like, not on its type. No button without a Wonder Blocks `data-kind`
+     has a native background; `tertiary` is Khan's link-styled button (transparent at rest AND
+     on hover), `secondary` the white-filled one. Painting by element type turns inline
+     `tertiary` link-buttons into grey pills mid-sentence and flattens Perseus's answer tiles.
+     It cannot leak a light surface: the neutralizer above already flattened everything. */
+  /* `a[data-kind="secondary"]` for the same reason the primary rule matches on the attribute:
+     Khan renders the kind as an <a> wherever the CTA navigates, so `button` alone leaves half
+     the component unfilled. */
   #main-content button[data-kind="secondary"],
   #main-content a[data-kind="secondary"],
   #main-content a[class][role],
@@ -822,43 +544,28 @@
   #main-content a[data-kind="secondary"]:hover,
   #main-content a[class][role]:hover,
   #main-content [role="button"]:hover { background-color: #232a32; }
-  /* Home testimonial video: the play affordance is an 88px disc (`border-radius: 50%` div,
-     brand-indigo fill) holding a white mask-icon triangle, over a photo thumbnail. The
-     neutralizer above flattens the disc, leaving a bare triangle floating on the photo.
-     Restore the disc in the theme's CTA blue. The button's accessible name is the stable
-     hook; `> div > div` is the disc (button > wrapper > [img, disc]). Must out-rank the
-     `[class]:not(span)` neutralizer (1,1,1), so keep the element types. */
+  /* Home testimonial video: the play affordance is an indigo disc holding a white mask-icon
+     triangle, which the neutralizer flattens. The accessible name is the stable hook,
+     `> div > div` the disc. Must out-rank the `[class]:not(span)` neutralizer (1,1,1), so keep
+     the element types. */
   #main-content button[aria-label^="Play video"] > div > div { background-color: #2563c9; }
   #main-content button[aria-label^="Play video"]:hover > div > div { background-color: #2f6fd6; }
 
-  /* Khan's list ROWS — the course-unit rail, the lesson rail beside a video /
-     article / exercise, and a search result card — are anchors whose only hover
-     affordance is a fill: white at rest, #edf3fe (`…-background-instructive-subtle`)
-     on hover. The neutralizer above flattens BOTH states, so the whole row family
-     hovers to nothing; the anchor's own `color` does change, but every one of these
-     rows keeps its label in a child <div>/<span> that the page-shell rule pins
-     near-white, so nothing visible moves. Restore the hover fill only — at rest the
-     rows must stay flat on the dark page. Needs `!important`: the neutralizer carries
-     `#main-content`, so two of the three selectors below lose the cascade otherwise.
-     Scoped to the three row containers because a blanket `a:hover` would put a grey
-     plate behind every inline text link. The search card has no test id of its own,
-     so it is reached through `.search_results`, the un-hashed class on the results
-     <article>; `ul > li > div > a` alone also matches the CS scratchpad's sprite
-     thumbnails, which Khan does not give a hover fill. */
+  /* Khan's list ROWS — course-unit rail, lesson rail, search result card — are anchors whose
+     only hover affordance is a fill, and the neutralizer flattens BOTH states. Restore the
+     hover fill only. Needs `!important` because the neutralizer carries `#main-content`.
+     Scoped to the three row containers: a blanket `a:hover` would plate every inline text
+     link. The search card has no test id, so it goes through `.search_results`;
+     `ul > li > div > a` alone would also match the scratchpad sprite thumbnails, which have no
+     hover fill. */
   nav[data-testid="course-unit-sidebar"] a:hover,
   [data-testid="learnable-content-cells"] a:hover,
   .search_results ul > li > div > a:hover { background-color: #1c2128 !important; }
 
-  /* Home "What learning looks like in practice." testimonial trio. Khan colour-codes the
-     three cards gold / green / orange and sets the light-page ink on top; the
-     `#main-content [class]` neutralizer above flattens all three to transparent, so they
-     render as identical grey boxes and the colour code is gone. Restore each fill and
-     restate the authored ink for the whole subtree — the same treatment the marketing
-     stat tiles (`.card_stat_inner`) get, and for the same reason: on a coloured tile
-     near-black is still the RIGHT colour, and the global `h1-h6` / `p, li, …` block
-     would otherwise repaint it near-white. The cards hold only a heading, a quote and an
-     attribution, no link or button whose label needs a different colour. Hashed
-     vanilla-extract classes, so degrade-safe: a re-hash returns them to today's grey. */
+  /* Home testimonial trio: the three cards are colour-coded with the light-page ink on top,
+     and the neutralizer flattens them to identical grey boxes. As with the marketing stat
+     tiles, on a coloured tile near-black is still RIGHT. Hashed vanilla-extract classes, so
+     degrade-safe. */
   #main-content li._14s0xxx { background-color: #fcc539; }   /* Administrator */
   #main-content li._186c56yx { background-color: #72bb82; }  /* Teacher */
   #main-content li._1yar44ex { background-color: #f97b4f; }  /* Families */
@@ -869,19 +576,12 @@
     -webkit-text-fill-color: #151521 !important;
   }
 
-  /* Mastery colour key (course-page legend + progress grid). Khan replaced the
-     old `--tile-color` custom property with a literal per-state background /
-     border colour on a hashed atomic class, so the `var(--tile-color, transparent)`
-     fallback in the neutralizer above no longer catches the swatches (there is no
-     `--tile-color` on the page any more) and the blanket border reset below greys
-     their outline — every swatch collapses to the same grey square and the
-     Mastered / Proficient / Familiar / Attempted colour code is erased, leaving
-     the legend meaningless. Re-assert the fixed mastery palette on the swatch fill
-     (`background-color`) and its container border. A vanilla-extract atomic class
-     is shared by the legend swatch AND every grid tile that paints the same state,
-     so this also restores the logged-in unit-progress grid. Native tones kept so
-     the legend matches Khan's own key. Degrade-safe: if Khan re-hashes these
-     classes the swatches simply return to grey, no worse than today. */
+  /* Mastery colour key (course legend + progress grid). Each state is a literal background /
+     border colour on a hashed atomic class, so the neutralizer's
+     `var(--tile-color, transparent)` fallback no longer catches these swatches and the blanket
+     border reset greys their outline. Khan's own tones, so the legend matches its key. The
+     class is shared by the legend swatch AND every grid tile in that state. Degrade-safe: a
+     re-hash returns them to grey. */
   /* The fill needs the `[role="img"]` swatch ancestor to clear the neutralizer's
      `:not(span)` specificity, which the bare class does not. */
   #main-content [role="img"] ._lm0f0w6 { background-color: #594094; }   /* Mastered fill */
@@ -893,62 +593,40 @@
   #main-content ._1hupj7i9 { border-color: #d77d0f !important; }  /* Familiar outline */
   #main-content ._88nb8z9 { border-color: #c66024 !important; }   /* Attempted outline */
 
-  /* Course / unit page "Up next for you:" card. Khan marks it as the recommended
-     next step with a 4px top rule in the brand blue; the blanket
-     `* { border-color }` reset near the end of this file repaints all four sides,
-     so the accent drops to the generic divider grey and the card reads as an
-     ordinary bordered box. Restore the top edge only — the other three sides are
-     Khan's own hairline and are correctly softened. Stable test id.
-     Two test ids, one component: the unit page mounts it as
-     `mastery-practice-content-item`, the course page's "Course challenge" twin still
-     carries the older `course-challenge-card`. Both draw the same 4px brand-blue top
-     rule, so both need naming — matching only one leaves the other flat. */
+  /* "Up next for you:" card: a 4px brand-blue top rule the blanket border reset would repaint
+     on all four sides. Restore the top edge only. Two test ids, one component:
+     `mastery-practice-content-item` (unit) and the older `course-challenge-card` (course). */
   [data-testid="mastery-practice-content-item"],
   [data-testid="course-challenge-card"] { border-top-color: #5fb0e6 !important; }
-  /* The course page's own "Up next for you:" section (below the mastery grid, mounted a
-     few seconds after the page) draws its brand-blue accent as a separate 4px DIV above
-     the heading rather than a border, so the `#main-content [class]` neutralizer is
-     what reaches it. Khan gives that bar no test id and no non-hashed class; the element
-     type is what lifts this above the neutralizer's `[class]:not(span)` specificity. */
+  /* The course page's own "Up next for you:" draws that accent as a separate 4px DIV, not a
+     border, so the neutralizer is what reaches it. No test id and no un-hashed class; the
+     element type lifts this above the neutralizer's specificity. */
   #main-content div._x7kvevl { background-color: #5fb0e6 !important; }
-  /* In the mastery grid the recommended skill is a tile carrying a 2px brand-blue ring on
-     a pale-blue plate — the only cue separating it from the "not started" tiles beside
-     it. The ring is border-reset territory and the plate is the neutralizer's; both are
-     restated on the tile's stable test id. */
+  /* The recommended mastery-grid tile carries a 2px brand-blue ring on a pale plate, the
+     only cue separating it from the "not started" tiles. The ring is border-reset territory,
+     the plate the neutralizer's. */
   #main-content a[data-testid="m8z-unfy-item"] {
     border-color: #5fb0e6 !important;
     background-color: #18222f;
   }
 
-  /* The "Level N … 0 /1 skill" bar above every article, video and exercise
-     marks how far along the level you are with a 14px knob Khan fills its
-     mastery purple (#9059ff); the track behind it is an unfilled outline. The
-     `#main-content [class]` neutralizer flattens the knob to transparent, so
-     the bar rendered as a hollow grey ring on a hollow grey rail with no
-     indication of progress at all. Only the knob carries the colour, so
-     re-asserting it here leaves the empty track alone. Hashed class, so
-     degrade-safe: a re-hash simply returns to today's grey ring. */
+  /* The "Level N" bar's progress knob is Khan's mastery purple over an unfilled track, and
+     the neutralizer flattens it to a hollow ring. Only the knob carries colour. Hashed class,
+     degrade-safe. */
   #main-content ._6cduun3 { background-color: #9059ff !important; }
 
-  /* …but the neutralizer strips the background off Wonder Blocks' PRIMARY
-     call-to-action (login submit, "Continue", the unit page's "Start" and
-     "Practice"), flattening the Khan blue into bare text on the dark page. Khan
-     tags variants with a stable `data-kind`, so give the primary kind its brand
-     blue back (the deepened shade from the token block).
-     Match on the ATTRIBUTE, not on `button[data-kind]`: Khan renders the primary
-     kind as an `<a>` wherever the CTA navigates, which is most of them — 11 of
-     the home page's, both of the unit page's. Keying on the element type meant
-     every navigating CTA on the site lost its fill and rendered as a bare label
-     with no button affordance at all. */
+  /* …but the neutralizer strips the fill off the PRIMARY call-to-action. Match on the
+     ATTRIBUTE, not `button[data-kind]`: Khan renders the primary kind as an `<a>` wherever the
+     CTA navigates, and keying on element type leaves every navigating CTA with no button
+     affordance. */
   [data-kind="primary"] { background-color: #2563c9 !important; }
   [data-kind="primary"]:hover { background-color: #2f6fd6 !important; }
-  /* The label of an anchor CTA lives in a child span, which the page-shell rule
-     above paints near-white — which is what we want on the blue fill. */
+  /* An anchor CTA's label lives in a child span the shell rule paints near-white — what we
+     want on the blue fill. */
   #main-content a[data-kind="primary"],
   #main-content a[data-kind="primary"] span { color: #ffffff !important; }
-  /* …and a disabled primary ("Check" before an answer is picked, "Log in"
-     before the form is filled) must stay inert, so these need at least the
-     specificity of the `#main-content` rule above, not just !important. */
+  /* …and a disabled primary must stay inert, so these need at least the specificity of the
+     `#main-content` rule above, not just !important. */
   #main-content [data-kind="primary"][aria-disabled="true"],
   #main-content [data-kind="primary"]:disabled,
   [data-kind="primary"][aria-disabled="true"],
@@ -957,241 +635,147 @@
     color: #8b949e !important;
   }
 
-  /* Search-facet checkboxes ("Content type", "Domain"): Khan fills the checked box
-     with the brand blue and draws a white tick over it. The neutralizer above
-     flattens the box to transparent, so a ticked filter kept only its white glyph
-     floating in an empty outline — legible, but it no longer reads as the same
-     "on" control the rest of the app uses. Give the checked box its fill back. */
+  /* Search-facet checkboxes: the checked box is brand blue under a white tick, and the
+     neutralizer flattens it, leaving a glyph in an empty outline. */
   #main-content input[type="checkbox"]:checked { background-color: #2563c9 !important; }
 
-  /* Problem-progress dots (`ul.indicatorContainer`, under every article's practice
-     block and along the foot of an exercise): each problem is a
-     `button[aria-label="Problem N"]` holding a single ring <div> whose 2px border Khan
-     paints the raw brand blue and which it FILLS the same blue on the problem you are
-     currently on. Two broad rules in this file each erase one of those cues — the
-     blanket `* { border-color }` reset at the end greys every ring, and the
-     `#main-content [class]` neutralizer flattens the current dot's fill to transparent,
-     leaving every dot an identical hollow circle with nothing saying which problem you
-     are on. Which dot is current lives ONLY in `aria-current`; the class list is
-     identical either way. The fill needs no `!important` (it only has to outrank the
-     neutralizer), the ring does (the border reset is `!important`). */
+  /* Problem-progress dots: a ring <div>, brand-blue bordered, FILLED the same blue on the
+     current problem. The blanket border reset greys every ring and the neutralizer flattens
+     the current fill. Which dot is current lives ONLY in `aria-current`; the class list is
+     identical either way. The fill needs no `!important` (it only outranks the neutralizer),
+     the ring does. */
   #main-content ul.indicatorContainer button[aria-label] > div {
     border-color: #5fb0e6 !important;
   }
   #main-content ul.indicatorContainer button[aria-current="true"] > div {
     background-color: #5fb0e6;
   }
-  /* The exercise page itself draws a SECOND, newer progress strip ("Do 7 problems"
-     in the sticky footer bar) that the list above does not cover: each problem is a
-     `data-testid` of `exercise-progress-N-<state>`. Khan encodes state by SHAPE —
-     an unanswered problem is a hollow 2px ring, an answered-wrong one a solid disc,
-     and the one you are on is 12px instead of 8px — and paints all three its
-     light-page ink (#21242c). Those need restating on dark, and they are two
-     different properties.
-     The ring: the blanket `* { border-color }` reset near the end of this file drops
-     it to #2d333b, about 1.3:1 on the page base. */
+  /* The exercise page draws a SECOND progress strip keyed by
+     `data-testid="exercise-progress-N-<state>"`, encoding state by SHAPE — hollow ring
+     unanswered, solid disc answered-wrong, 12px for current — all in the light-page ink, so
+     restating them takes two properties. */
   [data-testid^="exercise-progress-"][data-testid*="-incomplete"] {
     border-color: #5fb0e6 !important;
   }
-  /* The disc: an answered marker has NO border, so the `#main-content [class]`
-     neutralizer flattening its fill to transparent leaves it rendering as nothing
-     at all — the strip loses every problem you got wrong. Same blue as the ring, so
-     filled = done / hollow = to do survives exactly as Khan draws it, and the two
-     share a tone here just as they share the one ink natively. */
+  /* The disc: an answered marker has NO border, so the neutralizer flattening its fill
+     leaves nothing at all. Same blue as the ring, so filled = done / hollow = to do survives
+     as Khan draws it. */
   [data-testid^="exercise-progress-"][data-testid$="-incorrect"],
   [data-testid^="exercise-progress-"][data-testid$="-incorrect-current"] {
     background-color: #5fb0e6 !important;
   }
-  /* A CORRECT problem is the one marker Khan does NOT draw in the neutral ink: it is
-     a `mask-image` tick <span> filled the brand green (#00a60e), which is the only
-     thing in the strip saying you got a problem RIGHT rather than merely answered.
-     Painting it the same blue as the disc — as a single answered-state rule would —
-     collapses right and wrong into one appearance. Khan's own green measures 5.3:1
-     on the page base, so it is restated verbatim rather than lightened; it needs
-     `!important` only to hold the tick against the icon-span rules further down.
-     `-incorrect` cannot match `$="-correct"` (the preceding character is `n`), which
-     keeps this rule and the disc rule above disjoint. */
+  /* A CORRECT problem is the one marker Khan does not draw in the neutral ink: a `mask-image`
+     tick <span> in brand green, the only thing distinguishing right from merely answered.
+     Khan's green measures 5.3:1 on the page base, so it is restated verbatim; the `!important`
+     holds it against the icon-span rules below. `-incorrect` cannot match `$="-correct"`,
+     keeping the rules disjoint. */
   [data-testid^="exercise-progress-"][data-testid$="-correct"],
   [data-testid^="exercise-progress-"][data-testid$="-correct-current"] {
     background-color: #00a60e !important;
   }
 
-  /* Wonder Blocks renders a button's leading icon as an EMPTY <span> whose
-     `mask-image` is filled by the span's own background-color — which resolves
-     to the button's `currentColor`. Khan hardcodes that colour to the light-page
-     ink rgba(33,36,44,.64) on its icon buttons (the video Q&A Upvote / Downvote /
-     Flag / "more" rows), so every one of those glyphs renders dark-on-dark and
-     the buttons look like bare labels. An element-bg audit sees the span as a
-     16px box and skips it. `:empty` is what distinguishes an icon span from a
-     label span, so painting it is safe: a non-icon empty span has no size. */
+  /* Wonder Blocks renders a button's leading icon as an EMPTY <span> whose `mask-image` is
+     filled by its own background-color, resolving to the button's `currentColor` — hardcoded
+     to the light-page ink on Khan's icon buttons. `:empty` distinguishes an icon span from a
+     label span; a non-icon empty span has no size. */
   #main-content button > span:first-child:empty { background-color: #c4cdd6 !important; }
-  /* …but an icon-ONLY `tertiary` button is a link rendered as a glyph (the
-     exercise footer's "Start over" and "Draw on exercise"), and Khan paints
-     both its label and its glyph the brand blue. The muted grey above is the
-     neutral icon tone, so those buttons shipped with a grey glyph under the
-     blue link colour the rule 40 lines up already gives the same component.
-     `:first-child:last-child` is what marks an icon-only button — a tertiary
-     that also has a label (Share link, Microsoft Teams) keeps the neutral
-     glyph. Needs `#main-content` to outrank the id in the rule above. */
+  /* …but an icon-ONLY `tertiary` is a link rendered as a glyph, which Khan paints brand blue,
+     not the neutral icon grey above. `:first-child:last-child` marks icon-only. Needs
+     `#main-content` to outrank the id above. */
   #main-content button[data-kind="tertiary"] > span:first-child:last-child:empty {
     background-color: #5fb0e6 !important;
   }
 
-  /* Lesson-list content-type icons (video / article / exercise / challenge) are
-     inline <svg> whose paths hardcode Khan's near-black ink (`fill="#21242c"`,
-     plus a 50%-alpha variant for the surrounding rounded frame). They are not
-     token-driven and an SVG fill is invisible to a background-color audit, so
-     every row in the lesson sidebar showed an all-but-invisible glyph. Remap the
-     two ink values only — coloured data fills (brand green, Khan blue) are left
-     alone. */
+  /* Lesson-list content-type icons are inline <svg> hardcoding Khan's near-black ink
+     (`fill="#21242c"` plus a 50%-alpha variant), invisible to a background-color audit. Remap
+     the two ink values only. */
   #main-content [fill="#21242c"] { fill: #c4cdd6 !important; }
   #main-content [fill="rgba(33,36,44,0.50)"] { fill: rgba(196, 205, 214, 0.5) !important; }
-  /* The "Community questions" section marker at the foot of a course page is a
-     third hardcoded ink in the same family — a speech-bubble <svg> at #3B3E40,
-     which is a strong ink on the white page and ~1.6:1 here, so the glyph
-     disappears beside its (near-white) heading. */
+  /* The "Community questions" marker is a third hardcoded ink in the same family — a
+     speech-bubble <svg> at #3B3E40. */
   #main-content [fill="#3B3E40"] { fill: #c4cdd6 !important; }
 
-  /* The home page's "Key supporters" band is not an HTML box at all: Khan paints
-     it with a full-bleed <svg> whose single <path fill="#F5F5F5"> draws the
-     angled off-white section backdrop. No element on the page computes a light
-     background — every ancestor is transparent over our dark surface — so the
-     element-bg scan passes clean while a 1855x708 white slab renders behind the
-     supporter logos, taking the "Key supporters" heading (lifted to near-white by
-     the heading rule) with it. Remap the backdrop fill to the page base. The
-     partner logos are separate <img> PNGs and are untouched. */
+  /* The home "Key supporters" band is not an HTML box: a full-bleed <svg> whose
+     `<path fill="#F5F5F5">` draws the angled backdrop. No element computes a light background,
+     so an element-bg scan passes clean while a white slab renders. */
   svg path[fill="#F5F5F5"] { fill: #14181d !important; }
-  /* …and the supporter marks themselves are dark-grey artwork drawn for that
-     white slab (Khan even names the files `*-dark-gray@2x.png`), so once the
-     backdrop goes dark they must be inverted or they vanish into it. They are
-     flat greyscale wordmarks, so a straight inversion keeps them faithful. */
+  /* …and the supporter marks are dark-grey artwork drawn for that slab, so once it goes dark
+     they must be inverted. Flat greyscale wordmarks, so a straight inversion is faithful. */
   img[src*="supporters-logos"] { filter: invert(1) !important; }
 
-  /* Two raster illustrations whose OPAQUE white is baked into the pixels (lossy
-     WebP, no alpha), so no background rule can reach it. `invert(1) hue-rotate(180deg)`
-     flips lightness while returning each hue to roughly where it started: the white
-     collapses to near-black and the artwork keeps its palette. Only these two get it —
-     the 404 space scene, the login collage and the hero product screenshots are drawn
-     ON dark or genuinely depict the light product, and are left exactly as authored.
-
-     1. Home "Explore our content" subject chips: thirteen 32px icons, each a white
-     square with a coloured glyph, rendering as a grid of bright tiles — the brightest
-     thing on the page. Scoped to the grid's stable accessible name.
-
-     Eleven of the thirteen are OPAQUE plates (measured: 0% transparent, 30-61%
-     white), so the inversion lands their ground on pure #000 — DARKER than the page,
-     i.e. a hard black square framing each glyph. `mix-blend-mode: lighten` snaps every
-     pixel the inversion pushed below the page colour back to the page and leaves the
-     bright glyph untouched. Blending resolves against the nearest stacking context,
-     and this `<nav>` is one (`position:relative; z-index:0`), so its backdrop is empty
-     unless the page colour is painted INSIDE it — hence the fill on the nav itself,
-     which restates the colour it already sits on and is invisible alone. Verified by
-     sampling: plate pixels render exactly rgb(20,24,29). */
+  /* Two raster illustrations with OPAQUE white baked into the pixels (lossy WebP, no alpha),
+     so only a filter reaches it; `invert(1) hue-rotate(180deg)` flips lightness and returns
+     each hue roughly to where it started. Only these two — the 404 scene, login collage and
+     hero screenshots are drawn ON dark or genuinely depict the light product.
+     1. Home subject chips. Eleven of the thirteen are opaque plates, whose inverted ground
+     lands on #000, darker than the page: `mix-blend-mode: lighten` snaps those pixels back.
+     The blend resolves against the nearest stacking context and this `<nav>` is one, so its
+     backdrop is empty unless the page colour is painted INSIDE it — hence the fill on the nav,
+     invisible alone. */
   nav[aria-labelledby="course-list-section-heading"] { background-color: #14181d !important; }
   nav[aria-labelledby="course-list-section-heading"] img {
     filter: invert(1) hue-rotate(180deg) !important;
     mix-blend-mode: lighten !important;
   }
-  /* …except two of the thirteen, which are NOT white plates at all: the
-     Science flask and the ELA speech bubble ship with a transparent
-     background, so there is nothing to knock out and the inversion only
-     mangles the glyph — the flask's yellow (#e8b839) came out a muddy brown
-     (#8f5000) and stopped reading as Khan's science colour. Left as authored
-     they sit on the dark chip exactly as intended, and with no inversion there is
-     no black ground for the blend to lift, so it is switched off with it. Matched
-     on the filename stem, which is stable across the CDN's content hash. */
+  /* …except two of the thirteen: the Science flask and ELA speech bubble ship transparent, so
+     there is nothing to knock out and the inversion only mangles the glyph; with no inversion
+     there is no black ground, so the blend goes off with it. Filename stem, stable across the
+     CDN hash. */
   nav[aria-labelledby="course-list-section-heading"] img[src*="flask"],
   nav[aria-labelledby="course-list-section-heading"] img[src*="message_bubble"] {
     filter: none !important;
     mix-blend-mode: normal !important;
   }
-  /* Yellow is the one hue `hue-rotate(180deg)` cannot round-trip — it is a linear
-     matrix approximation, and yellow's inverse (blue) maps back to orange-brown, not
-     yellow. That is the same damage the flask exception above avoids by not inverting,
-     but the Partner-courses starburst has no alpha to fall back on: it is a plate, so
-     it must invert. Correct the hue on the way back instead. Tuned against the native
-     pixels, measured AFTER the blend (which floors blue at the page's 29): the glyph
-     lands rgb(255,184,29) against a native rgb(253,185,0) — the straight 180deg chain
-     left it rgb(151,72,0), a brown starburst. The plate is achromatic, so saturate and
-     brightness leave it at #000 and the blend still clears it. */
+  /* Yellow is the one hue `hue-rotate(180deg)` cannot round-trip — a linear matrix
+     approximation whose inverse maps back to orange-brown. The flask dodges that by not
+     inverting; this starburst is a plate with no alpha, so it must invert and the hue is
+     corrected on the way back. Tuned against native pixels measured AFTER the blend (which
+     floors blue at the page's 29): rgb(255,184,29) against a native rgb(253,185,0). The plate
+     is achromatic, so the blend still clears it. */
   nav[aria-labelledby="course-list-section-heading"] img[src*="badge"] {
     filter: invert(1) hue-rotate(195deg) saturate(2) brightness(2.2) !important;
   }
-  /*  2. The logged-out home hero (one responsive asset, whose every srcset entry shares
-     the `lohp_hero_graphic_mobile` stem). Its cream "graph paper" ramp is the largest
-     bright shape above the fold, and at narrow widths it extends BEHIND the "Get
-     started as a…" heading and the top of the Student card — invisible on Khan's white
-     page, a solid white slab here, with the heading (now near-white) lost inside it. */
+  /*  2. The logged-out home hero (one responsive asset; every srcset entry shares the
+     `lohp_hero_graphic_mobile` stem). Its cream "graph paper" ramp is the largest bright shape
+     above the fold. */
   img[src*="hp_hero_graphic_mobile"] {
     filter: invert(1) hue-rotate(180deg) !important;
   }
 
-  /* Article and exercise diagrams. Khan authors them outside the DOM — as
-     standalone files on its content CDN, dropped in as `<img>` — so no rule in
-     this sheet can reach their internals, and every one is drawn for the white
-     page: a fully transparent backdrop with `stroke="#000000"` axes, arrowheads
-     and labels. On the dark surface a whole graph renders as pure black on
-     near-black and effectively disappears; an exercise whose answer choices are
-     figures stops being answerable, not merely dim. Flip the lightness and put
-     each hue back where it started, exactly as the two raster illustrations
-     above get: the black line work becomes near-white and any coloured data
-     series keeps its meaning.
-
-     Matched on the CDN BUCKET as a substring, which covers both the
-     `cdn.kastatic.org/<bucket>/` and the legacy `<bucket>.s3.amazonaws.com/`
-     form of every asset URL. The two buckets that hold only line art:
-       - `ka-perseus-graphie` — the graphie editor's output, `.svg` and `.png`
-         alike, so no extension filter. Sampled across math, geometry and
-         physics: every `.png` measures 96-100% transparent with zero white
-         pixels, every `.svg` is pure vector with no embedded raster.
-       - `ka-content-images` — `.svg` only; that bucket also carries uploaded
-         article photos, and photographs are never SVG.
-
-     Deliberately NOT covered, and each would be damaged by inverting:
-     `ka-perseus-images` holds opaque uploaded figures and photographs (sampled:
-     0% transparent, 52-88% white) which render bright, not invisible; and Khan's
-     own product art under `/images/` is genuinely coloured — the home page's
-     "Every skill counts" bar chart, and the learner avatars in the Q&A thread
-     under every article, which are `/images/avatars/svg/*.svg` and are the
-     reason this cannot simply widen to all SVGs. */
+  /* Article and exercise diagrams: files on Khan's content CDN dropped in as `<img>`, so no
+     rule here reaches their internals, and every one is drawn for the white page (transparent
+     backdrop, `stroke="#000000"` linework). Matched on the CDN BUCKET as a substring, covering
+     both the `cdn.kastatic.org/<bucket>/` and legacy `<bucket>.s3.amazonaws.com/` forms. Only
+     two buckets hold line art alone: `ka-perseus-graphie`, `.svg` and `.png` alike, hence no
+     extension filter, and `ka-content-images`, `.svg` only, since it also carries uploaded
+     photos and photographs are never SVG. NOT covered, both damaged by inverting:
+     `ka-perseus-images` (opaque figures and photographs) and Khan's product art under
+     `/images/`, learner avatars included. */
   #main-content img[src*="ka-perseus-graphie"],
   #main-content img[src*="ka-content-images"][src$=".svg"] {
     filter: invert(1) hue-rotate(180deg) !important;
   }
 
-  /* Search-result content-type icons (article / video / exercise glyphs).
-     Khan renders each as a `mask-image` SVG on a 24px span inside a 48px ringed
-     circle, colouring the glyph through the span's `background-color` (natively a
-     dark ink rgba(33,36,44,.64)). That ink is dark-on-dark on the theme AND the
-     `#main-content [class]` neutraliser flattens it to transparent, so the glyph
-     vanishes and every result shows an empty ring. The circle carries a stable
-     (deterministic vanilla-extract) class; restore a muted light icon colour on
-     its masked span so the content type reads again. Degrades safely — if the
-     hashed class ever changes the icon simply stays empty as before, no breakage. */
+  /* Search-result content-type icons: a `mask-image` SVG on a span inside a ringed circle,
+     coloured through the span's `background-color` (natively a dark ink), which the neutralizer
+     also flattens. Deterministic vanilla-extract class, degrade-safe. */
   ._1yakn8cj span { background-color: #8b949e !important; }
 
-  /* Mastery "information" glyphs (the small "i" beside "… possible mastery
-     points" and each unit's "Unit mastery: NN%" indicator) are the same
-     `mask-image` icon pattern, hardcoded to a dark ink (rgba(33,36,44,.64))
-     built for the light page, so they read dark-on-dark here. Scoped to the
-     stable accessible name (not a hashed class) and lifted to a muted light so
-     the mastery affordance stays visible. */
+  /* Mastery "information" glyphs are the same `mask-image` pattern hardcoded to a dark ink.
+     Scoped to the stable accessible name, not a hashed class. */
   #main-content span[role="img"][aria-label="Mastery information"] { background-color: #8b949e !important; }
 
-  /* Logged-out donation widget (form/fieldset of amount + frequency options
-     render on white) — neutralized via its stable form structure. */
+  /* Logged-out donation widget (form/fieldset of amount + frequency options render on
+     white) — neutralized via its stable form structure. */
   form fieldset, form fieldset ul, form fieldset li,
   form fieldset li label { background-color: #1c2128 !important; color: #c4cdd6 !important; }
   form fieldset li label:hover { background-color: #232a32 !important; }
-  /* Khan signals the picked gift frequency ("Recurring") and amount ("$12") by
-     filling that label white with brand-blue text. The state lives on a
-     visually-hidden radio (`input.sr-only.choice-input`), so the label's own class
-     list is byte-identical in both states and the blanket rule above painted every
-     option the same grey — the widget shipped with no indication at all of which
-     frequency or amount was selected. The radio is the label's immediate previous
-     sibling, so `:checked + label` reaches it without a parent selector (which the
-     userstyles.org parser rejects). Scoped to `.choice-input`: the Monthly/Yearly
-     radios (`.frequency-input`) draw a real radio dot and are natively unfilled. */
+  /* The picked gift frequency and amount are signalled by a white label with brand-blue text,
+     and the state lives on a visually-hidden radio, so the label's class list is byte-identical
+     in both states. The radio is the label's immediate previous sibling, so `:checked + label`
+     reaches it without a parent selector (which the userstyles.org parser rejects). Scoped to
+     `.choice-input`: the `.frequency-input` radios draw a real dot and are natively
+     unfilled. */
   form fieldset input.choice-input:checked + label,
   form fieldset input.choice-input:checked + label:hover {
     background-color: #2563c9 !important;
@@ -1199,20 +783,13 @@
     -webkit-text-fill-color: #ffffff !important;
   }
 
-  /* Social sign-in buttons keep each provider's brand mark, but Apple's is a
-     solid black glyph built for the white button — invisible once the button
-     goes dark. Only Apple's is inverted; Clever / Facebook / Microsoft keep
-     their colours. */
+  /* Social sign-in buttons keep each provider's mark, but Apple's is a solid black glyph
+     built for the white button. Only Apple's is inverted. */
   button[aria-label="Continue with Apple"] svg path { fill: #e6edf3 !important; }
 
-  /* OneTrust cookie-consent banner (logged-out, first visit) — Khan loads the
-     stock OneTrust CMP, whose container, body text and "Cookies Settings"
-     outline button hardcode white / near-black built for a light page, leaving
-     a glaring white modal (and a near-invisible light-grey "Use of cookies"
-     heading on white). Not token-driven, so it bypasses every remap above.
-     Dark the OneTrust surfaces via its stable #onetrust-* ids. The filled
-     Accept/Allow/Confirm CTAs are natively a dark charcoal (rgb(49,49,48)) with
-     white text, so they already read correctly on dark and are left alone. */
+  /* OneTrust consent banner: the stock CMP hardcodes white / near-black and is not
+     token-driven, so it bypasses every remap above. The filled Accept/Allow/Confirm CTAs are
+     natively dark charcoal with white text and are left alone. */
   #onetrust-consent-sdk #onetrust-banner-sdk,
   #onetrust-consent-sdk #onetrust-pc-sdk,
   #onetrust-consent-sdk .ot-sdk-container,
@@ -1228,31 +805,24 @@
     color: #5fb0e6 !important;
     border-color: #3a424c !important;
   }
-  /* Preference centre ("Cookies Settings"): its long description, close button
-     and "Always Active" label keep light-page inks, and the "Powered by
-     OneTrust" strip keeps a hardcoded #f4f4f4 panel. */
+  /* Preference centre: its description, close button and "Always Active" label keep
+     light-page inks, and the "Powered by OneTrust" strip a hardcoded #f4f4f4 panel. */
   #onetrust-consent-sdk #ot-pc-desc,
   #onetrust-consent-sdk #ot-pc-desc * { color: #c4cdd6 !important; }
   #onetrust-consent-sdk #close-pc-btn-handler { color: #9aa4af !important; }
   #onetrust-consent-sdk .ot-always-active { color: #5fb0e6 !important; }
   #onetrust-consent-sdk .ot-pc-footer-logo { background-color: #1c2128 !important; }
-  /* Surfaces the preference centre only creates on an interaction, so a scan of the
-     opened centre still reports them clean:
-     - `.ot-acc-grpcntr` is a cookie category's description body, `display:none` until
-       that category's accordion is expanded — a white panel under the remapped light ink.
-     - `#ot-sel-blk` belongs to the "Cookie List" screen behind the category rows.
-     - `.ot-optout-signal` is the pale-green strip shown only when the browser sends a
-       Global Privacy Control signal. */
+  /* Surfaces the preference centre only creates on an interaction: `.ot-acc-grpcntr`, a
+     category's description body, hidden until its accordion opens; `#ot-sel-blk`, the "Cookie
+     List" screen; `.ot-optout-signal`, shown only under a Global Privacy Control signal. */
   #onetrust-consent-sdk .ot-acc-grpcntr,
   #onetrust-consent-sdk .ot-acc-txt,
   #onetrust-consent-sdk #ot-sel-blk,
   #onetrust-consent-sdk #ot-fltr-cnt,
   #onetrust-consent-sdk .ot-optout-signal { background-color: #1c2128 !important; }
-  /* Those four panels are the only place OneTrust puts its near-black ink on a plate
-     rather than on the modal, so darkening them is what makes the ink dark-on-dark:
-     the Cookie List's "Consent" / "Leg.Interest" column headers, the filter panel's
-     "Clear" (its "Apply" / "Cancel" siblings are natively dark charcoal with white
-     labels and need nothing), and the Global Privacy Control strip's message. */
+  /* Those four panels are the only place OneTrust puts its near-black ink on a plate rather
+     than on the modal, so darkening them is what makes the ink dark-on-dark. The filter panel's
+     "Apply" / "Cancel" siblings are natively dark and need nothing. */
   #onetrust-consent-sdk #ot-sel-blk .ot-consent-hdr,
   #onetrust-consent-sdk #ot-sel-blk .ot-li-hdr,
   #onetrust-consent-sdk #clear-filters-handler,
@@ -1261,39 +831,46 @@
   /* Both OneTrust wordmarks are solid-black artwork drawn for a white modal. */
   #onetrust-consent-sdk .ot-pc-logo,
   #onetrust-consent-sdk .ot-pc-footer-logo img { filter: invert(1) !important; }
-  /* `#ot-anchor` is a pure CSS triangle: a 0×0 box whose four 12px borders are
-     all `transparent`. The blanket `* { border-color }` rule below repaints all
-     four, turning "nothing" into a solid 24px diamond floating in the cookie-list
-     panel. Keep it invisible. */
+  /* `#ot-anchor` is a pure CSS triangle: a 0x0 box whose four 12px borders are all
+     `transparent`, which the blanket `* { border-color }` rule below would repaint into a
+     solid 24px diamond. */
   #onetrust-consent-sdk #ot-anchor { border-color: transparent !important; }
-  /* The weekly-streak counter in the "Start leveling up" banner above every lesson
-     page is a `border: 1px solid transparent` box, so the same blanket rule paints
-     all four sides and draws a grey rectangle around the flame that Khan never
-     draws. `div[tabindex]` is the counter's shape inside that banner — its only
-     focusable siblings there are an <h2> and an icon <span>. */
+  /* The weekly-streak counter is a `border: 1px solid transparent` box the blanket rule would
+     box in grey. `div[tabindex]` is its shape there — its only focusable siblings are an <h2>
+     and an icon <span>. */
   .stp-animated-banner div[tabindex] { border-color: transparent !important; }
-  /* That banner's "View progress for all courses" popover renders into a body-level
-     portal, outside `#main-content`. Its chrome and table header read Wonder Blocks
-     tokens; the empty-state box ("No recent progress yet!") is a literal
-     `background: rgb(247,248,250)` on a hashed class and needs its own surface.
-     `[data-placement]` separates a Popper-anchored Wonder Blocks Popover from the
-     app's modal dialogs (the Share-link sheet is `aria-modal`, no placement), and
-     "Close Popover" is the component's fixed close label; the box is the sibling
-     after the table's wrapper. Only that box is painted, so a populated table keeps
-     its own level/progress fills. */
+  /* That banner's progress popover renders into a body-level portal, outside `#main-content`.
+     Only the empty-state box, a literal light background on a hashed class, needs its own
+     surface. `[data-placement]` separates a Popper-anchored Popover from the app's modal
+     dialogs (the Share sheet is `aria-modal`, no placement), "Close Popover" is the fixed close
+     label, and the box is the sibling after the table's wrapper — so a populated table keeps
+     its own fills. */
   [role="dialog"][data-placement] button[aria-label="Close Popover"] + div > div > div + div {
     background-color: #1c2128 !important;
   }
 
-  /* ====================================================================
-     Soften any remaining bright borders across the app
-     ==================================================================== */
+  /* Soften any remaining bright borders across the app */
   * { border-color: #2d333b !important; }
 
-  /* ====================================================================
-     Code editor / syntax highlighting (CS & programming courses)
-     CodeMirror + ka-syntax tokens, kept readable on dark
-     ==================================================================== */
+  /* Form validation state (login / signup LabeledField): Khan reddens the invalid input's
+     border, the "Error:" mask icon and the helper text, all through the critical token, and
+     the blanket border reset, the shell `span` rule and the `p { color }` block flatten every
+     one of them to neutral. `aria-invalid` and the `-error` live region are Wonder Blocks'
+     stable contract; the login server error (`#log-in-server-error`) is the same shape with
+     its own id. Lifted red so the text passes on the page base, where Khan's #d92916 does
+     not. Placed after the blanket reset because the input border rule ties it on
+     specificity. */
+  input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: #ff7b72 !important; }
+  div[id$="-error"][aria-live] p,
+  #log-in-server-error p { color: #ff7b72 !important; }
+  span[role="img"][aria-label="Error:"],
+  #log-in-server-error span:empty {
+    background-color: #ff7b72 !important;
+    color: #ff7b72 !important;
+  }
+
+  /* Code editor / syntax highlighting (CS & programming courses)
+     CodeMirror + ka-syntax tokens */
   .CodeMirror, .CodeMirror-gutters,
   pre, code, .highlight, .codehilite {
     background-color: #0d1117 !important;
@@ -1310,13 +887,9 @@
   .cm-attribute { color: #79c0ff !important; }
   .cm-operator { color: #c4cdd6 !important; }
 
-  /* Khan's "scratchpad" code editor is ACE (class .ace_editor.ace-tm), not
-     CodeMirror, so the palette above never reaches it. ACE ships its light
-     "tm" theme whose token colors (blue keywords, dark-blue numbers, dark-green
-     strings, navy functions, black cursor) are built for a white background and
-     read poorly once the editor surface is dark; the generic span rule above
-     also flattens every token to one light grey, wiping out highlighting.
-     Re-theme ACE on dark with the same GitHub-dark palette as CodeMirror. */
+  /* Khan's "scratchpad" editor is ACE (`.ace_editor.ace-tm`), not CodeMirror, so the palette
+     above never reaches it; its light "tm" token colours are built for white, and the generic
+     span rule flattens them to one grey. */
   .ace_editor, .ace_editor .ace_gutter, .ace_editor .ace_scroller {
     background-color: #0d1117 !important;
   }
@@ -1336,29 +909,40 @@
   .ace_editor .ace_keyword.ace_operator, .ace_editor .ace_punctuation,
   .ace_editor .ace_paren { color: #c4cdd6 !important; }
   .ace_editor .ace_invalid { color: #ffa198 !important; }
-  /* Cursor + line/selection chrome (the universal border rule otherwise dims
-     the caret to #2d333b, leaving it nearly invisible). */
+  /* Cursor + line/selection chrome (the universal border rule otherwise dims the caret
+     to #2d333b). */
   .ace_editor .ace_cursor { color: #e6edf3 !important; border-left-color: #e6edf3 !important; }
   .ace_editor .ace_marker-layer .ace_active-line,
   .ace_editor .ace_gutter-active-line { background-color: #161b22 !important; }
   .ace_editor .ace_marker-layer .ace_selection { background-color: #2d4f7c !important; }
   .ace_editor .ace_print-margin { background-color: #21262d !important; }
 
-  /* Scratchpad "About" / "Documentation" tablist: Khan marks the current tab with
-     a 5px `border-bottom` in the raw brand blue. The blanket border reset at the
-     end of this file repaints it #2d333b, so the "you are here" indicator drops to
-     ~1.5:1 against the editor and effectively disappears. Re-tint the selected tab
-     via its stable ARIA state. */
+  /* Challenge hint code (`pre.rainbowjs`, Rainbow.js tokens) beside the ACE editor: a
+     light-page palette on white that the generic `pre, code` ink and the span-inherit rule
+     flatten to one white. Same token colours as the ACE block so the hint reads like the
+     editor it is copied into. The token family is the site's own `.rainbowjs .<token>` set;
+     `.function.call` has no site rule and keeps the base ink. */
+  .rainbowjs .comment { color: #8b949e !important; }
+  .rainbowjs .constant { color: #ff7b72 !important; }
+  .rainbowjs .constant.numeric { color: #79c0ff !important; }
+  .rainbowjs .storage, .rainbowjs .keyword, .rainbowjs .selector { color: #ff7b72 !important; }
+  .rainbowjs .keyword.operator { color: #c4cdd6 !important; }
+  .rainbowjs .string { color: #a5d6ff !important; }
+  .rainbowjs .entity { color: #7ee787 !important; }
+  .rainbowjs .entity.name.function { color: #d2a8ff !important; }
+  .rainbowjs .support { color: #79c0ff !important; }
+  .rainbowjs .variable.global, .rainbowjs .variable.class,
+  .rainbowjs .variable.instance { color: #e6edf3 !important; }
+
+  /* Scratchpad tablist: the current tab's 5px brand-blue `border-bottom` is repainted by the
+     blanket border reset. Re-tint via its stable ARIA state. */
   #scratchpad-tabs [role="tab"][aria-selected="true"] { border-bottom-color: #5fb0e6 !important; }
 
-  /* The CS editor's own tooltips (number scrubber, colour picker, autosuggest and
-     the image / sound picker) are plain `.tooltip` divs that Khan renders at the
-     end of <body>, hidden until you interact with the code. Two problems:
-     the image/sound picker's panels are hardcoded white, and each tooltip's tail
-     is a REAL-ELEMENT CSS triangle — a 0×0 box with three 8px borders, two of them
-     `transparent`. The blanket border reset repaints all four sides, turning each
-     tail into a solid grey square. Restore the transparency, then tint only the
-     edge that is actually visible (which side depends on where the tail points). */
+  /* The CS editor's own tooltips are `.tooltip` divs rendered at the end of <body>, hidden
+     until you interact with the code. The picker's panels are hardcoded white, and each tail is
+     a REAL-ELEMENT CSS triangle — a 0x0 box with three 8px borders, two `transparent` — that
+     the blanket border reset turns into a grey square. Restore the transparency, then tint only
+     the visible edge. */
   .tooltip { background-color: #1c2128 !important; }
   .tooltip .current-media,
   .tooltip .media-groups,
@@ -1374,35 +958,22 @@
     border-top-color: transparent !important;
     border-right-color: #1c2128 !important;
   }
-  /* The picker's full-size twin. `.tooltip.mediapicker` above is the hover grid; the
-     "see all" control opens a body-level `.modal.mediapicker-modal` instead — a separate
-     node with its own white sheet and its own white footer, `display:none` until opened.
-     Its sound rows are <audio> elements with the browser's own dark controls, so only the
-     sheet behind them and the footer under them need a surface.
-     The modal declares a mid grey (#555) on itself and its ~33 file labels are bare
-     <span>s that inherit it, which no rule in this sheet reaches — on the darkened sheet
-     that ink is the whole file list at ~2.4:1. Restating the inherited colour on the
-     modal covers every one of them; the footer's own buttons declare their own ink and
-     keep their native light faces. */
+  /* The picker's full-size twin: `.tooltip.mediapicker` above is the hover grid, while "see
+     all" opens a body-level `.modal.mediapicker-modal` with its own white sheet and footer,
+     `display:none` until opened. Its sound rows are <audio> with the browser's own dark
+     controls. The modal declares a mid grey that its bare-<span> file labels inherit and
+     nothing else here reaches. */
   .modal.mediapicker-modal,
   .modal.mediapicker-modal .mediapicker-modal-footer { background-color: #1c2128 !important; }
   .modal.mediapicker-modal { color: #c4cdd6 !important; }
 
-  /* The live editor's error bubble (`.tipbar`, "Oh noes! `ackground` is not
-     defined…") floats OVER the program canvas, which the learner's own program
-     paints and which no rule here can reach — white by default. The bubble itself
-     is plain HTML hardcoded for that white page (#f9f9f9 panel, black copy), so
-     the `#main-content [class]` neutralizer flattens the panel to transparent
-     while the text rules lift the copy to near-white: the whole error message
-     renders white-on-white and only the "Show me where" link stays readable, on
-     the one surface a beginner most needs to read. Give the bubble an opaque dark
-     panel of its own. The `.quote` chips holding the offending identifier are
-     <span>s — which the neutralizer deliberately skips, so they keep their
-     hardcoded white fill under that same near-white text — and need their own
-     dark tone. `.close` is a black glyph built for the light bubble.
-     The bubble's two sprite decorations (the `.speech-arrow` nub and the
-     `.error-buddy` mascot) are `background-image`s the neutralizer clears; both
-     are drawn for a light bubble, so they are left off rather than restored. */
+  /* The live editor's error bubble (`.tipbar`) floats over the program canvas, which the
+     learner's own program paints and no rule here can reach. Hardcoded for a white page, so the
+     neutralizer flattens its panel while the text rules lift the copy — white-on-white; it
+     needs an opaque dark panel of its own. The `.quote` chips are <span>s the neutralizer
+     deliberately skips, so they keep their white fill. The `.speech-arrow` and `.error-buddy`
+     sprites are cleared by the neutralizer and deliberately left off — both are drawn for a
+     light bubble. */
   .tipbar {
     background-color: #1c2128 !important;
     border-color: #3a424c !important;
@@ -1415,15 +986,9 @@
   }
   .tipbar .close { color: #9aa4af !important; text-shadow: none !important; }
 
-  /* ====================================================================
-     Worked-example math highlight colors (MathML `mathcolor`)
-     Khan tints terms in step-by-step solutions with a fixed palette built
-     for a white page: a grey for annotation labels ("Replace a with …"),
-     plus muted red/blue/green/purple term highlights. On the dark surface the
-     grey is dark-on-dark (~1.3 contrast) and the muted hues dim out. Remap
-     each to a lighter shade of the SAME hue so the pedagogical meaning (this
-     term is "the red one", that one "the blue one") is preserved while staying
-     legible on dark. Targets the `mathcolor` carrier and its descendants. */
+  /* Worked-example math highlight colors (MathML `mathcolor`). Khan tints solution terms with
+     a fixed white-page palette; remap each to a lighter shade of the SAME hue so the pairing
+     survives. Targets the carrier and its descendants. */
   [mathcolor="#5D5F66"], [mathcolor="#5D5F66"] * { color: #9aa4af !important; -webkit-text-fill-color: #9aa4af !important; }
   [mathcolor="#D92916"], [mathcolor="#D92916"] * { color: #ff7b72 !important; -webkit-text-fill-color: #ff7b72 !important; }
   [mathcolor="#3D7586"], [mathcolor="#3D7586"] * { color: #6cb6d9 !important; -webkit-text-fill-color: #6cb6d9 !important; }
@@ -1435,25 +1000,14 @@
   [mathcolor="#9D38BD"], [mathcolor="#9D38BD"] * { color: #d2a8ff !important; -webkit-text-fill-color: #d2a8ff !important; }
   [mathcolor="#CA337C"], [mathcolor="#CA337C"] * { color: #ff8ac4 !important; -webkit-text-fill-color: #ff8ac4 !important; }
   [mathcolor="#E07D10"], [mathcolor="#E07D10"] * { color: #f0a868 !important; -webkit-text-fill-color: #f0a868 !important; }
-  /* The order-of-operations / PEMDAS colour-coding uses a second palette the block
-     above did not cover: a deep purple (#594094 "Grouping", #8351E8 "Exponents") and a
-     dark olive-gold (#946700 addition/subtraction). Left raw they land ~2.2:1 (purple)
-     and ~2.8:1 (gold) on the dark page — the colour-coded letters and their matching
-     math read dark-on-dark. Lift each to the same light shade its hue already uses. */
+  /* PEMDAS colour-coding uses a second palette the block above misses: a deep purple
+     ("Grouping", "Exponents") and a dark olive-gold (addition/subtraction). */
   [mathcolor="#594094"], [mathcolor="#594094"] *,
   [mathcolor="#8351E8"], [mathcolor="#8351E8"] * { color: #d2a8ff !important; -webkit-text-fill-color: #d2a8ff !important; }
   [mathcolor="#946700"], [mathcolor="#946700"] * { color: #e3b341 !important; -webkit-text-fill-color: #e3b341 !important; }
-  /* Articles render their math through MathJax v3, which carries a highlight
-     colour as an INLINE `color` on an <mjx-mstyle> and paints the glyphs in
-     `mjx-c::before` pseudo-elements that inherit it — so neither the `mathcolor`
-     block above nor a text-colour audit of real elements sees it. This is the
-     inline-style twin of the `mathcolor` remaps above: the SAME worked-example
-     palette (the grey annotation label "Replace a with 1.", the muted
-     red/blue/green/purple term highlights) is emitted here as inline `color`
-     values, and left raw they land dark-on-dark (the grey annotation at ~2.8:1,
-     the blue variable term dimmer than the mathcolor path renders it). Remap each
-     inline value to the same light shade its `mathcolor` sibling uses so the
-     pedagogical colour pairing holds and the annotation stays legible. */
+  /* MathJax v3 (articles) carries the highlight as an INLINE `color` on an <mjx-mstyle> and
+     paints glyphs in `mjx-c::before` pseudo-elements that inherit it, so neither the
+     `mathcolor` block above nor a text-colour audit of real elements sees it. */
   #main-content [style*="color: rgb(93, 95, 102)"] { color: #9aa4af !important; -webkit-text-fill-color: #9aa4af !important; }
   #main-content [style*="color: rgb(217, 41, 22)"] { color: #ff7b72 !important; -webkit-text-fill-color: #ff7b72 !important; }
   #main-content [style*="color: rgb(61, 117, 134)"] { color: #6cb6d9 !important; -webkit-text-fill-color: #6cb6d9 !important; }
@@ -1468,58 +1022,43 @@
   #main-content [style*="color: rgb(224, 125, 16)"] { color: #f0a868 !important; -webkit-text-fill-color: #f0a868 !important; }
   #main-content [style*="color: rgb(68, 122, 83)"] { color: #7ee787 !important; -webkit-text-fill-color: #7ee787 !important; }
   #main-content [style*="color: rgb(178, 80, 113)"] { color: #ff8ac4 !important; -webkit-text-fill-color: #ff8ac4 !important; }
-  /* Inline-style twins of the PEMDAS colour-coding above (MathJax emits the same deep
-     purple #594094 and olive-gold #946700 as inline `color` on its <mjx-mstyle>). */
+  /* Inline-style twins of the PEMDAS colour-coding above. */
   #main-content [style*="color: rgb(89, 64, 148)"] { color: #d2a8ff !important; -webkit-text-fill-color: #d2a8ff !important; }
   #main-content [style*="color: rgb(148, 103, 0)"] { color: #e3b341 !important; -webkit-text-fill-color: #e3b341 !important; }
+  /* A token-coloured term inside a bold run inherits the `b, strong` text-fill above, which
+     paints over the term's colour; the fill must track that colour instead. */
+  #main-content [style*="learning-math-foreground"] {
+    -webkit-text-fill-color: currentColor !important;
+  }
 
-  /* The "Level N … 0 /1 skill" mastery bar (shown above every article, video and
-     exercise) puts its numerator in a <b>, which Khan hardcodes to the light-page
-     ink rgb(33,36,44). No rule in this file reaches a bare <b> — the shell rule
-     only covers a/span/div — so the count rendered at 1.15:1, effectively
-     invisible, while the "/1 skill" beside it stayed legible. */
+  /* The mastery bar's numerator is a <b> hardcoded to the light-page ink; no rule here
+     reaches a bare <b>, the shell rule covering only a/span/div. */
   .fraction-skills-to-proficient-numerator { color: #e6edf3 !important; }
 
-  /* Perseus exercise answer-choice tints (a muted green + mauve used to
-     colour the multiple-choice math on practice pages) hardcode dark values
-     built for the white page and land ~3.5:1 on the dark surface. Lift each
-     to the lighter same-hue shade already used for the worked-example set. */
+  /* Perseus answer-choice tints (muted green + mauve on multiple-choice math) hardcode
+     white-page values. Lift each to the same-hue shade the worked-example set uses. */
   [mathcolor="#447A53"], [mathcolor="#447A53"] * { color: #7ee787 !important; -webkit-text-fill-color: #7ee787 !important; }
   [mathcolor="#B25071"], [mathcolor="#B25071"] * { color: #ff8ac4 !important; -webkit-text-fill-color: #ff8ac4 !important; }
 
-  /* Article content tables: Khan renders some data/function tables with
-     hardcoded pale cells (rgb(247,248,250)) on classless <td>/<th>, which the
-     `#main-content [class]` neutralizer cannot reach. Flatten them to the dark
-     page; borders are already softened by the universal border rule. */
+  /* Article content tables: hardcoded pale cells on classless <td>/<th>, which the
+     `#main-content [class]` neutralizer cannot reach. */
   #main-content table, #main-content thead, #main-content tbody,
   #main-content tr, #main-content td, #main-content th {
     background-color: transparent !important;
   }
 
-  /* Perseus exercise multiple-choice cards: each choice `li` draws its card
-     frame/divider through `::before` + `::after` pseudo-elements hardcoded to
-     a light grey (rgb(219,220,221)) built for the white page — invisible to an
-     element-bg audit, but they render as bright white frames around the (dark)
-     answer cards here. Remap the pseudo fills to the theme's border tone so the
-     choices read as subtle dark cards. Scoped to the stable Perseus renderer
-     class so nothing else is touched. */
+  /* Perseus multiple-choice cards draw their frame / divider through `::before` + `::after`
+     hardcoded to a light grey — invisible to an element-bg audit, bright white frames on
+     screen. */
   .framework-perseus li::before,
   .framework-perseus li::after,
   .perseus-renderer li::before,
   .perseus-renderer li::after { background-color: #2d333b !important; }
 
-  /* Perseus "choose all / choose 1" answer cards were rendering as empty dark
-     boxes — only the A-E letter tile showed, the math statement inside each card
-     was invisible. Root cause: the logged-out donation-form rule above
-     (`form fieldset …`) is broad enough to also match the Perseus choice
-     <fieldset> (choices are grouped inside a <form>), painting an opaque #1c2128
-     onto the choice fieldset/ul/li. Perseus renders each choice's block math
-     (a MathJax `mjx-container` given compensating negative margins) on a lower
-     paint layer, so that opaque fill covered the math — the letters (drawn on a
-     separate button) stayed visible. Reset the Perseus choice containers to
-     transparent so the math paints again; the cards keep their dark look from the
-     surrounding exercise surface. Higher specificity than the `form fieldset`
-     rule, so it wins without touching the donation widget. */
+  /* The donation-widget `form fieldset …` rule above also matches the Perseus choice
+     <fieldset> (choices sit inside a <form>), painting it opaque; Perseus renders each choice's
+     block math on a lower paint layer, so that fill covers the math. Higher specificity, so the
+     donation widget is untouched. */
   .framework-perseus fieldset, .framework-perseus fieldset ul,
   .framework-perseus fieldset li, .framework-perseus fieldset li label,
   .perseus-renderer fieldset, .perseus-renderer fieldset ul,
@@ -1527,42 +1066,26 @@
     background-color: transparent !important;
   }
 
-  /* Perseus draws the answer-choice "card" edges by overlaying the choice <ul>
-     with a `::before` whose background-COLOR is transparent but whose
-     background-IMAGE is a hardcoded white linear-gradient — an opaque white
-     column down each side of the choice list. Every element-background audit
-     reads it as transparent and passes clean, yet it renders two glaring white
-     bars around the multiple-choice answers. Drop the image; the gutters then
-     show the (correct) dark exercise surface underneath. */
+  /* Perseus draws the answer-choice "card" edges by overlaying the choice <ul> with a
+     `::before` whose background-COLOR is transparent but whose background-IMAGE is a hardcoded
+     white gradient — read as transparent by every element-background audit. */
   .framework-perseus fieldset ul::before,
   .framework-perseus fieldset ul::after,
   .perseus-renderer fieldset ul::before,
   .perseus-renderer fieldset ul::after { background-image: none !important; }
 
-  /* Perseus marks the answer a student has picked ONLY through
-     `aria-pressed="true"` on the A-E letter tile — the tile's class list is
-     byte-identical in both states — painting it Khan blue with a white letter and
-     dropping the 2px outline the unpicked tiles carry. The interactive-card rule
-     above (`#main-content button[class]`) outranks Perseus's own non-important
-     selected-state rule, so BOTH states rendered as the same grey tile: nothing on
-     screen told the student which answer they had chosen, and the picked tile was
-     actually the LEAST distinct of the row, having lost its outline. Repaint it in
-     the theme's deepened Khan blue and restore the second cue Perseus uses — it
-     recolours the picked choice's math to the same blue, which the blanket
-     `li { color }` rule flattens back to ordinary ink. The choice content is the
-     tile's only sibling, so `+ div` reaches it without needing a parent selector
-     (which the userstyles.org parser rejects anyway).
-     Once the answer is submitted Perseus disables every tile and repaints the
-     right ones green; the same card rule was flattening that green away too, so
-     the answered state (`aria-disabled="true"`) keeps Perseus's own green instead
-     of the "still picking" blue. Specificity has to clear `#main-content`'s id —
-     an `!important` on its own loses to it, as the disabled-primary rule above
-     already learned. */
-  /* The tile carries no `data-kind`, so the rule above (correctly) leaves it
-     unpainted. Natively it is transparent with a mid-grey 2px outline, but the
-     blanket `* { border-color }` reset near the end of this file dims that outline
-     to #2d333b — so an unpainted tile would be a bare floating letter. Give the
-     resting tile the card surface Perseus's outline used to imply. */
+  /* Perseus marks the picked answer ONLY through `aria-pressed="true"` on the A-E letter tile
+     — its class list is byte-identical in both states. The interactive-card rule above outranks
+     Perseus's own non-important selected-state rule, so without this both states are the same
+     grey tile. Restore its second cue too: the picked choice's math is recoloured the same
+     blue, which the blanket `li { color }` rule flattens. The choice content is the tile's only
+     sibling, so `+ div` reaches it without a parent selector (which the userstyles.org parser
+     rejects). Once submitted Perseus repaints the right tiles green, so `aria-disabled="true"`
+     keeps that green. Specificity must clear `#main-content`'s id — `!important` alone loses to
+     it. */
+  /* The tile carries no `data-kind`, so the rule above leaves it unpainted; natively
+     transparent with a mid-grey 2px outline the blanket border reset dims, it would be a bare
+     floating letter. */
   #main-content .framework-perseus fieldset li > button[aria-pressed],
   #main-content .perseus-renderer fieldset li > button[aria-pressed] {
     background-color: #1c2128;
@@ -1577,15 +1100,10 @@
   #main-content .perseus-renderer fieldset li > button[aria-pressed="true"][aria-disabled="false"]:hover {
     background-color: #2f6fd6 !important;
   }
-  /* Perseus's second cue is the choice TEXT, which it recolours to match the
-     picked tile. The choice body is a nested stack of <div>s, and the page-shell
-     rule near the top of this file paints every one of them near-white
-     `!important` — so colouring the wrapper alone leaves the rendered words
-     identical to an unpicked choice and the cue never appears on screen. Restate
-     it on the descendants that carry the words. Only `div`/`span`/`b`/`strong`:
-     MathML and MathJax emit custom elements, and KaTeX carries Perseus's
-     `\blueD`-style term colours as an inline `color` on a span — none of which
-     this reaches, so colour-coded math inside a choice keeps its hue. */
+  /* Perseus's second cue is the choice TEXT, whose body is a nested stack of <div>s the
+     page-shell rule paints near-white `!important`, so colouring the wrapper alone changes
+     nothing. Only `div`/`span`/`b`/`strong`: MathML and MathJax emit custom elements and KaTeX
+     carries term colours as an inline `color` on a span, none of which this reaches. */
   #main-content .framework-perseus fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div,
   #main-content .perseus-renderer fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div,
   #main-content .framework-perseus fieldset li > button[aria-pressed="true"][aria-disabled="false"] + div div,
@@ -1605,23 +1123,20 @@
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
   }
-  /* The multi-select tick inside a picked tile is the empty-span mask icon, which
-     the icon rule above paints the muted light grey meant for dark surfaces; on
-     the blue/green tile Perseus draws it white. */
+  /* The multi-select tick inside a picked tile is the empty-span mask icon, painted the
+     neutral grey by the icon rule above; on the blue/green tile Perseus draws it white. */
   #main-content .framework-perseus fieldset li > button[aria-pressed="true"] > span:first-child:empty,
   #main-content .perseus-renderer fieldset li > button[aria-pressed="true"] > span:first-child:empty {
     background-color: #ffffff !important;
   }
 
-  /* ====================================================================
-     Scrollbars
-     ==================================================================== */
+  /* Scrollbars */
   ::-webkit-scrollbar { width: 12px; height: 12px; }
   ::-webkit-scrollbar-track { background: #14181d; }
   ::-webkit-scrollbar-thumb { background: #2d333b; border-radius: 6px; }
   ::-webkit-scrollbar-thumb:hover { background: #3a424c; }
-  /* The corner is a separate pseudo from the track: any element scrollable on
-     BOTH axes (Perseus renders its question column that way at narrow widths)
-     leaves a default-white square where the two bars meet. */
+  /* The corner is a separate pseudo from the track: any element scrollable on BOTH axes
+     (Perseus's question column at narrow widths) leaves a default-white square where the bars
+     meet. */
   ::-webkit-scrollbar-corner { background: #14181d; }
 }
