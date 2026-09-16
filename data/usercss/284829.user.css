@@ -1,0 +1,1473 @@
+/* ==UserStyle==
+@name         Sudoku Dark 2026
+@namespace    USO Archive
+@author       Reza Rahemtola
+@description  Dark theme for Sudoku.com that darkens the 9x9 board itself, number pads, hints, daily challenges, awards, tournaments and guides.
+@version      20260915.23.34
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("sudoku.com") {
+/* Sudoku.com Dark
+     
+     Every locale is a path on this one host (/de, /jp, ...), so one
+     domain() block covers the site. No custom properties: every colour
+     is a literal in ref-game.css, so each surface needs its own rule.
+     
+     Tone map, preserving the site's elevation order:
+     #fff            -> #1c2128  cards, popups, header, menus
+     #f3f6fa #f1f4f8 -> #22272e  panels, hovers, active tabs
+     #f0f4f9 #e4eaf1 -> #20252c  nested panels
+     #eaeef4         -> #242b33  control fills (numpad, keys)
+     #dce3ed         -> #2e3641  control hover
+     #d2dae7         -> #39424f  control pressed
+     #e0e8f7         -> #2d333b  borders
+     #344861         -> #e6edf3  headings
+     #6e7c8c         -> #a8b2bd  prominent muted text
+     #94a3b7 #adb6c2 -> #8b949e  quieter muted text
+     #325aaf         -> #7ea2ea  brand blue as INK
+     #5a7bc0         -> #4a68ad  brand blue as BUTTON FILL
+     
+     Event panels (tournament orange, storybook cover, win gradient) are
+     identity, not light leaks: keep the hue, drop one step.
+     
+     The 9x9 grid is a <canvas> whose colours live in a JS constant no
+     CSS rule can reach, so the board is retoned by a filter chain. */
+
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body {
+    background-color: #14181d !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* Must not be !important: it only faces buttons the site never
+     painted, and any author rule has to outrank it. */
+  button,
+  input[type="submit"],
+  input[type="button"],
+  input[type="reset"] {
+    background-color: #22272e;
+    color: #e6edf3;
+    border-color: #2d333b;
+  }
+
+  /* THE BOARD
+     
+     hue-rotate(180) after invert() puts every hue back where the site
+     drew it, so selected / same-value / conflict stay mutually distinct
+     instead of collapsing to one grey. The smart-hint overlay canvas
+     must stay on the same chain as the board or the layers stop lining
+     up. */
+
+  .game-wrapper .game canvas,
+  #game canvas,
+  #sh-canvas canvas {
+    filter: invert(0.9) hue-rotate(180deg) saturate(1.28) brightness(1.2) !important;
+  }
+
+  /* The canvas keeps the site's white background: it is inside the
+     filter, so #fff resolves to the empty-cell tone. Only the frame
+     around it takes the page ground. */
+  .game-wrapper {
+    background-color: #14181d !important;
+  }
+
+  /* Must stay lighter than the scrim the site draws on light, or the
+     board under it stops being legible. */
+  .smart-hint {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
+
+  /* HEADER */
+
+  .header,
+  .site-header,
+  #masthead,
+  .main-navigation {
+    background-color: #0d1117 !important;
+    border-color: #262c33 !important;
+  }
+
+  .header_menu > a,
+  .header_menu > div.events,
+  .nav-menu-item > a,
+  .header_left a,
+  .lang-menu_label,
+  .lang-menu-label,
+  .mode-menu-label {
+    color: #c4cdd6 !important;
+  }
+
+  .header_menu > a.active:not(.dc):not(.tournament):not(.postcards):not(.storybook):not(.events),
+  .header_menu > div.events.active:not(.dc):not(.tournament):not(.postcards):not(.storybook):not(.events),
+  .nav-menu-item > a:not(.more-menu-open).active,
+  .nav-menu-item > a:not(.more-menu-open).active span:not(.menu-notification),
+  .header_mobile_dropdown a.active,
+  .ref-mode-menu-item a.active span,
+  .mode-menu-dropdown ul > li > a.active,
+  .more-menu-dropdown li a.active {
+    color: #9bc0ff !important;
+  }
+
+  .header_menu > a:not(.active):not(.dc):not(.tournament):not(.postcards):not(.storybook):not(.events):hover,
+  .header_menu > div.events:not(.active):not(.dc):not(.tournament):not(.postcards):not(.storybook):not(.events):hover,
+  .nav-menu-item > a:not(.active):hover,
+  .header_mobile_dropdown a:not(.active):hover,
+  .lang-menu_dropdown ul li a:hover,
+  .lang-menu_label:hover,
+  .lang-menu-label:hover,
+  .mode-menu-label:hover,
+  .ref-mode-menu-item a:not(.active):hover,
+  .mode-menu-dropdown ul > li > a:not(.active):hover,
+  .more-menu-dropdown li a:not(.active):hover,
+  .difficulty-menu-dropdown a:hover,
+  .lang-menu-dropdown a:hover,
+  .mode-menu-dropdown a:hover {
+    background-color: #22272e !important;
+  }
+
+  .header_menu > a:not(.active):not(.dc):not(.tournament):not(.postcards):not(.storybook):not(.events):active,
+  .header_menu > div.events:not(.active):not(.dc):not(.tournament):not(.postcards):not(.storybook):not(.events):active,
+  .nav-menu-item > a:not(.active):active,
+  .ref-mode-menu-item a:active,
+  .mode-menu-dropdown ul > li > a:not(.active):active,
+  .header_mobile_dropdown a:not(.active):active {
+    background-color: #2e3641 !important;
+  }
+
+  .header_menu > a.active:not(.dc):not(.tournament):not(.postcards):not(.storybook):not(.events),
+  .nav-menu-item > a:not(.more-menu-open).active,
+  .header_mobile_dropdown a.active,
+  .mode-menu-dropdown ul > li > a.active,
+  .more-menu-dropdown li a.active,
+  .header .active.dc,
+  .header .active.events,
+  .header .active.postcards,
+  .header .active.storybook,
+  .header .active.tournament {
+    background-color: #1c2128 !important;
+  }
+
+  /* An active chip drops its brand plate for ours, so its label goes
+     from white to the active ink. */
+  .header .active.dc,
+  .header .active.events,
+  .header .active.postcards,
+  .header .active.storybook,
+  .header .active.tournament,
+  .header .active.dc span,
+  .header .active.events span,
+  .header .active.postcards span,
+  .header .active.storybook span,
+  .header .active.tournament span,
+  .main-navigation a.active[class*="_header-link"],
+  .main-navigation a.active[class*="_header-link"] span {
+    color: #9bc0ff !important;
+  }
+
+  /* Burger bars and the header logo are drawn as boxes, not glyphs. */
+  .header_burger > div,
+  .header_burger:after,
+  .header_burger:before {
+    background-color: #c4cdd6 !important;
+  }
+
+  .header_mobile_dropdown,
+  .header_mobile_dropdown:after,
+  .header .events_dropdown,
+  .header .events_dropdown:after,
+  .events-menu,
+  .lang-menu_dropdown,
+  .difficulty-menu-dropdown,
+  .lang-menu-dropdown,
+  .mode-menu-dropdown,
+  .more-menu-dropdown,
+  .more-menu-dropdown:after,
+  .main-navigation {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* Chips are brand plates: white label, until the chip is the active
+     tab and takes our surface instead. */
+  .header a.dc:not(.active),
+  .header a.tournament:not(.active),
+  .header a.postcards_header-link:not(.active),
+  .header a.storybook_header-link:not(.active),
+  .header a.ftc_header-link:not(.active),
+  .header a.dc:not(.active) span,
+  .header a.tournament:not(.active) span,
+  .header a.postcards_header-link:not(.active) span,
+  .header a.storybook_header-link:not(.active) span,
+  .header a.ftc_header-link:not(.active) span,
+  .main-navigation a.dc:not(.active),
+  .main-navigation a.tournament:not(.active),
+  .main-navigation a.postcards_header-link:not(.active),
+  .main-navigation a.storybook_header-link:not(.active),
+  .main-navigation a.ftc_header-link:not(.active),
+  .main-navigation a.dc:not(.active) span,
+  .main-navigation a.tournament:not(.active) span,
+  .main-navigation a.postcards_header-link:not(.active) span,
+  .main-navigation a.storybook_header-link:not(.active) span,
+  .main-navigation a.ftc_header-link:not(.active) span {
+    color: #ffffff !important;
+  }
+
+  /* The badge is its own light plate with deep blue numerals; the
+     chip's white label must not reach inside it, so this is written to
+     outrank the chip rule above. */
+  .header a[class*="_header-link"] .postcards_header-icon > span,
+  .header a[class*="_header-link"] .postcards_header-icon,
+  .main-navigation a[class*="_header-link"] .postcards_header-icon > span,
+  .main-navigation a[class*="_header-link"] .postcards_header-icon {
+    color: #004caf !important;
+  }
+
+  .header a[class*="_header-link"] .postcards_header-icon.crown.place-1 > span,
+  .header a[class*="_header-link"] .postcards_header-icon.crown.place-3 > span,
+  .main-navigation a[class*="_header-link"] .postcards_header-icon.crown.place-1 > span,
+  .main-navigation a[class*="_header-link"] .postcards_header-icon.crown.place-3 > span {
+    color: #a92500 !important;
+  }
+
+  .header a[class*="_header-link"] .postcards_header-icon.crown.place-2 > span,
+  .main-navigation a[class*="_header-link"] .postcards_header-icon.crown.place-2 > span {
+    color: #3f617a !important;
+  }
+
+  .header .events_dropdown_title,
+  .events-menu_title,
+  .events-menu_menu > a,
+  .events-menu_menu > div,
+  .header .dc:not(.events) > span.info,
+  .header .events:not(.events) > span.info,
+  .header .postcards:not(.events) > span.info,
+  .header .storybook:not(.events) > span.info,
+  .header .tournament:not(.events) > span.info {
+    color: #e6edf3 !important;
+  }
+
+  /* The white timer pill on a chip keeps its own plate so the
+     countdown stays readable over it. */
+  .header span.info,
+  .header_menu span.info,
+  .nav-menu-item span.info,
+  .emoji_circle,
+  .emoji_text,
+  .inter-emoji_circle,
+  .inter-emoji_text {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
+
+  .emoji_text,
+  .inter-emoji_text {
+    color: #9bc0ff !important;
+  }
+
+  .header .events_dropdown_item_button,
+  .events-menu_item_button {
+    background-color: #22272e !important;
+    color: #9bc0ff !important;
+  }
+
+  /* GAME CHROME — timer, score, mistakes */
+
+  .game_statistics,
+  .game-info-wrapper,
+  .timer-wrapper,
+  .timer-wrapper_text,
+  .score,
+  .mistakes-counter,
+  .game_statistics_goal_value {
+    color: #c4cdd6 !important;
+  }
+
+  .game-info-wrapper .score > span,
+  .game-info-wrapper .mistakes-counter > span,
+  .score-value {
+    color: #e6edf3 !important;
+  }
+
+  .timer-pause {
+    background-color: #242b33 !important;
+  }
+
+  .timer-pause:hover {
+    background-color: #2e3641 !important;
+  }
+
+  .timer-pause:active {
+    background-color: #39424f !important;
+  }
+
+  /* ACTION CIRCLES — undo, erase, pencil, hint */
+
+  .game-controls .game-controls-item {
+    background-color: #242b33 !important;
+    border-color: #2d333b !important;
+  }
+
+  .game-controls .game-controls-item:hover,
+  .mobile .game-controls .game-controls-item:hover {
+    background-color: #2e3641 !important;
+  }
+
+  .game-controls .game-controls-item:active {
+    background-color: #39424f !important;
+  }
+
+  /* The four glyphs are an icon font, so they take `color`. */
+  .game-controls .icon-game-control {
+    color: #c4cdd6 !important;
+  }
+
+  .game-controls .game-controls-label {
+    color: #9bc0ff !important;
+  }
+
+  /* Pencil mode is signalled by the ring, not by the fill. */
+  .pencil-mode:not(.win):not(.show-new-pause) .game-controls .game-controls-pencil {
+    background-color: #242b33 !important;
+    border-color: #7ea2ea !important;
+  }
+
+  /* The ON/OFF pill is a ::after; grey means off, brand blue means on. */
+  .game-controls .game-controls-pencil:after,
+  .new-breakpoints .game-controls .game-controls-item-wrap .game-controls-item.game-controls-pencil:after,
+  .portrait .game-controls .game-controls-item-wrap .game-controls-item.game-controls-pencil:after {
+    background-color: #4a5462 !important;
+    color: #e6edf3 !important;
+  }
+
+  .pencil-mode .game-controls .game-controls-pencil:after,
+  .new-breakpoints .pencil-mode .game-controls .game-controls-item-wrap .game-controls-item.game-controls-pencil:after,
+  .portrait .pencil-mode .game-controls .game-controls-item-wrap .game-controls-item.game-controls-pencil:after {
+    background-color: #325aaf !important;
+    color: #ffffff !important;
+  }
+
+  .game-controls-item .badge,
+  .game-controls_hint-count,
+  .game-controls-hint-label {
+    color: #ffffff !important;
+  }
+
+  /* NUMBER PAD */
+
+  .numpad-wrapper .numpad-item,
+  .landscape .numpad-wrapper .numpad-item,
+  .new-breakpoints .numpad-wrapper .numpad-item {
+    background-color: #242b33 !important;
+    color: #7ea2ea !important;
+  }
+
+  .numpad-wrapper .numpad-item[disabled],
+  .landscape .numpad-wrapper .numpad-item[disabled],
+  .new-breakpoints .numpad-wrapper .numpad-item[disabled] {
+    background-color: #1c2128 !important;
+    color: #5b6572 !important;
+  }
+
+  .numpad-wrapper .numpad-item:hover,
+  .landscape .numpad-wrapper .numpad-item:hover,
+  .new-breakpoints .numpad-wrapper .numpad-item:hover {
+    background-color: #2e3641 !important;
+  }
+
+  .numpad-wrapper .numpad-item:active,
+  .landscape .numpad-wrapper .numpad-item:active,
+  .new-breakpoints .numpad-wrapper .numpad-item:active {
+    background-color: #39424f !important;
+  }
+
+  /* NEW GAME BUTTON + DIFFICULTY MENU */
+
+  .difficulty-menu,
+  .new-game-menu,
+  .difficulty-menu .tooltip-arrow:after,
+  .new-game-menu .tooltip-arrow:after,
+  .cheats-menu,
+  .split-tab,
+  .scoreHint,
+  .inter-animation_tooltip {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .new-game-menu-difficulty-block,
+  .new-game-menu-mode-button.active,
+  .ref-start-game_items > a.selected {
+    background-color: #22272e !important;
+  }
+
+  .new-game-menu-mode-button,
+  .new-game-menu-mode-button.postcard-default,
+  .new-game-menu-mode-button.storybook-default {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  .new-game-menu-mode-button:hover {
+    background-color: #22272e !important;
+    border-color: #3a424c !important;
+  }
+
+  .new-game-menu-header,
+  .new-game-menu-button,
+  .ref-start-game_items > a {
+    color: #c4cdd6 !important;
+  }
+
+  .new-game-menu-button {
+    border-top-color: #2d333b !important;
+  }
+
+  .new-game-menu-button:hover,
+  .ref-start-game_items > a:hover {
+    background-color: #22272e !important;
+  }
+
+  .ref-start-game_items > a:active {
+    background-color: #2e3641 !important;
+  }
+
+  .new-game-menu-button.active,
+  .new-game-menu-mode-button.active,
+  .ref-start-game_items > a.active {
+    color: #9bc0ff !important;
+  }
+
+  /* PAUSE / WIN / GAME OVER / LOST PROGRESS */
+
+  .new-pause,
+  .lost-progress,
+  .game-over_body,
+  .game_settings_body,
+  .load-dialog,
+  .dc_cnt,
+  .build-version {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .new-pause_title,
+  .lost-progress_title,
+  .game-over_title,
+  .load-dialog-heading,
+  .game_settings_header_title,
+  .game_settings_content_item_title {
+    color: #e6edf3 !important;
+  }
+
+  .game_settings_content_item {
+    background-color: #22272e !important;
+  }
+
+  .game-over_cancel,
+  .load-dialog-cancel {
+    background-color: #22272e !important;
+    color: #9bc0ff !important;
+  }
+
+  .game-over,
+  .postcards-popup,
+  .storybook-popup {
+    background-color: rgba(0, 0, 0, 0.72) !important;
+  }
+
+  .lose-notification,
+  .daily-win-button {
+    background-color: #1c2128 !important;
+    color: #9bc0ff !important;
+  }
+
+  .daily-win-button:hover {
+    background-color: #242b33 !important;
+  }
+
+  /* SMART HINT CAROUSEL */
+
+  .smart-hint_carousel,
+  body.device-desktop.show-smart-hint .game-controls-wrapper.show-smart-hint-carousel,
+  body.device-tablet.show-smart-hint .game-controls-wrapper.show-smart-hint-carousel {
+    background-color: #1c2128 !important;
+  }
+
+  .smart-hint_carousel_name {
+    color: #e6edf3 !important;
+  }
+
+  .smart-hint_carousel_desc {
+    color: #a5b0bd !important;
+  }
+
+  .smart-hint_carousel_desc_item span {
+    color: #9bc0ff !important;
+  }
+
+  .smart-hint_carousel_nav .sh-nav-button,
+  .smart-hint_carousel_nav .sh-nav-submit,
+  .carousel-nav {
+    background-color: #242b33 !important;
+  }
+
+  .smart-hint_carousel_nav .sh-nav-button:hover,
+  .smart-hint_carousel_nav .sh-nav-submit:hover,
+  .carousel-nav:hover {
+    background-color: #2e3641 !important;
+  }
+
+  .smart-hint_carousel_nav .sh-nav-button:active,
+  .smart-hint_carousel_nav .sh-nav-submit:active,
+  .carousel-nav:active {
+    background-color: #39424f !important;
+  }
+
+  /* ARTICLE / TIPS CONTENT */
+
+  .entry-content,
+  .entry-content p,
+  .entry-content li,
+  .entry-content td,
+  .entry-content th,
+  #tips-articles-wrap,
+  .site-content,
+  .page-content {
+    color: #c4cdd6 !important;
+  }
+
+  .entry-content h1,
+  .entry-content h2,
+  .entry-content h3,
+  .entry-content h4,
+  .entry-title,
+  .entry-title a,
+  .daily .entry-content h1,
+  .daily .entry-content h2,
+  .daily .entry-content h1 a,
+  .daily .entry-content h2 a,
+  .main-page .entry-content h1,
+  .main-page .entry-content h2,
+  .main-page .entry-content h3,
+  .single-article-page .entry-content h3,
+  .articles-page .list-title,
+  .page-header_title,
+  .calendar-header,
+  .rules_header_title,
+  .rules_item_title,
+  .heading-404 {
+    color: #e6edf3 !important;
+  }
+
+  .entry-content a,
+  .cookies-popup a,
+  .more-link,
+  .post-navigation-item a,
+  .post-navigation a {
+    color: #7ea2ea !important;
+  }
+
+  .entry-content a:hover,
+  .more-link:hover,
+  .post-navigation a:hover {
+    color: #9bc0ff !important;
+  }
+
+  .entry-content ul,
+  .page-header_menu {
+    background-color: #1a1f26 !important;
+    border-color: #2d333b !important;
+  }
+
+  .entry-content table,
+  .entry-content table td,
+  .entry-content table th {
+    border-color: #2d333b !important;
+  }
+
+  .page-numbers {
+    color: #c4cdd6 !important;
+  }
+
+  .page-numbers:hover {
+    background-color: #22272e !important;
+  }
+
+  .page-numbers:hover circle {
+    fill: #22272e !important;
+  }
+
+  /* ASIDE — app teaser */
+
+  .app-teaser-wrapper {
+    background-color: #1a1f26 !important;
+  }
+
+  .app-teaser-info {
+    background-color: #22272e !important;
+    color: #c4cdd6 !important;
+  }
+
+  .app-info-heading {
+    color: #e6edf3 !important;
+  }
+
+  .app-info-author,
+  .app-teaser-info {
+    color: #8b949e !important;
+  }
+
+  /* Badge links wrap an image only; the UA visited colour would leak. */
+  .app-teaser-button,
+  .app-teaser-button:visited {
+    color: #c4cdd6 !important;
+  }
+
+  .ios-smart .app-button,
+  .mobile-smart .app-info-heading {
+    color: #9bc0ff !important;
+  }
+
+  /* FOOTER — already dark; deepened to match the page */
+
+  .ref-footer,
+  .ref-footer_top,
+  .ref-footer_bottom {
+    background-color: #0d1117 !important;
+  }
+
+  .ref-footer,
+  .ref-footer_bottom {
+    color: #8b949e !important;
+  }
+
+  .ref-footer a {
+    color: #c4cdd6 !important;
+  }
+
+  .ref-footer a:hover {
+    color: #9bd4ff !important;
+  }
+
+  .footer-anchor {
+    background-color: #22272e !important;
+  }
+
+  .footer-anchor:after,
+  .footer-anchor:before {
+    background-color: #c4cdd6 !important;
+  }
+
+  /* CONSENT BANNER + PRIVACY POPUP */
+
+  .cookies-banner,
+  .cookies-popup .popup-content,
+  .cookies-popup .options-list,
+  .cookies-popup .options-dropdown select {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
+
+  .cookies-popup .options-list li.active {
+    background-color: #22272e !important;
+    color: #9bc0ff !important;
+  }
+
+  .cookies-popup .options-content > div > div {
+    color: #e6edf3 !important;
+  }
+
+  .cookies-banner a,
+  .cookies-banner span.cookie-settings-link,
+  .cookies-btn-link,
+  .ot-sdk-show-settings {
+    color: #7ea2ea !important;
+  }
+
+  .cookies-popup .popup-content__top,
+  .cookies-popup .popup-content__bottom {
+    border-color: #2d333b !important;
+  }
+
+  /* ONETRUST PREFERENCE CENTRE
+     
+     A page state of its own, reached from the footer after the banner
+     is accepted. Its close/expand glyphs are dark PNGs, which only a
+     filter can reach. */
+
+  #onetrust-banner-sdk,
+  #onetrust-pc-sdk,
+  #onetrust-pc-sdk .ot-pc-footer,
+  #onetrust-pc-sdk #ot-pc-content,
+  #onetrust-pc-sdk .ot-accordion-layout,
+  #onetrust-pc-sdk #ot-sel-blk,
+  #onetrust-pc-sdk .ot-acc-hdr,
+  #onetrust-pc-sdk #ot-fltr-cnt,
+  #onetrust-pc-sdk .ot-pc-header {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  #onetrust-policy-text,
+  #onetrust-policy-text *,
+  #ot-pc-title,
+  #ot-pc-desc,
+  #ot-pc-desc *,
+  #onetrust-pc-sdk .ot-acc-txt,
+  #onetrust-pc-sdk .ot-acc-txt *,
+  #onetrust-pc-sdk h3,
+  #onetrust-pc-sdk h4,
+  #onetrust-pc-sdk h5,
+  #onetrust-pc-sdk p,
+  #onetrust-pc-sdk span,
+  #onetrust-pc-sdk .ot-always-active,
+  #onetrust-pc-sdk #ot-filter-list-header,
+  #onetrust-pc-sdk .ot-accordion-layout button {
+    color: #c4cdd6 !important;
+  }
+
+  body #onetrust-consent-sdk #onetrust-banner-sdk a[href],
+  body #onetrust-consent-sdk #onetrust-pc-sdk a[href],
+  body #onetrust-consent-sdk #onetrust-pc-sdk .ot-link-btn,
+  body #onetrust-consent-sdk #onetrust-pc-sdk .privacy-notice-link,
+  #onetrust-pc-sdk #clear-filters-handler {
+    color: #7ea2ea !important;
+  }
+
+  #onetrust-pc-sdk .ot-close-icon,
+  #onetrust-pc-sdk .ot-plus-minus,
+  #onetrust-pc-sdk .ot-arw-cntr,
+  #onetrust-banner-sdk .banner-close-button {
+    filter: invert(1) !important;
+  }
+
+  /* MODULE-CLASS SECTIONS
+     
+     awards / tournament / leaderboard / postcards / storybook / win
+     screen / daily challenge are CSS modules: only the trailing hash
+     rotates on a deploy, so every hook here matches on the prefix. */
+
+  [class*="_popup_content__"],
+  [class*="_playPopup__"],
+  [class*="_gamesPopup__"],
+  [class*="_modesPopup__"],
+  [class*="_dc__"],
+  [class*="_tournament__"],
+  [class*="_leaderboard_page__"],
+  [class*="_postcards__"],
+  [class*="_postcard__"],
+  [class*="_croco_info_content__"],
+  [class*="_btn_popup__"],
+  [class*="_win_left_sudoku__"],
+  [class*="_image_popup_close__"],
+  .tournament_popup_body,
+  .tournament_reward_body {
+    background-color: #1c2128 !important;
+    color: #c4cdd6 !important;
+  }
+
+  [class*="_btn_popup_buttons__"],
+  [class*="_playPopupButtons__"],
+  [class*="_playPopupItem__"],
+  [class*="_gamesPopupLink__"],
+  [class*="_croco_info_stats_item__"],
+  [class*="_leaderboard_me__"],
+  [class*="_leaderboard_page_me__"],
+  [class*="_awards_header_active_tab__"],
+  [class*="_month_day__"] {
+    background-color: #22272e !important;
+  }
+
+  [class*="_btn_popup_item__"]:hover,
+  [class*="_playPopupItem__"]:hover,
+  [class*="_gamesPopupLink__"]:hover,
+  [class*="_dc_arrow__"]:hover,
+  [class*="_arrow__"]:hover {
+    background-color: #2e3641 !important;
+  }
+
+  [class*="_popup_title__"],
+  [class*="_btn_popup_title__"],
+  [class*="_dc_header_title__"],
+  [class*="_tournament_right_title__"],
+  [class*="_leaderboard_page_right_title__"],
+  [class*="_playPopupTitle__"],
+  [class*="_modesPopupTitle__"],
+  [class*="_awards_empty_title__"],
+  [class*="_awards_header_title__"],
+  [class*="_awards_event_item_title__"],
+  [class*="_awards_dc_item_title__"],
+  [class*="_croco_hiw_title__"],
+  [class*="_croco_info_name__"],
+  [class*="_leaderboard_item_position__"],
+  [class*="_leaderboard_item_content__"],
+  [class*="_leaderboard_page_item_position__"],
+  [class*="_leaderboard_page_item_content__"],
+  [class*="_win_overlay_keys__"],
+  .tournament_popup_title,
+  .tournament_reward_title {
+    color: #e6edf3 !important;
+  }
+
+  /* A near-opaque white sheet over the panel it is loading; on dark
+     it has to be the ground, not a flash. */
+  [class*="loading-styles_loading__"],
+  .loading-screen {
+    background-color: rgba(20, 24, 29, 0.95) !important;
+  }
+
+  [class*="_levelsCount__"] {
+    background-color: #22272e !important;
+  }
+
+  [class*="_dc_arrow__"],
+  [class*="_navArrow__"],
+  [class*="_sliderContainer__"] [class*="_arrow__"] {
+    background-color: #22272e !important;
+    color: #c4cdd6 !important;
+  }
+
+  [class*="_playPopupItemText__"],
+  [class*="_difficultActive__"],
+  [class*="_image_popup_btn__"],
+  [class*="_btn_popup_item_text__"].blue {
+    color: #9bc0ff !important;
+  }
+
+  /* The site's "white" button variant is a light plate with brand
+     ink; on dark, an elevated plate with the same ink. */
+  [class*="_btn__"][class*="_white_green__"],
+  [class*="_cancelWhiteGreen__"],
+  .button.transparent {
+    background-color: #22272e !important;
+    border-color: #2d333b !important;
+    color: #c4cdd6 !important;
+  }
+
+  /* popup-styles' own "white" is a bare text button, not a plate — a
+     fill would invent a button. */
+  [class*="popup-styles_white__"] {
+    background-color: transparent !important;
+    color: #7ea2ea !important;
+  }
+
+  [class*="_popup_dots_item__"] {
+    background-color: #3a424c !important;
+  }
+
+  /* The active dot is the position marker, not another rail step. */
+  [class*="_popup_dots_item__"][class*="_active__"],
+  [class*="_popup_dots_item__"].active {
+    background-color: #7ea2ea !important;
+  }
+
+  [class*="_popup_dots_item__"][class*="_active__"].green {
+    background-color: #3fb950 !important;
+  }
+
+  [class*="_x_mark__"]:after,
+  [class*="_x_mark__"]:before {
+    background-color: #a8b2bd !important;
+  }
+
+  .button.transparent:hover {
+    background-color: #262d35 !important;
+  }
+
+  .button.transparent:active {
+    background-color: #2e3641 !important;
+  }
+
+  /* MUTED INK
+     
+     A two-step ramp: #6e7c8c is the prominent tier, #94a3b7 the quieter
+     one. Prominence inverts on dark, so #6e7c8c lands lighter. */
+
+  .header .events_close_active_content > div,
+  .header_mobile_dropdown a,
+  .lang-menu,
+  .lang-menu_dropdown ul li a,
+  .breadcrumbs a,
+  .ref-mode-menu-item a,
+  .main-navigation-item,
+  .main-navigation-item a,
+  .nav-menu-item > a.daily_header-link .daily_desc,
+  .nav-menu-item > a.ftc_header-link .ftc_desc,
+  .difficulty-menu-dropdown a,
+  .lang-menu-dropdown a,
+  .mode-menu-dropdown a,
+  .mode-menu-dropdown ul > li > a,
+  .more-menu-dropdown li a,
+  .single-article-page p,
+  .entry-content,
+  .entry-content li,
+  .page-numbers,
+  .calendar-table .day,
+  .inter-animation_text,
+  .page-header_button,
+  .game_statistics_date_value,
+  .game_statistics_label,
+  .game_statistics .mistakes-counter,
+  .game_statistics .mistakes-counter > span,
+  .game_statistics_goal_value,
+  .game_statistics .timer-wrapper .timer,
+  .game_statistics_difficulty .game_statistics_difficulty_value .difficulty-label,
+  .checkbox_text,
+  .loading-screen .loading-label,
+  .load-dialog-text,
+  .game-info-wrapper .difficulty-label,
+  .game-info-wrapper .difficulty-menu a,
+  .new-game-menu-subheader,
+  .solo-difficulty_value,
+  .lose-notification,
+  .cookies-banner,
+  .cookies-popup .options-dropdown select,
+  .cookies-popup .options-content p,
+  .cookies-popup .options-content ul,
+  .rules_item_desc,
+  .rules_item_difficulty,
+  .rules_header_desc,
+  .text-404,
+  .lost-progress_desc,
+  .tournament_reward_time .time-to-end,
+  [class*="_croco_info_stats_item__"] span,
+  [class*="_croco_hiw_item__"] span,
+  [class*="_btn_popup_desc__"],
+  [class*="_playPopupDesc__"],
+  [class*="_loading_label__"],
+  [class*="_awards_header_tab__"],
+  [class*="_awards_event_item_date__"],
+  [class*="_awards_dc_item_progress__"],
+  [class*="_awards_dc_item_status__"],
+  [class*="_difficultList__"] *,
+  [class*="_levelsCount__"],
+  [class*="_gamesPopupLink__"],
+  [class*="_popup_track_item_timer__"] {
+    color: #a8b2bd !important;
+  }
+
+  .header .events_close_active_content > span,
+  .events-menu_menu > a .right .lang-menu_label .language,
+  .events-menu_menu > div .right .lang-menu_label .language,
+  .ref-footer_top_content .easy-brain .copyright,
+  .footer-logo .copyright,
+  .footer-disclaimer,
+  .tournament_popup_item_text,
+  .tournament_reward_text,
+  .game_settings_content_item_value,
+  .game-over_desc,
+  .game-info-wrapper .sudoku-date,
+  .game-info-wrapper .difficulty-text,
+  .game-info-wrapper .timer-wrapper .timer,
+  .game-info-wrapper .score,
+  .game-info-wrapper .mistakes-counter,
+  .solo-difficulty_title,
+  .cookies-popup .options-list,
+  .cookies-popup .options-list li,
+  .mobile-smart .app-info-author,
+  .mobile-smart .app-info-description,
+  .ref-start-game_title,
+  .smart-hint_carousel_desc,
+  [class*="_croco_info_stats_item__"],
+  [class*="_awards_empty_desc__"],
+  [class*="_difficultTitle__"],
+  [class*="_hint__"],
+  [class*="_popup_track_item_text__"] {
+    color: #8b949e !important;
+  }
+
+  /* Must stay after the muted sweep: the selected difficulty is an
+     accent, not another muted row. */
+  [class*="_difficultActive__"] {
+    color: #9bc0ff !important;
+  }
+
+  [class*="_rewardCrown__"],
+  .leaderboardReward .rewardCrown,
+  .eventRewardLeaderboard .postcardReward .rewardCrown {
+    color: #9aa4b0 !important;
+  }
+
+  /* DISABLED / BLOCKED CONTROLS
+     
+     Quieter than the live ones without dropping into the unreadable
+     band. */
+
+  .numpad-wrapper .numpad-item[disabled],
+  .landscape .numpad-wrapper .numpad-item[disabled],
+  .new-breakpoints .numpad-wrapper .numpad-item[disabled] {
+    color: #77808b !important;
+  }
+
+  .blocked .numpad-wrapper .numpad-item svg path,
+  .show-new-pause .numpad-wrapper .numpad-item svg path,
+  .blocked .game-controls .game-controls-item .icon-game-control path,
+  .show-new-pause .game-controls .icon-game-control path {
+    fill: #77808b !important;
+  }
+
+  .blocked .game-controls .game-controls-item + .game-controls-label {
+    color: #77808b !important;
+  }
+
+  .game-controls .game-controls-item.blocked .game-controls-hint-label,
+  .blocked .game-controls .game-controls-item .game-controls-hint-label,
+  .preact-win .game-controls .game-controls-item .game-controls-hint-label,
+  .show-new-pause .game-controls .game-controls-item .game-controls-hint-label,
+  .win .game-controls .game-controls-item .game-controls-hint-label {
+    background-color: #4a5462 !important;
+  }
+
+  /* Pause bars and breadcrumb chevrons are boxes, so they take a
+     background not a colour. */
+  .icon-pause:before,
+  .icon-pause:after {
+    background-color: #a8b2bd !important;
+  }
+
+  /* State lives in the knob as well as the track: grey knob off,
+     brand blue knob on. */
+  .game_settings_toggle {
+    background-color: rgba(148, 163, 183, 0.28) !important;
+  }
+
+  .game_settings_toggle:before {
+    background-color: #8b949e !important;
+  }
+
+  .active-toggle .game_settings_toggle {
+    background-color: rgba(126, 162, 234, 0.3) !important;
+  }
+
+  .active-toggle .game_settings_toggle:before {
+    background-color: #7ea2ea !important;
+  }
+
+  .breadcrumbs a:not(.home):after,
+  .breadcrumbs a:not(.home):before,
+  .breadcrumbs span:not(.home):after,
+  .breadcrumbs span:not(.home):before {
+    background-color: #4a5462 !important;
+  }
+
+  .mode-menu-label path,
+  .mode-menu-dropdown path {
+    fill: #a8b2bd !important;
+  }
+
+  /* AWARDS */
+
+  [class*="_awards_header_tabs__"] {
+    background-color: #22272e !important;
+  }
+
+  [class*="_awards_header_tab__"][class*="_awards_header_active_tab__"],
+  [class*="_awards_header_tab__"][class*="_awards_header_active_tab__"] span {
+    background-color: #1c2128 !important;
+    color: #9bc0ff !important;
+  }
+
+  [class*="_awards_dc_item_progress_bar__"] {
+    background-color: #2e3641 !important;
+  }
+
+  /* Near-black PNG built for a white page; inverting back through
+     180deg keeps the blue rim blue and the body a muted silhouette. */
+  img[src*="unavailable"] {
+    filter: invert(1) hue-rotate(180deg) brightness(0.62) !important;
+  }
+
+  /* RULES DIAGRAMS
+     
+     Opaque PNGs whose plate is the site's own board palette, so the
+     board chain retones them into the same dark grid. Scoped to
+     .rules-page: the tips articles share the template but carry
+     photographs, which must not be touched. */
+
+  .rules_item_image {
+    background-color: #1c2128 !important;
+  }
+
+  .rules_item_image img,
+  .rules-page .entry-content img:not(.post-header-image) {
+    filter: invert(0.9) hue-rotate(180deg) saturate(1.28) brightness(1.2) !important;
+  }
+
+  #nav-below,
+  .post-navigation {
+    border-color: #2d333b !important;
+  }
+
+  /* SUDOKU SOLVER
+     
+     Own bundle (solver.css); its info / success / danger callouts are a
+     signal and stay in their hue family. */
+
+  .solver_notification_body {
+    background-color: #1c2128 !important;
+  }
+
+  .solver_notification_title {
+    color: #e6edf3 !important;
+  }
+
+  .solver_notification_desc {
+    color: #8b949e !important;
+  }
+
+  .solver_article h1,
+  .solver_article h2,
+  .solver_article h3,
+  .solver_article h4,
+  .solver_article h5 {
+    color: #e6edf3 !important;
+  }
+
+  .solver_article p,
+  .solver_article ul li {
+    color: #c4cdd6 !important;
+  }
+
+  .solver_article p a,
+  .solver_info a {
+    color: #7ea2ea !important;
+  }
+
+  .solver_article ul {
+    background-color: #1a1f26 !important;
+  }
+
+  .solver_info {
+    color: #c4cdd6 !important;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .solver_info.info {
+    background-color: #14283a !important;
+  }
+
+  .solver_info.success {
+    background-color: #10291b !important;
+    color: #56d17c !important;
+  }
+
+  .solver_info.danger {
+    background-color: #2e1618 !important;
+    color: #ff8a94 !important;
+  }
+
+  .solver_info_close:after,
+  .solver_info_close:before {
+    background-color: #a8b2bd !important;
+  }
+
+  .solver_btn[disabled],
+  .main-game-button.blocked,
+  .main-game-button[disabled] {
+    background-color: #2e3641 !important;
+    color: #a0aab6 !important;
+  }
+
+  /* PRINTABLE SUDOKU
+     
+     The sheet preview stays untouched: it is a picture of a page that
+     comes out of a printer on white paper. */
+
+  .printable {
+    background-color: #1a1f26 !important;
+  }
+
+  .printable_body_title {
+    color: #e6edf3 !important;
+  }
+
+  .printable_body_desc,
+  .printable_body .checkbox_text {
+    color: #c4cdd6 !important;
+  }
+
+  .printable_body_options .paper-switch_label {
+    background-color: #22272e !important;
+  }
+
+  .printable_body_options .paper-switch.menu-visible .paper-switch_label {
+    background-color: #2e3641 !important;
+  }
+
+  .printable_body_options .paper-switch_value {
+    color: #e6edf3 !important;
+  }
+
+  .printable_body_options .paper-switch_dropdown {
+    background-color: #1c2128 !important;
+    border: 1px solid #2d333b !important;
+    box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .printable_body_options .paper-switch_dropdown ul li {
+    color: #c4cdd6 !important;
+  }
+
+  .printable_body_options .paper-switch_dropdown ul li:hover {
+    background-color: #22272e !important;
+  }
+
+  /* background-color only — the tick and the box outline are one
+     sprite in the shorthand, and a `background` reset erases them. */
+  .printable_body .checkbox .checkbox-icon,
+  .checkbox .checkbox-icon {
+    background-color: #22272e !important;
+  }
+
+  .checkbox .checkbox-icon {
+    border-color: #4a5462 !important;
+  }
+
+  .checkbox input:checked + .checkbox-icon {
+    border-color: #7ea2ea !important;
+  }
+
+  /* WIN SCREEN
+     
+     The panel keeps its brand gradient, deepened; its CTAs stay light
+     plates on it as the site draws them. */
+
+  [class*="winscreen-styles_win__"] {
+    background-image: linear-gradient(#24406f, #34558f) !important;
+  }
+
+  /* The end-of-game thumbnail is the same grid in SVG, so it takes
+     the board chain. */
+  [class*="_win_left_sudoku__"] {
+    background-color: #14181d !important;
+  }
+
+  [class*="_win_left_sudoku__"] svg {
+    filter: invert(0.9) hue-rotate(180deg) saturate(1.28) brightness(1.2) !important;
+  }
+
+  /* TOURNAMENT + LEADERBOARDS
+     
+     The orange event gradients are identity and stay; only the white
+     sheet behind them moves. */
+
+  .tournament_leaderboard_content,
+  .tournament_hiw_body,
+  .tournament_popup_body,
+  .tournament_reward_body,
+  .tournament_reward_image,
+  [class*="_leaderboard_page__"] {
+    background-color: #1c2128 !important;
+  }
+
+  .tournament_leaderboard_content_title,
+  .tournament_hiw_title,
+  [class*="_leaderboard_page_right_title__"] {
+    color: #e6edf3 !important;
+  }
+
+  .tournament_hiw_item_text {
+    color: #8b949e !important;
+  }
+
+  /* The sheet's own scroll fades are white gradients: restate them in
+     the sheet's colour or they paint a bright band. */
+  .tournament_leaderboard_content:after {
+    background-image: linear-gradient(0deg, #1c2128, rgba(28, 33, 40, 0)) !important;
+  }
+
+  .tournament_leaderboard_content:before,
+  .tournament_leaderboard_content_title:before {
+    background-image: linear-gradient(180deg, #1c2128, rgba(28, 33, 40, 0)) !important;
+  }
+
+  .tournament_leaderboard_content_leaderboard .leaderboard-item {
+    background-color: transparent !important;
+  }
+
+  .tournament_leaderboard_content_leaderboard .leaderboard-item:before {
+    background-color: #2d333b !important;
+  }
+
+  .tournament_leaderboard_content_leaderboard .leaderboard-item.me,
+  [class*="_leaderboard_page_me__"] {
+    background-color: #22272e !important;
+  }
+
+  .tournament_leaderboard_content_leaderboard .leaderboard-item.me .leaderboard-item_avatar {
+    border-color: #2d333b !important;
+  }
+
+  .tournament_leaderboard_content_leaderboard .leaderboard-item_avatar {
+    background-color: #22384d !important;
+  }
+
+  .tournament_leaderboard_content_leaderboard .leaderboard-item_score,
+  .tournament_leaderboard_content_leaderboard .leaderboard-item_index,
+  .tournament_leaderboard_content_leaderboard .leaderboard-item_name {
+    color: #e6edf3 !important;
+  }
+
+  .tournament_hiw_dots li,
+  [class*="_withBorder__"]:before {
+    background-color: #3a424c !important;
+  }
+
+  .tournament_hiw_dots li.active {
+    background-color: #7ea2ea !important;
+  }
+
+  /* Medal ranks are a signal; keep the metal hues, lifted off the
+     dark sheet. */
+  [class*="_finished__"] [class*="_leaderboard_page_item_position__"] {
+    color: #7ea2ea !important;
+  }
+
+  .gold [class*="_leaderboard_page_item_position__"],
+  .bronze [class*="_leaderboard_page_item_position__"] {
+    color: #e08a4a !important;
+  }
+
+  .silver [class*="_leaderboard_page_item_position__"] {
+    color: #a9bccb !important;
+  }
+
+  [class*="_leaderboard_page_finish_line__"] {
+    color: #9b99ff !important;
+  }
+
+  /* Teaser thumbnails sit on their own plate. */
+  .entry-header-img,
+  .entry-header-img.article {
+    background-color: #1a1f26 !important;
+  }
+
+  /* BRAND BUTTONS
+     
+     Every module ships the same pair: a solid `_btn__` and a `_white__`
+     text-only variant, both in the brand blue. White on the site's
+     #5a7bc0 is 4.18:1, so the solid fill is deepened one step down the
+     site's own ramp and the text-only variant lifted to the ink blue. */
+
+  .button,
+  .main-game-button,
+  .game-over_btn,
+  .cookies-btn-action,
+  .mobile-smart .app-button,
+  [class*="_btn__"],
+  [class*="_popup_button__"],
+  [class*="_getMoreKeysPlayBtn__"] {
+    background-color: #4a68ad !important;
+    color: #ffffff !important;
+  }
+
+  .button:hover,
+  .main-game-button:hover,
+  .game-over_btn:hover,
+  [class*="_btn__"]:hover,
+  [class*="_popup_button__"]:hover,
+  [class*="_getMoreKeysPlayBtn__"]:hover {
+    background-color: #5675b8 !important;
+  }
+
+  .button:active,
+  .main-game-button:active,
+  .game-over_btn:active,
+  [class*="_btn__"]:active,
+  [class*="_popup_button__"]:active,
+  [class*="_getMoreKeysPlayBtn__"]:active {
+    background-color: #3d5794 !important;
+  }
+
+  [class*="_white__"],
+  [class*="cancelWhite__"],
+  .game-over_close,
+  .load-dialog-cancel {
+    background-color: transparent !important;
+    color: #7ea2ea !important;
+  }
+
+  /* This light CTA always sits on one of the site's coloured panels
+     (win gradient, event orange, event green), so it stays a light
+     plate with brand ink, not a dark block on colour. */
+  [class*="_win_btn__"] .btn.white,
+  [class*="_win_btn__"] .btn.white_green,
+  [class*="_win_table_title_link__"],
+  [class*="button-styles_white__"],
+  [class*="_playBtn__"] {
+    background-color: #eaeef4 !important;
+    color: #2d5199 !important;
+  }
+
+  [class*="_green__"] {
+    background-color: #00751c !important;
+    color: #ffffff !important;
+  }
+
+  [class*="_green__"]:hover {
+    background-color: #008722 !important;
+  }
+
+  [class*="_green__"]:active {
+    background-color: #005e16 !important;
+  }
+
+  /* BRAND PANELS
+     
+     Tip bar, tournament sheet and storybook cover are brand surfaces,
+     not light leaks: keep the hue, drop to a tone that carries white
+     and the yellow accent. */
+
+  .game-tip,
+  #game-smart-message,
+  #promo-bubble,
+  #best-score-notification {
+    background-color: #2a4a91 !important;
+  }
+
+  .tournament_body,
+  .tournament_leaderboard_info,
+  [class*="_tournament_left__"],
+  [class*="_tournament_upcomming__"] {
+    background-color: #8f3703 !important;
+    background-image: linear-gradient(180deg, #c2670a, #a83f02 30%), linear-gradient(180deg, #8f3703, #8f3703) !important;
+  }
+
+  [class*="storybook-styles_storybook__"] {
+    background-image: linear-gradient(180deg, #9c4a06, #a85a08 50%, #8f3703) !important;
+  }
+
+  .calendar-table .day.selected {
+    color: #ffffff !important;
+  }
+
+  /* BORDERS + SHADOWS
+     
+     The site's shadows are black at low alpha and smudge on dark, so
+     floating surfaces get a border instead. */
+
+  .difficulty-menu,
+  .new-game-menu,
+  .more-menu-dropdown,
+  .mode-menu-dropdown,
+  .lang-menu-dropdown,
+  .lang-menu_dropdown,
+  .header_mobile_dropdown,
+  .header .events_dropdown,
+  .events-menu,
+  .new-pause,
+  .lost-progress,
+  .game-over_body,
+  .game_settings_body,
+  .smart-hint_carousel,
+  .cheats-menu {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid #2d333b !important;
+  }
+}
