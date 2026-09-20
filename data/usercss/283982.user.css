@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260910.22.38
+@version      20260919.01.53
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -279,11 +279,12 @@
   [data-widget="wallpaper"] {
     background-color: var(--d-bg) !important;
   }
-  /* the Каталог menu wraps its blue CTA in a white shell: flatten the
-     wrapper, leave the blue button (a genuine brand CTA) alone */
+  /* The Каталог widget is a natively transparent 60px box around its 44px
+     blue CTA, 6px taller than the sticky header's rounded plate, so any fill
+     here pokes out below that plate as a tab once the page scrolls. */
   [data-widget="catalogMenu"],
   [data-widget="catalogMenu"] > div {
-    background-color: var(--d-header) !important;
+    background-color: transparent !important;
     color: var(--d-text) !important;
   }
   [data-widget="searchBarDesktop"] div {
@@ -434,6 +435,14 @@
   [data-comment-uuid] > div + div[class*="rpProduct_"]::before {
     background-color: var(--d-border-2) !important;
   }
+  /* The viewer's review column scrolls under a ::-webkit-scrollbar with a literal #fff
+     bar and track. `scrollbar-color` makes Chromium ignore every ::-webkit-scrollbar
+     rule, so it retones the pane without a pseudo selector; the thumb keeps its native
+     rgba(204,214,228,.6). */
+  .vue-portal-target div[class*="rpProduct_"] {
+    scrollbar-color: rgba(204, 214, 228, 0.6) transparent !important;
+    scrollbar-width: thin !important;
+  }
   /* The viewer's "Другие фото и видео" grid carries a sticky #fff
      back-to-top disc whose chevron takes the lifted --textPrimary. Disc and
      grid are the two children of one attribute-less wrapper under
@@ -525,7 +534,6 @@
   /* HEADER / NAV (data-widget="header") + sub-bars */
   [data-widget="header"],
   [data-widget="header"] > div,
-  [data-widget="catalogMenu"],
   [data-widget="horizontalMenu"],
   [data-widget="addressBookBarWeb"],
   [data-widget="selectedCurrencyLanguage"],
@@ -715,6 +723,26 @@
   .search-bar-wrapper div[class*="search_"] {
     background-color: var(--d-bg) !important;
   }
+  /* …except two natively transparent layers of it: the wrapper's one DIV
+     child, a square-cornered box as tall as the open panel, and at rest the
+     rounded shell inside it. Painted, the first is a square slab behind the
+     rounded panel and the second a lighter box around the idle field. The
+     shell and panel come back only while the wrapper carries its open-state
+     `search_` modifier (at rest its only other class is `search-bar-wrapper`,
+     no underscore). */
+  .search-bar-wrapper > div[class*="search_"],
+  .search-bar-wrapper > div > div[class*="search_"] {
+    background-color: transparent !important;
+  }
+  .search-bar-wrapper[class*=" search_"] > div > div[class*="search_"] {
+    background-color: var(--d-bg) !important;
+  }
+  /* The open flyout's page dimmer is the widget's other direct DIV child, a
+     fixed full-viewport rgba(3,8,13,.32) sibling of the wrapper, mounted only
+     while the flyout is open; the widget-wide transparent reset erases it. */
+  [data-widget="searchBarDesktop"] > div:not(.search-bar-wrapper) {
+    background-color: rgba(3, 8, 13, 0.32) !important;
+  }
   /* SUGGESTION CHIPS in the open suggest flyout: each pill's only fill is
      rgba(0,48,120,.04), which composites to the dark panel's own colour. The
      pill's class is a hash, but the row is the whole content of
@@ -756,6 +784,11 @@
      TRANSPARENT; our generic text-input background paints over three edges of
      that ring. The shell already carries the elevated surface. */
   [data-widget="searchResultsSort"] input {
+    background-color: transparent !important;
+  }
+  /* The same select component (`bh55_` id prefix, version suffix rotates)
+     sorts the PDP Q&A list outside that widget. */
+  input[class*="bh55_"] {
     background-color: transparent !important;
   }
 
@@ -964,6 +997,12 @@
   [data-widget="webCreateQuestion"] form {
     background-color: var(--d-surface) !important;
   }
+  /* Its field's only outline is a 1px inset box-shadow on the wrapper, and
+     the textarea spans the wrapper's full width: natively transparent, so the
+     generic textarea fill would cut the ring at both sides. */
+  [data-widget="webCreateQuestion"] textarea {
+    background-color: transparent !important;
+  }
   /* REVIEW LIST + its page heading render from a module that hardcodes ink
      instead of reading the tokens: rgb(7,7,7) on headings, names and body,
      rgba(0,26,51,.6) on dates and meta. Literals, and the module's hashes
@@ -981,6 +1020,28 @@
   [data-widget="reviewsTitle"] sup {
     color: var(--d-text-3) !important;
   }
+  /* INITIALS AVATAR — a 48px rgba(55,175,255,.1) disc (hashed, static,
+     overflow visible) around a classless SPAN initial. On the PDP tab the
+     webReviewTabs reset erases the disc; /reviews/ keeps it, so the redraw is
+     scoped to the tab or the two tints stack. The span is the only classless
+     only-child SPAN of a first-child module DIV that has a sibling (photo
+     avatars hold an IMG), so the disc is redrawn from it as a centred
+     pseudo. */
+  [data-widget="webReviewTabs"] [data-widget="webListReviews"] div[class*="rpProduct_"] > div[class*="rpProduct_"]:first-child:not(:only-child) > span:only-child:not([class]) {
+    position: relative;
+  }
+  [data-widget="webReviewTabs"] [data-widget="webListReviews"] div[class*="rpProduct_"] > div[class*="rpProduct_"]:first-child:not(:only-child) > span:only-child:not([class])::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 48px;
+    height: 48px;
+    margin: -24px 0 0 -24px;
+    border-radius: 50%;
+    background-color: rgba(55, 175, 255, 0.1);
+  }
+
   /* The two action inks the blanket above would otherwise swallow, both a
      literal #005bff. The SELECTED sort option is the only span in the widget
      carrying two module classes (the unselected one ships one), and "Читать
@@ -1055,6 +1116,14 @@
   [data-widget="webReviewProductScore"] div[class*="rpProduct_"] > span {
     color: var(--d-text) !important;
   }
+  /* Section tab labels (the `a25_` tab component) sit on a literal white
+     plate, active and idle alike, on the white page; lifted, it is a raised
+     band behind the strip. Scoped: the component's fill carries state in
+     other widgets. */
+  [data-widget="webProductTabs"] button[class*="a25_"] > span,
+  [data-widget="webReviewTabs"] button[class*="a25_"] > span {
+    background-color: transparent !important;
+  }
   /* ACTIVE review-tab underline: a 2px brand-blue bar painted via an inline
      left+width and flattened by the same `div { transparent }` reset. It is the
      ONLY inline-styled div carrying both `left` and `width` (the gold histogram
@@ -1071,6 +1140,17 @@
      inside #section-description, the PDP's own anchor target. */
   #section-description {
     --layerFloor1: var(--d-bg) !important;
+  }
+
+  /* PDP "Подборки товаров" link chips (data-widget="tagList"): a #f5f7fa pill
+     that resolves to the page canvas, leaving bare labels. Natively the hover
+     deepens the plate and turns the label blue. */
+  [data-widget="tagList"] a {
+    background-color: var(--d-surface) !important;
+  }
+  [data-widget="tagList"] a:hover {
+    background-color: #2b333d !important;
+    color: var(--d-blue-hover) !important;
   }
 
   /* SELLER RICH-CONTENT DESCRIPTION (data-widget="webDescription", the "Rich
@@ -1162,10 +1242,13 @@
     --ozCtrlPrimary: #005bff !important;
   }
 
-  [data-widget="searchResultsSort"],
+  /* Not stickyContainer: on the PDP it is a natively transparent full-width
+     72px strip stuck to the viewport bottom, holding only the "?" disc, and
+     painted it covers the page bottom as an opaque band. Not
+     searchResultsSort either: a static, natively transparent row as wide as
+     the grid, whose sort field carries its own surface. */
   [data-widget="searchResultsFiltersActive"],
   [data-widget="webStickyProducts"],
-  [data-widget="stickyContainer"],
   [data-widget="webChatButton"],
   [class*="sticky"],
   [role="dialog"],
@@ -1308,6 +1391,14 @@
   [data-widget="footer"] a:hover {
     color: var(--d-blue-hover) !important;
   }
+  /* The link component's muted variant (`ga5_` id, `-a6` modifier): the BUTTON form hovers
+     through --textActiveAction, the ANCHOR form (PDP "N отзывов" / "N вопросов") through a
+     literal navy #1344b8 on its label div and #0050e0 on its icon. */
+  a[class*="ga5_"][class*="-a6"]:hover,
+  a[class*="ga5_"][class*="-a6"]:hover div,
+  a[class*="ga5_"][class*="-a6"]:hover svg {
+    color: var(--d-blue-hover) !important;
+  }
 
   /* FOOTER */
   [data-widget="footer"],
@@ -1371,6 +1462,12 @@
   }
   [data-widget="webCustomizedCertificate"] input[type="radio"]:checked + span,
   [data-widget="webCustomizedCertificate"] input[type="checkbox"]:checked + div {
+    border-color: var(--d-blue) !important;
+  }
+  /* Its text fields are the `f5_` field component, whose focus is a 2px
+     #005bff border the blanket softener greys. Scoped: the same component in
+     the all-filters modal stays pale on focus natively. */
+  [data-widget="webCustomizedCertificate"] div[class^="f5_"]:focus-within {
     border-color: var(--d-blue) !important;
   }
   [data-widget="webCustomizedCertificate"] div[class*="tsBody300XSmall"] {
@@ -1584,6 +1681,12 @@
      links, greys on paragraphs, a pale-blue <mark> and a pale <th>, all outside the token
      system. The inline-white neutraliser darkens the plate, so the inline black ink has to be
      lifted with it; paragraph and heading are split by tag, as the CMS sheet does. */
+  /* The widget root is itself the inline-white plate, on a white page: its
+     dark equivalent is the canvas, not the neutraliser's raised surface,
+     which turns each block into a slab hugging its text. */
+  [data-widget="richTextWidget"][style*="background"] {
+    background-color: transparent !important;
+  }
   [data-widget="richTextWidget"],
   [data-widget="richTextWidget"] p,
   [data-widget="richTextWidget"] li,
@@ -1791,6 +1894,8 @@
     --ozi-graphic-quaternary-transparent: rgba(255, 255, 255, 0.16) !important;
     --ozi-graphic-tertiary-transparent: rgba(255, 255, 255, 0.32) !important;
     --ozi-graphic-secondary-transparent: rgba(255, 255, 255, 0.42) !important;
+    /* opaque hairline: the header's 2px bottom divider */
+    --ozi-graphic-quaternary: var(--d-border) !important;
   }
 
   /* Header and the tree side-nav are the two full-height surfaces the token
@@ -1887,7 +1992,8 @@
   .tree-item__button-marker-arrow,
   .page-header__burger,
   .country-modal__close-btn,
-  .select__trigger::after {
+  .select__trigger::after,
+  .details__summary::after {
     filter: invert(1) !important;
   }
   /* The remaining glyphs are the background of a box that also carries text or its own

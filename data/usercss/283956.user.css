@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260910.22.44
+@version      20260919.01.56
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -119,8 +119,25 @@
      Underground tile beside it is 50x50 and must NOT take a white plate. */
   svg[class*="text-[#003399]"],
   svg[class*="SidebarNavigation--logoIcon"],
-  .brands svg[viewBox="0 0 48 48"] {
+  .brands svg[viewBox="0 0 48 48"],
+  .footer-brands svg[viewBox="0 0 48 48"] {
     background-color: #ffffff !important;
+  }
+  /* the support footer's Weather Company wordmark is currentColor on its own white tile, so
+     it keeps the site's dark ink rather than the link colour its anchor takes. */
+  .footer-brands a.brand-home {
+    color: #333333 !important;
+  }
+  /* trust.weather.com (privacy / terms) carries the same knockout mark as an <img>. Keyed
+     to that app's asset host: the footer's Weather Channel tile draws its own letters. */
+  img[src*="wx-next-privacy"][src*="the-weather-channel-logo"] {
+    background-color: #ffffff !important;
+  }
+  /* that app's page-title icons are single-ink #252422 SVGs loaded as <img>, so no fill
+     rule reaches them; inverting maps the ink to the light text tone and their white
+     cut-outs to dark. */
+  img[src*="wx-next-privacy/img/"] {
+    filter: invert(1) hue-rotate(180deg) !important;
   }
 
   /* left sidebar navigation rail */
@@ -322,6 +339,19 @@
   [class*="AirQualityText--measurement"] {
     color: var(--wx-text-muted) !important;
   }
+  /* the Precip Intensity card's rain notice is a #f6f6f6 plate under the Helios inks the
+     text rules lift; its headline is the muted one of the pair. */
+  [class*="InsightNotification--root"] {
+    background-color: var(--wx-surface-2) !important;
+  }
+  [class*="InsightNotification--headline"] {
+    color: var(--wx-text-muted) !important;
+  }
+  /* its bar chart's x-axis <text> carries `fill="currentColor"`, but a module class pins
+     the fill to the Helios ink. */
+  [class*="PrecipIntensityBarChart--xAxisLabel"] {
+    fill: var(--wx-text-muted) !important;
+  }
   /* the ink sits on the anchor's own wrappers -- the `Ellipsis--ellipsis` span holding
      the words is a truncation utility with no colour. */
   [class*="CollectionMediaList--title"] {
@@ -420,6 +450,12 @@
   [class*="MemberLoginForm--separator"] {
     color: var(--wx-text-muted) !important;
   }
+  /* a cross-origin frame whose document is light-schemed: while its owner element
+     resolves `color-scheme: dark` from :root, Chromium paints the frame's canvas opaque
+     white, a square plate behind the rounded Google pill. */
+  iframe[src*="accounts.google.com/gsi"] {
+    color-scheme: light !important;
+  }
   /* an INVALID field is marked by a 2px #eb0000 rim on the <input> and the message under
      it; the generic `input` border pin greys the rim, and #eb0000 is 3.8:1 on the base.
      Rim and message take the same lifted red as the severe-alert text so the state stays
@@ -454,6 +490,14 @@
   }
   [class*="PromoFeaturePage--featuresTitle"] {
     color: var(--wx-text) !important;
+  }
+  /* the promo hero is its own navy band, never darkened: its copy and the outline
+     Sign In (white label AND rim) stay white. */
+  [class*="PromoFeaturePage--heroSummary"],
+  [class*="PromoFeaturePage--signInButton"],
+  [class*="PromoFeaturePage--signInButton"]:hover {
+    color: #ffffff !important;
+    border-color: #ffffff !important;
   }
   /* the ExpandableMenu rule lifts these inside the units panel; standalone (the
      /data-rights sections) nothing else reaches them. */
@@ -609,6 +653,11 @@
   [class*="text-[#039]"],
   [class*="text-[#003399]"] {
     color: var(--wx-link) !important;
+  }
+  /* ...but the SPA header wordmark carries the same utility: its navy square is the brand,
+     painted in currentColor over the white knockout backdrop. */
+  svg[class*="text-[#003399]"] {
+    color: #003399 !important;
   }
   /* the PALE brand tints are light surfaces; the SATURATED brand blues are real fills.
      The alpha variants have their own class TOKEN (`bg-brand-100/30`) the plain class
@@ -1039,6 +1088,12 @@
     -webkit-text-fill-color: var(--primary-foreground) !important;
   }
 
+  /* the feature hero's text panel is a white-ink block at every width (black plate
+     narrow, over the photo wide); its byline <p> inherits that white, which `p` greys. */
+  .text-white[class*="@xl/hero-item:bg-transparent"] p:not([class*="text-blue"]) {
+    color: #ffffff !important;
+  }
+
   /* data tables (hourly / 10-day details) */
   table,
   thead,
@@ -1112,6 +1167,20 @@
      chromatic step is data. */
   [style*="background-color: rgb(242, 242, 242)"] {
     background-color: var(--wx-border) !important;
+  }
+  /* the Hourly chart tabs: the UV ramp's zero step is the same achromatic near-white
+     (#f7f7f7), with its black label a SIBLING span, not a child. */
+  [class*="hourlyItem"] [style*="background-color: rgb(247, 247, 247)"] {
+    background-color: var(--wx-border) !important;
+  }
+  [class*="hourlyItem"] [style*="background-color: rgb(247, 247, 247)"] + [style*="color: rgb(0, 0, 0)"] {
+    color: var(--wx-text) !important;
+  }
+  /* the Dew Point tab labels its temperature end with the value's hue on an inline WHITE
+     plate: the page paper, masking the dotted rail under the label. It must track the card
+     it sits on. */
+  [class*="hourlyItem"] [style*="background-color: rgb(255, 255, 255)"] {
+    background-color: var(--wx-surface) !important;
   }
   /* forms / location search */
   input,

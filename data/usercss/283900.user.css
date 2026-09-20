@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260910.22.35
+@version      20260919.01.51
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -131,6 +131,13 @@
     color: #e6edf3 !important; }
   .contentItem__title a:hover, .headlineStack__list > li > a:hover,
   .AnchorLink:hover { color: #5fb0e6 !important; }
+  /* Hovering anywhere on a feed card inks its title link blue; featured and mini cards keep
+     their title colour. */
+  .contentItem__content:not(.contentItem__miniCards):not(.contentItem__miniCards--watchRow):not(.contentItem__content--featured):hover .contentItem__title {
+    color: #5fb0e6 !important; }
+  /* The title text sits in .Truncate spans, which the `a span` blue would otherwise ink
+     independently of the heading. */
+  .contentItem__title .Truncate, .contentItem__title .Truncate span { color: inherit !important; }
   /* .AnchorLink's BASE ink is link blue #0066cc; only heading-like components override it to
      near-black, so the headline-white rule above also swallows the genuinely blue ones.
      .Table__sub-header is re-excluded — those anchors are sortable column heads, i.e. real
@@ -141,11 +148,30 @@
   .TeamLinks__Link .AnchorLink, .ScoreboardEventInfo__TicketContainer .AnchorLink,
   .BaseballSituation .AnchorLink, .Athlete__Link .Athlete__PlayerName {
     color: #5fb0e6 !important; }
-  .Table__sub-header .AnchorLink { color: #e6edf3 !important; }
+  .Table__sub-header .AnchorLink,
+  .Table__TBODY .Table__sub-header .AnchorLink { color: #e6edf3 !important; }
+  /* The PITCHER / BATTER label sits in the same link as the name but is ESPN's muted grey. */
+  .Athlete__Header { color: #9aa4ae !important; -webkit-text-fill-color: #9aa4ae !important; }
   /* Card footer actions ("Full Roster", "See All", "Full Standings") and the ticket-price line
      are plain leaf .AnchorLinks in ESPN's link blue; .Button variants keep their own ink. */
   .Card__Footer .AnchorLink:not(.Button), a.powered-by__ticketsAvailable,
   .powered-by__details--buy .AnchorLink { color: #5fb0e6 !important; }
+  /* Unit / label ink inside whole-row links: ESPN greys the label and inks the value near-
+     black, so the `a span` blue would erase the label/value split. */
+  .Athlete__Stats--label, .powered-by__text,
+  [data-testid="oddsStrip"] li > span:first-child { color: #9aa4ae !important; }
+  .Athlete__SecondaryStat, [data-testid="oddsStrip"] li > span + span { color: #e6edf3 !important; }
+  /* Game-leader cards (hashed classes; the analytics attribute is the only stable hook): the
+     value and name are near-black, the position that follows the name is grey. */
+  a[data-track-event_detail="game leaders:player name click"] span { color: #e6edf3 !important; }
+  a[data-track-event_detail="game leaders:player name click"] span + span {
+    color: #9aa4ae !important; }
+  .Schedule__Game .Schedule_atVs, .Schedule__Game .Schedule__Team,
+  .Schedule__Game .Schedule__Score, .Schedule__Game .Schedule__Network,
+  .Image__Citation__Credit span { color: inherit !important; }
+  /* Week carousel: grey weeks, the selected (and hovered) week white. */
+  .custom--week .week { color: #9aa4ae !important; }
+  .custom--week.is-active .week, .custom--week:hover .week { color: #e6edf3 !important; }
 
   /* ---- Story / article body ---- */
   .article, #article-feed .article, .article-body, .Story, .Story__Body,
@@ -179,6 +205,9 @@
   /* .video-play-button is the full-size transparent overlay, NOT the control (that is its
      ::before disc); painting it scrims every video thumbnail. */
   .video-play-button { background-color: transparent !important; }
+  /* The poster disc is ESPN's translucent white; its glyph is white on it, which the link-blue
+     `a` rule would otherwise reach through the SVG's currentColor. */
+  .Media__PlayButton .Media__Icon { color: #ffffff !important; fill: #ffffff !important; }
 
   /* ---- Tables (stats / standings) ---- */
   /* .ResponsiveTable and .Roster__Heading paint solid #fff, and the zebra below leaves rows
@@ -210,6 +239,9 @@
   /* The inline-table <tfoot> cell hardcodes white on an unclassed <td>, out of reach of the
      Table__TD rule and the inline-white catch-all. */
   tfoot td { background-color: transparent !important; }
+  /* The expanded box-score row's caret is ESPN red; the collapsed ones stay neutral. */
+  .Boxscore__Athlete_Caret.Boxscore__Athlete_Caret--active {
+    color: #ff5a5a !important; fill: #ff5a5a !important; }
 
   /* ---- Forms / inputs / search ---- */
   input, textarea, select, .search-box, .Search__Input {
@@ -721,6 +753,10 @@
      are hashed; the preceding sibling icon's data-icon is the stable hook. */
   svg[data-icon="indicators-liveUpdates"] + h2 {
     color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
+  /* Where-to-Watch event rows put the same icon before "LIVE" and its period label, both
+     hashed spans inside the row link, which the `a span` blue would otherwise take. */
+  svg[data-icon="indicators-liveUpdates"] ~ span {
+    color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
 
   /* ---- Search results page: the React page wrapper (#themeProvider > breakpoint div) and
      .SearchBar ship a solid WHITE panel behind the field + filter-pill row. ---- */
@@ -745,6 +781,11 @@
     background-color: #14181d !important; }
   /* Taboola CTA pill hardcodes near-black text; lighten just the label. ---- */
   .video-cta-button, .video-cta-href { color: #c4cdd6 !important; }
+  /* Inside a card anchor, so the `a span` link blue would give title, description and the
+     "Brand | Sponsored" disclosure one colour; the disclosure has to stay the muted line. */
+  .videoCube .video-label.video-title { color: #e6edf3 !important; }
+  .videoCube .video-label.video-description { color: #c4cdd6 !important; }
+  .videoCube .branding, .videoCube .branding span { color: #8b949e !important; }
   /* Taboola feed cards separate with a BOX-SHADOW, not a border or background. */
   .tbl-feed-card { box-shadow: 0 1px 0 0 #2d333b !important; }
 
@@ -958,11 +999,17 @@
      light brand graphic we never darken. */
   .ShotChart__Court__Play:not(.ShotChart__Court__Play--made) {
     background-color: #ffffff !important; }
-  /* Odds-cell values hardcode pure black (--color-neutral-1000). */
   [data-testid="OddsCell"] {
     background-color: #1c2128 !important; border-color: #2d333b !important; }
-  [data-testid="OddsCell"], [data-testid="OddsCell"] * {
-    color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
+  /* The price is link blue and the juice line under it grey. The line-movement caret is red or
+     green through hashed classes only, so it and its currentColor glyph are kept out of the ink
+     rule. */
+  [data-testid="OddsCell"],
+  [data-testid="OddsCell"] *:not([data-testid="OddsCellMovement"]):not(svg):not(path) {
+    color: #5fb0e6 !important; -webkit-text-fill-color: #5fb0e6 !important; }
+  [data-testid="OddsCell"] [data-testid="OddsCellBottom"]:not(svg):not(path),
+  [data-testid="OddsCell"] [data-testid="OddsCellBottom"] *:not(svg):not(path) {
+    color: #9aa4ae !important; -webkit-text-fill-color: #9aa4ae !important; }
   /* The badge sits on a red/green chip but its label resolves through --color-combo-white-
      gray90, which we dark as a SURFACE elsewhere. */
   .ShotCard__GoalMouth, .ShotCard__GoalMouth * {
@@ -1020,6 +1067,10 @@
   .CustomLegend__Rect {
     border-color: transparent !important; background-origin: border-box !important; }
   .Weather__Temp, .Weather__Items, .Weather__HiLow { color: #c4cdd6 !important; }
+  /* In the weather card the title and its external-link glyph are the link-blue part and the
+     location under the logo is grey. */
+  .Weather .Weather__Title, .Weather .Weather__External { color: #5fb0e6 !important; fill: #5fb0e6 !important; }
+  .Weather .Location__Text { color: #9aa4ae !important; }
   /* Recharts ticks paint through a `fill` presentation attribute, out of reach of the token
      remaps and any `color` rule. Only the axis scale; series keep their team colours. */
   .recharts-cartesian-axis-tick text, .recharts-cartesian-axis-tick tspan,

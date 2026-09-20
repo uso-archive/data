@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Avito that's easy on the eyes, perfect for late-night browsing.
-@version      20260910.22.34
+@version      20260919.01.50
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -148,6 +148,13 @@
   button[class*="_6a9117bb1fcd1b61"] {
     background-color: transparent !important;
   }
+  /* The same bar child draws its bottom divider on `::after` as a `#ebeae8` `border-image` gradient
+     outset 2560px to the viewport edges; a border-image overrides border-color, so the blanket border
+     rule never reaches it. Only the source is restated, keeping the outset. Pure hash: a rotated one
+     brings back the light line. */
+  [class*="e2e69ff14443976d"]::after {
+    border-image-source: linear-gradient(#2a313a, #2a313a) !important;
+  }
 
   /* The wordmark path has NO fill attribute, so it defaults to black; `:not([fill])` keeps this off
      the coloured dot paths, which do carry fill attrs. Four builds name it differently — the last,
@@ -167,6 +174,21 @@
     background-color: var(--av-surface-2) !important;
     background-image: none !important;
     border-color: var(--av-border) !important;
+  }
+  /* A DS mask icon paints its glyph with `background-color`, and a marker ending `-button` on the
+     `<svg>` itself (the banner's close cross) drops it into the button rule's surface fill, the same
+     tone as the banner. `currentColor` is the icon's own ink. */
+  svg[data-marker$="-button"] {
+    background-color: currentColor !important;
+  }
+  /* A call site can pin the glyph through an inline `--ds-icon-color` (`--kitty-icon-color` in the
+     older build); hard black ones (the listing card's sale-timer clock, the adult-content
+     placeholder) vanish on the canvas. Grey and brand values are left alone. */
+  svg[style*="--ds-icon-color: #000000"],
+  svg[style*="--ds-icon-color:#000000"],
+  svg[style*="--kitty-icon-color: #000000"],
+  svg[style*="--kitty-icon-color:#000000"] {
+    background-color: currentColor !important;
   }
 
   /* Inline-styled badges & pills */
@@ -319,7 +341,8 @@
      rules above have already moved the colour to the pill's tone, so `currentColor` is the right
      fill. The card scope and `:empty` keep this off any text-bearing div with an inline colour. */
   [data-marker="item"] div[style^="color:"]:empty,
-  [data-marker^="iva-item"] div[style^="color:"]:empty {
+  [data-marker^="iva-item"] div[style^="color:"]:empty,
+  [data-marker="docking-badge-bar"] div[style^="color:"]:empty {
     background-color: currentColor !important;
   }
 
@@ -543,6 +566,15 @@
     background-color: var(--module-badge-backgroundColor, transparent) !important;
     color: var(--module-badge-color, var(--av-text-soft)) !important;
   }
+  /* The fixed title bar's model-score badge sits in that offset wrapper but carries its green as an
+     inline `background:` shorthand, leaving the badge tokens unset for the sale fallback above; the
+     shorthand rule further up is (0,1,0) and loses, so the wrapper scope is repeated here. */
+  [style*="--module-badge-offset-x"] > div[style*="background: rgb(0, 194, 87)"],
+  [style*="--module-badge-offset-x"] > div[style*="background:rgb(0, 194, 87)"],
+  [style*="--module-badge-offset-x"] > div[style*="background:#00C257"],
+  [style*="--module-badge-offset-x"] > div[style*="background:#00c257"] {
+    background-color: #198049 !important;
+  }
   /* The search / card reveal CTA is natively a SOFT light-blue button. The item-page primaries are
      promoted to the green call CTA below (same specificity, later wins). */
   [data-marker^="item-phone-button"] {
@@ -651,6 +683,18 @@
     color: #0b1620 !important;
   }
 
+  /* Segmented tabs under pure hashes (the item page's "Рекомендации" switcher): `label > radio + span`
+     pills, natively `#f2f1f0` with the selected one marked by a 2px ring alone. The group role is the
+     only non-hash hook. The `:not()` keeps the named segmented build, whose checked fill is a (0,1,0)
+     `wrapper_isChecked` arm, out of reach. The installment pills share this shape, so their checked
+     fill is restated below at this rule's specificity. */
+  [role="group"] > label > input[type="radio"] + span:not([class*="wrapper_"]) {
+    background-color: var(--av-surface) !important;
+  }
+  [role="group"] > label > input[type="radio"]:checked + span:not([class*="wrapper_"]) {
+    border-color: var(--av-accent) !important;
+  }
+
   /* Installment-period selector (item buy-box) */
   /* The "рассрочка" period picker is `label > input[type=radio] + span` pills, natively white with a
      near-black checked one; `span` is deliberately outside the div-neutraliser. */
@@ -659,7 +703,8 @@
     border-color: var(--av-border) !important;
     color: var(--av-text) !important;
   }
-  [data-marker="installments-promoblock"] input:checked + span {
+  [data-marker="installments-promoblock"] input:checked + span,
+  [data-marker="installments-promoblock"] label > input[type="radio"]:checked + span {
     background-color: var(--av-accent) !important;
     border-color: var(--av-accent) !important;
     color: #0b1620 !important;
@@ -684,6 +729,13 @@
   [data-marker="multi-items"] label > span,
   [data-marker="multi-items"] label > span * {
     color: var(--av-text) !important;
+  }
+  /* An option whose listing differs in another attribute is muted by ink alone, through a pure-hash
+     class (`color: var(--kitty-chips-color-disabled)`) with no attribute or token on the element; the
+     ink rule above would light it like a live option. A rotated hash degrades to all-bright chips. */
+  [data-marker="multi-items"] label > span[class*="_8c38d256c84191e7"],
+  [data-marker="multi-items"] label > span[class*="_8c38d256c84191e7"] * {
+    color: var(--av-text-muted) !important;
   }
   [data-marker="multi-items"] label input:checked + span {
     background-color: var(--av-accent) !important;
@@ -719,6 +771,11 @@
   [data-marker="model-card/mini-serp-2/button"] {
     background-color: var(--av-surface) !important;
     border-color: var(--av-border) !important;
+  }
+  /* "Все характеристики" is a secondary `#f2f1f0` pill anchor under pure hashes; the text-link
+     un-painter above strips it at the same (0,1,1), so this arm wins on source order. */
+  a[data-marker="model-card/specs-button"] {
+    background-color: #262c35 !important;
   }
   /* `a[data-marker$="-button"]` (the text-link un-painter above) also matches
      `model-card/ui-button` at (0,1,1), so this arm must carry the `a` type too —
@@ -966,6 +1023,16 @@
   a.header-add-item-link, a.content-home-link {
     background-color: var(--av-accent) !important;
   }
+  /* The modern 404's only CTA is the bare-name DS Button build as an ANCHOR, a near-black `#141414`
+     primary the `button`-scoped primary arm never reaches, so it keeps that fill on the dark canvas.
+     Keyed to the home link: SEO tag anchors carry the same preset. */
+  a[href="/"][class*="root_preset_primary"] {
+    background-color: var(--av-accent) !important;
+  }
+  a[href="/"][class*="root_preset_primary"],
+  a[href="/"][class*="root_preset_primary"] * {
+    color: #0b1620 !important;
+  }
   a.header-add-item-link, a.header-add-item-link *,
   a.content-home-link, a.content-home-link * {
     color: #0b1620 !important;
@@ -1012,8 +1079,10 @@
   /* Every suggest-panel row leads with a 20x20 `<img>` of flat BLACK line art drawn for the white
      sheet. A raster is out of reach of `fill`/`color`, so flip the lightness; the set is monochrome
      (the "full_color" path name notwithstanding), so the invert cannot distort a hue. Scoped to the
-     panel's only `<img>`. */
-  [class*="itemIconImg"] {
+     panel's only `<img>`; the item-page build names neither the class nor anything but the row
+     marker. */
+  [class*="itemIconImg"],
+  [data-marker="suggest/list/item"] img {
     filter: invert(1);
   }
   /* The in-profile filters icon has two SVG paths with a hard `fill="black"` ATTRIBUTE, overriding
@@ -1021,6 +1090,13 @@
      near-WHITE fills, and the element's own `color` reads light. */
   [data-marker$="/filters_icon"] svg path {
     fill: var(--av-text) !important;
+  }
+
+  /* "Спросите у продавца" draws its field box on the wrapping `<label>` (natively `#f2f1f0`) under
+     pure hashes and leaves the `<textarea>` transparent; the neutraliser wipes the label while the
+     generic input rule fills the textarea, leaving a lit slab inside a hollow ring. */
+  [data-marker="icebreakers"] label {
+    background-color: var(--av-surface) !important;
   }
 
   /* The generic input rule paints the auth popup's fields `--av-surface`, exactly the popup's own
@@ -1241,10 +1317,16 @@
   [class*="contacts__overflow"] {
     background-image: none !important;
   }
-  /* Cookie-consent toast (bottom-centre, z-index 12000): a DIV-based floating "kitty toastBar". */
+  /* Cookie-consent toast (bottom-centre, z-index 12000): a DIV-based floating "kitty toastBar",
+     natively a near-black `#141414` bar holding a white pill CTA. It floats over the mega-menu sheet
+     and the popups, which are `--av-surface`, so the bar takes the header tone to keep an edge, and
+     its sole button needs a step lighter than the bar or it reads as bare text. */
   [data-marker="cookie-consent"] {
-    background-color: var(--av-surface) !important;
+    background-color: var(--av-header) !important;
     border-color: var(--av-border) !important;
+  }
+  [data-marker="cookie-consent"] button {
+    background-color: #262c35 !important;
   }
   /* Modal backdrop scrim, painted with `--kitty-backdrop-background` on a DIV. Only the
      `<name>/overlay` markers are backdrops; the bare `overlay` marker wraps dropdown listboxes and
@@ -1295,6 +1377,15 @@
      wrapper, is natively transparent, so the canvas tone is invisible on it at rest. */
   [data-marker="item-view/main-gallery"] > div {
     background-color: var(--av-bg) !important;
+  }
+  /* The sheet's header carries the purple delivery CTAs, which the gallery's (0,1,1) transparent
+     button arm would strip, and a close cross hard-filled `black` on the SVG and its path. */
+  [data-marker="item-view/main-gallery"] [data-marker^="delivery-item-button"] {
+    background-color: #7d5bc4 !important;
+  }
+  [data-marker="item-view/main-gallery"] > div button svg[fill="black"],
+  [data-marker="item-view/main-gallery"] > div button svg path[fill="black"] {
+    fill: var(--av-text) !important;
   }
 
   /* Dark scrims over photos (erased by the div-neutraliser) */
@@ -1452,6 +1543,29 @@
   [style*="--theme-semantics-components-rate-bg-"],
   [style*="--theme-semantics-components-rate-bg-"] span {
     color: #fff !important;
+  }
+  /* The review-count link beside that pill takes its ink from a wrapper's inline
+     `color: var(--theme-semantics-components-rate-text-<tier>)`, which the broad text rule beats.
+     Each tier hands its own token back, so the step of the scale survives. */
+  [style*="--theme-semantics-components-rate-text-excellent"],
+  [style*="--theme-semantics-components-rate-text-excellent"] * {
+    color: var(--theme-semantics-components-rate-text-excellent) !important;
+  }
+  [style*="--theme-semantics-components-rate-text-good"],
+  [style*="--theme-semantics-components-rate-text-good"] * {
+    color: var(--theme-semantics-components-rate-text-good) !important;
+  }
+  [style*="--theme-semantics-components-rate-text-medium"],
+  [style*="--theme-semantics-components-rate-text-medium"] * {
+    color: var(--theme-semantics-components-rate-text-medium) !important;
+  }
+  [style*="--theme-semantics-components-rate-text-low"],
+  [style*="--theme-semantics-components-rate-text-low"] * {
+    color: var(--theme-semantics-components-rate-text-low) !important;
+  }
+  [style*="--theme-semantics-components-rate-text-none"],
+  [style*="--theme-semantics-components-rate-text-none"] * {
+    color: var(--theme-semantics-components-rate-text-none) !important;
   }
 
   /* Pagination current page */

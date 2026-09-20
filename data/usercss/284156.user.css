@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Substack (the hub, discovery, and every publication and post) while keeping each newsletter's own accent color intact.
-@version      20260910.22.40
+@version      20260919.01.54
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -211,8 +211,10 @@
      border, so the border override skips them too.
      Checkbox/radio: with `appearance: auto` a background-color override replaces
      the native paint, tick/dot included.
-     Button-ish types are out like `<button>`: CONTROLS, not fields. */
-  input:not([class*="emailInputOnAccentBackground"]):not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]),
+     Button-ish types are out like `<button>`: CONTROLS, not fields.
+     `bg-primary-` fields (the search modal) paint the same token as their panel
+     so they sit borderless; the forced fill would draw a box. */
+  input:not([class*="emailInputOnAccentBackground"]):not([class*="bg-primary-"]):not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]),
   textarea,
   select {
     background-color: #1c2128 !important;
@@ -506,12 +508,18 @@
     filter: invert(1) hue-rotate(180deg) !important;
   }
 
+  /* Press logos are monochrome black inline SVGs drawn for white cards. */
+  #substack-home [class*="press-logo"] svg {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+
   /* `heroCard` at a word boundary: `heroCardGrid-`/`heroCardBody-` are
      natively transparent over the green brand band, so a substring match darkens
-     the gutters. */
+     the gutters. Grid-scoped: /podcasts ships a `heroCard-` too, a transparent
+     ticker viewport whose gaps show the glow between its own cards. */
   #substack-home [class*="benefitCard"],
-  #substack-home [class^="heroCard-"],
-  #substack-home [class*=" heroCard-"],
+  #substack-home [class*="heroCardGrid"] > [class^="heroCard-"],
+  #substack-home [class*="heroCardGrid"] > [class*=" heroCard-"],
   #substack-home [class*="heroCreatorCard"],
   #substack-home [class*="compareTableScrollInn"],
   #substack-home [class*="startOptionCard"],
@@ -522,6 +530,11 @@
   #substack-home .resources-page .banner {
     background-color: #1c2128 !important;
     background-image: none !important;
+  }
+  /* Its 70%-white hairline was drawn to vanish on a white card. */
+  #substack-home [class*="heroCardGrid"] > [class^="heroCard-"],
+  #substack-home [class*="heroCardGrid"] > [class*=" heroCard-"] {
+    border-color: #2d333b !important;
   }
 
   /* www marketing footer */
@@ -678,6 +691,12 @@
   .accordion--default .accordion__item-title--active {
     background-color: #262c33 !important;
     color: #e6edf3 !important;
+  }
+
+  /* The magnifier is a data-URI SVG whose `fill='currentColor'` resolves to
+     black inside an image; restated with a literal fill, same path. */
+  form.search::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%238b949e' d='M508.5 468.9L387.1 347.5c-2.3-2.3-5.3-3.5-8.5-3.5h-13.2c31.5-36.5 50.6-84 50.6-136C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c52 0 99.5-19.1 136-50.6v13.2c0 3.2 1.3 6.2 3.5 8.5l121.4 121.4c4.7 4.7 12.3 4.7 17 0l22.6-22.6c4.7-4.7 4.7-12.3 0-17zM208 368c-88.4 0-160-71.6-160-160S119.6 48 208 48s160 71.6 160 160-71.6 160-160 160z'/%3E%3C/svg%3E") !important;
   }
 
   /* The theme repaints the field solid white on focus, hiding the query under

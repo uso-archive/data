@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark mode for the SCP Foundation Wiki: articles, sidebar, tables, tabs, ratings, forums and search all get a comfortable night palette.
-@version      20260910.22.39
+@version      20260919.01.53
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -59,7 +59,6 @@
 
   div#container-wrap,
   div#container-wrap-wrap,
-  #container,
   #main-content,
   #page-content,
   #skrollr-body,
@@ -124,7 +123,7 @@
     --tables-header-txt: 230, 237, 243;
   }
 
-  /* Callout boxes are authored as [[div style="background:#f2f2c2"]] with no ink, so the box hands the ink back. Matched on the VALUE (inline background plus a light hex or `white`), never on a class - classes are page-local. NOT !important, so an author's own ink still wins.
+  /* Callout boxes are authored as [[div style="background:#f2f2c2"]] with no ink, so the box hands the ink back. Matched on the VALUE (inline background plus a light hex or `white`), never on a class - classes are page-local. NOT !important, so an author's own ink still wins. Below the `#c` floor only the six-digit `#bbbbbb` grey is named: a `#b` prefix also opens dark reds (`#b01`).
      A dark box with a pale border hex matches harmlessly: it must name its own light ink for the site's white page, and that beats this. Filtering needs a `color:`-bearing :not(), which also drops light boxes that DO name their ink and still need the rebinds below.
      `.content-panel` is excluded - ARTICLE FURNITURE fills it dark with !important, as must be any component filled that way - and returns when its inline background is an IMAGE, which paints over our fill. `##` is a malformed hex that paints nothing.
      Curated-series grids are the same shape one step out: their white plate is page CSS, so only cards naming an inline background COLOUR are excluded. */
@@ -137,6 +136,8 @@
   #page-content [style*="background"][style*="#E"]:not(.content-panel):not([style*="##"]),
   #page-content [style*="background"][style*="#F"]:not(.content-panel):not([style*="##"]),
   #page-content [style*="background"][style*="white"]:not(.content-panel):not([style*="##"]),
+  #page-content [style*="background"][style*="#bbbbbb"]:not(.content-panel):not([style*="##"]),
+  #page-content [style*="background"][style*="#BBBBBB"]:not(.content-panel):not([style*="##"]),
   #page-content .content-panel[style*="url("],
   #page-content .multi-grid > div:not([style*="background:"]):not([style*="background-color"]),
   #page-content .multi-grid-small > div:not([style*="background:"]):not([style*="background-color"]) {
@@ -163,6 +164,38 @@
     --scp-lift-brown: #6b4423;
     --scp-lift-teal: #006a6a;
     --scp-lift-pink: #a1004a;
+  }
+
+  /* A #bbbbbb box is too mid-grey for the paper crimson (4.0:1); the link inks go one step darker there. */
+  #page-content [style*="background"][style*="#bbbbbb"]:not(.content-panel):not([style*="##"]),
+  #page-content [style*="background"][style*="#BBBBBB"]:not(.content-panel):not([style*="##"]) {
+    --scp-link: #8b0f14;
+    --scp-link-hover: #5c0a0e;
+  }
+
+  /* Skin and format components painted light by class that state no ink of their own (Foxtrot's .notation/.jotting/.paper/.modal, Flopstyle's report boxes, Redtape's .addendum, Oceanbound's .phasebox) take the paper inks. The same class names are dark on Basalt, New Age, Penumbra, Flopstyle Dark and Foxtrot's dark-mode include (--white-bar), so every value is keyed on --scp-dark-skin: on those skins it resolves to a palette token that is not a colour, the declaration computes invalid and the element inherits the page ink as before.
+     One class, no id: Basalt states its own ink from `div.notation` and must keep winning. */
+  :root {
+    --scp-dark-skin: var(--basalt-secondary-color, var(--dark-midnight, var(--arrow-size, var(--abrahamics, var(--hue, var(--white-bar))))));
+  }
+
+  .notation,
+  .jotting,
+  .paper,
+  .modal,
+  .addendum,
+  .phasebox,
+  .interview,
+  .CICAPOCOnotice,
+  .report-box,
+  .log-header,
+  .card-block {
+    color: var(--scp-dark-skin, #1b1815);
+    --scp-title: var(--scp-dark-skin, #7a1d24);
+    --scp-heading: var(--scp-dark-skin, #1b1815);
+    --scp-link: var(--scp-dark-skin, #a4161a);
+    --scp-link-visited: var(--scp-dark-skin, #6d3550);
+    --scp-link-hover: var(--scp-dark-skin, #d21414);
   }
 
   /* A heading in a box stating its own `color:` follows that ink, not the paper value above. The match must be property-adjacent: a bare `color:` substring also sits inside `background-color:` and `--link-color:`, which hub cards carry without naming an ink. Wikidot echoes the author's spacing verbatim, so the forms matched are `color:` at the start of the attribute and `; color:` after a semicolon (`;color:` free); `-color:` longhands never match. */
@@ -252,6 +285,13 @@
     color: var(--link-color);
   }
 
+  /* The discord-chat component draws Discord's own dark client, so its links keep Discord's blue. */
+  #main-content #page-content .discord a,
+  #main-content #page-content .discord a:visited,
+  #main-content #page-content .discord a:hover {
+    color: #00b0f4;
+  }
+
   /* HEADER / TOP BAR */
 
   /* No colour on #header h1 a: Sigma-9 already paints it #eee, BH holds its span transparent, and the Sigma-derived skins hide the anchor's own text with `color: transparent` under a ::before copy - an ink here prints the title twice. */
@@ -302,6 +342,20 @@
   #login-status a.btn:hover,
   #login-status a.btn-primary:hover {
     color: #ff8f97 !important;
+  }
+
+  /* The admin-denied page (/admin:manage) is a Bootstrap template whose light navbar stays: the Wikidot logo on it is black linework. Its labels take back the dark inks the page ink would otherwise reach them with. */
+  #header .navbar-inner {
+    color: #555;
+  }
+
+  #header .navbar-inner #login-status a.login-status-create-account {
+    color: #333 !important;
+  }
+
+  .row-fluid div.form-actions {
+    background-color: #1c2128;
+    border-top-color: #2d333b;
   }
 
   #login-status ul a,
@@ -419,10 +473,7 @@
     border-color: #b98a8a !important;
   }
 
-
   /* No "Search" label colour in this build (the .user.css lights it from the same token as the plate). Without the token branch a single literal is wrong somewhere: light punches text-shaped flecks through the magnifier mask on every BH skin, plate-coloured blanks the label on the real-button skins (classic, decom-dept, derby, black-diamond, aces-and-eights). Those skins' own dark label stays and reads on the mid plate above. */
-
-  /* BH masks this pseudo to a person icon below the desktop breakpoint and paints it from --login-mobile-icon-color, pitched near-black by the themes. No opposite case here - Sigma-9 gives the pseudo no content - so a flat fill, not a token branch. */
 
   /* BH masks this pseudo to a person icon below the desktop breakpoint and paints it from --login-mobile-icon-color, pitched near-black by the themes. No opposite case here - Sigma-9 gives the pseudo no content - so a flat fill, not a token branch. */
   #login-status::before {
@@ -572,12 +623,29 @@
     background-color: #1a1f26 !important;
   }
 
-  /* This plate is ours and dark wherever it sits, so these tokens are restated: inside an author's light box the paper rule hands the subtree dark inks, which a heading or link here would print on this fill. */
   blockquote,
   div.blockquote {
     background-color: #1a1f26 !important;
     border-color: #3a4048 !important;
     color: #c4cdd6;
+  }
+
+  /* These plates are ours and dark wherever they sit, so the dark tokens are restated: inside an author's light box the paper rule hands the subtree dark inks, which a heading or link here would print on the fill. Every component given a dark fill with !important belongs here. */
+  blockquote,
+  div.blockquote,
+  .code,
+  #toc,
+  div.note,
+  div.note-block,
+  #page-content .footnotes-footer,
+  #page-content .fncon,
+  div.wiki-note,
+  .hovertip,
+  div.sexy-box,
+  .content-panel,
+  .scp-image-block .scp-image-caption,
+  .yui-navset .yui-content,
+  #main-content table.wiki-content-table th {
     --scp-title: #e05f6b;
     --scp-heading: #e6edf3;
     --scp-link: #e8626e;
@@ -1064,14 +1132,18 @@
     box-shadow: 1px 1px 4px rgba(0, 0, 0, .6);
   }
 
-  div.page-rate-widget-box .rate-points {
+  /* The `html div … span` forms outrank skins that fill these parts !important from a (0,2,2) chain (theme:y2k), whose black labels would otherwise sit under our pinned inks. */
+  div.page-rate-widget-box .rate-points,
+  html div.page-rate-widget-box span.rate-points {
     background-color: #5a2f2f !important;
     border-color: #5a2f2f !important;
     color: #f0e2e2 !important;
   }
 
   .page-rate-widget-box .rateup,
-  .page-rate-widget-box .ratedown {
+  .page-rate-widget-box .ratedown,
+  html div.page-rate-widget-box span.rateup,
+  html div.page-rate-widget-box span.ratedown {
     background-color: #22282f !important;
     border-top-color: #5a2f2f !important;
     border-bottom-color: #5a2f2f !important;
@@ -1090,7 +1162,8 @@
     color: #fff6f0 !important;
   }
 
-  .page-rate-widget-box .cancel {
+  .page-rate-widget-box .cancel,
+  html div.page-rate-widget-box span.cancel {
     background-color: #5a2f2f !important;
     border-color: #5a2f2f !important;
   }
@@ -1700,6 +1773,11 @@
     background-color: #2a2419;
   }
 
+  /* /canon-hub's "So You Wanna…" guide blocks are the cream variant of the canon card; same tone, so they stay set apart from the canon entries. */
+  #page-content .canon-block.sywbac {
+    background-color: #2a2419;
+  }
+
   /* /universe-hub's orientation letter sits in one near-white terminal panel; its rule comes from the shared `hr` override. */
   #page-content .terminalbody {
     background-color: #1c2128;
@@ -1718,6 +1796,13 @@
   /* The author and artist directories head themselves with a class-painted #660000 masthead, 1.3:1 on the page floor. */
   #page-content .welcome-header {
     color: var(--scp-title);
+  }
+
+  /* /lesnoc-s-author-directory's teal work cards title each entry in a navy link; the two-id article ink lands crimson on the teal at 1.0:1. The page draws no hover swap. */
+  #main-content #page-content .box-container .box-link a,
+  #main-content #page-content .box-container .box-link a:visited,
+  #main-content #page-content .box-container .box-link a:hover {
+    color: #000084;
   }
 
   /* FORUM */
@@ -2077,6 +2162,18 @@
     --link-bg: #6fbc8a1f;
   }
 
+  /* The statement banner is a knocked-out slab: plate from --dark, label and masked icon from --light, which the remap above swaps into a light plate. Handed back as a raised dark plate with white ink. The ink outweighs the core-link rule in every state; the hover sweep is --active, which white still reads on. */
+  #page-content #u-fp-statement .survey-link {
+    --dark: #2d333b;
+    --light: #fff;
+  }
+
+  #main-content #page-content #u-fp-statement a.survey-link,
+  #main-content #page-content #u-fp-statement a.survey-link:visited,
+  #main-content #page-content #u-fp-statement a.survey-link:hover {
+    color: var(--light);
+  }
+
   /* Text that must stay light because it sits on an accent/photo fill */
   #page-content .box .title,
   #page-content .caption,
@@ -2218,6 +2315,41 @@
   /* It fills a collapsible's open state with its accent and knocks the label out of it, which the article-link colour takes back - crimson on red. Clearing the fill leaves the accent ring the theme draws on the same element, so the cue survives; no other skin fills this element. */
   #page-content .collapsible-block-unfolded-link {
     background-color: transparent !important;
+  }
+
+  /* MONOTYPICAL THEME */
+
+  /* Monotypical hides its closed sidebar (fixed, z-index -1) behind #container's own token fill; left transparent, the rail shows through the masthead band. The token takes the page floor there, and the panel value back for everything inside. */
+  #container {
+    --primaryBackgroundColor: #14181d;
+  }
+
+  #container > * {
+    --primaryBackgroundColor: #1a1f26;
+  }
+
+  /* Monotypical-only surface tokens: the "+ Options" pill, the credit button, table stripes, the sidebar and its headings, the selected tab, title rules. */
+  :root {
+    --secondaryBackgroundColor: #22282f;
+    --tertiaryBackgroundColor: #2d333b;
+    --borderColor: #3a4048;
+  }
+
+  /* The name is not monotypical's alone: shared components (the author badge set) write `var(--borderColor, <hex>)` inline and rely on it being unset. `initial` hands them their fallback. */
+  #page-content [style*="var(--borderColor,"] {
+    --borderColor: initial;
+  }
+
+  /* Its links wipe a --linkColor fill in on hover, pink under our pink hover ink; the wipe takes a maroon the ink reads on. */
+  #main-content a:hover,
+  #main-content a:focus,
+  #odialog-hovertips a:hover {
+    --linkColor: #5c2129;
+  }
+
+  /* Its label reads --textColor from a two-id rule the row's link ink cannot outweigh. */
+  #more-options-button {
+    --textColor: #e8626e;
   }
 
   /* Reached from a class chain the site-wide link rule cannot outweigh, at an accent red pitched for a cream rail. */
