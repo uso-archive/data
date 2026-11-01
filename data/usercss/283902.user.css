@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A complete dark theme for Genius with lyrics pages, the homepage, artist pages and search all in a comfortable dark look, with lyrics and annotations kept crisp and readable. Genius's red accents and link colors stay intact.
-@version      20260919.01.51
+@version      20261031.15.37
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -21,8 +21,10 @@
   /* PageGrid-desktop is NOT layout-only: the song page's annotation portal grid shares the
      class and is a pointer-events:none overlay on the lyrics column, so the transparent
      exception below must stay. */
-  [class*="PageGrid-desktop"] {
-    background-color: #14181d !important; background-image: none !important; }
+  [class*="PageGrid-desktop"] { background-color: #14181d !important; }
+  /* the React artist profile's <header> grid carries the artist's banner photo (per artist,
+     url in a hashed class) as its background-image */
+  [class*="PageGrid-desktop"]:not(header) { background-image: none !important; }
 
   /* Annotation portal grid: transparent overlay, must never be painted. */
   [class*="AnnotationPortal-desktop__Grid"] {
@@ -82,6 +84,9 @@
   [class*="StickyNav-mobile__Navigation"],
   [class*="StickyNavSiteLinks__MobileContainer"] {
     background-color: #14181d !important; }
+  /* hamburger / close glyph: an unfilled inline SVG that defaults to black */
+  [class*="StickyNav-mobile__ToggleIcon"] svg,
+  [class*="StickyNav-mobile__ToggleIcon"] svg path { fill: #e6edf3 !important; }
   [class*="SocialLinks__Link"] svg, [class*="SocialLinks__Link"] svg path {
     fill: #c4cdd6 !important; }
   /* Every section link ships a transparent 1px border and the CURRENT one turns it white -
@@ -185,7 +190,8 @@
   a:hover { color: #c2cbff !important; }
 
   /* Action / UI icons (inline SVG) - black on the light site. The GENIUS wordmark, yellow IQ
-     badges and brand-coloured surfaces are NOT in these families. */
+     badges and brand-coloured surfaces are NOT in these families, nor "RoleIcon", whose fill IS the
+     role (white contributor, yellow verified, periwinkle/lilac/steel staff) under a black stroke. */
   [class*="Button__Container"] svg, [class*="Button__Container"] svg path,
   [class*="ShareButtons__Container"] svg, [class*="ShareButtons__Container"] svg path,
   [class*="LyricsFooter"] svg, [class*="LyricsFooter"] svg path,
@@ -196,7 +202,6 @@
   [class*="InfoTooltip__Container"] svg, [class*="InfoTooltip__Container"] svg path,
   [class*="MetadataTooltip"] svg, [class*="MetadataTooltip"] svg path,
   [class*="LyricsHeader__Container"] svg, [class*="LyricsHeader__Container"] svg path,
-  [class*="RoleIcon__Container"] svg, [class*="RoleIcon__Container"] svg path,
   [class*="InlineSvg__Wrapper"] svg, [class*="InlineSvg__Wrapper"] svg path {
     fill: #c4cdd6 !important; color: #c4cdd6 !important; }
   /* brand share glyphs keep their own colour, just off pure black */
@@ -274,23 +279,23 @@
     color: #9aa7f0 !important; -webkit-text-fill-color: #9aa7f0 !important; }
 
   /* Cards / panels that default to white */
-  [class*="QuestionTemplate__Title"],
-  [class*="MetadataQuestionTemplate__Title"],
   [class*="QuestionList__Table"] {
     background-color: #1c2128 !important; color: #e6edf3 !important; }
-  /* the expand glyph keeps the row's brand red, so a grey title drops the cue that the row
-     opens. [class^=] because the substring also matches "MetadataQuestionTemplate__Title", which
-     must stay light. */
-  [class^="QuestionTemplate__Title"],
-  [class^="QuestionTemplate__Title"] *,
-  [class^="QuestionTemplate__Container"] [class*="ExpandButton"],
-  [class^="QuestionTemplate__Container"] [class*="ExpandButton"] svg,
-  [class^="QuestionTemplate__Container"] [class*="ExpandButton"] path {
-    color: #f26659 !important; fill: #f26659 !important;
-    -webkit-text-fill-color: #f26659 !important; }
-  /* an <a> around a "__QuestionBody" span, but an accordion heading rather than a link - "a
-     span" would repaint it */
-  [class*="MetadataQuestionTemplate__Title"] * { color: #e6edf3 !important; }
+  /* Q&A accordion rows (user and Genius-metadata alike). The open row is the only one the site
+     plates, exactly #fff over a bare row, under a hashed class no selector can name. The stack
+     reads that bit: `difference` over #fff is light and `darken` caps it at the open plate,
+     while over a bare row both layers resolve to #1c2128. Do NOT add a background-color - the
+     blend needs the site's own value underneath. Ink and glyph are the song's cover-art colour
+     natively (per song), so one light ink for every row and state. */
+  [class*="QuestionTemplate__Title"] {
+    background-image: linear-gradient(#373e47, #373e47), linear-gradient(#1c2128, #1c2128) !important;
+    background-blend-mode: darken, difference !important;
+    color: #e6edf3 !important; }
+  [class*="QuestionTemplate__Title"] *,
+  [class*="QuestionTemplate__Title"] svg,
+  [class*="QuestionTemplate__Title"] svg path {
+    color: #e6edf3 !important; fill: #e6edf3 !important;
+    -webkit-text-fill-color: #e6edf3 !important; }
   [class*="QuestionTemplate__Container"],
   [class*="MetadataQuestionTemplate__Container"],
   [class*="Answer__Container"],
@@ -346,6 +351,7 @@
   .apple_music_player-seekbar::before { background-color: #4a525c !important; }
   .apple_music_player-seekbar-scrubber-circle { background-color: #e6edf3 !important; }
   .apple_music_player-logo path,
+  .apple_music_player-header-logo path,
   .apple_music_player-expanded_header-logo path { fill: #c4cdd6 !important; }
   /* a same-origin Primis iframe: the body rule darkens its document but the inner #largeUnit
      slate stays white */
@@ -369,7 +375,7 @@
 
   /* ---- Buttons ---- */
   [class*="Button__Container"], [class*="VotingActions__Button"],
-  [class*="ExpandableContent__Button"], [class*="List__More"],
+  [class*="ExpandableContent__Button"],
   [class*="SquareButton"], [class*="Charts__LoadMore"] button {
     background-color: #21262d !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   /* these sit on the full-width grid wrapper, not on the button; transparent on the live
@@ -379,6 +385,8 @@
   [class*="ExpandableContent__ButtonContainer"] {
     background-color: transparent !important; }
   [class*="SquareButton"] *, [class*="Charts__LoadMore"] * { color: #e6edf3 !important; }
+  /* the "& N more" of a credit or AKA list: an inline underlined text button in its row's ink */
+  [class*="List__More"] { background-color: transparent !important; color: inherit !important; }
   /* not a button surface: no fill, border-width 0 - the bare thumb / running-total row
      inline in annotation, comment and Q&A copy, which the neutral surface above would box. */
   [class*="VotingActions__Button"] { background-color: transparent !important; }
@@ -476,6 +484,44 @@
     color: #ff3d7f !important; -webkit-text-fill-color: #ff3d7f !important; }
   #videos [color="accent.main"], #videos [color="accent.main"] * {
     color: #ffff64 !important; -webkit-text-fill-color: #ffff64 !important; }
+
+  /* React artist profile ("/artists/<name>"; some artists still get the legacy page below) */
+  [class^="Profile__Container"] { background-color: #14181d !important; }
+  /* Activity tab feed: each row is a white plate (page paper) with a #e9e9e9 hover, its
+     "EventCountBadge" sharing both fills; the timestamp is the muted #9a9a9a */
+  [class*="LineItem__ItemRow"], [class*="LineItem__EventCountBadge"] {
+    background-color: #14181d !important; }
+  [class*="LineItem__ItemRow"]:hover,
+  [class*="LineItem__ItemRow"]:hover [class*="LineItem__EventCountBadge"] {
+    background-color: #1c2128 !important; }
+  [class*="LineItem__Timestamp"] { color: #8b949e !important; }
+  /* white for every artist, brand yellow when the header carries the Verified eyebrow; the
+     two differ only by a build-volatile hash */
+  [class*="ProfileHeader__ArtistAvatar"] { border-color: #e6edf3 !important; }
+  [class*="VerifiedBadge__VerifiedBadgeContainer"],
+  [class*="VerifiedBadge__VerifiedBadgeContainer"] svg { color: #ffff64 !important; }
+  /* section tabs: aria-pressed="true" is a solid black pill with white ink, the rest bare
+     outlines - the shared "Button__Container" surface would make them all one grey pill */
+  [class*="SmallButton__Container"] { background-color: transparent !important; }
+  [class*="SmallButton__Container"]:hover { background-color: #2d333b !important; }
+  [class*="SmallButton__Container"][aria-pressed="true"],
+  [class*="SmallButton__Container"][aria-pressed="true"]:hover {
+    background-color: #e6edf3 !important; color: #14181d !important; }
+  [class*="SmallButton__Container"][aria-pressed="true"] *,
+  [class*="SmallButton__Container"][aria-pressed="true"] svg {
+    color: #14181d !important; fill: #14181d !important; }
+  /* the current page is a black disc with white ink and the rest black ink, marked only by a
+     hashed class, so the native pair is inverted whole. Glyph-only host: no rule here may give
+     it a colour or fill. */
+  [class*="PagingActions__PageButton"] { filter: invert(1) !important; }
+  /* plain-ink metadata inside the card or row <a>, which the link rules would accent */
+  [class*="DiscographyItem__Artist"],
+  [class*="DiscographyItem__Popularity"],
+  [class*="DiscographyItem__Popularity"] * { color: #c4cdd6 !important; }
+  [class*="DiscographyItem__ReleaseDate"], [class*="InlineUserBadge__IQ"] { color: #8b949e !important; }
+  [class*="ArtistBadge__ArtistName"],
+  [class*="QuestionAnswerList__ItemContainer"],
+  [class*="QuestionAnswerList__ItemContainer"] * { color: #e6edf3 !important; }
 
   /* LEGACY ("snarly") pages - artist + search results */
   /* legacy top nav */
@@ -762,6 +808,13 @@
     background-color: #1b3a1e !important; color: #b3ffb3 !important; }
   .rich_text_formatting img.del { border-color: #f85149 !important; }
   .rich_text_formatting img.ins { border-color: #3fb950 !important; }
+  /* a ruled grid with a #ccc header band: the blanket reset all but erases the #666 cell
+     edges, and the th ink lands light-on-#ccc */
+  .rich_text_formatting .rich_text_formatting-scrollable_table td,
+  .rich_text_formatting .rich_text_formatting-scrollable_table th {
+    border-color: #4a525c !important; }
+  .rich_text_formatting .rich_text_formatting-scrollable_table th {
+    background-color: #2d333b !important; color: #e6edf3 !important; }
 
   /* green when net-positive, red when negative - a real sentiment cue, flattened by the
      neutral .square_button colour rule above */
@@ -975,6 +1028,12 @@
   /* the lockup is one inline SVG of fill="#000" paths. Key to its own class, not every path
      in the footer: the sticky Home pill's chevron is stroked fill="none". */
   svg[class*="Footer-module__"] path { fill: #c4cdd6 !important; }
+  /* the splash's Sprite/GENIUS lockup is the same fill="#000" artwork, shown while the loader
+     counts up */
+  [class*="Loader-module__"][class*="__header"] svg path { fill: #c4cdd6 !important; }
+  /* the related-track arrow is brand yellow on a black square, but sits in a <span> inside the
+     row's <a>, which "a span" repaints */
+  [class*="TrackRelatedItem-module__"][class*="__arrow"] { color: #ffff64 !important; }
   /* a bare 24px anchor for the floating Home/Explore pill, natively transparent so the page
      scrolls under it; the shared footer rule would fill it opaque */
   footer[class*="StickyFooter-module__"] { background-color: transparent !important; }

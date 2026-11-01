@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Ozon: easy on the eyes across home, catalog, search, product pages and cart, with prices, ratings and the Ozon blue kept right.
-@version      20260919.01.53
+@version      20261031.15.39
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -530,6 +530,11 @@
   [mountto="body"] div[class*="uw_"] span[class*="tsBody500"] {
     color: var(--d-text-2) !important;
   }
+  /* The close-X disc is a literal white plate over the banner art; its glyph
+     is inked inline with `var(--textPrimary)`, which the remap lightens. */
+  [mountto="body"] button[class*="ga5_"] > svg[style*="--textPrimary"] {
+    color: #070707 !important;
+  }
 
   /* HEADER / NAV (data-widget="header") + sub-bars */
   [data-widget="header"],
@@ -589,6 +594,13 @@
      mis-hit is inert: every header child sits on the header ground. */
   [data-widget="header"] > div:nth-child(2) {
     box-shadow: -24px 0 0 var(--d-header), 24px 0 0 var(--d-header);
+  }
+  /* …but the counter-embed artwork's white band is 37px deep, reaching ~16px below the nav
+     row, and runs the full banner width. Only a crop removes it: the art that pokes up into the band
+     (appliances, campaign logo) is baked into the same opaque bitmap and goes with it. The
+     img renders at its natural 100px height (object-fit: cover), so px match the bitmap. */
+  [data-widget="header"] img[src*="blackfriday-widgets-api-images"][src*="background"] {
+    clip-path: inset(37px 0 0 0) !important;
   }
 
   /* MAIN-NAV ROW (data-widget="horizontalMenu") — item colour is an INLINE style,
@@ -743,6 +755,12 @@
   [data-widget="searchBarDesktop"] > div:not(.search-bar-wrapper) {
     background-color: rgba(3, 8, 13, 0.32) !important;
   }
+  /* The flyout's "Рекомендуем для вас" skuGrid carries the same inline
+     var(--bgLightKey) discount mask as the tile grids, but sits on the
+     panel's --d-bg, not a --d-surface card: the mask must match the panel. */
+  .search-bar-wrapper [style*="var(--bgLightKey)"] {
+    --bgLightKey: var(--d-bg) !important;
+  }
   /* SUGGESTION CHIPS in the open suggest flyout: each pill's only fill is
      rgba(0,48,120,.04), which composites to the dark panel's own colour. The
      pill's class is a hash, but the row is the whole content of
@@ -750,6 +768,17 @@
      pills. */
   [data-widget="tapTags"] > div > div > div {
     background-color: var(--d-surface) !important;
+  }
+  /* The suggestion rows' magnifier disc (`b75_` icon component) has the same
+     rgba(0,48,120,.04) fill, erased by the widget-wide transparent reset. */
+  [data-widget="webSuggestions"] div[class*="b75_"] {
+    background-color: var(--d-surface) !important;
+  }
+  /* SEARCH-SCOPE POPUP ("Везде ▾") category glyphs are CMS <img> SVGs in a
+     single #001a34 @ .4 fill, so only a filter reaches them. Every img in the
+     widget is one of these monochrome glyphs. */
+  [data-widget="searchContextPopup"] img {
+    filter: invert(1) hue-rotate(180deg) !important;
   }
   /* APPLIED SEARCH-SCOPE CHIP ("Смартфоны ✕") — natively a solid #005bff fill with a
      white label, flattened by the neutraliser above. Named by SHAPE, not hash: the applied
@@ -869,6 +898,20 @@
   [data-widget="webPdpGrid"] div[class*="pdp_"]:not([style*="background"]) {
     background-color: transparent !important;
   }
+  /* …except the `b5_` tag component ("Входит в заказ", the seller's "174 K",
+     hashtags), whose plate is a token-filled class: --bgSecondary, or
+     --bgActionSecondary on the hashtag variant. */
+  [data-widget="webPdpGrid"] div[class*="pdp_"][class*="b5_"]:not([style*="background"]) {
+    background-color: var(--bgSecondary) !important;
+  }
+  [data-widget="webPdpGrid"] [data-widget="webHashtags"] div[class*="pdp_"][class*="b5_"]:not([style*="background"]) {
+    background-color: var(--bgActionSecondary) !important;
+  }
+  /* The price card's "~N ₽ доплата" row is the card's only inline
+     var(--layerFloor2) fill, the card's own white; the card is cleared above. */
+  [data-widget="webSale"] [data-widget="webIconWithText"] {
+    --layerFloor2: transparent !important;
+  }
 
   /* PDP title truncation "…ещё" pill ships `background: var(--graphicLightKey)` = literal
      #fff. --graphicLightKey is deliberately NOT remapped at :root: it is a CONTEXT-named
@@ -889,6 +932,17 @@
      available wherever the token paints on a ground WE darken. */
   [data-widget="webInstallmentPurchase"] {
     --textDarkKey: #070707 !important;
+  }
+  /* INSTALMENT ROW ("Оплатить позже") — a rounded rgba(0,48,120,.04) plate
+     (the overflow-hidden wrapper's FIRST child, erased by the grid neutraliser)
+     swept every few seconds by its SECOND, empty child: a 104x56 absolute
+     white .6–.8 gradient, animated on `left` only. Natively a faint gloss on
+     near-white; at full strength on dark it is a bright slab over the label. */
+  [data-widget="webPdpGrid"] [data-widget="webInstallmentPurchase"] > div > div:first-child {
+    background-color: var(--d-surface) !important;
+  }
+  [data-widget="webInstallmentPurchase"] > div > div + div:empty {
+    opacity: 0.1 !important;
   }
 
   /* MAIN CTA BUTTON (В корзину) — keep the label white on the blue fill. The
@@ -980,16 +1034,35 @@
   [data-widget="webPDPListQuestions"] div:not([class]) > div[class*="rpProduct_"]:first-child {
     color: var(--d-text-3) !important;
   }
-  /* "Лучший ответ" badge — natively white on a green plate the webReviewTabs
-     reset strips (no inline background, hashed class). The plate cannot be
-     named without a parent selector, but the badge is the widget's only lone-child DIV
-     that opens with an inline SVG (the medal), so the medal and the label DIV
-     after it take the positive green instead. Scoped to the PDP tab: on the
-     /questions/ route the same widget sits outside webReviewTabs and keeps
-     its plate, where a green label would vanish into it. */
-  [data-widget="webReviewTabs"] [data-widget="webPDPListQuestions"] div[class*="rpProduct_"]:only-child > svg:first-child,
+  /* "Лучший ответ" badge — natively white on a rgb(14,173,67) pill the
+     webReviewTabs reset strips (no inline background, hashed class). The pill
+     cannot be named without a parent selector, but the badge is the widget's
+     only lone-child DIV that opens with an inline SVG (the medal), so the pill
+     is redrawn from the label DIV after it: a pseudo reaching back over the
+     badge's 2px/8px padding and the 16px medal + 5px gap (left -29px), held
+     under the label by `isolation`, with the medal lifted above it. Scoped to
+     the PDP tab: on the /questions/ route the same widget sits outside
+     webReviewTabs and keeps its pill. */
+  [data-widget="webReviewTabs"] [data-widget="webPDPListQuestions"] div[class*="rpProduct_"]:only-child > svg:first-child {
+    position: relative;
+    z-index: 1;
+    color: #fff !important;
+  }
   [data-widget="webReviewTabs"] [data-widget="webPDPListQuestions"] div[class*="rpProduct_"]:only-child > svg:first-child + div {
-    color: var(--d-green) !important;
+    position: relative;
+    isolation: isolate;
+    color: #fff !important;
+  }
+  [data-widget="webReviewTabs"] [data-widget="webPDPListQuestions"] div[class*="rpProduct_"]:only-child > svg:first-child + div::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    right: -8px;
+    bottom: -2px;
+    left: -29px;
+    z-index: -1;
+    border-radius: 10px;
+    background-color: rgb(14, 173, 67);
   }
   /* "ЗАДАЙТЕ ВОПРОС О ТОВАРЕ" form. The rpProduct module paints its plate a
      literal #f5f7fa through a hashed class while its heading and hint take the
@@ -1002,6 +1075,20 @@
      generic textarea fill would cut the ring at both sides. */
   [data-widget="webCreateQuestion"] textarea {
     background-color: transparent !important;
+  }
+  /* PDP "Документы качества" CELL (cellList): an inline var(--layerFloor1) shell
+     (radius 16) around an inline var(--bgPrimary) plate (radius 24), i.e. a
+     page-coloured shell around a canvas-grey plate. Remapped, the plate sinks
+     below the shell and the shell's corners poke out past it: drop the shell,
+     raise the plate, and lift the icon tile (`b85_`, --layerFloor1) off it. */
+  [data-widget="cellList"] > div[style*="var(--layerFloor1)"] {
+    background-color: transparent !important;
+  }
+  [data-widget="cellList"] div[style*="var(--bgPrimary)"] {
+    background-color: var(--d-surface) !important;
+  }
+  [data-widget="cellList"] div[style*="var(--bgPrimary)"] div[class*="b85_"] {
+    background-color: var(--d-border) !important;
   }
   /* REVIEW LIST + its page heading render from a module that hardcodes ink
      instead of reading the tokens: rgb(7,7,7) on headings, names and body,
@@ -1023,14 +1110,15 @@
   /* INITIALS AVATAR — a 48px rgba(55,175,255,.1) disc (hashed, static,
      overflow visible) around a classless SPAN initial. On the PDP tab the
      webReviewTabs reset erases the disc; /reviews/ keeps it, so the redraw is
-     scoped to the tab or the two tints stack. The span is the only classless
-     only-child SPAN of a first-child module DIV that has a sibling (photo
-     avatars hold an IMG), so the disc is redrawn from it as a centred
-     pseudo. */
-  [data-widget="webReviewTabs"] [data-widget="webListReviews"] div[class*="rpProduct_"] > div[class*="rpProduct_"]:first-child:not(:only-child) > span:only-child:not([class]) {
+     scoped to the tab or the two tints stack. The disc is the widget's only
+     two-class module DIV whose sole child is a classless SPAN (photo avatars
+     hold an IMG), so the disc is redrawn from the span as a centred pseudo. */
+  [data-widget="webReviewTabs"] [data-widget="webListReviews"] div[class*="rpProduct_"][class*=" "] > span:only-child:not([class]),
+  [data-widget="webReviewTabs"] [data-widget="webPDPListQuestions"] div[class*="rpProduct_"][class*=" "] > span:only-child:not([class]) {
     position: relative;
   }
-  [data-widget="webReviewTabs"] [data-widget="webListReviews"] div[class*="rpProduct_"] > div[class*="rpProduct_"]:first-child:not(:only-child) > span:only-child:not([class])::before {
+  [data-widget="webReviewTabs"] [data-widget="webListReviews"] div[class*="rpProduct_"][class*=" "] > span:only-child:not([class])::before,
+  [data-widget="webReviewTabs"] [data-widget="webPDPListQuestions"] div[class*="rpProduct_"][class*=" "] > span:only-child:not([class])::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -1041,6 +1129,12 @@
     border-radius: 50%;
     background-color: rgba(55, 175, 255, 0.1);
   }
+  /* The Q&A answer avatars are the module's 32px size. */
+  [data-widget="webReviewTabs"] [data-widget="webPDPListQuestions"] div[class*="rpProduct_"][class*=" "] > span:only-child:not([class])::before {
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0 -16px;
+  }
 
   /* The two action inks the blanket above would otherwise swallow, both a
      literal #005bff. The SELECTED sort option is the only span in the widget
@@ -1050,6 +1144,12 @@
   [data-widget="webListReviews"] span[class*="rpProduct_"][class*=" "],
   [data-widget="webListReviews"] div > span + span {
     color: var(--d-blue-ink) !important;
+  }
+  /* The UNSELECTED sort option is natively muted rgba(0,26,51,.6), not body
+     ink: one module class, inside a wrapper SPAN that follows the row's
+     "Показать сначала:" label. */
+  [data-widget="webListReviews"] div > span[class*="rpProduct_"]:first-child ~ span > span[class*="rpProduct_"]:not([class*="\20"]) {
+    color: var(--d-text-3) !important;
   }
   /* Two more action labels the DIV blanket swallows, both natively #005bff and wrapped in a
      component whose label is a DIV: the "N комментариев" toggle (Ozon's link component, id
@@ -1246,8 +1346,9 @@
      72px strip stuck to the viewport bottom, holding only the "?" disc, and
      painted it covers the page bottom as an opaque band. Not
      searchResultsSort either: a static, natively transparent row as wide as
-     the grid, whose sort field carries its own surface. */
-  [data-widget="searchResultsFiltersActive"],
+     the grid, whose sort field carries its own surface. Not
+     searchResultsFiltersActive: the static, natively transparent applied-chip
+     row, which painted is a full-width band under the chips. */
   [data-widget="webStickyProducts"],
   [data-widget="webChatButton"],
   [class*="sticky"],
@@ -1333,6 +1434,11 @@
   [data-widget="filtersDesktop"] input:checked + div {
     background-color: #005bff !important;
   }
+  /* An ON switch is never `:checked`: its input gains a second (modifier) class
+     instead, so "a nameless input with a space in its class" is the ON state. */
+  [data-widget="filtersDesktop"] input:not([name])[class*=" "] + div {
+    background-color: #005bff !important;
+  }
   /* …and both of those fills are !important, so they also pin the control's HOVER: a switch
      track natively tints rgba(11,152,253,.17) and a checked control deepens to #0050e0. Every
      rail row is wrapped in a <label>, so hover is read there. Order is load-bearing: both rules
@@ -1342,7 +1448,8 @@
   [data-widget="filtersDesktop"] label:hover input:not([name]) + div {
     background-color: rgba(255, 255, 255, 0.26) !important;
   }
-  [data-widget="filtersDesktop"] label:hover input:checked + div {
+  [data-widget="filtersDesktop"] label:hover input:checked + div,
+  [data-widget="filtersDesktop"] label:hover input:not([name])[class*=" "] + div {
     background-color: var(--d-blue) !important;
   }
   /* "Все фильтры" is the rail's one shared-component <button>, and that component shows its
@@ -1420,6 +1527,30 @@
   [data-widget="cartFooter"],
   [data-widget="cartEmpty"] {
     background-color: transparent !important;
+  }
+  /* Cart sub-pages (/cart/longtails …): the breadcrumb island is a page-ground
+     band whose inline #F5F7FA is UPPERCASE, which the case-sensitive neutraliser
+     substrings miss (no ` i` flag: the .org parser rejects it). The selection
+     description widget paints a class-hardcoded white plate inside its island. */
+  [data-widget="island"][style*="background-color:#F5F7FA"] {
+    background-color: var(--d-bg) !important;
+  }
+  [data-widget="webSelectionItemDescription"] {
+    background-color: transparent !important;
+  }
+
+  /* ACCOUNT HOME  (/my/main) */
+  /* Guest login banner: a 65%-alpha pale-blue plate under a pale-blue Ozon
+     logo bg-image. The ground must be OPAQUE for the multiply blend to sink
+     the logo into a dark watermark instead of a bright slab. */
+  [data-widget="login"][style*="background-image"] {
+    background-color: #1e2d46 !important;
+    background-blend-mode: multiply;
+  }
+  /* "Сервис и помощь" cards are the island's own colour, told apart only by a
+     navy drop shadow that vanishes on dark. Inset ring: no layout shift. */
+  [data-widget="serviceMenu"] a {
+    box-shadow: inset 0 0 0 1px var(--d-border-2), 0 4px 16px rgba(0, 0, 0, 0.35) !important;
   }
 
   /* ERROR PAGE  ("Такой страницы не существует") */
@@ -1563,6 +1694,12 @@
   [data-widget="webMarketingLabels"] div[style*="bgOpaqueMarketingSecondary"] {
     color: var(--textMarketing) !important;
   }
+  /* "Соц. сертификат" chip — literal `background:#E5F9F9; color:#00B8B8`, no token.
+     Plate is opaque: the chips sit over the gallery photo. The teal ink is kept. */
+  [data-widget="webMarketingLabels"] div[style*="#E5F9F9"],
+  [data-widget="webMarketingLabels"] div[style*="rgb(229, 249, 249)"] {
+    background: #10353a !important;
+  }
 
   /* VERIFIED-SELLER REPLY BADGE — the shop-name pill above a seller's answer, an INLINE
      `background-image: linear-gradient(90deg, #E3F8EB, #E6FCFD); color: var(--textPrimary)`:
@@ -1624,6 +1761,12 @@
   }
   [data-widget="webAspects"] span > span:not([class]) {
     color: var(--d-text) !important;
+  }
+  /* Two-line chips ("250" over "302 ₽/100 гр"): the value and its unit-price
+     subline are sibling classed wrappers around classless spans; the SECOND is
+     natively muted rgba(0,26,51,.6). */
+  [data-widget="webAspects"] span > span[class] + span[class] > span:not([class]) {
+    color: var(--d-text-3) !important;
   }
   [data-widget="webAspects"] span[class*="tsBody"] > span[class*="pdp_"] {
     color: var(--d-red) !important;
@@ -1743,6 +1886,27 @@
   [data-widget="contextQuestionsStatistic"] div[class*="rpProduct_"] > div[class*="rpProduct_"] + div[class*="rpProduct_"] {
     color: var(--d-text) !important;
   }
+  /* The verdict rows' trailing "i" glyph is the same second-DIV shape as a
+     percentage, natively a 20% navy hint; it takes the hint ink on its svg. */
+  [data-widget="contextQuestionsStatistic"] div[class*="rpProduct_"] > svg {
+    color: var(--d-text-4) !important;
+  }
+  /* That "i" opens a `d45_` popover portal-mounted outside the widget, carrying
+     the same rpProduct histogram (labels, percentages, #f5f7fa track that clips
+     the #005bff fill). */
+  .vue-portal-target > div[class*="d45_"] div[class*="rpProduct_"] div[class*="rpProduct_"] {
+    color: var(--d-text-3) !important;
+  }
+  .vue-portal-target > div[class*="d45_"] div[class*="rpProduct_"] > div[class*="rpProduct_"] + div[class*="rpProduct_"] {
+    color: var(--d-text) !important;
+  }
+  .vue-portal-target > div[class*="d45_"] div[class*="rpProduct_"]:not([style*="width"]) {
+    background-color: transparent !important;
+  }
+  .vue-portal-target > div[class*="d45_"] div[class*="rpProduct_"][style*="width"][style*="%"] {
+    background-color: var(--d-blue) !important;
+    box-shadow: 0 0 0 300px rgba(255, 255, 255, 0.12) !important;
+  }
   [data-widget="contextQuestionsStatistic"] div[style*="width"][style*="%"] {
     background-color: var(--d-blue) !important;
     box-shadow: 0 0 0 300px rgba(255, 255, 255, 0.12) !important;
@@ -1784,6 +1948,15 @@
   [data-widget="tileScrollDesktop"] > div > div > button[disabled] {
     background-color: rgba(255, 255, 255, 0.05) !important;
     color: var(--d-text-4) !important;
+  }
+  /* The /reviews/ tag-chip strip's scroll arrow is a disc overlapping the last
+     chip, filled through an INLINE `--icon-button-background-color:
+     var(--layerFloor1)`. The chips are --layerFloor1 too, so the disc must sit a
+     step lighter or it reads as part of the chip. */
+  [data-widget="tagListModal"] button[style*="--icon-button-background-color"] {
+    --icon-button-background-color: var(--d-border-2) !important;
+    --icon-button-color: var(--d-text-2) !important;
+    --icon-button-hover-color: var(--d-text) !important;
   }
 
   /* generic SVG icons that inherit currentColor stay readable */

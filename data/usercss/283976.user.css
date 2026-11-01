@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, comfortable dark theme for Khan Academy: courses, lessons, articles, exercises and search go dark while your mastery progress stays clear.
-@version      20260919.01.52
+@version      20261031.15.38
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -143,6 +143,18 @@
      `a:hover` above and would otherwise erase the cue. */
   #main-content a[data-testid="lesson-card-link"] { color: #e6edf3 !important; }
   #main-content a[data-testid="lesson-card-link"]:hover { color: #9bd4ff !important; }
+  /* Q&A "jump to 4:15" timestamps are `div.youTubeLink[role="link"]`, not anchors, so the shell's
+     `div` rule pins them near-white. Native hover adds a blue underline on a transparent 1px
+     bottom border the blanket reset would grey at rest. */
+  #main-content .youTubeLink { color: #5fb0e6 !important; border-bottom-color: transparent !important; }
+  #main-content .youTubeLink:hover { color: #9bd4ff !important; border-bottom-color: #9bd4ff !important; }
+  /* Narrow-width lesson header: the title <h1> and book mask icon sit inside the
+     `content-list-toggle` button that opens the lesson list, both brand blue as its only
+     affordance; the heading and icon-span rules flatten them. */
+  #main-content [data-testid="content-list-toggle"] h1 { color: #5fb0e6 !important; }
+  #main-content button[data-testid="content-list-toggle"] > span:first-child:empty {
+    background-color: #5fb0e6 !important;
+  }
   /* `tertiary` IS a link rendered as a button, so give back the brand blue the shell's
      span rule flattens. `#main-content button[aria-expanded]` (home accordions) is more
      specific and stays near-white. */
@@ -150,6 +162,16 @@
   button[data-kind="tertiary"] span { color: #5fb0e6 !important; }
   button[data-kind="tertiary"]:hover,
   button[data-kind="tertiary"]:hover span { color: #9bd4ff !important; }
+  /* An icon-only tertiary's hover cue is a 2px ring in its own ink, which the blanket border
+     reset greys. Text tertiaries have a 0px border, so this paints nothing on them. */
+  button[data-kind="tertiary"]:hover { border-color: currentColor !important; }
+  /* A disabled tertiary (logged-out Q&A "more" menu) is natively a pale grey, not link blue;
+     `aria-disabled` is its only state carrier. Its chevron is a mask span filled by its own
+     `currentColor`, so the span ink carries the glyph too. */
+  button[data-kind="tertiary"][aria-disabled="true"],
+  button[data-kind="tertiary"][aria-disabled="true"] span,
+  button[data-kind="tertiary"][aria-disabled="true"]:hover,
+  button[data-kind="tertiary"][aria-disabled="true"]:hover span { color: #8b949e !important; }
 
   /* Top nav. `#top-header-container` is the full-bleed strip; the inner `nav` is
      width-capped, so theming only the nav leaves brand-navy shoulders. */
@@ -177,6 +199,16 @@
   [data-testid="learn-menu"] a:focus, [data-testid="learn-menu"] button:focus {
     background-color: #232a32 !important;
   }
+  /* Course submenu: its first entry is the whole-category link ("SCIENCE"), the one link-blue
+     row at rest; every course row turns link-blue under the cursor. All are <a>s whose label
+     span the shell's `span` rule pins near-white. The category column is <button>s, which stay
+     neutral on hover. */
+  [data-testid="learn-menu"] ul[role="menu"] > a:first-child,
+  [data-testid="learn-menu"] ul[role="menu"] > a:first-child span { color: #5fb0e6 !important; }
+  [data-testid="learn-menu"] ul[role="menu"] > a:hover,
+  [data-testid="learn-menu"] ul[role="menu"] > a:hover span,
+  [data-testid="learn-menu"] ul[role="menu"] > a:focus,
+  [data-testid="learn-menu"] ul[role="menu"] > a:focus span { color: #9bd4ff !important; }
 
   /* Mobile hamburger drawer: a body-level region outside `#main-content` with a hardcoded
      white panel and rows, so neither the token remaps nor the neutralizer reach it. */
@@ -184,6 +216,23 @@
   #page-header-responsive-nav-menu [class] { background-color: transparent !important; }
   #page-header-responsive-nav-menu a:hover,
   #page-header-responsive-nav-menu button:hover { background-color: #232a32 !important; }
+  /* The subject accordions' chevron is a mask-icon span filled by its own background, which
+     the transparent rule above erases. */
+  #page-header-responsive-nav-menu [data-testid="mobile-menu-domain-caret-icon"] {
+    background-color: #9aa4af !important;
+  }
+  /* Log in / Sign up and every course entry are link-blue; the shell's `a` / `span` rules pin
+     them near-white. The one test-id'd anchor is the white-on-fill Donate button. */
+  #page-header-responsive-nav-menu a:not([data-testid]),
+  #page-header-responsive-nav-menu a:not([data-testid]) span { color: #5fb0e6 !important; }
+  #page-header-responsive-nav-menu a:not([data-testid]):hover,
+  #page-header-responsive-nav-menu a:not([data-testid]):hover span { color: #9bd4ff !important; }
+  #page-header-responsive-nav-menu [data-testid="mobile-menu-donate-link"] {
+    background-color: #2563c9 !important;
+  }
+  #page-header-responsive-nav-menu [data-testid="mobile-menu-donate-link"]:hover {
+    background-color: #2f6fd6 !important;
+  }
 
   /* "NEW" pill: a pale blue chip whose label inherits the remapped near-white text.
      Stable test id. */
@@ -280,8 +329,15 @@
     color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important;
   }
   /* Home "Explore" grid: each category header's label is a direct text node hardcoded
-     near-black. Stable scope: the only aria-expanded buttons under #main-content. */
+     near-black. Every other aria-expanded button under #main-content needs its own restate below. */
   #main-content button[aria-expanded] { color: #e6edf3 !important; }
+  /* An article practice set's "Explain" / "Hide explanation" toggle is also an aria-expanded
+     button, brand blue natively as its only affordance. */
+  #main-content .perseus-graded-group button[aria-expanded] { color: #5fb0e6 !important; }
+  #main-content .perseus-graded-group button[aria-expanded]:hover { color: #9bd4ff !important; }
+  /* The practice set's card is a `base-subtle` plate between two hairlines; the
+     `#main-content [class]` neutralizer outranks its hashed class. */
+  #main-content .perseus-widget-container > ._mg08ap { background-color: #1c2128 !important; }
   p, li, label, dd, dt, blockquote, figcaption, td, th, caption,
   legend, article, section, main { color: #c4cdd6 !important; }
   span:not([class*="color"]):not([style*="color"]) { color: inherit; }
@@ -534,6 +590,25 @@
   #main-content div._1r3t0of5 {
     background-image: url("https://cdn.kastatic.org/images/content-library/course-accordion-bg.png") !important;
   }
+  /* Quiz / unit test / course challenge rail: the box under the current row is a childless
+     `background-image` of light-page line art (white-sheet JPGs, an alpha PNG with navy ink),
+     stripped by the same split. Restored under the sprite's 0.92 invert so the sheet lands on
+     the page base and the navy ink reads. One hashed class per art file, degrade-safe. */
+  #main-content div._b3upxqj {
+    background-image: url("https://cdn.kastatic.org/images/content-library/quiz-context.jpg") !important;
+  }
+  #main-content div._y8k5z4j {
+    background-image: url("https://cdn.kastatic.org/images/content-library/test-context.jpg") !important;
+  }
+  #main-content div._xxsdyuv {
+    background-image: url("https://cdn.kastatic.org/images/content-library/course-challenge-context.png") !important;
+  }
+  /* Unscoped: at narrow widths the rail is copied into a body-level `[role="dialog"]`, where
+     the neutralizer never strips the art and the white sheet shows unfiltered. */
+  div._b3upxqj, div._y8k5z4j, div._xxsdyuv { filter: invert(0.92) hue-rotate(180deg); }
+  /* Quiz intro card: a brand-blue panel under white copy and a planet illustration drawn for
+     that ground; the neutralizer leaves the art floating on the page base. Hashed, degrade-safe. */
+  #main-content div._1y3pxpe5 { background-color: #1b3d7a !important; }
   /* Re-surface the elements that NATIVELY carry a background, and only those — keyed on what
      the element looks like, not on its type. No button without a Wonder Blocks `data-kind`
      has a native background; `tertiary` is Khan's link-styled button (transparent at rest AND
@@ -551,12 +626,27 @@
   #main-content a[data-kind="secondary"]:hover,
   #main-content a[class][role]:hover,
   #main-content [role="button"]:hover { background-color: #232a32; }
+  /* Section dividers are 1px boxes FILLED with a 16%-alpha ink (or a grey `<hr>` fill), not
+     borders, so the neutralizer erases them. Hashed classes, one per component, degrade-safe:
+     course page, Q&A header (/a/ /v/), scratchpad tab row. */
+  #main-content hr[class],
+  #main-content div._ctp1at,
+  #main-content div._11ylneuv,
+  #main-content div._1twd5e7 { background-color: #2d333b; }
   /* Home testimonial video: the play affordance is an indigo disc holding a white mask-icon
      triangle, which the neutralizer flattens. The accessible name is the stable hook,
      `> div > div` the disc. Must out-rank the `[class]:not(span)` neutralizer (1,1,1), so keep
      the element types. */
   #main-content button[aria-label^="Play video"] > div > div { background-color: #2563c9; }
   #main-content button[aria-label^="Play video"]:hover > div > div { background-color: #2f6fd6; }
+  /* Home "Get started as a..." role cards are opaque plates that, at narrow widths, sit over
+     the hero ramp art; a transparent card lets the art through. Title ink over a muted
+     description is the native hierarchy. */
+  #main-content h2 ~ a[href^="/signup/"][class] { background-color: #1c2128; }
+  #main-content h2 ~ a[href^="/signup/"] > div > span { color: #9aa4af !important; }
+  /* Its hover/focus ring is an indigo outline offset by a paper-white spread shadow. */
+  #main-content h2 ~ a[href^="/signup/"]:hover,
+  #main-content h2 ~ a[href^="/signup/"]:focus-visible { box-shadow: 0 0 0 2px #14181d !important; }
 
   /* Khan's list ROWS — course-unit rail, lesson rail, search result card — are anchors whose
      only hover affordance is a fill, and the neutralizer flattens BOTH states. Restore the
@@ -568,6 +658,16 @@
   nav[data-testid="course-unit-sidebar"] a:hover,
   [data-testid="learnable-content-cells"] a:hover,
   .search_results ul > li > div > a:hover { background-color: #1c2128 !important; }
+  /* Program cards (CS browse / spin-offs): the author is its own link-blue profile link and the
+     "Votes · Spin-Offs" line under it a 64%-alpha muted ink; the shell `span` / `div` rules pin
+     both to the title's near-white. Q&A author names link to `…/discussion` and are natively
+     the neutral ink. */
+  #main-content a[href^="/profile/"]:not([href$="/discussion"]) > span { color: #5fb0e6 !important; }
+  #main-content a[href^="/profile/"]:not([href$="/discussion"]):hover > span { color: #9bd4ff !important; }
+  #main-content a[href^="/profile/"] + div { color: #9aa4af !important; }
+  /* Search's "Find content that matches your state standards" callout is a pale-blue plate
+     beside a brand-blue `::before` bar; without the plate the bar floats. */
+  #main-content a[href^="/regions/"][class] { background-color: #18222f; }
   /* The CURRENT row of the course-unit rail and the lesson rail is a pale-blue plate under a
      brand-blue title (`aria-current` is the only state carrier); the neutralizer and the shell
      ink rules flatten both, leaving only the 4px edge bar. Placed after the hover rules, which
@@ -579,6 +679,20 @@
   }
   nav[data-testid="course-unit-sidebar"] a[aria-current="true"] ._iuft71f,
   #main-content [data-testid="learnable-content-active"] div { color: #5fb0e6 !important; }
+  /* Narrow widths render the same lesson rail inside a body-level modal (opened by
+     `content-list-toggle`), outside `#main-content`: its frame, card and breadcrumb plate are
+     hardcoded light, and the `[role="dialog"] a` rule would paint every row link-blue. Rows
+     natively take the neutral ink; the current row keeps its blue title. Hashed plates,
+     degrade-safe. */
+  [role="dialog"] div._ogl5g9u { background-color: #1c2128 !important; }
+  [role="dialog"] div._1hh740ni { background-color: #14181d !important; }
+  [role="dialog"] [data-testid="learnable-content-cells"] a { color: #e6edf3 !important; }
+  [role="dialog"] [data-testid="learnable-content-active"] div { color: #5fb0e6 !important; }
+  /* The rail's footer breadcrumb (desktop sidebar and modal alike) is a pale plate of
+     underlined muted-ink links, not link-blue. */
+  div._pulyoef, #main-content div._pulyoef { background-color: #1c2128 !important; }
+  #main-content [aria-label="breadcrumbs"] a._cdjozu6,
+  [role="dialog"] [aria-label="breadcrumbs"] a._cdjozu6 { color: #9aa4af !important; }
 
   /* Home testimonial trio: the three cards are colour-coded with the light-page ink on top,
      and the neutralizer flattens them to identical grey boxes. As with the marketing stat
@@ -627,6 +741,9 @@
   [data-testid="mastery-practice-content-item"] > div > div > span:first-child:not(:last-child) {
     color: #5fb0e6 !important;
   }
+  /* The course page's personalised "Up next for you:" (the `._x7kvevl` card) carries the same
+     blue eyebrow as the span right before its `unit-header` link. */
+  #main-content span._p3we8bu { color: #5fb0e6 !important; }
   /* The unit card has no border, only a subtle plate the neutralizer strips, which leaves its
      top accent and column divider floating. Element type ties the neutralizer; source order wins. */
   #main-content div[data-testid="mastery-practice-content-item"] { background-color: #1c2128; }
@@ -712,6 +829,9 @@
      `#main-content` to outrank the id above. */
   #main-content button[data-kind="tertiary"] > span:first-child:last-child:empty {
     background-color: #5fb0e6 !important;
+  }
+  #main-content button[data-kind="tertiary"][aria-disabled="true"] > span:first-child:last-child:empty {
+    background-color: #8b949e !important;
   }
 
   /* Lesson-list content-type icons are inline <svg> hardcoding Khan's near-black ink
@@ -870,6 +990,29 @@
      `transparent`, which the blanket `* { border-color }` rule below would repaint into a
      solid 24px diamond. */
   #onetrust-consent-sdk #ot-anchor { border-color: transparent !important; }
+  /* TrustArc consent banner (light DOM): a hardcoded white panel with light-page inks, outside
+     every token remap; the global `h2` rule paints its title near-white on that white. */
+  #truste-consent-content { background-color: #1c2128 !important; }
+  #truste-consent-content #truste-consent-text,
+  #truste-consent-content #truste-powered-by,
+  #truste-consent-content #trustarc-lang-selector-label { color: #c4cdd6 !important; }
+  #truste-consent-content a { color: #5fb0e6 !important; }
+  #truste-consent-content .trustarc-banner-btn,
+  #truste-consent-content #trustarc-lang-select {
+    background-color: #1c2128 !important;
+    color: #e6edf3 !important;
+  }
+  #truste-consent-content .trustarc-banner-btn * { color: #e6edf3 !important; }
+  /* Its outline is a 1px inset shadow, and the focus ring a paper-white spread under the indigo
+     ring (focus is trapped onto "Cookies Settings" as soon as the banner opens). */
+  #truste-consent-content .trustarc-banner-btn { box-shadow: inset 0 0 0 1px #3a424c !important; }
+  #truste-consent-content .trustarc-banner-btn:focus {
+    box-shadow: 0 0 0 2px #1c2128, 0 0 0 4px #5753fa !important;
+  }
+  #truste-consent-content .trustarc-banner-btn:hover { background-color: #232a32 !important; }
+  /* Its preference centre renders inside a shadow root our rules cannot enter; the host is the
+     only reachable box, so the white modal is flipped whole. */
+  .truste_box_overlay .trustarc_newcm_container { filter: invert(0.9) hue-rotate(180deg) !important; }
   /* The weekly-streak counter is a `border: 1px solid transparent` box the blanket rule would
      box in grey. `div[tabindex]` is its shape there — its only focusable siblings are an <h2>
      and an icon <span>. */
@@ -886,6 +1029,12 @@
 
   /* Soften any remaining bright borders across the app */
   * { border-color: #2d333b !important; }
+  /* A Wonder Blocks checkbox is `appearance: none` with a transparent fill, so its 1px ring
+     is the whole control; at the hairline grey above it drops to ~1.4:1 on the page. Checked,
+     the ring takes the fill colour. Must stay above the `aria-invalid` rule, which ties it on
+     specificity. */
+  input[type="checkbox"] { border-color: #6e7681 !important; }
+  input[type="checkbox"]:checked { border-color: #2563c9 !important; }
 
   /* Form validation state (login / signup LabeledField): Khan reddens the invalid input's
      border, the "Error:" mask icon and the helper text, all through the critical token, and
@@ -972,6 +1121,11 @@
   /* Scratchpad tablist: the current tab's 5px brand-blue `border-bottom` is repainted by the
      blanket border reset. Re-tint via its stable ARIA state. */
   #scratchpad-tabs [role="tab"][aria-selected="true"] { border-bottom-color: #5fb0e6 !important; }
+  /* Its label is brand blue too, like the Help Requests tablist under it. */
+  #scratchpad-tabs [role="tab"][aria-selected="true"],
+  #scratchpad-tabs [role="tab"][aria-selected="true"] * {
+    color: #5fb0e6 !important; -webkit-text-fill-color: #5fb0e6 !important;
+  }
 
   /* The CS editor's own tooltips are `.tooltip` divs rendered at the end of <body>, hidden
      until you interact with the code. The picker's panels are hardcoded white, and each tail is

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Pikabu.
-@version      20260919.01.53
+@version      20261031.15.40
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -254,6 +254,12 @@
     --c-btn-special-bgHover: #705d1c;
     --c-btn-special-bgClick: #937615;
     --c-btn-special-textIcon: #ebedf2;
+
+    /* Neutral short-post plate (`story_bright-800`); must stay distinct from the card
+       it sits on. The hue gradients are the author's choice and are kept. */
+    --special-base-gradA: #2d343d;
+    --special-base-gradB: #262c34;
+    --special-blackText: var(--pk-text);
 
     /* ---- Pagination ---- */
     --c-pagination-defaultBg: var(--pk-surface-2);
@@ -558,16 +564,22 @@
   .story__title-link.story__title-link_visited { color: var(--pk-text-muted) !important; }
   .page-story__story .story__title-link.story__title-link_visited { color: var(--pk-text) !important; }
 
-  /* The author's colour is painted on .story__content-inner, so the nested text block
-     must stay transparent. */
-  [class*="story_primary"] .story-block,
-  [class*="story_primary"] .story-block_type_text { background-color: transparent !important; }
+  /* The author's gradient is painted on .story__content-inner (every colour variant),
+     so the nested text block must stay transparent. */
+  .story_short .story-block,
+  .story_short .story-block_type_text { background-color: transparent !important; }
 
-  /* The author's plate stays saturated (--color-story-theme is a hue token we do not
-     flip), where --pk-text-soft is 2.5:1. `bright-800` is the one plate painted from a
-     neutral token, flipped dark here, so it keeps light ink. */
+  /* The author's plate stays saturated (--special-<hue>-grad* are hue tokens we do not
+     flip), where --pk-text-soft is 2.5:1. `bright-800` is the one neutral plate
+     (--special-base-grad*), flipped dark in :root, so it keeps light ink. */
   .story_short .story__content-inner { color: #ffffff !important; }
   .story_short.story_bright-800 .story__content-inner { color: var(--pk-text) !important; }
+  .story_short.story_bright-800 .story__content-inner .icon--ui__short-story-bg { color: rgba(255, 255, 255, 0.05) !important; }
+
+  /* The spoiler veil is a #212121 dot pattern; light-OS Pikabu only lifts it under
+     [data-theme-dark]. Its own bright-800 `filter:none` is (0,6,1) !important. */
+  .story-block_type_text span.pkb-spoiler { filter: brightness(5.8) !important; }
+  :root:not([data-theme-dark]) .story_short.story_bright-800 .story__content-inner .story-block_type_text span.pkb-spoiler { filter: brightness(5.8) !important; }
 
   /* Rating block on the story card */
   .story__rating-block { background-color: var(--pk-surface-2) !important; }
@@ -672,6 +684,8 @@
     color: var(--pk-text) !important;
     border-color: var(--pk-border) !important;
   }
+  /* The `.input` wrapper owns the field's fill; its inner input is bare. */
+  .input .input__input { background-color: transparent !important; }
   input::placeholder,
   textarea::placeholder { color: var(--pk-text-muted) !important; }
   .search-results,
@@ -705,6 +719,12 @@
   .header-menu__item_current:hover a,
   .header-menu__item_active:hover,
   .header-menu__item_active:hover a { color: var(--pk-green) !important; }
+  /* The sponsored Alfa feed tab paints its current state in the bank's red (label +
+     underline), not brand green. */
+  .header-menu__item_current.header-menu__item_alfa,
+  .header-menu__item_current.header-menu__item_alfa a,
+  .header-menu__item_current.header-menu__item_alfa:hover,
+  .header-menu__item_current.header-menu__item_alfa:hover a { color: #ef3124 !important; }
 
   /* Search result tabs (Посты / Пользователи / Теги / Сообщества) */
   [class*="TabItem__tab"],
@@ -731,6 +751,15 @@
   [class*="Counter__host"][class*="_primary"] span {
     color: var(--pk-bg) !important;
     -webkit-text-fill-color: var(--pk-bg) !important;
+  }
+  /* The tertiary counter is a muted pill on the tab's own pill: it must differ from
+     both the tab fill and the tab label. */
+  [class*="TabItem__tab"] [class*="Counter__host"][class*="_tertiary"] {
+    background-color: var(--pk-border-soft) !important;
+  }
+  [class*="TabItem__tab"] [class*="Counter__host"][class*="_tertiary"],
+  [class*="TabItem__tab"] [class*="Counter__host"][class*="_tertiary"] span {
+    color: var(--pk-text-muted) !important;
   }
 
   /* Search period / type segmented buttons (Сегодня / Неделя / Текстовые …) */

@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Clean & modern dark theme for ESPN with full coverage across the homepage, sport sections (NBA, NFL, etc.) and story/article pages.
-@version      20260919.01.51
+@version      20261031.15.37
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -50,6 +50,21 @@
   .scoreEvent__athlete, .scoreEvent__score, .scoreEvent__position,
   .scoreEvent__description, .scoreEvent__competitors, .cscore_rank,
   .cscore_aggregate, .scoreCell__Score, .gameStrip__team-name { color: #e6edf3 !important; }
+  /* The racing chip's "Lap(s)" unit is a bare span inside the chip's <a>; natively it shares the
+     value's ink. */
+  .ScoreCellAthlete__Score span { color: inherit !important; }
+  /* The final-score winner caret draws in the default black fill; ESPN's own dark cell uses
+     its light text colour. */
+  .ScoreboardScoreCell__WinnerIcon, .ScoreCell__WinnerIcon,
+  .BracketCell__WinnerIcon, .Gamestrip__WinnerIcon { fill: #e6edf3 !important; }
+  /* Final-score loser: ESPN greys the score through --text-weak; the team name keeps its ink. */
+  .ScoreCell__Item--loser .ScoreCell__Score,
+  .ScoreboardScoreCell__Item--loser .ScoreCell__Score,
+  .BracketCell__Score.BracketCell__Score--post--loser { color: #8b949e !important; }
+  /* Gamestrip (player "Previous Game" card) greys the loser's team name as well as its score. */
+  .Gamestrip__Team--loser .Gamestrip__Score, .Gamestrip__Team--loser .Gamestrip__SubScore,
+  .Gamestrip__Team--loser .ScoreCell__TeamName { color: #8b949e !important; }
+  .Gamestrip__Team--loser a .ScoreCell__TeamName:hover { color: #5fb0e6 !important; }
   .cscore_date-time, .cscore_date, .cscore_network, .cscore_info, .cscore_info-overview,
   .cscore_notes, .cscore_status, .cscore_odds, .scoreEvent__status,
   .ScoreCell__Time, .Schedule__Time, .scoreEvent__event, .scoreEvent__title { color: #8b949e !important; }
@@ -68,6 +83,12 @@
   /* Same live signal on the one-feed scoreEvent; the grey rule above lists
      .scoreEvent__status. */
   .scoreEvent--live .scoreEvent__status {
+    color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
+  /* Golf events ink the tournament name and round status as primary text; live, the red moves
+     to the tournament name. */
+  .scoreEvent.golf .scoreEvent__title, .scoreEvent.golf .scoreEvent__status {
+    color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
+  .scoreEvent__headlines.live .scoreEvent__title {
     color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
   /* Legacy duration chips are a translucent WHITE pill with dark text. Same treatment as
      .Media__Duration below. */
@@ -94,6 +115,16 @@
   .upsell, .premiumUpsell { background-color: #1a1f26 !important; border-color: #2d333b !important; }
   .dtc-upsell__cta__btn, .WatchTile__Button {
     background-color: #c8102e !important; color: #ffffff !important; border-color: #c8102e !important; }
+  /* The rail "ALL OF ESPN" card is dark artwork (background-image on the article): its inner
+     boxes stay bare over it and the CTA keeps ESPN's white pill. */
+  .dtc-upsell .dtc-upsell__wrapper, .dtc-upsell .dtc-upsell__inner,
+  .dtc-upsell .dtc-upsell__header, .dtc-upsell .dtc-upsell__subheader,
+  .dtc-upsell .dtc-upsell__cta__placeholder { background-color: transparent !important; }
+  /* a.WatchTile is the full-size click overlay stacked above the poster image (z-index 200);
+     the tile surface is the wrapper div. */
+  a.WatchTile { background-color: transparent !important; }
+  .dtc-upsell .dtc-upsell__cta__btn {
+    background-color: #ffffff !important; color: #101113 !important; border-color: #ffffff !important; }
 
   /* ---- Content cards / feed items ---- */
   .contentItem, .contentItem--collection, .contentItem--featured,
@@ -138,6 +169,8 @@
   /* The title text sits in .Truncate spans, which the `a span` blue would otherwise ink
      independently of the heading. */
   .contentItem__title .Truncate, .contentItem__title .Truncate span { color: inherit !important; }
+  /* Recap cards put the subhead copy in a bare span; it is body text, not a link. */
+  .contentItem__subhead span { color: inherit !important; }
   /* .AnchorLink's BASE ink is link blue #0066cc; only heading-like components override it to
      near-black, so the headline-white rule above also swallows the genuinely blue ones.
      .Table__sub-header is re-excluded — those anchors are sortable column heads, i.e. real
@@ -155,7 +188,8 @@
   /* Card footer actions ("Full Roster", "See All", "Full Standings") and the ticket-price line
      are plain leaf .AnchorLinks in ESPN's link blue; .Button variants keep their own ink. */
   .Card__Footer .AnchorLink:not(.Button), a.powered-by__ticketsAvailable,
-  .powered-by__details--buy .AnchorLink { color: #5fb0e6 !important; }
+  .powered-by__details--buy .AnchorLink, .contentItem__footer .AnchorLink,
+  .AnchorLink.footer__noteLink, .Futures__Footer .AnchorLink { color: #5fb0e6 !important; }
   /* Unit / label ink inside whole-row links: ESPN greys the label and inks the value near-
      black, so the `a span` blue would erase the label/value split. */
   .Athlete__Stats--label, .powered-by__text,
@@ -166,6 +200,9 @@
   a[data-track-event_detail="game leaders:player name click"] span { color: #e6edf3 !important; }
   a[data-track-event_detail="game leaders:player name click"] span + span {
     color: #9aa4ae !important; }
+  /* A third span is the injury status (IR / O / Q), ESPN live red. */
+  a[data-track-event_detail="game leaders:player name click"] span + span + span {
+    color: #ff5a5a !important; }
   .Schedule__Game .Schedule_atVs, .Schedule__Game .Schedule__Team,
   .Schedule__Game .Schedule__Score, .Schedule__Game .Schedule__Network,
   .Image__Citation__Credit span { color: inherit !important; }
@@ -205,9 +242,11 @@
   /* .video-play-button is the full-size transparent overlay, NOT the control (that is its
      ::before disc); painting it scrims every video thumbnail. */
   .video-play-button { background-color: transparent !important; }
-  /* The poster disc is ESPN's translucent white; its glyph is white on it, which the link-blue
-     `a` rule would otherwise reach through the SVG's currentColor. */
-  .Media__PlayButton .Media__Icon { color: #ffffff !important; fill: #ffffff !important; }
+  /* The poster disc stays ESPN's translucent white, so its glyph keeps the native dark fill;
+     that fill rides --icon-weak, which the fusion block lightens. The live variant is red. */
+  .Media__PlayButton .Media__Icon { fill: #48494a !important; }
+  .Media--live .Media__PlayButton .Media__Icon,
+  .Media__PlayButton--live .Media__Icon { fill: #dd0000 !important; }
 
   /* ---- Tables (stats / standings) ---- */
   /* .ResponsiveTable and .Roster__Heading paint solid #fff, and the zebra below leaves rows
@@ -247,6 +286,9 @@
   input, textarea, select, .search-box, .Search__Input {
     background-color: #1c2128 !important; color: #e6edf3 !important; border-color: #2d333b !important; }
   input::placeholder { color: #8b949e !important; }
+  /* A .dropdown pill draws its own fill and rounded border; the square <select> inside it
+     must stay clear or it paints over the pill's outline. */
+  .dropdown__select { background-color: transparent !important; }
   /* The magnifier is a BLACK raster PNG background-image, untouchable by fill/color. Zero the
      button's own fill so the invert flips only the glyph. */
   .btn-search { background-color: transparent !important; filter: invert(1) !important; }
@@ -276,10 +318,11 @@
   .button.watch-link:hover, .button.cscore_button:hover {
     background-color: #7aa1ea !important; }
   /* Fantasy rail is already dark by design: per-sport brand fill on the first CTA, white-
-     outline secondaries. */
+     outline secondaries, a white footer text link. */
   .fantasySignupV2 .button {
     background-color: transparent !important; border-color: #ffffff !important;
     color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+  .fantasySignupV2 .fantasySignup__footer > a { color: #ffffff !important; }
   .fantasySignupV2.fantasySignup-football .fantasySignup__cta .button:first-child {
     background-color: #2dcc30 !important; border-color: #2dcc30 !important;
     color: #101113 !important; -webkit-text-fill-color: #101113 !important; }
@@ -361,16 +404,26 @@
      against the filled variant — which the generic span grey out-specifies. */
   [data-testid="prism-Button"] span {
     color: inherit !important; -webkit-text-fill-color: inherit !important; }
-  /* Built on `.Button--default`, so the filled-primary rule above turns the filter bank blue
-     and collapses ESPN's `--active` pill into it. These are neutral controls. Their two-tone
-     SVG glyph resolves through combo tokens and already darks. */
+  /* Shot map (soccer) and shot chart (basketball) filters. Built on `.Button--default`, so the
+     filled-primary rule above turns the filter bank blue and collapses ESPN's `--active` /
+     `--filtered` pill into it. These are neutral controls. Their two-tone SVG glyph resolves
+     through combo tokens and already darks. */
   .ShotMapFilterButtons__Pill.Button--default,
-  .ShotMapFilterButtons__Dropdown.Button--default {
+  .ShotMapFilterButtons__Dropdown.Button--default,
+  .ShotChartFilterButtons__Dropdown.Button--default {
     background-color: #21262d !important; border-color: #2d333b !important;
     color: #c4cdd6 !important; -webkit-text-fill-color: #c4cdd6 !important; }
-  .ShotMapFilterButtons__Pill--active.Button--default {
+  .ShotMapFilterButtons__Pill--active.Button--default,
+  .ShotMapFilterButtons__Dropdown--filtered.Button--default,
+  .ShotChartFilterButtons__Dropdown--filtered.Button--default {
     background-color: #2d333b !important; border-color: #4a525b !important;
     color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
+  /* Three classes, to tie the brand-blue `.Button.Button--default:hover` and win by order. */
+  .ShotMapFilterButtons__Pill.Button--default:hover,
+  .ShotMapFilterButtons__Dropdown.Button--default:hover,
+  .ShotChartFilterButtons__Dropdown.Button--default:hover {
+    background-color: #2d333b !important; }
+  .ShotMapFilterButtons__ResetButton { color: #5fb0e6 !important; }
   /* The panel these dropdowns open is a separate component: .FilterOptions ships a light body
      while its __Heading strip already darks. */
   .FilterOptions { background-color: #1c2128 !important; }
@@ -401,6 +454,15 @@
   button.Button--filter.Button--active .LastGames__TeamName,
   .Button--filter.Button--active .LastGames__TeamName {
     color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
+  /* The v4 segmented group (Win / Cover Probability, Last Five) marks its active segment by the
+     plate alone; the label stays neutral. */
+  .ButtonGroup--v4 .Button--filter.Button--active {
+    color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
+  /* Inside the fusion scope the active segment is a filled plate + label pair from the inputs-
+     active tokens, not the red label. */
+  .theme-espnDS_v2 .ButtonGroup:not(.ButtonGroup--v4) .Button--active {
+    background-color: var(--bg-inputs-active) !important;
+    color: var(--text-inputs-active) !important; -webkit-text-fill-color: var(--text-inputs-active) !important; }
 
   /* ---- Promos / callouts / banners ---- */
   .promo, .scorePromo, .premiumEngagement, .callout, .alert, .notification-bar,
@@ -715,6 +777,9 @@
   .dropdown, .dropdown--md, .dropdown--sm, .dropdown--lg, .ButtonGroup,
   .filters__seasonDropdown, .pageHeading__team-stats-dropdown {
     background-color: #1c2128 !important; border-color: #2d333b !important; }
+  /* Inside the rounded ButtonGroup pill only the active segment is filled; a filled square
+     idle segment overhangs the pill's rounded end. */
+  .ButtonGroup .Button--filter:not(.Button--active) { background-color: transparent !important; }
 
   /* ---- Player page: header image container + "Switch Player" flyout (default white) ---- */
   .PlayerHeader__Image_Container, [class*="PlayerHeader__Image"] { background-color: #1c2128 !important; }
@@ -743,9 +808,23 @@
   .SwitchPlayer__athlete_link, .SwitchPlayer__athlete_link span,
   [class*="SwitchPlayer__athlete"] { color: #c4cdd6 !important; }
 
+  /* ---- Gamecast rink/field play-marker tooltip: mounted in a body-level #fittPortal, outside
+     the token scope, so --bg-surface-raised falls back to white. The notch is .arrow. ---- */
+  .LastPlays__gamecast__tooltip { color: #e6edf3 !important; }
+  .LastPlays__gamecast__tooltip__container, .LastPlays__gamecast__tooltip .arrow {
+    background-color: #1c2128 !important; }
+
   /* ---- Header-scoreboard event cards (e.g. live golf "spotlight") that go white ---- */
   .HeaderEvent { background-color: #1c2128 !important; border-color: #2d333b !important; }
   .ScoreCell__NetworkItem { color: #9aa4ae !important; }
+  /* Athlete-event finishing position: ESPN's ink equals its own dark chip. */
+  .ScoreCell__Rank--athlete { color: #9aa4ae !important; }
+  /* The watch-network play glyph fills through --text-weak with a red fallback; the fusion
+     block sets --text-weak grey, which would erase the watch cue. */
+  .ScoreCell__Network--watch .ScoreCell__NetworkIcon { fill: #ff5a5a !important; }
+  /* Possession football: same --text-default fallback trap, football brown. .isRedZone turns
+     it red with a filter over this fill. */
+  .ScoreCell__Possession.icon__svg { fill: #b85c4d !important; }
   /* A live spotlight's headline is ESPN live-red at ~3.1:1 on the darkened chip. ---- */
   .HeaderEvent--in .HeaderEvent__Headline {
     color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
@@ -758,11 +837,15 @@
   svg[data-icon="indicators-liveUpdates"] ~ span {
     color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
 
-  /* ---- Search results page: the React page wrapper (#themeProvider > breakpoint div) and
-     .SearchBar ship a solid WHITE panel behind the field + filter-pill row. ---- */
-  #themeProvider > div, .SearchBar { background-color: #14181d !important; }
+  /* ---- Search results page: the breakpoint wrapper ([data-fitt-page-type=search], its depth
+     under #themeProvider varies by build) and .SearchBar ship a solid WHITE panel behind the
+     field + filter-pill row. ---- */
+  #themeProvider > div, [data-fitt-page-type="search"],
+  .SearchBar { background-color: #14181d !important; }
   /* The field's edge is a two-sided inset bevel (box-shadow, not a border). */
   .SearchBar { box-shadow: 0 0 0 1px #2d333b inset !important; }
+  /* The square field inside the rounded bar is bare; the bar is the only surface. */
+  .SearchBar .SearchBar__Input { background-color: transparent !important; }
   /* ---- Search results: filter pills + video duration badge ---- */
   .Pill { background-color: #21262d !important; border-color: #2d333b !important; color: #c4cdd6 !important; }
   .Pill--selected { background-color: #2d333b !important; color: #e6edf3 !important; }
@@ -816,6 +899,15 @@
   /* The live clock is ESPN's live-red, flattened to blue by the a-span rule. Scope to .live. */
   header.game-strip.live .game-time, .game-strip.live .game-time {
     color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
+  /* The strip's whole team/score row is one <a>, so the `a span` blue inks every label. ESPN
+     inks it neutral: records, broadcaster, kickoff time and the final-score loser grey. These
+     stay below the live clock's specificity. */
+  .game-strip .competitors span { color: #e6edf3 !important; }
+  .game-strip .competitors .record, .game-strip .competitors .network span,
+  .game-strip .competitors .game-time.time,
+  .game-strip.team-a-winner .team-b .score, .game-strip.team-a-winner .team-b .abbrev,
+  .game-strip.team-b-winner .team-a .score, .game-strip.team-b-winner .team-a .abbrev {
+    color: #9aa4ae !important; }
 
   /* ---- Next-gen "prism" design system (espnDS_v2). Fully token-driven: surfaces white ->
      dark, text dark -> light. Targets the design-system theme wrappers, not hashed component
@@ -898,7 +990,11 @@
     --text-disabled: #6e7681 !important;
     --text-inputs-default: #ffffffb8 !important;
     --text-inputs-disabled: #6e7681 !important;
+    --bg-inputs-active: #e6edf3 !important;
+    --text-inputs-active: #101113 !important;
     --text-action-secondary-default: #c4cdd6 !important;
+    /* ink ON the branded-blue fill, which stays native; the fallback is a surface token */
+    --text-action-branded-default: #ffffff !important;
     --text-status-success: #4ac76a !important;
     --text-status-live: #ff5a5a !important;
     --text-hyperlink: #5fb0e6 !important;
@@ -966,10 +1062,23 @@
     --color-combo-themeLight-gray80: #21262d !important;
     --color-combo-themeLight-themeDark: #14181d !important;
     --color-combo-white-black: #1c2128 !important;
+    --color-combo-white--80-black--80: rgba(0,0,0,0.8) !important;
+    --color-combo-white--80-black-21-85: rgba(21,22,23,0.85) !important;
+    --carouselArrow-default-backgroundColor: rgba(21,22,23,0.85) !important;
+    --carouselArrow-default-hover-backgroundColor: #2d333b !important;
+    --carouselArrow-default-borderColor: #4c99e6 !important;
     --color-combo-white-disableddark: #4a525b !important;
     --color-combo-white-gray80: #21262d !important;
     --color-combo-white-pictonblue: #4c99e6 !important;
   }
+  /* Bracket round pills (narrow viewport): the selected round is the raised pill, the others
+     sit on --color-combo-gray30-gray70, a light grey under our light --text-inputs-default.
+     The tokens are declared on .BracketLayout itself, so they are rebound there. */
+  .BracketLayout {
+    --bracket-pills-pill-backgroundColor: #1c2128 !important;
+    --bracket-pills-pill-color: #8b949e !important;
+    --bracket-pills-pill-active-backgroundColor: #454d57 !important;
+    --bracket-pills-pill-active-color: #ffffff !important; }
   /* --color-neutral-0 is shared with white text, so the Gamestrip header darks through its
      container instead. */
   .Gamestrip, .Gamestrip__Container, .Gamestrip__StickyContainer { background-color: #14181d !important; }
@@ -1007,6 +1116,10 @@
   [data-testid="OddsCell"],
   [data-testid="OddsCell"] *:not([data-testid="OddsCellMovement"]):not(svg):not(path) {
     color: #5fb0e6 !important; -webkit-text-fill-color: #5fb0e6 !important; }
+  /* In-game cells are not links: .TUcwu is the atomic class for the disabled-price ink
+     (--betSixPack-disabledPrimaryOdds-color), plain text rather than link blue. */
+  [data-testid="OddsCell"] .TUcwu.TUcwu {
+    color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
   [data-testid="OddsCell"] [data-testid="OddsCellBottom"]:not(svg):not(path),
   [data-testid="OddsCell"] [data-testid="OddsCellBottom"] *:not(svg):not(path) {
     color: #9aa4ae !important; -webkit-text-fill-color: #9aa4ae !important; }
@@ -1026,6 +1139,33 @@
   .Gamecast__Baseball .headshot { background-color: #1c2128 !important; }
   /* White-on-white natively; let the darked panel show through. */
   .FieldView__Square--hidden { background-color: transparent !important; }
+  /* Football field bands: the dark band fills through --icon-default, an ICON token our fusion
+     block lightens, so the stripes invert. Values follow ESPN's own `.theme.dark` field. */
+  .FieldView .tenYardFill { fill: #21262d !important; }
+  .FieldView .tenYardFill--dark { fill: #2d333b !important; }
+  .FieldView--blue .tenYardFill { fill: #133778 !important; }
+  .FieldView--blue .tenYardFill--dark { fill: #0d2450 !important; }
+  .FieldView--red-zone-left .redzone--left.tenYardFill,
+  .FieldView--red-zone-right .redzone--right.tenYardFill { fill: #402324 !important; }
+  /* The ball-path overlay is drawn in near-black ink with a white halo stroke underneath. */
+  .FieldView .BallPath, .FieldView .DriveStart { stroke: #e6edf3 !important; }
+  .FieldView .BallPath--background { stroke: #1c2128 !important; }
+  .FieldView .BallPath--penalty { stroke: #ffff00 !important; }
+  .FieldView .BallPath__X { stroke: #ff5a5a !important; }
+  /* The in-flight ball <symbol>: inline --fixed-black body, laces through --color-neutral-100,
+     which we darken. */
+  .BallDefs__Ball { fill: #b85c4d !important; }
+  .BallDefs__Laces { fill: #edeef0 !important; }
+  .FieldView .TeamLogoBubble__arrow { fill: #e6edf3 !important; }
+  /* Prism CSS-border triangles (narrow gamestrip drive arrow): each atomic class sets one side,
+     the transparent sides included; the `*` border reset otherwise draws a square. */
+  .uIGIl { border-top-color: transparent !important; }
+  .FiDsF { border-bottom-color: transparent !important; }
+  .TwWMG { border-right-color: transparent !important; }
+  .ZuvmJ { border-left-color: transparent !important; }
+  .pXcNR { border-right-color: var(--color-combo-oreo-white) !important; }
+  .BUFcu { border-left-color: var(--color-combo-oreo-white) !important; }
+  .FieldView .TeamLogoBubble__arrow--penalty { fill: #ffff00 !important; }
   /* The EMPTY pitch-count orb is a solid WHITE fill while --filled is a coloured disc, so on
      dark an empty orb reads as LIT. Hollow slot with a muted ring; --filled keeps ESPN's
      colour as the signal. ---- */
@@ -1140,11 +1280,26 @@
 
   /* ---- Each legend swatch carries its TEAM colour via an inline --legend-color property,
      border-drawn, so the blanket * { border-color } greys it. ---- */
-  .GraphHeader__ColorLegend { border-color: var(--legend-color) !important; }
+  .GraphHeader__ColorLegend, .GraphInlineHeader__Dash { border-color: var(--legend-color) !important; }
   /* An achromatic team gets a near-black instead of a brand hue, so its curve and legend dash
-     vanish on dark. Chromatic colours match neither selector. */
-  stop[stop-color="#1d1e1f"] { stop-color: #c4cdd6 !important; }
-  .GraphHeader__ColorLegend[style*="#1d1e1f"] { border-color: #c4cdd6 !important; }
+     vanish on dark. Chromatic colours match neither selector. The --dotted dash paints the
+     same token as a background-image, so the token itself is rebound. */
+  stop[stop-color="#1d1e1f"],
+  .recharts-surface stop[stop-color="#000000"], .recharts-surface stop[stop-color="#231f20"],
+  .recharts-surface stop[stop-color="#121212"] { stop-color: #c4cdd6 !important; }
+  .GraphHeader__ColorLegend[style*="#1d1e1f"], .GraphHeader__ColorLegend[style*="#000000"],
+  .GraphHeader__ColorLegend[style*="#231f20"],
+  .GraphHeader__ColorLegend[style*="#121212"] { border-color: #c4cdd6 !important; }
+  .GraphHeader__ColorLegend[style*="#1d1e1f"], .GraphHeader__ColorLegend[style*="#000000"],
+  .GraphHeader__ColorLegend[style*="#231f20"], .GraphHeader__ColorLegend[style*="#121212"],
+  .GraphInlineHeader__Dash[style*="#1d1e1f"], .GraphInlineHeader__Dash[style*="#000000"],
+  .GraphInlineHeader__Dash[style*="#231f20"],
+  .GraphInlineHeader__Dash[style*="#121212"] { --legend-color: #c4cdd6 !important; }
+  /* Game Flow draws each team as a line whose colour is the stroke attribute. */
+  .recharts-surface path.recharts-line-curve[stroke="#1d1e1f"],
+  .recharts-surface path.recharts-line-curve[stroke="#000000"],
+  .recharts-surface path.recharts-line-curve[stroke="#231f20"],
+  .recharts-surface path.recharts-line-curve[stroke="#121212"] { stroke: #c4cdd6; }
 
   /* ---- ESPNIcons glyphs drawn through ::before / ::after in ESPN's hardcoded darks or link-
      blue: carousel arrows, sub-nav carets, external-link markers, the filter caret. ---- */
@@ -1167,6 +1322,10 @@
   .quicklinks_list__icon img[src*="_bk.png"],
   .contentItem__logo img[src*="black.png"],
   .contentItem__logo img[src*="_bk.png"] { filter: invert(1) !important; }
+  /* The "ESPN on Disney+" rail wordmark ships a white-on-dark twin (-light); the -dark file is
+     the black one for a white card. */
+  img[src$="/disneyplus/espn-logo-dark.svg"] {
+    content: url("https://a.espncdn.com/redesign/assets/img/logos/disneyplus/espn-logo-light.svg") !important; }
 
   /* ---- Card top rule: .contentItem__teamBorder and its Prism successor .ColorBorder carry
      the TEAM colour inline; a card with no team gets a light neutral instead. No CSS can test
@@ -1223,11 +1382,18 @@
   .ColorBorder[style*="rgb(255, 255, 255)"], .contentItem__teamBorder[style*="rgb(255, 255, 255)"],
   .ColorBorder[style*="rgb(255,255,255)"], .contentItem__teamBorder[style*="rgb(255,255,255)"] {
     background-color: #2d333b !important; }
+  /* A bracket seed whose team is not decided yet gets a #999 logo plate instead of the team
+     colour; the attribute ends at the value, so anchor on the end to spare team hexes. */
+  .ByeCell__LogoWrap[style$="#999"], .ByeCell__LogoWrap[style*="#999;"],
+  .ByeCell__LogoWrap[style*="rgb(153, 153, 153)"] { background-color: #2d333b !important; }
 
   /* ---- Percentages and their "%" suffix hardcode near-black; the team abbreviations are
      already light. */
   .matchupPredictor__teamValue, .matchupPredictor__teamValue div,
   .matchupPredictor__suffix { color: #e6edf3 !important; -webkit-text-fill-color: #e6edf3 !important; }
+  /* The analytics credit is a grey footnote inside a link; it turns blue only on hover. */
+  .matchupPredictor__disclaimer, .matchupPredictor__disclaimer span { color: #9aa4ae !important; }
+  a:hover .matchupPredictor__disclaimer span { color: #5fb0e6 !important; }
 
   /* ---- Headshot discs are a solid white circle behind a transparent PNG. .headshot-md is the
      one-feed shortstop variant and .author-img the byline mugshot — same disc, different
@@ -1258,11 +1424,23 @@
   /* The mobile-nav search reveal expands to a near-white panel. Scope to the mobile nav so the
      transparent desktop .global-search is untouched. ---- */
   #global-nav-mobile .global-search { background-color: #14181d !important; }
+  /* Prism mobile-nav toggle on the red logo block: the hamburger's bars (the span and its two
+     pseudos, which turn into the X) fill from a white surface token we darken. The open state
+     fades the span itself out. */
+  .nav-mobile-toggle span::before, .nav-mobile-toggle span::after,
+  .nav-mobile-toggle:not(.is--active) > span { background-color: #ffffff !important; }
   /* A solid white 50x50 box with a dark calendar glyph, espnfitt-only. ---- */
   .DateCarousel__MonthTrigger {
     background-color: #1c2128 !important; border-color: #2d333b !important; }
   .DateCarousel__MonthTrigger svg, .DateCarousel__MonthTrigger path,
   .DateCarousel__MonthTrigger use { fill: #c4cdd6 !important; }
+  /* Three day tiers: the selected day, days with games, and .disabled days with none. The
+     labels are bare spans the generic span ink would flatten into one tone. */
+  .DateCarousel .Day { color: #9aa4ae !important; }
+  .DateCarousel .Day.is-today, .DateCarousel .Day:hover { color: #e6edf3 !important; }
+  .DateCarousel .Day.is-active { color: #ffffff !important; }
+  .DateCarousel .Day.disabled, .DateCarousel .Day.disabled:hover { color: #5c6570 !important; }
+  .DateCarousel .Day span { color: inherit !important; }
   /* The popover it opens is a solid-white card with a near-white halo box-shadow. Its month
      caption is a hardcoded near-black that survives our token remaps, and ESPN separates the
      SELECTED day by tone, which our broad text rule would flatten. */
@@ -1308,6 +1486,11 @@
      greys into the thumbnail. */
   .slick-prev, .slick-next, .CarouselArrow, button.CarouselArrow {
     border-color: #4c99e6 !important; }
+  /* Prism SimpleCarousel arrows: disc comes from --carouselArrow-default-* (prism block); the
+     ring and the glyph ink are restated here since the `*` border reset and the carousel's own
+     --carouselArrow-default-color (link-blue tuned for white) sit on the element itself. */
+  [data-testid="SimpleCarouselLeftArrow"], [data-testid="SimpleCarouselRightArrow"] {
+    border-color: #4c99e6 !important; color: #4c99e6 !important; }
 
   /* ---- ESPN paints .MediaList__item__playing native red. .mediaList__phase is the legacy
      equivalent — a span inside an anchor, so the `a span` blue rule flattens that one instead.
@@ -1328,8 +1511,67 @@
   [data-test-id="prism-progress-bar"][style*="#1d1e1f"],
   [data-test-id="prism-progress-bar"][style*="rgb(0, 0, 0)"],
   [data-test-id="prism-progress-bar"][style*="#000000"],
+  [data-test-id="prism-progress-bar"][style*="#231f20"],
+  [data-test-id="prism-progress-bar"][style*="#121212"],
   span[style*="background:#1d1e1f"],
   span[style*="background:#000000"] { background-color: #c4cdd6 !important; }
+  /* The second side of a pair is a hatch of its team colour over --color-combo-white-oreo
+     gaps, a token the fusion block darkens to the card. A chromatic hatch reads on that; the
+     achromatic ones vanish, so only their gaps are rebound light. */
+  [data-test-id="prism-progress-bar"][style*="repeating-linear-gradient(118deg, #1d1e1f"],
+  [data-test-id="prism-progress-bar"][style*="repeating-linear-gradient(118deg, #000000"],
+  [data-test-id="prism-progress-bar"][style*="repeating-linear-gradient(118deg, #231f20"],
+  [data-test-id="prism-progress-bar"][style*="repeating-linear-gradient(118deg, #121212"],
+  span[style*="repeating-linear-gradient(118deg, #1d1e1f"],
+  span[style*="repeating-linear-gradient(118deg, #000000"],
+  span[style*="repeating-linear-gradient(118deg, #231f20"],
+  span[style*="repeating-linear-gradient(118deg, #121212"],
+  .matchupPredictor .teamColor[style*="repeating-linear-gradient(118deg, #1d1e1f"],
+  .matchupPredictor .teamColor[style*="repeating-linear-gradient(118deg, #000000"],
+  .matchupPredictor .teamColor[style*="repeating-linear-gradient(118deg, #231f20"],
+  .matchupPredictor .teamColor[style*="repeating-linear-gradient(118deg, #121212"] {
+    --color-combo-white-oreo: #c4cdd6 !important; }
+  .matchupPredictor .teamColor[style*="background:#1d1e1f"],
+  .matchupPredictor .teamColor[style*="background:#000000"],
+  .matchupPredictor .teamColor[style*="background:#231f20"],
+  .matchupPredictor .teamColor[style*="background:#121212"] { background-color: #c4cdd6 !important; }
+  /* Matchup Predictor ring: each arc's colour is its stroke attribute; the hatched side strokes
+     a <pattern> whose single line carries the team colour. */
+  .matchupPredictor path[stroke="#1d1e1f"], .matchupPredictor path[stroke="#000000"],
+  .matchupPredictor path[stroke="#231f20"], .matchupPredictor path[stroke="#121212"],
+  .matchupPredictor pattern line[stroke$="#1d1e1f"], .matchupPredictor pattern line[stroke$="#000000"],
+  .matchupPredictor pattern line[stroke$="#231f20"],
+  .matchupPredictor pattern line[stroke$="#121212"] { stroke: #c4cdd6; }
+  /* The Team Stats donut paints each team's share as a Recharts sector with the colour in a
+     `fill` attribute. */
+  path.recharts-sector[fill="#1d1e1f"], path.recharts-sector[fill="#000000"],
+  path.recharts-sector[fill="#231f20"], path.recharts-sector[fill="#121212"] {
+    fill: #c4cdd6; }
+  /* Play-by-play timeline: each play's rail is inline in the team colour, a radial-gradient dot
+     row or (scoring plays) a solid fill. Client renders serialize it as rgb(), server renders
+     keep the hex. */
+  [style*="radial-gradient(circle at 2px center, rgb(0, 0, 0) 2px"],
+  [style*="radial-gradient(circle at 2px center, rgb(29, 30, 31) 2px"],
+  [style*="radial-gradient(circle at 2px center, rgb(35, 31, 32) 2px"],
+  [style*="radial-gradient(circle at 2px center, rgb(18, 18, 18) 2px"],
+  [style*="radial-gradient(circle at 2px center, #000000 2px"],
+  [style*="radial-gradient(circle at 2px center, #1d1e1f 2px"],
+  [style*="radial-gradient(circle at 2px center, #231f20 2px"],
+  [style*="radial-gradient(circle at 2px center, #121212 2px"] {
+    background-image: radial-gradient(circle at 2px center, #c4cdd6 2px, transparent 2px) !important; }
+  [data-testid="PlayColumn"] [style*="background-color:#000000;background-image:none"],
+  [data-testid="PlayColumn"] [style*="background-color:#1d1e1f;background-image:none"],
+  [data-testid="PlayColumn"] [style*="background-color:#231f20;background-image:none"],
+  [data-testid="PlayColumn"] [style*="background-color:#121212;background-image:none"],
+  [data-testid="PlayColumn"] [style*="background-color: rgb(0, 0, 0); background-image: none"],
+  [data-testid="PlayColumn"] [style*="background-color: rgb(29, 30, 31); background-image: none"],
+  [data-testid="PlayColumn"] [style*="background-color: rgb(35, 31, 32); background-image: none"],
+  [data-testid="PlayColumn"] [style*="background-color: rgb(18, 18, 18); background-image: none"] {
+    background-color: #c4cdd6 !important; }
+  /* A play's "Win %" figure and its arrow are inked red or green by atomic classes (.dDMFd =
+     loss red, .uMgoy = gain green); the generic span ink greys the figure. */
+  .awXxV.dDMFd { color: #ff5a5a !important; }
+  .awXxV.uMgoy { color: #4ac76a !important; }
 
   /* ---- ESPN paints each W/L/D badge its outcome colour as a form signal; the badge is a span
      inside an .AnchorLink, so the a / a span blue rule flattens all three. The span carries
@@ -1340,6 +1582,143 @@
     color: #4ac76a !important; -webkit-text-fill-color: #4ac76a !important; }
   .GameResults.GameResults--loss {
     color: #ff5a5a !important; -webkit-text-fill-color: #ff5a5a !important; }
+
+  /* ---- Golf leaderboard. The expanded player row is a `var(--color-neutral-0, #fff)` panel;
+     its skewed .Leaderboard__Overlay plates and the headshot divider fade the photo into that
+     same panel colour, so all three move together. ESPN ships a --dark variant it never adds.
+     ---- */
+  .Leaderboard__Player__Detail {
+    background-color: #1c2128 !important; border-bottom-color: #2d333b !important; }
+  .Leaderboard__Overlay { background-color: #1c2128 !important; }
+  .Leaderboard__Overlay_Detail { border-right-color: #1c2128 !important; }
+  /* The Follow pill inks through `var(--text-action-branded-default,
+     var(--color-combo-white-gray100))`; the fallback is a surface token we darken. */
+  .Leaderboard__Follow {
+    --text-action-branded-default: #ffffff !important; border-color: #3772df !important; }
+  /* Prism pure-button: .ncXDa is the atomic class that binds the ring to the branded border
+     token; the `*` border reset greys that ring around the blue pill. */
+  .ncXDa.OJpwZ { border-color: var(--pureButton-border-color, transparent) !important; }
+  /* Fantasy integrations (Pick'em, polls, fantasy promo cards): token-driven, with ESPN's own
+     -dark twin of each theme class; values follow that twin. Promo cards rebind the button
+     tokens inline on inner nodes, which still wins over these. */
+  .theme-fantasy-integrations-gamecast-light, .theme-fantasy-integrations-polls-light {
+    --card-background-color: #1c2128 !important;
+    --card-background-color-grayed-out: #2d333b !important;
+    --card-background-color-nested: #21262d !important;
+    --card-outcomeCard-backgroundColor: #14181d !important;
+    --card-outcomeCard-hover-backgroundColor: rgba(255,255,255,0.08) !important;
+    --card-text-color: #e6edf3 !important;
+    --card-text-color-primary: #e6edf3 !important;
+    --card-text-color-secondary: #9aa4ae !important;
+    --text-color-primary: #e6edf3 !important;
+    --text-color-secondary: #9aa4ae !important;
+    --divider-color: #2d333b !important;
+    --color-actionable: #5990f6 !important;
+    --color-error: #ff7f7f !important;
+    --color-success: #41ba42 !important;
+    --color-warning: #ffb759 !important;
+    --button-primary-background-color: #5990f6 !important;
+    --button-primary-text-color: #101113 !important;
+    --button-secondary-border-color: #5990f6 !important;
+    --button-secondary-text-color: #5990f6 !important;
+    --button-demoted-text-color: #5990f6 !important;
+    --carousel-button-background-color: rgba(21,22,23,0.85) !important;
+    --carousel-button-border-color: #4c99e6 !important;
+    --carousel-button-fill: #4c99e6 !important;
+    --carousel-button-hover-background-color: #2d333b !important;
+    --carousel-button-hover-border-color: #4c99e6 !important;
+    --carousel-navBullets-active-background-color: #ffffff !important;
+    --carousel-navBullets-background-color: #a1a2a3 !important;
+    --groupRankOutcome-backgroundColor-default: #21262d !important;
+    --groupRankOutcome-backgroundColor-scored: #14181d !important;
+    --groupRankOutcome-points-color: #101113 !important;
+    --icon-chevron-color: #e6edf3 !important;
+    --icon-close-color: #e6edf3 !important;
+    --icon-firstPlace-color: #e6edf3 !important;
+    --icon-foamFinger-color: #e6edf3 !important;
+    --icon-football-color: #e6edf3 !important;
+    --icon-social-color: #e6edf3 !important;
+    --icon-greenCheck-color: #41ba42 !important;
+    --icon-path: #101113 !important;
+    --icon-plusAdd-color: #5990f6 !important;
+    --icon-priorityInfo-color: #8d8e90 !important;
+    --icon-redX-color: #f35858 !important;
+    --icon-shield-color-border: #2d333b !important;
+    --icon-shield-color-primary: #a1a2a3 !important;
+    --icon-shield-color-secondary: #48494a !important;
+    --poll-option-background-color-hover: rgba(255,255,255,0.04) !important;
+    --poll-option-background-color-pressed: rgba(255,255,255,0.08) !important;
+    --poll-option-border-color-chosen: #f9f9fb !important;
+    --poll-option-border-color-default: rgba(255,255,255,0.36) !important;
+    --poll-option-border-color-muted: #444444 !important;
+    --poll-option-scrim-background-color: rgba(0,0,0,0.5) !important;
+    --tabSelector-indicator-color: #f95252 !important;
+    --polls-module-header-countdown-color: #ff9466 !important; }
+  /* The "Voting ends in" countdown is a bare span; .SciDY is the atomic class that binds it to
+     the countdown token, which the generic span ink would otherwise grey. */
+  .PollsModule .SciDY { color: var(--polls-module-header-countdown-color) !important; }
+  /* Their buttons draw the ring through a per-variant token; the `*` border reset greys it. */
+  .ic-button[data-variant="primary"] {
+    border-color: var(--button-primary-border-color, var(--button-border-color, #3772df)) !important; }
+  .ic-button[data-variant="secondary"] {
+    border-color: var(--button-secondary-border-color, var(--button-border-color, #3772df)) !important; }
+  .ic-button[data-variant="demoted"] {
+    border-color: var(--button-demoted-border-color, var(--button-border-color, #3772df)) !important; }
+  /* Label spans take the button's own variant ink. */
+  .ic-ExternalLinkButton-label, .fc-GameName { color: inherit !important; }
+  /* Hole-score chips keep their pastel fills; the number on them is dark ink. */
+  .Scorecard__Score--eagle, .Scorecard__Score--double-eagle, .Scorecard__Score--birdie,
+  .Scorecard__Score--bogey, .Scorecard__Score--double-bogey {
+    color: #121213 !important; -webkit-text-fill-color: #121213 !important; }
+  /* Position movement: ESPN inks the arrow AND the count green/red; the blanket span ink
+     greys the count. */
+  .Table__TD .mv.up { color: #4ac76a !important; }
+  .Table__TD .mv.down { color: #ff5a5a !important; }
+  .Table__TD .mv.up use { fill: #4ac76a !important; }
+  .Table__TD .mv.down use { fill: #ff5a5a !important; }
+  /* Rankings / FPI trend column: the same up/down pair, inked for white paper. */
+  .trend.positive { color: #4ac76a !important; }
+  .trend.negative { color: #ff5a5a !important; }
+  .trend.positive .icon__svg { fill: #4ac76a !important; }
+  .trend.negative .icon__svg { fill: #ff5a5a !important; }
+  /* Column dividers between side-by-side polls are a pseudo filled with a light neutral. */
+  .InnerLayout__child--dividers::before { background-color: #2d333b !important; }
+
+  /* ---- NFL depth chart: the injury tag after a player name and the glossary codes are ESPN
+     red; both are spans under the blanket span ink. ---- */
+  .nfl-injuries-status, .nfl-depth-glossary-injuries .glossary__abbr {
+    color: #ff5a5a !important; }
+  .DepthChart__footer { color: #9aa4ae !important; }
+
+  /* ---- Live football drive chart (scoreboard). A light track with a dark progress fill
+     and dark yard markers, the red zone in ESPN red: track and fill swap ends on dark. ---- */
+  .DriveChart2D__Bar { background-color: #3a4149 !important; }
+  .DriveChart2D__ProgressBar { background-color: #9aa4ae !important; }
+  .DriveChart2D__Markers { color: #9aa4ae !important; }
+  .DriveChart2D__Marker::before { background-color: #6e7681 !important; }
+  .DriveChart2D__DownAndDistance { color: #c4cdd6 !important; }
+  .DriveChart2D__Indicator::after { border-left-color: #c4cdd6 !important; }
+  .DriveChart2D__Marker.DriveChart2D__Marker--redzone,
+  .DriveChart2D--redzone .DriveChart2D__DownAndDistance { color: #ff5a5a !important; }
+  .DriveChart2D__Marker.DriveChart2D__Marker--redzone::before { background-color: #ff5a5a !important; }
+  .DriveChart2D--redzone .DriveChart2D__Indicator::after { border-left-color: #ff5a5a !important; }
+
+  /* ---- Tennis scoreboard match cells carry only prism atomic classes, one class per
+     declaration (`.Ykpiq` is `color:#121213`), so the class names ARE the colour roles:
+     #121213 status / #101113 winner / #6c6d6f + #6c6e6f loser / #48494a seed + round /
+     #d00 live game score. Scoped to the match cell so the same atomic class elsewhere is
+     untouched. The winner caret is the competitor's ::after border triangle. ---- */
+  [data-testid="match-cell"] .Ykpiq, [data-testid="match-cell"] .TXMzn {
+    color: #e6edf3 !important; }
+  [data-testid="match-cell"] .uQOvX, [data-testid="match-cell"] .nPLaK {
+    color: #8b949e !important; }
+  [data-testid="match-cell"] .UavLc { color: #9aa4ae !important; }
+  [data-testid="match-cell"] .vuLkQ { color: #ff5a5a !important; }
+  [data-testid="match-cell"] [data-testid="competitor"]::after {
+    border-right-color: #e6edf3 !important; }
+  /* Gamestrip team-name links: prism atomic `.uUdvB` is `--text-weaker`, the final-score
+     loser; the `a span` link blue would ink it like the winner. */
+  a.uUdvB, a.uUdvB span { color: #8b949e !important; }
 
   /* ---- ESPN Radio player. The video.js `.audio` skin is the inverse of the video one: solid
      #fff stage, caption layer, now-playing block and settings menu with black ink and black

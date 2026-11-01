@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Stack Overflow and the whole Stack Exchange network: easy-on-the-eyes questions, answers, code blocks, comments and sidebar.
-@version      20260919.01.54
+@version      20261031.15.40
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -51,6 +51,18 @@
   body,
   body.unified-theme {
     --scrollbar: rgba(255, 255, 255, 0.22) !important;
+  }
+
+  /* `--focus-neutral` is the canvas-coloured band Stacks pairs with the blue
+     `--focus-theme` in every focus ring (buttons, tabs, pagination, tags, nav). It
+     feeds focus box-shadows/borders only. Stacks re-declares the palette on `body`,
+     every `.themed` / `.theme-light__forced` subtree and per topbar variant. */
+  body,
+  body.unified-theme,
+  .themed,
+  .theme-light__forced,
+  .s-topbar {
+    --focus-neutral: #14181d !important;
   }
 
   /* Generic light-surface neutralizers; specific surfaces are re-elevated below. */
@@ -221,6 +233,12 @@
   .s-topbar .s-popover .s-navigation .s-navigation--item:not(.is-selected):hover {
     background-color: #21262d !important;
     color: #e6edf3 !important;
+  }
+
+  /* The top-bar items mix <a> and <button> under one site ink; `.s-topbar a` would
+     light only the links. */
+  .s-topbar--container > .s-navigation .s-navigation--item:not(.is-selected) {
+    color: #c4cdd6 !important;
   }
 
   .s-navigation--item:not(.is-selected):hover,
@@ -709,7 +727,8 @@
     color: #e6edf3 !important;
   }
 
-  /* Selected nav item: SE marks it `aria-current="page"` (`.youarehere` is gone).
+  /* Selected nav item: SE marks either the link `aria-current="page"` or, on
+     question pages, its parent `li.youarehere[aria-current="true"]`.
      Must out-rank both the ID-carrying at-rest reset and the hover rule, so it
      repeats `#left-sidebar` and sits after them. */
   .left-sidebar .nav-links--link.youarehere,
@@ -719,20 +738,23 @@
   .left-sidebar .nav-links--link[aria-current="page"],
   #left-sidebar .nav-links--link[aria-current="page"],
   #left-sidebar .nav-links--link[aria-current="true"],
-  #left-sidebar .nav-links .nav-links--link[aria-current="page"] {
+  #left-sidebar .nav-links .nav-links--link[aria-current="page"],
+  #left-sidebar .nav-links .youarehere > .nav-links--link {
     background-color: #1c2128 !important;
     border-left: 3px solid #d98b3a !important;
     color: #e6edf3 !important;
   }
 
   #left-sidebar .nav-links .nav-links--link[aria-current="page"]:hover,
-  #left-sidebar .nav-links--link[aria-current="page"]:hover {
+  #left-sidebar .nav-links--link[aria-current="page"]:hover,
+  #left-sidebar .nav-links .youarehere > .nav-links--link:hover {
     background-color: #21262d !important;
   }
 
   /* keep the selected item's label bright (over the generic muted nav-link colour) */
   .nav-links--link[aria-current="page"],
   .nav-links--link[aria-current="page"] .-link--channel-name,
+  .nav-links .youarehere > .nav-links--link .-link--channel-name,
   .nav-links--link:hover .-link--channel-name {
     color: #e6edf3 !important;
   }
@@ -760,7 +782,8 @@
 
   .nav-links--link:hover .svg-icon:not(.fc-white),
   .nav-links--link[aria-current="page"] .svg-icon:not(.fc-white),
-  .left-sidebar .nav-links--link[aria-current="page"] .svg-icon:not(.fc-white) {
+  .left-sidebar .nav-links--link[aria-current="page"] .svg-icon:not(.fc-white),
+  .nav-links .youarehere > .nav-links--link .svg-icon:not(.fc-white) {
     color: #e6edf3 !important;
   }
 
@@ -2543,12 +2566,19 @@
   /* In the preference center the reject button carries `.ot-pc-refuse-all-handler`
      as a CLASS (no id) and SE's skin paints it `var(--black-150) !important`, so an
      id-only selector never matches. Mirror SE's 2-id selector. */
-  #onetrust-banner-sdk #onetrust-button-group button#onetrust-pc-btn-handler,
   #onetrust-pc-sdk #ot-pc-refuse-all-handler,
   #onetrust-consent-sdk #onetrust-pc-sdk button.ot-pc-refuse-all-handler {
     background-color: transparent !important;
     color: #5fb0e6 !important;
     border-color: #2d333b !important;
+  }
+
+  /* The banner's "Customize settings" is a text link with zero side padding; any
+     visible border rings the glyphs edge to edge. */
+  #onetrust-banner-sdk #onetrust-button-group button#onetrust-pc-btn-handler {
+    background-color: transparent !important;
+    color: #5fb0e6 !important;
+    border-color: transparent !important;
   }
 
   /* "Always Active" status label: SE's skin colours it `var(--black-600)`, pure
@@ -2882,9 +2912,9 @@
   }
 
   /* The Markdown help strip, its "?" toggle and the resize grippie are SE light
-     plates mounted only once the answer box takes focus. Both glyphs come from the
-     legacy sprite: the "?" sits alone in its own <span> so it can be inverted, while
-     the grippie shares its box with the plate and can only drop its dots. */
+     plates mounted only once the answer box takes focus. The "?" glyph is a cell of
+     the toolbar sprite below; the grippie's dots share its box with the plate and
+     can only be dropped. */
   button#wmd-help-button,
   div#mdhelp,
   ul#mdhelp-tabs,
@@ -2897,17 +2927,23 @@
     background-image: none !important;
   }
 
-  button#wmd-help-button > span {
-    filter: invert(1) !important;
-  }
-
   /* The toolbar glyphs are a three-row sprite (rest / focused / pressed) whose
      focused row is #535a60 and pressed row near-black, both baked for the light bar.
      SE ships a dark twin of the sprite for its own dark mode (`wmd-buttons-dark.svg`)
      with the same row layout, so swapping the image keeps every state. Absolute URL
-     (the file is identical on every network site) — .org rejects relative URLs. */
+     (.org rejects relative ones) on SE's static CDN: the stackoverflow.com copy
+     fails to load as a cross-site image from every other network host. */
   .wmd-button > span {
-    background-image: url("https://stackoverflow.com/Content/Img/unified/wmd-buttons-dark.svg") !important;
+    background-image: url("https://cdn.sstatic.net/Img/unified/wmd-buttons-dark.svg") !important;
+  }
+
+  /* `.favicon` (site switcher, profile Communities, Hot Network Questions, Featured
+     on Meta) is one network-wide sprite whose light copy draws several marks
+     (Stack Overflow, Super User, Server Fault) in near-black. SE's own dark mode
+     swaps in a twin with the same cell layout; the 32px copy also serves the 1x
+     `.favicon` since the site scales it with `background-size: 16px`. */
+  .favicon {
+    background-image: url("https://cdn.sstatic.net/Img/favicons-sprite32-dark.png") !important;
   }
 
   /* The link / image inserter is an inline panel under the toolbar on `var(--white)`,
@@ -2930,6 +2966,15 @@
     background-color: #181d23 !important;
     color: #c4cdd6 !important;
     border-color: #2d333b !important;
+  }
+
+  /* Developer Story (`/users/story/<id>`, the profile "Story" tab) is a Svelte app in
+     the shadow root of <devstory-app>; its Stacks tokens are declared on the inner
+     `.stacks-root`, so neither selectors nor inherited tokens reach it. The host
+     filter is the only hook. Safe while the app ships no raster images and no
+     position:fixed nodes (the filter makes the host their containing block). */
+  devstory-app {
+    filter: invert(0.92) hue-rotate(180deg) !important;
   }
 
   /* /collectives ships an in-page <style> for its scroll-spy nav (a near-white plate
@@ -2999,6 +3044,26 @@
   .bg-black-100, .bg-black-150, .bg-black-200,
   .bg-powder-100, .bg-powder-200, .bg-powder-300 {
     background-color: #1c2128 !important;
+  }
+
+  /* The /collectives feature mocks draw placeholder text as bare filled bars on a
+     mock card the ramp above paints the same tone, so the bars need a step above
+     it; the one blue bar is the mock's link line. */
+  .js-feature-section .bg-black-150.h8,
+  .js-feature-section .bg-black-150.h16,
+  .js-feature-section .bg-black-200.h12,
+  .js-feature-section .bg-black-200.h16 {
+    background-color: #2d333b !important;
+  }
+
+  .js-feature-section .bg-blue-500.h8 {
+    background-color: #3b82b8 !important;
+  }
+
+  /* The mock cards are stacked and overlap by design, so each needs an opaque
+     plate a step above the section ground. */
+  .js-feature-section .bg-white {
+    background-color: #22272e !important;
   }
 
   /* ---- Pagination ---- */
@@ -3850,6 +3915,13 @@ header.site-header,
      place is safe; real avatars have a different src. */
   img[src*="Img/anon.png"] {
     filter: invert(1) !important;
+  }
+
+  /* The footer wordmark is the host site's `/Content/Sites/<site>/Img/logo.png`, a
+     dark raster baked for the white page. chat.stackexchange.com instead ships a
+     white SE logo on a dark band there, which must not invert. */
+  #footer-logo img[src*="/Content/Sites/"] {
+    filter: invert(1) hue-rotate(180deg) !important;
   }
 
   #conversation-body ul#participants li.selected {
@@ -4706,8 +4778,10 @@ header.site-header,
     border-color: #3d444d !important;
   }
 
+  /* The wrapper is the plate the site's own 16px icon is drawn for; Stack
+     Overflow's is a near-black mark, so the plate stays light. */
   nav.primary .nav .site-selector-arrow .site-icon-wrapper {
-    background-color: #2d333b !important;
+    background-color: #c4cdd6 !important;
   }
 
   /* These are `nav.primary .nav li` on a flat #777 with white labels. The

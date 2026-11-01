@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark theme for Sudoku.com that darkens the 9x9 board itself, number pads, hints, daily challenges, awards, tournaments and guides.
-@version      20260919.01.55
+@version      20261031.15.41
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -169,7 +169,16 @@
     color: #9bc0ff !important;
   }
 
-  /* Burger bars and the header logo are drawn as boxes, not glyphs. */
+  /* Wordmark is an inline SVG: navy "Sudoku", brand-blue dot. */
+  .header_logo path.sudoku-text {
+    fill: #e6edf3 !important;
+  }
+
+  .header_logo path[fill="#325aaf"] {
+    fill: #7ea2ea !important;
+  }
+
+  /* Burger bars are drawn as boxes, not glyphs. */
   .header_burger > div,
   .header_burger:after,
   .header_burger:before {
@@ -264,6 +273,20 @@
     color: #e6edf3 !important;
   }
 
+  /* The countdown digits are nested spans; on the active chip they
+     must not take the chip's active ink. */
+  .header .active span.info,
+  .header .active span.info span,
+  .main-navigation .active span.info span {
+    color: #e6edf3 !important;
+  }
+
+  /* The mobile dropdown is the chip's own surface, so the active plate
+     steps up one tone. */
+  .header .header_mobile_dropdown a.active {
+    background-color: #22272e !important;
+  }
+
   .emoji_text,
   .inter-emoji_text {
     color: #9bc0ff !important;
@@ -291,6 +314,17 @@
   .game-info-wrapper .mistakes-counter > span,
   .score-value {
     color: #e6edf3 !important;
+  }
+
+  /* Not !important: the mobile postcards screen paints this counter
+     white over its own coloured backdrop at (0,3,0) and must keep
+     outranking these. */
+  button.streak .streak_value {
+    color: #e6edf3;
+  }
+
+  button.streak--none .streak_value {
+    color: #a8b2bd;
   }
 
   .timer-pause {
@@ -321,9 +355,15 @@
     background-color: #39424f !important;
   }
 
-  /* The four glyphs are an icon font, so they take `color`. */
   .game-controls .icon-game-control {
     color: #c4cdd6 !important;
+  }
+
+  /* The glyphs are inline SVG with the brand blue as a fill attribute.
+     Must not be !important: the site's per-control .blocked grey and the
+     narrow-layout grey outrank it and carry the disabled state. */
+  .game-controls .icon-game-control path[fill="#325aaf"] {
+    fill: #7ea2ea;
   }
 
   .game-controls .game-controls-label {
@@ -385,6 +425,28 @@
     background-color: #39424f !important;
   }
 
+  /* Narrow layouts draw the numpad and action row as bare glyphs; the
+     breakpoints are the site's own. */
+  @media (max-width: 929px) {
+    .new-breakpoints .numpad-wrapper .numpad-item,
+    .new-breakpoints .numpad-wrapper .numpad-item[disabled],
+    .new-breakpoints .numpad-wrapper .numpad-item:hover,
+    .new-breakpoints .numpad-wrapper .numpad-item:active {
+      background-color: transparent !important;
+    }
+  }
+
+  @media (max-width: 539px) {
+    .new-breakpoints .game-controls .game-controls-item-wrap .game-controls-item,
+    .new-breakpoints.pencil-mode:not(.win):not(.show-new-pause) .game-controls .game-controls-item-wrap .game-controls-pencil {
+      background-color: transparent !important;
+    }
+
+    .new-breakpoints .game-controls .game-controls-item-wrap .game-controls-item:active {
+      background-color: #2e3641 !important;
+    }
+  }
+
   /* NEW GAME BUTTON + DIFFICULTY MENU */
 
   .difficulty-menu,
@@ -425,6 +487,11 @@
     color: #ffffff !important;
   }
 
+  .new-game-menu-mode-button.postcard-default.active,
+  .new-game-menu-mode-button.storybook-default.active {
+    background-color: #22272e !important;
+  }
+
   .new-game-menu-header,
   .new-game-menu-button,
   .ref-start-game_items > a {
@@ -435,9 +502,13 @@
     border-top-color: #2d333b !important;
   }
 
-  .new-game-menu-button:hover,
   .ref-start-game_items > a:hover {
     background-color: #22272e !important;
+  }
+
+  /* The rows sit on the #22272e difficulty block. */
+  .new-game-menu-button:hover {
+    background-color: #2e3641 !important;
   }
 
   .ref-start-game_items > a:active {
@@ -617,8 +688,13 @@
   }
 
   .app-teaser-info {
-    background-color: #22272e !important;
     color: #c4cdd6 !important;
+  }
+
+  /* Only the sidebar layout plates the store-badge row; the in-flow
+     mobile teaser leaves it bare. */
+  .aside .app-teaser-wrapper .app-teaser-info {
+    background-color: #22272e !important;
   }
 
   .app-info-heading {
@@ -830,6 +906,51 @@
   #onetrust-pc-sdk .ot-arw-cntr,
   #onetrust-banner-sdk .banner-close-button {
     filter: invert(1) !important;
+  }
+
+  /* TRUSTARC BANNER + PREFERENCE CENTRE
+
+     The banner reads --tc-* tokens from :root; the secondary button's
+     plate is a literal. */
+
+  #consent_blackbar {
+    --tc-bg-color: #1c2128;
+    --tc-main-color: #e6edf3;
+    --tc-text-color: #a8b2bd;
+    --tc-link-color: #7ea2ea;
+    --tc-blue: #7ea2ea;
+    --tc-gradient-color: #4a68ad;
+    --tc-gradient-hover-color: #5675b8;
+    --tc-repop-bg-color: #2a2540;
+    --tc-repop-color: #c9a8f0;
+  }
+
+  #consent_blackbar .tc-track {
+    border-top-color: #2d333b !important;
+  }
+
+  #consent_blackbar .tc-btn-primary:active {
+    background: #3d5794 !important;
+  }
+
+  #consent_blackbar .tc-btn-secondary {
+    background: #242b33 !important;
+  }
+
+  #consent_blackbar .tc-btn-secondary:hover {
+    background: #2e3641 !important;
+  }
+
+  #consent_blackbar .tc-btn-secondary:active {
+    background: #39424f !important;
+  }
+
+  /* The preference centre renders inside a shadow root with literal
+     colours, so only a filter on its host reaches it. The filter also
+     inverts the host's own shadow: it is stated light so it lands dark. */
+  .trustarc_newcm_container {
+    filter: invert(0.9) hue-rotate(180deg) !important;
+    box-shadow: 0 2px 12px 0 rgba(255, 255, 255, 0.4) !important;
   }
 
   /* MODULE-CLASS SECTIONS
@@ -1261,6 +1382,81 @@
     color: #a0aab6 !important;
   }
 
+  /* GET IN TOUCH
+
+     Own bundle (get-in-touch.css). Error / success states are a signal
+     and stay in their hue family. */
+
+  .getInTouch_title,
+  .form_field_drag .empty-file_title,
+  .form_field_drag .empty-file_upload,
+  .form_field_drag .has-file_name {
+    color: #e6edf3 !important;
+  }
+
+  .form_field label,
+  .form_field_counter,
+  .form_field_drag .empty-file_desc {
+    color: #a8b2bd !important;
+  }
+
+  .form_field input:not([type="file"]),
+  .form_field textarea,
+  .form_field_drag {
+    background-color: #22272e !important;
+    border-color: #2d333b !important;
+    color: #e6edf3 !important;
+  }
+
+  .form_field_drag.highlight {
+    border-color: #7ea2ea !important;
+  }
+
+  .form_field.error input:not([type="file"]),
+  .form_field.error textarea,
+  .form_field.error .form_field_drag {
+    border-color: #f07f8c !important;
+  }
+
+  .form_field.error input:not([type="file"]),
+  .form_field.error textarea,
+  .form_field_error,
+  .maxLength .form_field_counter {
+    color: #f07f8c !important;
+  }
+
+  .form_field_drag .file-remove {
+    background-color: #2e3641 !important;
+  }
+
+  .form_field_drag .file-remove img {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+
+  .form_message .error {
+    background-color: #2e1618 !important;
+    color: #ff8a94 !important;
+  }
+
+  .form_message .success {
+    background-color: #10291b !important;
+    color: #56d17c !important;
+  }
+
+  .form .form_button {
+    background-color: #4a68ad !important;
+    color: #ffffff !important;
+  }
+
+  .form .form_button:hover {
+    background-color: #5675b8 !important;
+  }
+
+  .form .form_button[disabled] {
+    background-color: #2e3641 !important;
+    color: #a0aab6 !important;
+  }
+
   /* PRINTABLE SUDOKU
      
      The sheet preview stays untouched: it is a picture of a page that
@@ -1325,8 +1521,24 @@
      The panel keeps its brand gradient, deepened; its CTAs stay light
      plates on it as the site draws them. */
 
-  [class*="winscreen-styles_win__"] {
+  /* The colour is a variant class: blue for plain games, turquoise for
+     the croco event. The postcards / storybook variants are the event's
+     own colours and stay native. */
+  [class*="winscreen-styles_win__"].blue {
     background-image: linear-gradient(#24406f, #34558f) !important;
+  }
+
+  [class*="winscreen-styles_win__"].turquoise {
+    background-image: linear-gradient(#0b4a6b, #0e6a8f) !important;
+  }
+
+  /* The fade above the CTA must end in the panel's own bottom tone. */
+  [class*="winscreen-styles_win__"].blue [class*="winscreen-styles_win_btn__"]:after {
+    background-image: linear-gradient(rgba(52, 85, 143, 0), #34558f) !important;
+  }
+
+  [class*="winscreen-styles_win__"].turquoise [class*="winscreen-styles_win_btn__"]:after {
+    background-image: linear-gradient(rgba(14, 106, 143, 0), #0e6a8f) !important;
   }
 
   /* The end-of-game thumbnail is the same grid in SVG, so it takes
@@ -1370,8 +1582,13 @@
   }
 
   .tournament_leaderboard_content:before,
-  .tournament_leaderboard_content_title:before {
+  .tournament_leaderboard_content_title:before,
+  [class*="_leaderboard_page_right_title__"]:after {
     background-image: linear-gradient(180deg, #1c2128, rgba(28, 33, 40, 0)) !important;
+  }
+
+  [class*="_leaderboard_page__"] [class*="LeaderboardPage-styles_btn__"]:after {
+    background-image: linear-gradient(0deg, #1c2128, rgba(28, 33, 40, 0)) !important;
   }
 
   .tournament_leaderboard_content_leaderboard .leaderboard-item {
@@ -1472,6 +1689,18 @@
     background-color: #3d5794 !important;
   }
 
+  /* The win CTA's wrapper also matches _btn__ but is a bare box; only
+     the portrait postcards layout fills it, with the event colour. */
+  [class*="winscreen-styles_win_btn__"],
+  [class*="winscreen-styles_win_btn__"]:hover,
+  [class*="winscreen-styles_win_btn__"]:active {
+    background-color: transparent !important;
+  }
+
+  [class*="winscreen-styles_newGradient__"][class*="winscreen-styles_pview__"].postcards [class*="winscreen-styles_win_btn__"] {
+    background-color: var(--postcards-gradient-end) !important;
+  }
+
   [class*="_white__"],
   [class*="cancelWhite__"],
   .game-over_close,
@@ -1531,6 +1760,76 @@
   }
 
   .calendar-table .day.selected {
+    color: #ffffff !important;
+  }
+
+  /* Future days are [disabled]; they must stay quieter than playable ones. */
+  .calendar-table .day[disabled] {
+    color: #4f5864 !important;
+  }
+
+  /* A started day is a paper disc with a progress ring; the selected
+     variant keeps the site's blue plate and white ring. */
+  .calendar-table .day.progress:not(.selected) {
+    background-color: #1c2128 !important;
+  }
+
+  .calendar-table .day.progress:not(.selected) svg .background {
+    stroke: #2e3641 !important;
+  }
+
+  .calendar-table .day.progress:not(.selected) svg .progress {
+    stroke: #7ea2ea !important;
+  }
+
+  /* Locked postcard fragments are tinted by difficulty; the hue is the
+     signal. The 1px cell border is the card colour drawn as a gap. */
+  [class*="postcards-styles_postcard__"] [class*="postcards-styles_cell__"],
+  [class*="postcards-styles_blocksContainer__"] [class*="postcards-styles_difficultyItem__"] {
+    border-color: #1c2128 !important;
+  }
+
+  [class*="postcards-styles_postcard__"] [class*="postcards-styles_cell__"]:after {
+    border-color: #1c2128 !important;
+  }
+
+  [class*="postcards-styles_easy__"]:not([class*="postcards-styles_active__"]) {
+    background-color: #2d5c3c !important;
+  }
+
+  [class*="postcards-styles_medium__"]:not([class*="postcards-styles_active__"]) {
+    background-color: #6b5a1f !important;
+  }
+
+  [class*="postcards-styles_hard__"]:not([class*="postcards-styles_active__"]) {
+    background-color: #6e3634 !important;
+  }
+
+  [class*="postcards-styles_expert__"]:not([class*="postcards-styles_active__"]) {
+    background-color: #3f3e7a !important;
+  }
+
+  [class*="postcards-styles_lockedCard__"] {
+    background-color: #2e3641 !important;
+  }
+
+  /* The tutorial's mini postcard frame is the card colour. */
+  [class*="postcards-styles_blocksContainer__"] {
+    background-color: #1c2128 !important;
+  }
+
+  /* Portrait and redesign layouts run the event gradient into the card
+     colour; the stops and the event tokens are the site's own. */
+  [class*="postcards-styles_postcards__"] [class*="postcards-styles_left__"][class*="postcards-styles_portrait__"] {
+    background-image: linear-gradient(to bottom, var(--postcards-gradient-end), var(--postcards-gradient-start), #1c2128 370px) !important;
+  }
+
+  [class*="postcards-styles_postcards__"][class*="postcards-styles_redesignGradient__"] {
+    background-image: linear-gradient(180deg, var(--postcards-gradient-end) 0, var(--postcards-gradient-start) 36.5%, #1c2128 72.7%) !important;
+  }
+
+  /* In portrait the hint sits on the event gradient, not the card. */
+  [class*="postcards-styles_hint__"][class*="postcards-styles_portrait__"] {
     color: #ffffff !important;
   }
 

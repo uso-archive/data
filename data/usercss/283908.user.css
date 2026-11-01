@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for Vinted with the homepage, catalog and search, item pages and seller profiles in a comfortable dark look that's easy on the eyes for late-night browsing.  Works on every country version of Vinted (vinted.fr, .de, .com, .co.uk, .es, .it, .nl, .be, .pl and more).   Prices, ratings and Vinted's teal stay clear and recognizable.
-@version      20260919.01.56
+@version      20261031.15.42
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -115,6 +115,17 @@
     --stroke-action-neutral-subtle-active:   201, 240, 238;
     --stroke-action-neutral-subtle-selected: 201, 240, 238;
     --stroke-action-primary-prominent-high-idle: 201, 240, 238;
+
+    /* Neutral/success inks read by the `bloom` field labels, helpers and select
+       items; values from the site's own dark block. `*-neutral-prominent-idle` stays:
+       it also inks the amber expose button's content. */
+    --foreground-passive-neutral-subtle-idle: 168, 178, 179;
+    --foreground-action-neutral-subtle-idle:  168, 178, 179;
+    --foreground-passive-neutral-high-idle:   240, 242, 242;
+    --stroke-action-neutral-subtle-high-idle: 168, 178, 179;
+    --foreground-passive-success-prominent:   51, 172, 120;
+    --foreground-action-success-prominent-idle: 51, 172, 120;
+    --stroke-action-success-prominent-idle:   51, 172, 120;
   }
 
   /* ---- Base surfaces ---- */
@@ -130,9 +141,9 @@
 
   /* Page shell: the site's own white-bg rule outranks the single-class overrides
      above. Scope to the shell so other u-background-white cards keep their
-     elevation; the class is a module, so match a substring. */
+     elevation. The class is a module (`<hash>_site`), so match a substring. */
   html body main.site.u-background-white,
-  html body main[class*="__site"].u-background-white,
+  html body main[class*="_site"].u-background-white,
   html body .standard-layout { background-color: #14181d !important; }
 
   /* CSS-module surfaces with a hardcoded white; match the prefix, the hash varies. */
@@ -140,6 +151,9 @@
   [class*="seller-promotion"], [class*="promotion-block"],
   [class*="homepage-block"] [class*="card"] {
     background-color: #1c2128 !important; }
+  /* The wrapper is a square box around the rounded card, so a fill squares its
+     corners; the card paints itself. */
+  [class*="hero-block__wrapper"] { background-color: transparent !important; }
   [class*="hero-block"] h1, [class*="hero-block"] h2,
   [class*="hero-block"] p, [class*="hero-block"] span,
   [class*="seller-promotion"] h1, [class*="seller-promotion"] h2,
@@ -170,14 +184,14 @@
     [class*="Button__label"] { color: #f9bb42 !important; }
 
   /* Header / global nav */
-  /* Hashed CSS-module classes: match `__l-header`, which also covers the error-page
-     header. A bare `l-header` would match `.modal-header`. */
-  .l-header, [class*="__l-header"], .js-header { background-color: #0d1117 !important; }
-  [class*="__l-header__main"] { border-bottom: 1px solid #262c33 !important; }
+  /* Hashed CSS-module classes (`<hash>_l-header`): match `_l-header`, which also
+     covers the error-page header. A bare `l-header` would match `.modal-header`. */
+  .l-header, [class*="_l-header"], .js-header { background-color: #0d1117 !important; }
+  [class*="_l-header__main"] { border-bottom: 1px solid #262c33 !important; }
   .nav-links, .header-nav, [data-testid="nav-tabs"] { background-color: #0d1117 !important; }
   /* Buttons excluded: an outlined/flat button draws ring AND label from `color`. */
   .nav-links a, .header-nav a, [data-testid="nav-tabs"] a,
-  [class*="__l-header"] a:not([class*="Button__filled"]):not([class*="Button__primary"]) {
+  [class*="_l-header"] a:not([class*="Button__filled"]):not([class*="Button__primary"]) {
     color: #e6edf3 !important; }
   .nav-links a:hover, .header-nav a:hover { color: #ffffff !important; }
 
@@ -185,14 +199,14 @@
      component's `__controls` layer is absolutely positioned over the whole rail, so
      an opaque fill hides every tile. Paint only the arrow handle. */
   .catalog-tree-menu, .horizontal-navigation,
-  [class*="__l-header"] [class*="HorizontalScroll"] {
+  [class*="_l-header"] [class*="HorizontalScroll"] {
     background-color: #0d1117 !important; }
   /* No bare `.nav-tabs`: the only element still carrying it is the help centre's
      tab switcher, natively plateless. */
   [class*="horizontal-scroll__handle"] { background-color: #1c2128 !important; }
   /* A Tabs bar reading the white token; pin it to the header. Tabs elsewhere stay
      elevated. */
-  [class*="__l-header"] [class*="Tabs__tabs"] { background-color: #0d1117 !important; }
+  [class*="_l-header"] [class*="Tabs__tabs"] { background-color: #0d1117 !important; }
 
   /* Dropdowns / flyouts / menus */
   .web_ui__Menu__menu, .web_ui__Dropdown__dropdown, .dropdown-menu,
@@ -209,9 +223,9 @@
   .web_ui__InputBar__value::placeholder,
   input::placeholder, textarea::placeholder { color: #8b949e !important; opacity: 1 !important; }
 
-  /* The scrim reads greyscale-level-1, our TEXT colour. Match both halves of the
-     module class: a bare `__background` also hits the homepage hero. */
-  [class*="SearchBar-module"][class*="__background"] {
+  /* The scrim reads greyscale-level-1, our TEXT colour. Its module class is a bare
+     `<hash>_background`; a `_background` substring also hits the homepage hero. */
+  [data-testid="search-bar-background"] {
     background-color: #06080a !important; }
 
   /* The already-typed prefix is a <b> baked #5a6566; keep it dimmer than the white
@@ -432,6 +446,11 @@
   /* The inverse pill is dark for us, so expose reverses again: amber label. */
   [class*="Button__inverse"][class*="Button__filled"][class*="Button__expose"]
     [class*="Button__label"] { color: #f9bb42 !important; }
+  /* An INVERSE outlined button is a white ring + label for coloured bands; the
+     outlined variant rules above would repaint it teal. Must stay after them. */
+  [class*="Button__inverse"][class*="Button__outlined"],
+  [class*="Button__inverse"][class*="Button__outlined"]
+    [class*="Button__label"] { color: #e6edf3 !important; }
 
   /* Google/Facebook logos are multicolour, so scope to black-filled paths only. */
   [class*="Button__icon"] svg path[fill="#000"],
@@ -472,6 +491,11 @@
   [class*="new-item-box__image"],
   [class*="Image__image"][style*="background-color"] {
     background-color: #1c2128 !important; }
+  /* The card's caption Cell sits inset inside the summary's padding, so the
+     elevated Cell fill draws a slab narrower than the photo; fill the summary. */
+  [class*="new-item-box__summary"] { background-color: #1c2128 !important; }
+  [class*="new-item-box__summary"] [class*="Cell__cell"] {
+    background-color: transparent !important; }
   /* Natively a light translucent scrim with dark text — flip both halves. */
   .web_ui__Image__label, [class*="Image__label"] {
     background-color: rgba(13, 17, 23, 0.6) !important; color: #e6edf3 !important; }
@@ -555,6 +579,9 @@
   .item-shipping-banner { background-color: #1c2128 !important; }
   /* The buyer-protection total is a Text__primary span, left teal by that rule. */
   [data-testid="item-price"] { color: #e6edf3 !important; }
+  /* Gallery tiles are spaced by 2px transparent borders: gutters show the page,
+     not a rule. */
+  figure[class*="item-photo-box"] { border-color: transparent !important; }
 
   /* Seller / member profile */
   .profile, [class*="profile"], [data-testid="profile-username"] {
@@ -564,10 +591,10 @@
      column, so elevate the column and flatten the Cells. The `:not()` guards pin
      this to that column: grid cards reuse `.u-flex-grow` with `u-fill-width` /
      `u-min-width-none`, the sort row adds `u-flexbox`. */
-  [class*="__profile"] .u-flex-grow:not(.u-fill-width):not(.u-min-width-none):not(.u-flexbox) {
+  [class*="_profile"] .u-flex-grow:not(.u-fill-width):not(.u-min-width-none):not(.u-flexbox) {
     background-color: #1c2128 !important; }
-  [class*="__profile"] .u-flex-grow:not(.u-fill-width):not(.u-min-width-none):not(.u-flexbox) [class*="Cell__cell"],
-  [class*="__profile"] .u-flex-grow:not(.u-fill-width):not(.u-min-width-none):not(.u-flexbox) [class*="u-background-white"] {
+  [class*="_profile"] .u-flex-grow:not(.u-fill-width):not(.u-min-width-none):not(.u-flexbox) [class*="Cell__cell"],
+  [class*="_profile"] .u-flex-grow:not(.u-fill-width):not(.u-min-width-none):not(.u-flexbox) [class*="u-background-white"] {
     background-color: transparent !important; }
 
   /* Footer */
@@ -657,6 +684,18 @@
   .web_ui__Icon__greyscale-level-6 svg,
   [class*="Icon__greyscale-level-6"] svg {
     fill: #e6edf3 !important; color: #e6edf3 !important; }
+  /* Seller-badge / buyer-protection icon family bakes a pale-mint disc and a
+     #007782 glyph as literal path fills. */
+  .web_ui__Icon__icon svg path[fill="#C9F0EE"],
+  .web_ui__Icon__icon svg path[fill="#c9f0ee"] { fill: #12363d !important; }
+  .web_ui__Icon__icon svg path[fill="#007782"] { fill: #33adb8 !important; }
+  /* The same disc+shield drawn as an external <img> SVG ("Shop and sell safely"
+     card). No filter chain maps disc dark and shield mid while keeping the white
+     tick, so the image is pushed out of its box and a recoloured copy painted as
+     the background. */
+  img[src*="/buyer-protection-shield."] {
+    object-position: -9999px 0 !important;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='none' viewBox='0 0 48 48'%3E%3Cpath fill='%2312363d' d='M48 24c0 13.254-10.745 24-24 24C10.746 48 0 37.254 0 24 0 10.745 10.746 0 24 0c13.255 0 24 10.745 24 24'/%3E%3Cpath fill='%2333adb8' d='M24 36s-10-3.6-10-12v-8.4L24 12l10 3.6V24c0 8.4-10 12-10 12'/%3E%3Cpath fill='%23fff' d='M23.202 27.791 18.5 23.152l1.613-1.59 3.089 3.048L28.887 19l1.613 1.59-7.298 7.201Z'/%3E%3C/svg%3E") center / contain no-repeat !important; }
   /* greyscale-level-6 is web_ui's "on-inverse" FOREGROUND (Icon glyphs above, text
      here). Only members whose surface is DARK for us belong. Input__primary must
      NOT be flipped: it fills from --primary-default, where the dark ink is 6:1 and
@@ -688,7 +727,7 @@
   [class*="Box__box-theme-primary-extra-dark"],
   section[class*="item-verification"][class*="closing"],
   [class*="hc-"][class*="search-header"],
-  [class*="advertising-module"][class*="__hero"],
+  [class*="_page"] > [class$="_hero"],
   [class*="dac7__taxrules"], [class*="dac7__checkstatus"] {
     background-color: #0e3b42 !important; }
   .web_ui__Tooltip__tooltip, [class*="Tooltip__tooltip"],
@@ -705,6 +744,9 @@
   section[class*="item-verification"][class*="closing"] a,
   [class*="dac7__taxrules"], [class*="dac7__checkstatus"] {
     color: #e6edf3 !important; }
+  /* /advertising's torn hero edge is a masked ::after in greyscale-level-6, the
+     page colour natively; the page under it is our base, not the elevated tone. */
+  [class*="_page"] > [class$="_hero"]::after { background-color: #14181d !important; }
   /* These headings take their colour from `--shadow`, which must stay black for its
      real job. */
   [class*="dac7__links-group-heading"] { color: #e6edf3 !important; }
@@ -756,11 +798,13 @@
   [class*="electronics__discover-link"],
   [class*="electronics__discover-link-icon"] { color: #4db8c4 !important; }
 
-  /* how-it-works' hero keeps its native peach: the illustration is a raster whose
-     own background IS that peach, starting 184px INSIDE the title column, so a dark
-     band leaves heading tails light-on-peach. Rebind the greyscale levels. */
-  [class*="how-it-works__header"] {
-    background-color: #fce7dc !important;
+  /* how-it-works' hero keeps its native light fill: the illustration is a raster
+     whose own background IS that fill, starting INSIDE the title column, so a dark
+     band leaves heading tails light-on-light. No colour is pinned here because the
+     site recolours fill and raster together; only the ink is rebound dark. Bound on
+     the hero box only (`__header-*` children excluded): on mobile the title and body
+     sit OUTSIDE it, on a dark `tear` band, and must keep the light ink. */
+  [class*="how-it-works__header"]:not([class*="__header-"]) {
     --greyscale-level-1: 21, 25, 26;
     --greyscale-level-2: 90, 101, 102; }
 
@@ -810,6 +854,10 @@
      instead of warm. */
   img[src*="user-empty-state"] {
     filter: invert(1) hue-rotate(180deg) !important; }
+  /* how_it_works "Shop safely" <img> SVGs: black/#333 outline over pale-mint
+     fills; hue-rotate keeps the mint a green once inverted. */
+  img[src*="/media/safe."], img[src*="/media/guarantee."] {
+    filter: invert(1) hue-rotate(180deg) !important; }
 
   /* The hard 404 is its own `gnf-*` family, outside web_ui, from an inline <style>.
      Its mascot <video> has white baked into the frames: invert (hue-rotate restores
@@ -842,6 +890,22 @@
      (not `:focus-visible`) stays in the CSS2 subset the old parser accepts. */
   input:focus, textarea:focus, select:focus {
     border-color: #4db8c4 !important; }
+  /* `bloom` fields draw their box and every state on the `*-root` wrapper's
+     border, which the blanket border reset flattens. Focus last: an invalid field
+     takes the focus colour while focused. */
+  .input-root, .password-root, .input-datetime-root, .select-root,
+  .textarea-field { border-color: #667273 !important; }
+  .input-root:hover, .password-root:hover, .input-datetime-root:hover,
+  .select-root:hover, .textarea-field:hover { border-color: #a8b2b3 !important; }
+  [class*="-root"][data-validation-type="error"],
+  .textarea-field[data-validation-type="error"] { border-color: #d04555 !important; }
+  [class*="-root"][data-validation-type="success"],
+  .textarea-field[data-validation-type="success"] { border-color: #33ac78 !important; }
+  .input-root:focus-within, .password-root:focus-within,
+  .input-datetime-root:focus-within, .select-root[data-state="open"],
+  .select-root:focus, .textarea-field:focus { border-color: #c9f0ee !important; }
+  [class*="-root"][data-disabled="true"],
+  .textarea-field:disabled { border-color: #2a3233 !important; }
   /* A Radio's ring is the 1px border of the `Radio__button` span — an ELEMENT, so
      the blanket border reset takes it. */
   .web_ui__Radio__button, [class*="Radio__button"] {

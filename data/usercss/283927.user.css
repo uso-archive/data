@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A full dark theme for Thingiverse: browse the feed, model pages, search and profiles in comfortable dark while 3D model previews stay true to color.
-@version      20260919.01.55
+@version      20261031.15.41
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -28,7 +28,8 @@
     --tv-bg-layer-selected-02: #1d2a3a !important;
     --tv-bg-layer-selected-03: #1d2a3a !important;
     --tv-bg-disabled: #2d333b !important;
-    --tv-bg-inverse-primary: #e6edf3 !important;
+    /* Spent only as a native-navy band under `--tv-content-inverse` (white) ink. */
+    --tv-bg-inverse-primary: #12226b !important;
     --tv-bg-inverse-secondary: #c4cdd6 !important;
 
     /* ---- Neutral ramp (dark -> light) ---- */
@@ -178,15 +179,26 @@
      verbatim. */
   [class*="GroupHeader__groupHeader--"] { background-color: #248bfb !important; }
 
-  /* Natively lands on near-white to hand off into a white page; land it on the page
-     colour instead. */
-  [class*="AboutMembershipPage__aboutMembershipHero"] {
-    background-image: linear-gradient(#1e42df 14%, #3a5fe0 41%, #24304f 84%, #1a1f28 93%, #14181d 100%) !important; }
+  /* /membership/*: a translucent blue gradient fading out over a #f6f7fa base; on the
+     page colour it fades into dark. */
+  [class*="MembershipPageShell__layout"] { background-color: #14181d !important; }
+  /* `bg-white` resolves the retoned `--tv-white`; these are hairlines on the blue. */
+  [class*="MembershipPageShell__layout"] .h-px.bg-white { background-color: #ffffff !important; }
 
   /* The inner carousel is transparent, so the panel's background shows around
      letterboxed photos. The <img> photos keep their true colour. */
   [class*="Card__card"], [class*="Card__layer"] {
     background-color: #1c2128 !important; }
+  /* Featured plan card: a white padding-box over a silver border-box gradient (the
+     "featured" cue), set by a layered `!` utility no unlayered rule can outrank. The
+     plate is redrawn on a pseudo stacked under the content, inside the border. Bare-hex
+     hook (the silver stop) for the same parser reason as below; the hex hooks here are
+     generic utilities, so they stay under the membership shell. */
+  [class*="MembershipPageShell__layout"] [class*="D6D7D9"] { isolation: isolate !important; }
+  [class*="MembershipPageShell__layout"] [class*="D6D7D9"]::before {
+    content: "" !important; position: absolute !important; inset: 0 !important;
+    z-index: -1 !important; border-radius: 24px !important;
+    background-color: #1c2128 !important; pointer-events: none !important; }
 
   /* The auth card sits over a decorative montage and needs a SOLID surface.
      Google's `gsi-material-button` keeps its white one — its label is
@@ -326,6 +338,14 @@
      same parser reason (`text-[#EE2722]`). */
   [class*="AboutMembershipPage__membershipSavings"] { color: #5cb98a !important; }
   [class*="EE2722"] { color: #ff6b5e !important; }
+  /* Plan-card notice panel (`bg-[#F6F7FA]`) and savings teal (`text-[#0D9488]`,
+     4.3:1 on the card), bare-hex hooks for the same parser reason. */
+  [class*="F6F7FA"] { background-color: #262c33 !important; }
+  [class*="0D9488"] { color: #14b8a6 !important; }
+  /* Plan chips in `text-[#315C6D]` teal: outlined on the card (lifted, with its
+     border), or a pill on its own `bg-[#C4E3F0]` (kept); the pill must follow. */
+  [class*="MembershipPageShell__layout"] [class*="315C6D"] { color: #7fbcd2 !important; border-color: #7fbcd2 !important; }
+  [class*="MembershipPageShell__layout"] [class*="C4E3F0"] { color: #315c6d !important; }
 
   /* Marketing one-offs outside the ramp. The Xometry hero is natively dark and
      stays; everything below the fold is a light-page design. */
@@ -364,6 +384,9 @@
      real class carries brackets. `bg-black` resolves `--tv-black`, retoned to a LIGHT
      ink. */
   p[class*="1cb119"], p[class*="1cb119"] span { color: #1cb119 !important; }
+  /* The legacy shell's server 404 (bad `/challenges/<slug>`) is the same console in
+     plain CSS. */
+  #error-box #error-message { color: #1cb119 !important; }
   .bg-black { background-color: #000e1a !important; }
 
   /* Buttons — a stable `tv-button` BEM system; each variant is restated because its
@@ -487,7 +510,9 @@
      blanket heading and `p` inks beat it as direct declarations. */
   [class*="PageHero__pageHeroTitle"], [class*="PageHero__pageHeroSubtitle"],
   [class*="GroupHeader__groupHeaderTitle"],
-  [class*="AboutMembershipPage__headerSkip"] { color: #ffffff !important; }
+  [class*="MembershipPageShell__headerSkip"] { color: #ffffff !important; }
+  /* Tailwind's inverse-ink utility, used on copy over the dark-navy /hall-of-fame hero. */
+  .text-content-inverse { color: #ffffff !important; }
 
   /* Homepage hero tagline: the dark-navy "Thingiverse" brand word -> light */
   [class*="HomePageTagline"], [class*="HomePageTagline"] [class*="brand"] {
@@ -647,6 +672,31 @@
      a fill reads as a band whenever anything precedes it in flow. Same specificity as
      the skeleton rule, so it must follow it. */
   [class*="PageHeader__pageHeaderPlaceholder"] { background-color: transparent !important; }
+  /* Placeholder cards sweep a 60%-white glow; logged out they never resolve, so it
+     loops forever. */
+  [class*="PlaceholderCard__placeholderCard"]::after {
+    background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent) !important; }
+
+  /* /discover: the hero carousel's lower half fades into the first section's paper. */
+  [class*="DiscoverPage__discoverHeroCarousel"] {
+    background-image: linear-gradient(transparent calc(50% - 35px), #1c2128 calc(50% - 35px)) !important; }
+  /* Tag chips cycle four pastel hues by :nth-child(4n+k) under a primary ink; each
+     becomes the matching dark status tint. The loading variant ties the nth-child
+     hooks on specificity, so it must stay after them. */
+  [class*="DiscoverTag__discoverTag--"]:nth-child(4n+1) { background-color: #1e2750 !important; }
+  [class*="DiscoverTag__discoverTag--"]:nth-child(4n+1) [class*="DiscoverTag__discoverTagIcon"] { background-color: #2c3d80 !important; }
+  [class*="DiscoverTag__discoverTag--"]:nth-child(4n+1) [class*="DiscoverTag__discoverTagIcon"] svg { color: #9bb0ff !important; }
+  [class*="DiscoverTag__discoverTag--"]:nth-child(4n+2) { background-color: #122a25 !important; }
+  [class*="DiscoverTag__discoverTag--"]:nth-child(4n+2) [class*="DiscoverTag__discoverTagIcon"] { background-color: #1a4a42 !important; }
+  [class*="DiscoverTag__discoverTag--"]:nth-child(4n+2) [class*="DiscoverTag__discoverTagIcon"] svg { color: #6fd8c9 !important; }
+  [class*="DiscoverTag__discoverTag--"]:nth-child(4n+3) { background-color: #2a2410 !important; }
+  [class*="DiscoverTag__discoverTag--"]:nth-child(4n+3) [class*="DiscoverTag__discoverTagIcon"] { background-color: #4a3d12 !important; }
+  [class*="DiscoverTag__discoverTag--"]:nth-child(4n+3) [class*="DiscoverTag__discoverTagIcon"] svg { color: #ffd75c !important; }
+  [class*="DiscoverTag__discoverTag--"]:nth-child(4n+4) { background-color: #2a1419 !important; }
+  [class*="DiscoverTag__discoverTag--"]:nth-child(4n+4) [class*="DiscoverTag__discoverTagIcon"] { background-color: #4a2029 !important; }
+  [class*="DiscoverTag__discoverTag--"]:nth-child(4n+4) [class*="DiscoverTag__discoverTagIcon"] svg { color: #ffa94d !important; }
+  [class*="DiscoverTag__discoverTag--"][class*="DiscoverTag__loading"] { background-color: #262c33 !important; }
+  [class*="DiscoverTag__discoverTag--"][class*="DiscoverTag__loading"] [class*="DiscoverTag__discoverTagIcon"] { background-color: #2d333b !important; }
 
   /* Paints BEHIND the image only, so photos keep their true colour. Previews the CDN
      bakes onto a white canvas (`?cbg=white`) carry that white in the pixels — image
@@ -704,6 +754,10 @@
   /* In-content video player frame: #dbdbdb top/bottom rules drawn as dividers for a
      white page. */
   .adthrive-collapse-player { border-color: #2d333b !important; }
+  /* Floating video's close disc: a presentation-attribute `fill="white"` under a black
+     `stroke` glyph. */
+  .adthrive-video-close > svg { fill: #2d333b !important; }
+  .adthrive-video-close > svg path { stroke: #e6edf3 !important; }
   .adthrive-content.adthrive-sticky::after { color: #8b949e !important; }
   .raptive-content-terms-modal-content, .adthrive-act25-modal,
   .adthrive-us-cmp-modal-content, .adthrive-ccpa-modal-content {

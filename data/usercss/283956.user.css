@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean dark theme for weather.com. Darkens the today, hourly and 10-day forecasts, cards and tables while keeping radar, maps and weather icons intact.
-@version      20260919.01.56
+@version      20261031.15.42
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -89,6 +89,12 @@
   [class*="hover:border-black"]:hover {
     border-color: var(--wx-text-muted) !important;
   }
+  /* the location search field is `border-transparent` at rest; its blue border is the
+     hover / keyboard-focus cue and must outrank `.border-transparent`. */
+  [class~="hover:border-blue-500"]:hover,
+  [class~="focus-visible:border-blue-500"]:focus-visible {
+    border-color: var(--wx-link) !important;
+  }
   /* a chromatic accent the blanket reset would erase; #679ced reads on dark. Both hex
      spellings: the attribute match is case-sensitive. */
   [class*="border-[#679CED]"],
@@ -121,6 +127,26 @@
   svg[class*="SidebarNavigation--logoIcon"],
   .brands svg[viewBox="0 0 48 48"],
   .footer-brands svg[viewBox="0 0 48 48"] {
+    background-color: #ffffff !important;
+  }
+  /* the static /sitemap page carries it as a bare currentColor svg in `a.masthead`, which
+     the link colour would lift to the pale accent. */
+  a.masthead > svg[viewBox="0 0 52 48"] {
+    color: #003399 !important;
+    background-color: #ffffff !important;
+  }
+  /* that page inks its date shortcuts like body copy and only the "Go to weather.com"
+     link in the brand blue. */
+  nav.quick-links a {
+    color: var(--wx-text) !important;
+  }
+  footer.site-footer .home-link {
+    color: var(--wx-link) !important;
+  }
+  /* the sign-in modal's knockout mark is `text-blue-600`, which the link rule would lift
+     to the pale accent; it keeps its own navy. */
+  svg[viewBox="0 0 432.96 399.36"] {
+    color: #204794 !important;
     background-color: #ffffff !important;
   }
   /* the support footer's Weather Company wordmark is currentColor on its own white tile, so
@@ -171,6 +197,12 @@
   [data-testid="sidebar-navigation"] a[aria-current] p,
   [data-testid="sidebar-navigation"] [aria-current="page"] p,
   [data-testid="sidebar-navigation"] a.bg-gray-100 p {
+    color: var(--wx-link) !important;
+  }
+  /* the More <button> takes the same blue while its drawer is open; the rail's
+     `button:hover` restatement ties at (0,2,1), so this must stay after it. */
+  [data-testid="sidebar-navigation"] button.text-blue-500,
+  [data-testid="sidebar-navigation"] button.text-blue-500 p {
     color: var(--wx-link) !important;
   }
   /* the LEGACY rail shares the data-testid but marks the current page with a `--active`
@@ -420,12 +452,17 @@
     color: var(--wx-link) !important;
     fill: var(--wx-link) !important;
   }
-  /* this glyph's <path> has no fill attribute, so the blanket rule matches it at (0,4,2);
-     the fill selector must repeat that tail plus one more simple selector. */
-  svg[class*="Icon--icon"][class*="DetailsTable--moonIcon"],
-  svg[class*="Icon--icon"][class*="DetailsTable--moonIcon"]:not([class*="logoIcon"]):not([class*="WxIcon"]) path:not([fill]) {
-    color: var(--wx-link) !important;
-    fill: var(--wx-link) !important;
+  /* moon-phase glyphs (`name="phase-N"`: Monthly's calendar corners and day-detail row):
+     the ink is the SHADOWED part plus the rim, the lit part is a hole onto the page.
+     Ink drops to a shadow grey over a lit disc drawn behind (centre 50.4%/50.6%, r = 98%
+     of closest-side in the 1024 box). Under `.twcTheme` the detail-row icon is plain
+     ink, not `Icon--actionTheme` blue. The path has no fill attribute, so the blanket
+     rule matches it at (0,4,2); the fill selector repeats that tail plus one. */
+  svg[class*="Icon--icon"][name^="phase-"] {
+    background: radial-gradient(circle closest-side at 50.4% 50.6%, var(--wx-text) 97%, transparent 98%) !important;
+  }
+  svg[class*="Icon--icon"][name^="phase-"]:not([class*="logoIcon"]):not([class*="WxIcon"]) path:not([fill]) {
+    fill: #4b5563 !important;
   }
   /* keyed to the Pagination class, NOT `Icon--actionTheme`: that theme class also sits
      on Monthly's marks, which are plain ink natively. */
@@ -490,6 +527,17 @@
   }
   [class*="PromoFeaturePage--featuresTitle"] {
     color: var(--wx-text) !important;
+  }
+  /* the feature shots melt into the page through a paper-coloured `::after` fade; its end
+     stop must be the page base the cards sit on. */
+  [class*="PromoFeaturePage--featureCardFadeBottom"]::after {
+    background: linear-gradient(rgba(20, 24, 29, 0) 80%, var(--wx-base)) !important;
+  }
+  [class*="PromoFeaturePage--featureCardFadeRight"]::after {
+    background: linear-gradient(90deg, rgba(20, 24, 29, 0) 75%, var(--wx-base)) !important;
+  }
+  [dir="rtl"] [class*="PromoFeaturePage--featureCardFadeRight"]::after {
+    background: linear-gradient(270deg, rgba(20, 24, 29, 0) 75%, var(--wx-base)) !important;
   }
   /* the promo hero is its own navy band, never darkened: its copy and the outline
      Sign In (white label AND rim) stay white. */
@@ -564,18 +612,35 @@
     --tw-gradient-from: var(--wx-base) !important;
     --tw-gradient-via: var(--wx-base) !important;
   }
+  /* the forecast subnav's fades sit on its surface-toned pill, not on the page base. */
+  [data-testid="subnavigation"] > [class*="pointer-events-none"][class*="from-white"] {
+    --color-white: var(--wx-surface) !important;
+    --tw-gradient-from: var(--wx-surface) !important;
+    --tw-gradient-via: var(--wx-surface) !important;
+  }
   /* the chart tab strip's fades are literal `linear-gradient(to right/left, #fff 36px,
-     transparent)`, so the image is overridden too. An edge fade is anchored to ONE side;
+     transparent)`, so the image is overridden too, in the card surface tone the strip sits
+     on. An edge fade is anchored to ONE side;
      an overlay anchored on BOTH is a full-width layer -- the radar map's control layer is
      `inset-y-0 left-0 right-0` at rest and `left-[370px]` with the Map Menu open, ships no
      background, and must never take this image or the basemap is veiled. The exclusion is
      the OTHER side's PREFIX (`left-`/`right-`), not `left-0`, so the open-menu variant
      stays excluded. */
   [class*="pointer-events-none"][class*="absolute"][class*="inset-y-0"][class*="left-0"]:not([class*="right-"]) {
-    background-image: linear-gradient(to right, var(--wx-base) 36px, rgba(20, 24, 29, 0) 100%) !important;
+    background-image: linear-gradient(to right, var(--wx-surface) 36px, rgba(28, 33, 40, 0) 100%) !important;
   }
   [class*="pointer-events-none"][class*="absolute"][class*="inset-y-0"][class*="right-0"]:not([class*="left-"]) {
-    background-image: linear-gradient(to left, var(--wx-base) 36px, rgba(20, 24, 29, 0) 100%) !important;
+    background-image: linear-gradient(to left, var(--wx-surface) 36px, rgba(28, 33, 40, 0) 100%) !important;
+  }
+  /* below md the strip is `-mx-4`, so each fade's outer 16px hangs off the card onto the
+     page base. */
+  @media (max-width: 767px) {
+    [class*="pointer-events-none"][class*="absolute"][class*="inset-y-0"][class*="left-0"]:not([class*="right-"]) {
+      background-image: linear-gradient(to right, var(--wx-base) 16px, var(--wx-surface) 16px, var(--wx-surface) 36px, rgba(28, 33, 40, 0) 100%) !important;
+    }
+    [class*="pointer-events-none"][class*="absolute"][class*="inset-y-0"][class*="right-0"]:not([class*="left-"]) {
+      background-image: linear-gradient(to left, var(--wx-base) 16px, var(--wx-surface) 16px, var(--wx-surface) 36px, rgba(28, 33, 40, 0) 100%) !important;
+    }
   }
   /* this button's own background IS the fade, so it resolves to the card surface. The
      site writes it !important from a `[dir="ltr"] .class` rule, so the override needs a
@@ -601,6 +666,7 @@
   .bg-gray-50,
   .bg-neutral-100,
   .bg-slate-100,
+  .bg-slate-50,
   .bg-muted,
   .bg-secondary,
   .bg-accent {
@@ -627,6 +693,23 @@
   [class~="bg-black/10"] {
     background-color: rgba(230, 237, 243, 0.06) !important;
   }
+  /* the same idea as an arbitrary alpha of the site's own dark ink (footer column rules,
+     social-icon discs). */
+  [class~="bg-[rgba(37,36,34,0.10)]"],
+  [class~="bg-[rgba(53,45,35,0.102)]"] {
+    background-color: rgba(230, 237, 243, 0.1) !important;
+  }
+  /* a pale amber notice plate; plate, rim and ink step to the dark end of the same hue. */
+  .bg-amber-50 {
+    background-color: #2b2416 !important;
+  }
+  .border-amber-200 {
+    border-color: #6b5320 !important;
+  }
+  .text-amber-800,
+  .text-amber-800 strong {
+    color: #f6c35a !important;
+  }
   [class~="hover:bg-black/5"]:hover,
   [class~="hover:bg-black/14"]:hover,
   [class~="hover:bg-black/20"]:hover,
@@ -639,7 +722,9 @@
   }
   /* an arbitrary class no named `.bg-gray-*` utility matches, under labels our text
      rules lift. */
-  [class*="bg-[#ebecee]"] {
+  [class*="bg-[#ebecee]"],
+  [class*="bg-[#F4F4F4]"],
+  [class*="bg-[#f4f4f4]"] {
     background-color: var(--wx-surface-2) !important;
   }
   /* trust.weather.com (privacy / terms) sets its intro callout as a pale-blue arbitrary
@@ -750,6 +835,12 @@
     color: var(--wx-chrome) !important;
     -webkit-text-fill-color: var(--wx-chrome) !important;
   }
+  /* each option nests its hover tooltip (a dark `bg-gray-900` bubble), which inherits the
+     checked pill's dark text-fill. */
+  [role="radio"][aria-checked="true"][class~="bg-gray-900"] > span {
+    color: var(--wx-text) !important;
+    -webkit-text-fill-color: var(--wx-text) !important;
+  }
   /* `md:hidden`, i.e. below 768px only. `data-[state=inactive]:bg-gray-100` is a class
      token no plain `.bg-gray-*` selector matches, and it is in the list in BOTH states, so
      it must be paired with the state attribute. */
@@ -764,6 +855,11 @@
      ringed element suffices. */
   [class*="ring-blue-500"] {
     --tw-ring-color: var(--wx-link) !important;
+  }
+  /* the offset gap is painted in `--tw-ring-offset-color`, a non-inheriting @property whose
+     initial value is #fff, so it is set on the ringed element itself. */
+  [class*="ring-offset-"] {
+    --tw-ring-offset-color: var(--wx-base) !important;
   }
   /* a plain `outline-color` no ring token feeds. Its width and style only exist in the
      focus-visible state, so recolouring unconditionally touches nothing at rest. */
@@ -791,6 +887,15 @@
   [data-slot="card-header"] {
     background-color: transparent !important;
   }
+  /* a hover-tinted card (liveblog entries) must tint as one plate; the content slot's own
+     surface would stay behind as an untinted slab. */
+  [class*="hover:bg-gray-50"]:hover [data-slot="card-content"],
+  [class*="hover:bg-gray-100"]:hover [data-slot="card-content"],
+  [class*="hover:bg-gray-200"]:hover [data-slot="card-content"],
+  [class*="hover:bg-neutral-100"]:hover [data-slot="card-content"],
+  [class*="hover:bg-neutral-200"]:hover [data-slot="card-content"] {
+    background-color: transparent !important;
+  }
 
   /* text */
   h1, h2, h3, h4, h5, h6,
@@ -798,13 +903,16 @@
   .text-black,
   .text-card-foreground,
   .text-foreground,
+  .text-slate-900,
   b, strong {
     color: var(--wx-text) !important;
   }
   p, li, dt, dd, label, figcaption, small,
   .text-gray-700,
   .text-gray-800,
-  .text-neutral-800 {
+  .text-neutral-800,
+  .text-slate-600,
+  .text-slate-700 {
     color: var(--wx-text-2) !important;
   }
   /* list BULLETS and NUMBERS come from `::marker`, which no `li { color }` rule
@@ -964,7 +1072,9 @@
 
   /* the only place the severe-alert red is TEXT rather than a banner fill. The alert
      BANNER is untouched. */
-  [class*="text-[var(--color-alert-severe)]"] {
+  [class*="text-[var(--color-alert-severe)]"],
+  /* the live-coverage kicker; it sits on a <p>, which the text rules would grey. */
+  .text-destructive {
     color: #f4695c !important;
   }
 
@@ -1040,6 +1150,13 @@
   [class*="active:bg-[#0C1226]"]:active {
     background-color: #0c1226 !important;
   }
+  /* the headline-link banner's YELLOW variant keeps its pale fill, so it keeps its
+     near-black label too; the blue/green variants are `text-white` and need nothing. */
+  a[class*="bg-[#ffd981]"][class*="text-[#252422]"],
+  a[class*="bg-[#ffd981]"][class*="text-[#252422]"] * {
+    color: #252422 !important;
+    -webkit-text-fill-color: #252422 !important;
+  }
   /* #0d142a is the design system's ink, not an accent. Today it only lands on <button>s
      (which take `button { color: inherit }`), but elsewhere it would render ~1.05:1. */
   .text-brand-dark,
@@ -1086,6 +1203,18 @@
   .bg-primary.text-primary-foreground {
     color: var(--primary-foreground) !important;
     -webkit-text-fill-color: var(--primary-foreground) !important;
+  }
+  /* the SnowCast campaign app (/campaign/snowcast/beta) is its own build whose `--primary`
+     is a brand GREEN, not the main frontends' near-black; its CTAs keep it. Its
+     `.bg-background.min-h-screen` root sits inside a next/font `…__className` wrapper.
+     trust.weather.com uses the same root class directly under <body> and paints its
+     back-to-top `bg-primary`, so the wrapper is the discriminator. */
+  [class*="__className"] > .bg-background.min-h-screen .bg-primary {
+    background-color: #008d52 !important;
+  }
+  [class*="__className"] > .bg-background.min-h-screen .bg-primary.text-primary-foreground {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
   }
 
   /* the feature hero's text panel is a white-ink block at every width (black plate
@@ -1484,6 +1613,16 @@
   [class*="tbl-ui-line"] {
     background-color: var(--wx-border-2) !important;
   }
+  /* the collapsed feed's "show more" edge: a white `::after` strip and a white `::before`
+     tab carrying a BLACK chevron raster. The tab is filled with the inverse of our surface
+     and inverted whole, so it lands on the surface with a light chevron. */
+  .trc_rbox_outer.slideDown::after {
+    background-color: var(--wx-surface) !important;
+  }
+  .trc_rbox_outer.slideDown::before {
+    background-color: #e3ded7 !important;
+    filter: invert(1) !important;
+  }
 
   /* Outbrain recommendation strips (international news lists) */
   /* these slots ship a white fill of their own and stay in flow even when the widget
@@ -1494,6 +1633,45 @@
   .ob-widget,
   .ob-widget a {
     color: var(--wx-text-2) !important;
+  }
+  /* Outbrain's per-widget sheets (`.SB_2.ob-one-column-layout .ob-rec-text`, `.AR_1.ob-strip-
+     layout ...`) ink every text part on its own, light-page hexes. The widget-id prefix
+     varies per placement, so the generic part names are the hooks. `.ob-rec-label` is the
+     ad disclosure and keeps its native ink. */
+  .ob-widget .ob-widget-header,
+  .ob-widget .ob-widget-text,
+  .ob-widget .ob-rec-text {
+    color: var(--wx-text) !important;
+  }
+  .ob-widget .ob-rec-text:hover {
+    color: var(--wx-link) !important;
+  }
+  .ob-widget .ob-rec-description,
+  .ob-widget .ob-rec-disclaimer {
+    color: var(--wx-text-2) !important;
+  }
+  .ob-widget .ob-rec-source,
+  .ob-widget .ob-rec-date,
+  .ob-widget .ob-rec-author,
+  .ob-widget .ob_what a {
+    color: var(--wx-text-muted) !important;
+  }
+  .ob-widget.ob-one-column-layout,
+  .ob-widget .ob-dynamic-rec-container {
+    background-color: var(--wx-surface) !important;
+  }
+  /* Smartfeed cards render inside an open shadow root whose sheet sets `color` on each text
+     part, so no selector here reaches them. `-webkit-text-fill-color` is inherited across the
+     boundary, is never set in that sheet, and paints over `color`. */
+  .OUTBRAIN[data-feed-father-idx] {
+    -webkit-text-fill-color: var(--wx-text-2) !important;
+  }
+
+  /* Steller "Things to do" strip: a same-origin about:blank iframe the sheet also reaches.
+     Its "Powered by steller" lockup inks the lettering black through hashed classes; the
+     gradient S mark carries a `fill` attribute and keeps its colours. */
+  [data-testid="partners-embed-poweredby-label-image"] path:not([fill]) {
+    fill: var(--wx-text-2) !important;
   }
 
   /* interactive radar map: the rebuilt Tailwind map UI */
@@ -1726,13 +1904,22 @@
   /* the shader must be OPAQUE for the absolutely-positioned button's full width or the
      clamped paragraph shows through the label. The widget publishes that width as
      `--dd-article-summary-button-width` (150px when unset), so this gradient ends at the
-     same stop. */
+     same stop. Its end colour must be the ground the widget sits on: page base on
+     liveblogs, the article card (`.bg-white`, repainted surface) on articles. */
   #dd-widget .dd-widget-article-summary-button-shader {
+    background-image: linear-gradient(to right, rgba(20, 24, 29, 0), var(--wx-base) calc(100% - var(--dd-article-summary-button-width, 150px))) !important;
+  }
+  .bg-white #dd-widget .dd-widget-article-summary-button-shader {
     background-image: linear-gradient(to right, rgba(28, 33, 40, 0), var(--wx-surface) calc(100% - var(--dd-article-summary-button-width, 150px))) !important;
   }
   #dd-widget .dd-widget-input-wrapper {
     background-color: var(--wx-surface-2) !important;
     border: 1px solid var(--wx-border) !important;
+  }
+  /* the placeholder is a sibling div stacked BEHIND the input, so the field stays clear.
+     Unscoped: the answer dialog mounts the same field outside `#dd-widget`. */
+  .dd-widget-input-field-textarea {
+    background-color: transparent !important;
   }
   #dd-widget .dd-widget-branding-logo svg path {
     fill: var(--wx-text) !important;
@@ -1835,6 +2022,9 @@
     --spotim-content-loaders-secondary-color: #262c33 !important;
     --spotim-modal-backdrop-background-color: rgba(13, 17, 23, 0.7) !important;
     --spotim-safeframe-modal-backdrop-color: rgba(13, 17, 23, 0.7) !important;
+    /* one token is both the link/selected INK and the fill behind hardcoded-white button
+       labels, so it is a mid blue: >=4.5:1 as ink on our surfaces, ~3.5:1 under white. */
+    --spotim-brand-color: #3b8fd0 !important;
   }
   /* a SECOND shadow root whose disc is a hardcoded `background-color:#fff` with no
      custom property behind it, so the vars above cannot reach it. `filter: invert()` would
@@ -2048,6 +2238,11 @@
     background-color: transparent !important;
     color: var(--wx-link) !important;
   }
+  /* the language picker is a bare select on the navy band; the generic field fill would
+     plate it. */
+  select.bg-transparent {
+    background-color: transparent !important;
+  }
   /* every in-app navigation mounts this spinner, whose plate is rgba(255,255,255,.8) for
      as long as the route takes. */
   .siteforceLoadingBalls {
@@ -2085,6 +2280,15 @@
      (0,2,0), above the (0,1,0) neutralizers. */
   [data-testid="DynamicMap"] [data-testid="LocationPin"] {
     background-color: #1944de !important;
+    border-color: #ffffff !important;
+  }
+  /* the legacy pin shares the testid but is a translucent halo around an inner blue dot,
+     so the halo keeps its own veil and the dot is restored instead. */
+  [data-testid="DynamicMap"] [data-testid="LocationPin"][class*="LocationPin--LocationPin"] {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+  }
+  [data-testid="DynamicMap"] [class*="LocationPin--innerPin"] {
+    background-color: #1b4de4 !important;
     border-color: #ffffff !important;
   }
   [data-testid="DynamicMap"] [data-testid="DynamicMapTimeStamp"] {
@@ -2168,6 +2372,12 @@
   svg circle[stroke="#d1d5db"],
   svg line[stroke="#d1d5db"] {
     stroke: var(--wx-border-2) !important;
+  }
+  /* (2e) the Visibility tile's unreached bars are a #e5e7eb TRACK; the reached ones are
+     #0ea5e9 data. */
+  svg rect[fill="#e5e7eb"],
+  svg rect[fill="#E5E7EB"] {
+    fill: var(--wx-border-2) !important;
   }
 
   /* (3) chart plot backgrounds shipped as a white <rect>; data bars keep their fill.

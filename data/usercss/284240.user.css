@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  Dark mode for the SCP Foundation Wiki: articles, sidebar, tables, tabs, ratings, forums and search all get a comfortable night palette.
-@version      20260919.01.53
+@version      20261031.15.40
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -63,6 +63,11 @@
   #page-content,
   #skrollr-body,
   #html-body {
+    background-color: transparent;
+  }
+
+  /* theme:word-processor paints its page white as `div#main-content`, which outranks the group above; the skin's own sheet loads after this one, so a tie still loses. */
+  html div#main-content {
     background-color: transparent;
   }
 
@@ -283,6 +288,13 @@
   #main-content #page-content a.core-link,
   #page-content .masthead .line.middle {
     color: var(--link-color);
+  }
+
+  /* .slider sweeps --active in from the left on hover/focus and knocks its label out white; the rule above outweighs the site's own .slider state rule. */
+  #main-content #page-content a.core-link.slider:hover,
+  #main-content #page-content a.core-link.slider:focus,
+  #main-content #page-content a.core-link.slider:focus-within {
+    color: #fff;
   }
 
   /* The discord-chat component draws Discord's own dark client, so its links keep Discord's blue. */
@@ -628,6 +640,12 @@
     background-color: #1a1f26 !important;
     border-color: #3a4048 !important;
     color: #c4cdd6;
+  }
+
+  /* The quote's light paper is the ground of the transparent black-linework PNGs authors drop in it, so it moves onto the image; opaque pictures cover it. A quote naming its own inline paper may be dark, with art drawn for that, so it is excluded. */
+  blockquote:not([style*="background"]) img.image,
+  div.blockquote:not([style*="background"]) img.image {
+    background-color: #dcdcdc;
   }
 
   /* These plates are ours and dark wherever they sit, so the dark tokens are restated: inside an author's light box the paper rule hands the subtree dark inks, which a heading or link here would print on the fill. Every component given a dark fill with !important belongs here. */
@@ -1154,6 +1172,9 @@
   div.page-rate-widget-box .ratedown a {
     color: #e8949a !important;
     border-color: #5a2f2f !important;
+
+    /* component:sigma-plus fills the anchor from this token, near-white by default. No background-color here: skins' own button fills at rest must survive. */
+    --sp_rate-module-button-background: transparent;
   }
 
   div.page-rate-widget-box .rateup a:hover,
@@ -1210,6 +1231,11 @@
 
   .creditButton a:hover {
     color: #fff !important;
+  }
+
+  /* Basalt draws the credit button as a ::before plate in this token under a masked ::after glyph; skins pitch it to their light widget paper (512-onwards, hytoth-two). The glyph token is left to the skin. */
+  div.rate-box-with-credit-button .creditButton > p > a {
+    --rate-module-info-background-color: 34, 40, 47;
   }
 
   /* The panel's surface is a background-IMAGE - a grey title strip over a white body - so a background-color alone never reaches it. */
@@ -2163,14 +2189,14 @@
   }
 
   /* The statement banner is a knocked-out slab: plate from --dark, label and masked icon from --light, which the remap above swaps into a light plate. Handed back as a raised dark plate with white ink. The ink outweighs the core-link rule in every state; the hover sweep is --active, which white still reads on. */
-  #page-content #u-fp-statement .survey-link {
+  #page-content .fp-statement .survey-link {
     --dark: #2d333b;
     --light: #fff;
   }
 
-  #main-content #page-content #u-fp-statement a.survey-link,
-  #main-content #page-content #u-fp-statement a.survey-link:visited,
-  #main-content #page-content #u-fp-statement a.survey-link:hover {
+  #main-content #page-content .fp-statement a.survey-link,
+  #main-content #page-content .fp-statement a.survey-link:visited,
+  #main-content #page-content .fp-statement a.survey-link:hover {
     color: var(--light);
   }
 
@@ -2265,12 +2291,21 @@
   }
 
   #page-content .event-banner,
-  #page-content .event-banner p,
   #page-content .event-banner li,
   #page-content .event-banner dd,
   #page-content .event-banner dt,
   #page-content .event-banner td {
     color: #1b1815 !important;
+  }
+
+  /* Paragraphs take their wrapper's ink: a dark-art banner names its own light title colour on a div around the p. */
+  #page-content .event-banner p {
+    color: inherit !important;
+  }
+
+  /* The section head sits on the page ground above the art, not on it. */
+  #page-content .event-banner > .section-head {
+    --dark: #e6edf3;
   }
 
   /* The front page resets these to bare strips inside its category cards. */
@@ -2358,8 +2393,11 @@
     color: var(--scp-link) !important;
   }
 
+  /* BH and Basalt skins slide a plate in their accent under the hovered link. This build cannot read the skin's hover-ink token (the parser rejects a channel token inside the colour function), so the label keeps the Sigma-9 hover pink on every skin. */
   #side-bar div.menu-item a:hover,
-  #interwiki div.menu-item a:hover {
+  #side-bar div.menu-item a:focus,
+  #interwiki div.menu-item a:hover,
+  #interwiki div.menu-item a:focus {
     color: var(--scp-link-hover) !important;
   }
 
@@ -2455,5 +2493,38 @@
   textarea::placeholder {
     color: #8b949e !important;
     opacity: 1;
+  }
+}
+
+@-moz-document url-prefix("https://scpwiki.github.io/timer/") {
+:root {
+    color-scheme: dark;
+  }
+
+  html,
+  body {
+    background-color: transparent !important;
+    color: #c4cdd6 !important;
+  }
+
+  #title.progress {
+    color: #e6edf3 !important;
+  }
+
+  #title.finished {
+    color: #3fb950 !important;
+  }
+
+  #title.error {
+    color: #ff7b72 !important;
+  }
+
+  #clock {
+    background-color: #1c2128 !important;
+  }
+
+  .unit-value {
+    background-color: #2d333b !important;
+    color: #e6edf3 !important;
   }
 }

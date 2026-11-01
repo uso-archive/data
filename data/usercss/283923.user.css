@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A clean, modern dark theme for Avito that's easy on the eyes, perfect for late-night browsing.
-@version      20260919.01.50
+@version      20261031.15.36
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -76,6 +76,12 @@
   header {
     background-color: var(--av-header) !important;
     border-color: var(--av-border) !important;
+  }
+  /* The favourites / cart glyphs paint from the link's `color` and are natively idle grey, not the
+     link blue. */
+  a[data-marker="header/favorites"],
+  a[data-marker="header/cart"] {
+    color: var(--av-text-soft) !important;
   }
   /* The navbar is a DIV; real `<header>`s are inside popups and cards, which the bare `header`
      arm above would blacken. */
@@ -285,6 +291,11 @@
   [style*="background-color:#00aaff"], [style*="background-color:#00AAFF"] {
     background-color: var(--av-accent) !important; color: #0b1620 !important;
   }
+  /* Search query-correction notice ("Выбраны фильтры, соответствующие запросу…"): a 15% amber
+     wash, the site's own value, which reads on dark as-is. Pure hash. */
+  div[class*="root-_4ba950965bc8dc48"] {
+    background-color: rgba(253, 178, 38, 0.15) !important;
+  }
   /* The score badge in the FIXED title bar sits under pure hashes; its only durable hook is the
      inline fill, written with the `background` SHORTHAND, which a `background-color:` selector
      cannot see. */
@@ -339,8 +350,12 @@
   /* One card build draws the end-cap as an EMPTY div filled from that same inline colour through
      `currentColor`, and the div-neutraliser wipes it, leaving the pill a flat rectangle. The cap
      rules above have already moved the colour to the pill's tone, so `currentColor` is the right
-     fill. The card scope and `:empty` keep this off any text-bearing div with an inline colour. */
+     fill. The card scope and `:empty` keep this off any text-bearing div with an inline colour. The
+     home feed's cards carry neither card marker; there the ribbon's own `corner_start-`/`corner_end-`
+     modifiers are the hook. */
   [data-marker="item"] div[style^="color:"]:empty,
+  div[class*="corner_start-"][style^="color:"]:empty,
+  div[class*="corner_end-"][style^="color:"]:empty,
   [data-marker^="iva-item"] div[style^="color:"]:empty,
   [data-marker="docking-badge-bar"] div[style^="color:"]:empty {
     background-color: currentColor !important;
@@ -422,6 +437,12 @@
   .js-item-view-title-info [data-marker="item-view/favorite-button"] {
     background-color: var(--av-surface) !important;
   }
+  /* The 88px bar (hash shared with its divider rule) is itself surface-toned, so its `#f2f1f0`
+     compare and favourite chips take the secondary tone to keep an edge. */
+  [class*="e2e69ff14443976d"] [data-marker="comparison/add"],
+  [class*="e2e69ff14443976d"] [data-marker="item-view/favorite-button"] {
+    background-color: #262c35 !important;
+  }
   /* Seller-profile badge rows and "Показать все" are natively transparent `<button>`s, only 230px
      wide while their labels run longer. */
   [data-marker^="badge-row-"],
@@ -457,6 +478,11 @@
   button[class*="root_preset_primary"],
   button[class*="root_preset_primary"] * {
     color: #0b1620 !important;
+  }
+  /* Mask icons pinned white by an inline `--ds-icon-color` paint through `background-color`, which
+     the ink above cannot reach (the vacancy hub's shift-carousel arrow). */
+  button[class*="root_preset_primary"] svg[style*="--ds-icon-color: #ffffff"] {
+    background-color: currentColor !important;
   }
   [class*="root_preset_secondary"] {
     background-color: #262c35 !important;
@@ -566,6 +592,10 @@
     background-color: var(--module-badge-backgroundColor, transparent) !important;
     color: var(--module-badge-color, var(--av-text-soft)) !important;
   }
+  /* The label is a nested span the broad text rule would ink apart from the badge. */
+  [style*="--module-badge-offset-x"] > div span {
+    color: inherit !important;
+  }
   /* The fixed title bar's model-score badge sits in that offset wrapper but carries its green as an
      inline `background:` shorthand, leaving the badge tokens unset for the sale fallback above; the
      shorthand rule further up is (0,1,0) and loses, so the wrapper scope is repeated here. */
@@ -584,6 +614,16 @@
   [data-marker^="item-phone-button"],
   [data-marker^="item-phone-button"] * {
     color: #9fd0f5 !important;
+  }
+  /* Built from the DS secondary preset, the card CTA is the same neutral chip as its "Написать"
+     sibling; the item page's green call CTAs are excluded by marker. */
+  [data-marker^="item-phone-button"][class*="root_preset_secondary"]:not([data-marker$="/header"]):not([data-marker$="/card"]):not([data-marker$="/gallery"]) {
+    background-color: #262c35 !important;
+    border-color: var(--av-border) !important;
+  }
+  [data-marker^="item-phone-button"][class*="root_preset_secondary"]:not([data-marker$="/header"]):not([data-marker$="/card"]):not([data-marker$="/gallery"]),
+  [data-marker^="item-phone-button"][class*="root_preset_secondary"]:not([data-marker$="/header"]):not([data-marker$="/card"]):not([data-marker$="/gallery"]) * {
+    color: var(--av-text-soft) !important;
   }
   /* Primary brand-blue CTAs */
   [data-marker="search-form/submit-button"],
@@ -661,6 +701,27 @@
   [data-marker$="-delivery-button"] * {
     color: #fff !important;
   }
+  /* The car catalog's new-car lead-gen CTA ("Свяжитесь со мной") is the same solid purple, class-driven. */
+  [data-marker="new-cars-leadgen-form/recall-button"] {
+    background-color: #7d5bc4 !important;
+  }
+  [data-marker="new-cars-leadgen-form/recall-button"],
+  [data-marker="new-cars-leadgen-form/recall-button"] * {
+    color: #fff !important;
+  }
+  /* Short-term rental booking CTAs (buy box and sticky title bar), same class-driven purple. */
+  [data-marker="str/item-booking-button"] {
+    background-color: #7d5bc4 !important;
+    border-color: #7d5bc4 !important;
+  }
+  [data-marker="str/item-booking-button"],
+  [data-marker="str/item-booking-button"] * {
+    color: #fff !important;
+  }
+  /* "Цены по датам" date-price cards: the `#f2f1f0` card is the option's grandchild div. */
+  [data-marker="nearest-dates"] [role="option"] > div > div {
+    background-color: var(--av-surface) !important;
+  }
 
   /* Segmented filter controls: the SELECTED option */
   /* The search filters are radio groups whose pill is a SPAN next to a visually-hidden checked
@@ -709,6 +770,10 @@
     border-color: var(--av-accent) !important;
     color: #0b1620 !important;
   }
+  /* The label text sits in nested spans the broad text rule inks directly. */
+  [data-marker="installments-promoblock"] label > input[type="radio"]:checked + span span {
+    color: #0b1620 !important;
+  }
   /* The upcoming payment segments are inline-styled SPANs under pure hashes, so the inline value is
      the only stable hook. Written against `background`, not `background-color`: Avito uses the
      shorthand here. */
@@ -737,7 +802,10 @@
   [data-marker="multi-items"] label > span[class*="_8c38d256c84191e7"] * {
     color: var(--av-text-muted) !important;
   }
-  [data-marker="multi-items"] label input:checked + span {
+  /* The chip group carries `role="group"`, so the (0,3,3) segmented-tab surface rule above reaches
+     these chips too; the `[type="radio"]` arm ties it and wins on source order. */
+  [data-marker="multi-items"] label input:checked + span,
+  [data-marker="multi-items"] label > input[type="radio"]:checked + span {
     background-color: var(--av-accent) !important;
     border-color: var(--av-accent) !important;
   }
@@ -787,6 +855,26 @@
   [data-marker="model-card/ui-button"],
   [data-marker="model-card/ui-button"] * {
     color: #0b1620 !important;
+  }
+  /* The car catalog's section tabs are natively bare `role="tab"` buttons marking the selected one by
+     ink alone (black vs `#757575`), each label an `<a>` the blanket link accent would blue alike. */
+  [data-marker^="model-tab/tab("] {
+    background-color: transparent !important;
+  }
+  [data-marker^="model-tab/tab("] a {
+    color: var(--av-text-muted) !important;
+  }
+  [data-marker^="model-tab/tab("][aria-selected="true"] a {
+    color: var(--av-text) !important;
+  }
+  /* Its dealer carousel tiles are `#f2f1f0` anchors outside the div-neutraliser, labelled in body
+     black, not link blue. */
+  [data-marker="auto-dealers/carousel"] a {
+    background-color: var(--av-surface) !important;
+  }
+  [data-marker="auto-dealers/carousel"] a,
+  [data-marker="auto-dealers/carousel"] a * {
+    color: var(--av-text) !important;
   }
 
   /* Item-page colour-variant swatches (inline-rgb solids) */
@@ -887,6 +975,12 @@
   [data-marker="discount-value"] * {
     color: #ff5c78 !important;
   }
+  /* Item spec rows are `<p><span>Label<span>: </span></span>Value</p>`; the grey label is the only
+     thing setting it apart from the value. */
+  [data-marker="item-view/item-params"] li > p > span:first-child,
+  [data-marker="item-view/item-params"] li > p > span:first-child span {
+    color: var(--av-text-muted) !important;
+  }
   /* Rating STARS are mask-image `<svg>`s painted by `background-color: currentColor`, so a star's
      colour IS its inherited `color` and the broad span rule greys it — invisible to any contrast or
      light-surface check. Scoped to the `filled` modifier so empty stars keep their muted state. */
@@ -966,6 +1060,24 @@
   a[class*="link-"]:hover {
     border-color: currentColor !important;
   }
+  /* DS Link (both builds): the preset sets `--kitty-link-color` on the `<a>` from palette tokens, and
+     the label is a child span the broad text rule pins grey, so blue and grey presets look alike.
+     The palette tokens are declared on page-theme wrappers, so they are rebound on the `<a>` itself,
+     where the preset resolves them. A non-DS anchor has no `--kitty-link-color` and keeps the soft
+     ink. `--theme-palette-black` is not rebound (it also fills black buttons and scrims), so the
+     monochrome preset, named and pure-hash, is pinned by class. */
+  a {
+    --theme-palette-blue600: var(--av-accent);
+    --theme-palette-gray54: var(--av-text-muted);
+    --theme-semantics-components-link-noAccent: var(--av-text-soft);
+  }
+  a > span {
+    color: var(--kitty-link-color, var(--av-text-soft)) !important;
+  }
+  a[class*="root_preset_monochrome"] > span,
+  a._3ef3514183129496 > span {
+    color: var(--av-text-soft) !important;
+  }
 
   /* Text on coloured surfaces (must come after the broad text rule) */
   /* Keep labels readable on the re-painted chips, pills and primary buttons. */
@@ -1003,6 +1115,8 @@
   [data-marker="search-form/submit-button"] *,
   [data-marker="top-rubricator/all-categories"],
   [data-marker="top-rubricator/all-categories"] *,
+  [data-marker="top-rubricator/all-categories-icon"],
+  [data-marker="top-rubricator/all-categories-icon"] *,
   [data-marker$="/phone-button"],
   [data-marker$="/phone-button"] * {
     color: #0b1620 !important;
@@ -1037,6 +1151,16 @@
   a.content-home-link, a.content-home-link * {
     color: #0b1620 !important;
   }
+  /* The travel search widget's CTA is the same near-black primary anchor. Its marker ends in
+     `-button`, so the text-link un-painter strips it at equal specificity; this arm wins on source
+     order. */
+  a[data-marker="steps-search-widget/action-button"] {
+    background-color: var(--av-accent) !important;
+  }
+  a[data-marker="steps-search-widget/action-button"],
+  a[data-marker="steps-search-widget/action-button"] * {
+    color: #0b1620 !important;
+  }
 
   /* Inputs, selects, filter fields */
   [data-marker="search-form/suggest/input"],
@@ -1058,7 +1182,8 @@
      size modifier — the switch/checkbox label spells it `root_size_`. The header search widget shares
      the `suggest-` name on a DIV that already has its own fill, so the tag guard is load-bearing. */
   label[class*="root_size-"],
-  label[class*="suggest-"] {
+  label[class*="suggest-"],
+  [data-marker="model-card/root"] label {
     background-color: var(--av-surface) !important;
   }
   /* The header-search field and its submit button each sit on a full-size `::before` plate painting
@@ -1067,6 +1192,28 @@
      the plates are the direct div children of the marker. */
   [data-marker="search-form"] > div::before {
     background-color: var(--av-accent) !important;
+  }
+  /* The redesigned header search draws its brand ring as the frame's own 2.5px border (the
+     `[class*="Input"]` arm above greys it); the ring goes transparent while focused and on hero
+     pages. The frame is the direct parent of the `search-form` marker — named
+     `searchInputFrameRedesign-` on home/search, pure hash on item pages (reachable only by `:has`).
+     The older `searchDesign2023` build's parent of that marker is a borderless square row, so the
+     `:has` arms must skip every named `search…` parent.
+     The DS label inside keeps a 1px border in the field colour, so it must vanish into the frame.
+     `searchInputFrameRedesign_focused-` does not contain the `-` spelling of the base arm. */
+  [class*="searchInputFrameRedesign-"] {
+    border-color: var(--av-accent) !important;
+  }
+
+  [class*="searchInputFrameRedesign_focused-"],
+  [class*="searchRowRedesignHero-"] [class*="searchInputFrameRedesign-"],
+  [class*="searchInputFrameRedesign-"] label,
+  label[data-marker="search-form/suggest"] {
+    border-color: transparent !important;
+  }
+  /* Page dimmer under the open suggest panel; the div neutraliser wipes its native 0.32 black. */
+  div[class*="suggest_background-"] {
+    background-color: rgba(0, 0, 0, 0.5) !important;
   }
   ::placeholder { color: var(--av-text-muted) !important; opacity: 1; }
   /* The price range fields have no `placeholder`: their "От" / "до" hints are `prefix-<hash>` SPANs
@@ -1090,6 +1237,20 @@
      near-WHITE fills, and the element's own `color` reads light. */
   [data-marker$="/filters_icon"] svg path {
     fill: var(--av-text) !important;
+  }
+  /* A category hub's vertical name beside the logo ("Недвижимость") is an `<img>` of a single-colour
+     black SVG wordmark, out of reach of `fill`; flipping its lightness cannot shift a hue. */
+  [data-marker="search-form/logo/postfix"] img {
+    filter: invert(1);
+  }
+  /* The card's "Цена снижена" marker beside the price is a popup-trigger `<svg>` whose disc path has
+     a hard `fill="black"` attribute, the arrow cut out of it. */
+  svg[aria-haspopup] path[fill="black"] {
+    fill: var(--av-text) !important;
+  }
+  /* The card's "…" overflow trigger draws its dots with a hard `fill="black"` attribute. */
+  [data-marker="more-action-tooltip/button"] svg path[fill="black"] {
+    fill: currentColor;
   }
 
   /* "Спросите у продавца" draws its field box on the wrapping `<label>` (natively `#f2f1f0`) under
@@ -1174,6 +1335,14 @@
   [class*="tab-button_active"] [class*="tab-button-title"] {
     color: var(--av-accent) !important;
   }
+  /* The DS Tabs draw the current-tab bar and the full-width divider as two empty sibling divs
+     (`emphasis-`, `underline-`) that the div neutraliser wipes. */
+  [class*="tabs-"] ~ [class*="emphasis-"] {
+    background-color: var(--av-accent) !important;
+  }
+  [class*="content-"] ~ [class*="underline-"] {
+    background-color: var(--av-border) !important;
+  }
 
   /* Floating surfaces (dropdowns, popovers, menus) */
   /* The DS Dropdown root is `styles-module-dropdown-` in one build and a bare `dropdown-` in the
@@ -1200,6 +1369,27 @@
      rather than a surface. Only the panel is a surface. */
   [class*="tooltip-trigger"] {
     background-color: transparent !important;
+  }
+  /* The DS Tooltip's `default` preset is the near-black bubble (`inverse` is the white one). It
+     opens over other floating panels, e.g. the travel datepicker, where the surface tone above would
+     make it an edgeless patch hiding the grid under it. */
+  [role="tooltip"][class*="root_preset_default-"] {
+    background-color: var(--av-header) !important;
+    box-shadow: 0 0 0 1px var(--av-border) !important;
+  }
+  [role="tooltip"][class*="root_preset_default-"] button {
+    background-color: transparent !important;
+  }
+  /* The item page's Avito Доставка coach-mark is a pure-hash tooltip on the surface tone; its CTA is
+     natively one step lighter than the bubble. */
+  [data-marker$="-tooltip-button"] {
+    background-color: #262c35 !important;
+  }
+  /* The coach-mark's pointer dot above the bubble: natively a solid disc in the bubble's ink on the
+     page; the bubble tone would vanish on the canvas, so it takes a lighter grey. */
+  [role="tooltip"] > div[style*="top: -"] {
+    background-color: var(--av-text-muted) !important;
+    border-color: var(--av-bg) !important;
   }
   /* `role="listbox"` is a floating-panel hook, but the DS List also hangs the role on IN-FLOW
      horizontal carousels. Orientation is the durable discriminator: a floating dropdown listbox is
@@ -1299,6 +1489,10 @@
   [data-marker="map-view"] {
     background-color: var(--av-bg) !important;
   }
+  /* The map teaser's promo sticker is a bare `<button>` around a transparent-backed PNG. */
+  [data-marker="map-banner"] [class*="mapOnboarding-"] > button {
+    background-color: transparent !important;
+  }
   /* While the filter drawer is open a `disabled-<hash>` sibling veils the rail: a white plate the
      site fades to 0.8, which the neutraliser wipes. The drawer is narrower than the rail, so the
      uncovered strip must dim with it. The tag guard keeps the fragment off any disabled button. */
@@ -1357,6 +1551,12 @@
     background-color: var(--av-surface) !important;
     border-color: var(--av-surface) !important;
   }
+  /* The bare-name build's anchor is a 9px `point-<hash>` DOT above the popup, natively an ink-black
+     disc in a page-white ring; the dark counterpart is a light disc in a page-dark ring. */
+  div[class*="point_preset_"] {
+    background-color: var(--av-text-soft) !important;
+    border-color: var(--av-header) !important;
+  }
   /* The photo lightbox's backdrop lives on two hashed, marker-less DIVs whose only ancestor hook is
      the unnamed portal node. A parent-selector rule would reach it but is stripped from the
      userstyles.org build, so the scrim is a fixed `::before` on the one marker'd descendant:
@@ -1378,10 +1578,21 @@
   [data-marker="item-view/main-gallery"] > div {
     background-color: var(--av-bg) !important;
   }
-  /* The sheet's header carries the purple delivery CTAs, which the gallery's (0,1,1) transparent
-     button arm would strip, and a close cross hard-filled `black` on the SVG and its path. */
+  /* The sheet's header carries the purple delivery CTAs and the green call CTA, which the gallery's
+     (0,1,1) transparent button arm would strip, and a close cross hard-filled `black` on the SVG and
+     its path. */
   [data-marker="item-view/main-gallery"] [data-marker^="delivery-item-button"] {
     background-color: #7d5bc4 !important;
+  }
+  [data-marker="item-view/main-gallery"] [data-marker^="item-phone-button"] {
+    background-color: #198049 !important;
+  }
+  /* Card location pin: black presentation attributes, the text's own ink natively. */
+  [data-marker="item-location"] svg [stroke="black"] {
+    stroke: currentColor;
+  }
+  [data-marker="item-location"] svg [fill="black"] {
+    fill: currentColor;
   }
   [data-marker="item-view/main-gallery"] > div button svg[fill="black"],
   [data-marker="item-view/main-gallery"] > div button svg path[fill="black"] {
@@ -1393,10 +1604,26 @@
      pill behind each one for legibility (values from the site's own stylesheet). Keep the labels
      white. */
   [class*="styles-galleryBadge"],
+  [class*="galleryBadge-"],
   [class*="photo-slider-item-more"],
+  [class*="photoSlider-"] [class*="item-more-"],
   [class*="badge-reserved"],
   [class*="badge-viewed"] {
     background-color: rgba(0, 0, 0, 0.6) !important;
+  }
+  /* The item page's recommendation carousel ships the same badge under pure hashes: the pill is the
+     child of the INNER of two nested spacer slots over the photo (the outer slot's child is the
+     column wrapper). */
+  [data-marker="item-image"] [style*="--module-spacer-slot-width"] [style*="--module-spacer-slot-width"] > div {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+  }
+  /* Model page gallery: the last tile's "N+" veil is a hash-only div between the photo and the
+     always-present last-child hover veil. */
+  [data-marker="model-card/gallery"] img + div:not(:last-child) {
+    background-color: rgba(0, 0, 0, 0.16) !important;
+  }
+  [data-marker="model-card/gallery"] img + div:not(:last-child) * {
+    color: #fff !important;
   }
   [class*="photo-slider-counter"],
   [class*="custom-badge-module-badge"],
@@ -1406,7 +1633,9 @@
   }
   [class*="photo-slider-item-more"],
   [class*="photo-slider-item-more"] *,
+  [class*="photoSlider-"] [class*="item-more-"],
   [class*="photo-slider-counter"],
+  [class*="galleryBadge-"] *,
   [class*="badge-reserved"], [class*="badge-reserved"] *,
   [class*="badge-viewed"], [class*="badge-viewed"] * {
     color: #fff !important;
@@ -1523,26 +1752,32 @@
   /* That pill's fill comes from an INLINE design token, so no
      `[style*="rgb(...)"]`/`[style*="#hex"]` selector could reach it — the token NAME is the hook.
      The rate palette is a five-step SCALE; collapsing it to one tone would make every rating look
-     the same, so each step is named and refined to clear 4.5:1 against the white label. Listed after
-     the link rule so the score stays white (equal specificity, later wins). */
-  [style*="--theme-semantics-components-rate-bg-excellent"] {
+     the same, so each step is named and refined to clear 4.5:1 against the white label. The doubled
+     `[style]` lifts them over the DS Badge wrapper rule (0,1,1), which the fixed title bar's score
+     badge also matches. */
+  [style*="--theme-semantics-components-rate-bg-excellent"][style] {
     background-color: #198049 !important;
   }
-  [style*="--theme-semantics-components-rate-bg-good"] {
+  [style*="--theme-semantics-components-rate-bg-good"][style] {
     background-color: #4b7f10 !important;
   }
-  [style*="--theme-semantics-components-rate-bg-medium"] {
+  [style*="--theme-semantics-components-rate-bg-medium"][style] {
     background-color: #8a5a00 !important;
   }
-  [style*="--theme-semantics-components-rate-bg-low"] {
+  [style*="--theme-semantics-components-rate-bg-low"][style] {
     background-color: #c8323f !important;
   }
-  [style*="--theme-semantics-components-rate-bg-none"] {
+  [style*="--theme-semantics-components-rate-bg-none"][style] {
     background-color: #4a4f57 !important;
   }
-  [style*="--theme-semantics-components-rate-bg-"],
+  [style*="--theme-semantics-components-rate-bg-"][style],
   [style*="--theme-semantics-components-rate-bg-"] span {
     color: #fff !important;
+  }
+  /* The score badge's 2px cut-out ring is a `box-shadow` in the page token (`#fff`); in the bar it
+     sits on the surface tone. */
+  [class*="e2e69ff14443976d"] [style*="--theme-semantics-components-rate-bg-"] {
+    --theme-semantics-bg-page: var(--av-surface);
   }
   /* The review-count link beside that pill takes its ink from a wrapper's inline
      `color: var(--theme-semantics-components-rate-text-<tier>)`, which the broad text rule beats.
@@ -1626,12 +1861,20 @@
      reaches it by structure: it is the only `div::before` inside a card that paints a background
      (the other pseudos are `::after` photo veils). The card's own `::before` has `content: none` at
      rest and never masks this one. */
-  [class*="iva-item-redesign"]:hover::before,
-  [class*="iva-item-redesign"]:hover [class*="iva-item-actions"]::before,
+  /* The action-slot halo is natively the card's own paper, invisible at rest and on hover alike; it
+     takes the canvas at rest and the hover panel's tone under a hovered card, or it prints a slab
+     around the CTAs of every resting card. */
   [class*="iva-item-actions"]::before,
   [class*="actionsRedesign"]::before,
-  [data-marker="item"]::before,
   [data-marker="item"] div::before {
+    background-color: var(--av-bg) !important;
+    box-shadow: none !important;
+  }
+  [class*="iva-item-redesign"]:hover::before,
+  [class*="iva-item-redesign"]:hover [class*="iva-item-actions"]::before,
+  [data-marker="item"]:hover [class*="actionsRedesign"]::before,
+  [data-marker="item"]::before,
+  [data-marker="item"]:hover div::before {
     background-color: var(--av-surface) !important;
     box-shadow: none !important;
   }
@@ -1722,10 +1965,26 @@
     border-color: #2f4a63 !important;
   }
 
+  /* The vacancies hub's "Подработка с быстрой оплатой" shift tiles are `#f2f1f0` cards whose fill sits
+     on the marker'd root DIV. Their CTA is the bare-name DS Button's near-black primary as an ANCHOR,
+     which the `button`-scoped primary arm never reaches; the marker keys the accent. */
+  [data-marker^="itemsCarousel/gigTile("] {
+    background-color: var(--av-surface) !important;
+  }
+  a[data-marker="itemsCarousel/gigTile/actionButton"] {
+    background-color: var(--av-accent) !important;
+  }
+  a[data-marker="itemsCarousel/gigTile/actionButton"],
+  a[data-marker="itemsCarousel/gigTile/actionButton"] * {
+    color: #0b1620 !important;
+  }
+
   /* The stories-rail scroll arrow is an empty DIV whose glyph is a background-IMAGE (a single
      `stroke="black"` path), which the neutraliser does not clear and no `color`/`fill` rule can reach.
-     The asset is monochrome, so inverting its lightness cannot distort a hue. */
-  [class*="story-previewer-arrow"] {
+     The asset is monochrome, so inverting its lightness cannot distort a hue. The bare-name build
+     (`arrow-<hash>` in a `controlButton-<hash>`) is reachable only through the button's marker. */
+  [class*="story-previewer-arrow"],
+  [data-marker^="story-previewer/"][data-marker$="-arrow"] > div {
     filter: invert(1);
   }
 
@@ -1767,6 +2026,85 @@
   [class*="highlightRedesign"] * {
     color: #0b1620 !important;
     -webkit-text-fill-color: #0b1620 !important;
+  }
+  /* The pure-hash build (car catalog) names the state only by a hash on the price's grandparent,
+     whose SECOND child is the empty swash div; the parent-selector arm is the rotation-proof one,
+     the hash arm the only one the userstyles.org build keeps. */
+  [class*="_4bb38e7a1358b669"] [data-marker="item-price"],
+  [class*="_4bb38e7a1358b669"] [data-marker="item-price"] * {
+    color: #0b1620 !important;
+    -webkit-text-fill-color: #0b1620 !important;
+  }
+
+  /* Travel search widget (`/all/travel`): one `#f2f1f0` plate whose fields are `label`s in the SAME
+     tone, split by `#ccc` 1px `::after` rules. The open field's only marker is a 2px black outline
+     from the wrapper's `active` modifier. */
+  [data-marker="steps-search-widget/widget-container"],
+  [data-marker="steps-search-widget/widget-container"] label {
+    background-color: var(--av-surface) !important;
+    border-color: var(--av-surface) !important;
+  }
+  [data-marker="steps-search-widget/widget-container"] [class*="item-"]::after {
+    background-color: var(--av-border) !important;
+  }
+  [data-marker="steps-search-widget/widget-container"] [class*="wrapper_active-"] label {
+    outline-color: var(--av-text) !important;
+  }
+  /* Category picker tiles are `#f5f5f5` cards; the check badge alone marks the selected one. */
+  [data-marker^="steps-search-widget/category/item/"] {
+    background-color: #262c35 !important;
+  }
+
+  /* DS Datepicker. Past days, sibling-month days and the year carry only a grey ink; the chosen
+     range is FILLS on divs the neutraliser clears (ends near-black, span `control-bg-hover`), and
+     the in-range rows are split by 1px page-white pseudo rules. The grey arm must precede the
+     accent arm: the anchor day also carries `day_selecting-`. */
+  [class*="day_disabled-"], [class*="day_disabled-"] *,
+  [class*="day_sibling-"], [class*="day_sibling-"] *,
+  [class*="title_year-"] {
+    color: var(--av-text-muted) !important;
+  }
+  [class*="day_now-"] {
+    outline-color: var(--av-text-soft) !important;
+  }
+  [class*="day_selectedWithinRange-"], [class*="day_selecting-"],
+  [class*="dayBackground_startSelected-"], [class*="dayBackground_endSelected-"],
+  [class*="dayBackground_selectingStart-"], [class*="dayBackground_selectingEnd-"] {
+    background-color: #262c35 !important;
+  }
+  [class*="dayBackground_startSelected-"][class*="dayBackground_endSelected-"],
+  [class*="dayBackground_selectingStart-"][class*="dayBackground_selectingEnd-"] {
+    background-color: transparent !important;
+  }
+  [class*="day_startSelected-"], [class*="day_endSelected-"],
+  [class*="day_singleSelected-"], [class*="day_selectingAnchor-"] {
+    background-color: var(--av-accent) !important;
+  }
+  [class*="day_startSelected-"], [class*="day_startSelected-"] *,
+  [class*="day_endSelected-"], [class*="day_endSelected-"] *,
+  [class*="day_singleSelected-"], [class*="day_singleSelected-"] *,
+  [class*="day_selectingAnchor-"], [class*="day_selectingAnchor-"] * {
+    color: #0b1620 !important;
+  }
+  [class*="day_selectedWithinRange-"]::before, [class*="day_selectedWithinRange-"]::after,
+  [class*="day_selectingWithinRange-"]::before, [class*="day_selectingWithinRange-"]::after {
+    background-color: var(--av-surface) !important;
+  }
+  /* The item-page booking calendar is an older hash-only build: unavailable days are a `#f2f1f0`
+     band with grey ink, named only by the per-day marker. */
+  [data-marker="datepicker-day-disabled"] {
+    background-color: #262c35 !important;
+  }
+  [data-marker="datepicker-day-disabled"],
+  [data-marker="datepicker-day-disabled"] * {
+    color: var(--av-text-muted) !important;
+  }
+  /* Month arrows are bare glyph buttons painting through a black `fill` on the button itself; the
+     booking calendar's build is reachable only by marker. */
+  [class*="controlButton_next-"], [class*="controlButton_prev-"],
+  [data-marker="datepicker/next-button"], [data-marker="datepicker/prev-button"] {
+    background-color: transparent !important;
+    fill: var(--av-text) !important;
   }
 
   /* Footer */

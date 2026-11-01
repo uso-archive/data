@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       Reza Rahemtola
 @description  A comfortable dark theme for craigslist. Covers every city site, the search app with its filters and map, listings, postings, forums and account pages.
-@version      20260919.01.50
+@version      20261031.15.36
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -374,7 +374,6 @@
   .cl-mobile-homepage .footer .cl-app-anchor,
   .cl-location-picker-by-map-ng .map-area-container .find-me-button-bg .find-me-button,
   .qtip-default .qtip-icon,
-  .cl-posting-process.post.edit .json-form-group-container.contact-info>div.json-form-group.contact-info .email-form .json-form-item.contact_chat_ok,
   .cl-posting-process.post.editimage .images .imgbox,
   .cl-posting-process.post.side_edit_image .images .imgbox,
   .cl-posting-process.post.loginloop #thanks div,
@@ -972,6 +971,13 @@
     color: #8b949e !important;
   }
 
+  /* No-photo peace glyphs: a faint watermark, as the site's #ddd is on
+     white. The gallery one sits inside a result link. */
+  .empty.cl-gallery .gallery-inner .main,
+  .cl-thumb.empty-thumb {
+    color: #3d444d !important;
+  }
+
   /* ---------- link blue ---------- */
 
   /* Every selector the bundles paint #00e. */
@@ -1006,6 +1012,7 @@
   .cl-posting-process.post.side_edit_image .images .imgbox-rotate-image,
   .cl-posting-viewer .cl-close-group .bd-button,
   .cl-posting-viewer .cl-prev-next-group .bd-button,
+  .cl-search-filters-panel .cl-title-bar .back-and-title-links h1,
   .cl-search-map .leaflet-container a.cl-app-anchor,
   .homepage #rightbar h5,
   .searching .cl-chat-navigator .header .search-button,
@@ -1219,6 +1226,7 @@
     background-color: #191d23 !important;
     color: #7d8792 !important;
     border-color: #262c33 !important;
+    text-shadow: none !important;
   }
 
   .bd-button.link-like.bd-disabled,
@@ -1303,6 +1311,34 @@
     color: #e6edf3 !important;
   }
 
+  /* Folder tabs: the selected tab is open at the bottom, the others show
+     only a bottom rule. The blanket border-color above paints all four
+     sides, so the open sides are restated here. */
+  body .bd-tab-selector .bd-tab-selectors .bd-button {
+    border-color: #444c56 !important;
+  }
+
+  body .bd-tab-selector .bd-tab-selectors .bd-button.bd-tab-selected {
+    border-color: #444c56 #444c56 transparent !important;
+  }
+
+  body .bd-tab-selector .bd-tab-selectors .bd-button:not(.bd-tab-selected) {
+    border-top-color: transparent !important;
+    border-right-color: transparent !important;
+    border-left-color: transparent !important;
+  }
+
+  /* Area-picker drill arrow: upstream paints it the row's own white, so it
+     shows only on hover and on the selected row. */
+  .bd-dialog.cl-location-picker-ng .cl-location-picker-by-area .bd-tree-selector button span.icom- {
+    color: transparent !important;
+  }
+
+  .bd-can-hover .bd-dialog.cl-location-picker-ng .cl-location-picker-by-area .bd-tree-selector button:hover span.icom-,
+  .bd-dialog.cl-location-picker-ng .cl-location-picker-by-area .bd-tree-selector button.selected span.icom- {
+    color: #e6edf3 !important;
+  }
+
   .cl-show-map.panes-NAK.cl-search-ng .cl-view-mode-selector .cl-search-view-mode-list,
   .cl-show-map-full.panes-NAK.cl-search-ng .cl-view-mode-selector .cl-search-view-mode-list {
     background-color: #1c2128 !important;
@@ -1377,6 +1413,107 @@
   textarea.err {
     color: #f85149 !important;
     border-color: #6e2a2c !important;
+  }
+
+  input:disabled,
+  textarea:disabled,
+  select:disabled {
+    background-color: #191d23 !important;
+    color: #7d8792 !important;
+    border-color: #262c33 !important;
+  }
+
+  /* ---------- posting form ---------- */
+
+  /* Unframed fields keep the UA `2px inset` border, which bevels once we
+     paint them. Kept at (0,4,1) so the site's `border: none` on inputs
+     inside the required and price wrappers still wins. */
+  .post.edit .json-form input[type="text"],
+  .post.edit .json-form input[type="number"],
+  .post.edit .json-form input[type="email"],
+  .post.edit .json-form input[type="tel"],
+  .post.edit .json-form input[type="url"] {
+    border-style: solid;
+    border-width: 1px;
+  }
+
+  /* Bare UA controls the site gives no border; they bevel the same way.
+     The posting-process pair is the site's own selector for every step's
+     submit button. */
+  .bestof-search input[type="text"],
+  .bestof-search input[type="submit"],
+  .cl-posting-process.post .pickbutton,
+  .cl-posting-process.post .submit_button button {
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 3px;
+  }
+
+  /* The price wrapper draws `border: 1px solid` with no colour, so it
+     takes currentColor; it and the field inside must read as one box. */
+  .cl-posting-process.post.edit .input.price,
+  .cl-posting-process.post.edit .input.monthly_payment {
+    background-color: #1c2128 !important;
+    border-color: #2d333b !important;
+  }
+
+  /* Required fields: green label and frame. Must outrank the price
+     wrapper and the bare textarea/select rule above. */
+  .cl-posting-process.post.edit .json-form .json-form-item.req .label,
+  .cl-posting-process.post.edit .json-form .json-form-item.req .input.price > span,
+  .cl-posting-process.post.pn label.req .label span:first-child,
+  .cl-posting-process.post.pc label.req .label span:first-child,
+  .cl-posting-process.post.pn .method .req .label,
+  .cl-posting-process.post.pc .method .req .label,
+  .cl-posting-process.post.pn .lang .req .label,
+  .cl-posting-process.post.pc .lang .req .label {
+    color: #3fb950 !important;
+  }
+
+  .cl-posting-process.post.edit .json-form .json-form-item.req .input,
+  .cl-posting-process.post.edit .json-form .json-form-item.req textarea,
+  .cl-posting-process.post.edit .json-form .json-form-item.req .ui-selectmenu-button,
+  .cl-posting-process.post.pn label.req .input input,
+  .cl-posting-process.post.pc label.req .input input {
+    border-color: #2ea043 !important;
+  }
+
+  /* Fields failing validation carry .err beside .req; red must stay after
+     the green required rules above at the same specificity. */
+  .cl-posting-process.post.edit .json-form .json-form-item.err .label,
+  .cl-posting-process.post.edit .json-form .json-form-item.err .input.price > span,
+  .cl-posting-process.post.edit .json-form .html.error-list .err,
+  .cl-posting-process.post.pn label.err .label span:first-child,
+  .cl-posting-process.post.pc label.err .label span:first-child,
+  .cl-posting-process.post.pn .method .err .label,
+  .cl-posting-process.post.pc .method .err .label,
+  .cl-posting-process.post.pn .lang .err .label,
+  .cl-posting-process.post.pc .lang .err .label,
+  .cl-posting-process.post.pn .error,
+  .cl-posting-process.post.pc .error,
+  .cl-posting-process.post .error-text,
+  .cl-posting-process.post.editimage .image-upload-errors,
+  .cl-posting-process.post.side_edit_image .image-upload-errors {
+    color: #f85149 !important;
+  }
+
+  .cl-posting-process.post.edit .json-form .json-form-item.err .input,
+  .cl-posting-process.post.edit .json-form .json-form-item.err textarea,
+  .cl-posting-process.post.edit .json-form .json-form-item.err select,
+  .cl-posting-process.post.edit .json-form .json-form-item.err .ui-selectmenu-button,
+  .cl-posting-process.post.pn label.err .input input,
+  .cl-posting-process.post.pc label.err .input input {
+    border-color: #f85149 !important;
+  }
+
+  .cl-posting-process.post.edit .json-form .disabled .label {
+    color: #6e7681 !important;
+  }
+
+  .cl-posting-process.post.edit .json-form-group-container.contact-info > div.json-form-group.contact-info .email-form .json-form-item.contact_chat_ok {
+    background-color: #172536 !important;
+    color: #79c0ff !important;
+    border-color: #2f6ba8 !important;
   }
 
   .bd-labeled label,
@@ -1601,6 +1738,21 @@
     border-color: #55396c !important;
   }
 
+  .cl-reply-flap .reply-options .reply-option-section .reply-content .reply-copy-button .label {
+    color: #dbb6f0 !important;
+  }
+
+  .cl-reply-flap .reply-options .reply-option-section .reply-content .reply-copy-button:hover .label {
+    color: #ecd6f8 !important;
+  }
+
+  /* The AOL sprite cell is a black monochrome wordmark; the other
+     webmail cells are coloured and stay untouched. */
+  .cl-reply-flap .reply-options .reply-option-section .reply-content-email .reply-email-webmail-link.aol::before,
+  .reply-flap .reply-email.aol::before {
+    filter: invert(1) !important;
+  }
+
   .cl-reply-button > button:hover,
   .actions-combo .reply-button:hover,
   .show-phone:hover,
@@ -1622,8 +1774,36 @@
     color: #5fb0e6 !important;
   }
 
+  /* Best-of heart: recessed until hovered or nominated. */
+  .posting .bestof-icon {
+    color: #4a525c !important;
+  }
+
+  .posting .bestof-link:hover .bestof-icon {
+    color: #f4a6c0 !important;
+  }
+
+  .posting .bestof-icon.done {
+    color: #f85149 !important;
+  }
+
   a.show-contact:hover {
     color: #9bd4ff !important;
+  }
+
+  a.show-contact {
+    border-color: #35506e !important;
+  }
+
+  a.show-contact:hover {
+    border-color: #5fb0e6 !important;
+  }
+
+  /* Dotted underline marks a click-to-toggle timestamp; upstream draws
+     it #000. */
+  .posting time,
+  .cl-posted-time .time-ago {
+    border-bottom-color: #6e7681 !important;
   }
 
   .actions-combo .action.flag-action .flag:hover .black-flag,
@@ -1926,10 +2106,12 @@
     color: #222 !important;
   }
 
+  /* Upstream haloes the scale label with a 1px white text-shadow. */
   .leaflet-container .leaflet-control-attribution,
   .leaflet-control-scale-line {
     background-color: rgba(13, 17, 23, .8) !important;
     color: #c4cdd6 !important;
+    text-shadow: none !important;
   }
 
   .leaflet-container a {
@@ -1981,9 +2163,30 @@
   }
 
   body.dayTheme .anon,
-  body.dayTheme .hnd,
   body.dayTheme .threadline .dotz {
     color: #8b949e !important;
+  }
+
+  /* Handle inks carry rank (registered, staff, own); the greyed
+     baleeted/overwritten rules below must stay after these. */
+  body.dayTheme .hnd,
+  body.dayTheme .plus {
+    color: #3fb950 !important;
+  }
+
+  body.dayTheme .stf {
+    color: #dd9900 !important;
+  }
+
+  body.dayTheme .own,
+  body.dayTheme .minus,
+  body.dayTheme .threadline.sticky .title {
+    color: #f85149 !important;
+  }
+
+  body.dayTheme .status {
+    background-color: #3a3316 !important;
+    color: #f85149 !important;
   }
 
   body.dayTheme .baleeted .anon,
@@ -2195,5 +2398,10 @@
   [tabindex]:focus-visible {
     outline: 2px solid #5fb0e6 !important;
     outline-offset: 1px !important;
+  }
+
+  /* Filter rows clip to the field's own height. */
+  .widget-line input:focus-visible {
+    outline-offset: -2px !important;
   }
 }
