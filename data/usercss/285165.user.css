@@ -3,12 +3,14 @@
 @namespace    USO Archive
 @author       Lucas Corp
 @description  cmd type
-@version      20261025.23.34
+@version      20261101.12.59
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
 @-moz-document domain("web.whatsapp.com") {
-:root {
+/* CMD Whats v3 - seletores baseados na estrutura real (nov/2026) */
+
+  :root {
     --kali-bg: #0d0f14;
     --kali-bg-alt: #1a1d26;
     --kali-fg: #d6dbe5;
@@ -20,7 +22,7 @@
     --kali-border: #23272f;
   }
 
-  /* Base */
+  /* ---------- Base ---------- */
   html, body, #app, #app * {
     font-family: "Fira Code", "Hack", "JetBrains Mono", "Cascadia Mono", "Consolas", monospace !important;
     color: var(--kali-fg) !important;
@@ -29,33 +31,29 @@
     text-shadow: none !important;
   }
 
-  html, body, #app, #side, #pane-side, #main, header, footer {
+  html, body, #app, #side, #pane-side, #main, #main header, #main footer {
     background-color: var(--kali-bg) !important;
   }
 
-  /* Papel de parede */
-  #app div, #app span {
+  /* ---------- Papel de parede e degrades do chat ---------- */
+  #main div, #main span,
+  #main div:before, #main div:after {
     background-image: none !important;
   }
 
-  /* Baloes transparentes */
-  [role="row"], [role="row"] * {
-    background-color: transparent !important;
-  }
-
-  /* Topo da lista com prompt */
-  #side header:before {
+  /* ---------- Lista de conversas ---------- */
+  #pane-side:before {
     content: "\250C \2500 \2500 (kali\327F whatsapp)-[~/conversas]\A\2514 \2500 $ ls -la";
     white-space: pre;
     display: block;
-    padding: 8px 12px;
+    padding: 10px 14px;
     font-size: 12px;
     line-height: 1.5;
     color: var(--kali-green) !important;
   }
 
-  /* Lista de conversas */
-  #pane-side img {
+  /* Esconde fotos, mas mantem os emojis */
+  #pane-side img:not(.emoji) {
     display: none !important;
   }
 
@@ -71,7 +69,9 @@
   }
 
   #pane-side [role="row"]:hover,
-  #pane-side [role="row"]:hover * {
+  #pane-side [role="row"]:hover *,
+  #pane-side [role="listitem"]:hover,
+  #pane-side [role="listitem"]:hover * {
     background-color: var(--kali-bg-alt) !important;
   }
 
@@ -86,34 +86,73 @@
     color: var(--kali-white) !important;
   }
 
-  /* Prefixo de log nas mensagens */
+  #pane-side [aria-label*="n\E3 o lida"],
+  #pane-side [aria-label*="unread"] {
+    background: var(--kali-red) !important;
+    color: var(--kali-white) !important;
+  }
+
+  /* ---------- Mensagens: fim dos baloes ---------- */
+  [data-testid="msg-container"],
+  [data-testid="msg-container"] * {
+    background-color: transparent !important;
+  }
+
+  /* Tudo alinhado a esquerda, como log */
+  #main .focusable-list-item {
+    align-items: flex-start !important;
+  }
+
+  [data-testid="msg-container"] {
+    align-self: flex-start !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    max-width: 100% !important;
+  }
+
+  /* Recebidas: [hora, data] Nome: */
   [data-pre-plain-text]:before {
     content: attr(data-pre-plain-text);
     color: var(--kali-dim) !important;
   }
 
-  /* Rabinho e tiques */
+  /* Enviadas (as suas): prompt do Kali em duas linhas */
+  [data-pre-plain-text$="Lucas Hernandes: "]:before {
+    content: "\250C \2500 \2500 (lucas\327F whatsapp)-[~/chat]\A\2514 \2500 $ ";
+    white-space: pre;
+    color: var(--kali-green) !important;
+  }
+
+  [data-pre-plain-text$="Lucas Hernandes: "],
+  [data-pre-plain-text$="Lucas Hernandes: "] * {
+    color: var(--kali-white) !important;
+  }
+
+  /* Rabinho do balao e tiques de leitura */
   [data-icon*="tail"],
   [data-icon^="msg-check"],
   [data-icon^="msg-dblcheck"] {
     display: none !important;
   }
 
-  /* Icones */
+  /* ---------- Icones ---------- */
   #app svg, #app svg * {
     fill: var(--kali-dim) !important;
   }
 
-  /* Campo de digitacao */
-  footer [contenteditable="true"] {
+  /* ---------- Campo de digitacao ---------- */
+  [data-testid="conversation-compose-box-input"] {
     caret-color: var(--kali-white) !important;
     color: var(--kali-white) !important;
   }
 
-  footer [contenteditable="true"]:before {
-    content: "\2514 \2500 $ ";
+  /* Prompt fica no rodape, fora da caixa, para nao cobrir o "Digite uma mensagem" */
+  #main footer:before {
+    content: "\2514 \2500 $";
+    align-self: center;
+    padding: 0 10px 0 14px;
+    font-weight: 700;
     color: var(--kali-blue) !important;
-    font-weight: 700 !important;
   }
 
   ::selection {
