@@ -2,8 +2,8 @@
 @name         Gmail - Hacker Green | Dark
 @namespace    USO Archive
 @author       UrsidaeSentinel
-@description  A terminal-inspired Gmail them.
-@version      20261105.22.31
+@description  This theme works best when paired with browser extension Dark Reader    A terminal-inspired Gmail them.
+@version      20261108.18.54
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -24,6 +24,7 @@ html {
   --hg-raised: rgba(2,23,11,.97);
   --hg-raised-hover: rgba(4,32,15,.97);
   --hg-tooltip: rgba(1,20,10,.97);
+  --hg-mail-toolbar: #021c0e;
   --hg-field: rgba(4,43,20,.95);
   --hg-unread: rgba(3,30,14,.75);
   --hg-selected: rgba(4,54,27,.58);
@@ -32,22 +33,27 @@ html {
   --hg-line: rgba(32,243,107,.18);
   --hg-border: rgba(28,240,102,.36);
   --hg-glow: rgba(37,255,110,.14);
-  color-scheme: dark !important;
-}
-
-/* Paint the reference grid directly on the visible inbox and thread pane. */
-html,
-html body div[role="main"],
-html body div.bGI.oy8Mbf.O96AK[role="main"] {
-  background-color: #0a0a0a !important;
-  background-image:
+  --hg-right-edge:
+    inset -1px 0 0 rgba(0,255,102,.85),
+    inset -4px 0 8px -3px rgba(0,255,102,.58),
+    inset -10px 0 18px -10px rgba(0,255,102,.35);
+  --hg-grid:
     linear-gradient(to right, rgba(130,255,167,.13) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(130,255,167,.13) 1px, transparent 1px),
     repeating-linear-gradient(to bottom,
       rgba(10,10,10,0) 0px,
       rgba(10,10,10,0) 3px,
       rgba(105,255,153,.035) 3px,
-      rgba(105,255,153,.035) 4px) !important;
+      rgba(105,255,153,.035) 4px);
+  color-scheme: dark !important;
+}
+
+/* Paint the viewport-aligned grid on the mail canvas. */
+html,
+html body div[role="main"],
+html body div.bGI.oy8Mbf.O96AK[role="main"] {
+  background-color: #0a0a0a !important;
+  background-image: var(--hg-grid) !important;
   background-size: 40px 40px, 40px 40px, 100% 4px !important;
   background-position: 0 0 !important;
   background-repeat: repeat !important;
@@ -120,9 +126,15 @@ html body .bAw {
 html body #gb {
   background-image: none !important;
 }
+/* The bottom gutter is outside the mail footer, on the app backdrop. */
+html body,
 html body .vI,
 html body .bkK {
-  background-image: none !important;
+  background-image: linear-gradient(to top, #062318 0, #062318 16px, transparent 16px) !important;
+  background-size: 100% 100% !important;
+  background-position: center bottom !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
 }
 html body div[role="main"] {
   border-color: var(--hg-line) !important;
@@ -138,6 +150,49 @@ html body .aRs {
   background-color: var(--hg-panel) !important;
   border-color: var(--hg-line) !important;
 }
+/* A local corner glow over the viewport-aligned grid and a lit right edge. */
+html body .aeN {
+  background-color: rgba(4,23,15,.96) !important;
+  background-image:
+    radial-gradient(ellipse 235% 78% at left top, rgba(20,70,40,.46) 0%, rgba(20,70,40,.12) 62%, rgba(20,70,40,0) 100%),
+    var(--hg-grid) !important;
+  background-size: 100% 100%, 40px 40px, 40px 40px, 100% 4px !important;
+  background-position: left top, 0 0, 0 0, 0 0 !important;
+  background-repeat: no-repeat, repeat, repeat, repeat !important;
+  background-attachment: scroll, fixed, fixed, fixed !important;
+  box-shadow: var(--hg-right-edge) !important;
+  backdrop-filter: none !important;
+}
+html body .a9Z {
+  background: rgba(3,33,17,.26) !important;
+  backdrop-filter: none !important;
+}
+html body .aeN .a9Z,
+html body .aeN .wT {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Tint the full bottom strip around Gmail's storage and account links. */
+html body div[role="main"] .l2[role="contentinfo"] {
+  background: var(--hg-unread) !important;
+  color: var(--hg-secondary) !important;
+  box-shadow: inset 0 1px var(--hg-line) !important;
+}
+html body div[role="main"] .l2[role="contentinfo"] .aeV,
+html body div[role="main"] .l2[role="contentinfo"] .aeU,
+html body div[role="main"] .l2[role="contentinfo"] .ae3 {
+  background: transparent !important;
+}
+
+/* Continue the sidebar glow along the split-view message list and its footer. */
+html body div[role="main"] .Nu.tf.aZ6 {
+  box-shadow: var(--hg-right-edge) !important;
+}
+html body div[role="main"] .Nu.tf.aZ6 > .l2[role="contentinfo"] {
+  box-shadow: var(--hg-right-edge), inset 0 1px var(--hg-line) !important;
+}
+
 /* Gmail header branding: cast a green shadow below the original artwork. */
 #gb img[src*="logo_gmail"],
 #gb img[alt="Gmail"],
@@ -281,6 +336,134 @@ select:focus-visible,
   color: var(--hg-text) !important;
 }
 
+/* Paint the mail toolbar strip, with direct fallbacks for separately mounted controls. */
+html body .G-atb:not(.qZ),
+html body .AO .G-tF,
+html body .aeH .G-tF {
+  background: var(--hg-mail-toolbar) !important;
+  border-color: var(--hg-border) !important;
+  box-shadow: inset 0 -1px var(--hg-border) !important;
+}
+html body .G-atb .G-tF {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html body .Di,
+html body .aBS,
+html body .T-I.apG,
+html body .T-I[data-tooltip*="split pane"],
+html body .T-I[data-tooltip*="Split Pane"],
+html body [role="button"][aria-label*="split pane"],
+html body [role="button"][aria-label*="Split Pane"] {
+  background: var(--hg-sidebar) !important;
+  color: var(--hg-icon) !important;
+  border-color: var(--hg-border) !important;
+  border-radius: 8px !important;
+  box-shadow: inset 0 0 0 1px var(--hg-border) !important;
+}
+html body .Di .adl,
+html body .Di .adl span,
+html body .Dj,
+html body .Dj span {
+  color: var(--hg-text) !important;
+  font-family: var(--hg-font) !important;
+}
+html body .Di .amH,
+html body .Di .T-I,
+html body .aBS [role="button"] {
+  background-color: transparent !important;
+  border-color: var(--hg-line) !important;
+  color: var(--hg-icon) !important;
+}
+html body .Di .amH:not(.T-I-JE):not([aria-disabled="true"]):hover,
+html body .Di .T-I:not(.T-I-JE):not([aria-disabled="true"]):hover,
+html body .aBS [role="button"]:not([aria-disabled="true"]):hover,
+html body .T-I.apG:hover,
+html body .T-I[data-tooltip*="split pane"]:hover,
+html body .T-I[data-tooltip*="Split Pane"]:hover,
+html body [role="button"][aria-label*="split pane"]:hover,
+html body [role="button"][aria-label*="Split Pane"]:hover {
+  background-color: var(--hg-hover) !important;
+  box-shadow: inset 0 0 0 1px var(--hg-border) !important;
+}
+html body .Di .T-I-JE,
+html body .Di [aria-disabled="true"],
+html body .aBS [aria-disabled="true"] {
+  background-color: transparent !important;
+  color: var(--hg-muted) !important;
+  box-shadow: none !important;
+}
+html body .aBS .J-JN-M-I-JG,
+html body .T-I.apG .J-JN-M-I-JG {
+  border-top-color: var(--hg-icon) !important;
+}
+html body .Di [role="button"]:focus-visible,
+html body .aBS [role="button"]:focus-visible,
+html body .T-I.apG:focus-visible,
+html body [role="button"][aria-label*="split pane"]:focus-visible,
+html body [role="button"][aria-label*="Split Pane"]:focus-visible {
+  outline: 2px solid var(--hg-focus) !important;
+  outline-offset: -2px !important;
+}
+
+/* Paint the right-hand strip itself, including the gap around its controls. */
+html body .G-atb[gh="tm"] > .aqK > .Cr.aqJ {
+  background: var(--hg-mail-toolbar) !important;
+  border-radius: 8px !important;
+  box-shadow: inset 0 0 0 1px var(--hg-border) !important;
+}
+html body .G-atb[gh="tm"] > .aqK > .Cr.aqJ .Di,
+html body .G-atb[gh="tm"] > .aqK > .Cr.aqJ .T-I.apF,
+html body .G-atb[gh="tm"] > .aqK > .Cr.aqJ .T-I.apG {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html body .G-atb[gh="tm"] > .aqK > .Cr.aqJ .T-I.apF:hover,
+html body .G-atb[gh="tm"] > .aqK > .Cr.aqJ .T-I.apG:hover,
+html body .G-atb[gh="tm"] > .aqK > .Cr.aqJ .T-I.apG[aria-expanded="true"] {
+  background: var(--hg-hover) !important;
+  box-shadow: inset 0 0 0 1px var(--hg-border) !important;
+}
+html body .G-atb[gh="tm"] > .aqK > .Cr.aqJ .T-I.apG > .G-asx {
+  border-top-color: var(--hg-icon) !important;
+}
+
+/* Back the full toolbar, including the gutter outside its right-hand controls. */
+html body div.bGI.S4[role="main"] {
+  box-shadow: inset 0 48px 0 var(--hg-mail-toolbar) !important;
+}
+html body .G-atb[gh="tm"],
+html body .G-atb[gh="tm"] > .aqK {
+  background: var(--hg-mail-toolbar) !important;
+  border-color: var(--hg-border) !important;
+}
+html body div.bGI.S4[role="main"] > .G-atb[gh="tm"] > .aqK > .Cr.aqJ {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Use the toolbar's own glass as the normal button surface. */
+html body .G-atb[gh="tm"] > .aqK .aBS,
+html body .G-atb[gh="tm"] > .aqK .G-tF .T-I[role="button"],
+html body .G-atb[gh="tm"] > .aqK .Cr.aqJ .T-I[role="button"],
+html body .G-atb[gh="tm"] > .aqK .Cr.aqJ .amH[role="button"] {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+html body .G-atb[gh="tm"] > .aqK .G-tF .T-I[role="button"]::before,
+html body .G-atb[gh="tm"] > .aqK .Cr.aqJ .T-I[role="button"]::before,
+html body .G-atb[gh="tm"] > .aqK .Cr.aqJ .amH[role="button"]::before {
+  background-color: transparent !important;
+}
+html body .G-atb[gh="tm"] > .aqK .G-tF .T-I[role="button"]:not(.T-I-JE):not([aria-disabled="true"]):hover,
+html body .G-atb[gh="tm"] > .aqK .Cr.aqJ .T-I[role="button"]:not(.T-I-JE):not([aria-disabled="true"]):hover,
+html body .G-atb[gh="tm"] > .aqK .Cr.aqJ .amH[role="button"]:not([aria-disabled="true"]):hover,
+html body .G-atb[gh="tm"] > .aqK .T-I[aria-expanded="true"] {
+  background-color: var(--hg-hover) !important;
+  box-shadow: inset 0 0 0 1px var(--hg-border) !important;
+}
+
 /* Use a green icon tint only on Gmail controls with known monochrome glyphs. */
 .G-atb .asa,
 .G-atb .asf,
@@ -366,12 +549,28 @@ html body div[role="main"] table.cf.TB > tbody > tr.TD[tabindex="-1"] > td.TC[co
   font-family: var(--hg-font) !important;
 }
 
+/* Clear the reply footer layers behind the transparent action bar. */
+html body .gA.gt.acV,
+html body .gA.gt.acV > .gB.xu,
+html body .gA.gt.acV > .gB.xu > .ip.iq,
+html body .gA.gt.acV table.wS,
+html body .gA.gt.acV table.wS > tbody > tr > td.amr,
+html body .gA.gt.acV table.wS td.amr > .nr.wR {
+  background: transparent !important;
+}
+
 /* Footer actions on an open message. Keep Gmail's native button geometry. */
 html body div.amn {
-  background: var(--hg-unread) !important;
-  backdrop-filter: blur(6px);
-  border-radius: 12px !important;
-  box-shadow: inset 0 0 0 1px var(--hg-line) !important;
+  background: #02170b !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+html body div.amn::before,
+html body div.amn::after {
+  background: transparent !important;
+  box-shadow: none !important;
 }
 html body div.amn > span.ams[role="link"],
 html body div.amn .wrsVRe button.jWOS7-JX-I.LS5phe {
@@ -942,5 +1141,37 @@ html body ul.aqdrmf-Kf[role="listbox"][aria-label="Nest label under:"] [role="op
 ::selection {
   background: rgba(0,255,102,.35) !important;
   color: #f5fff7 !important;
+}
+
+/* Gmail-owned shell shared by the Workspace side panels. */
+html body .brC-brG .brB-brH[role="tabpanel"],
+html body .brC-brG .brB-brH[role="tabpanel"] > .brB-Jz {
+  background: var(--hg-raised) !important;
+  color: var(--hg-text) !important;
+}
+html body .brC-brG .brB-brH[role="tabpanel"] > .brC-brG-avC {
+  background: var(--hg-field) !important;
+  color: var(--hg-text) !important;
+  box-shadow: inset 0 -1px var(--hg-border) !important;
+}
+html body .brC-brG .brC-brG-K7-K0,
+html body .brC-brG .brC-brG-a1P-K0,
+html body .brC-brG .brC-brG-axL-J7 {
+  color: var(--hg-text) !important;
+  font-family: var(--hg-font) !important;
+}
+html body .brC-brG .brC-brG-axL-J7 {
+  background: var(--hg-panel) !important;
+  border-color: var(--hg-border) !important;
+}
+html body .brC-brG .brC-brG-avC-I[role="button"] {
+  color: var(--hg-icon) !important;
+}
+html body .brC-brG .brC-brG-avC-I[role="button"]:hover {
+  background-color: var(--hg-hover) !important;
+}
+html body .brC-brG .brC-brG-avC-I[role="button"]:focus-visible {
+  outline: 2px solid var(--hg-focus) !important;
+  outline-offset: -2px !important;
 }
 }
