@@ -1,0 +1,354 @@
+/* ==UserStyle==
+@name         HotUKDeals Mosaic - Tiles Layout
+@namespace    USO Archive
+@author       Gabriele Zanella
+@description  Turns the HotUKDeals deal list into a compact grid of tiles.    - More deals on screen: tiles fill the full width, and closing the sidebar boxes gives you even more columns.  - Only what matters: votes, time, image, title, price, merchant, comments and the deal button. No descriptions, share or bookmark clutter.  - Tidy tiles: equal heights, two-line titles, images scaled to fit.  - Voucher codes in one pill: code and copy button on a single line.  - Small touches: a pin badge for pinned deals, and a readable expiry countdown.  - Infinite scroll still works, and the sidebar ads are hidden.
+@version      20261115.20.10
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("hotukdeals.com") {
+/* ---------- Page and grid ---------- */
+
+    /* Wider page so more tiles fit */
+    .listLayout {
+        max-width: 120em !important;
+    }
+
+    /* The list becomes a responsive tile grid */
+    .listLayout-main .js-threadList {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+        gap: 12px;
+        align-items: stretch;
+    }
+
+    /* Hide spacers, banners and widgets between deals (they break the rows).
+       #thread-inject is kept: it is the marker infinite scroll watches to load the next page. */
+    .listLayout-main .js-threadList > *:not(article.thread):not(#thread-inject) {
+        display: none !important;
+    }
+    .listLayout-main .js-threadList > #thread-inject {
+        grid-column: 1 / -1;
+    }
+
+    /* Hide sidebar advertisement slots */
+    .slot {
+        display: none !important;
+    }
+
+    /* Sidebar: top of "Hottest deals" lines up with the first row of tiles, same 12px gutter */
+    .listLayout-side .listLayout-box.card {
+        margin-top: 0 !important;
+        margin-bottom: 12px !important;
+    }
+    .listLayout-side--right {
+        padding-left: 12px !important;
+    }
+
+    /* Hide the right sidebar so the tiles use the full width.
+       Delete this rule if you want the Hottest deals / vouchers boxes back. */
+    .listLayout-side--right {
+        display: none !important;
+    }
+    .listLayout-main {
+        flex: 1 1 auto !important;
+        min-width: 0;
+    }
+
+    /* ---------- Tile ---------- */
+
+    /* Each deal fills its cell, equal heights per row */
+    .listLayout-main article.thread {
+        width: auto !important;
+        margin: 0 !important;
+        height: 100%;
+    }
+    .listLayout-main article.thread > .box--contents,
+    .listLayout-main article.thread .threadListCard {
+        height: 100%;
+    }
+
+    /* Re-stack the card vertically: label, votes/time, image, body, footer */
+    .listLayout-main .threadListCard {
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: auto auto auto 1fr auto !important;
+        grid-template-areas: "l" "h" "i" "b" "f" !important;
+        padding: 8px !important;
+    }
+    .listLayout-main .threadListCard > * {
+        grid-column: 1 / -1 !important;
+    }
+
+    /* Remove the inner grey panel so everything sits on the main tile */
+    .listLayout-main .threadListCard::before {
+        display: none !important;
+    }
+
+    /* Stop wide images or long words pushing content past the tile edge */
+    .listLayout-main article.thread,
+    .listLayout-main .threadListCard > * {
+        min-width: 0 !important;
+        max-width: 100%;
+    }
+
+    /* Pinned: a small grey circle with the pin icon, on the votes row at the right */
+    .listLayout-main .threadListCard-label {
+        grid-area: h !important;
+        justify-self: end;
+        align-self: center;
+        z-index: 1;
+        padding-top: 2px;
+    }
+    .threadListCard-label .bRad--t-a {
+        width: 24px;
+        height: 24px;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        justify-content: center !important;
+    }
+    .threadListCard-label .bRad--t-a > span {
+        font-size: 0 !important;
+        gap: 0 !important;
+    }
+    .threadListCard-label .bRad--t-a svg {
+        width: 12px !important;
+        height: 12px !important;
+        margin: 0 !important;
+    }
+    /* Make room for the pin so the posted/refreshed time doesn't run under it */
+    .threadListCard-label:not(:empty) + .threadListCard-header {
+        padding-right: 30px !important;
+    }
+    .threadListCard-header { grid-area: h !important; }
+    .threadListCard-body   { grid-area: b !important; min-width: 0; }
+    .threadListCard-footer { grid-area: f !important; flex-wrap: wrap; gap: 4px; }
+
+    /* ---------- Header: votes and posted time ---------- */
+
+    .listLayout-main .threadListCard-header {
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 6px !important;
+        min-width: 0;
+        padding: 2px 2px 0 !important;
+    }
+    .threadListCard-header .vote-box {
+        height: 30px !important;
+        padding: 0 2px !important;
+    }
+    .threadListCard-header .vote-button {
+        width: 26px !important;
+        height: 26px !important;
+        min-width: 0 !important;
+    }
+    .threadListCard-header .vote-button svg {
+        width: 14px !important;
+        height: 14px !important;
+    }
+    .threadListCard-header .vote-temp {
+        font-size: .9rem !important;
+        margin: 0 2px !important;
+    }
+    .threadListCard-header .chip {
+        background: none !important;
+        border: 0 !important;
+        padding: 0 !important;
+        min-height: 0 !important;
+        min-width: 0;
+        flex-shrink: 1;
+    }
+    .threadListCard-header .chip span {
+        font-size: .72rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        opacity: .75;
+    }
+    .threadListCard-header .chip {
+        gap: 3px !important;
+    }
+    .threadListCard-header .chip svg {
+        width: 12px !important;
+        height: 12px !important;
+        flex-shrink: 0;
+    }
+
+    /* Expiring deals: drop the word "Expires", keep clock icon + "in 1d 5h ...", full colour */
+    .threadListCard-header .chip--type-warning svg + span {
+        font-size: 0 !important;
+        overflow: visible !important;
+        display: flex !important;
+        align-items: center;
+        line-height: 1 !important;
+    }
+    .threadListCard-header .chip .box--all-i {
+        font-size: .72rem !important;
+        line-height: 1 !important;
+        display: block !important;
+    }
+    .threadListCard-header .chip--type-warning span {
+        opacity: 1 !important;
+    }
+
+    /* ---------- Image ---------- */
+
+    .listLayout-main .threadListCard-image {
+        grid-area: i !important;
+        width: 100% !important;
+        max-width: none !important;
+        padding: 6px !important;
+        margin: 6px 0 8px !important;
+        height: auto !important;
+        align-self: start;
+        display: flex;
+        justify-content: center;
+    }
+    .threadListCard-image .box--contents {
+        display: block;
+        width: 100%;
+    }
+    .threadListCard-image .imgFrame {
+        width: 100% !important;
+        height: 160px !important;
+        padding: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .threadListCard-image img {
+        max-height: 160px !important;
+        max-width: 100% !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain;
+    }
+
+    /* ---------- Body: title, price, merchant ---------- */
+
+    .listLayout-main .threadListCard-body {
+        margin: 0 !important;
+        padding: 0 8px !important;
+    }
+
+    /* Title: two lines, slightly smaller */
+    .listLayout-main .threadListCard-body .thread-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 4px !important;
+        line-height: 1.3 !important;
+    }
+    .listLayout-main .threadListCard-body .thread-title a {
+        font-size: 15px !important;
+        line-height: 1.3 !important;
+    }
+
+    /* Spacing between price line and merchant line */
+    .threadListCard-body .thread-title + .box--contents > .flex {
+        gap: 6px !important;
+        row-gap: 6px !important;
+    }
+
+    /* Hide the deal description */
+    .threadListCard-body .userHtml {
+        display: none !important;
+    }
+
+    /* Poster: keep the avatar, drop the "Posted by ..." text, avatar on the right */
+    .threadListCard-body .userAvatar + span,
+    .threadListCard-body .thread-divider {
+        display: none !important;
+    }
+    .threadListCard-body .thread-divider + span {
+        flex-direction: row !important;
+        align-items: center;
+    }
+    .threadListCard-body .thread-divider + span,
+    .threadListCard-body .thread-title + .box--contents > .flex > span {
+        width: 100% !important;
+    }
+    .threadListCard-body .thread-divider + span > span:last-child {
+        margin-left: auto;
+    }
+
+    /* ---------- Footer: actions and Get deal ---------- */
+
+    /* One row: comments count on the left, Get deal filling the rest */
+    .listLayout-main .threadListCard-footer {
+        margin-top: 6px !important;
+        padding: 0 4px 4px !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+    .threadListCard-footer > .box--contents > a.button {
+        flex-shrink: 0;
+        padding: 0 4px !important;
+    }
+
+    /* Hide share and bookmark */
+    .threadListCard-footer > .box--contents > button.button--square {
+        display: none !important;
+    }
+
+    /* Get deal button shrinks to fit (site sets min-width: 198px) */
+    .listLayout-main .threadListCard-footer-action {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto !important;
+    }
+    .threadListCard-footer-action .button,
+    .threadListCard-footer .voucher {
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* Voucher deals: one pill, code on the left, round copy-and-open icon on the right */
+    .threadListCard-footer .voucher {
+        border-radius: 999px !important;
+        height: 36px;
+        display: flex !important;
+        align-items: center;
+    }
+    .threadListCard-footer .voucher > .flex {
+        flex-wrap: nowrap !important;
+        width: 100%;
+        height: 100%;
+        align-items: center !important;
+    }
+    .threadListCard-footer .buttonWithCode-code {
+        width: auto !important;
+        max-width: none !important;
+        flex: 1 1 auto;
+        min-width: 0;
+        text-align: left !important;
+        padding: 0 4px 0 10px !important;
+        font-size: .75rem !important;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .threadListCard-footer .voucher button {
+        flex: 0 0 auto;
+        width: 30px !important;
+        height: 30px !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        margin-right: 2px;
+        justify-content: center;
+    }
+    .threadListCard-footer .voucher button .size--all-s {
+        display: none !important;
+    }
+    .threadListCard-footer .voucher button > span,
+    .threadListCard-footer .voucher button svg {
+        margin: 0 !important;
+        gap: 0 !important;
+    }
+}
