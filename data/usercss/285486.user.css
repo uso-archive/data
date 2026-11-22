@@ -1,0 +1,129 @@
+/* ==UserStyle==
+@name         glazzy liquid motion
+@namespace    USO Archive
+@author       NèA.K
+@description  another one
+@version      20261121.09.14
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+/* Liquid Glass Motion - Global */
+/* i really want this to be global */
+
+/* Đổi các giá trị này để chỉnh màu và tốc độ */
+:root {
+  --my-base: #0b1022;
+  --my-blob1: rgba(90, 120, 255, 0.55);
+  --my-blob2: rgba(190, 90, 255, 0.45);
+  --my-blob3: rgba(0, 200, 190, 0.40);
+  --my-accent: #8ab4ff;
+  --my-text: #f2f5ff;
+  --my-glass-bg: rgba(255, 255, 255, 0.10);
+  --my-glass-border: rgba(255, 255, 255, 0.30);
+  --my-blur: 24px;
+  --my-radius: 22px;
+  --my-flow-speed: 28s;
+}
+
+/* nền: màu gốc tối, lớp aurora nằm phía sau */
+html {
+  background: var(--my-base) !important;
+}
+body {
+  background: transparent !important;
+  color: var(--my-text) !important;
+  font-family: -apple-system, "SF Pro Display", "Segoe UI Variable", "Segoe UI", Inter, sans-serif !important;
+}
+
+/* aurora trôi chậm như chất lỏng */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 40% at 20% 25%, var(--my-blob1), transparent 70%),
+    radial-gradient(35% 35% at 80% 30%, var(--my-blob2), transparent 70%),
+    radial-gradient(45% 45% at 50% 85%, var(--my-blob3), transparent 70%);
+  filter: blur(40px) saturate(140%);
+  animation: my-flow var(--my-flow-speed) ease-in-out infinite alternate;
+}
+@keyframes my-flow {
+  0%   { transform: translate3d(-4%, -3%, 0) rotate(0deg) scale(1); }
+  50%  { transform: translate3d(5%, 4%, 0) rotate(8deg) scale(1.12); }
+  100% { transform: translate3d(-3%, 6%, 0) rotate(-6deg) scale(1.05); }
+}
+
+/* kính: ô nhập, popup, menu */
+textarea,
+input[type="text"],
+input[type="search"],
+[role="dialog"],
+[role="menu"],
+[role="listbox"] {
+  background: var(--my-glass-bg) !important;
+  -webkit-backdrop-filter: blur(var(--my-blur)) saturate(190%) !important;
+  backdrop-filter: blur(var(--my-blur)) saturate(190%) !important;
+  border: 1px solid var(--my-glass-border) !important;
+  border-radius: var(--my-radius) !important;
+  color: var(--my-text) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 36px rgba(0, 0, 0, 0.30) !important;
+  transition: box-shadow 0.4s ease, border-color 0.4s ease !important;
+}
+
+/* ô nhập "thở" nhẹ khi focus */
+textarea:focus,
+input[type="text"]:focus,
+input[type="search"]:focus {
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  animation: my-breathe 3s ease-in-out infinite;
+}
+@keyframes my-breathe {
+  0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 0 18px rgba(138,180,255,0.25); }
+  50%      { box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 0 34px rgba(138,180,255,0.55); }
+}
+
+/* nút dạng viên kính + vệt sáng quét ngang khi hover */
+button {
+  background:
+    linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.40) 50%, transparent 65%) no-repeat 130% 0 / 250% 100%,
+    var(--my-glass-bg) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(170%) !important;
+  backdrop-filter: blur(16px) saturate(170%) !important;
+  border: 1px solid var(--my-glass-border) !important;
+  border-radius: 999px !important;
+  color: var(--my-text) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+  transition:
+    background-position 0.8s ease,
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease !important;
+}
+button:hover {
+  background-position: -30% 0, 0 0 !important;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 10px 24px rgba(0, 0, 0, 0.3) !important;
+}
+button:active {
+  transform: scale(0.95);
+}
+
+/* link và màu chọn chữ */
+a { color: var(--my-accent) !important; }
+::selection { background: var(--my-accent); color: #0b1020; }
+
+/* thanh cuộn mảnh, trong suốt */
+* { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.35) transparent; }
+
+/* ảnh bo góc mềm */
+img { border-radius: 16px; }
+
+/* ai bật "giảm chuyển động" trong hệ điều hành thì tắt animation */
+@media (prefers-reduced-motion: reduce) {
+  body::before, textarea:focus, input:focus { animation: none !important; }
+  button { transition: none !important; }
+}
