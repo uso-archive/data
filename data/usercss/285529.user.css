@@ -1,0 +1,1195 @@
+/* ==UserStyle==
+@name         eBay - Hacker Green | Dark (in progress)
+@namespace    USO Archive
+@author       UrsidaeSentinel
+@description  eBay - Hacker Green | Dark
+@version      20261123.02.43
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("ebay.com") {
+/* ======================================================================
+     TOKENS
+     Every color/opacity decision in this file reads from these variables.
+     Change the theme by editing this block only.
+     ====================================================================== */
+  html {
+    /* ink */
+    --hg-ink: #d7e6da;            /* primary text */
+    --hg-ink-dim: #9fb3a3;        /* secondary/muted text */
+    --hg-ink-bright: #eaffee;     /* headings, emphasis on dark glass */
+
+    /* accent green, light -> dark */
+    --hg-accent-soft: #72f59a;    /* default links, icons */
+    --hg-accent: #65ff94;         /* active borders, dividers, focus */
+    --hg-accent-strong: #a5ffb8;  /* hover text / strongest highlight */
+    --hg-accent-cta: #226b3b;     /* solid filled buttons (submit, buy) */
+    --hg-accent-cta-hover: #2c884a;
+
+    /* surfaces: 3 tiers only.
+       surface-0/1 are transparent so the grid wallpaper shows through
+       every panel that used to be a flat fill (cards, header, footer,
+       filters, tabs, etc). surface-2 stays a faint tint, only for form
+       fields, so typed text has a hint of a field to sit in. */
+    --hg-surface-0: transparent;  /* page canvas */
+    --hg-surface-1: transparent;  /* raised panel: cards, header, footer */
+    --hg-surface-2: rgba(16,27,20,.55); /* form fields / inputs, slightly inset */
+
+    /* glass overlay (dropdowns, popovers, modals, VI-EVO banners) */
+    --hg-glass-bg: linear-gradient(135deg, rgba(21,62,37,.80), rgba(6,25,15,.92));
+    --hg-glass-blur: blur(14px) saturate(130%);
+
+    /* borders: 2 tiers only */
+    --hg-border-resting: #365a3d;     /* structural, always-on dividers */
+    --hg-border-active: var(--hg-accent); /* hover/focus/selected only */
+
+    /* glow: one strength, reused, not stacked differently per rule */
+    --hg-glow-sm: 0 0 8px rgba(101,255,148,.30);
+    --hg-glow-md: 0 0 14px rgba(101,255,148,.42);
+    --hg-glow-lg: 0 0 22px rgba(101,255,148,.30);
+
+    --hg-focus-ring: 0 0 0 2px rgba(101,255,148,.55);
+  }
+
+  /* ======================================================================
+     BASE CANVAS + SIGNATURE GRID WALLPAPER
+     Boosted slightly vs v1.12 so it's visible, not just technically present.
+     ====================================================================== */
+  /* Painted redundantly on html AND body (not just html with everything
+     else "transparent"): some eBay page shells scroll inside body rather
+     than the viewport, which can stop a fixed background declared only on
+     html from ever being visible. Giving body the identical paint means
+     the grid shows no matter which element ends up doing the scrolling. */
+  html, body {
+    background-color: #0a0a0a !important;
+    background-image:
+      linear-gradient(to right, rgba(146,255,174,.14) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(146,255,174,.14) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(110,239,143,.035) 1px, transparent 1px) !important;
+    background-size: 40px 40px, 40px 40px, 100% 4px !important;
+    background-position: 0 0, 0 0, 0 0 !important;
+    background-repeat: repeat, repeat, repeat !important;
+    background-attachment: fixed, fixed, fixed !important;
+    min-height: 100vh !important;
+  }
+
+  html, body, #mainContent, #maincontent, main, [role="main"] {
+    color: var(--hg-ink) !important;
+  }
+  /* Everything between body and the actual content panels stays clear so
+     the grid painted above keeps showing through the gutters. */
+  #mainContent, #maincontent, main, [role="main"] {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  /* Outer layout shells stay transparent so the grid reads through the
+     gutters; only actual content panels (below) get a solid fill. */
+  html body .page-grid,
+  html body .page-layout,
+  html body .page-grid-container,
+  html body #mainContent > div,
+  html body #maincontent > div,
+  html body main > div,
+  html body [role="main"] > div,
+  html body section.custom-page-grid-container,
+  html body .custom-page-grid-container,
+  html body #mainContent > section,
+  html body #mainContent > div > section,
+  html body main > section,
+  html body main > div > section,
+  html body [role="main"] > section,
+  html body .page-grid-container > section,
+  html body .page-grid-container > div[class*="bg-neutral"],
+  html body [class*="homepage"] > section,
+  html body [class*="homepage"] > div[class*="bg-neutral"],
+  html body main section[class*="bg-neutral"],
+  html body main div[class*="bg-neutral"][class*="hp-"],
+  html body #mainContent div[class*="bg-neutral"][class*="hp-"],
+  html body main > div[class*="bg-neutral"],
+  html body main > div > div[class*="bg-neutral"],
+  html body #mainContent > div[class*="bg-neutral"],
+  html body #mainContent > div > div[class*="bg-neutral"],
+  html body [role="main"] > div[class*="bg-neutral"],
+  html body.vi-body .vi-evo,
+  html body.vi-body .vi-evo > main,
+  html body.vi-body .vi-evo .main-container,
+  html body.vi-body .vi-evo .x-vi-evo-main-container,
+  html body.vi-body .vi-evo .top-panel-container,
+  html body.vi-body .vi-evo .bottom-panel-container,
+  html body.vi-body #vi-global-header.vi-global-header.vi-grid,
+  html body.vi-body #vi-global-header.vi-global-header > .ghw.ghw--loaded,
+  html body.vi-body #vi-global-header.vi-global-header > .ghw.ghw--loaded > header#gh.gh-header {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  /* ----------------------------------------------------------------------
+     SAFETY NET — generated/inline white backgrounds anywhere in the page.
+     eBay's homepage and search pages render a lot of their layout through
+     Tailwind-style utility classes and JS-written inline styles with no
+     stable name, so no fixed list of selectors ever catches all of them
+     (that's why v1.1 through v1.21 kept finding new white rectangles one
+     DOM snapshot at a time). This block catches the common *patterns*
+     instead of individual components, and runs EARLY in the cascade: the
+     specific panel/card/glass rules further down in this file (buybox,
+     dropdowns, cards, inputs, the image mat) are written with selectors
+     at least as specific, so they still win back a solid or glass fill
+     where one is actually wanted. Everything else just goes transparent
+     and the grid wallpaper shows straight through it.
+     ---------------------------------------------------------------------- */
+  html body [class*="bg-white"],
+  html body [class~="bg-white"],
+  html body [class*="bg-neutral-0"],
+  html body [class*="bg-neutral-50"],
+  html body [class*="bg-neutral-100"],
+  html body [class*="bg-neutral-200"],
+  html body [class*="bg-gray-50"],
+  html body [class*="bg-gray-100"],
+  html body [class*="bg-gray-200"],
+  html body [style*="background-color: rgb(255, 255, 255)"],
+  html body [style*="background-color:#fff"],
+  html body [style*="background-color: #fff"],
+  html body [style*="background-color: #ffffff"],
+  html body [style*="background: rgb(255, 255, 255)"],
+  html body [style*="background-color: rgb(248, 248, 248)"],
+  html body [style*="background-color: rgb(247, 247, 247)"],
+  html body [style*="background-color: #f8f8f8"],
+  html body [style*="background-color: #f7f7f7"],
+  html body [style*="background-color: #f5f5f5"] {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+  /* Generated global-header / sticky-search wrappers with hashed or
+     prefix-only class names (no stable "header" or "sticky" substring). */
+  html body div[class^="gh"], html body section[class^="gh"],
+  html body form[class^="gh"], html body header[class^="gh"],
+  html body div[class*=" gh"], html body section[class*=" gh"],
+  html body div[id^="gh"], html body section[id^="gh"],
+  html body div[class*="sticky"], html body div[class*="Sticky"],
+  html body div[class*="header-"], html body div[class*="Header"],
+  html body div[class*="search-header"], html body div[class*="searchHeader"],
+  html body div[class*="search-bar"], html body div[class*="searchBar"] {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+  /* A floating toolbar whose position is set inline by script often
+     carries its background the same way. */
+  html body div[style*="position: fixed"][style*="top: 0"],
+  html body div[style*="position:fixed"][style*="top:0"],
+  html body div[style*="position: sticky"][style*="top: 0"],
+  html body div[style*="position:sticky"][style*="top:0"] {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  ::selection { background: #2c7543 !important; color: #fff !important; }
+
+  /* ======================================================================
+     TYPOGRAPHY
+     ====================================================================== */
+  h1, h2, h3, h4, h5, h6, p, label, legend, summary,
+  dt, dd, th, td, li, small, strong, em,
+  [class*="title"], [class*="Title"],
+  [class*="subtitle"], [class*="description"] {
+    color: var(--hg-ink) !important;
+  }
+
+  a, a:link, #gh a, footer a, nav a {
+    color: var(--hg-accent-soft) !important;
+    text-decoration-color: #3a8050 !important;
+  }
+  a:visited { color: #b0daa8 !important; }
+
+  /* One hover rule for all links; subtle glow, not a halo + shadow stack. */
+  html body a:hover, html body a:focus,
+  html body [role="link"]:hover {
+    color: var(--hg-accent-strong) !important;
+    text-decoration-color: currentColor !important;
+    text-shadow: var(--hg-glow-sm) !important;
+  }
+
+  /* ======================================================================
+     FORM CONTROLS
+     ====================================================================== */
+  input[type="text"], input[type="search"], input[type="email"],
+  input[type="password"], input[type="number"], input[type="tel"],
+  textarea, select, [role="combobox"], [contenteditable="true"],
+  .gh-tb, #gh-ac, #gh-cat, .textbox__control {
+    background-color: var(--hg-surface-2) !important;
+    color: var(--hg-ink) !important;
+    border-color: #426a4c !important;
+    caret-color: var(--hg-accent-soft) !important;
+  }
+  input::placeholder, textarea::placeholder { color: var(--hg-ink-dim) !important; opacity: 1 !important; }
+
+  html body input[type="text"]:hover,
+  html body input[type="search"]:hover,
+  html body textarea:hover,
+  html body [role="combobox"]:hover {
+    border-color: var(--hg-accent) !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+
+  input:focus, textarea:focus, select:focus, button:focus, a:focus, [role="button"]:focus {
+    outline: 2px solid var(--hg-accent-strong) !important;
+    outline-offset: 2px !important;
+  }
+
+  html body select option, html body select optgroup {
+    background-color: #102719 !important;
+    color: #d9ffe4 !important;
+  }
+
+  /* ======================================================================
+     BUTTONS
+     Plain buttons: quiet hover (border brighten only).
+     The search submit / primary CTA: solid fill, reserved for real actions.
+     ====================================================================== */
+  button, [role="button"], .btn, .fake-btn, .ux-call-to-action,
+  .filter-menu-button, .x-atc-action {
+    background-color: #17241b !important;
+    color: var(--hg-accent-soft) !important;
+    border-color: var(--hg-border-resting) !important;
+  }
+  /* .fake-link / .ux-action cover the inline "See details", "Message",
+     and info-icon (ⓘ) controls seen throughout the item page — these are
+     link-styled, not button-styled, so they get no fill, just accent text. */
+  html body .fake-link, html body .ux-action,
+  html body button.fake-link, html body a.ux-action {
+    background-color: transparent !important;
+    color: var(--hg-accent-soft) !important;
+    border-color: transparent !important;
+  }
+  html body .fake-link:hover, html body .ux-action:hover {
+    color: var(--hg-accent-strong) !important;
+    text-shadow: var(--hg-glow-sm) !important;
+  }
+  html body button:hover, html body [role="button"]:hover,
+  html body .btn:hover, html body .fake-btn:hover,
+  html body [role="tab"]:hover, html body [role="menuitem"]:hover,
+  html body input[type="button"]:hover,
+  html body input[type="submit"]:hover,
+  html body select:hover {
+    color: var(--hg-accent-strong) !important;
+    border-color: var(--hg-accent) !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+  html body button:hover svg,
+  html body [role="button"]:hover svg,
+  html body .gh-header a:hover svg,
+  html body #dp-global-footer a:hover svg {
+    filter: drop-shadow(0 0 4px rgba(101,255,148,.45)) !important;
+  }
+
+  #gh-btn, button[type="submit"],
+  html body #gh-search-btn,
+  html body section.gh-header__main.gh-header__main-sticky #gh-search-btn {
+    background-color: var(--hg-accent-cta) !important;
+    color: #f5fff7 !important;
+    border-color: #3b9a56 !important;
+  }
+  html body #gh-btn:hover, html body button[type="submit"]:hover,
+  html body #gh-search-btn:hover {
+    background-color: var(--hg-accent-cta-hover) !important;
+    border-color: var(--hg-accent-strong) !important;
+    color: #fff !important;
+    box-shadow: var(--hg-glow-md) !important;
+  }
+
+  /* ======================================================================
+     STRUCTURAL SURFACES: header, nav, footer, drawers, modals (resting)
+     ====================================================================== */
+  header, footer, nav, aside, section, article,
+  [role="navigation"], [role="dialog"], [role="menu"], [role="listbox"],
+  [class*="drawer"], [class*="Drawer"],
+  #gh, #gh-top, #gh-gb, #gh-cat, .gh-flyout, .gh-menu,
+  #glbfooter, .gh-clearfix, .gh-tbl, .gh-td,
+  .srp-controls, .srp-controls__row, .srp-river,
+  .x-breadcrumb, .breadcrumbs, .x-item-title,
+  html body #gh, html body #gh-header, html body #gh-main,
+  html body #gh-f, html body #gh-gb, html body #gh-top,
+  html body #gh-bar, html body #gh-ug,
+  html body #global-header, html body #globalHeader,
+  html body .ghw, html body .gh-header, html body .gh-header__main,
+  html body .global-header, html body .globalHeader,
+  html body .sticky-header, html body .stickyHeader,
+  html body .header-sticky, html body .headerSticky,
+  html body section.gh-header__main.gh-header__main-sticky,
+  html body section.gh-header__main.gh-header__main-sticky > div.gh-header__logo-cats-wrap,
+  html body section.gh-header__main.gh-header__main-sticky > form#gh-f.gh-search,
+  html body #dp-global-footer, html body #dp-global-footer footer.gh-footer,
+  html body #glbfooter footer.gh-footer,
+  html body section.custom-page-grid-container > .dp-topo-item-grid-2x2,
+  html body section.custom-page-grid-container > section.border-subtle,
+  html body main .border-subtle, html body #mainContent .border-subtle,
+  html body [class*="homepage"] .border-subtle,
+  html body [class*="my-garage"], html body [class*="myGarage"],
+  html body [class*="MyGarage"], html body [class*="garage"],
+  html body [class*="Garage"], html body [id*="garage"], html body [id*="Garage"],
+  html body .s-item, html body .s-item__wrapper,
+  html body section.gh-header__main.gh-header__main-sticky #gh-search-box,
+  html body section.gh-header__main.gh-header__main-sticky .gh-search__wrap,
+  html body section.gh-header__main.gh-header__main-sticky #gh-ac-wrap,
+  html body section.gh-header__main.gh-header__main-sticky #gh-ac,
+  html body section.gh-header__main.gh-header__main-sticky #gh-cat,
+  html body #vi-global-header #gh > nav.gh-nav,
+  html body #vi-global-header #gh > section.gh-header__main {
+    background-color: var(--hg-surface-1) !important;
+    background-image: none !important;
+    color: var(--hg-ink) !important;
+    border-color: var(--hg-border-resting) !important;
+  }
+  /* form-field sub-cases inside the header keep the inset surface tier */
+  html body section.gh-header__main.gh-header__main-sticky #gh-search-box,
+  html body section.gh-header__main.gh-header__main-sticky .gh-search__wrap,
+  html body section.gh-header__main.gh-header__main-sticky #gh-ac-wrap,
+  html body section.gh-header__main.gh-header__main-sticky #gh-ac,
+  html body section.gh-header__main.gh-header__main-sticky #gh-cat,
+  html body #gh input, html body #gh-f input,
+  html body header input[type="text"], html body header input[type="search"],
+  html body [role="banner"] input, html body [role="search"] input,
+  html body [role="banner"] select, html body #gh select {
+    background-color: var(--hg-surface-2) !important;
+    color: var(--hg-ink) !important;
+    border-color: #426a4c !important;
+  }
+
+  /* Pseudo-element overlays some skins paint separately from the element */
+  html body #gh::before, html body #gh::after,
+  html body section.gh-header__main.gh-header__main-sticky::before,
+  html body section.gh-header__main.gh-header__main-sticky::after {
+    background-color: var(--hg-surface-1) !important;
+    background-image: none !important;
+  }
+
+  html body img, html body picture, html body video,
+  html body canvas, html body svg, html body iframe { filter: none !important; }
+
+  .s-item__image-wrapper, .s-item__image, .ux-image-carousel-item,
+  .ux-image-carousel-container, .gallery, .gallery__image {
+    background-color: #e6e9e5 !important;
+  }
+
+  /* Modals / popovers use the glass treatment, not a flat panel */
+  [class*="modal"], [class*="Modal"], [class*="popover"], [class*="Popover"] {
+    background: var(--hg-glass-bg) !important;
+    -webkit-backdrop-filter: var(--hg-glass-blur) !important;
+    backdrop-filter: var(--hg-glass-blur) !important;
+    color: var(--hg-ink-bright) !important;
+    border: 1px solid rgba(101,255,148,.45) !important;
+    box-shadow: var(--hg-glow-md) !important;
+  }
+
+  /* ======================================================================
+     LISTING CARDS / RESULTS
+     eBay has shipped more than one generation of search-result markup
+     (the classic .s-item cards this theme was first built against, and a
+     newer card component with different class names). Both are matched
+     here so the listing page gets the same card treatment as the
+     homepage regardless of which markup this account is served.
+     ====================================================================== */
+  .s-item__info, .s-item__details,
+  .srp-river-results, .srp-rail, .srp-sidebar,
+  .x-item-title, .x-price-primary, .x-about-this-item,
+  .vim, .vim-container, .ux-layout-section,
+  .ux-section, .ux-labels-values, .ux-layout-section__item,
+  [class*="card"], [class*="Card"],
+  [class*="s-card"], [class*="su-card"],
+  [class*="listing-card"], [class*="ListingCard"],
+  [class*="item-card"], [class*="ItemCard"] {
+    background-color: var(--hg-surface-1) !important;
+    background-image: none !important;
+    color: var(--hg-ink) !important;
+    border-color: var(--hg-border-resting) !important;
+  }
+  .s-item__title, .s-item__price, .x-item-title__mainTitle,
+  .x-price-primary span, [class*="price"], [class*="Price"],
+  [class*="s-card__title"], [class*="s-card__price"] {
+    color: var(--hg-ink-bright) !important;
+  }
+  .s-item__title a, .s-item__link, .s-item__title a:hover,
+  [class*="s-card"] a, [class*="su-card"] a {
+    color: var(--hg-accent-soft) !important;
+  }
+  .s-item__shipping, .s-item__location, .s-item__subtitle,
+  .s-item__seller-info-text, [class*="secondary"], [class*="muted"],
+  [class*="s-card__caption"], [class*="s-card__subtitle"],
+  [class*="s-card__attribute"] {
+    color: var(--hg-ink-dim) !important;
+  }
+  /* Generic text spans used throughout both markup generations: inherit
+     the card's text color instead of staying at eBay's own default,
+     which is often a near-black meant for a white card. */
+  [class*="card"] [class*="textspans"],
+  [class*="s-card"] [class*="textspans"],
+  [class*="su-card"] [class*="textspans"],
+  .s-item [class*="textspans"] {
+    color: inherit !important;
+  }
+
+  /* ----------------------------------------------------------------------
+     UX-TEXTSPANS — the wrapper eBay puts almost EVERY piece of body text
+     in, on the item detail page (price, condition, shipping, seller name,
+     "Hurry before it's gone", payment methods, and so on). Confirmed from
+     inspected markup that eBay's own class is written in upper case
+     ("ux-textspans--SECONDARY", "--BOLD", "--PSEUDOLINK"), not the lower
+     case this theme originally guessed — CSS class matching is case
+     sensitive, so the earlier rules silently matched nothing and these
+     spans were showing eBay's own near-black default color on our dark
+     panels. This is likely the single biggest reason the item page read
+     as "unthemed" next to the homepage. ---------------------------------- */
+  html body .ux-textspans {
+    color: inherit !important;
+  }
+  html body .ux-textspans--BOLD {
+    color: var(--hg-ink-bright) !important;
+  }
+  html body .ux-textspans--SECONDARY {
+    color: var(--hg-ink-dim) !important;
+  }
+  html body .ux-textspans--PSEUDOLINK,
+  html body .ux-textspans--LEGAL_LINK {
+    color: var(--hg-accent-soft) !important;
+  }
+  html body a:hover .ux-textspans--PSEUDOLINK,
+  html body button:hover .ux-textspans--PSEUDOLINK,
+  html body .fake-link:hover .ux-textspans--PSEUDOLINK {
+    color: var(--hg-accent-strong) !important;
+  }
+  html body .ux-textspans--SUPERSCRIPT {
+    color: inherit !important;
+  }
+
+  /* Tooltips/infotips (ⓘ popovers) and lightbox dialogs: same glass
+     treatment as the other overlay surfaces, since neither "lightbox-
+     dialog" nor "infotip__overlay" contains the word modal/popover that
+     the earlier generic rule matched on. */
+  html body .infotip__overlay,
+  html body [role="tooltip"],
+  html body .lightbox-dialog,
+  html body .lightbox-dialog__window {
+    background: var(--hg-glass-bg) !important;
+    color: var(--hg-ink-bright) !important;
+    border: 1px solid rgba(101,255,148,.45) !important;
+    box-shadow: var(--hg-glow-md) !important;
+    -webkit-backdrop-filter: var(--hg-glass-blur) !important;
+    backdrop-filter: var(--hg-glass-blur) !important;
+  }
+  html body .infotip__pointer { display: none !important; }
+
+  /* Klarna / financing promo banners: give the pill module a panel fill
+     instead of leaving its native light background in place. */
+  html body .promotional-spotlight,
+  html body [class*="financing-details"],
+  html body [class*="financing-options-section"] {
+    background-color: rgba(13,32,20,.5) !important;
+    color: var(--hg-ink) !important;
+    border-color: rgba(101,255,148,.35) !important;
+  }
+  html body .d-financing-options-section__step-badge .badge {
+    background-color: var(--hg-accent-cta) !important;
+    color: #f5fff7 !important;
+  }
+
+  /* Cards/tiles hover: quiet border brighten, no heavy stacked glow */
+  html body .s-item:hover,
+  html body [class*="card"]:hover,
+  html body [class*="Card"]:hover,
+  html body [class*="tile"]:hover,
+  html body [class*="Tile"]:hover,
+  html body [class*="s-card"]:hover,
+  html body [class*="su-card"]:hover,
+  html body [class*="listing-card"]:hover,
+  html body [class*="item-card"]:hover {
+    border-color: var(--hg-accent) !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+
+  html body main .border-subtle,
+  html body .border-subtle.rounded-50,
+  html body .border-subtle.rounded-100,
+  html body [class*="border-neutral-400"],
+  html body [class*="border-subtle"] {
+    border-color: var(--hg-border-resting) !important;
+  }
+  html body main .border-subtle:hover,
+  html body .border-subtle.rounded-50:hover,
+  html body .border-subtle.rounded-100:hover {
+    border-color: var(--hg-accent) !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+
+  /* ======================================================================
+     PANELS: filters, cart, watchlist, account, tabs
+     ====================================================================== */
+  .x-refine__main, .x-refine__group, .x-refine__multi-select,
+  .srp-refine__category, .srp-refine__filters,
+  .cart-bucket, .cart-summary, .cart-summary__total,
+  .watchlist, .mye-module, .mys-module,
+  [class*="accordion"], [class*="Accordion"],
+  [class*="tabs"], [class*="Tabs"] {
+    background-color: var(--hg-surface-1) !important;
+    border-color: var(--hg-border-resting) !important;
+    color: var(--hg-ink) !important;
+  }
+  [aria-selected="true"], [aria-current="page"], [aria-pressed="true"],
+  .tabs__item--selected { color: var(--hg-accent-strong) !important; border-color: var(--hg-accent) !important; }
+
+  table, thead, tbody, tr, th, td, fieldset, [role="separator"] {
+    background-color: transparent !important;
+    border-color: var(--hg-border-resting) !important;
+  }
+  th { background-color: #17241b !important; }
+  html body table tbody tr:hover {
+    background-color: #16281c !important;
+  }
+
+  [role="alert"], [class*="error"], [class*="warning"], [class*="success"] {
+    border-color: #6b7552 !important;
+  }
+
+  #mainContent > div, main > div, .srp-main, .srp-content,
+  .x-item-title, .x-item-description, .item-desc,
+  .seo-breadcrumb-text {
+    background-color: var(--hg-surface-0) !important;
+    border-color: var(--hg-border-resting) !important;
+  }
+
+  /* ======================================================================
+     DIVIDERS / HORIZONTAL RULES — one consistent neon line, used everywhere
+     ====================================================================== */
+  hr, [role="separator"] {
+    border: 0 !important;
+    background: var(--hg-accent) !important;
+    height: 1px !important;
+    min-height: 1px !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+  [class*="divider"], [class*="Divider"],
+  [class*="separator"], [class*="Separator"] {
+    border-top-color: var(--hg-accent) !important;
+    border-bottom-color: var(--hg-accent) !important;
+  }
+  html body #gh-top, html body #gh-gb,
+  html body .gh-header__main, html body .gh-header__navigation,
+  html body .gh-header__nav, html body .gh-header__nav-wrap,
+  html body .gh-header__navigation-wrap,
+  html body .srp-controls, html body .srp-controls__row,
+  html body .x-breadcrumb, html body .breadcrumbs,
+  html body .srp-refine__filters,
+  html body .tabs__items, html body .tabs__list {
+    border-bottom: 1px solid var(--hg-accent) !important;
+  }
+  html body div.mt-400.bg-neutral-200.border-t-solid.border-neutral-400,
+  html body #dp-global-footer footer.gh-footer {
+    border-top: 1px solid var(--hg-accent) !important;
+  }
+  html body #dp-global-footer .gf-small-links,
+  html body #dp-global-footer .gf-legal {
+    border-top: 1px solid var(--hg-accent) !important;
+  }
+  html body div.home-flyout-menu {
+    border-top: 1px solid var(--hg-accent) !important;
+    border-bottom-color: var(--hg-accent) !important;
+    border-left-color: var(--hg-border-resting) !important;
+    border-right-color: var(--hg-border-resting) !important;
+  }
+  html body section.gh-header__main.gh-header__main-sticky {
+    border-bottom: 2px solid var(--hg-accent) !important;
+  }
+  html body section.gh-header__main.gh-header__main-sticky > .gh-header__logo-cats-wrap,
+  html body section.gh-header__main.gh-header__main-sticky > form#gh-f.gh-search {
+    border-bottom: 0 none !important;
+    box-shadow: none !important;
+  }
+
+  /* ======================================================================
+     FOOTER
+     ====================================================================== */
+  html body #dp-global-footer .gf-big-links,
+  html body #dp-global-footer .gf-big-links__col,
+  html body #dp-global-footer .gf-big-links__col-group,
+  html body #dp-global-footer .gf-big-links__element,
+  html body #dp-global-footer .gf-big-links__list,
+  html body #dp-global-footer .gf-big-links__list-item,
+  html body #dp-global-footer .gf-small-links,
+  html body #dp-global-footer .gf-small-links__link,
+  html body #dp-global-footer .gf-legal,
+  html body #dp-global-footer .gf-flag {
+    background-color: var(--hg-surface-1) !important;
+    color: var(--hg-ink) !important;
+    border-color: var(--hg-border-resting) !important;
+  }
+  html body #dp-global-footer .gf-big-links__title,
+  html body #dp-global-footer .gf-big-links__title a {
+    color: var(--hg-accent-strong) !important;
+  }
+  html body #dp-global-footer footer.gh-footer a,
+  html body #dp-global-footer .gf-big-links__list-item a,
+  html body #dp-global-footer .gf-small-links a,
+  html body #dp-global-footer .gf-legal a {
+    color: var(--hg-accent-soft) !important;
+  }
+  html body #dp-global-footer footer.gh-footer a:hover,
+  html body #dp-global-footer footer.gh-footer a:focus {
+    color: var(--hg-accent-strong) !important;
+    text-shadow: var(--hg-glow-sm) !important;
+  }
+  html body #dp-global-footer .gf-flag__button,
+  html body #dp-global-footer .gh-btt-button {
+    background: #17241b !important;
+    color: var(--hg-accent-strong) !important;
+    border-color: #426a4c !important;
+  }
+  html body #dp-global-footer .gf-flag__button:hover,
+  html body #dp-global-footer .gh-btt-button:hover {
+    border-color: var(--hg-accent) !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+  html body #dp-global-footer .gf-flag__dropdown,
+  html body #dp-global-footer .gh-btt-button svg,
+  html body #dp-global-footer .gf-big-links__list-item svg { color: var(--hg-accent-strong) !important; }
+  html body #dp-global-footer #ghw-static-footer,
+  html body #dp-global-footer #ghw-static-footer footer {
+    background-color: var(--hg-surface-1) !important;
+    color: var(--hg-ink-dim) !important;
+  }
+  html body #dp-global-footer .gf-big-links__list-item:hover,
+  html body #dp-global-footer .gf-small-links__link:hover {
+    background-color: #16281c !important;
+  }
+
+  /* ======================================================================
+     WATCH / CAROUSEL / FULL-PAGE ICON BUTTONS (listing + search pages)
+     These sit directly on top of listing thumbnails, so unlike a text
+     button they NEED a solid, opaque disc behind them to read against a
+     photo — and against the grid wallpaper now showing through the page,
+     a plain "transparent" background makes the icon disappear entirely.
+     The "html body ...[attr]" form on every rule here is deliberate: the
+     safety-net rules added for the grid rollout match on generic classes
+     like [class*="bg-white"], and some of eBay's own circular icon
+     buttons carry exactly that class. Without the extra specificity here,
+     that generic rule can out-rank this one and strip the disc back to
+     transparent regardless of source order. Everything below is written
+     to always win on specificity, not on order. ====================== */
+
+  /* Favorite / Watch heart */
+  html body button[aria-label^="Watch "],
+  html body button[title^="Watch "],
+  html body button[aria-label*="watchlist"],
+  html body button[aria-label*="Watchlist"],
+  html body button[aria-label*="Add to watchlist"],
+  html body button[aria-label*="Remove from watchlist"] {
+    background-color: #142b1b !important;
+    background-image: none !important;
+    color: var(--hg-accent-strong) !important;
+    border: 1px solid #458a58 !important;
+    border-radius: 50% !important;
+    opacity: 1 !important;
+  }
+  /* Any inner circle/icon wrapper eBay nests inside the button must stay
+     transparent so the button's own disc color (above) is what's seen,
+     rather than a second, lighter disc painted on top of it. */
+  html body button[aria-label^="Watch "] > *,
+  html body button[title^="Watch "] > *,
+  html body button[aria-label*="watchlist"] > *,
+  html body button[aria-label*="Watchlist"] > * {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+  html body button[aria-label^="Watch "] svg,
+  html body button[title^="Watch "] svg,
+  html body button[aria-label*="watchlist"] svg,
+  html body button[aria-label*="Watchlist"] svg {
+    color: var(--hg-accent-strong) !important;
+    stroke: var(--hg-accent-strong) !important;
+    opacity: 1 !important;
+  }
+  html body button[aria-label^="Watch "]:hover,
+  html body button[title^="Watch "]:hover,
+  html body button[aria-label*="watchlist"]:hover,
+  html body button[aria-label*="Watchlist"]:hover {
+    border-color: var(--hg-accent) !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+  html body button[aria-pressed="true"][aria-label*="watchlist"],
+  html body button[aria-pressed="true"][aria-label^="Watch "] {
+    background-color: #246539 !important;
+    background-image: none !important;
+    color: #d7ffe0 !important;
+  }
+
+  /* Carousel prev/next arrows (homepage rails, recommendation carousels) */
+  html body button[aria-label="Next Slide"],
+  html body button[aria-label="Previous Slide"],
+  html body button[aria-label="Next slide"],
+  html body button[aria-label="Previous slide"] {
+    background-color: #193522 !important;
+    background-image: none !important;
+    color: var(--hg-accent-strong) !important;
+    border-color: #458a58 !important;
+    opacity: 1 !important;
+  }
+  html body button[aria-label="Next Slide"] > *,
+  html body button[aria-label="Previous Slide"] > *,
+  html body button[aria-label="Next slide"] > *,
+  html body button[aria-label="Previous slide"] > * {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+  html body button[aria-label="Next Slide"] svg,
+  html body button[aria-label="Previous Slide"] svg,
+  html body button[aria-label="Next slide"] svg,
+  html body button[aria-label="Previous slide"] svg {
+    color: var(--hg-accent-strong) !important;
+    stroke: var(--hg-accent-strong) !important;
+    opacity: 1 !important;
+  }
+  html body button[aria-label="Next Slide"]:hover,
+  html body button[aria-label="Previous Slide"]:hover,
+  html body button[aria-label="Next slide"]:hover,
+  html body button[aria-label="Previous slide"]:hover {
+    border-color: var(--hg-accent) !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+
+  /* "Full page" / zoom / quick-view / enlarge icon on listing thumbnails.
+     eBay's exact aria-label varies by surface, so this matches on the
+     common wordings rather than one fixed string. */
+  html body button[aria-label*="Zoom"],
+  html body button[aria-label*="zoom"],
+  html body button[aria-label*="Enlarge"],
+  html body button[aria-label*="enlarge"],
+  html body button[aria-label*="Expand image"],
+  html body button[aria-label*="expand image"],
+  html body button[aria-label*="Full screen"],
+  html body button[aria-label*="full screen"],
+  html body button[aria-label*="View larger"],
+  html body button[aria-label*="Quick look"],
+  html body button[aria-label*="Quick view"],
+  html body button[aria-label="Opens image gallery"] {
+    background-color: #142b1b !important;
+    background-image: none !important;
+    color: var(--hg-accent-strong) !important;
+    border: 1px solid #458a58 !important;
+    border-radius: 50% !important;
+    opacity: 1 !important;
+  }
+  html body button[aria-label*="Zoom"] > *,
+  html body button[aria-label*="zoom"] > *,
+  html body button[aria-label*="Enlarge"] > *,
+  html body button[aria-label*="enlarge"] > *,
+  html body button[aria-label*="Expand image"] > *,
+  html body button[aria-label*="Full screen"] > *,
+  html body button[aria-label*="View larger"] > *,
+  html body button[aria-label*="Quick look"] > *,
+  html body button[aria-label*="Quick view"] > *,
+  html body button[aria-label="Opens image gallery"] > * {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+  html body button[aria-label*="Zoom"] svg,
+  html body button[aria-label*="zoom"] svg,
+  html body button[aria-label*="Enlarge"] svg,
+  html body button[aria-label*="enlarge"] svg,
+  html body button[aria-label*="Expand image"] svg,
+  html body button[aria-label*="Full screen"] svg,
+  html body button[aria-label*="View larger"] svg,
+  html body button[aria-label*="Quick look"] svg,
+  html body button[aria-label*="Quick view"] svg,
+  html body button[aria-label="Opens image gallery"] svg {
+    color: var(--hg-accent-strong) !important;
+    stroke: var(--hg-accent-strong) !important;
+    opacity: 1 !important;
+  }
+  html body button[aria-label*="Zoom"]:hover,
+  html body button[aria-label*="zoom"]:hover,
+  html body button[aria-label*="Enlarge"]:hover,
+  html body button[aria-label*="enlarge"]:hover,
+  html body button[aria-label*="Expand image"]:hover,
+  html body button[aria-label*="Full screen"]:hover,
+  html body button[aria-label*="View larger"]:hover,
+  html body button[aria-label*="Quick look"]:hover,
+  html body button[aria-label*="Quick view"]:hover,
+  html body button[aria-label="Opens image gallery"]:hover {
+    border-color: var(--hg-accent) !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+
+  /* ======================================================================
+     EBAY LIVE PILL
+     ====================================================================== */
+  html body a[href*="/ebaylive"] {
+    background-color: #163622 !important;
+    color: #b8ffc9 !important;
+    border: 1px solid var(--hg-accent) !important;
+    border-radius: 999px !important;
+  }
+  html body a[href*="/ebaylive"] > span,
+  html body a[href*="/ebaylive"] > div {
+    background: transparent !important;
+    color: #b8ffc9 !important;
+  }
+  html body a[href*="/ebaylive"]:hover {
+    background-color: #205d35 !important;
+    color: #e3ffe9 !important;
+    border-color: var(--hg-accent-strong) !important;
+    box-shadow: var(--hg-glow-md) !important;
+  }
+
+  /* ======================================================================
+     DROPDOWNS / FLYOUTS / AUTOCOMPLETE — shared "green glass" treatment
+     ====================================================================== */
+  html body .home-flyout-menu .vl-flyout-nav__flyout,
+  html body #vl-flyout-nav .vl-flyout-nav__flyout,
+  html body .vl-flyout-nav__more .vl-flyout-nav__flyout,
+  html body .gh-flyout__box,
+  html body .gh-menu__menu,
+  html body .gh-menu__content,
+  html body .gh-submenu,
+  html body .gf-flag__dropdown,
+  html body .filter-menu,
+  html body .filter-menu__content,
+  html body .ui-autocomplete,
+  html body #ebay-autocomplete,
+  html body [role="listbox"],
+  html body [role="menu"],
+  html body [class*="dropdown-menu"],
+  html body [class*="dropdown__menu"],
+  html body [class*="dropdown__panel"],
+  html body [class*="DropdownMenu"],
+  html body [class*="popover__content"],
+  html body [class*="PopoverContent"] {
+    background: var(--hg-glass-bg) !important;
+    color: #d9ffe4 !important;
+    border: 1px solid var(--hg-accent) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--hg-glow-md) !important;
+    -webkit-backdrop-filter: var(--hg-glass-blur) !important;
+    backdrop-filter: var(--hg-glass-blur) !important;
+  }
+  html body .gh-flyout__dialog,
+  html body .gh-menu__menu .gh-menu__content,
+  html body .filter-menu .filter-menu__content {
+    background: transparent !important;
+    border: 0 none !important;
+    box-shadow: none !important;
+  }
+  html body .home-flyout-menu .vl-flyout-nav__flyout .vl-flyout-nav__sub-cats,
+  html body .home-flyout-menu .vl-flyout-nav__flyout .vl-flyout-nav__sub-cat-col,
+  html body .home-flyout-menu .vl-flyout-nav__flyout .vl-flyout-nav__rtm,
+  html body .home-flyout-menu .vl-flyout-nav__flyout .vl-flyout-nav__rtm > div,
+  html body .gh-flyout__dialog .gh-categories__col,
+  html body .gh-flyout__dialog .gh-categories__group,
+  html body .gh-flyout__dialog .gh-categories__foot,
+  html body .gh-flyout__dialog .gh-categories__list,
+  html body .gh-flyout__dialog .gh-categories__main > div,
+  html body .gh-flyout__box > div {
+    background: transparent !important;
+    color: #d9ffe4 !important;
+  }
+  html body .home-flyout-menu .vl-flyout-nav__flyout .vl-flyout-nav__sub-cats,
+  html body .gh-flyout__dialog .gh-categories__main {
+    background-color: rgba(4,21,11,.36) !important;
+  }
+  html body .vl-flyout-nav__sub-cat-col + .vl-flyout-nav__sub-cat-col,
+  html body .gh-categories__col + .gh-categories__col {
+    border-left: 1px solid rgba(101,255,148,.25) !important;
+  }
+  html body .vl-flyout-nav__flyout h2, html body .vl-flyout-nav__flyout h3,
+  html body .vl-flyout-nav__flyout h4,
+  html body .gh-flyout__dialog h3, html body .gh-flyout__dialog h4 {
+    color: #c1ffd1 !important;
+    border-bottom-color: rgba(101,255,148,.5) !important;
+  }
+  html body .vl-flyout-nav__flyout a, html body .gh-flyout__dialog a,
+  html body #ebay-autocomplete a, html body [role="listbox"] [role="option"] {
+    color: #95ffb0 !important;
+  }
+  html body .vl-flyout-nav__flyout a:hover,
+  html body .gh-flyout__dialog a:hover,
+  html body #ebay-autocomplete li:hover,
+  html body [role="listbox"] [role="option"]:hover,
+  html body [role="menu"] [role="menuitem"]:hover,
+  html body nav li:hover,
+  html body .gh-flyout__target:hover,
+  html body .gh-categories__cat:hover,
+  html body .gh-categories__list li:hover,
+  html body #gh li:hover,
+  html body #gh .gh-flyout__target:hover,
+  html body .gh-header .gh-categories__cat:hover {
+    background-color: rgba(36,96,55,.45) !important;
+    color: var(--hg-accent-strong) !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+  html body .home-flyout-menu .vl-flyout-nav__js-tab:hover,
+  html body .home-flyout-menu .vl-flyout-nav__js-tab:hover > a {
+    background-color: #18432a !important;
+    color: #c8ffd7 !important;
+    box-shadow: inset 0 -2px 0 var(--hg-accent) !important;
+  }
+
+  /* ======================================================================
+     VI-EVO / ITEM DETAIL PAGE
+     ====================================================================== */
+  html body .vi-evo .x-buybox,
+  html body .vi-evo .x-buybox__container,
+  html body .vi-evo .x-seller-info,
+  html body .vi-evo .x-sellercard,
+  html body .vi-evo .x-price-section,
+  html body .vi-evo .x-item-title,
+  html body .vim.x-buybox,
+  html body .vim.x-sellercard,
+  html body.vi-body .vi-evo .x-buybox,
+  html body.vi-body .vi-evo .x-buybox__container,
+  html body.vi-body .vi-evo .x-seller-info,
+  html body.vi-body .vi-evo .x-sellercard,
+  html body.vi-body .vi-evo .x-price-section,
+  html body.vi-body .vi-evo .x-shipping-section,
+  html body.vi-body .vi-evo .x-about-this-item,
+  html body.vi-body .vi-evo .ux-layout-section,
+  html body.vi-body .vi-evo .ux-layout-section__item,
+  html body.vi-body .vi-evo .ux-labels-values,
+  /* Unscoped fallback: same reasoning as the image carousel fix above —
+     if the live page doesn't carry a .vi-evo/.vi-body wrapper around
+     these, the ancestor-scoped rules above never match anything. */
+  html body .x-buybox,
+  html body .x-buybox__container,
+  html body .x-seller-info,
+  html body .x-sellercard,
+  html body .x-price-section,
+  html body .x-shipping-section,
+  html body .x-about-this-item,
+  html body .ux-labels-values {
+    background-color: rgba(13,32,20,.32) !important;
+    border-color: rgba(101,255,148,.4) !important;
+    color: var(--hg-ink-bright) !important;
+  }
+  html body .vi-evo .x-buybox, html body .vi-evo .x-buybox__container {
+    border: 1px solid rgba(101,255,148,.48) !important;
+    border-radius: 14px !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+  html body .vi-evo .x-seller-info, html body .vi-evo .x-sellercard {
+    border-bottom: 1px solid rgba(101,255,148,.38) !important;
+  }
+  html body .vi-evo .x-item-title__mainTitle,
+  html body .vi-evo .x-item-title__mainTitle span,
+  html body .vi-evo .x-price-primary,
+  html body .vi-evo .x-price-primary span,
+  html body .vi-evo .x-price-section span,
+  html body.vi-body .vi-evo h1, html body.vi-body .vi-evo h2, html body.vi-body .vi-evo h3 {
+    color: var(--hg-ink-bright) !important;
+  }
+  html body .vi-evo .x-item-condition, html body .vi-evo .x-item-condition span,
+  html body .vi-evo .ux-labels-values__labels, html body .vi-evo .ux-labels-values__labels span,
+  html body .vi-evo .ux-labels-values__labels-content, html body .vi-evo .ux-labels-values__labels-content span,
+  html body .vi-evo .x-shipping-minview, html body .vi-evo .x-shipping-minview span,
+  html body .vi-evo .x-shipping-section, html body .vi-evo .ux-textspans--secondary,
+  html body.vi-body .vi-evo .ux-labels-values__labels,
+  html body.vi-body .vi-evo .ux-labels-values__labels span,
+  html body.vi-body .vi-evo .ux-textspans--secondary,
+  html body.vi-body .vi-evo .x-item-condition,
+  html body.vi-body .vi-evo .x-item-condition span,
+  html body.vi-body .vi-evo .x-shipping-section .ux-textspans,
+  html body.vi-body .vi-evo .x-shipping-minview .ux-textspans {
+    color: #b9dcc5 !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+  }
+  html body .vi-evo .ux-labels-values__values,
+  html body .vi-evo .ux-labels-values__values span,
+  html body .vi-evo .x-item-condition__value {
+    color: var(--hg-ink-bright) !important;
+  }
+
+  /* Urgency / watcher / social-proof banners — one glass treatment */
+  html body .vi-evo [class*="urgency"], html body .vi-evo [class*="Urgency"],
+  html body .vi-evo [class*="signal"], html body .vi-evo [class*="Signal"],
+  html body .vi-evo [class*="watcher"], html body .vi-evo [class*="watching"],
+  html body .vi-evo [class*="social-proof"], html body .vi-evo [class*="socialProof"],
+  html body .vi-evo [class*="fomo"], html body .vi-evo [class*="scarcity"],
+  html body .vim div[class*="urgency"], html body .vim div[class*="signal"] {
+    background: var(--hg-glass-bg) !important;
+    color: #d9ffe4 !important;
+    border: 1px solid rgba(101,255,148,.6) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+  html body .vi-evo [class*="urgency"] span, html body .vi-evo [class*="urgency"] p,
+  html body .vi-evo [class*="signal"] span, html body .vi-evo [class*="scarcity"] span,
+  html body .vi-evo [class*="urgency"] .ux-textspans, html body .vi-evo [class*="signal"] .ux-textspans {
+    color: #d9ffe4 !important;
+    opacity: 1 !important;
+  }
+  html body .vi-evo [class*="urgency"] > div, html body .vi-evo [class*="urgency"] > section,
+  html body .vi-evo [class*="signal"] > div {
+    background: transparent !important;
+  }
+
+  /* Buy actions: the ONE strongly-glowing CTA on the page. Everything
+     else gets the quiet border-glow treatment, keeping this one special. */
+  html body .vi-evo a[href*="/bin/ctb"],
+  html body .vim a[href*="/bin/ctb"],
+  html body .vi-evo .x-bin-action .ux-call-to-action,
+  html body.vi-body .vi-evo a[href*="/bin/ctb"],
+  html body.vi-body .vi-evo [class*="bin-action"] a,
+  html body.vi-body .vi-evo [class*="buy-now"] a {
+    background: linear-gradient(180deg, #40ce72, #237b43) !important;
+    color: #06150a !important;
+    border: 1px solid #a0ffb9 !important;
+    border-radius: 999px !important;
+    font-weight: 700 !important;
+    box-shadow: var(--hg-glow-md) !important;
+    text-shadow: none !important;
+  }
+  html body .vi-evo a[href*="/bin/ctb"]:hover,
+  html body .vim a[href*="/bin/ctb"]:hover,
+  html body.vi-body .vi-evo a[href*="/bin/ctb"]:hover {
+    background: linear-gradient(180deg, #70f89a, #36b967) !important;
+    color: #051509 !important;
+    border-color: #d2ffdc !important;
+    box-shadow: var(--hg-glow-lg) !important;
+  }
+  html body .vi-evo a[href*="cart.payments.ebay.com/sc/add"],
+  html body .vi-evo a[href*="/bo/makeOffer/"],
+  html body .vi-evo .x-atc-action .ux-call-to-action,
+  html body .vi-evo .x-offer-action .ux-call-to-action,
+  html body .vi-evo .x-watchlist .ux-call-to-action,
+  html body.vi-body .vi-evo a[href*="cart.payments.ebay.com/sc/add"],
+  html body.vi-body .vi-evo a[href*="/bo/makeOffer/"],
+  html body.vi-body .vi-evo button[aria-label*="Watchlist"],
+  html body.vi-body .vi-evo button[aria-label*="watchlist"],
+  html body .vim a[href*="cart.payments.ebay.com/sc/add"],
+  html body .vim a[href*="/bo/makeOffer/"] {
+    background-color: rgba(24,57,34,.9) !important;
+    color: #aaffc1 !important;
+    border: 1px solid #4bb86b !important;
+    border-radius: 999px !important;
+  }
+  html body .vi-evo a[href*="cart.payments.ebay.com/sc/add"]:hover,
+  html body .vi-evo a[href*="/bo/makeOffer/"]:hover,
+  html body.vi-body .vi-evo button[aria-label*="Watchlist"]:hover,
+  html body.vi-body .vi-evo button[aria-label*="watchlist"]:hover {
+    border-color: var(--hg-accent) !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+
+  /* Gallery chrome only — image pixels always untouched.
+     Every rule here is written BOTH scoped to .vi-body .vi-evo (in case
+     that wrapper is present) AND unscoped on the bare class names (in
+     case eBay's current item page doesn't carry that wrapper at all —
+     confirmed from inspected markup that the carousel div itself renders
+     with no ancestor context assumed). This is what was previously
+     making the item page look unstyled next to the homepage: the rule
+     existed, but its required ancestor wasn't actually in the DOM. */
+  html body .vi-evo .ux-image-carousel-container,
+  html body .vi-evo .ux-image-carousel-item,
+  html body .vi-evo .ux-image-carousel,
+  html body .vi-evo .gallery, html body .vi-evo .gallery__image,
+  html body.vi-body .vi-evo [class*="image-carousel"],
+  html body.vi-body .vi-evo [class*="image-gallery"],
+  html body.vi-body .vi-evo [class*="gallery__container"],
+  html body .ux-image-carousel-container,
+  html body .ux-image-carousel-item,
+  html body .ux-image-carousel,
+  html body [class*="image-carousel"],
+  html body [class*="image-gallery"],
+  html body [class*="gallery__container"] {
+    background-color: var(--hg-surface-2) !important;
+    border-color: rgba(101,255,148,.4) !important;
+  }
+  html body.vi-body .vi-evo .ux-image-carousel-item.image-treatment,
+  html body.vi-body .vi-evo .ux-image-carousel-item.image-treatment.active.image,
+  html body .ux-image-carousel-item.image-treatment,
+  html body .ux-image-carousel-item.image-treatment.active.image {
+    background: var(--hg-glass-bg) !important;
+    border: 1px solid rgba(105,255,153,.65) !important;
+    border-radius: 10px !important;
+    box-shadow: var(--hg-glow-sm) !important;
+    -webkit-backdrop-filter: var(--hg-glass-blur) !important;
+    backdrop-filter: var(--hg-glass-blur) !important;
+  }
+  html body .vi-evo img, html body .vi-evo .ux-image-carousel img,
+  html body .vi-evo .gallery img, html body .vi-evo img[src*="i.ebayimg.com"],
+  html body.vi-body .vi-evo .ux-image-carousel-item.image-treatment > img,
+  html body .ux-image-carousel img,
+  html body .gallery img,
+  html body img[src*="i.ebayimg.com"],
+  html body .ux-image-carousel-item.image-treatment > img {
+    filter: none !important;
+    opacity: 1 !important;
+    mix-blend-mode: normal !important;
+  }
+  html body .vi-evo .ux-image-carousel__thumbnail,
+  html body .vi-evo .ux-image-carousel__thumbnail-item,
+  html body .vi-evo .ux-image-carousel__thumbnail-list button,
+  html body.vi-body .vi-evo button[aria-label*="Item images thumbnails"],
+  html body.vi-body .vi-evo button[aria-label="Opens image gallery"],
+  html body .ux-image-carousel__thumbnail,
+  html body .ux-image-carousel__thumbnail-item,
+  html body .ux-image-carousel__thumbnail-list button,
+  html body button[aria-label*="Item images thumbnails"] {
+    background-color: #102719 !important;
+    color: #adffc2 !important;
+    border-color: rgba(101,255,148,.5) !important;
+  }
+  html body .vi-evo .ux-image-carousel__thumbnail:hover,
+  html body .vi-evo .ux-image-carousel__thumbnail-item:hover,
+  html body.vi-body .vi-evo button[aria-label*="Item images thumbnails"]:hover {
+    border-color: var(--hg-accent) !important;
+    box-shadow: var(--hg-glow-sm) !important;
+  }
+
+  html body .vi-evo hr, html body.vi-body .vi-evo hr,
+  html body.vi-body .vi-evo .ux-layout-section__row {
+    border-bottom-color: rgba(101,255,148,.5) !important;
+  }
+  html body .vi-evo .x-about-this-item h2,
+  html body .vi-evo .ux-layout-section__title,
+  html body .vi-evo .x-item-description h2 {
+    color: var(--hg-accent-strong) !important;
+  }
+
+  /* VI-EVO top offer banner — the same glass treatment, consolidated */
+  html body.vi-body .vi-evo .vim.vi-grid.x-evo-atf-top-river {
+    background: var(--hg-glass-bg) !important;
+    border: 1px solid rgba(105,255,153,.75) !important;
+    border-radius: 12px !important;
+    color: var(--hg-ink-bright) !important;
+    box-shadow: var(--hg-glow-md) !important;
+    -webkit-backdrop-filter: var(--hg-glass-blur) !important;
+    backdrop-filter: var(--hg-glass-blur) !important;
+  }
+  html body.vi-body .vi-evo .x-evo-atf-top-river > .d-vi-evo-region,
+  html body.vi-body .vi-evo .x-evo-atf-top-river .d-statusmessage,
+  html body.vi-body .vi-evo .x-evo-atf-top-river .d-statusmessage__notice-live-region,
+  html body.vi-body .vi-evo .x-evo-atf-top-river .d-top-panel-message,
+  html body.vi-body .vi-evo .x-evo-atf-top-river .d-top-panel-message--statuscontainer,
+  html body.vi-body .vi-evo .x-evo-atf-top-river .d-top-panel-message--statuscontainer .ux-layout-section__item,
+  html body.vi-body .vi-evo .x-evo-atf-top-river .d-top-panel-message--statuscontainer .ux-layout-section__row,
+  html body.vi-body .vi-evo .x-evo-atf-top-river .ux-layout-section__textual-display--statusMessage {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+  }
+  html body.vi-body .vi-evo .x-evo-atf-top-river .d-top-panel-message--statuscontainer .ux-textspans,
+  html body.vi-body .vi-evo .x-evo-atf-top-river .d-top-panel-message--statuscontainer .ux-textspans--BOLD {
+    color: var(--hg-ink-bright) !important;
+    opacity: 1 !important;
+  }
+  html body.vi-body .vi-evo .x-evo-atf-top-river .d-top-panel-message--statuscontainer button.ux-action.fake-link,
+  html body.vi-body .vi-evo .x-evo-atf-top-river .d-top-panel-message--statuscontainer button.ux-action.fake-link .ux-textspans--PSEUDOLINK {
+    background: transparent !important;
+    color: #89ffad !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  html body.vi-body .vi-evo .x-evo-atf-top-river .d-top-panel-message--statuscontainer button.ux-action.fake-link:hover,
+  html body.vi-body .vi-evo .x-evo-atf-top-river .d-top-panel-message--statuscontainer button.ux-action.fake-link:hover .ux-textspans--PSEUDOLINK {
+    color: var(--hg-accent-strong) !important;
+    text-shadow: var(--hg-glow-sm) !important;
+  }
+}
