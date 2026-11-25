@@ -3,7 +3,7 @@
 @namespace    USO Archive
 @author       UrsidaeSentinel
 @description  eBay - Hacker Green | Dark
-@version      20261123.02.43
+@version      20261124.21.07
 @license      NONE
 @preprocessor uso
 ==/UserStyle== */
@@ -55,12 +55,32 @@
      BASE CANVAS + SIGNATURE GRID WALLPAPER
      Boosted slightly vs v1.12 so it's visible, not just technically present.
      ====================================================================== */
-  /* Painted redundantly on html AND body (not just html with everything
-     else "transparent"): some eBay page shells scroll inside body rather
-     than the viewport, which can stop a fixed background declared only on
-     html from ever being visible. Giving body the identical paint means
-     the grid shows no matter which element ends up doing the scrolling. */
+  /* PERFORMANCE NOTE (scroll smoothness):
+     background-attachment: fixed on html/body is the classic cause of
+     choppy scrolling — on most engines a fixed background has to be
+     repainted against the new scroll position on every single frame,
+     because it lives on the same layer as the content that's scrolling.
+     The fix below keeps the exact same visual (same colors, same grid,
+     same "stays put while content scrolls" behavior) but moves the grid
+     onto its own dedicated position:fixed element instead. A position:
+     fixed element gets its own GPU compositing layer automatically, so
+     the browser can cache it once and just scroll the content on top of
+     it, instead of repainting the gradient itself on every scroll tick.
+     html/body keep a cheap flat color only (in case the pseudo-element
+     ends up hidden by something — e.g. an ancestor with its own CSS
+     transform, which is the one case that can make position:fixed stop
+     being relative to the viewport). */
   html, body {
+    background-color: #0a0a0a !important;
+    background-image: none !important;
+    min-height: 100vh !important;
+  }
+  html::before {
+    content: "" !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
     background-color: #0a0a0a !important;
     background-image:
       linear-gradient(to right, rgba(146,255,174,.14) 1px, transparent 1px),
@@ -69,16 +89,23 @@
     background-size: 40px 40px, 40px 40px, 100% 4px !important;
     background-position: 0 0, 0 0, 0 0 !important;
     background-repeat: repeat, repeat, repeat !important;
-    background-attachment: fixed, fixed, fixed !important;
-    min-height: 100vh !important;
+    /* Promotes this to its own compositor layer instead of repainting
+       with the page; transform/backface-visibility are the standard
+       pair browsers key this optimization off of. */
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    will-change: transform !important;
   }
 
   html, body, #mainContent, #maincontent, main, [role="main"] {
     color: var(--hg-ink) !important;
   }
   /* Everything between body and the actual content panels stays clear so
-     the grid painted above keeps showing through the gutters. */
+     the grid painted above keeps showing through the gutters. Explicit
+     z-index/position so these panels paint above the fixed grid layer. */
   #mainContent, #maincontent, main, [role="main"] {
+    position: relative !important;
+    z-index: 1 !important;
     background-color: transparent !important;
     background-image: none !important;
   }
