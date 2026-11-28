@@ -1,0 +1,571 @@
+/* ==UserStyle==
+@name         知乎 · 星空图书馆
+@namespace    USO Archive
+@author       ha mu
+@description  把知乎变成星空图书馆：拱形夜窗封面、羊皮纸书页回答、书签侧栏、星座热榜。原创插画，Tokeny 出品。 官网：https://tokeny-ai.com/?utm_source=userstyles&utm_medium=style&utm_campaign=anime-userstyles    源码与更新：https://github.com/tokeny-ai/anime-userstyles
+@version      20261128.03.56
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("zhihu.com") {
+/*
+ * 知乎 · 星空图书馆（完全改造版）
+ * 母题：夜空背景 + 拱形窗主视觉 + 书页卡片（羊皮纸、金色双线页边、卷角）+ 书签侧栏 + 星座热榜 + 烫金按钮。
+ * 四色：夜空 #141233 / 星金 #ffd98a / 书页 #f3ead6 / 墨 #2a2440（星紫 #8b7bff 只作点缀）
+ * 走知乎原生浅色色板：书页上的正文本来就是深色墨字，只把夜空里的文字改亮。
+ */
+
+:root {
+  --lb-night: #141233;
+  --lb-frame: #231e4d;
+  --lb-gold: #ffd98a;
+  --lb-gold-deep: #b8893a;
+  --lb-paper: #f3ead6;
+  --lb-ink: #2a2440;
+  --lb-violet: #8b7bff;
+  --lb-violet-ink: #5446c2;
+  --lb-serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", serif;
+  /* 书页：金色双线页边 + 夜里透出的暖光 */
+  --lb-page-bg: radial-gradient(ellipse at 50% 40%, #f7f0de 55%, #e9dcba 100%);
+  --lb-page-rule: inset 0 0 0 1px #c9a24a, inset 0 0 0 5px #f3ead6, inset 0 0 0 6px rgba(184, 137, 58, 0.55);
+  --lb-page-glow: 0 10px 28px rgba(5, 4, 24, 0.55), 0 0 36px rgba(255, 217, 138, 0.14);
+  --lb-foil: linear-gradient(160deg, #fff1c8 0%, #ffd98a 38%, #d6a650 62%, #ffe4a3 100%);
+  --MapBrand: #5446c2 !important;
+  --MapInfo: #5446c2 !important;
+  --MapLink: #5446c2 !important;
+  --MapText02A: #2a2440 !important;
+  --MapText03A: #2a2440 !important;
+  --MapText04A: #3d3554 !important;
+  --MapText05A: #5f5672 !important;
+  --MapText06A: #5f5672 !important;
+  --MapText07A: #7d7388 !important;
+  --MapUIFrame08A: rgba(42, 36, 64, 0.16) !important;
+  --MapUIFrame08B: rgba(42, 36, 64, 0.16) !important;
+  --MapUIFrame10A: rgba(184, 137, 58, 0.12) !important;
+  --MapUIFrame99A: #f3ead6 !important;
+}
+
+/* ============ 夜空 ============ */
+html {
+  background: var(--lb-night) !important;
+}
+body {
+  background:
+    linear-gradient(rgba(20, 18, 51, 0.5), rgba(20, 18, 51, 0.5)),
+    url("https://cdn.jsdelivr.net/gh/tokeny-ai/anime-userstyles@main/images/zhihu-bg.webp") center top / cover fixed no-repeat,
+    var(--lb-night) !important;
+}
+#root, .App, .App-main, .Topstory, .Topstory-container, .Topstory-mainColumn,
+.Topstory-mainColumnCard, .Topstory-content, .ListShortcut,
+.QuestionPage, .Question-main, .Question-mainColumn, .Post-content,
+.AnswerFormPortalContainer, .HotList-list, .HotItem, .Topstory-recommend,
+.QuestionAnswers-answers, .AnswersNavWrapper, .Card > div:first-child:last-child,
+.skeleton {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+/* ============ 顶栏：书架顶板，金色双线下沿 ============ */
+.AppHeader, .ColumnPageHeader, .AppHeader .PageHeader {
+  background: var(--lb-night) !important;
+  border-bottom: 3px double rgba(255, 217, 138, 0.7) !important;
+  box-shadow: 0 6px 18px rgba(5, 4, 24, 0.45) !important;
+}
+.AppHeader .PageHeader {
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+.AppHeader nav a, .AppHeader nav div, .AppHeader a div, .AppHeader button,
+.AppHeader [class*="Popover"] div, .ColumnPageHeader div, .PageHeader .QuestionHeader-title {
+  color: #e6dcc0 !important;
+}
+.PageHeader .QuestionHeader-title {
+  font-family: var(--lb-serif) !important;
+  color: var(--lb-gold) !important;
+}
+.ColumnPageHeader a, .ColumnPageHeader a div {
+  color: var(--lb-gold) !important;
+}
+.AppHeader nav a:hover, .AppHeader nav a.is-active, .AppHeader nav a.is-active div {
+  color: var(--lb-gold) !important;
+  font-weight: 700 !important;
+}
+.AppHeader nav a.is-active div:empty {
+  background: var(--lb-gold) !important;
+}
+.AppHeader a[aria-label="知乎"] svg path, .AppHeader svg[viewBox="0 0 64 30"] path {
+  fill: var(--lb-gold) !important;
+}
+.SearchBar-input, .SearchBar .Input-wrapper {
+  background: var(--lb-paper) !important;
+  border: 1px solid var(--lb-gold-deep) !important;
+  border-radius: 3px !important;
+}
+.SearchBar-input input {
+  color: var(--lb-ink) !important;
+  background: transparent !important;
+}
+.SearchBar-searchButton {
+  background: var(--lb-foil) !important;
+  border-radius: 0 3px 3px 0 !important;
+  color: var(--lb-ink) !important;
+}
+
+/* ============ 主视觉：图书馆的拱形夜窗 400px ============ */
+.App-main {
+  position: relative !important;
+}
+.App-main::before {
+  content: "今夜，翻开哪一页的答案";
+  display: flex;
+  align-items: flex-end;
+  box-sizing: border-box;
+  width: min(1000px, calc(100% - 32px));
+  height: 400px;
+  margin: 22px auto 26px;
+  padding: 0 0 108px 60px;
+  border: 12px solid var(--lb-frame);
+  border-radius: 500px 500px 4px 4px / 150px 150px 4px 4px;
+  font: 700 46px/1.25 var(--lb-serif);
+  letter-spacing: 0.08em;
+  color: var(--lb-gold);
+  text-shadow: 0 2px 0 var(--lb-night), 0 0 22px rgba(255, 217, 138, 0.55);
+  background:
+    /* 捧书少女站在右侧窗格前，被窗台裁到膝上 */
+    url("https://cdn.jsdelivr.net/gh/tokeny-ai/anime-userstyles@main/images/zhihu-char-1.webp") right 9% top 4px / auto 440px no-repeat,
+    /* 竖棂：一根贯通（隔出角色窗格），左上拱窗里再加一根短棂，不穿过标题 */
+    linear-gradient(90deg, transparent calc(66.6% - 6px), rgba(255, 217, 138, 0.55) 0 calc(66.6% - 5px),
+      #231e4d 0 calc(66.6% + 5px), rgba(255, 217, 138, 0.55) 0 calc(66.6% + 6px), transparent 0),
+    linear-gradient(90deg, transparent calc(33.3% - 6px), rgba(255, 217, 138, 0.55) 0 calc(33.3% - 5px),
+      #231e4d 0 calc(33.3% + 5px), rgba(255, 217, 138, 0.55) 0 calc(33.3% + 6px), transparent 0) top / 100% 35% no-repeat,
+    /* 横档 */
+    linear-gradient(180deg, transparent 34%, rgba(255, 217, 138, 0.55) 0 calc(34% + 1px), #231e4d 0 calc(34% + 9px),
+      rgba(255, 217, 138, 0.55) 0 calc(34% + 10px), transparent 0),
+    /* 窗台 */
+    linear-gradient(180deg, var(--lb-gold) 0 2px, #231e4d 2px) center bottom / 100% 20px no-repeat,
+    /* 窗台上的一排书脊：高矮两层 */
+    repeating-linear-gradient(90deg, #3b3180 0 14px, transparent 0 30px, #b8893a 0 41px, transparent 0 60px,
+      #8b7bff 0 70px, transparent 0 88px) left 40px bottom 20px / 30% 46px no-repeat,
+    repeating-linear-gradient(90deg, transparent 0 15px, #5446c2 0 29px, transparent 0 42px, #ffd98a 0 50px,
+      #2a2440 0 59px, transparent 0 71px, #3b3180 0 87px, transparent 0 88px) left 40px bottom 20px / 30% 34px no-repeat,
+    /* 书页的暖光 */
+    radial-gradient(circle at 80% 58%, rgba(255, 217, 138, 0.42), transparent 24%),
+    linear-gradient(90deg, rgba(20, 18, 51, 0.78) 0%, rgba(20, 18, 51, 0.3) 48%, transparent 66%),
+    url("https://cdn.jsdelivr.net/gh/tokeny-ai/anime-userstyles@main/images/zhihu-banner.webp") center 28% / cover no-repeat,
+    var(--lb-night);
+  box-shadow: 0 0 0 2px var(--lb-gold), 0 0 0 7px var(--lb-night), 0 0 0 8px rgba(255, 217, 138, 0.5),
+    0 20px 50px rgba(5, 4, 24, 0.6), 0 0 90px rgba(139, 123, 255, 0.28);
+}
+/* 小标：馆名，压在大标题上方 */
+.App-main::after {
+  content: "✦  知乎 · 星空图书馆  ✦";
+  position: absolute;
+  top: 192px;
+  left: max(88px, calc(50% - 500px + 88px));
+  padding: 6px 16px;
+  font: 600 17px/1 var(--lb-serif);
+  letter-spacing: 0.32em;
+  color: var(--lb-ink);
+  background: var(--lb-foil);
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px #a07a34, 0 3px 10px rgba(5, 4, 24, 0.5);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ============ 书页：信息流、回答、文章、热榜 ============ */
+.WriteArea.Card, .TopstoryItem, .HotList, .QuestionHeader, .AnswersNavWrapper .List-item,
+.Post-content > div:not(.Post-Sub) > div:first-child:nth-last-child(2), .Recommendations-Main .PostItem {
+  position: relative !important;
+  background: var(--lb-page-bg) !important;
+  border: 0 !important;
+  border-radius: 2px 2px 2px 2px !important;
+  box-shadow: var(--lb-page-rule), var(--lb-page-glow) !important;
+  color: var(--lb-ink) !important;
+}
+/* 右下角卷页 */
+.TopstoryItem::after, .AnswersNavWrapper .List-item::after,
+.Post-content > div:not(.Post-Sub) > div:first-child:nth-last-child(2)::after, .QuestionHeader::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(315deg, var(--lb-night) 0 50%, #c9b37f 50%, #efe2c2 85%);
+  box-shadow: -3px -3px 6px rgba(42, 36, 64, 0.18);
+  border-top-left-radius: 6px;
+  pointer-events: none;
+}
+.TopstoryItem, .AnswersNavWrapper .List-item {
+  margin-bottom: 16px !important;
+  counter-increment: lb-page;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.TopstoryItem:hover, .AnswersNavWrapper .List-item:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--lb-page-rule), 0 14px 32px rgba(5, 4, 24, 0.6), 0 0 48px rgba(255, 217, 138, 0.26) !important;
+}
+/* 页码：竖排写在书页左侧的夜色里 */
+.ListShortcut, .AnswersNavWrapper {
+  counter-reset: lb-page;
+}
+.TopstoryItem::before, .AnswersNavWrapper .List-item::before {
+  content: "第 " counter(lb-page) " 页";
+  position: absolute;
+  left: -34px;
+  top: 18px;
+  writing-mode: vertical-rl;
+  font: 600 13px/1 var(--lb-serif);
+  letter-spacing: 0.2em;
+  color: rgba(255, 217, 138, 0.75);
+  pointer-events: none;
+}
+.WriteArea.Card {
+  margin-bottom: 16px !important;
+}
+.AnswersNavWrapper .List-item {
+  padding: 22px 24px !important;
+  border: 0 !important;
+}
+/* 回答数 = 章节标题，写在夜空里 */
+.AnswersNavWrapper .List-header, .ListShortcut > div:first-child:nth-last-child(2):not(.HotList) {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 3px double rgba(255, 217, 138, 0.6) !important;
+  box-shadow: none !important;
+  margin-bottom: 16px !important;
+}
+.List-headerText, .List-headerText span, .ListShortcut > div:first-child:nth-last-child(2):not(.HotList) div {
+  color: var(--lb-gold) !important;
+  font: 700 18px/1.2 var(--lb-serif) !important;
+  letter-spacing: 0.1em !important;
+}
+.List-headerOptions .InputButton, .List-headerOptions .InputButton span {
+  background: transparent !important;
+  color: #e6dcc0 !important;
+}
+.List-item + .List-item, .ContentItem:not(:last-child) {
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+}
+
+/* 衬线书名：标题全部换成宋体 */
+.ContentItem-title, .ContentItem-title a, .HotItem-title, .Post-Title, .QuestionHeader-title,
+.Card-headerText, .HotSearchCard-header, .AuthorCard-title, .RichText h2, .RichText h3 {
+  font-family: var(--lb-serif) !important;
+  color: var(--lb-ink) !important;
+}
+.ContentItem-title, .HotItem-title {
+  font-weight: 700 !important;
+}
+.ContentItem-title a:hover, .HotItem-title:hover {
+  color: var(--lb-violet-ink) !important;
+}
+.RichText, .RichContent-inner, .RichText p {
+  color: var(--lb-ink) !important;
+}
+.RichText a, .RichContent a:not(.Button), .RichContent-EntityWord, .ContentItem-more {
+  color: var(--lb-violet-ink) !important;
+}
+.RichText blockquote {
+  color: #5f5672 !important;
+  border-left: 3px solid var(--lb-gold-deep) !important;
+}
+.RichText pre, .RichText code, .highlight pre {
+  background: #e9dcba !important;
+  color: var(--lb-ink) !important;
+}
+/* 首字下沉：每页的第一段像书的开篇 */
+.Post-RichText > p:first-of-type::first-letter {
+  float: left;
+  font: 700 3.1em/1 var(--lb-serif);
+  margin: 4px 8px 0 0;
+  color: var(--lb-gold-deep);
+}
+
+/* ============ 问题页头 = 扉页 ============ */
+.QuestionHeader {
+  width: min(1000px, calc(100% - 32px)) !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  margin: 0 auto 16px !important;
+  padding: 26px 0 10px !important;
+}
+.QuestionHeader > .QuestionHeader-content, .QuestionHeader-footer-inner {
+  width: auto !important;
+  padding: 0 24px !important;
+  box-sizing: border-box !important;
+}
+.QuestionHeader-footer {
+  background: transparent !important;
+  border-top: 1px solid rgba(184, 137, 58, 0.45) !important;
+  box-shadow: none !important;
+  margin: 0 14px !important;
+}
+.QuestionHeader > .QuestionHeader-content .QuestionHeader-title {
+  font-size: 30px !important;
+  letter-spacing: 0.06em !important;
+  text-align: center !important;
+  margin: 16px 0 6px !important;
+}
+.QuestionHeader > .QuestionHeader-content .QuestionHeader-title::before,
+.QuestionHeader > .QuestionHeader-content .QuestionHeader-title::after {
+  content: "✦";
+  font-size: 16px;
+  color: var(--lb-gold-deep);
+  vertical-align: middle;
+  margin: 0 16px;
+}
+.Post-Title {
+  font-size: 32px !important;
+  line-height: 1.4 !important;
+  text-align: center !important;
+}
+.Post-Header {
+  padding-bottom: 14px !important;
+  border-bottom: 3px double rgba(184, 137, 58, 0.6) !important;
+}
+
+/* ============ 标签 = 书脊签 ============ */
+.Tag, .HotItem-label {
+  background: var(--lb-night) !important;
+  border: 1px solid var(--lb-gold-deep) !important;
+  border-radius: 2px !important;
+}
+.Tag, .Tag div, .Tag a, .Tag span, .HotItem-label {
+  color: var(--lb-gold) !important;
+  font-family: var(--lb-serif) !important;
+}
+/* 收录 / 专栏 小牌：同样做成书脊签 */
+.Post-Header > [class*="css-"] > [class*="css-"]:only-child > [class*="css-"], .LabelContainer > div {
+  background: var(--lb-night) !important;
+  border: 1px solid var(--lb-gold-deep) !important;
+  border-radius: 2px !important;
+}
+.Post-Header > [class*="css-"] > [class*="css-"]:only-child > [class*="css-"] *, .LabelContainer > div * {
+  color: var(--lb-gold) !important;
+  fill: currentColor;
+  font-family: var(--lb-serif) !important;
+}
+/* 热榜的「辟谣专区」等分栏：夜空里的金字目录 */
+.ListShortcut > div:first-child:nth-last-child(2):not(.HotList) * {
+  background: transparent !important;
+  color: var(--lb-gold) !important;
+  border-color: rgba(255, 217, 138, 0.6) !important;
+  font-family: var(--lb-serif) !important;
+}
+/* 顶栏（夜色）里的次级按钮：金线描边 */
+.AppHeader .Button:not(.Button--primary):not(.AppHeader-profileEntry) {
+  border-color: rgba(255, 217, 138, 0.6) !important;
+  color: var(--lb-gold) !important;
+}
+
+/* ============ 按钮 = 烫金标签 ============ */
+.Button--primary, .Button--primary.Button--blue, .FollowButton.Button--primary,
+.SearchBar-askButton, .WriteArea button.Button--blue {
+  background: var(--lb-foil) !important;
+  border: 1px solid #a07a34 !important;
+  border-radius: 3px !important;
+  color: var(--lb-ink) !important;
+  font-family: var(--lb-serif) !important;
+  font-weight: 700 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 2px 0 #8a6a2c !important;
+}
+.Button--primary svg, .FollowButton.Button--primary svg {
+  color: var(--lb-ink) !important;
+}
+.Button--secondary.Button--blue, .Button--blue.Button--plain, .Button--grey.Button--withIcon,
+.QuestionButtonGroup .Button--blue:not(.Button--primary) {
+  background: transparent !important;
+  border: 1px solid rgba(42, 36, 64, 0.5) !important;
+  border-radius: 3px !important;
+  color: var(--lb-ink) !important;
+}
+.VoteButton {
+  background: rgba(84, 70, 194, 0.1) !important;
+  border: 1px solid rgba(84, 70, 194, 0.35) !important;
+  border-radius: 3px !important;
+  color: var(--lb-violet-ink) !important;
+}
+.ContentItem-actions .Button:not(.VoteButton), .RichContent-actions .Button:not(.VoteButton) {
+  color: #5f5672 !important;
+}
+.Button:hover {
+  transform: translateY(-1px);
+}
+.Button--primary:hover {
+  filter: brightness(1.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 3px 0 #8a6a2c, 0 0 14px rgba(255, 217, 138, 0.6) !important;
+}
+.ContentItem-actions.is-fixed, .RichContent-actions.is-fixed, .Sticky.is-fixed .ContentItem-actions {
+  background: #efe4c8 !important;
+  border-top: 1px solid rgba(184, 137, 58, 0.5) !important;
+}
+
+/* ============ 热榜 = 星座图 ============ */
+.HotList {
+  padding-top: 8px !important;
+}
+.HotList-list {
+  position: relative !important;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 217, 138, 0.9) 0 1px, transparent 1.6px) 18px 0 / 56px 97px repeat-y,
+    radial-gradient(circle at 75% 60%, rgba(255, 255, 255, 0.7) 0 0.8px, transparent 1.4px) 18px 0 / 56px 61px repeat-y,
+    linear-gradient(90deg, transparent 18px, var(--lb-night) 18px 74px, transparent 74px) !important;
+  margin: 0 8px 0 8px !important;
+}
+.HotList-list::before {
+  content: "";
+  position: absolute;
+  left: 45px;
+  top: 30px;
+  bottom: 30px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--lb-gold), rgba(255, 217, 138, 0.35));
+}
+.HotItem {
+  padding-left: 10px !important;
+  border-bottom: 1px dashed rgba(184, 137, 58, 0.45) !important;
+}
+.HotItem-index {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 40px !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+.HotItem-content {
+  margin-left: 22px !important;
+}
+.HotItem-rank {
+  width: 26px !important;
+  height: 26px !important;
+  line-height: 24px !important;
+  box-sizing: border-box !important;
+  border: 2px solid var(--lb-gold) !important;
+  border-radius: 50% !important;
+  background: var(--lb-night) !important;
+  color: var(--lb-gold) !important;
+  font: 700 13px/22px var(--lb-serif) !important;
+  text-align: center !important;
+}
+/* 前三名是大星 */
+.HotItem:nth-child(-n+3) .HotItem-index {
+  filter: drop-shadow(0 0 6px rgba(255, 217, 138, 0.85));
+}
+.HotItem:nth-child(-n+3) .HotItem-rank {
+  width: 42px !important;
+  height: 42px !important;
+  margin-top: -8px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--lb-foil) !important;
+  color: var(--lb-ink) !important;
+  font: 800 15px/44px var(--lb-serif) !important;
+  clip-path: polygon(50% 0, 62% 35%, 100% 38%, 70% 60%, 80% 98%, 50% 76%, 20% 98%, 30% 60%, 0 38%, 38% 35%);
+}
+.HotItem-excerpt, .HotItem-metrics {
+  color: #5f5672 !important;
+}
+.HotItem-img, .HotItem-img img {
+  border-radius: 2px !important;
+  box-shadow: 0 0 0 1px #c9a24a, 0 0 0 4px #f3ead6, 0 0 0 5px rgba(184, 137, 58, 0.5) !important;
+}
+.HotList-end, .HotList-end div {
+  color: #e6dcc0 !important;
+  font-family: var(--lb-serif) !important;
+}
+
+/* ============ 侧栏 = 书签 ============ */
+/* 主视觉把内容区下推了 400px，知乎的侧栏吸顶脚本会算错偏移：侧栏改为随内容滚动 */
+.Topstory-container > div:last-child > div:last-child {
+  position: relative !important;
+  top: 0 !important;
+}
+.Topstory-container > div:last-child .Card, .Question-sideColumn .Card,
+.HotSearchCard, .AuthorCard {
+  position: relative !important;
+  background: var(--lb-page-bg) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding-bottom: 22px !important;
+  box-shadow: inset 6px 0 0 var(--lb-violet), inset 0 0 0 1px #c9a24a !important;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 16px), 0 100%);
+  margin-bottom: 10px !important;
+}
+.Topstory-container > div:last-child .Card:empty, .Question-sideColumn .Card:empty {
+  display: none !important;
+}
+/* 书签头：夜空丝带 + 金字 */
+.HotSearchCard-header, .Card-header, .AuthorCard-title {
+  background: var(--lb-night) !important;
+  border-bottom: 2px solid var(--lb-gold) !important;
+}
+.HotSearchCard-header, .HotSearchCard-header div, .HotSearchCard-header span, .HotSearchCard-header button,
+.Card-header, .Card-header div, .AuthorCard-title, .AuthorCard-title div {
+  color: var(--lb-gold) !important;
+  font-family: var(--lb-serif) !important;
+}
+.HotSearchCard-itemText, .AuthorCard-user-name, .NumberBoard-itemValue {
+  color: var(--lb-ink) !important;
+}
+/* 侧栏里的蓝色描边按钮：改成墨线书签扣 */
+[data-za-detail-view-path-module="RightSideBar"] .Card a:not(.HotSearchCard-itemLink):not(.Banner-link),
+[data-za-detail-view-path-module="RightSideBar"] .Card a:not(.HotSearchCard-itemLink) div,
+[data-za-detail-view-path-module="RightSideBar"] .Card button:not(.Button--primary),
+[class*="KfeCollection-"][class*="button"], .CreatorEntrance-link a, .CreatorEntrance-link a div {
+  color: var(--lb-ink) !important;
+  border-color: rgba(42, 36, 64, 0.55) !important;
+  border-radius: 3px !important;
+  font-family: var(--lb-serif) !important;
+}
+.HotSearchCard-heat {
+  color: #7d7388 !important;
+}
+.HotSearchCard-itemLink:hover .HotSearchCard-itemText {
+  color: var(--lb-violet-ink) !important;
+}
+/* 侧栏页脚在夜空里：浅色字 */
+footer.css-2pfapc, footer.css-2pfapc div, footer.css-2pfapc a, footer.css-2pfapc span {
+  color: #b9b2d6 !important;
+}
+
+/* ============ 其他：评论、弹层、滚动条 ============ */
+.Comments-container, .Comments-container div[style*="box-shadow"] {
+  background: transparent !important;
+}
+.Popover-content, .Menu, .Modal, .SearchBar-historyMenu {
+  background: var(--lb-paper) !important;
+  border: 1px solid #c9a24a !important;
+  color: var(--lb-ink) !important;
+}
+.Menu-item:hover, .Select-option:hover {
+  background: rgba(184, 137, 58, 0.18) !important;
+}
+textarea, .Input-wrapper, .InputLike, .public-DraftEditor-content {
+  background: rgba(255, 252, 244, 0.7) !important;
+  border-color: rgba(184, 137, 58, 0.5) !important;
+  color: var(--lb-ink) !important;
+}
+.CornerButton {
+  background: var(--lb-night) !important;
+  border: 1px solid var(--lb-gold) !important;
+  color: var(--lb-gold) !important;
+}
+::selection {
+  background: rgba(255, 217, 138, 0.6);
+  color: var(--lb-ink);
+}
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--lb-night);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--lb-gold), var(--lb-gold-deep));
+  border-radius: 2px;
+}
+}

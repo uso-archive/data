@@ -1,0 +1,790 @@
+/* ==UserStyle==
+@name         微博 · 夏日汽水明信片
+@namespace    USO Archive
+@author       ha mu
+@description  把微博变成夏日明信片：海边封面、齿孔明信片微博卡、车票热搜榜、汽水瓶盖排名。原创插画，Tokeny 出品。 官网：https://tokeny-ai.com/?utm_source=userstyles&utm_medium=style&utm_campaign=anime-userstyles    源码与更新：https://github.com/tokeny-ai/anime-userstyles
+@version      20261128.03.56
+@license      NONE
+@preprocessor uso
+==/UserStyle== */
+@-moz-document domain("weibo.com"), domain("s.weibo.com") {
+/*
+ * 微博 · 夏日汽水明信片（完全改造版）
+ * 母题：蓝天大海背景 + 海边明信片主视觉 + 每条微博是一张邮票齿边明信片（角上贴邮票、盖邮戳、航空信条纹）
+ *       热搜榜是汽水瓶 + 车票存根，名次是汽水瓶盖，按钮是瓶盖，标签是贴纸。
+ * 四色：天空蓝 #2b9fe6 / 柠檬黄 #ffd24a / 明信片纸 #fffaf0 / 墨蓝 #1f3b57（航空信条纹点缀一点邮政红）
+ */
+
+:root,
+html:root {
+  --sd-sky: #2b9fe6;
+  --sd-sky-deep: #1a82c4;
+  --sd-lemon: #ffd24a;
+  --sd-paper: #fffaf0;
+  --sd-ink: #1f3b57;
+  --sd-red: #ec6a5c;
+  --sd-hand: "STXingkai", "华文行楷", "KaiTi", "楷体", serif;
+  /* 邮票齿边：边线上一排半圆缺口 */
+  --sd-perf: radial-gradient(circle, #0000 4.6px, #000 5.2px) -7px -7px / 14px 14px round,
+    linear-gradient(#000 0 0) center / calc(100% - 10px) calc(100% - 10px) no-repeat;
+  --sd-perf-s: radial-gradient(circle, #0000 3px, #000 3.5px) -5px -5px / 10px 10px round,
+    linear-gradient(#000 0 0) center / calc(100% - 7px) calc(100% - 7px) no-repeat;
+  /* 航空信条纹 */
+  --sd-airmail: repeating-linear-gradient(-45deg, var(--sd-red) 0 9px, #0000 9px 15px, var(--sd-sky) 15px 24px, #0000 24px 30px);
+  /* 瓶盖压褶外沿 */
+  --sd-cap-rim: repeating-conic-gradient(#1a82c4 0 9deg, #2b9fe6 9deg 18deg);
+  --sd-cap-rim-lemon: repeating-conic-gradient(#e2ae17 0 9deg, #ffd24a 9deg 18deg);
+  /* 明信片书写区：地址线 + 竖分隔线 + 纸色（宽度由 --sd-w 决定） */
+  --sd-lines: repeating-linear-gradient(#0000 0 22px, rgba(31, 59, 87, 0.28) 22px 24px);
+  --sd-divider: linear-gradient(90deg, rgba(31, 59, 87, 0.18) 0 2px, #0000 2px);
+  --sd-marker: linear-gradient(#0000 60%, rgba(255, 210, 74, 0.8) 60% 86%, #0000 86%);
+  --sd-char-edge: drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 -3px 0 #fff)
+    drop-shadow(5px 6px 0 rgba(31, 59, 87, 0.22));
+  --sd-shadow: drop-shadow(0 3px 0 rgba(31, 59, 87, 0.16)) drop-shadow(0 10px 14px rgba(31, 59, 87, 0.14));
+  --w-brand: #2b9fe6 !important;
+  --w-brand-hover: #1a82c4 !important;
+  --w-alink: #1a82c4 !important;
+  --w-hover: rgba(43, 159, 230, 0.1) !important;
+  --w-b-line-primary-bg-hover: rgba(43, 159, 230, 0.1) !important;
+}
+
+/* ============ 背景：蓝天大海 ============ */
+html {
+  background:
+    linear-gradient(rgba(236, 246, 253, 0.28), rgba(236, 246, 253, 0.28)),
+    url("https://cdn.jsdelivr.net/gh/tokeny-ai/anime-userstyles@main/images/weibo-bg.webp") center bottom / cover no-repeat fixed,
+    #d9efff !important;
+}
+body,
+#app > div.woo-box-flex.woo-box-column,
+body.wbs-hotrank,
+.m-main,
+#plc_main,
+div[class*="_content_"],
+div[class*="_side_"],
+div[class*="_full_"],
+main,
+#__sidebar,
+.rightSide {
+  background-color: transparent !important;
+}
+
+/* ============ 顶栏：信封封口，下沿一条航空信条纹 ============ */
+div[class^="_top_"] > div:last-child > div > div[class^="_wrap_"],
+div[class^="Nav_wrap_"] {
+  border-top-color: var(--sd-sky) !important;
+}
+.woo-panel-main.woo-panel-bottom[class*="anel_"] {
+  background: var(--sd-airmail) left bottom / 100% 5px no-repeat, var(--sd-paper) !important;
+  border-bottom: 0 !important;
+  box-shadow: 0 4px 14px rgba(31, 59, 87, 0.12) !important;
+}
+.woo-panel-main.woo-panel-bottom[class*="anel_"] .woo-input-wrap {
+  background: #fff !important;
+  border: 1.5px dashed rgba(31, 59, 87, 0.35) !important;
+}
+
+/* ============ 按钮：汽水瓶盖 ============ */
+.woo-button-main.woo-button-flat.woo-button-primary,
+a[class*="LoginBtn_btna"],
+a[class*="_btna_"] {
+  background: var(--sd-sky) !important;
+  border: 0 !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 3px 0 var(--sd-ink) !important;
+  outline: 1.5px dashed rgba(255, 255, 255, 0.8) !important;
+  outline-offset: -5px !important;
+}
+.woo-button-main.woo-button-line.woo-button-primary {
+  background: var(--sd-lemon) !important;
+  border: 1.5px solid var(--sd-ink) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 0 var(--sd-ink) !important;
+}
+.woo-button-main.woo-button-line.woo-button-primary,
+.woo-button-main.woo-button-line.woo-button-primary * {
+  color: var(--sd-ink) !important;
+}
+.woo-button-main:active,
+a[class*="_btna_"]:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--sd-ink) !important;
+}
+.woo-button-main:hover {
+  animation: sd-fizz 0.45s ease;
+}
+@keyframes sd-fizz {
+  0%, 100% { transform: scale(1); }
+  35% { transform: scale(1.06, 0.94); }
+  65% { transform: scale(0.98, 1.02); }
+}
+/* 顶栏发微博按钮：一枚压褶瓶盖 */
+button[class*="IconBox_pub"],
+button[class*="_pub_"] {
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: radial-gradient(closest-side, var(--sd-sky) 72%, #fff 73% 80%, #0000 81%), var(--sd-cap-rim) !important;
+  box-shadow: 0 2px 0 var(--sd-ink) !important;
+}
+
+/* ============ 主视觉共用：大角色 / 邮票 / 邮戳 / 手写标题 ============ */
+div[class^="_top_"] > div[class*="_box_"] > div::after,
+.wbpro-pos::after,
+#plc_main::after {
+  content: "";
+  position: absolute;
+  background: url("https://cdn.jsdelivr.net/gh/tokeny-ai/anime-userstyles@main/images/weibo-char-1.webp") center top / 100% auto no-repeat;
+  filter: var(--sd-char-edge);
+  pointer-events: none;
+  z-index: 2;
+}
+/* 邮票：柠檬黄齿边，里面是抱西瓜少年 */
+div[class^="_top_"] > div[class*="_box_"] [class*="_videoc_"],
+.wbpro-pos::before,
+#pl_top_realtimehot::before {
+  content: "";
+  position: absolute !important;
+  box-sizing: border-box;
+  width: 92px !important;
+  height: 112px !important;
+  border: 7px solid #0000 !important;
+  background:
+    url("https://cdn.jsdelivr.net/gh/tokeny-ai/anime-userstyles@main/images/weibo-char-2.webp") center 6px / 90% auto no-repeat padding-box,
+    linear-gradient(#bfe6ff, var(--sd-sky)) padding-box,
+    var(--sd-lemon) !important;
+  -webkit-mask: var(--sd-perf-s);
+  mask: var(--sd-perf-s);
+  transform: rotate(4deg);
+  z-index: 3;
+}
+/* 邮戳：双圈（实线 + 虚线）+ 日期 */
+div[class^="_top_"] > div[class*="_box_"] [class*="_logoS_"],
+.wbpro-pos .woo-picture-main::after,
+#pl_top_realtimehot::after {
+  position: absolute !important;
+  box-sizing: border-box !important;
+  width: 76px !important;
+  height: 76px !important;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  white-space: pre;
+  font: 700 11px/1.25 "Microsoft YaHei", sans-serif;
+  color: rgba(31, 59, 87, 0.7);
+  border: 2.5px solid rgba(31, 59, 87, 0.5) !important;
+  border-radius: 50% !important;
+  outline: 1.5px dashed rgba(31, 59, 87, 0.4) !important;
+  outline-offset: -8px !important;
+  transform: rotate(-14deg);
+  pointer-events: none;
+  z-index: 4;
+}
+/* 手写大标题 + 柠檬黄马克笔划线 */
+div[class^="_top_"] > div[class*="_box_"] [class*="_searchbox_"]::before,
+.wbpro-pos .woo-picture-main::before,
+#plc_main::before {
+  white-space: pre;
+  font-family: var(--sd-hand);
+  color: var(--sd-ink);
+  -webkit-text-stroke: 0.6px var(--sd-ink);
+  pointer-events: none;
+}
+
+/* ============ 首页主视觉：海边明信片 420px ============ */
+div[class^="_top_"] > div[class*="_box_"] {
+  position: relative !important;
+  height: 420px !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+div[class^="_top_"] > div[class*="_box_"] > div {
+  position: relative !important;
+  display: block !important;
+  width: 1122px !important;
+  max-width: calc(100% - 32px) !important;
+  height: 420px !important;
+  margin: 0 auto !important;
+}
+/* 明信片本体：纸边框 + 左侧照片 + 右侧书写区 */
+div[class^="_top_"] > div[class*="_box_"] > div::before {
+  content: "";
+  position: absolute;
+  inset: 24px 0 20px;
+  border: 14px solid var(--sd-paper);
+  background:
+    var(--sd-lines) right 24px bottom 16px / 330px 48px no-repeat,
+    var(--sd-divider) right 470px top 0 / 2px 100% no-repeat,
+    linear-gradient(var(--sd-paper), var(--sd-paper)) right top / 470px 100% no-repeat,
+    url("https://cdn.jsdelivr.net/gh/tokeny-ai/anime-userstyles@main/images/weibo-banner.webp") left -20px top -150px / 1040px auto no-repeat,
+    var(--sd-paper);
+  -webkit-mask: var(--sd-perf);
+  mask: var(--sd-perf);
+  transform: rotate(-0.6deg);
+}
+div[class^="_top_"] > div[class*="_box_"] > div::after {
+  left: 470px;
+  top: 0;
+  width: 260px;
+  height: 420px;
+}
+div[class^="_top_"] > div[class*="_box_"] [class*="_logo_"] {
+  position: absolute !important;
+  left: 756px;
+  top: 52px;
+  z-index: 3;
+  transform: rotate(-3deg);
+}
+div[class^="_top_"] > div[class*="_box_"] [class*="_logo_"] g[fill="#fff"] {
+  fill: var(--sd-ink) !important;
+}
+div[class^="_top_"] > div[class*="_box_"] [class*="_videoc_"] {
+  display: block !important;
+  inset: 48px 32px auto auto !important;
+}
+div[class^="_top_"] [class*="_videoc_"] video {
+  display: none !important;
+}
+div[class^="_top_"] > div[class*="_box_"] [class*="_searchbox_"] {
+  position: absolute !important;
+  left: 756px;
+  top: 266px;
+  width: 336px !important;
+  z-index: 4;
+}
+div[class^="_top_"] > div[class*="_box_"] [class*="_search_"] {
+  width: 100% !important;
+}
+div[class^="_top_"] > div[class*="_box_"] .woo-input-wrap {
+  background: #fff !important;
+  border: 1.5px dashed rgba(31, 59, 87, 0.45) !important;
+  box-shadow: none !important;
+}
+div[class^="_top_"] > div[class*="_box_"] [class*="_searchbox_"]::before {
+  content: "夏天的热搜，\A从这里寄出";
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 18px);
+  padding-right: 6px;
+  font-size: 40px;
+  line-height: 48px;
+  background: var(--sd-marker) 0 0 / 100% 48px;
+}
+/* 邮戳：原小微博标志的位置，改写邮戳文字 */
+div[class^="_top_"] > div[class*="_box_"] [class*="_logoS_"] {
+  left: 266px !important;
+  top: -112px !important;
+  right: auto !important;
+}
+div[class^="_top_"] > div[class*="_box_"] [class*="_logoS_"] svg {
+  display: none !important;
+}
+div[class^="_top_"] > div[class*="_box_"] [class*="_logoS_"]::before {
+  content: "WEIBO\A夏日邮局\A 11·27";
+}
+
+/* ============ 个人主页：资料卡顶部是一张明信片 ============ */
+.woo-panel-main > .wbpro-pos.wbpro-pos {
+  position: relative !important;
+  overflow: visible !important;
+  padding: 14px 14px 0 !important;
+}
+.wbpro-pos .woo-picture-main {
+  position: relative !important;
+  height: 360px !important;
+  padding: 0 !important;
+  background:
+    var(--sd-lines) right 10px bottom 12px / 130px 48px no-repeat,
+    var(--sd-divider) right 236px top 0 / 2px 100% no-repeat,
+    linear-gradient(var(--sd-paper), var(--sd-paper)) right top / 236px 100% no-repeat,
+    url("https://cdn.jsdelivr.net/gh/tokeny-ai/anime-userstyles@main/images/weibo-banner.webp") left -10px top -30px / 700px auto no-repeat !important;
+}
+.wbpro-pos .woo-picture-main > div:first-child {
+  padding-bottom: 0 !important;
+}
+.wbpro-pos .woo-picture-main img,
+.wbpro-pos .woo-picture-cover {
+  opacity: 0 !important;
+}
+.wbpro-pos::after {
+  left: 282px;
+  top: 14px;
+  width: 176px;
+  height: 360px;
+}
+.wbpro-pos::before {
+  right: 28px;
+  top: 30px;
+  width: 74px !important;
+  height: 90px !important;
+}
+.wbpro-pos .woo-picture-main::before {
+  content: "盛夏来信\A见字如面";
+  position: absolute;
+  left: 462px;
+  top: 140px;
+  font-size: 34px;
+  line-height: 44px;
+  background: var(--sd-marker) 0 0 / 100% 44px;
+  z-index: 3;
+}
+.wbpro-pos .woo-picture-main::after {
+  content: "WEIBO\A夏日邮局";
+  left: 452px;
+  top: 14px;
+  width: 68px !important;
+  height: 68px !important;
+  font-size: 10px;
+}
+[class*="_transparent_"] [class*="_bar_"] {
+  text-shadow: 0 1px 3px rgba(10, 50, 90, 0.45);
+}
+[class*="_box2_"] [class*="_tag_"],
+[class*="_box2_"] [class*="_tag_"] a {
+  background-color: var(--sd-lemon) !important;
+  color: var(--sd-ink) !important;
+}
+[class*="_box2_"] [class*="_tag_"] {
+  box-shadow: 0 0 0 2px #fff, 1px 2px 0 2px rgba(31, 59, 87, 0.25) !important;
+  transform: rotate(-1.5deg);
+}
+
+/* ============ 热搜页主视觉：明信片 400px ============ */
+#plc_main {
+  position: relative !important;
+}
+#plc_main::before {
+  content: "夏天的热搜，\A从这里寄出";
+  display: block;
+  box-sizing: border-box;
+  height: 400px;
+  margin-bottom: 18px;
+  padding: 150px 0 0 618px;
+  font-size: 38px;
+  line-height: 48px;
+  border: 14px solid var(--sd-paper);
+  background:
+    repeating-linear-gradient(#0000 0 29px, rgba(255, 210, 74, 0.8) 29px 41px, #0000 41px 48px) 604px 150px / 244px 96px no-repeat,
+    var(--sd-lines) right 24px bottom 14px / 270px 48px no-repeat,
+    var(--sd-divider) right 400px top 0 / 2px 100% no-repeat,
+    linear-gradient(var(--sd-paper), var(--sd-paper)) right top / 400px 100% no-repeat,
+    url("https://cdn.jsdelivr.net/gh/tokeny-ai/anime-userstyles@main/images/weibo-banner.webp") left -10px top -120px / 900px auto no-repeat,
+    var(--sd-paper);
+  background-clip: padding-box;
+  -webkit-mask: var(--sd-perf);
+  mask: var(--sd-perf);
+}
+#plc_main::after {
+  left: 380px;
+  top: 4px;
+  width: 226px;
+  height: 396px;
+}
+#pl_top_realtimehot {
+  position: static !important;
+}
+#pl_top_realtimehot::before {
+  right: 34px;
+  top: 34px;
+}
+#pl_top_realtimehot::after {
+  content: "WEIBO\A热搜邮局\A 11·27";
+  right: 104px;
+  top: 30px;
+}
+
+/* ============ 明信片卡片：微博、资料卡、右栏 ============ */
+article.woo-panel-main,
+main .woo-panel-main,
+#__sidebar .woo-panel-main,
+.wbpro-side-copy-inner {
+  position: relative !important;
+  background: var(--sd-airmail) 11px 0 / 7px 100% no-repeat, var(--sd-paper) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-mask: var(--sd-perf);
+  mask: var(--sd-perf);
+}
+#__sidebar .woo-panel-main,
+.wbpro-side-copy-inner {
+  background: var(--sd-paper) !important;
+}
+/* 投影交给外层，不被齿边裁掉 */
+.wbpro-scroller-item,
+#__sidebar .rightSide {
+  filter: var(--sd-shadow);
+}
+/* 微博明信片：轻微错落 */
+.vue-recycle-scroller__item-view:nth-child(odd) article.woo-panel-main {
+  rotate: -0.4deg;
+}
+.vue-recycle-scroller__item-view:nth-child(even) article.woo-panel-main {
+  rotate: 0.35deg;
+}
+article.woo-panel-main {
+  transition: transform 0.2s ease !important;
+}
+article.woo-panel-main:hover {
+  transform: translateY(-3px);
+}
+/* 右上角小邮票 + 邮戳 */
+article.woo-panel-main::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  width: 38px;
+  height: 46px;
+  box-sizing: border-box;
+  border: 4px solid #0000;
+  background:
+    radial-gradient(circle at 66% 34%, var(--sd-lemon) 0 5px, #0000 5.5px) padding-box,
+    linear-gradient(#a8dcff, var(--sd-sky) 64%, #fff 64% 70%, var(--sd-sky-deep) 70%) padding-box,
+    var(--sd-sky-deep);
+  -webkit-mask: radial-gradient(circle, #0000 2px, #000 2.5px) -3.5px -3.5px / 7px 7px round,
+    linear-gradient(#000 0 0) center / calc(100% - 5px) calc(100% - 5px) no-repeat;
+  mask: radial-gradient(circle, #0000 2px, #000 2.5px) -3.5px -3.5px / 7px 7px round,
+    linear-gradient(#000 0 0) center / calc(100% - 5px) calc(100% - 5px) no-repeat;
+  transform: rotate(5deg);
+  pointer-events: none;
+}
+article.woo-panel-main::before {
+  content: "微博\A邮戳";
+  position: absolute;
+  right: 40px;
+  top: 10px;
+  width: 42px;
+  height: 42px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  white-space: pre;
+  font: 700 9px/1.2 "Microsoft YaHei", sans-serif;
+  color: rgba(31, 59, 87, 0.55);
+  border: 1.5px dashed rgba(31, 59, 87, 0.45);
+  border-radius: 50%;
+  transform: rotate(-16deg);
+  pointer-events: none;
+  z-index: 1;
+}
+article.woo-panel-main header > div:last-child {
+  margin-right: 74px !important;
+}
+/* 配图像贴上去的照片 */
+article [class*="_videoBox_"],
+article .woo-picture-main {
+  border-radius: 2px !important;
+  box-shadow: 0 0 0 5px #fff, 0 4px 10px 5px rgba(31, 59, 87, 0.16) !important;
+}
+article footer {
+  border-top: 1.5px dashed rgba(31, 59, 87, 0.22) !important;
+}
+article footer * {
+  color: #4b6378 !important;
+}
+.wbpro-feed-content [class*="_wbtext_"] a,
+.wbpro-feed-content [class*="_wbtext_"] a span {
+  color: var(--sd-sky-deep) !important;
+}
+article.woo-panel-main [class*="_wbtext_"] {
+  color: #1f2d3a !important;
+}
+
+/* ============ 分栏标签：一张车票条，选中项是柠檬黄贴纸 ============ */
+[class*="_visable_"] > .woo-panel-main {
+  background: var(--sd-ink) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 6px 14px rgba(31, 59, 87, 0.22) !important;
+  -webkit-mask: radial-gradient(circle at 0 50%, #0000 9px, #000 9.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, #0000 9px, #000 9.5px) right / 51% 100% no-repeat;
+  mask: radial-gradient(circle at 0 50%, #0000 9px, #000 9.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, #0000 9px, #000 9.5px) right / 51% 100% no-repeat;
+}
+[class*="_visable_"] .wbpro-tab2 .wbpro-textcut,
+[class*="_visable_"] .woo-tab-item-main [class*="_btn_"] {
+  color: rgba(255, 250, 240, 0.86) !important;
+  font-weight: 600 !important;
+}
+[class*="_visable_"] .wbpro-tab2 .cur .wbpro-textcut,
+[class*="_visable_"] .woo-tab-active [class*="_btn_"] {
+  color: var(--sd-ink) !important;
+  background: var(--sd-lemon) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35) !important;
+  font-weight: 800 !important;
+  display: grid !important;
+  place-items: center !important;
+  transform: rotate(-2deg);
+}
+[class*="_visable_"] .woo-tab-active [class*="_btn_"] {
+  display: block !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  padding: 0 14px !important;
+  margin: 7px -14px 0 !important;
+}
+[class*="_visable_"] .woo-tab-item-main::after,
+[class*="_visable_"] .woo-tab-item-border {
+  display: none !important;
+}
+.wbpro-screen-v2 {
+  width: max-content;
+  margin: 6px 0 !important;
+  padding: 6px 16px !important;
+  background: var(--sd-paper) !important;
+  color: var(--sd-ink) !important;
+  font-weight: 700 !important;
+  border-radius: 999px !important;
+  box-shadow: 0 2px 0 rgba(31, 59, 87, 0.3) !important;
+  transform: rotate(-1.5deg);
+}
+
+/* ============ 左侧导航：行李牌 ============ */
+div[class^="_side_"] > div[class^="_main_"] > .woo-panel-main,
+.m-main-nav {
+  background: var(--sd-paper) !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 18px rgba(31, 59, 87, 0.16) !important;
+  outline: 2px dashed rgba(43, 159, 230, 0.45) !important;
+  outline-offset: -7px !important;
+  overflow: hidden !important;
+}
+div[class^="_side_"] > div[class^="_main_"] > .woo-panel-main h2,
+.m-main-nav h2 {
+  position: relative !important;
+  margin: 0 0 8px !important;
+  padding: 14px 16px 12px 44px !important;
+  background: var(--sd-airmail) left bottom / 100% 5px no-repeat, var(--sd-sky) !important;
+  color: #fff !important;
+  font: 28px/1.2 var(--sd-hand) !important;
+  -webkit-text-stroke: 0.4px #fff;
+}
+div[class^="_side_"] > div[class^="_main_"] > .woo-panel-main h2:empty::after {
+  content: "推荐";
+}
+/* 行李牌的穿绳孔 */
+div[class^="_side_"] > div[class^="_main_"] > .woo-panel-main h2::before,
+.m-main-nav h2::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -10px;
+  border-radius: 50%;
+  background: var(--sd-paper);
+  box-shadow: 0 0 0 3px var(--sd-lemon);
+}
+div[class^="_side_"] > div[class^="_main_"] a[class*="_default_"] > div,
+div[class^="_side_"] > div[class^="_main_"] [class*="_main_"],
+.m-main-nav li a {
+  border-radius: 999px !important;
+  color: var(--sd-ink) !important;
+}
+div[class^="_side_"] > div[class^="_main_"] a[class*="_default_"] > div:hover,
+.m-main-nav li a:hover {
+  background: rgba(43, 159, 230, 0.1) !important;
+}
+div[class^="_side_"] > div[class^="_main_"] [class*="_cur_"],
+.m-main-nav ul li a.cur {
+  background: var(--sd-lemon) !important;
+  box-shadow: 0 2px 0 var(--sd-ink) !important;
+  font-weight: 800 !important;
+  transform: rotate(-1.5deg);
+}
+div[class^="_side_"] > div[class^="_main_"] [class*="_cur_"] i,
+div[class^="_side_"] > div[class^="_main_"] [class*="_cur_"] span,
+.m-main-nav ul li a.cur,
+.m-main-nav ul li a.cur i {
+  color: var(--sd-ink) !important;
+  fill: var(--sd-ink) !important;
+}
+.m-main-nav ul li a.cur i {
+  filter: grayscale(1) brightness(0.4);
+}
+
+/* ============ 右栏：明信片 + 瓶盖名次 ============ */
+#__sidebar .wbpro-side-tit .f16 {
+  font: 24px/1.2 var(--sd-hand) !important;
+  color: var(--sd-ink) !important;
+  -webkit-text-stroke: 0.4px var(--sd-ink);
+}
+#__sidebar .wbpro-side-tit .f16::after {
+  content: " ✉";
+  font: 16px/1 "Segoe UI Symbol", sans-serif;
+  color: var(--sd-sky);
+}
+#__sidebar [class*="_tabItem_"] {
+  border-radius: 999px !important;
+}
+#__sidebar [class*="_tabItem_"][class*="_active_"] {
+  background: var(--sd-lemon) !important;
+  color: var(--sd-ink) !important;
+  font-weight: 800 !important;
+}
+#__sidebar .rank {
+  flex: none !important;
+  width: 24px !important;
+  height: 24px !important;
+  margin-right: 10px !important;
+  border-radius: 50% !important;
+  display: grid !important;
+  place-items: center !important;
+  font: italic 800 12px/1 "Segoe UI", sans-serif !important;
+  color: #fff !important;
+  background: radial-gradient(closest-side, var(--sd-sky) 70%, rgba(255, 255, 255, 0.9) 71% 78%, #0000 79%), var(--sd-cap-rim) !important;
+}
+#__sidebar .rank.wbpro-fontnum-rank,
+#__sidebar .rank.top {
+  color: var(--sd-ink) !important;
+  background: radial-gradient(closest-side, var(--sd-lemon) 70%, #fff 71% 78%, #0000 79%), var(--sd-cap-rim-lemon) !important;
+}
+#__sidebar .wbpro-icon-doticon {
+  background-color: #fff !important;
+}
+#__sidebar .wbpro-side-panel a .cla {
+  color: var(--sd-ink) !important;
+}
+#__sidebar .icon img,
+#__sidebar .icon i {
+  transform: rotate(-8deg);
+  filter: drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff) drop-shadow(0 1px 0 #fff);
+}
+#__sidebar .wbpro-side-bottom [class*="_btn_"] {
+  border: 1.5px dashed rgba(31, 59, 87, 0.35) !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: var(--sd-ink) !important;
+}
+/* 右栏登录卡片手写标语染成天空蓝 */
+#__sidebar .rightSide > div > .woo-panel-main:not(.wbpro-side) {
+  isolation: isolate;
+}
+#__sidebar .rightSide > div > .woo-panel-main:not(.wbpro-side)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--sd-sky);
+  mix-blend-mode: hue;
+  pointer-events: none;
+}
+.wbpro-side-copy-inner {
+  padding: 6px 0 !important;
+}
+.wbpro-side-copy .scale {
+  transform: scale(0.8) !important;
+}
+
+/* ============ 热搜榜：汽水瓶 + 车票存根 ============ */
+#pl_top_realtimehot {
+  padding: 10px 22px 18px !important;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0 14px, #0000 14px 30px, rgba(255, 255, 255, 0.3) 30px 36px, #0000 36px),
+    linear-gradient(rgba(43, 159, 230, 0.22), rgba(43, 159, 230, 0.32)) !important;
+  border: 2px solid rgba(255, 255, 255, 0.75) !important;
+  border-radius: 34px !important;
+  box-shadow: inset 0 0 0 6px rgba(255, 255, 255, 0.18), 0 10px 24px rgba(31, 59, 87, 0.16) !important;
+}
+#pl_top_realtimehot table {
+  border-collapse: separate !important;
+  border-spacing: 0 8px !important;
+}
+#pl_top_realtimehot thead th {
+  background: var(--sd-ink) !important;
+  color: var(--sd-lemon) !important;
+  font: 700 14px/30px "Microsoft YaHei", sans-serif !important;
+  letter-spacing: 2px;
+  border: 0 !important;
+}
+#pl_top_realtimehot thead th:first-child {
+  border-radius: 999px 0 0 999px !important;
+}
+#pl_top_realtimehot thead th:last-child {
+  border-radius: 0 999px 999px 0 !important;
+}
+#pl_top_realtimehot tbody td {
+  height: 40px !important;
+  border: 0 !important;
+}
+/* 存根：右侧半圆缺口 + 虚线撕口 + 中间一枚瓶盖 */
+body.wbs-hotrank #pl_top_realtimehot table tr td.td-01 {
+  --cap: var(--sd-sky);
+  --rim: var(--sd-cap-rim);
+  --r: 10px;
+  border-radius: 8px 0 0 8px !important;
+  border-right: 2px dashed rgba(31, 59, 87, 0.3) !important;
+  color: #fff !important;
+  font: italic 800 13px/1 "Segoe UI", sans-serif !important;
+  background:
+    radial-gradient(circle, var(--cap) 0 var(--r), #fff calc(var(--r) + 0.5px) calc(var(--r) + 2px), #0000 calc(var(--r) + 2.5px)) center / 34px 34px no-repeat,
+    radial-gradient(circle, #0000 calc(var(--r) + 4px), var(--sd-paper) calc(var(--r) + 4.5px)) center / 34px 34px no-repeat,
+    var(--rim) center / 34px 34px no-repeat,
+    radial-gradient(circle at 100% 0, #0000 7px, var(--sd-paper) 7.5px) top / 100% 51% no-repeat,
+    radial-gradient(circle at 100% 100%, #0000 7px, var(--sd-paper) 7.5px) bottom / 100% 51% no-repeat !important;
+}
+body.wbs-hotrank #pl_top_realtimehot table tr td.td-01.ranktop1,
+body.wbs-hotrank #pl_top_realtimehot table tr td.td-01.ranktop2,
+body.wbs-hotrank #pl_top_realtimehot table tr td.td-01.ranktop3 {
+  --cap: var(--sd-lemon);
+  --rim: var(--sd-cap-rim-lemon);
+  --r: 11px;
+  color: var(--sd-ink) !important;
+}
+#pl_top_realtimehot td.td-02 {
+  padding-left: 18px !important;
+  background:
+    radial-gradient(circle at 0 0, #0000 7px, var(--sd-paper) 7.5px) top / 100% 51% no-repeat,
+    radial-gradient(circle at 0 100%, #0000 7px, var(--sd-paper) 7.5px) bottom / 100% 51% no-repeat !important;
+}
+#pl_top_realtimehot td.td-03 {
+  border-radius: 0 8px 8px 0 !important;
+  background: var(--sd-paper) !important;
+}
+#pl_top_realtimehot tbody tr {
+  transition: transform 0.15s ease;
+}
+#pl_top_realtimehot tbody tr:hover {
+  transform: translateX(6px) rotate(-0.3deg);
+  background: transparent !important;
+}
+#pl_top_realtimehot .icon-top {
+  filter: brightness(0) invert(1);
+}
+#pl_top_realtimehot .td-02 a {
+  color: var(--sd-ink) !important;
+  font-weight: 600 !important;
+}
+#pl_top_realtimehot .td-02 a:hover {
+  color: var(--sd-sky) !important;
+}
+#pl_top_realtimehot .td-02 span {
+  color: #7d93a8 !important;
+}
+/* 新 / 热 / 沸：贴纸 */
+#pl_top_realtimehot .icon-txt {
+  border-radius: 5px !important;
+  transform: rotate(-8deg);
+  box-shadow: 0 0 0 2px #fff, 1px 2px 0 2px rgba(31, 59, 87, 0.22) !important;
+}
+
+/* ============ 链接 / 选中 / 滚动条 ============ */
+a:hover {
+  color: var(--sd-sky) !important;
+}
+::selection {
+  background: rgba(255, 210, 74, 0.7);
+  color: var(--sd-ink);
+}
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--sd-sky);
+  border-radius: 999px;
+  border: 2px solid var(--sd-paper);
+}
+}
